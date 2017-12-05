@@ -44,6 +44,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.R.badRequest;
+import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
@@ -313,8 +314,19 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The event could not be found."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws NotFoundException, UnauthorizedException {
-    if (!getIndexService().removeEvent(id))
-      return Response.serverError().build();
+    try {
+      if (!getIndexService().removeEvent(id))
+        return Response.serverError().build();
+    } catch (NotFoundException e) {
+      // If we couldn't find any trace of the event in the underlying database(s), we can get rid of it
+      // entirely in the index.
+      try {
+        getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+      } catch (SearchIndexException e1) {
+        logger.error("error removing event {}: {}",id,e1);
+        return Response.serverError().build();
+      }
+    }
 
     return Response.ok().build();
   }
@@ -358,6 +370,16 @@ public abstract class AbstractEventEndpoint {
       }
     }
     return Response.ok(result.toJson()).build();
+  }
+
+  @GET
+  @Path("{eventId}/hasSnapshots.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "hassnapshots", description = "Returns a JSON object containing a boolean indicating if snapshots exist for this event", returnDescription = "A JSON object", pathParameters = {
+    @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+    @RestResponse(description = "A JSON object containing a property \"hasSnapshots\"", responseCode = HttpServletResponse.SC_OK) })
+  public Response hasEventSnapshots(@PathParam("eventId") String id) throws Exception {
+    return okJson(obj(f("hasSnapshots",this.getIndexService().hasSnapshots(id))));
   }
 
   @GET
@@ -449,37 +471,37 @@ public abstract class AbstractEventEndpoint {
       if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
         agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
         logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
-                new Object[] { eventId, technicalMetadata.getAgentId(), agentId });
+                eventId, technicalMetadata.getAgentId(), agentId);
       }
 
       Opt<Date> start = Opt.none();
       if (schedulingJson.has(SCHEDULING_START_KEY)) {
         start = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
         logger.trace("Updating start time of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
-                        DateTimeSupport.toUTC(start.get().getTime()) });
+                eventId, DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
+                        DateTimeSupport.toUTC(start.get().getTime()));
       }
 
       Opt<Date> end = Opt.none();
       if (schedulingJson.has(SCHEDULING_END_KEY)) {
         end = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
         logger.trace("Updating end time of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
-                        DateTimeSupport.toUTC(end.get().getTime()) });
+                eventId, DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
+                        DateTimeSupport.toUTC(end.get().getTime()));
       }
 
       Opt<Map<String, String>> agentConfiguration = Opt.none();
       if (schedulingJson.has(SCHEDULING_AGENT_CONFIGURATION_KEY)) {
         agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
         logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration });
+                eventId, technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
       }
 
       Opt<Opt<Boolean>> optOut = Opt.none();
       if (schedulingJson.has(SCHEDULING_OPT_OUT_KEY)) {
         optOut = Opt.some(Opt.some(schedulingJson.getBoolean(SCHEDULING_OPT_OUT_KEY)));
         logger.trace("Updating optout status of event '{}' id from '{}' to '{}'",
-                new Object[] { eventId, event.getOptedOut(), optOut });
+                eventId, event.getOptedOut(), optOut);
       }
 
       if (start.isNone() && end.isNone() && agentId.isNone() && agentConfiguration.isNone() && optOut.isNone())
@@ -677,7 +699,9 @@ public abstract class AbstractEventEndpoint {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
                 + "being used by the distribution channel.");
-        return forbidden("Unable to edit an ACL for a current workflow.");
+        JSONObject json = new JSONObject();
+        json.put("Error", "Unable to edit an ACL for a current workflow.");
+        return conflict(json.toJSONString());
       } else {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
@@ -688,7 +712,7 @@ public abstract class AbstractEventEndpoint {
       }
     } catch (AclServiceException e) {
       logger.error("Error applying acl '{}' to event '{}' because: {}",
-              new Object[] { accessControlList, eventId, ExceptionUtils.getStackTrace(e) });
+              accessControlList, eventId, ExceptionUtils.getStackTrace(e));
       return serverError();
     } catch (SchedulerException e) {
       logger.error("Error applying ACL to scheduled event {} because {}", eventId, ExceptionUtils.getStackTrace(e));

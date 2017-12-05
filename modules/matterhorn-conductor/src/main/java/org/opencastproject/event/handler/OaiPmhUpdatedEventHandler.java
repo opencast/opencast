@@ -242,12 +242,21 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
         }
 
         // Update the series dublin core
-        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
-          DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
-          mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+                || SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
+          DublinCoreCatalog seriesDublinCore = null;
+          MediaPackageElementFlavor catalogType = null;
+          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
+            seriesDublinCore = seriesItem.getMetadata();
+            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+            catalogType = MediaPackageElements.SERIES;
+          } else {
+            seriesDublinCore = seriesItem.getExtendedMetadata();
+            catalogType = MediaPackageElementFlavor.flavor(seriesItem.getElementType(), "series");
+          }
 
           // Update the series dublin core
-          Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+          Catalog[] seriesCatalogs = mp.getCatalogs(catalogType);
           if (seriesCatalogs.length == 1) {
             Catalog c = seriesCatalogs[0];
             String filename = FilenameUtils.getName(c.getURI().toString());
@@ -376,6 +385,12 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       if (result.getItems().size() < 1) {
         logger.trace("There is no OAI-PMH record to update for media package {}. Skipping.",
             snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+
+      if (result.getItems().get(0).isDeleted()) {
+        logger.trace("This OAI-PMH record has been deleted {}. Skipping.",
+                snapshotItem.getMediapackage().getIdentifier());
         return;
       }
 

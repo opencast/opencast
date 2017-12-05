@@ -4,47 +4,49 @@
         <h2 translate="EVENTS.RETRACT.CAPTION"><!-- Template --></h2>
     </header>
 
-    <div class="modal-body">
+    <div class="modal-body modal-content">
         <div class="full-col">
-            <div class="obj">
-                <div class="modal-alert danger">
-                    <p translate="EVENTS.RETRACT.WARNING">
-                        <!-- This event has been published to at least one publication channel so it has to be
-                             retracted before it can be deleted. Select from the tasks below to retract the
-                             publictions. -->
-                    </p>
-                </div>
+          <div class="list-obj">
+            <div class="modal-alert obj danger">
+                <p translate="EVENTS.RETRACT.WARNING">
+                    <!-- This event has been published to at least one publication channel so it has to be
+                         retracted before it can be deleted. Select from the tasks below to retract the
+                         publictions. -->
+                </p>
             </div>
             <div class="obj">
-                <header translate="EVENTS.RETRACT.SELECT_TASK"><!-- Select Task --></header>
-                <select chosen pre-select-from="processing.workflows"
-                    data-width="'100%'"
-                    ng-change="processing.changeWorkflow(); valid();"
-                    data-disable-search-threshold="8"
-                    not-empty-selection
-                    ng-model="processing.ud.workflow"
-                    ng-model-options="{ allowInvalid: true }"
-                    ng-options="w.title for w in processing.workflows"
-                    data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
-                    no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
-                    >
-                  <option value=""></option>
-                </select>
+                <header translate="BULK_ACTIONS.DELETE.EVENTS.SELECT_RETRACT_TASK">
+                    <!-- Select a Retract Task -->
+                </header>
+                <div class="obj-container">
+                    <select chosen pre-select-from="processing.workflows"
+                        data-width="'100%'"
+                        ng-change="processing.changeWorkflow(); valid();"
+                        data-disable-search-threshold="8"
+                        not-empty-selection
+                        ng-model="processing.ud.workflow"
+                        ng-model-options="{ allowInvalid: true }"
+                        ng-options="w.title for w in processing.workflows"
+                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
+                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                        >
+                            <option value=""></option>
+                    </select>
 
-                <div id="new-event-workflow-configuration"
-                     class="checkbox-container"
-                     ng-click="processing.save()"
-                     ng-bind-html="processing.workflowConfiguration"
-                     class="obj-container">
+                    <div id="new-event-workflow-configuration"
+                        class="checkbox-container"
+                        ng-click="processing.save()"
+                        ng-bind-html="processing.workflowConfiguration"
+                        class="obj-container">
+                    </div>
                 </div>
-
             </div>
-
+          </div>
         </div>
     </div><!-- modal-content -->
 
    <footer>
-        <a ng-click="submit()" ng-class="($valid && !submitButton) ? 'active' : 'disabled'" class="submit" translate="SUBMIT">
+        <a ng-click="submit()" class="submit {{getSubmitButtonState()}}" translate="SUBMIT">
             <!-- Submit -->
         </a>
         <a ng-click="close()" class="cancel" translate="CANCEL">

@@ -108,18 +108,20 @@ angular.module('adminNg.directives')
                 }
 
                 // Prevent submission if value has not changed.
-                if (scope.params.value === scope.original) { return; }
+                if (scope.params.value === scope.original) {
+                    scope.editMode = false;
+                    return;
+                 }
 
                 scope.presentableValue = present(scope.params);
                 scope.editMode = false;
 
                 if (!_.isUndefined(scope.params)) {
-                    scope.save(scope.params.id, function () {
-                        scope.original = scope.params.value;
-                        if (scope.params.type === 'time') {
-                            parseTime(scope.params.value);
-                        }
-                    });
+                    scope.save(scope.params.id);
+                    scope.original = scope.params.value;
+                    if (scope.params.type === 'time') {
+                        parseTime(scope.params.value);
+                    }
                 }
             };
 

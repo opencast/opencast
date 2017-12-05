@@ -63,7 +63,7 @@ public class UrlSigningFilter implements Filter, ManagedService {
 
   private UrlSigningVerifier urlSigningVerifier;
 
-  private List<String> urlRegularExpressions = new LinkedList<String>();
+  private List<String> urlRegularExpressions = new LinkedList<>();
 
   private boolean enabled = true;
 
@@ -96,7 +96,8 @@ public class UrlSigningFilter implements Filter, ManagedService {
     HttpServletResponse httpResponse = (HttpServletResponse) response;
 
     if (!("GET".equalsIgnoreCase(httpRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpRequest.getMethod()))) {
-      logger.debug("The request '{}' is not a GET or HEAD request so skipping the filter.", httpRequest.getRequestURL());
+      logger.debug("The request '{}' is not a GET or HEAD request so skipping the filter.",
+              httpRequest.getRequestURL());
       chain.doFilter(request, response);
       return;
     }
@@ -141,32 +142,31 @@ public class UrlSigningFilter implements Filter, ManagedService {
           logger.debug(
                   "Unable to process httpRequest '{}' because it was rejected as a Bad Request, usually a problem with query string: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
           return;
         case Forbidden:
           logger.debug(
                   "Unable to process httpRequest '{}' because is was rejected as Forbidden, usually a problem with making policy matching the signature: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN);
           return;
         case Gone:
           logger.debug("Unable to process httpRequest '{}' because is was rejected as Gone: {}",
                   httpRequest.getRequestURL(), resourceRequest.getRejectionReason());
-          httpResponse.sendError(HttpServletResponse.SC_GONE, resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_GONE);
           return;
         default:
           logger.error(
                   "Unable to process httpRequest '{}' because is was rejected as status {} which is not a status we should be handling here. This must be due to a code change and is a bug.: {}",
-                  new Object[] { httpRequest.getRequestURL(), resourceRequest.getStatus(),
-                          resourceRequest.getRejectionReason() });
-          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, resourceRequest.getRejectionReason());
+                  httpRequest.getRequestURL(), resourceRequest.getStatus(), resourceRequest.getRejectionReason());
+          httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
           return;
 
       }
     } catch (UrlSigningException e) {
       logger.error("Unable to verify request for '{}' with query string '{}' from host '{}' because: {}",
-              new Object[] { httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(),
-                      ExceptionUtils.getStackTrace(e) });
+              httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(),
+              ExceptionUtils.getStackTrace(e));
       httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               String.format("%s is unable to verify request for '%s' with query string '%s' from host '%s' because: %s",
                       getName(), httpRequest.getRequestURL(), httpRequest.getQueryString(), httpRequest.getRemoteAddr(),

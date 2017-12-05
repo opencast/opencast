@@ -125,8 +125,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel: {}", new Object[] {
-              mediaPackageXml, elementId, e });
+      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel: {}", mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();
@@ -151,14 +150,13 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract media package {}, element {} from aws s3 channel: {}", new Object[] {
-              mediaPackageXml, elementId, e });
+      logger.warn("Unable to retract media package {}, element {} from aws s3 channel: {}", mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();
   }
 
-  /*
+  /* TODO
   Commented out due to changes in the way the element IDs are passed (ie, a list rather than individual ones
   per job).  This code is still useful long term, but I don't have time to write the necessary wrapper code
   around it right now.
@@ -184,8 +182,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to restore element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to restore media package {}, element {} from aws s3 channel: {}", new Object[] {
-              mediaPackageXml, elementId, e });
+      logger.warn("Unable to restore media package {}, element {} from aws s3 channel: {}", mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();

@@ -175,10 +175,9 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
     }
     Collection<Track> sourceTracks = trackSelector.select(mediaPackage, false);
     if (sourceTracks.isEmpty()) {
-      logger.info("No tracks found in mediapackage {} with specified {} {}", new Object[] {
-              mediaPackage.getIdentifier().compact(),
+      logger.info("No tracks found in mediapackage {} with specified {} {}", mediaPackage.getIdentifier().compact(),
               SOURCE_FLAVOR_PROPERTY,
-              sourceFlavorProperty});
+              sourceFlavorProperty);
       createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 

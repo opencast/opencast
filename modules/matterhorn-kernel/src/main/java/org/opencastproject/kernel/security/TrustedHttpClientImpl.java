@@ -186,7 +186,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
       ObjectName name;
       name = new ObjectName("org.opencastproject.security.api.TrustedHttpClient:type=HttpConnections");
       Object mbean = this;
-      mbs.registerMBean(mbean, name);
+      if (!mbs.isRegistered(name)) {
+        mbs.registerMBean(mbean, name);
+      }
     } catch (Exception e) {
       logger.warn("Unable to register {} as an mbean: {}", this, e);
     }

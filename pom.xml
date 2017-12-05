@@ -19,7 +19,8 @@
     <matterhorn.basedir>${basedir}</matterhorn.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <opencast.nexus.url>http://nexus.opencast.org</opencast.nexus.url>
+    <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
+    <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collection.version>3.2.2</commons-collection.version>
     <commons-compress.version>1.12</commons-compress.version>
@@ -294,6 +295,7 @@
             <eclipselink.logging.level>CONFIG</eclipselink.logging.level>
             <java.util.logging.config.file>${basedir}/conf/services/java.util.logging.properties</java.util.logging.config.file>
             <logj4.configuration>${basedir}/docs/log4j/log4j.properties</logj4.configuration>
+            <java.io.tmpdir>${project.build.directory}</java.io.tmpdir>
           </systemPropertyVariables>
         </configuration>
       </plugin>
@@ -379,6 +381,7 @@
                   <pluginExecutionFilter>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
+                    <versionRange>[1.5,)</versionRange>
                     <goals>
                       <goal>install-node-and-npm</goal>
                       <goal>npm</goal>
@@ -507,7 +510,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-assembly-plugin</artifactId>
-          <version>2.5.5</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -622,6 +625,16 @@
           <groupId>com.github.eirslett</groupId>
           <artifactId>frontend-maven-plugin</artifactId>
           <version>1.5</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>1.6.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -1614,12 +1627,34 @@
         <enabled>true</enabled>
       </releases>
     </pluginRepository>
+    <pluginRepository>
+      <id>opencast-backup</id>
+      <name>Opencast Backup Repository</name>
+      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </pluginRepository>
   </pluginRepositories>
   <repositories>
     <repository>
       <id>opencast</id>
       <name>Opencast Repo</name>
       <url>${opencast.nexus.url}/nexus/content/groups/public</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>opencast-backup</id>
+      <name>Opencast Backup Repo</name>
+      <url>${opencast.nexus-backup.url}/nexus/content/groups/public</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>

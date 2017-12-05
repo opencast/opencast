@@ -601,8 +601,8 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       return Response.status(NOT_FOUND).build();
     } catch (SeriesException e) {
-      logger.warn("Could not update series property for series {} property {}:{} : {}", new Object[] { seriesId, name,
-              value, ExceptionUtils.getStackTrace(e) });
+      logger.warn("Could not update series property for series {} property {}:{} : {}", seriesId, name,
+              value, ExceptionUtils.getStackTrace(e));
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -633,8 +633,8 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not delete series '{}' property '{}' query: {}", new Object[] { seriesId, propertyName,
-              ExceptionUtils.getStackTrace(e) });
+      logger.warn("Could not delete series '{}' property '{}' query: {}", seriesId, propertyName,
+              ExceptionUtils.getStackTrace(e));
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -816,8 +816,8 @@ public class SeriesRestService {
         return R.notFound();
       }
     } catch (SeriesException e) {
-      logger.warn("Error while returning element '{}' of series '{}': {}", new Object[] { elementType, seriesId,
-              ExceptionUtils.getStackTrace(e) });
+      logger.warn("Error while returning element '{}' of series '{}': {}", elementType, seriesId,
+              ExceptionUtils.getStackTrace(e));
       return R.serverError();
     }
   }

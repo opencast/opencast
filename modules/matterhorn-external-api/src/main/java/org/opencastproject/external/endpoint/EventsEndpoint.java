@@ -726,8 +726,8 @@ public class EventsEndpoint implements ManagedService {
     fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
     fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
     if (event.getTechnicalEndTime() != null) {
-      long duration = new DateTime(event.getTechnicalStartTime()).getMillis()
-              - new DateTime(event.getTechnicalEndTime()).getMillis();
+      long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
+                    - new DateTime(event.getTechnicalStartTime()).getMillis();
       fields.add(f("duration", v(duration)));
     }
     if (StringUtils.trimToNull(event.getSubject()) != null) {
@@ -809,7 +809,7 @@ public class EventsEndpoint implements ManagedService {
         accessControlList = indexService.updateEventAcl(id, accessControlList, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl with '{}' because: {}",
-                new Object[] { id, acl, ExceptionUtils.getStackTrace(e) });
+                id, acl, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -858,7 +858,7 @@ public class EventsEndpoint implements ManagedService {
         withNewAce = indexService.updateEventAcl(id, withNewAce, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}' because: {}",
-                new Object[] { id, action, role, ExceptionUtils.getStackTrace(e) });
+                id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -899,7 +899,7 @@ public class EventsEndpoint implements ManagedService {
         withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}' because: {}",
-                new Object[] { id, action, role, ExceptionUtils.getStackTrace(e) });
+                id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -1067,12 +1067,12 @@ public class EventsEndpoint implements ManagedService {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
     } catch (ParseException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}' because: {}",
-              new Object[] { id, type, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, ExceptionUtils.getStackTrace(e)));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}' because: {}",
-              new Object[] { id, type, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(e.getMessage());
     }
 
@@ -1230,11 +1230,11 @@ public class EventsEndpoint implements ManagedService {
         return ApiResponses.notFound(e.getMessage());
       } catch (IndexServiceException e) {
         logger.error("Unable to remove metadata catalog with type '{}' from event '{}' because {}",
-                new Object[] { type, id, ExceptionUtils.getStackTrace(e) });
+                type, id, ExceptionUtils.getStackTrace(e));
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (IllegalStateException e) {
         logger.debug("Unable to remove metadata catalog with type '{}' from event '{}' because {}",
-                new Object[] { type, id, ExceptionUtils.getStackTrace(e) });
+                type, id, ExceptionUtils.getStackTrace(e));
         throw new WebApplicationException(e, Status.BAD_REQUEST);
       } catch (UnauthorizedException e) {
         return Response.status(Status.UNAUTHORIZED).build();

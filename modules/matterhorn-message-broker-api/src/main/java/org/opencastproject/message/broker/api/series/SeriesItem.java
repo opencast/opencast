@@ -34,7 +34,7 @@ import java.io.Serializable;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a SeriesService queue.
  */
-public class SeriesItem implements MessageItem, Serializable {
+public final class SeriesItem implements MessageItem, Serializable {
 
   private static final long serialVersionUID = 3275142857854793612L;
 
@@ -42,16 +42,18 @@ public class SeriesItem implements MessageItem, Serializable {
 
   public static final String SERIES_QUEUE = SERIES_QUEUE_PREFIX + "QUEUE";
 
+  private final Type type;
   private final String seriesId;
   private final String series;
   private final String acl;
   private final String propertyName;
   private final String propertyValue;
   private final Boolean optOut;
-  private final Type type;
+  private final String element;
+  private final String elementType;
 
   public enum Type {
-    UpdateCatalog, UpdateAcl, UpdateOptOut, UpdateProperty, Delete
+    UpdateCatalog, UpdateElement, UpdateAcl, UpdateOptOut, UpdateProperty, Delete
   };
 
   /**
@@ -60,7 +62,20 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series.
    */
   public static SeriesItem updateCatalog(DublinCoreCatalog series) {
-    return new SeriesItem(series);
+    return new SeriesItem(Type.UpdateCatalog, null, series, null, null, null, null, null, null);
+  }
+
+  /**
+   * @param seriesId
+   *          The unique id for the series to update.
+   * @param type
+   *          The type of series element.
+   * @param data
+   *          The series element data.
+   * @return Builds {@link SeriesItem} for updating series element.
+   */
+  public static SeriesItem updateElement(String seriesId, String type, String data) {
+    return new SeriesItem(Type.UpdateElement, seriesId, null, null, null, null, null, type, data);
   }
 
   /**
@@ -71,7 +86,8 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating the access control list of a series.
    */
   public static SeriesItem updateAcl(String seriesId, AccessControlList acl) {
-    return new SeriesItem(seriesId, acl);
+    return new SeriesItem(Type.UpdateAcl, seriesId, null, AccessControlParser.toJsonSilent(acl),
+            null, null, null, null, null);
   }
 
   /**
@@ -82,7 +98,7 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating the opt out status.
    */
   public static SeriesItem updateOptOut(String seriesId, boolean optOut) {
-    return new SeriesItem(seriesId, optOut);
+    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optOut, null, null);
   }
 
   /**
@@ -95,7 +111,7 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series property.
    */
   public static SeriesItem updateProperty(String seriesId, String propertyName, String propertyValue) {
-    return new SeriesItem(seriesId, propertyName, propertyValue);
+    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null);
   }
 
   /**
@@ -106,7 +122,7 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating the opt out status of a series.
    */
   public static SeriesItem delete(String seriesId, boolean optedOut) {
-    return new SeriesItem(seriesId, optedOut);
+    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optedOut, null, null);
   }
 
   /**
@@ -115,104 +131,73 @@ public class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for deleting a series.
    */
   public static SeriesItem delete(String seriesId) {
-    return new SeriesItem(seriesId);
+    return new SeriesItem(Type.Delete, seriesId, null, null, null, null, null, null, null);
   }
 
   /**
-   * Constructor to build an update series {@link SeriesItem}.
+   * Constructor to build an {@link SeriesItem} with given parameters.
    *
+   * @param type
+   *          The update type.
+   * @param seriesId
+   *          The series ID to update. If you provide both, the seriesId and the series DublinCore catalog,
+   *          the seriesId must match the value of {@link DublinCore.PROPERTY_IDENTIFIER}.
    * @param series
-   *          The series to update.
-   */
-  public SeriesItem(DublinCoreCatalog series) {
-    this.seriesId = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    try {
-      this.series = series.toXmlString();
-    } catch (IOException e) {
-      throw new IllegalStateException(e);
-    }
-    this.acl = null;
-    this.optOut = null;
-    this.propertyName = null;
-    this.propertyValue = null;
-    this.type = Type.UpdateCatalog;
-  }
-
-  /**
-   * Constructor to build an update access control list for a series {@link SeriesItem}.
-   *
-   * @param seriesId
-   *          The id of the series to update.
+   *          The series DublinCore catalog to update. The value of {@link DublinCore.PROPERTY_IDENTIFIER} must match
+   *          the value of seriesId if you provide both.
    * @param acl
-   *          The access control list to update.
-   */
-  public SeriesItem(String seriesId, AccessControlList acl) {
-    this.seriesId = seriesId;
-    this.series = null;
-    this.acl = AccessControlParser.toJsonSilent(acl);
-    this.optOut = null;
-    this.propertyName = null;
-    this.propertyValue = null;
-    this.type = Type.UpdateAcl;
-  }
-
-  /**
-   * Constructor to build a update opt out status for a series {@link SeriesItem}.
-   *
-   * @param seriesId
-   *          The id of the series to update.
-   * @param optedOut
-   *          The opt out status
-   */
-  public SeriesItem(String seriesId, boolean optedOut) {
-    this.seriesId = seriesId;
-    this.series = null;
-    this.acl = null;
-    this.optOut = optedOut;
-    this.propertyName = null;
-    this.propertyValue = null;
-    this.type = Type.UpdateOptOut;
-  }
-
-  /**
-   * Constructor to build a update property for a series {@link SeriesItem}.
-   *
-   * @param seriesId
-   *          The id of the series to update.
+   *          The series ACL to update. Note: the series ID must be also provided.
    * @param propertyName
-   *          The property name.
+   *          The name of the series property to update. Note: the series ID and property value must be also provided.
    * @param propertyValue
-   *          The property value.
+   *          The value of the series property to update. Note: the series ID and property name must be also provided.
+   * @param optOut
+   *          The series opt out status to update. Note: the series ID must be also provided.
+   * @param elementType
+   *          The type of the series element to update. Note: the series ID and element must be also provided.
+   * @param element
+   *          The series element to update. Note: the series ID and element type must be also provided.
+   *
+   * @throws IllegalStateException
+   *          If the series ID and the series are not provided or the series ID and the value of
+   *          {@link DublinCore.PROPERTY_IDENTIFIER} in the series catalog does not match.
    */
-  public SeriesItem(String seriesId, String propertyName, String propertyValue) {
-    this.seriesId = seriesId;
-    this.series = null;
-    this.acl = null;
-    this.optOut = null;
+  private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl,
+          String propertyName, String propertyValue, Boolean optOut, String elementType, String element) {
+    if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER)))
+      throw new IllegalStateException("Provided series ID and dublincore series ID does not match");
+
+    this.type = type;
+    if (series != null) {
+      try {
+        this.series = series.toXmlString();
+      } catch (IOException e) {
+        throw new IllegalStateException(e);
+      }
+    } else {
+      this.series = null;
+    }
+    if (seriesId != null)
+      this.seriesId = seriesId;
+    else if (series != null)
+      this.seriesId = series.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+    else
+      throw new IllegalStateException("Neither series nor series ID is provided");
+    this.acl = acl;
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;
-    this.type = Type.UpdateProperty;
-  }
-
-  /**
-   * Constructor to build a delete series {@link SeriesItem}.
-   *
-   * @param seriesId
-   *          The id of the series to delete.
-   */
-  public SeriesItem(String seriesId) {
-    this.seriesId = seriesId;
-    this.series = null;
-    this.acl = null;
-    this.optOut = null;
-    this.propertyName = null;
-    this.propertyValue = null;
-    this.type = Type.Delete;
+    this.optOut = optOut;
+    this.elementType = elementType;
+    this.element = element;
   }
 
   @Override
   public String getId() {
     return seriesId;
+  }
+
+  public Type getType() {
+    return type;
   }
 
   public String getSeriesId() {
@@ -221,6 +206,14 @@ public class SeriesItem implements MessageItem, Serializable {
 
   public DublinCoreCatalog getMetadata() {
     return DublinCoreXmlFormat.readOpt(series).orNull();
+  }
+
+  public DublinCoreCatalog getExtendedMetadata() {
+    try {
+      return DublinCoreXmlFormat.read(element);
+    } catch (Exception ex) {
+      return null;
+    }
   }
 
   public AccessControlList getAcl() {
@@ -243,8 +236,12 @@ public class SeriesItem implements MessageItem, Serializable {
     return propertyValue;
   }
 
-  public Type getType() {
-    return type;
+
+  public String getElement() {
+    return element;
   }
 
+  public String getElementType() {
+    return elementType;
+  }
 }

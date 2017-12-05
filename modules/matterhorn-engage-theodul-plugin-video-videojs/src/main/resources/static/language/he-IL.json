@@ -1,0 +1,15 @@
+{
+    "value_locale": "אנגלית",
+    "error_AudioCodecNotSupported": "שגיאה: קודק אודיו אינו נתמך על ידי דפדפן זה.",
+    "error_AudioElementNotSupported": "שגיאה: הדפדפן שלך אינו תומך באלמנט שמע.",
+    "video": "וידאו",
+    "video_short": "וידאו.",
+    "openInPlayer": "פתח בנגן",
+    "givenTime": "זמן שניתן",
+    "hasToBeSmallerThanDuration": "חייב להיות קטן מהאורך הכולל.",
+    "msg_waitToSetTime": "נא המתן, מגדיר זמן השמעה עד שהווידיאו ייטען.",
+    "msg_startPlayingToSetTime": ". בבקשה התחל בהפעלת הוידאו לפני קביעת זמן הפעלה.",
+    "msg_waitToSeek": "חיפוש אינו אפשרי עד טעינת הווידאו.",
+    "msg_startPlayingToSeek": "חיפוש אינו אפשרי עד טעינת הווידאו.",
+    "chromeBuffer": "בודק אוגר הוידאו הושבת בשל מגבלות בדפדפן (Chrome). ייתכן שתיתקלו בבעיות עם הפעלת הווידאו."
+}

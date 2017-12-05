@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -305,5 +306,10 @@ public class XacmlSecurityTest {
       // TODO Auto-generated method stub
     }
 
+    @Override
+    public void cleanup(Id mediaPackageId) throws IOException {
+      // Nothing to do
+    }
   }
+
 }

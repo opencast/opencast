@@ -33,6 +33,10 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
         $scope.$valid = angular.isDefined($scope.processing.ud.workflow.id);
     };
 
+    $scope.getSubmitButtonState = function() {
+      return ($scope.$valid && !$scope.submitButton) ? 'active' : 'disabled';
+    };
+
     onSuccess = function () {
         $scope.submitButton = false;
         $scope.close();
@@ -51,7 +55,7 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
         var eventIds = [], payload;
         eventIds.push($scope.$parent.resourceId);
         payload = {
-            workflows: $scope.processing.ud.workflow.id,
+            workflow: $scope.processing.ud.workflow.id,
             configuration: $scope.processing.ud.workflow.selection.configuration,
             eventIds: eventIds
         };

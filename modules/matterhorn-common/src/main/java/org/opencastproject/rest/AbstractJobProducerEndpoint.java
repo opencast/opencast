@@ -60,7 +60,7 @@ public abstract class AbstractJobProducerEndpoint {
 
     // See if the service is ready to accept anything
     if (!service.isReadyToAcceptJobs(jobOperation)) {
-      logger.debug("Service {} is not ready to accept jobs with operation {}", new Object[] { service, jobOperation });
+      logger.debug("Service {} is not ready to accept jobs with operation {}", service, jobOperation);
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
 

@@ -103,6 +103,9 @@ angular.module('adminNg.directives')
 
             scope.$on('$destroy', function () {
                 $timeout.cancel(scope.checkTimeout);
+                if (angular.isDefined(scope.player.adapter)) {
+                  scope.player.adapter.pause();
+                }
             });
 
             scope.previousFrame = function () {

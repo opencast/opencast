@@ -773,7 +773,7 @@ public class MetadataField<A> {
         } catch (Exception e) {
           logger.error(
                   "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} because: {}",
-                  new Object[] { periodEncodedString.get(), pattern, getStackTrace(e) });
+                  periodEncodedString.get(), pattern, getStackTrace(e));
           throw new IllegalArgumentException(e);
         }
       }
@@ -1021,7 +1021,7 @@ public class MetadataField<A> {
           this.order = Opt.some(orderValue);
         } catch (NumberFormatException e) {
           logger.warn("Unable to parse order value {} of metadata field {} because:{}",
-                  new Object[] { value, this.getInputID(), ExceptionUtils.getStackTrace(e) });
+                  value, this.getInputID(), ExceptionUtils.getStackTrace(e));
           this.order = Opt.none();
         }
         break;

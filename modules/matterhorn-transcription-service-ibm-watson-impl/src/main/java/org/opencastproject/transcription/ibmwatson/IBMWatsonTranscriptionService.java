@@ -232,7 +232,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           } catch (NumberFormatException e) {
             // Use default
             logger.warn("Invalid configuration for {} : {}. Default used instead: {}",
-                    new Object[] { COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer });
+                    COMPLETION_CHECK_BUFFER_CONFIG, bufferOpt.get(), completionCheckBuffer);
           }
         }
         logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
@@ -331,7 +331,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         saveResults(jobId, jsonObj);
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-              new Object[] { mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString() });
+              mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString());
       throw new TranscriptionServiceException("Could not save transcription results file", e);
     } catch (TranscriptionDatabaseException e) {
       logger.warn("Transcription results file were saved but state in db not updated for mpId {}, jobId {}", mpId,
@@ -846,10 +846,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
             // Update state in the database
             database.updateJobControl(jobId, TranscriptionJobControl.Status.Closed.name());
             logger.info("Attach transcription workflow {} scheduled for mp {}, watson job {}",
-                    new Object[] { wfId, mpId, jobId });
+                    wfId, mpId, jobId);
           } catch (Exception e) {
             logger.warn("Attach transcription workflow could NOT be scheduled for mp {}, watson job {}, {}: {}",
-                    new Object[] { mpId, jobId, e.getClass().getName(), e.getMessage() });
+                    mpId, jobId, e.getClass().getName(), e.getMessage());
           }
         }
       } catch (TranscriptionDatabaseException e) {

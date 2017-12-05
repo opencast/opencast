@@ -902,32 +902,38 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       .and(query.hasPropertiesOf(p.namespace())))
               .run();
       Opt<ARecord> recordOpt = result.getRecords().head();
-      if (recordOpt.isNone())
-        throw new NotFoundException();
+      long deletedProperties = 0;
+      if (recordOpt.isSome()) {
+        // Check for locked transactions
+        Opt<String> source = recordOpt.get().getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
+        if (source.isSome() && persistence.hasTransaction(source.get())) {
+          logger.warn("Unable to remove event '{}', source '{}' is currently locked due to an active transaction!",
+                  mediaPackageId, source.get());
+          throw new SchedulerTransactionLockException("Unable to remove event, locked source " + source.get());
+        }
 
-      // Check for locked transactions
-      Opt<String> source = recordOpt.get().getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
-      if (source.isSome() && persistence.hasTransaction(source.get())) {
-        logger.warn("Unable to remove event '{}', source '{}' is currently locked due to an active transaction!",
-                mediaPackageId, source.get());
-        throw new SchedulerTransactionLockException("Unable to remove event, locked source " + source.get());
+        String agentId = recordOpt.get().getProperties().apply(Properties.getString(AGENT_CONFIG));
+
+        // Delete all properties
+        deletedProperties = query.delete(SNAPSHOT_OWNER, query.propertiesOf(p.namespace(), WORKFLOW_NAMESPACE, CA_NAMESPACE))
+                .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))).name("delete all properties")
+                .run();
+
+        if (StringUtils.isNotEmpty(agentId))
+          touchLastEntry(agentId);
       }
 
-      String agentId = recordOpt.get().getProperties().apply(Properties.getString(AGENT_CONFIG));
-
-      // Delete all properties
-      query.delete(SNAPSHOT_OWNER, query.propertiesOf(p.namespace(), WORKFLOW_NAMESPACE, CA_NAMESPACE))
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))).name("delete all properties")
-              .run();
       // Delete scheduler snapshot
-      query.delete(SNAPSHOT_OWNER, query.snapshot())
+      long deletedSnapshots = query.delete(SNAPSHOT_OWNER, query.snapshot())
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
-              .name("delete episode if no more properties exist").run();
+              .name("delete episode").run();
+
+      if (deletedProperties + deletedSnapshots == 0)
+        throw new NotFoundException();
 
       messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
               SchedulerItem.delete(mediaPackageId));
 
-      touchLastEntry(agentId);
     } catch (NotFoundException | SchedulerException e) {
       throw e;
     } catch (Exception e) {

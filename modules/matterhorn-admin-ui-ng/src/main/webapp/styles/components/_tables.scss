@@ -59,6 +59,12 @@
             border-right: none;
         }
 
+        input[type=checkbox] {
+            margin-left: 1px;
+            margin-right: 1px;
+            vertical-align: middle;
+        }
+
         // Aesthetic Style
         border-right: 1px solid #c9d0d6;
         border-left: 1px solid #fff;
@@ -254,10 +260,9 @@
 
             &.crosslink {
                 border-bottom: 1px solid transparent;
-                color: darken($color-darkgray, 12%);
 
                 &:hover {
-                    border-bottom: 1px solid $color-gray;
+                    border-bottom: 1px solid;
                 }
              }
 
@@ -346,6 +351,7 @@
             border-radius: $main-border-radius;
             display: inline-block;
             padding-left: 10px;
+            vertical-align: middle;
         }
 
         .hidden-input {

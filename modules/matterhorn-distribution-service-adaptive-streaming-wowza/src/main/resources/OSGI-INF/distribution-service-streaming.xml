@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.distribution.streaming.wowza.StreamingDistributionService" immediate="true"
+  <scr:component name="org.opencastproject.distribution.streaming.wowza.WowzaAdaptiveStreamingDistributionService" immediate="true"
     activate="activate">
-    <implementation class="org.opencastproject.distribution.streaming.wowza.StreamingDistributionService" />
+    <implementation class="org.opencastproject.distribution.streaming.wowza.WowzaAdaptiveStreamingDistributionService" />
     <property name="service.description" value="Distribution Service (Streaming)" />
     <property name="distribution.channel" value="streaming" />
     <service>
       <provide interface="org.opencastproject.distribution.api.DistributionService" />
+      <provide interface="org.opencastproject.distribution.api.StreamingDistributionService" />
       <provide interface="org.osgi.service.cm.ManagedService" />
     </service>
     <reference name="WORKSPACE" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
@@ -21,9 +22,9 @@
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   </scr:component>
 
-  <scr:component name="org.opencastproject.distribution.streaming.wowza.endpoint.StreamingDistributionRestService"
+  <scr:component name="org.opencastproject.distribution.streaming.wowza.endpoint.WowzaAdaptiveStreamingDistributionRestService"
     immediate="true" activate="activate">
-    <implementation class="org.opencastproject.distribution.streaming.wowza.endpoint.StreamingDistributionRestService" />
+    <implementation class="org.opencastproject.distribution.streaming.wowza.endpoint.WowzaAdaptiveStreamingDistributionRestService" />
     <property name="service.description" value="Streaming Distribution REST Endpoint" />
 
     <property name="opencast.service.type" value="org.opencastproject.distribution.streaming" />
@@ -31,11 +32,11 @@
     <property name="opencast.service.jobproducer" value="true" />
 
     <service>
-      <provide interface="org.opencastproject.distribution.streaming.wowza.endpoint.StreamingDistributionRestService" />
+      <provide interface="org.opencastproject.distribution.streaming.wowza.endpoint.WowzaAdaptiveStreamingDistributionRestService" />
     </service>
 
-    <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
-      cardinality="1..1" policy="static" bind="setService" target="(distribution.channel=streaming)" />
+    <reference name="distributionService" interface="org.opencastproject.distribution.api.StreamingDistributionService"
+      cardinality="1..1" policy="static" bind="setService" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
   </scr:component>

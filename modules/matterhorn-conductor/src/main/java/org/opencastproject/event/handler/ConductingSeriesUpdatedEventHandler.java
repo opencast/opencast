@@ -51,7 +51,7 @@ public class ConductingSeriesUpdatedEventHandler {
   private SecurityService securityService;
   private MessageReceiver messageReceiver;
 
-  private AssetManagerPermissionsUpdatedEventHandler assetManagerPermissionsUpdatedEventHandler;
+  private AssetManagerUpdatedEventHandler assetManagerUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
   private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
@@ -93,40 +93,32 @@ public class ConductingSeriesUpdatedEventHandler {
     @Override
     public void run() {
       logger.info("Starting to listen for series update messages");
-      long counter = 0;
       while (listening) {
         future = messageReceiver.receiveSerializable(QUEUE_ID, MessageSender.DestinationType.Queue);
         executor.execute(future);
         try {
           BaseMessage baseMessage = (BaseMessage) future.get();
-          if (null == baseMessage) {
-            //This message appears every 100th of a second or so, so let's throttle this...
-            if (counter % 1000 == 0) {
-              logger.error("Problem while receiving series update messages: Message is null");
-              logger.error("The connection with ActiveMQ is probably down!");
-            }
-            counter++;
-            continue;
-          }
           securityService.setOrganization(baseMessage.getOrganization());
           securityService.setUser(baseMessage.getUser());
           SeriesItem seriesItem = (SeriesItem) baseMessage.getObject();
 
-          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
-                  || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
-                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
-            seriesUpdatedEventHandler.handleEvent(seriesItem);
-            assetManagerPermissionsUpdatedEventHandler.handleEvent(seriesItem);
-            workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+          if (SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
+            assetManagerUpdatedEventHandler.handleEvent(seriesItem);
             // the OAI-PMH handler is a dynamic dependency
             if (oaiPmhUpdatedEventHandler != null) {
               oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
             }
+          } else if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+                  || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
+                  || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
+            seriesUpdatedEventHandler.handleEvent(seriesItem);
+            assetManagerUpdatedEventHandler.handleEvent(seriesItem);
+            workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
+            if (oaiPmhUpdatedEventHandler != null) {
+              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
+            }
           }
-          counter = 0;
-        } catch (InterruptedException e) {
-          logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
         } catch (CancellationException e) {
           logger.trace("Listening for series update messages has been cancelled.");
@@ -143,8 +135,8 @@ public class ConductingSeriesUpdatedEventHandler {
   }
 
   /** OSGi DI callback. */
-  public void setAssetManagerPermissionsUpdatedEventHandler(AssetManagerPermissionsUpdatedEventHandler h) {
-    this.assetManagerPermissionsUpdatedEventHandler = h;
+  public void setAssetManagerUpdatedEventHandler(AssetManagerUpdatedEventHandler h) {
+    this.assetManagerUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */

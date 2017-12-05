@@ -112,8 +112,8 @@
               </header>
               <div class="obj-container">
                 <ul>
-                  <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: wizard.step.translatedSourceShortTitle track by asset.id">
-                      <div class="file-upload">
+                  <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
+                    <div class="file-upload">
                       <input id="{{asset.id}}" class="blue-btn file-select-btn" admin-ng-file-upload data-ng-file-select data-ng-multiple="asset.multiple"
                         type="file" file="$parent.wizard.step.ud.upload.{{asset.id}}" tabindex="" />
                     </div>
@@ -155,7 +155,7 @@
                     <table class="main-tbl">
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
-                            <td>{{ wizard.step.tz }}</td>['dublincore/episode'].fields
+                            <td>{{ wizard.step.tz }}</td>
                         </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>

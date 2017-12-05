@@ -26,12 +26,6 @@ angular.module('adminNg.controllers')
     function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
-            var lastRoute, off;
-            lastRoute = $route.current;
-            off = $scope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                off();
-            });
             $location.path(path).replace();
         };
 
@@ -54,15 +48,7 @@ angular.module('adminNg.controllers')
             } else if ($scope.tab === "playback") {
               $scope.area   = "metadata";
             }
-            // Find elements by video tag
-            var videoArray = [].slice.call(document.querySelectorAll("video"));
-            // Loop through each video element
-            angular.forEach(videoArray, function(player) {
-                // Apply pause to the object
-                player.pause();
-            });
-            $scope.navigateTo('events/' + $scope.resource + '/' +
-                $scope.id + '/tools/' + tab);
+            $scope.navigateTo('/events/' + $scope.resource + '/' + $scope.id + '/tools/' + tab);
         };
 
         $scope.openArea = function (area) {

@@ -381,6 +381,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       current[0] = 1;
       logger.info("Re-populating index '{}' with comments for events. There are {} events with comments to add",
               indexName, total);
+      final int responseInterval = (total < 100) ? 1 : (total / 100);
       for (Iterator<EventCommentDto> i = getComments(); i.hasNext();) {
         final EventCommentDto comment = i.next();
         Organization organization = organizationDirectoryService.getOrganization(comment.getOrganization());
@@ -392,9 +393,10 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                     CommentItem.update(comment.getEventId(), true, !comment.isResolvedStatus(),
                             (!comment.isResolvedStatus()
                                     && EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()))));
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Comments, total,
-                            current[0]));
+            if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
+            }
             current[0] += 1;
           }
         });

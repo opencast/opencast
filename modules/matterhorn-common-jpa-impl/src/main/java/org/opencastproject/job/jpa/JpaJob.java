@@ -250,6 +250,7 @@ public class JpaJob {
     this.creator = currentUser.getUsername();
     this.organization = organization.getId();
     this.creatorServiceRegistration = creatingService;
+    this.jobType = creatingService.getServiceType();
     this.operation = operation;
     this.arguments = arguments;
     this.payload = payload;
@@ -278,6 +279,9 @@ public class JpaJob {
     newJob.uri = job.getUri();
     newJob.creator = job.getCreator();
     newJob.organization = job.getOrganization();
+    newJob.jobLoad = job.getJobLoad();
+    newJob.blockedJobIds = job.getBlockedJobIds();
+    newJob.blockingJobId = job.getBlockingJobId();
     return newJob;
   }
 

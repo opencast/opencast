@@ -26,6 +26,7 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
@@ -47,10 +48,12 @@ import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
 import java.lang.management.ManagementFactory;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -86,6 +89,9 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
 
   /** A token to store in the miss cache */
   protected Object nullToken = new Object();
+
+  /** Opencast's security service */
+  private SecurityService securityService;
 
   /** The general role prefix, to be added to all the LDAP roles that do not start by one of the exclude prefixes */
   private String rolePrefix;
@@ -127,14 +133,17 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
    *          the number of users to cache
    * @param cacheExpiration
    *          the number of minutes to cache users
-   * @param groupRoleProvider
+   * @param securityService
+   *          a reference to Opencast's security service
    */
   // CHECKSTYLE:OFF
   LdapUserProviderInstance(String pid, Organization organization, String searchBase, String searchFilter, String url,
           String userDn, String password, String roleAttributesGlob, String rolePrefix, String[] extraRoles,
-          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration) {
+          String[] excludePrefixes, boolean convertToUppercase, int cacheSize, int cacheExpiration,
+          SecurityService securityService) {
     // CHECKSTYLE:ON
     this.organization = organization;
+    this.securityService = securityService;
     logger.debug("Creating LdapUserProvider instance with pid=" + pid + ", and organization=" + organization
             + ", to LDAP server at url:  " + url);
 
@@ -330,7 +339,6 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
         /*
          * Please note the prefix logic for roles:
          *
-         * - Group roles are left intact
          * - Roles that start with any of the "exclude prefixes" are left intact
          * - In any other case, the "role prefix" is prepended to the roles read from LDAP
          *
@@ -381,18 +389,38 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
     // TODO implement a LDAP wildcard search
+    // FIXME We return the current user, rather than an empty list, to make sure the current user's role is displayed in
+    // the admin UI (MH-12526).
+    User currentUser = securityService.getUser();
+    if (loadUser(currentUser.getUsername()) != null) {
+      List<User> retVal = new ArrayList<>();
+      retVal.add(securityService.getUser());
+      return retVal.iterator();
+    }
     return Collections.<User> emptyList().iterator();
   }
 
   @Override
   public Iterator<User> getUsers() {
     // TODO implement LDAP get all users
+    // FIXME We return the current user, rather than an empty list, to make sure the current user's role is displayed in
+    // the admin UI (MH-12526).
+    User currentUser = securityService.getUser();
+    if (loadUser(currentUser.getUsername()) != null) {
+      List<User> retVal = new ArrayList<>();
+      retVal.add(securityService.getUser());
+      return retVal.iterator();
+    }
     return Collections.<User> emptyList().iterator();
   }
 
   @Override
   public long countUsers() {
     // TODO implement LDAP count users
+    // FIXME Because of MH-12526, we return conditionally 1 when the previous methods return the current user
+    if (loadUser(securityService.getUser().getUsername()) != null) {
+      return 1;
+    }
     return 0;
   }
 

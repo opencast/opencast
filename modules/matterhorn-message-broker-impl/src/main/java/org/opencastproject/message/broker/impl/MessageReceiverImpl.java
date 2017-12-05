@@ -37,6 +37,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
 import javax.jms.ObjectMessage;
+import javax.jms.Session;
 
 /**
  * A class to receive messages from a ActiveMQ Message Broker.
@@ -50,6 +51,35 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
   private static final String SERVICE_PID = "org.opencastproject.message.broker.impl.MessageReceiverImpl";
 
   /**
+   * Wait for a connection and then create a consumer from it
+   * @param destinationId
+   *          The destination queue or topic to create the consumer from.
+   * @param type
+   *          The type of the destination either queue or topic.
+   * @return A consumer or <code>null</code> if there was a problem creating it.
+   */
+  private MessageConsumer createConsumer(String destinationId, DestinationType type) throws JMSException {
+    waitForConnection();
+    synchronized (this) {
+      // Create the destination (Topic or Queue)
+      Destination destination;
+      Session session = getSession();
+      // This shouldn't happen after a connection has been successfully
+      // established at least once, but better be safe than sorry.
+      if (session == null)
+        return null;
+      if (type.equals(DestinationType.Queue)) {
+        destination = session.createQueue(destinationId);
+      } else {
+        destination = session.createTopic(destinationId);
+      }
+
+      // Create a MessageConsumer from the Session to the Topic or Queue
+      return session.createConsumer(destination);
+    }
+  }
+
+  /**
    * Private function to get a message or none if there is an error.
    *
    * @param destinationId
@@ -59,34 +89,16 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
    * @return A message or none if there was a problem getting the message.
    */
   private Message waitForMessage(String destinationId, DestinationType type) {
-    if (getSession() == null || !isConnected()) {
-      return null;
-    }
+    waitForConnection();
     MessageConsumer consumer = null;
     try {
-      // Create the destination (Topic or Queue)
-      Destination destination;
-      if (type.equals(DestinationType.Queue)) {
-        destination = getSession().createQueue(destinationId);
-      } else {
-        destination = getSession().createTopic(destinationId);
-      }
-
-      // Create a MessageConsumer from the Session to the Topic or Queue
-      try {
-        consumer = getSession().createConsumer(destination);
-      } catch (JMSException e) {
-        if (e.getCause() instanceof InterruptedIOException) {
-          logger.trace("Exception due to message receiver shutdown: {}", e);
-        } else {
-          throw e;
-        }
-      }
-
-      // Wait for a message
-      return consumer.receive();
+      consumer = createConsumer(destinationId, type);
+      if (consumer != null)
+          return consumer.receive();
     } catch (JMSException e) {
-      if (isConnected()) {
+      if (e.getCause() instanceof InterruptedIOException || e.getCause() instanceof InterruptedException) {
+        logger.trace("Exception due to message receiver shutdown: {}", e);
+      } else if (isConnected()) {
         logger.error("Unable to receive messages", e);
       }
     } finally {
@@ -102,7 +114,6 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
   }
 
   protected Serializable getSerializable(String destinationId, DestinationType type) {
-    Serializable messageObject = null;
     while (true) {
       // Wait for a message
       Message message = waitForMessage(destinationId, type);
@@ -115,11 +126,6 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
         }
       }
       logger.debug("Skipping invalid message: {}", message);
-
-      /* Try to reconnect */
-      if (!isConnected() && !connectMessageBroker()) {
-        return null;
-      }
     }
   }
 

@@ -73,7 +73,7 @@ pages:
 - Infrastructure:
    - Overview: 'infrastructure/index.md'
    - Notes: 'infrastructure/notes.md'
-   - Nexus Maven Repository: 'infrastructure/nexus.md'
+   - Maven Repository: 'infrastructure/maven-repository.md'
 - API:
    - Introduction: 'api/index.md'
    - Usage: 'api/usage.md'

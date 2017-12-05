@@ -28,6 +28,8 @@ pre-built Opencast installations.
  - [CentOS](rpm-rhel-sl-centos.md)
  - [Scientific Linux](rpm-rhel-sl-centos.md)
  - [Fedora](rpm-fedora.md)
+ - [Debian](debs.md)
+ - [Ubuntu](debs.md)
 
 
 Installation with Docker
