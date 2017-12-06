@@ -923,4 +923,9 @@ public final class WorkspaceImpl implements Workspace {
     logger.debug("Clean workspace media package directory {}", f);
     FileUtils.deleteDirectory(f);
   }
+
+  @Override
+  public String rootDirectory() {
+    return wsRoot;
+  }
 }
