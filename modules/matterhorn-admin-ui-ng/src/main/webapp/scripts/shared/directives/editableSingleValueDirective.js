@@ -80,8 +80,16 @@ angular.module('adminNg.directives')
                 });
             };
 
+            scope.keyDown = function (event) {
+		if (event.keyCode === 13 && !event.shiftKey) {
+		    event.stopPropagation();
+		    event.preventDefault();
+		}
+	    }
+
+
             scope.keyUp = function (event) {
-                if (event.keyCode === 13) {
+                if (event.keyCode === 13 && !event.shiftKey) {
                     // Submit the form on ENTER
                     // Leaving the edit mode causes a blur which in turn triggers
                     // the submit action.
