@@ -41,13 +41,17 @@ The new scheduler service adds support for extended metadata and is bound to the
 If you're setting up Opencast from scratch you can safely skip this document but if you plan to upgrade your system
 and continue to use your data you should read on.
 
+Requirement Changes
+-------------------
+
+Please be aware that Opencast 4.0 requires Java 8.
 
 Configuration Changes
 ---------------------
 
 Opencast 4.0 has following configuration changes:
 
-1. The Working File Repository URL can be set per tenant.
+1. The Working File Repository URL can be set per tenant (due to [MH-12104](https://opencast.jira.com/browse/MH-12104))
 
 The Configuration key `org.opencastproject.file.repo.url` was moved from `etc/custom.properties` to
 `etc/org.opencastproject.organization-mh_default_org.cfg` as `prop.org.opencastproject.file.repo.url`.
@@ -55,6 +59,21 @@ The fallback value is same as before (set to `${org.opencastproject.server.url}`
 On a multiple server setup the value should be same on all nodes.
 For more information read the [Configure Opencast](installation/multiple-servers/#step-5-configure-opencast) section.
 
+2. WOH snapshot vs archive (due to [MH-12082](https://opencast.jira.com/browse/MH-12082))
+
+The workflow operation handler *archive* has been renamed to *snapshot*. Besides its new name, the workflow operation
+handler *snapshot* is fully compatible to *archive*. You will need, however, to adapt the name in your workflow
+definition.
+
+3. Asset Manager Configuration (due to [MH-12082](https://opencast.jira.com/browse/MH-12082))
+
+There are two new optional configuration properties `org.opencastproject.episode.rootdir` and
+`org.opencastproject.storage.dir` in `custom.properties` that you might want to have a look at.
+Those properties are descibed in the [Asset Manager Configuration](configuration/asset-manager/)
+
+4. ActiveMQ (due to [MH-12082](https://opencast.jira.com/browse/MH-12082))
+
+Please don't forget to update your activemq.xml to the version provided with this release.
 
 Migrate Scheduler Service
 -------------------------
