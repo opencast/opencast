@@ -219,6 +219,13 @@ angular.module('adminNg.controllers')
                 });
               }, this);
             },
+            cleanupScopeResources = function() {
+              $timeout.cancel($scope.checkForActiveTransactionsTimer);
+              if ($scope.lastNotificationId) {
+                  Notifications.remove($scope.lastNotificationId, 'event-scheduling');
+                  $scope.lastNotificationId = undefined;
+              }
+            },
             fetchChildResources = function (id) {
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
@@ -636,7 +643,9 @@ angular.module('adminNg.controllers')
         fetchChildResources($scope.resourceId);
 
         $scope.$on('change', function (event, id) {
+            cleanupScopeResources();
             fetchChildResources(id);
+            checkForActiveTransactions();
         });
 
         $scope.transactions = {
@@ -975,16 +984,6 @@ angular.module('adminNg.controllers')
             );
         };
 
-        $scope.modal_close = $scope.close;
-        // CERV-1048 override default close of the modal to stop checking for active transactions.
-        $scope.close = function () {
-            $timeout.cancel($scope.checkForActiveTransactionsTimer);
-            if ($scope.lastNotificationId) {
-                Notifications.remove($scope.lastNotificationId, 'event-scheduling');
-                $scope.lastNotificationId = undefined;
-            }
-            $scope.modal_close();
-        };
         checkForActiveTransactions();
         
         $scope.workflowAction = function (wfId, action) {
@@ -1017,6 +1016,10 @@ angular.module('adminNg.controllers')
                     $scope.setSourceFields($scope.episodeCatalog);
                 });
 
-        }
+        };
+
+        $scope.$on('$destroy', function () {
+            cleanupScopeResources();
+        });
     }
 ]);
