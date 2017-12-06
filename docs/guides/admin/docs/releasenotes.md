@@ -22,7 +22,7 @@ New Features and Improvements
 - **Monitoring Service** - The UI has been enhanced with a monitoring service that provides a visual indication
     of both the ActiveMQ status and the services status. In case of problems with Opencast services, a single click
     navigates the user to the Systems->Services page with an appropriate filter already set
-- **IBM Watson Transcription Serice** - The integration of the IBN Watson Speech-to-Text service allows Adopters 
+- **IBM Watson Transcription Service** - The integration of the IBN Watson Speech-to-Text service allows Adopters 
     to easily integrate speech-to-text into their existing workflows.
 - **Wowza Adaptive Streaming** - The Wowza adaptive streaming distribution service is now included in the official
     Opencast release which relieves Adopters from the need to include this functionality from a separate code
