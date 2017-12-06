@@ -68,6 +68,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     describe('for a single value', function () {
         beforeEach(function () {
             $rootScope.params = {
+                id:   'title',
                 type: 'text',
                 label: 'TITLE',
                 value: 'A Title',

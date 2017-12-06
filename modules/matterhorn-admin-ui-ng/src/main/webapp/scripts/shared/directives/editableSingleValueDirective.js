@@ -77,7 +77,7 @@ angular.module('adminNg.directives')
                   } else if (element.find('input')) {
                     element.find('input').focus();
                   }
-                  });
+                });
             };
 
             scope.keyUp = function (event) {
@@ -126,6 +126,7 @@ angular.module('adminNg.directives')
             };
 
             scope.$on('$destroy', function () {
+                $timeout.cancel(scope.focusTimer);
             });
        }
     };
