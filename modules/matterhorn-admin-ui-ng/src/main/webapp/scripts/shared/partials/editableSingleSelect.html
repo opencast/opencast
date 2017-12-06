@@ -1,10 +1,10 @@
 <div ng-form="innerForm" ng-click="enterEditMode()">
-  <span ng-show="!editMode" ng-click="enterEditMode()">{{ ((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value)) | translate }}</span>
+  &nbsp;<span ng-show="!editMode" ng-click="enterEditMode()">{{ ((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value)) | translate }}</span>
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="enterEditMode()" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
   <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
-  <div ng-show="editMode">
+  <div class="editable-select" ng-show="editMode">
 
     <!-- Try to translate drop-down values by default -->
     <div ng-if="params.translatable !== false">
