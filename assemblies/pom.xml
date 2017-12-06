@@ -31,6 +31,7 @@
         <module>dist-ingest</module>
         <module>dist-presentation</module>
         <module>dist-worker</module>
+        <module>dist-migration</module>
       </modules>
     </profile>
     <profile>
@@ -100,9 +101,6 @@
           <version>${karaf.version}</version>
           <extensions>true</extensions>
           <configuration>
-            <installedFeatures>
-              <feature>opencast-migration</feature>
-            </installedFeatures>
             <libraries>
               <library>xerces-2.11.0.jar;url:="wrap:mvn:xerces/xercesImpl/2.11.0$Export-Package=org.apache.*;version=2.11.0";type:=endorsed;export:=true;delegate:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxp-api-1.4/2.8.0;type:=endorsed;export:=true</library>

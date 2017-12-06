@@ -15,11 +15,9 @@ How to Upgrade
 5. Update the third party tools
 6. Replace Opencast 3.0 with 4.0
 7. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
-8. \* [Migrate the scheduler service](#migrate-scheduler-service)
-9. Drop the old scheduler DB table `DROP TABLE mh_scheduled_event;` and delete the old scheduler solr data by removing the scheduler solr directory.
-10. [Re-build the search indexes](#re-build-search-indexes)
-
-\* This step is optional and only needed if you want to migrate old scheduler data.
+8. [Optional: Migrate the scheduler service](#migrate-scheduler-service)
+9. [Re-build the search indexes](#re-build-search-indexes)
+10. Drop the old scheduler DB table `DROP TABLE mh_scheduled_event;` and delete the old scheduler solr data directory (`data/solr-indexes/scheduler`)
 
 
 Database Migration
@@ -61,11 +59,10 @@ Migrate Scheduler Service
 
 The migration of the scheduler service uses the data of the old scheduling database table which hasn't been deleted by the DB migration script.
 
-1. Configure the destination organization by adding the [migration configuration](#migration-configuration) to the `custom.properties`.
-2. Start Opencast using the interactive script in `bin/start-opencast`
-3. Log-in to the Karaf console on your node where the scheduler service is running (usually admin node) and install the opencast-migration feature by entering: `feature:install opencast-migration`
+1. Delete the existing indexes in `data/index` and `data/solr-indexes/scheduler`
+2. Configure the destination organization by adding the [migration configuration](#migration-configuration) to the `custom.properties`.
+3. Start Opencast
 4. Check the logs for errors!
-5. Restart Opencast service - you do not need to use the interactive start script.
 
 #### Migration Configuration
 ```
@@ -81,11 +78,12 @@ Re-Build Search Indexes
 
 The introduction of the new scheduler service requires an update to the Elasticsearch index:
 
-1. Delete the index directory at `…/data/index`.
-2. Restart Opencast and wait until the system is fully started.
+1. Delete the index directory at `data/index`.
+    - Note: If you previously deleted `data/index` while migrating the scheduler service, skip step 1!
+2. Start Opencast if you have not already, waiting until it has started completely.
 3. Use one of the following methods to recreate the index:
 
-    - Make an HTTP GET request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
+    - Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
     - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
       symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
       `/recreateIndex`.
