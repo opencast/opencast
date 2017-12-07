@@ -1,8 +1,6 @@
 Opencast 4: Release Notes
 =========================
 
-WORK IN PROGRESS
-
 New Features and Improvements
 -----------------------------
 
@@ -70,20 +68,12 @@ capture agent may modify these data.  If not required for the inner workings of 
 download, modify and upload any media package elements to avoid errors.
 
 
-Event Prolonging
-----------------
-
-- TODO: MH-10342 [Improvement] Implemented an endpoint to start (create), stop and prolong an immediate event
-https://bitbucket.org/opencast-community/opencast/pull-requests/1084/mh-10342-improvement-implemented-an/diff#chg-modules/matterhorn-scheduler-impl/src/main/java/org/opencastproject/scheduler/impl/CaptureNowProlongingService.java
-https://bitbucket.org/opencast-community/opencast/pull-requests/1544
-
-
 Working File Repository Configuration
 -------------------------------------
 
 The Working File Repository URL is now set per tenant.  The Configuration key `org.opencastproject.file.repo.url` was
 moved from `etc/custom.properties` to `etc/org.opencastproject.organization-mh_default_org.cfg` as
-`prop.org.opencastproject.file.repo.url`.  The default value has not changed (`${org.opencastproject.server.url}`).  On
+`prop.org.opencastproject.file.repo.url`.  The default value has not changed (`${org.opencastproject.server.url}`). On
 a multiple server setup the value should be the same on all nodes.  For more information read the [Configure Opencast
 ](installation/multiple-servers/#step-5-configure-opencast) section.
 
