@@ -251,10 +251,6 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
     if (element == null) {
       throw new IllegalStateException("No element " + mpeId + " found in media package");
     }
-    // Streaming servers only deal with tracks
-    if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
-      throw new IllegalArgumentException("Media package element type " + element.getElementType() + " not supported");
-    }
     try {
       File source;
       try {
