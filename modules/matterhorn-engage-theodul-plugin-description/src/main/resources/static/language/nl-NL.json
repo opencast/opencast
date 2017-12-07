@@ -1,7 +1,7 @@
 {
-  "value_locale":"en",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "videoTitle":"Titel van de video",
-  "creator":"Auteur",
-  "date":"Datum"
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "videoTitle": "Titel van de video",
+    "creator": "Auteur",
+    "date": "Datum"
 }

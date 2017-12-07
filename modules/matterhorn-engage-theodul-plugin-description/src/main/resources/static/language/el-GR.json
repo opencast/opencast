@@ -1,7 +1,7 @@
 {
-  "value_locale":"en",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "videoTitle":"Τίτλος Βίντεο",
-  "creator":"Δημιουργός",
-  "date":"Ημερομηνία"
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "videoTitle": "Τίτλος Βίντεο",
+    "creator": "Δημιουργός",
+    "date": "Ημερομηνία"
 }

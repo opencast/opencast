@@ -1,13 +1,13 @@
 {
-  "value_locale":"sv",
-  "value_dateFormatFull":"MMMM Vd åååå, t:mm:ss",
-  "error_videoLoading":"Videon laddas. Vänta ett ögonblick.",
-  "error_audioLoading":"Ljudet laddas. Vänta ett ögonblick.",
-  "msg_videoLoadedSuccessfully":"Videon har laddats.",
-  "msg_audioLoadedSuccessfully":"Ljudet har laddats.",
-  "msg_videoBuffering":"Videon buffras för tillfället. Vänta ett ögonblick.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"Videon har buffrats och spelas nu upp automatiskt.",
-  "msg_videoBufferedSuccessfully":"Videon har buffrats.",
-  "error":"Fel",
-  "error_AudioCodecNotSupported":"Fel: Ljud-codec stöds inte av denna webbläsare"
+    "value_locale": "sv",
+    "value_dateFormatFull": "MMMM Vd åååå, t:mm:ss",
+    "error_videoLoading": "Videon laddas. Vänta ett ögonblick.",
+    "error_audioLoading": "Ljudet laddas. Vänta ett ögonblick.",
+    "msg_videoLoadedSuccessfully": "Videon har laddats.",
+    "msg_audioLoadedSuccessfully": "Ljudet har laddats.",
+    "msg_videoBuffering": "Videon buffras för tillfället. Vänta ett ögonblick.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Videon har buffrats och spelas nu upp automatiskt.",
+    "msg_videoBufferedSuccessfully": "Videon har buffrats.",
+    "error": "Fel",
+    "error_AudioCodecNotSupported": "Fel: Ljud-codec stöds inte av denna webbläsare"
 }

@@ -1,13 +1,13 @@
 {
-  "value_locale":"fr",
-  "value_dateFormatFull":"D MMMM YYYY, HH:mm:ss",
-  "error_videoLoading":"Vidéo en cours de chargement. Veuillez patienter un instant.",
-  "error_audioLoading":"Audio en cours de chargement. Veuillez patienter un instant.",
-  "msg_videoLoadedSuccessfully":"La vidéo a été chargée avec succès.",
-  "msg_audioLoadedSuccessfully":"L'audio a été chargé avec succès.",
-  "msg_videoBuffering":"La vidéo est actuellement mise en mémoire tampon. Veuillez patienter un instant.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"La vidéo a été chargée et la lecture va démarrer automatiquement.",
-  "msg_videoBufferedSuccessfully":"La vidéo a été chargée.",
-  "error":"Erreur",
-  "error_AudioCodecNotSupported":"Erreur : Le codec audio n'est pas supporté par ce navigateur"
+    "value_locale": "fr",
+    "value_dateFormatFull": "D MMMM YYYY, HH:mm:ss",
+    "error_videoLoading": "Vidéo en cours de chargement. Veuillez patienter un instant.",
+    "error_audioLoading": "Audio en cours de chargement. Veuillez patienter un instant.",
+    "msg_videoLoadedSuccessfully": "La vidéo a été chargée avec succès.",
+    "msg_audioLoadedSuccessfully": "L'audio a été chargé avec succès.",
+    "msg_videoBuffering": "La vidéo est actuellement mise en mémoire tampon. Veuillez patienter un instant.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "La vidéo a été chargée et la lecture va démarrer automatiquement.",
+    "msg_videoBufferedSuccessfully": "La vidéo a été chargée.",
+    "error": "Erreur",
+    "error_AudioCodecNotSupported": "Erreur : Le codec audio n'est pas supporté par ce navigateur"
 }

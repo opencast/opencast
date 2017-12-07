@@ -1,13 +1,13 @@
 {
-  "value_locale":"zh",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "error_videoLoading":"正在載入視訊。請稍等。",
-  "error_audioLoading":"正在載入音訊。請稍等。",
-  "msg_videoLoadedSuccessfully":"已成功載入了視訊。",
-  "msg_audioLoadedSuccessfully":"已成功載入音訊。",
-  "msg_videoBuffering":"目前緩衝視訊。請稍等。",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"該視訊已被成功地緩衝和現在是自動播放。",
-  "msg_videoBufferedSuccessfully":"視訊已被成功地緩衝。",
-  "error":"錯誤",
-  "error_AudioCodecNotSupported":"錯誤: 此瀏覽器不支援的音訊編解碼器"
+    "value_locale": "英文",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "正在載入視訊。請稍等。",
+    "error_audioLoading": "正在載入音訊。請稍等。",
+    "msg_videoLoadedSuccessfully": "已成功載入了視訊。",
+    "msg_audioLoadedSuccessfully": "已成功載入音訊。",
+    "msg_videoBuffering": "目前正在緩衝視訊。請稍等。",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "該視訊已被成功地緩衝和現正自動播放中。",
+    "msg_videoBufferedSuccessfully": "視訊已被成功地緩衝。",
+    "error": "錯誤",
+    "error_AudioCodecNotSupported": "錯誤: 此瀏覽器不支援的音訊編解碼器"
 }

@@ -1,1843 +1,1843 @@
 {
-  "MATTERHORN":"Opencast",
-  "NAV_HOME":"Start",
-  "NAV_ABOUT":"Om",
-  "NO":"NEJ",
-  "SUBMIT":"Skicka",
-  "UPDATE":"Uppdatera",
-  "CANCEL":"Avbryt",
-  "CONFIRM":"Bekräfta",
-  "SAVE":"Spara",
-  "LOGOUT":"Logga ut",
-  "RESET":"Nollställ",
-  "SELECT_NO_OPTIONS":"Ingen option",
-  "YES":"Ja",
-  "LANGUAGES":{
-    "ARABIC":"Arabiska",
-    "DANISH":"Danska",
-    "GERMAN":"Tyska",
-    "GERMAN_CH":"Schweizertyska",
-    "FINNISH":"Finska",
-    "HINDI":"Hindi",
-    "ITALIAN":"Italienska",
-    "JAPANESE":"Japanska",
-    "DUTCH":"Holländska",
-    "NORWEGIAN":"Norska",
-    "FRENCH":"Franska",
-    "ENGLISH":"Engelska",
-    "SPANISH":"Spanska",
-    "ROMANSH":"Ratoromanska",
-    "POLISH":"Polska",
-    "PORTUGESE":"Portugisiska",
-    "SLOVENIAN":"Slovenska",
-    "SWEDISH":"Svenska",
-    "RUSSIAN":"Ryska",
-    "TURKISH":"Turkiska",
-    "UKRAINIAN":"Ukrainska",
-    "CHINESE":"Kinesiska"
-  },
-  "PREFERENCES":{
-    "TABLE":{
-      "CAPTION":"Redigera tabellvy",
-      "SUBHEADING":"Välj data som du vill ha visad i vyn {{ tableName }}",
-      "AVAILABLE_COLUMNS":"Tillgängliga kolumner",
-      "SELECTED_COLUMNS":"Valda kolumner",
-      "FOOTER_TEXT":"Ordningen och urvalet kommer att sparas automatiskt. Tryck på \"{{resetTranslation}}\" för att återställa standardvyn."
-    }
-  },
-  "CONFIRMATIONS":{
-    "CONTINUE_ACTION":"Är du säker på att du vill fortsätta?",
-    "METADATA":{
-      "NOTICE":{
-        "UNKNOWN":"Följande element tas bort",
-        "EVENT":"Följande händelse raderas",
-        "SERIES":"Följande serie raderas",
-        "ACL":"Följande ACL raderas",
-        "GROUP":"Följande grupp raderas",
-        "USER":"Följande användare kommer att raderas",
-        "USER_BLACKLIST":"Följande svarta användarelistan kommer att raderas",
-        "THEME":"Följande tema raderas",
-        "EMAIL":"Följande e-postmallen raderas",
-        "LOCATION":"Följande plats tas bort",
-        "LOCATION_BLACKLIST":"Den följande svarta platslistan kommer att raderas"
-      },
-      "NAME":"Namn"
-    },
-    "ACTIONS":{
-      "CONFIRMATION":"Bekräftelse krävs"
-    }
-  },
-  "MEDIAMODULE":"Mediemodul",
-  "HELP":{
-    "HELP":"Hjälp",
-    "USERS_GUIDE":"Användarhandbok",
-    "DOCUMENTATION":"Dokumentation",
-    "REST_DOC":"REST API dokumentation"
-  },
-  "NOTIFICATIONS":{
-    "ACL_ADDED":"Åtkomstpolicyn har skapats",
-    "ACL_NOT_SAVED":"Åtkomstpolicyn kunde inte sparas",
-    "ACL_UPDATED":"Åtkomstpolicyn har uppdaterats",
-    "ACL_DELETED":"Åtkomstpolicyn har tagits bort",
-    "ACL_NOT_DELETED":"Åtkomstpolicyn kunde inte tas bort",
-    "USER_ADDED":"Användaren har skapats",
-    "USER_UPDATED":"Användaren har uppdaterats",
-    "USER_NOT_SAVED":"Användaren kunde inte sparas",
-    "USER_DELETED":"Användaren har tagits bort",
-    "USER_NOT_DELETED":"Användaren kunde inte raderas",
-    "USER_NOT_MANAGEABLE":"Användaren är inte hanterbar",
-    "GROUP_ADDED":"Gruppen har skapats",
-    "GROUP_CONFLICT":"Det genererade gruppnamnet existerar redan",
-    "GROUP_UPDATED":"Gruppen har uppdaterats",
-    "GROUP_NOT_SAVED":"Gruppen kunde inte sparas",
-    "GROUP_DELETED":"Gruppen har tagits bort",
-    "GROUP_NOT_DELETED":"Gruppen kunde inte raderas",
-    "ACCESS_DENIED":"Åtkomst nekad. Du har inte tillåtelse att visa denna sida",
-    "SERIES_ADDED":"Serien har skapats",
-    "SERIES_NOT_SAVED":"Serien kunde inte sparas",
-    "EVENTS_CREATED":"Händelsen har skapats",
-    "EVENTS_UPLOAD_STARTED":"Händelsen laddas upp…",
-    "EVENTS_NOT_CREATED":"Händelsen kunde inte skapas",
-    "EVENTS_UPDATED_NB":"{{ number }} händelser har uppdaterats",
-    "EVENTS_UPDATED_ALL":"Alla händelser har uppdaterats",
-    "EVENTS_NOT_UPDATED":"Händelsen kunde inte sparas",
-    "EVENTS_NOT_UPDATED_ID":"Händelsen {{ id }} kunde inte sparas",
-    "EVENTS_NOT_UPDATED_ALL":"Ingen av händelserna kunde sparas",
-    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
-    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
-    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
-    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
-    "SERIES_UPDATED_NB":"{{ number }} serier har uppdaterats",
-    "SERIES_UPDATED_ALL":"Alla serier har uppdaterats",
-    "SERIES_NOT_UPDATED":"Serien kunde inte sparas",
-    "SERIES_NOT_UPDATED_ID":"Serien {{ id }} kunde inte sparas",
-    "SERIES_NOT_UPDATED_ALL":"Ingen av serier kunde sparas",
-    "EVENTS_DELETED":"Händelsen har tagits bort",
-    "EVENTS_NOT_DELETED":"Händelsen kunde inte raderas",
-    "SERIES_DELETED":"Serien har tagits bort",
-    "SERIES_NOT_DELETED":"Serien kunde inte raderas",
-    "USER_BLACKLIST_CREATED":"Svartlistan har skapats",
-    "USER_BLACKLIST_NOT_CREATED":"Svartlistan kunde inte skapas",
-    "USER_BLACKLIST_SAVED":"Svartlistan har sparats",
-    "USER_BLACKLIST_NOT_SAVED":"Svartlistan kunde inte sparas",
-    "USER_BLACKLIST_DELETED":"Svartlistan har tagits bort",
-    "USER_BLACKLIST_NOT_DELETED":"Svartlistan kunde inte tas bort",
-    "LOCATION_DELETED":"Platsen har raderats",
-    "LOCATION_NOT_DELETED":"Platsen kunde inte raderas",
-    "LOCATION_BLACKLIST_CREATED":"Svartlistan har skapats",
-    "LOCATION_BLACKLIST_NOT_CREATED":"Svartlistan kunde inte skapas",
-    "LOCATION_BLACKLIST_SAVED":"Svartlistan har sparats",
-    "LOCATION_BLACKLIST_NOT_SAVED":"Svartlistan kunde inte sparas",
-    "LOCATION_BLACKLIST_DELETED":"Svartlistan har tagits bort",
-    "LOCATION_BLACKLIST_NOT_DELETED":"Svartlistan kunde inte tas bort",
-    "EMAIL_TEMPLATE_CREATED":"Mallen har skapats",
-    "EMAIL_TEMPLATE_NOT_CREATED":"Mallen kunde inte skapas",
-    "EMAIL_TEMPLATE_SAVED":"Mallen har sparats",
-    "EMAIL_TEMPLATE_NOT_SAVED":"Mallen kunde inte sparas",
-    "EMAIL_TEMPLATE_DELETED":"Mallen har tagits bort",
-    "EMAIL_TEMPLATE_NOT_DELETED":"Mallen kunde inte tas bort",
-    "EMAIL_TEMPLATE_NAME_TAKEN":"Detta namn används redan",
-    "EMAIL_SENT":"Meddelandet har skickats",
-    "EMAIL_NOT_SENT":"Meddelandet kunde inte skickas",
-    "CONFLICT_DETECTED":"Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
-    "CONFLICT_ALREADY_ENDED":"Fel vid schemaläggning: Händelsen har redan avslutats.",
-    "CONFLICT_END_BEFORE_START":"Fel vid schemaläggning: Slutet måste vara senare än början.",
-    "INVALID_ACL_RULES":"Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
-    "MISSING_ACL_RULES":"Åtminstone en roll med läs- och skrivrättigheter krävs!",
-    "SAVED_ACL_RULES":"Reglerna för åtkomst har sparats.",
-    "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Händelserna i denna serie kommer att behöva arbetas om",
-    "SERIES_ACL_LOCKED":"Åtkomstpolicys får inte redigeras medan en operation utförs på en händelse som är del av serien",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Händelsens avhopp-status har uppdaterats.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Fel vid uppdatering händelsens avhopp-status.",
-    "EVENT_PARTICIPATION_STATUS_READONLY":"Deltagandestatus kan inte uppdateras eftersom startdatum är förflyten.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Seriens avhopp-status har uppdaterats.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Fel vid uppdatering seriens avhopp-status.",
-    "THEME_NAME_ALREADY_TAKEN":"Detta namn används redan",
-    "THEME_NAME_EMPTY":"Namn får inte vara tom",
-    "BUMPER_UPLOAD_ERROR":"Fel vid uppladdning av media",
-    "TRAILER_UPLOAD_ERROR":"Fel vid uppladdning av media",
-    "TITLE_UPLOAD_ERROR":"Fel vid uppladdning av media",
-    "LICENSE_UPLOAD_ERROR":"Fel vid uppladdning av media",
-    "WATERMARK_UPLOAD_ERROR":"Fel vid uppladdning av media",
-    "THEME_UPLOAD_STARTED":"Mediat laddas upp…",
-    "THEME_CREATED":"Temat har skapats",
-    "THEME_NOT_CREATED":"Temat kunde inte skapas",
-    "THEME_DELETED":"Temat har tagits bort",
-    "THEME_NOT_DELETED":"Temat kunde inte tas bort",
-    "TASK_CREATED":"Uppgiften har skapats",
-    "TASK_NOT_CREATED":"Uppgiften kunde inte skapas",
-    "VIDEO_CUT_NOT_SAVED":"Redigeringsinformationen kunde inte sparas",
-    "VIDEO_CUT_SAVED":"Redigeringsinformationen har sparats",
-    "VIDEO_CUT_PROCESSING":"Videon bearbetas…",
-    "SERVER_UNRESPONSIVE":"Oops! Servern svarar inte. Försök igen senare.",
-    "SERVICE_UNAVAILABLE":"Oops! Servern svarar inte. Försök igen senare.",
-    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
-  },
-  "BULK_ACTIONS":{
-    "CAPTION":"Åtgärder",
-    "SEND_MESSAGE":"Skicka meddelande",
-    "WARNING":"Varning",
-    "EDIT_STATUS":{
-      "CAPTION":"Redigera status",
-      "READY_FOR_RECORDING":"Redo för inspelning",
-      "OPTED_OUT":"Avhoppad"
-    },
-    "DELETE":{
-      "SERIES":{
-        "CAPTION":"Ta bort",
-        "BUTTON":"Ta bort"
-      },
-      "EVENTS":{
-        "CAPTION":"Ta bort",
-        "DELETE_EVENTS":"Radera händelser",
-        "PUBLISHED":{
-          "NONE":"Ingen av de markerade händelserna måste dras tillbaka innan de kan tas bort.",
-          "WARNING":"Händelserna nedan kan inte tas bort eftersom de redan har publicerats och att ta bort dem skulle lämna inget sätt att ta bort publicerade filer. Välj ett workflow nedan för att dra tillbaks händelserna först och sedan ta bort dem."
-        },
-        "RETRACT_EVENTS":"Dra tillbaka händelser",
-        "SELECT_RETRACT_TASK":"Välj en aktivitet för att dra tillbaka",
-        "SUMMARY":{
-          "EVENTS_DELETED":"Händelser som ska tas bort",
-          "EVENTS_RETRACTED":"Händelser som ska dras tillbaka",
-          "RETRACT_WORKFLOW":"Workflow att ta tillbaka händelser"
-        },
-        "UNPUBLISHED":{
-          "NONE":"Ingen av de markerade händelserna kan tas bort utan att lämna överblivna filer."
-        },
-        "BUTTON":"Ta bort"
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Starta",
+   "NAV_ABOUT": "Om",
+   "NO": "NEJ",
+   "SUBMIT": "Skicka",
+   "UPDATE": "Uppdatera",
+   "CANCEL": "Avbryt",
+   "CONFIRM": "Bekräfta",
+   "SAVE": "Spara",
+   "LOGOUT": "Logga ut",
+   "RESET": "Nollställ",
+   "SELECT_NO_OPTIONS": "Ingen option",
+   "YES": "Ja",
+   "LANGUAGES": {
+      "ARABIC": "Arabiska",
+      "DANISH": "Danska",
+      "GERMAN": "Tyska",
+      "GERMAN_CH": "Schweizertyska",
+      "FINNISH": "Finska",
+      "HINDI": "Hindiska",
+      "ITALIAN": "Italienska",
+      "JAPANESE": "Japanska",
+      "DUTCH": "Holländska",
+      "NORWEGIAN": "Norska",
+      "FRENCH": "Franska",
+      "ENGLISH": "Engelska",
+      "SPANISH": "Spanska",
+      "ROMANSH": "Ratoromanska",
+      "POLISH": "Polska",
+      "PORTUGESE": "Portugisiska",
+      "SLOVENIAN": "Slovenska",
+      "SWEDISH": "Svenska",
+      "RUSSIAN": "Ryska",
+      "TURKISH": "Turkiska",
+      "UKRAINIAN": "Ukrainska",
+      "CHINESE": "Kinesiska"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Redigera tabellvy",
+         "SUBHEADING": "Välj data som du vill ha visad i vyn {{ tableName }}",
+         "AVAILABLE_COLUMNS": "Tillgängliga kolumner",
+         "SELECTED_COLUMNS": "Valda kolumner",
+         "FOOTER_TEXT": "Ordningen och urvalet kommer att sparas automatiskt. Tryck på \"{{resetTranslation}}\" för att återställa standardvyn."
       }
-    },
-    "DELETE_EVENTS_WARNING_LINE1":"Efter raderingen kan inga metadata av händelsen och inga ljud- och videofiler återställas.",
-    "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1":"Efter raderingen kan inga metadata av serien återställas. Händelserna i serien tas inte bort.",
-    "DELETE_SERIES_WARNING_LINE2":"",
-    "SCHEDULE_TASK":{
-      "CAPTION":"Starta uppgift",
-      "GENERAL":{
-        "CAPTION":"Allmänt",
-        "SUMMARY":"({{ count }} händelser valda)",
-        "CANNOTSTART":"Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den/dem eller försök igen senare."
+   },
+   "CONFIRMATIONS": {
+      "CONTINUE_ACTION": "Är du säker på att du vill fortsätta?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Följande element tas bort",
+            "EVENT": "Följande händelse raderas",
+            "SERIES": "Följande serie raderas",
+            "ACL": "Följande ACL raderas",
+            "GROUP": "Följande grupp raderas",
+            "USER": "Följande användare kommer att raderas",
+            "USER_BLACKLIST": "Följande svarta användarelistan kommer att raderas",
+            "THEME": "Följande tema raderas",
+            "EMAIL": "Följande e-postmallen raderas",
+            "LOCATION": "Följande plats tas bort",
+            "LOCATION_BLACKLIST": "Den följande svarta platslistan kommer att raderas"
+         },
+         "NAME": "Namn"
       },
-      "TASKS":{
-        "CAPTION":"Uppgifter",
-        "SELECT":"Välj uppgift"
-      },
-      "SUMMARY":{
-        "CAPTION":"Summering",
-        "EVENTS":"Händelser",
-        "EVENTS_SUMMARY":"Du har valt {{numberOfEvents}} händelser",
-        "CONFIGURATION":"Konfiguration",
-        "WORKFLOW":"Uppgift"
+      "ACTIONS": {
+         "CONFIRMATION": "Bekräftelse krävs"
       }
-    }
-  },
-  "DATES":{
-    "TODAY":"Idag",
-    "TOMORROW":"Imorgon",
-    "YESTERDAY":"Igår"
-  },
-  "DATETIMES":{
-    "TODAY":"Idag på {{ time }}",
-    "TOMORROW":"Imorgon kl {{ time }}",
-    "YESTERDAY":"Igår på {{ time }}"
-  },
-  "WIZARD":{
-    "NEXT_STEP":"Nästa",
-    "BACK":"Föregående",
-    "CREATE":"Skapa",
-    "RETRACT":"Dra tillbaka",
-    "UPDATE":"Uppdatera",
-    "DURATION":{
-      "HOURS":"Timmar",
-      "MINUTES":"Minuter"
-    }
-  },
-  "CAPTURE_AGENT":{
-    "DEVICE":{
-      "MICROPHONE":"Mikrofon",
-      "CAMERA":"Kamera",
-      "PRESENTATION":"Presentation"
-    }
-  },
-  "NAV":{
-    "DASHBOARD":{
-      "TITLE":"Dashboard"
-    },
-    "EVENTS":{
-      "TITLE":"Inspelningar"
-    },
-    "SYSTEMS":{
-      "TITLE":"System"
-    },
-    "CAPTUREAGENTS":{
-      "TITLE":"Fånga"
-    },
-    "USERS":{
-      "TITLE":"Organisation"
-    },
-    "INTEGRATIONS":{
-      "TITLE":"Integrationer"
-    },
-    "CONFIGURATION":{
-      "TITLE":"Konfiguration"
-    }
-  },
-  "EVENTS":{
-    "RETRACT":{
-      "CAPTION":"Dra tillbaka händelsen",
-      "ID":"ID",
-      "SELECT_TASK":"Välj uppgift",
-      "SUMMARY":"Summering",
-      "WARNING":"Denna händelse har publicerats till minst en publikationskanal så den måste dras tillbaka innan den kan tas bort. Markera uppgifterna nedan för att kunna dra tillbaka publikationerna."
-    },
-    "LICENSE":{
-      "ALLRIGHTS":"Alla rättigheter reserverade",
-      "CCBY":"CC BY",
-      "CCBYSA":"CC BY-SA",
-      "CCBYND":"CC BY-ND",
-      "CCBYNC":"CC BY-NC",
-      "CCBYNCSA":"CC BY-NC-SA",
-      "CCBYNCND":"CC BY-NC-ND",
-      "CC0":"CC0",
-      "BSD":"BSD",
-      "CCND":"CCND",
-      "GPL":"GPL"
-    },
-    "SEND_MESSAGE":{
-      "CAPTION":"Skicka meddelande",
-      "TABS":{
-        "RECIPIENTS":"Mottagare",
-        "MESSAGE":"Meddelande",
-        "SUMMARY":"Summering"
+   },
+   "MEDIAMODULE": "Mediemodul",
+   "HELP": {
+      "HELP": "Hjälp",
+      "USERS_GUIDE": "Användarhandbok",
+      "DOCUMENTATION": "Dokumentation",
+      "REST_DOC": "REST API dokumentation"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Åtkomstpolicyn har skapats",
+      "ACL_NOT_SAVED": "Åtkomstpolicyn kunde inte sparas",
+      "ACL_UPDATED": "Åtkomstpolicyn har uppdaterats",
+      "ACL_DELETED": "Åtkomstpolicyn har tagits bort",
+      "ACL_NOT_DELETED": "Åtkomstpolicyn kunde inte tas bort",
+      "USER_ADDED": "Användaren har skapats",
+      "USER_UPDATED": "Användaren har uppdaterats",
+      "USER_NOT_SAVED": "Användaren kunde inte sparas",
+      "USER_DELETED": "Användaren har tagits bort",
+      "USER_NOT_DELETED": "Användaren kunde inte raderas",
+      "USER_NOT_MANAGEABLE": "Användaren är inte hanterbar",
+      "GROUP_ADDED": "Gruppen har skapats",
+      "GROUP_CONFLICT": "Det genererade gruppnamnet existerar redan",
+      "GROUP_UPDATED": "Gruppen har uppdaterats",
+      "GROUP_NOT_SAVED": "Gruppen kunde inte sparas",
+      "GROUP_DELETED": "Gruppen har tagits bort",
+      "GROUP_NOT_DELETED": "Gruppen kunde inte raderas",
+      "ACCESS_DENIED": "Åtkomst nekad. Du har inte tillåtelse att visa denna sida",
+      "SERIES_ADDED": "Serien har skapats",
+      "SERIES_NOT_SAVED": "Serien kunde inte sparas",
+      "EVENTS_CREATED": "Händelsen har skapats",
+      "EVENTS_UPLOAD_STARTED": "Händelsen laddas upp…",
+      "EVENTS_NOT_CREATED": "Händelsen kunde inte skapas",
+      "EVENTS_UPDATED_NB": "{{ number }} händelser har uppdaterats",
+      "EVENTS_UPDATED_ALL": "Alla händelser har uppdaterats",
+      "EVENTS_NOT_UPDATED": "Händelsen kunde inte sparas",
+      "EVENTS_NOT_UPDATED_ID": "Händelsen {{ id }} kunde inte sparas",
+      "EVENTS_NOT_UPDATED_ALL": "Ingen av händelserna kunde sparas",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Bearbetning fortsätts...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Bearbetning kunde inte fortsättas.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Bearbetning avbryts...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Bearbetning kunde inte avbrytas.",
+      "SERIES_UPDATED_NB": "{{ number }} serier har uppdaterats",
+      "SERIES_UPDATED_ALL": "Alla serier har uppdaterats",
+      "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
+      "SERIES_NOT_UPDATED_ID": "Serien {{ id }} kunde inte sparas",
+      "SERIES_NOT_UPDATED_ALL": "Ingen av serier kunde sparas",
+      "EVENTS_DELETED": "Händelsen har tagits bort",
+      "EVENTS_NOT_DELETED": "Händelsen kunde inte raderas",
+      "SERIES_DELETED": "Serien har tagits bort",
+      "SERIES_NOT_DELETED": "Serien kunde inte raderas",
+      "USER_BLACKLIST_CREATED": "Svartlistan har skapats",
+      "USER_BLACKLIST_NOT_CREATED": "Svartlistan kunde inte skapas",
+      "USER_BLACKLIST_SAVED": "Svartlistan har sparats",
+      "USER_BLACKLIST_NOT_SAVED": "Svartlistan kunde inte sparas",
+      "USER_BLACKLIST_DELETED": "Svartlistan har tagits bort",
+      "USER_BLACKLIST_NOT_DELETED": "Svartlistan kunde inte tas bort",
+      "LOCATION_DELETED": "Platsen har raderats",
+      "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
+      "LOCATION_BLACKLIST_CREATED": "Svartlistan har skapats",
+      "LOCATION_BLACKLIST_NOT_CREATED": "Svartlistan kunde inte skapas",
+      "LOCATION_BLACKLIST_SAVED": "Svartlistan har sparats",
+      "LOCATION_BLACKLIST_NOT_SAVED": "Svartlistan kunde inte sparas",
+      "LOCATION_BLACKLIST_DELETED": "Svartlistan har tagits bort",
+      "LOCATION_BLACKLIST_NOT_DELETED": "Svartlistan kunde inte tas bort",
+      "EMAIL_TEMPLATE_CREATED": "Mallen har skapats",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Mallen kunde inte skapas",
+      "EMAIL_TEMPLATE_SAVED": "Mallen har sparats",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Mallen kunde inte sparas",
+      "EMAIL_TEMPLATE_DELETED": "Mallen har tagits bort",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Mallen kunde inte tas bort",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Detta namn används redan",
+      "EMAIL_SENT": "Meddelandet har skickats",
+      "EMAIL_NOT_SENT": "Meddelandet kunde inte skickas",
+      "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
+      "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
+      "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
+      "INVALID_ACL_RULES": "Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
+      "MISSING_ACL_RULES": "Åtminstone en roll med läs- och skrivrättigheter krävs!",
+      "SAVED_ACL_RULES": "Reglerna för åtkomst har sparats.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Händelserna i denna serie kommer att behöva arbetas om",
+      "SERIES_ACL_LOCKED": "Åtkomstpolicys får inte redigeras medan en operation utförs på en händelse som är del av serien",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Åtkomstpolicy kräver minst en roll med behörigheterna att läsa och skriva.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Händelsens avhopp-status har uppdaterats.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering händelsens avhopp-status.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Deltagandestatus kan inte uppdateras eftersom startdatum är förflyten.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Seriens avhopp-status har uppdaterats.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fel vid uppdatering seriens avhopp-status.",
+      "THEME_NAME_ALREADY_TAKEN": "Detta namn används redan",
+      "THEME_NAME_EMPTY": "Namn får inte vara tom",
+      "BUMPER_UPLOAD_ERROR": "Fel vid uppladdning av media",
+      "TRAILER_UPLOAD_ERROR": "Fel vid uppladdning av media",
+      "TITLE_UPLOAD_ERROR": "Fel vid uppladdning av media",
+      "LICENSE_UPLOAD_ERROR": "Fel vid uppladdning av media",
+      "WATERMARK_UPLOAD_ERROR": "Fel vid uppladdning av media",
+      "THEME_UPLOAD_STARTED": "Mediat laddas upp…",
+      "THEME_CREATED": "Temat har skapats",
+      "THEME_NOT_CREATED": "Temat kunde inte skapas",
+      "THEME_DELETED": "Temat har tagits bort",
+      "THEME_NOT_DELETED": "Temat kunde inte tas bort",
+      "TASK_CREATED": "Uppgiften har skapats",
+      "TASK_NOT_CREATED": "Uppgiften kunde inte skapas",
+      "VIDEO_CUT_NOT_SAVED": "Redigeringsinformationen kunde inte sparas",
+      "VIDEO_CUT_SAVED": "Redigeringsinformationen har sparats",
+      "VIDEO_CUT_PROCESSING": "Videon bearbetas…",
+      "SERVER_UNRESPONSIVE": "Oops! Servern svarar inte. Försök igen senare.",
+      "SERVICE_UNAVAILABLE": "Oops! Servern svarar inte. Försök igen senare.",
+      "ACTIVE_TRANSACTION": "Den aktuella händelsen kan för närvarande inte redigeras för att den deltar i en aktiv transaktion."
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Åtgärder",
+      "SEND_MESSAGE": "Skicka meddelande",
+      "WARNING": "Varning",
+      "EDIT_STATUS": {
+         "CAPTION": "Redigera status",
+         "READY_FOR_RECORDING": "Redo för inspelning",
+         "OPTED_OUT": "Avhoppad"
       },
-      "RECIPIENTS":{
-        "AUDIT_TRAIL_CAPTION":"Lägg till på redovisningsspårningen",
-        "AUDIT_TRAIL_DESCRIPTION":"Markera om du vill lägga till meddelandet i redovisningsspårningen",
-        "AUDIT_TRAIL_LABEL":""
-      },
-      "MESSAGE":{
-        "EMAIL_TEMPLATE":"Välj e-postmall",
-        "SUBJECT":"Ämne",
-        "MESSAGE":"Meddelande",
-        "INCLUDE_SIGNATURE":"Lägg till min signatur i e-post"
-      },
-      "SUMMARY":{
-        "MESSAGE_SUMMARY":"Summering"
-      }
-    },
-    "EVENTS":{
-      "NEW":{
-        "CAPTION":"Skapa händelse",
-        "METADATA":{
-          "CAPTION":"Metadata"
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Utökad metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Utökad metadata"
-          }
-        },
-        "SOURCE":{
-          "CAPTION":"Källa",
-          "SELECT_SOURCE":"Välj källa",
-          "PLACEHOLDER":{
-            "LOCATION":"Plats",
-            "INPUTS":"Ingångar",
-            "HOUR":"Timme",
-            "MINUTE":"Minut",
-            "REPEATS":"Upprepningar",
-            "START_DATE":"åååå-mm-dd",
-            "START_DATE_FORMAT":"åååå-mm-dd",
-            "END_DATE":"åååå-mm-dd",
-            "END_DATE_FORMAT":"åååå-mm-dd"
-          },
-          "UPLOAD":{
-            "CAPTION":"Ladda upp",
-            "RECORDING_ELEMENTS":"Inspelningselement",
-            "RECORDING_METADATA":"Recording metadata",
-            "SEGMENTABLE":{
-              "SHORT":"Transparanger",
-              "DETAIL":"Filen innehåller en inspelning av transparanger (Keynote, Powerpoint, etc)."
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Ta bort",
+            "BUTTON": "Ta bort"
+         },
+         "EVENTS": {
+            "CAPTION": "Ta bort",
+            "DELETE_EVENTS": "Radera händelser",
+            "PUBLISHED": {
+               "NONE": "Ingen av de markerade händelserna måste dras tillbaka innan de kan tas bort.",
+               "WARNING": "Händelserna nedan kan inte tas bort eftersom de redan har publicerats och att ta bort dem skulle lämna inget sätt att ta bort publicerade filer. Välj ett workflow nedan för att dra tillbaks händelserna först och sedan ta bort dem."
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Presentatör",
-              "DETAIL":"Filen innehåller en inspelning av en person som talar till en publik."
+            "RETRACT_EVENTS": "Dra tillbaka händelser",
+            "SELECT_RETRACT_TASK": "Välj en aktivitet för att dra tillbaka",
+            "SUMMARY": {
+               "EVENTS_DELETED": "Händelser som ska tas bort",
+               "EVENTS_RETRACTED": "Händelser som ska dras tillbaka",
+               "RETRACT_WORKFLOW": "Workflow att ta tillbaka händelser"
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Endast ljud",
-              "DETAIL":"Filen innehåller endast ljud."
+            "UNPUBLISHED": {
+               "NONE": "Ingen av de markerade händelserna kan tas bort utan att lämna överblivna filer."
             },
-            "MULTIPLE_PARTS":{
-              "SHORT":"Multiple parts",
-              "DETAIL":"A set of files containing different parts of the event."
-            }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Schema",
-            "START_DATE":"Startdatum",
-            "START_TIME":"Starttid",
-            "TIMEZONE":"Tidszon",
-            "END_DATE":"Slutdatum",
-            "DURATION":"Längd"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Lägg till händelse"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Lägg till flera händelser",
-            "REPEATS":"Upprepningar",
-            "REPEAT_ON":"Upprepa på",
-            "WEEKDAYS":"Vardagar"
-          },
-          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
-        },
-        "PROCESSING":{
-          "CAPTION":"Bearbetar",
-          "SELECT_WORKFLOW":"Välj workflow",
-          "SELECT_WORKFLOW_EMPTY":"Ingen workflow hittades",
-          "WORKFLOW":"Workflow"
-        },
-        "UPLOAD_ASSET":{
-          "CAPTION":"Asset Upload",
-          "SELECT_TYPE":"Select asset type",
-          "ADD":"Add Asset",
-          "OPTION":{
-            "CLASS_HANDOUT_NOTES":"Class handout notes",
-            "CAPTIONS_DFXP":"Captions DFXP",
-            "CAPTIONS_WEBVTT":"Captions WebVTT",
-            "PREVIEW_IMAGE":"Preview image",
-            "SMIL":"Smil catalog",
-            "TRACK_PARTS":"Track parts"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "POLICY":"Åtkomstpolicy",
-          "ACL":"Åtkomstpolicy"
-        },
-        "SUMMARY":{
-          "CAPTION":"Summering"
-        },
-        "WEEKDAYS":{
-          "MO":"Må",
-          "TU":"Ti",
-          "WE":"On",
-          "TH":"To",
-          "FR":"Fr",
-          "SA":"Lö",
-          "SU":"Sö"
-        }
+            "BUTTON": "Ta bort"
+         }
       },
-      "NAVIGATION":{
-        "EVENTS":"Händelser",
-        "SERIES":"Serie",
-        "OVERVIEW":"Översikt"
+      "DELETE_EVENTS_WARNING_LINE1": "Efter raderingen kan inga metadata av händelsen och inga ljud- och videofiler återställas.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Efter raderingen kan inga metadata av serien återställas. Händelserna i serien tas inte bort.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Starta uppgift",
+         "GENERAL": {
+            "CAPTION": "Allmänt",
+            "SUMMARY": "({{ count }} händelser valda)",
+            "CANNOTSTART": "Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den/dem eller försök igen senare."
+         },
+         "TASKS": {
+            "CAPTION": "Uppgifter",
+            "SELECT": "Välj uppgift"
+         },
+         "SUMMARY": {
+            "CAPTION": "Summering",
+            "EVENTS": "Händelser",
+            "EVENTS_SUMMARY": "Du har valt {{numberOfEvents}} händelser",
+            "CONFIGURATION": "Konfiguration",
+            "WORKFLOW": "Uppgift"
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Idag",
+      "TOMORROW": "Imorgon",
+      "YESTERDAY": "Igår"
+   },
+   "DATETIMES": {
+      "TODAY": "Idag på {{ time }}",
+      "TOMORROW": "Imorgon kl {{ time }}",
+      "YESTERDAY": "Igår på {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Nästa",
+      "BACK": "Föregående",
+      "CREATE": "Skapa",
+      "RETRACT": "Dra tillbaka",
+      "UPDATE": "Uppdatera",
+      "DURATION": {
+         "HOURS": "Timmar",
+         "MINUTES": "Minuter"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Mikrofon",
+         "CAMERA": "Kamera",
+         "PRESENTATION": "Presentation"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Dashboard"
       },
-      "UPLOAD":"Ladda upp",
-      "ADD_SERIES":"Lägg till serie",
-      "ADD_EVENT":"Lägg till händelse",
-      "TABLE":{
-        "CAPTION":"Händelser",
-        "CREATORS":"Skapare",
-        "TITLE":"Titel",
-        "PRESENTERS":"Presentatör(er)",
-        "SERIES":"Serie",
-        "DATE":"Datum",
-        "START":"Start",
-        "STOP":"Stop",
-        "STATUS":"Status",
-        "LOCATION":"Plats",
-        "ACTION":"Åtgärder",
-        "FIRST":"Först",
-        "LAST":"Sista",
-        "NEXT":"Nästa",
-        "MANAGED_ACL":"Åtkomstpolicy",
-        "SCHEDULING_STATUS":"Status",
-        "WORKFLOW_STATE":"Förlopp",
-        "REVIEW_STATUS":"Granskningsstatus",
-        "PREVIOUS":"Föregående",
-        "NOCONTENT":"Inga data tillgängliga",
-        "PUBLISHED":"Publicerad"
+      "EVENTS": {
+         "TITLE": "Inspelningar"
       },
-      "SCHEDULING_STATUS":{
-        "READY_FOR_RECORDING":"Redo för inspelning",
-        "BLACKLISTED":"Svartlistad",
-        "OPTED_OUT":"Avhoppad"
+      "SYSTEMS": {
+         "TITLE": "System"
       },
-      "STATUS":{
-        "SCHEDULED":"Schemalagd",
-        "OPTEDOUT":"Avhoppad",
-        "BLACKLISTED":"Svartlistad",
-        "RECORDING":"Spelar in",
-        "UPLOADING":"Laddar upp",
-        "INGESTING":"Intag",
-        "PENDING":"Väntläge",
-        "PROCESSING":"Kör",
-        "PAUSED":"Pausad",
-        "PROCESSED":"Färdig",
-        "RECORDING_FAILURE":"Inspelningsfel",
-        "PROCESSING_FAILURE":"Bearbetning misslyckades",
-        "PROCESSING_CANCELED":"Bearbetning avbruten"
+      "CAPTUREAGENTS": {
+         "TITLE": "Fånga"
       },
-      "DETAILS":{
-        "HEADER":"Händelsedetaljer - {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Allmänt",
-          "METADATA":"Metadata",
-          "EXTENDED-METADATA":"Metadata II",
-          "ASSETS":"Resurser",
-          "SCHEDULING":"Schemaläggning",
-          "WORKFLOWS":"Workflows",
-          "ACCESS":"Åtkomstpolicy",
-          "COMMENTS":"Kommentarer"
-        },
-        "GENERAL":{
-          "PUBLICATION_STATUS":"Publiceringsstatus",
-          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
-          "SCHEDULING_STATUS":"Status",
-          "READY_FOR_RECORDING":"Redo för inspelning",
-          "OPTED_OUT":"Avhoppad",
-          "CUSTOM":"Anpassad",
-          "ENGAGE":"Engage",
-          "EXTERNAL_API":"External API publikation",
-          "YOUTUBE":"YouTube",
-          "OAIPMH":"OAI-PMH",
-          "SELECT_WORKFLOW":"Välj workflow",
-          "SELECT_WORKFLOW_EMPTY":"Inga tillgängliga workflows"
-        },
-        "MEDIA":{
-          "TRIM_MEDIA":"Trimma media",
-          "MEDIA":"Media",
-          "ID":"ID",
-          "TYPE":"Typ",
-          "MIMETYPE":"MimeType",
-          "URL":"URL",
-          "DETAILS":"Detaljer"
-        },
-        "ATTACHMENTS":{
-          "CAPTION":"Bilagor",
-          "ID":"Id",
-          "TYPE":"Typ",
-          "MIMETYPE":"MimeType",
-          "TAGS":"Taggar",
-          "LINK":"Länk"
-        },
-        "SOURCE":{
-          "CAPTION":"Källa",
-          "SELECT_SOURCE":"Välj källa",
-          "PLACEHOLDER":{
-            "LOCATION":"Plats",
-            "INPUTS":"Ingångar",
-            "HOUR":"Timme",
-            "MINUTE":"Minut",
-            "REPEATS":"Upprepningar",
-            "START_DATE":"åååå-mm-dd",
-            "END_DATE":"åååå-mm-dd"
-          },
-          "UPLOAD":{
-            "CAPTION":"Ladda upp",
-            "RECORDING_ELEMENTS":"Inspelningselement",
-            "SEGMENTABLE":{
-              "SHORT":"Transparanger",
-              "DETAIL":"Filen innehåller en inspelning av transparanger (Keynote, Powerpoint, etc)."
+      "USERS": {
+         "TITLE": "Organisation"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Integrationer"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Konfiguration"
+      }
+   },
+   "EVENTS": {
+      "RETRACT": {
+         "CAPTION": "Dra tillbaka händelsen",
+         "ID": "ID",
+         "SELECT_TASK": "Välj uppgift",
+         "SUMMARY": "Summering",
+         "WARNING": "Denna händelse har publicerats till minst en publikationskanal så den måste dras tillbaka innan den kan tas bort. Markera uppgifterna nedan för att kunna dra tillbaka publikationerna."
+      },
+      "LICENSE": {
+         "ALLRIGHTS": "Alla rättigheter reserverade",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Skicka meddelande",
+         "TABS": {
+            "RECIPIENTS": "Mottagare",
+            "MESSAGE": "Meddelande",
+            "SUMMARY": "Summering"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Lägg till på redovisningsspårningen",
+            "AUDIT_TRAIL_DESCRIPTION": "Markera om du vill lägga till meddelandet i redovisningsspårningen",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Välj e-postmall",
+            "SUBJECT": "Ämne",
+            "MESSAGE": "Meddelande",
+            "INCLUDE_SIGNATURE": "Lägg till min signatur i e-post"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Summering"
+         }
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Skapa händelse",
+            "METADATA": {
+               "CAPTION": "Metadata"
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Presentatör",
-              "DETAIL":"Filen innehåller en inspelning av en person som talar till en publik."
+            "METADATA_EXTENDED": {
+               "CAPTION": "Utökad metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Utökad metadata"
+               }
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Endast ljud",
-              "DETAIL":"Filen innehåller endast ljud."
+            "SOURCE": {
+               "CAPTION": "Källa",
+               "SELECT_SOURCE": "Välj källa",
+               "PLACEHOLDER": {
+                  "LOCATION": "Plats",
+                  "INPUTS": "Ingångar",
+                  "HOUR": "Timme",
+                  "MINUTE": "Minut",
+                  "REPEATS": "Upprepningar",
+                  "START_DATE": "åååå-mm-dd",
+                  "START_DATE_FORMAT": "åååå-mm-dd",
+                  "END_DATE": "åååå-mm-dd",
+                  "END_DATE_FORMAT": "åååå-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Ladda upp",
+                  "RECORDING_ELEMENTS": "Inspelningselement",
+                  "RECORDING_METADATA": "Metadata av inspelningen",
+                  "SEGMENTABLE": {
+                     "SHORT": "Transparanger",
+                     "DETAIL": "Filen innehåller en inspelning av transparanger (Keynote, Powerpoint, etc)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Presentatör",
+                     "DETAIL": "Filen innehåller en inspelning av en person som talar till en publik."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Endast ljud",
+                     "DETAIL": "Filen innehåller endast ljud."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Flera delar",
+                     "DETAIL": "En uppsättning filer som innehåller olika delar av händelsen."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Schema",
+                  "START_DATE": "Startdatum",
+                  "START_TIME": "Starttid",
+                  "TIMEZONE": "Tidszon",
+                  "END_DATE": "Slutdatum",
+                  "DURATION": "Längd"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Lägg till händelse"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Lägg till flera händelser",
+                  "REPEATS": "Upprepningar",
+                  "REPEAT_ON": "Upprepa på",
+                  "WEEKDAYS": "Vardagar"
+               },
+               "NO_SOURCE_AVAILABLE": "Ingen capture agent tillgänglig för schemaläggning"
+            },
+            "PROCESSING": {
+               "CAPTION": "Bearbetar",
+               "SELECT_WORKFLOW": "Välj workflow",
+               "SELECT_WORKFLOW_EMPTY": "Ingen workflow hittades",
+               "WORKFLOW": "Workflow"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Uppladdning av resurser",
+               "SELECT_TYPE": "Välj typ av resurs",
+               "ADD": "Lägg till resurs",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Lektionsanteckningar/Handout",
+                  "CAPTIONS_DFXP": "Undertexter DFXP",
+                  "CAPTIONS_WEBVTT": "Undertexter WebVTT",
+                  "PREVIEW_IMAGE": "Förhandsgranskningsbilden",
+                  "SMIL": "SMIL-katalogen",
+                  "TRACK_PARTS": "Delar av spår"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "POLICY": "Åtkomstpolicy",
+               "ACL": "Åtkomstpolicy"
+            },
+            "SUMMARY": {
+               "CAPTION": "Summering"
+            },
+            "WEEKDAYS": {
+               "MO": "Må",
+               "TU": "Ti",
+               "WE": "On",
+               "TH": "To",
+               "FR": "Fr",
+               "SA": "Lö",
+               "SU": "Sö"
             }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Schema",
-            "START_DATE":"Startdatum",
-            "START_TIME":"Starttid",
-            "TIMEZONE":"Tidszon",
-            "END_DATE":"Slutdatum",
-            "DURATION":"Längd"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Lägg till händelse"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Lägg till flera händelser",
-            "REPEATS":"Upprepningar",
-            "REPEAT_ON":"Upprepa på",
-            "WEEKDAYS":"Vardagar"
-          }
-        },
-        "ASSETS":{
-          "CAPTION":"Resurser",
-          "TYPE":"Typ",
-          "SIZE":"Storlek",
-          "DETAILS":"Detaljer",
-          "ATTACHMENTS":{
-            "TITLE":"Bilagor",
-            "CAPTION":"Bilagor",
-            "ID":"Id",
-            "TYPE":"Typ",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Taggar",
-            "LINK":"Länk",
-            "DETAILS":{
-              "TITLE":"Bilagsdetaljer",
-              "CAPTION":"Bilagsdetaljer",
-              "ID":"Id",
-              "TYPE":"Typ",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Taggar",
-              "URL":"URL",
-              "SIZE":"Storlek",
-              "CHECKSUM":"Kontrollsumma",
-              "REFERENCE":"Referens"
+         },
+         "NAVIGATION": {
+            "EVENTS": "Händelser",
+            "SERIES": "Serie",
+            "OVERVIEW": "Översikt"
+         },
+         "UPLOAD": "Ladda upp",
+         "ADD_SERIES": "Lägg till serie",
+         "ADD_EVENT": "Lägg till händelse",
+         "TABLE": {
+            "CAPTION": "Händelser",
+            "CREATORS": "Skapare",
+            "TITLE": "Titel",
+            "PRESENTERS": "Presentatör(er)",
+            "SERIES": "Serie",
+            "DATE": "Datum",
+            "START": "Start",
+            "STOP": "Stopp",
+            "STATUS": "Status",
+            "LOCATION": "Plats",
+            "ACTION": "Åtgärder",
+            "FIRST": "Först",
+            "LAST": "Sista",
+            "NEXT": "Nästa",
+            "MANAGED_ACL": "Åtkomstpolicy",
+            "SCHEDULING_STATUS": "Status",
+            "WORKFLOW_STATE": "Förlopp",
+            "REVIEW_STATUS": "Granskningsstatus",
+            "PREVIOUS": "Föregående",
+            "NOCONTENT": "Inga data tillgängliga",
+            "PUBLISHED": "Publicerad"
+         },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Redo för inspelning",
+            "BLACKLISTED": "Svartlistad",
+            "OPTED_OUT": "Avhoppad"
+         },
+         "STATUS": {
+            "SCHEDULED": "Schemalagd",
+            "OPTEDOUT": "Avhoppad",
+            "BLACKLISTED": "Svartlistad",
+            "RECORDING": "Spelar in",
+            "UPLOADING": "Laddar upp",
+            "INGESTING": "Intag",
+            "PENDING": "Väntläge",
+            "PROCESSING": "Kör",
+            "PAUSED": "Pausad",
+            "PROCESSED": "Färdig",
+            "RECORDING_FAILURE": "Inspelningsfel",
+            "PROCESSING_FAILURE": "Bearbetning misslyckades",
+            "PROCESSING_CANCELED": "Bearbetning avbruten"
+         },
+         "DETAILS": {
+            "HEADER": "Händelsedetaljer - {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Allmänt",
+               "METADATA": "Metadata",
+               "EXTENDED-METADATA": "Metadata II",
+               "ASSETS": "Resurser",
+               "SCHEDULING": "Schemaläggning",
+               "WORKFLOWS": "Workflows",
+               "ACCESS": "Åtkomstpolicy",
+               "COMMENTS": "Kommentarer"
+            },
+            "GENERAL": {
+               "PUBLICATION_STATUS": "Publiceringsstatus",
+               "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
+               "SCHEDULING_STATUS": "Status",
+               "READY_FOR_RECORDING": "Redo för inspelning",
+               "OPTED_OUT": "Avhoppad",
+               "CUSTOM": "Anpassad",
+               "ENGAGE": "Engage",
+               "EXTERNAL_API": "External API publikation",
+               "YOUTUBE": "YouTube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Välj workflow",
+               "SELECT_WORKFLOW_EMPTY": "Inga tillgängliga workflows"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Trimma media",
+               "MEDIA": "Media",
+               "ID": "ID",
+               "TYPE": "Typ",
+               "MIMETYPE": "MimeType",
+               "URL": "URI",
+               "DETAILS": "Detaljer"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Bilagor",
+               "ID": "ID",
+               "TYPE": "Typ",
+               "MIMETYPE": "MimeType",
+               "TAGS": "Taggar",
+               "LINK": "Länk"
+            },
+            "SOURCE": {
+               "CAPTION": "Källa",
+               "SELECT_SOURCE": "Välj källa",
+               "PLACEHOLDER": {
+                  "LOCATION": "Plats",
+                  "INPUTS": "Ingångar",
+                  "HOUR": "Timme",
+                  "MINUTE": "Minut",
+                  "REPEATS": "Upprepningar",
+                  "START_DATE": "åååå-mm-dd",
+                  "END_DATE": "åååå-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Ladda upp",
+                  "RECORDING_ELEMENTS": "Inspelningselement",
+                  "SEGMENTABLE": {
+                     "SHORT": "Transparanger",
+                     "DETAIL": "Filen innehåller en inspelning av transparanger (Keynote, Powerpoint, etc)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Presentatör",
+                     "DETAIL": "Filen innehåller en inspelning av en person som talar till en publik."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Endast ljud",
+                     "DETAIL": "Filen innehåller endast ljud."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Schema",
+                  "START_DATE": "Startdatum",
+                  "START_TIME": "Starttid",
+                  "TIMEZONE": "Tidszon",
+                  "END_DATE": "Slutdatum",
+                  "DURATION": "Längd"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Lägg till händelse"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Lägg till flera händelser",
+                  "REPEATS": "Upprepningar",
+                  "REPEAT_ON": "Upprepa på",
+                  "WEEKDAYS": "Vardagar"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Resurser",
+               "TYPE": "Typ",
+               "SIZE": "Storlek",
+               "DETAILS": "Detaljer",
+               "ATTACHMENTS": {
+                  "TITLE": "Bilagor",
+                  "CAPTION": "Bilagor",
+                  "ID": "ID",
+                  "TYPE": "Typ",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Taggar",
+                  "LINK": "Länk",
+                  "DETAILS": {
+                     "TITLE": "Bilagsdetaljer",
+                     "CAPTION": "Bilagsdetaljer",
+                     "ID": "ID",
+                     "TYPE": "Typ",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Taggar",
+                     "URL": "URI",
+                     "SIZE": "Storlek",
+                     "CHECKSUM": "Kontrollsumma",
+                     "REFERENCE": "Referens"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Kataloger",
+                  "CAPTION": "Kataloger",
+                  "ID": "ID",
+                  "TYPE": "Typ",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Taggar",
+                  "LINK": "Länk",
+                  "DETAILS": {
+                     "TITLE": "Katalogdetaljer",
+                     "CAPTION": "Katalogdetaljer",
+                     "ID": "ID",
+                     "TYPE": "Typ",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Taggar",
+                     "URL": "URL",
+                     "SIZE": "Storlek",
+                     "CHECKSUM": "Kontrollsumma",
+                     "REFERENCE": "Referens"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Media",
+                  "CAPTION": "Media",
+                  "ID": "ID",
+                  "TYPE": "Typ",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Taggar",
+                  "LINK": "Länk",
+                  "DETAILS": {
+                     "TITLE": "Mediadetaljer",
+                     "ID": "ID",
+                     "TYPE": "Typ",
+                     "MIMETYPE": "MimeType",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Inspelningsdatum",
+                     "FLAVOR": "Smak",
+                     "TAGS": "Taggar",
+                     "DURATION": "Längd",
+                     "STREAM_AUDIO": "Ljudströmmar",
+                     "STREAM_VIDEO": "Videoströmmar",
+                     "CHANNELS": "Kanaler",
+                     "BITRATE": "Bithastighet",
+                     "BITDEPTH": "Bitdjup",
+                     "SAMPLINGRATE": "Samplingshastighet",
+                     "FRAMECOUNT": "Antal bilder",
+                     "PEAKLEVELDB": "RMS-nivå (dB)",
+                     "RMSLEVELDB": "RMS-nivå (dB)",
+                     "RMSPEAKDB": "RMS-nivå (dB)",
+                     "FRAMERATE": "Bildfrekvens",
+                     "RESOLUTION": "Upplösning",
+                     "SIZE": "Storlek",
+                     "SCANTYPE": "Typ av skanning",
+                     "SCANORDER": "Scan ordning"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Publikationer",
+                  "CAPTION": "Publikationer",
+                  "CHANNEL": "Kanal",
+                  "ID": "ID",
+                  "TYPE": "Typ",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Taggar",
+                  "LINK": "Länk",
+                  "DETAILS": {
+                     "TITLE": "Publiceringsdetaljer",
+                     "CAPTION": "Publiceringsdetaljer",
+                     "ID": "ID",
+                     "TYPE": "Typ",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Taggar",
+                     "URL": "URL",
+                     "SIZE": "Storlek",
+                     "CHANNEL": "Kanal",
+                     "REFERENCE": "Referens"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mallar"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Åtkomstpolicy",
+                  "DESCRIPTION": "",
+                  "LABEL": "Välj en mall",
+                  "EMPTY": "Ingen mall hittades",
+                  "ROLE": "Roll",
+                  "WRITE": "Skriv",
+                  "READ": "Läs",
+                  "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
+                  "ACTION": "Åtgärder",
+                  "NEW": "Ny policy",
+                  "DETAILS": "Detaljer"
+               },
+               "ROLES": {
+                  "LABEL": "Välj en roll",
+                  "EMPTY": "Ingen roll hittad"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Kommentarer",
+               "PLACEHOLDER": "Kommentar…",
+               "SELECTPLACEHOLDER": "Välj orsaker",
+               "RESOLVED": "Löst",
+               "REPLY": "Svara",
+               "REPLY_TO": "Svara på",
+               "CANCEL_REPLY": "Avbryt",
+               "DELETE": "Ta bort",
+               "REASON": "Orsak",
+               "REASONS": {
+                  "CUTTING": "Skärning krävs",
+                  "REVIEW": "Granskning krävs",
+                  "ASYNC": "A/V spår asynkron",
+                  "AUDIO_ISSUE": "Ljudspår saknas eller är felaktig",
+                  "CANCELED": "Avbruten händelse",
+                  "CONFLICTING_METADATA": "Motstridiga metadata",
+                  "IMPROPER_POINT": "Felaktig in- eller utpunkt",
+                  "MISSING_AGREEMENT": "Avtal saknas",
+                  "OTHER": "övrigt",
+                  "PRIVACY": "Privatlivet",
+                  "SEGMENTATION": "Slarvig segmentation",
+                  "UNKNOWN_CREATOR": "Skaparen okänd",
+                  "VIDEO_ISSUE": "Video visar distorsion eller är beskärt",
+                  "WRONG_INPUT_FORMAT": "Filformatet stöds inte",
+                  "WRONG_METADATA": "Metadata behöver korrigeras",
+                  "WRONG_SERIES_PUBLICATION": "Fel serie eller publikationskanal",
+                  "WRONG_WORKFLOW": "Fel workflow",
+                  "PROCESSING_FAILURE": "Bearbetning misslyckades"
+               }
+            },
+            "METADATA": {
+               "CAPTION": "Händelseinformation",
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Serie",
+               "RECORDING_DATE": "Inspelningsdatum",
+               "SUBJECT": "Ämne",
+               "DESCRIPTION": "Beskrivning",
+               "START_DATE": "Startdatum",
+               "START_TIME": "Starttid",
+               "DURATION": "Längd",
+               "LOCATION": "Plats",
+               "SOURCE": "Källa",
+               "CREATED": "Skapad",
+               "CREATED_BY": "Skapad av",
+               "LICENSE": "Licens",
+               "CONTRIBUTORS": "Medförfattare",
+               "RIGHTS": "Rättigheter",
+               "PRESENTERS": "Presentatör(er)",
+               "LANGUAGE": "Språk",
+               "COPYRIGHT": "Copyright",
+               "VISIBILITY": "Synlighet",
+               "PUBLIC": "Offentliga mål",
+               "OS": "Operativsystemet",
+               "LOCKED": {
+                  "RUNNING": "Det är inte tillåtet att redigera metadata när operationer utförs på en händelse"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Deltagandestatus",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Granskningsstatus"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opt out-status",
+                  "READY": "Redo för inspelning",
+                  "OPTEDOUT": "Avhoppad"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Meddelanden",
+                  "CREATION_DATE": "Skapandedatum",
+                  "SENDER": "Avsändare",
+                  "SUBJECT": "Ämne"
+               },
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Presentatör(er)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Aktioner",
+               "DETAILS": "Detaljer",
+               "DESCRIPTION": "",
+               "ID": "ID",
+               "TYPE": "Typ",
+               "TITLE": "Titel",
+               "STATE": "Status",
+               "STARTED": "Startad",
+               "SERIES": "Serie",
+               "SUBMITTED": "Skickad",
+               "MIMETYPE": "MimeType",
+               "URL": "URL",
+               "CONFIGURATION": "Konfiguration",
+               "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
+               "WORKFLOW": "Workflow"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Workflowdetaljer",
+               "CONFIGURATION": "Workflowkonfiguration"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Workflowoperationer"
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Operationsdetaljer"
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Workflowdetaljer"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Mediadetaljer",
+               "ID": "ID",
+               "TYPE": "Typ",
+               "MIMETYPE": "MimeType",
+               "URL": "URL",
+               "RECORDING_DATE": "Inspelningsdatum",
+               "TAGS": "Taggar",
+               "DURATION": "Längd",
+               "STREAM_AUDIO": "Ljudströmmar",
+               "STREAM_VIDEO": "Videoströmmar",
+               "CHANNELS": "Kanaler",
+               "BITRATE": "Bithastighet",
+               "FRAMERATE": "Bildfrekvens",
+               "RESOLUTION": "Upplösning"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Fel & varningar",
+               "TITLE": "Fel & varningar",
+               "DATE": "Datum",
+               "HOST": "Host",
+               "TYPE": "Typ",
+               "EMPTY": "Inga fel",
+               "DETAILS": {
+                  "HEADER": "Felinformation",
+                  "SEVERITY": "Allvarsgrad",
+                  "TITLE": "Titel",
+                  "DESCRIPTION": "Beskrivning",
+                  "JOB_ID": "Jobb-ID",
+                  "DATE": "Datum",
+                  "HOST": "Bearbetar värd",
+                  "TYPE": "Tjänstetyp",
+                  "TECHNICAL_DETAILS": "Tekniska detaljer"
+               }
             }
-          },
-          "CATALOGS":{
-            "TITLE":"Kataloger",
-            "CAPTION":"Kataloger",
-            "ID":"Id",
-            "TYPE":"Typ",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Taggar",
-            "LINK":"Länk",
-            "DETAILS":{
-              "TITLE":"Katalogdetaljer",
-              "CAPTION":"Katalogdetaljer",
-              "ID":"Id",
-              "TYPE":"Typ",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Taggar",
-              "URL":"URL",
-              "SIZE":"Storlek",
-              "CHECKSUM":"Kontrollsumma",
-              "REFERENCE":"Referens"
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Skapa serie",
+            "METADATA": {
+               "CAPTION": "Metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadata"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Utökad metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Utökad metadata"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mallar"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Åtkomstpolicy",
+                  "DESCRIPTION": "Åtminstone en roll med läs- och skrivrättigheter krävs.",
+                  "LABEL": "Välj en mall",
+                  "EMPTY": "Ingen mall hittades",
+                  "ROLE": "Roll",
+                  "WRITE": "Skriv",
+                  "READ": "Läs",
+                  "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
+                  "ACTION": "Åtgärder",
+                  "NEW": "Ny policy",
+                  "DETAILS": "Detaljer"
+               },
+               "ROLES": {
+                  "LABEL": "Välj en roll",
+                  "EMPTY": "Ingen roll hittad"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Tema",
+               "DESCRIPTION": "",
+               "TITLE": "Tema",
+               "LABEL": "Inget tema",
+               "EMPTY": "Inget tema hittades"
+            },
+            "SUMMARY": {
+               "CAPTION": "Summering"
             }
-          },
-          "MEDIA":{
-            "TITLE":"Media",
-            "CAPTION":"Media",
-            "ID":"ID",
-            "TYPE":"Typ",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Taggar",
-            "LINK":"Länk",
-            "DETAILS":{
-              "TITLE":"Mediadetaljer",
-              "ID":"ID",
-              "TYPE":"Typ",
-              "MIMETYPE":"MimeType",
-              "URL":"URL",
-              "RECORDING_DATE":"Inspelningsdatum",
-              "FLAVOR":"Smak",
-              "TAGS":"Taggar",
-              "DURATION":"Längd",
-              "STREAM_AUDIO":"Ljudströmmar",
-              "STREAM_VIDEO":"Videoströmmar",
-              "CHANNELS":"Kanaler",
-              "BITRATE":"Bithastighet",
-              "BITDEPTH":"Bitdjup",
-              "SAMPLINGRATE":"Samplingshastighet",
-              "FRAMECOUNT":"Antal bilder",
-              "PEAKLEVELDB":"RMS-nivå (dB)",
-              "RMSLEVELDB":"RMS-nivå (dB)",
-              "RMSPEAKDB":"RMS-nivå (dB)",
-              "FRAMERATE":"Bildfrekvens",
-              "RESOLUTION":"Upplösning",
-              "SIZE":"Storlek",
-              "SCANTYPE":"Typ av skanning",
-              "SCANORDER":"Scan ordning"
+         },
+         "TABLE": {
+            "CAPTION": "Serie",
+            "TITLE": "Serie",
+            "CREATORS": "Organisatör(er)",
+            "CONTRIBUTORS": "Medförfattare",
+            "CREATED": "Skapad",
+            "MANAGED_ACL": "Åtkomstpolicy",
+            "EVENTS": "Händelser",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "HEADER": "Seriedetaljer - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadata",
+               "EXTENDED_METADATA": "Metadata II",
+               "PARTICIPATION": "Deltagande",
+               "EVENTS": "Händelser",
+               "PERMISSIONS": "Åtkomstpolicy",
+               "THEME": "Tema"
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mallar"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Åtkomstpolicy",
+                  "DESCRIPTION": "",
+                  "LABEL": "Välj en mall",
+                  "EMPTY": "Ingen mall hittades",
+                  "ROLE": "Roll",
+                  "WRITE": "Skriv",
+                  "READ": "Läs",
+                  "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
+                  "ACTION": "Åtgärder",
+                  "NEW": "Ny policy",
+                  "DETAILS": "Detaljer"
+               },
+               "ROLES": {
+                  "LABEL": "Välj en roll",
+                  "EMPTY": "Ingen roll hittad"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Serie",
+               "PUBLISHERS": "Publicerad av",
+               "ORGANIZERS": "Organisatör(er)",
+               "CONTRIBUTORS": "Medförfattare",
+               "RECORDING_DATE": "Inspelningsdatum",
+               "CREATED_BY": "Skapad av",
+               "RIGHTS": "Rättigheter",
+               "SUBJECT": "Ämne",
+               "LANGUAGE": "Språk",
+               "LICENSE": "Licens",
+               "DESCRIPTION": "Beskrivning"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Deltagandestatus schablon",
+               "WARNING_TEMPLATE": "Deltagandestatus för serien används som standardvärde för nya händelser som ingår i serien.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Granskningsstatus"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opt out-status",
+                  "READY": "Redo för inspelning",
+                  "OPTEDOUT": "Avhoppad"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Meddelanden",
+                  "CREATION_DATE": "Skapandedatum",
+                  "SENDER": "Avsändare",
+                  "SUBJECT": "Ämne"
+               }
+            },
+            "EVENTS": {
+               "TITLE": "Titel",
+               "PRESENTER": "Presentatör(er)",
+               "CREATED": "Skapad",
+               "MODIFIED": "Ändrad",
+               "STATUS": "Status",
+               "LOCATION": "Plats",
+               "LINK": "Länk"
             }
-          },
-          "PUBLICATIONS":{
-            "TITLE":"Publikationer",
-            "CAPTION":"Publikationer",
-            "CHANNEL":"Kanal",
-            "ID":"Id",
-            "TYPE":"Typ",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Taggar",
-            "LINK":"Länk",
-            "DETAILS":{
-              "TITLE":"Publiceringsdetaljer",
-              "CAPTION":"Publiceringsdetaljer",
-              "ID":"Id",
-              "TYPE":"Typ",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Taggar",
-              "URL":"URL",
-              "SIZE":"Storlek",
-              "CHANNEL":"Kanal",
-              "REFERENCE":"Referens"
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Platser",
+         "BLACKLISTS": "Svartlistor"
+      },
+      "ACTIONS": {
+         "EXPORT": "Exportera",
+         "ADD_BLACKLIST": "Lägg till svartlista",
+         "REMOVE": "Ta bort"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Platser",
+            "TITLE": "UID",
+            "NAME": "Namn",
+            "LOCATION": "Plats",
+            "UPDATED": "Senast uppdaterad",
+            "NEXT_DATE": "Nästa händelse",
+            "NEXT_NAME": "Nästa händelsetitel",
+            "STATUS": "Status",
+            "VERSION": "Version",
+            "BLACKLIST_FROM": "Svartlistad från",
+            "BLACKLIST_TO": "Svartlistad tills",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "HEADER": "Händelsedetaljer - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Allmänt",
+               "CONFIGURATION": "Konfiguration",
+               "CAPABILITIES": "Funktioner"
+            },
+            "GENERAL": {
+               "CAPTION": "Allmänt",
+               "NAME": "Namn",
+               "URL": "URL",
+               "STATUS": "Status",
+               "UPDATE": "Senast hört av"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Konfiguration",
+               "NO_CONFIGURATION": "Ingen konfiguration given"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Funktioner",
+               "NO_CAPABILITIES": "Inga funktioner given"
             }
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Mallar"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Åtkomstpolicy",
-            "DESCRIPTION":"",
-            "LABEL":"Välj en mall",
-            "EMPTY":"Ingen mall hittades",
-            "ROLE":"Roll",
-            "WRITE":"Skriv",
-            "READ":"Läs",
-            "ADDITIONAL_ACTIONS":"Ytterliga aktioner",
-            "ACTION":"Åtgärder",
-            "NEW":"Ny policy",
-            "DETAILS":"Detaljer"
-          },
-          "ROLES":{
-            "LABEL":"Välj en roll",
-            "EMPTY":"Ingen roll hittad"
-          }
-        },
-        "COMMENTS":{
-          "CAPTION":"Kommentarer",
-          "PLACEHOLDER":"Kommentar…",
-          "SELECTPLACEHOLDER":"Välj orsaker",
-          "RESOLVED":"Löst",
-          "REPLY":"Svara",
-          "REPLY_TO":"Svara på",
-          "CANCEL_REPLY":"Cancel",
-          "DELETE":"Ta bort",
-          "REASON":"Orsak",
-          "REASONS":{
-            "CUTTING":"Skärning krävs",
-            "REVIEW":"Granskning krävs",
-            "ASYNC":"A/V spår asynkron",
-            "AUDIO_ISSUE":"Ljudspår saknas eller är felaktig",
-            "CANCELED":"Avbruten händelse",
-            "CONFLICTING_METADATA":"Motstridiga metadata",
-            "IMPROPER_POINT":"Felaktig in- eller utpunkt",
-            "MISSING_AGREEMENT":"Avtal saknas",
-            "OTHER":"övrigt",
-            "PRIVACY":"Privatlivet",
-            "SEGMENTATION":"Slarvig segmentation",
-            "UNKNOWN_CREATOR":"Skaparen okänd",
-            "VIDEO_ISSUE":"Video visar distorsion eller är beskärt",
-            "WRONG_INPUT_FORMAT":"Filformatet stöds inte",
-            "WRONG_METADATA":"Metadata behöver korrigeras",
-            "WRONG_SERIES_PUBLICATION":"Fel serie eller publikationskanal",
-            "WRONG_WORKFLOW":"Fel workflow",
-            "PROCESSING_FAILURE":"Bearbetning misslyckades"
-          }
-        },
-        "METADATA":{
-          "CAPTION":"Händelseinformation",
-          "TITLE":"Titel",
-          "ID":"UID",
-          "SERIES":"Serie",
-          "RECORDING_DATE":"Inspelningsdatum",
-          "SUBJECT":"Ämne",
-          "DESCRIPTION":"Beskrivning",
-          "START_DATE":"Startdatum",
-          "START_TIME":"Starttid",
-          "DURATION":"Längd",
-          "LOCATION":"Plats",
-          "SOURCE":"Källa",
-          "CREATED":"Skapad",
-          "CREATED_BY":"Skapad av",
-          "LICENSE":"Licens",
-          "CONTRIBUTORS":"Medförfattare",
-          "RIGHTS":"Rättigheter",
-          "PRESENTERS":"Presentatör(er)",
-          "LANGUAGE":"Språk",
-          "COPYRIGHT":"Copyright",
-          "VISIBILITY":"Synlighet",
-          "PUBLIC":"Offentliga mål",
-          "OS":"Operativsystemet",
-          "LOCKED":{
-            "RUNNING":"Det är inte tillåtet att redigera metadata när operationer utförs på en händelse"
-          }
-        },
-        "SCHEDULING":{
-          "CAPTION":"Deltagandestatus",
-          "REVIEW_STATUS":{
-            "CAPTION":"Granskningsstatus"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Opt out-status",
-            "READY":"Redo för inspelning",
-            "OPTEDOUT":"Avhoppad"
-          },
-          "MESSAGES":{
-            "CAPTION":"Meddelanden",
-            "CREATION_DATE":"Skapandedatum",
-            "SENDER":"Avsändare",
-            "SUBJECT":"Ämne"
-          },
-          "PLACEHOLDER":{
-            "PRESENTERS":"Presentatör(er)"
-          }
-        },
-        "WORKFLOWS":{
-          "ACTIONS":"Actions",
-          "DETAILS":"Detaljer",
-          "DESCRIPTION":"",
-          "ID":"ID",
-          "TYPE":"Typ",
-          "TITLE":"Titel",
-          "STATE":"Status",
-          "STARTED":"Startad",
-          "SERIES":"Serie",
-          "SUBMITTED":"Skickad",
-          "MIMETYPE":"MimeType",
-          "URL":"URL",
-          "CONFIGURATION":"Konfiguration",
-          "NO_CONFIGURATION":"Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
-          "WORKFLOW":"Workflow"
-        },
-        "WORKFLOW_DETAILS":{
-          "TITLE":"Workflowdetaljer",
-          "CONFIGURATION":"Workflowkonfiguration"
-        },
-        "WORKFLOW_OPERATIONS":{
-          "TITLE":"Workflowoperationer"
-        },
-        "OPERATION_DETAILS":{
-          "TITLE":"Operationsdetaljer"
-        },
-        "QUICKACTION_WORKFLOW_DETAILS":{
-          "TITLE":"Workflowdetaljer"
-        },
-        "MEDIA_DETAILS":{
-          "TITLE":"Mediadetaljer",
-          "ID":"ID",
-          "TYPE":"Typ",
-          "MIMETYPE":"MimeType",
-          "URL":"URL",
-          "RECORDING_DATE":"Inspelningsdatum",
-          "TAGS":"Taggar",
-          "DURATION":"Längd",
-          "STREAM_AUDIO":"Ljudströmmar",
-          "STREAM_VIDEO":"Videoströmmar",
-          "CHANNELS":"Kanaler",
-          "BITRATE":"Bithastighet",
-          "FRAMERATE":"Bildfrekvens",
-          "RESOLUTION":"Upplösning"
-        },
-        "ERRORS_AND_WARNINGS":{
-          "HEADER":"Fel & varningar",
-          "TITLE":"Fel & varningar",
-          "DATE":"Datum",
-          "HOST":"Host",
-          "TYPE":"Typ",
-          "EMPTY":"Inga fel",
-          "DETAILS":{
-            "HEADER":"Felinformation",
-            "SEVERITY":"Allvarsgrad",
-            "TITLE":"Titel",
-            "DESCRIPTION":"Beskrivning",
-            "JOB_ID":"Jobb-ID",
-            "DATE":"Datum",
-            "HOST":"Bearbetar värd",
-            "TYPE":"Tjänstetyp",
-            "TECHNICAL_DETAILS":"Tekniska detaljer"
-          }
-        }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Platssvartlista",
+            "NAME": "Namn",
+            "ACTIONS": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa svartlista",
+            "EDITCAPTION": "Redigera svartlista",
+            "TABS": {
+               "LOCATIONS": "Platser",
+               "DATES": "Datum",
+               "REASON": "Orsak",
+               "SUMMARY": "Summering"
+            },
+            "LOCATIONS": {
+               "REMOVE": "Ta bort",
+               "ADD_LOCATION": "Välj plats",
+               "ALL_LOCATIONS": "Alla platser",
+               "SELECT_LOCATION": "Välj"
+            },
+            "DATES": {
+               "START_DATE": "Startdatum",
+               "END_DATE": "Slutdatum"
+            },
+            "REASON": {
+               "SELECT_REASON": "Välj",
+               "REASON": "Orsak",
+               "COMMENTS": "Kommentarer"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Summering",
+               "LOCATION": "Plats",
+               "DATE_FROM": "Från",
+               "DATE_TO": "Tills",
+               "REASON": "Orsak",
+               "COMMENTS": "Kommentarer"
+            }
+         }
       }
-    },
-    "SERIES":{
-      "NEW":{
-        "CAPTION":"Skapa serie",
-        "METADATA":{
-          "CAPTION":"Metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Metadata"
-          }
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Utökad metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Utökad metadata"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Mallar"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Åtkomstpolicy",
-            "DESCRIPTION":"Åtminstone en roll med läs- och skrivrättigheter krävs.",
-            "LABEL":"Välj en mall",
-            "EMPTY":"Ingen mall hittades",
-            "ROLE":"Roll",
-            "WRITE":"Skriv",
-            "READ":"Läs",
-            "ADDITIONAL_ACTIONS":"Ytterliga aktioner",
-            "ACTION":"Åtgärder",
-            "NEW":"Ny policy",
-            "DETAILS":"Detaljer"
-          },
-          "ROLES":{
-            "LABEL":"Välj en roll",
-            "EMPTY":"Ingen roll hittad"
-          }
-        },
-        "THEME":{
-          "CAPTION":"Tema",
-          "DESCRIPTION":"",
-          "TITLE":"Tema",
-          "LABEL":"Inget tema",
-          "EMPTY":"Inget tema hittades"
-        },
-        "SUMMARY":{
-          "CAPTION":"Summering"
-        }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Lägg till användare",
+         "ADD_GROUP": "Lägg till grupp",
+         "ADD_ACL": "Lägg till åtkomstpolicy",
+         "ADD_BLACKLIST": "Lägg till svartlista"
       },
-      "TABLE":{
-        "CAPTION":"Serie",
-        "TITLE":"Serie",
-        "CREATORS":"Organisatör(er)",
-        "CONTRIBUTORS":"Medförfattare",
-        "CREATED":"Skapad",
-        "MANAGED_ACL":"Åtkomstpolicy",
-        "EVENTS":"Händelser",
-        "ACTION":"Åtgärder"
+      "NAVIGATION": {
+         "USERS": "Användare",
+         "GROUPS": "Grupper",
+         "PERMISSIONS": "Åtkomstpolicyer",
+         "BLACKLISTS": "Svartlista"
       },
-      "DETAILS":{
-        "HEADER":"Seriedetaljer - {{resourceId}}",
-        "TABS":{
-          "METADATA":"Metadata",
-          "EXTENDED_METADATA":"Metadata II",
-          "PARTICIPATION":"Deltagande",
-          "EVENTS":"Händelser",
-          "PERMISSIONS":"Åtkomstpolicy",
-          "THEME":"Tema"
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Mallar"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Åtkomstpolicy",
-            "DESCRIPTION":"",
-            "LABEL":"Välj en mall",
-            "EMPTY":"Ingen mall hittades",
-            "ROLE":"Roll",
-            "WRITE":"Skriv",
-            "READ":"Läs",
-            "ADDITIONAL_ACTIONS":"Ytterliga aktioner",
-            "ACTION":"Åtgärder",
-            "NEW":"Ny policy",
-            "DETAILS":"Detaljer"
-          },
-          "ROLES":{
-            "LABEL":"Välj en roll",
-            "EMPTY":"Ingen roll hittad"
-          }
-        },
-        "METADATA":{
-          "TITLE":"Titel",
-          "ID":"UID",
-          "SERIES":"Serie",
-          "PUBLISHERS":"Publicerad av",
-          "ORGANIZERS":"Organisatör(er)",
-          "CONTRIBUTORS":"Medförfattare",
-          "RECORDING_DATE":"Inspelningsdatum",
-          "CREATED_BY":"Skapad av",
-          "RIGHTS":"Rättigheter",
-          "SUBJECT":"Ämne",
-          "LANGUAGE":"Språk",
-          "LICENSE":"Licens",
-          "DESCRIPTION":"Beskrivning"
-        },
-        "PARTICIPATION":{
-          "CAPTION":"Deltagandestatus schablon",
-          "WARNING_TEMPLATE":"Deltagandestatus för serien används som standardvärde för nya händelser som ingår i serien.",
-          "REVIEW_STATUS":{
-            "CAPTION":"Granskningsstatus"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Opt out-status",
-            "READY":"Redo för inspelning",
-            "OPTEDOUT":"Avhoppad"
-          },
-          "MESSAGES":{
-            "CAPTION":"Meddelanden",
-            "CREATION_DATE":"Skapandedatum",
-            "SENDER":"Avsändare",
-            "SUBJECT":"Ämne"
-          }
-        },
-        "EVENTS":{
-          "TITLE":"Titel",
-          "PRESENTER":"Presentatör(er)",
-          "CREATED":"Skapad",
-          "MODIFIED":"Ändrad",
-          "STATUS":"Status",
-          "LOCATION":"Plats",
-          "LINK":"Länk"
-        }
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Användare",
+            "NAME": "Namn",
+            "USERNAME": "Användarnamn",
+            "EMAIL": "E-post",
+            "ROLES": "Roller",
+            "TYPE": "Typ",
+            "PROVIDER": "Leverantör",
+            "BLACKLIST_FROM": "Svartlistad från",
+            "BLACKLIST_TO": "Svartlistad tills",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa användare",
+            "EDITCAPTION": "Redigera användare",
+            "TABS": {
+               "USER": "Användare",
+               "ROLES": "Roller",
+               "EXTERNALROLES": "Externa roller",
+               "EFFECTIVEROLES": "Effektiva roller"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Roller och grupper som kan tilldelas eller redan har tilldelats användaren.",
+               "EXTERNALROLES": "Listan över externa roller som tilldelats användaren genom externa roll-leverantören/-erna.",
+               "EFFECTIVEROLES": "Listan över effektiva roller som direkt tilldelats användaren och rollerna som indirekt laddades via gruppmedlemskap."
+            },
+            "FORM": {
+               "USERNAME": "Användarnamn",
+               "NAME": "Namn",
+               "EMAIL": "E-post",
+               "PASSWORD": "Lösenord",
+               "REPEAT_PASSWORD": "Upprepa lösenord"
+            },
+            "ROLES": {
+               "LEFT": "Roller",
+               "RIGHT": "Valda roller",
+               "REMOVE": "Ta bort roll",
+               "ADD": "Lägg till roll"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Skapa grupp"
+         },
+         "TABLE": {
+            "CAPTION": "Grupper",
+            "NAME": "Namn",
+            "DESCRIPTION": "Beskrivning",
+            "ROLE": "Roll",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa grupp",
+            "EDITCAPTION": "Redigera grupp",
+            "TABS": {
+               "GROUP": "Grupp",
+               "ROLES": "Roller",
+               "METADATA": "Metadata",
+               "USERS": "Användare",
+               "SUMMARY": "Summering"
+            },
+            "FORM": {
+               "NAME": "Namn",
+               "DESCRIPTION": "Beskrivning",
+               "SUMMARY": "Summering",
+               "ROLES": "Roller",
+               "USERS": "Användare"
+            },
+            "USERS": {
+               "LEFT": "Användare",
+               "RIGHT": "Valda användare",
+               "REMOVE": "Ta bort användare",
+               "ADD": "Lägg till användare"
+            },
+            "ROLES": {
+               "LEFT": "Roller",
+               "RIGHT": "Valda roller",
+               "REMOVE": "Ta bort roll",
+               "ADD": "Lägg till roll"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Åtkomstpolicyer",
+            "NAME": "Namn",
+            "CREATED": "Skapad",
+            "CREATOR": "Skapare",
+            "IN_USE": "Används",
+            "ACTION": "Åtgärder"
+         },
+         "NEW": {
+            "CAPTION": "Ny åtkomstpolicy",
+            "TABS": {
+               "SUMMARY": "Summering",
+               "METADATA": "Metadata",
+               "ACCESS": "Tillgång"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Namn",
+                  "PLACEHOLDER": "Namn…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "TEMPLATES": {
+                  "TITLE": "Mallar"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Åtkomstpolicy",
+                  "LABEL": "Välj en mall",
+                  "EMPTY": "Ingen mall hittades",
+                  "ROLE": "Roll",
+                  "WRITE": "Skriv",
+                  "READ": "Läs",
+                  "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
+                  "ACTION": "Åtgärder",
+                  "NEW": "Ny policy",
+                  "DETAILS": "Detaljer",
+                  "DESCRIPTION": "Välj en förkonfigurerad uppsättning av regler eller lägg till anpassade regler nedan"
+               },
+               "ROLES": {
+                  "LABEL": "Välj en roll",
+                  "EMPTY": "Ingen roll hittad"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Tillgångsinformationer - {{resourceId}}",
+            "TABS": {
+               "SUMMARY": "Summering",
+               "METADATA": "Metadata",
+               "ACCESS": "Tillgång"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Namn",
+                  "PLACEHOLDER": "Namn…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Åtkomstpolicy",
+               "TEMPLATES": {
+                  "TITLE": "Mallar"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Åtkomstpolicy",
+                  "LABEL": "Välj en mall",
+                  "EMPTY": "Ingen mall hittades",
+                  "ROLE": "Roll",
+                  "WRITE": "Skriv",
+                  "READ": "Läs",
+                  "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
+                  "ACTION": "Åtgärder",
+                  "NEW": "Ny policy",
+                  "DETAILS": "Detaljer",
+                  "DESCRIPTION": "Välj en förkonfigurerad uppsättning av regler eller lägg till anpassade regler nedan"
+               },
+               "ROLES": {
+                  "LABEL": "Välj en roll",
+                  "EMPTY": "Ingen roll hittad"
+               }
+            }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Användarsvartlista",
+            "NAME": "Namn",
+            "DATE_FROM": "Från",
+            "DATE_TO": "Tills",
+            "REASON": "Orsak",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa svartlista",
+            "EDITCAPTION": "Redigera svartlista",
+            "TABS": {
+               "USERS": "Användare",
+               "DATES": "Datum",
+               "REASON": "Orsak",
+               "SUMMARY": "Summering"
+            },
+            "USERS": {
+               "REMOVE": "Ta bort",
+               "ADD_USER": "Välj användare",
+               "ALL_USERS": "Alla användare",
+               "SELECT_USER": "Välj"
+            },
+            "DATES": {
+               "START_DATE": "Startdatum",
+               "END_DATE": "Slutdatum"
+            },
+            "REASON": {
+               "SELECT_REASON": "Välj",
+               "REASON": "Orsak",
+               "COMMENTS": "Kommentarer"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Summering",
+               "USER": "Användare",
+               "DATE_FROM": "Från",
+               "DATE_TO": "Tills",
+               "REASON": "Orsak",
+               "COMMENTS": "Kommentarer"
+            }
+         }
       }
-    }
-  },
-  "RECORDINGS":{
-    "NAVIGATION":{
-      "LOCATIONS":"Platser",
-      "BLACKLISTS":"Svartlistor"
-    },
-    "ACTIONS":{
-      "EXPORT":"Exportera",
-      "ADD_BLACKLIST":"Lägg till svartlista",
-      "REMOVE":"Remove"
-    },
-    "RECORDINGS":{
-      "TABLE":{
-        "CAPTION":"Platser",
-        "TITLE":"UID",
-        "NAME":"Namn",
-        "LOCATION":"Plats",
-        "UPDATED":"Senast uppdaterad",
-        "NEXT_DATE":"Nästa händelse",
-        "NEXT_NAME":"Nästa händelsetitel",
-        "STATUS":"Status",
-        "VERSION":"Version",
-        "BLACKLIST_FROM":"Svartlistad från",
-        "BLACKLIST_TO":"Svartlistad tills",
-        "ACTION":"Åtgärder"
-      },
-      "DETAILS":{
-        "HEADER":"Location details - {{resourceId}}",
-        "TAB":{
-          "GENERAL":"General",
-          "CONFIGURATION":"Configuration",
-          "CAPABILITIES":"Capabilities"
-        },
-        "GENERAL":{
-          "CAPTION":"General",
-          "NAME":"Name",
-          "URL":"Url",
-          "STATUS":"Status",
-          "UPDATE":"Last heard from"
-        },
-        "CONFIGURATION":{
-          "CAPTION":"Configuration",
-          "NO_CONFIGURATION":"No configuration provided"
-        },
-        "CAPABILITIES":{
-          "CAPTION":"Capabilities",
-          "NO_CAPABILITIES":"No capabilities provided"
-        }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Temadetaljer {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Allmänt",
+               "BUMPER": "Bumper (start)",
+               "TRAILER": "Bumper (slut)",
+               "TITLE": "Titel",
+               "LICENSE": "Licens",
+               "WATERMARK": "Vattenstämpel",
+               "USAGE": "Användning"
+            },
+            "GENERAL": {
+               "CAPTION": "Allmänt",
+               "NAME": "Namn",
+               "DESCRIPTION": "Beskrivning",
+               "DEFAULT": "Standard",
+               "SET_DEFAULT_INFO": "Ange som standardtema för alla serier och händelser",
+               "NAME_ERROR": "Namnet används redan",
+               "NAME_REQUIRED": "Obligatorisk"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (start)",
+               "DESCRIPTION": "Fördefinierad video som läggs till i början av en inspelning.",
+               "ACTIVE": "Aktiv"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (slut)",
+               "DESCRIPTION": "Fördefinierad video som läggs till i slutet av en inspelning.",
+               "ACTIVE": "Aktiv"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "DESCRIPTION": "Fördefinierad bild inklusive beskrivande metadata läggs till i början eller slutet av en inspelning.",
+               "ACTIVE": "Aktiv"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vattenstämpel",
+               "DESCRIPTION": "Halvgenomskinlig bild som är överlagrad på varje bildruta av inspelningen.",
+               "ACTIVE": "Aktiv"
+            },
+            "USAGE": {
+               "CAPTION": "Användning",
+               "SERIES": "Serienamn"
+            }
+         }
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Platssvartlista",
-        "NAME":"Namn",
-        "ACTIONS":"Åtgärder"
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Lägg till mall",
+         "ADD_THEME": "Lägg till tema"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa svartlista",
-        "EDITCAPTION":"Redigera svartlista",
-        "TABS":{
-          "LOCATIONS":"Platser",
-          "DATES":"Datum",
-          "REASON":"Orsak",
-          "SUMMARY":"Summering"
-        },
-        "LOCATIONS":{
-          "REMOVE":"Ta bort",
-          "ADD_LOCATION":"Välj plats",
-          "ALL_LOCATIONS":"Alla platser",
-          "SELECT_LOCATION":"Välj"
-        },
-        "DATES":{
-          "START_DATE":"Startdatum",
-          "END_DATE":"Slutdatum"
-        },
-        "REASON":{
-          "SELECT_REASON":"Välj",
-          "REASON":"Orsak",
-          "COMMENTS":"Kommentarer"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Summering",
-          "LOCATION":"Plats",
-          "DATE_FROM":"Från",
-          "DATE_TO":"Tills",
-          "REASON":"Orsak",
-          "COMMENTS":"Kommentarer"
-        }
+      "NAVIGATION": {
+         "MAIL_TEMPLATES": "E-postmallar",
+         "MAIL_SERVERS": "E-postinställningar",
+         "THEMES": "Teman"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "E-postmallar",
+            "NAME": "Namn",
+            "CREATOR": "Skapare",
+            "CREATED": "Skapad",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa mall",
+            "EDITCAPTION": "Redigera mall",
+            "TABS": {
+               "MESSAGE": "Meddelande",
+               "SUMMARY": "Summering"
+            },
+            "MESSAGE": {
+               "NAME": "Namn",
+               "SUBJECT": "Ämne",
+               "MESSAGE": "Meddelande"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Sammanfattning av meddelandet"
+            }
+         }
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Teman",
+            "NAME": "Namn",
+            "DESCRIPTION": "Beskrivning",
+            "CREATOR": "Skapare",
+            "CREATED": "Skapad",
+            "DEFAULT": "Standard",
+            "USAGE": "Användning",
+            "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Skapa tema",
+            "EDITCAPTION": "Redigera tema",
+            "GENERAL": {
+               "CAPTION": "Allmänt",
+               "NAME": "Namn",
+               "DESCRIPTION": "Beskrivning",
+               "DEFAULT": "Standard",
+               "SET_DEFAULT_INFO": "Ange som standardtema för alla serier och händelser",
+               "NAME_REQUIRED": "Obligatorisk"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (start)",
+               "FILE_UPLOADED": "Fil har laddats upp: ",
+               "DESCRIPTION": "Fördefinierad video som läggs till i början av en inspelning.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivera bumper",
+               "SELECT": "Välj",
+               "UPLOAD_LABEL": "Ladda upp video",
+               "UPLOAD_BUTTON": "Ladda upp"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (slut)",
+               "FILE_UPLOADED": "Fil har laddats upp: ",
+               "DESCRIPTION": "Fördefinierad video som läggs till i slutet av en inspelning.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivera bumper",
+               "UPLOAD_LABEL": "Ladda upp video",
+               "UPLOAD_BUTTON": "Ladda upp"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "FILE_UPLOADED": "Fil har laddats upp: ",
+               "DESCRIPTION": "Fördefinierad bild inklusive beskrivande metadata läggs till i början eller slutet av en inspelning.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivera rubrikbilden",
+               "BACKGROUND": "Bakgrund",
+               "EXTRACT": "Extrahera bakgrund",
+               "UPLOAD": "Ladda upp",
+               "UPLOAD_LABEL": "Ladda upp bild",
+               "UPLOAD_BUTTON": "Ladda upp"
+            },
+            "WATERMARK": {
+               "CAPTION": "Vattenstämpel",
+               "FILE_UPLOADED": "Fil har laddats upp: ",
+               "DESCRIPTION": "Halvgenomskinlig bild som är överlagrad på varje bildruta av inspelningen.",
+               "ACTIVE": "Aktiv",
+               "ENABLE": "Aktivera vattenstämpel",
+               "TOP_LEFT": "Överst till vänster",
+               "TOP_RIGHT": "Överst till höger",
+               "BOTTOM_LEFT": "Nederst till vänster",
+               "BOTTOM_RIGHT": "Nederst till höger",
+               "UPLOAD": "Ladda upp",
+               "POSITION": "Vattenstämpelsposition och förhandsgranskning",
+               "FILEUPLOAD_DESCRIPTION": "Filen skulle ha en alfakanal (genomskinlig bakgrund). Acceptabla filtyper är: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Ladda upp bild",
+               "UPLOAD_BUTTON": "Ladda upp"
+            },
+            "SUMMARY": {
+               "CAPTION": "Summering"
+            },
+            "USAGE": {
+               "CAPTION": "Användning",
+               "SERIE": "Serienamn",
+               "EMPTY": "Inga serier hittades för aktuellt tema"
+            }
+         }
       }
-    }
-  },
-  "USERS":{
-    "ACTIONS":{
-      "ADD_USER":"Lägg till användare",
-      "ADD_GROUP":"Lägg till grupp",
-      "ADD_ACL":"Lägg till åtkomstpolicy",
-      "ADD_BLACKLIST":"Lägg till svartlista"
-    },
-    "NAVIGATION":{
-      "USERS":"Användare",
-      "GROUPS":"Grupper",
-      "PERMISSIONS":"Åtkomstpolicyer",
-      "BLACKLISTS":"Svartlista"
-    },
-    "USERS":{
-      "TABLE":{
-        "CAPTION":"Användare",
-        "NAME":"Namn",
-        "USERNAME":"Användarnamn",
-        "EMAIL":"E-post",
-        "ROLES":"Roller",
-        "TYPE":"Typ",
-        "PROVIDER":"Provider",
-        "BLACKLIST_FROM":"Svartlistad från",
-        "BLACKLIST_TO":"Svartlistad tills",
-        "ACTION":"Åtgärder"
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Jobb",
+         "SERVERS": "Servrar",
+         "SERVICES": "Tjänster"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa användare",
-        "EDITCAPTION":"Redigera användare",
-        "TABS":{
-          "USER":"Användare",
-          "ROLES":"Roller",
-          "EXTERNALROLES":"External Roles",
-          "EFFECTIVEROLES":"Effective Roles"
-        },
-        "DESCRIPTION":{
-          "ROLES":"Roles and groups that can be or are already assigned to the user.",
-          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
-          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
-        },
-        "FORM":{
-          "USERNAME":"Användarnamn",
-          "NAME":"Namn",
-          "EMAIL":"E-post",
-          "PASSWORD":"Lösenord",
-          "REPEAT_PASSWORD":"Upprepa lösenord"
-        },
-        "ROLES":{
-          "LEFT":"Roller",
-          "RIGHT":"Valda roller",
-          "REMOVE":"Ta bort roll",
-          "ADD":"Lägg till roll"
-        }
+      "JOBS": {
+         "TABLE": {
+            "ID": "Jobb-ID",
+            "ACTION": "Åtgärder",
+            "CAPTION": "Jobb",
+            "CREATED": "Skapad",
+            "CREATOR": "Skapare",
+            "HOST_NAME": "Hostnamn",
+            "OPERATION": "Operation",
+            "STARTED": "Startad",
+            "STATUS": "Status",
+            "SUBMITTED": "Skickad",
+            "TYPE": "Typ"
+         },
+         "DETAILS": {
+            "HEADER": "Jobbdetaljer {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Allmänt",
+               "OPERATIONS": "Aktiviteter",
+               "INCIDENTS": "Incidenter"
+            }
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Servrar",
+            "STATUS": "Status",
+            "HOST_NAME": "Hostnamn",
+            "CORES": "Kärnor",
+            "COMPLETED": "Avslutade jobb",
+            "RUNNING": "Aktiva jobb",
+            "QUEUED": "Köade jobb",
+            "MEAN_RUN_TIME": "Genomsnittlig körtid",
+            "MEAN_QUEUE_TIME": "Genomsnittlig kötid",
+            "MAINTENANCE": "Underhåll",
+            "ACTION": "Åtgärder",
+            "MAINTENANCE_OFF": "Starta underhållsläge",
+            "MAINTENANCE_ON": "Lämna underhållsläget"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Tjänster",
+            "STATUS": "Status",
+            "NAME": "Tjänstenamn",
+            "HOST_NAME": "Hostnamn",
+            "COMPLETED": "Avslutade jobb",
+            "RUNNING": "Aktiva jobb",
+            "QUEUED": "Köade jobb",
+            "MEAN_RUN_TIME": "Genomsnittlig körtid",
+            "MEAN_QUEUE_TIME": "Genomsnittlig kötid",
+            "SANITIZE": "Rensa misslyckad tjänst",
+            "ACTION": "Åtgärder"
+         }
       }
-    },
-    "GROUPS":{
-      "NEW":{
-        "CAPTION":"Skapa grupp"
+   },
+   "VIDEO_TOOL": {
+      "TIMELINE": "Tidslinje",
+      "ZOOMLEVEL": "Zoomnivå",
+      "ZOOM": "Zooma",
+      "BUTTONS": {
+         "CLOSE": "Stäng",
+         "SAVE": "Spara",
+         "PROCESS": "Spara & bearbeta",
+         "ADD_COMMENT": "Lägg till kommentar"
       },
-      "TABLE":{
-        "CAPTION":"Grupper",
-        "NAME":"Namn",
-        "DESCRIPTION":"Beskrivning",
-        "ROLE":"Roll",
-        "ACTION":"Åtgärder"
+      "TABS": {
+         "PLAY": "Uppspelning",
+         "EDIT": "Redigerare",
+         "CAPTIONS": "Bildtexter",
+         "ANNOTATIONS": "Noteringar"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa grupp",
-        "EDITCAPTION":"Redigera grupp",
-        "TABS":{
-          "GROUP":"Grupp",
-          "ROLES":"Roller",
-          "METADATA":"Metadata",
-          "USERS":"Användare",
-          "SUMMARY":"Summering"
-        },
-        "FORM":{
-          "NAME":"Namn",
-          "DESCRIPTION":"Beskrivning",
-          "SUMMARY":"Summering",
-          "ROLES":"Roller",
-          "USERS":"Användare"
-        },
-        "USERS":{
-          "LEFT":"Användare",
-          "RIGHT":"Valda användare",
-          "REMOVE":"Ta bort användare",
-          "ADD":"Lägg till användare"
-        },
-        "ROLES":{
-          "LEFT":"Roller",
-          "RIGHT":"Valda roller",
-          "REMOVE":"Ta bort roll",
-          "ADD":"Lägg till roll"
-        }
+      "AREAS": {
+         "METADATA": "Metadata",
+         "COMMENTS": "Kommentarer",
+         "SEGMENTS": "Segment"
+      },
+      "ACTIONS": {
+         "SPLIT": "Dela",
+         "CUT": "Klipp ut",
+         "REPLAY_SEGMENT": "Spel upp segment igen",
+         "REPLAY_END_OF_SEGMENT": "Slutet av segmentet",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Kontrollera övergången",
+         "UNDO": "Ångra",
+         "REDO": "Gör om",
+         "CLEAR_SEGMENTS": "Rensa segment",
+         "CLEAR_SELECTED_SEGMENT": "Ta bort markeringen"
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Radera segment",
+         "USE_SEGMENT": "Använd detta segment"
+      },
+      "PLAYER": {
+         "PLAY": "Spela",
+         "PAUSE": "Pausa",
+         "NEXT_FRAME": "Nästa bild",
+         "PREVIOUS_FRAME": "Föregående bild",
+         "NEXT_SEGMENT": "Nästa segment / Hoppa till slutet",
+         "PREVIOUS_SEGMENT": "Föregående segment / Hoppa till start",
+         "MUTE": "Tyst",
+         "VOLUME": "Volym"
       }
-    },
-    "ACLS":{
-      "TABLE":{
-        "CAPTION":"Åtkomstpolicyer",
-        "NAME":"Namn",
-        "CREATED":"Skapad",
-        "CREATOR":"Skapare",
-        "IN_USE":"Används",
-        "ACTION":"Åtgärder"
+   },
+   "LOGIN": {
+      "WELCOME": "Välkommen till Opencast",
+      "REMEMBER": "Kom ihåg mig på den här datorn",
+      "USERNAME": "Användarnamn…",
+      "PASSWORD": "Lösenord…",
+      "LOGIN": "Logga in",
+      "ERROR": "Felaktigt användarnamn, e-post och/eller lösenord"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Välj ett filter…",
+         "NO_OPTIONS": "Inga filter hittades"
       },
-      "NEW":{
-        "CAPTION":"Ny åtkomstpolicy",
-        "TABS":{
-          "SUMMARY":"Summering",
-          "METADATA":"Metadata",
-          "ACCESS":"Tillgång"
-        },
-        "METADATA":{
-          "TITLE":"Metadata",
-          "NAME":{
-            "CAPTION":"Namn",
-            "PLACEHOLDER":"Namn…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "TEMPLATES":{
-            "TITLE":"Mallar"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Åtkomstpolicy",
-            "LABEL":"Välj en mall",
-            "EMPTY":"Ingen mall hittades",
-            "ROLE":"Roll",
-            "WRITE":"Skriv",
-            "READ":"Läs",
-            "ADDITIONAL_ACTIONS":"Ytterliga aktioner",
-            "ACTION":"Åtgärder",
-            "NEW":"Ny policy",
-            "DETAILS":"Detaljer",
-            "DESCRIPTION":"Välj en förkonfigurerad uppsättning av regler eller lägg till anpassade regler nedan"
-          },
-          "ROLES":{
-            "LABEL":"Välj en roll",
-            "EMPTY":"Ingen roll hittad"
-          }
-        }
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Välj ett värde…",
+         "NO_OPTIONS": "Inga värden hittades"
       },
-      "DETAILS":{
-        "HEADER":"Tillgångsinformationer - {{resourceId}}",
-        "TABS":{
-          "SUMMARY":"Summering",
-          "METADATA":"Metadata",
-          "ACCESS":"Tillgång"
-        },
-        "METADATA":{
-          "TITLE":"Metadata",
-          "NAME":{
-            "CAPTION":"Namn",
-            "PLACEHOLDER":"Namn…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Åtkomstpolicy",
-          "TEMPLATES":{
-            "TITLE":"Mallar"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Åtkomstpolicy",
-            "LABEL":"Välj en mall",
-            "EMPTY":"Ingen mall hittades",
-            "ROLE":"Roll",
-            "WRITE":"Skriv",
-            "READ":"Läs",
-            "ADDITIONAL_ACTIONS":"Ytterliga aktioner",
-            "ACTION":"Åtgärder",
-            "NEW":"Ny policy",
-            "DETAILS":"Detaljer",
-            "DESCRIPTION":"Välj en förkonfigurerad uppsättning av regler eller lägg till anpassade regler nedan"
-          },
-          "ROLES":{
-            "LABEL":"Välj en roll",
-            "EMPTY":"Ingen roll hittad"
-          }
-        }
+      "CLEAR": "Rensa alla filter",
+      "REMOVE": "Ta bort filter",
+      "ADD": "Lägg till filter",
+      "PLACEHOLDER": "Sök…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Sparade filter-set",
+         "EMPTY": "Inga sparade filter än",
+         "SAVE_FILTERS": "Spara",
+         "FILTER_HEADER": "Spara filter-set",
+         "NAME": "Namn",
+         "NAME_PLACEHOLDER": "Namn…",
+         "DESCRIPTION": "Beskrivning",
+         "DESCRIPTION_PLACEHOLDER": "Beskrivning…"
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Användarsvartlista",
-        "NAME":"Namn",
-        "DATE_FROM":"Från",
-        "DATE_TO":"Tills",
-        "REASON":"Orsak",
-        "ACTION":"Åtgärder"
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Namn"
+         }
       },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa svartlista",
-        "EDITCAPTION":"Redigera svartlista",
-        "TABS":{
-          "USERS":"Användare",
-          "DATES":"Datum",
-          "REASON":"Orsak",
-          "SUMMARY":"Summering"
-        },
-        "USERS":{
-          "REMOVE":"Ta bort",
-          "ADD_USER":"Välj användare",
-          "ALL_USERS":"Alla användare",
-          "SELECT_USER":"Välj"
-        },
-        "DATES":{
-          "START_DATE":"Startdatum",
-          "END_DATE":"Slutdatum"
-        },
-        "REASON":{
-          "SELECT_REASON":"Välj",
-          "REASON":"Orsak",
-          "COMMENTS":"Kommentarer"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Summering",
-          "USER":"Användare",
-          "DATE_FROM":"Från",
-          "DATE_TO":"Tills",
-          "REASON":"Orsak",
-          "COMMENTS":"Kommentarer"
-        }
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Namn"
+         },
+         "STATUS": {
+            "LABEL": "Status"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Capture Agent-ID"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Åtkomstpolicy"
+         },
+         "COMMENTS": {
+            "LABEL": "Kommentarer"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bidragsgivare"
+         },
+         "CREATOR": {
+            "LABEL": "Skapare"
+         },
+         "HOSTNAME": {
+            "LABEL": "Hostnamn"
+         },
+         "LANGUAGE": {
+            "LABEL": "Språk"
+         },
+         "LICENSE": {
+            "LABEL": "Licens"
+         },
+         "LOCATION": {
+            "LABEL": "Plats"
+         },
+         "OPTEDOUT": {
+            "LABEL": "Avhoppad"
+         },
+         "PERIOD": {
+            "LABEL": "Tidsperiod"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Presentatör bibliografisk"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Presentatör teknisk"
+         },
+         "PROGRESS": {
+            "LABEL": "Förlopp"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Granskningsstatus",
+            "CONFIRMED": "Bekräftad",
+            "UNCONFIRMED": "Obekräftad",
+            "UNSENT": "Ej skickad"
+         },
+         "SERIES": {
+            "LABEL": "Serie"
+         },
+         "SOURCE": {
+            "LABEL": "Källa"
+         },
+         "START_DATE": {
+            "LABEL": "Startdatum"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "SCHEDULED": "Schemalagd",
+            "RECORDING": "Spelar in",
+            "INGESTING": "Intag",
+            "PROCESSING": "Bearbetar",
+            "ARCHIVE": "Arkiv",
+            "WAITINGFOR": "Väntar på",
+            "UPLOAD": "Ladda upp",
+            "ONHOLD": "På is"
+         },
+         "SUBJECT": {
+            "LABEL": "Ämne"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "MimeType"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Upplösning"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Typ"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Workflowdefinition"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Workflowstatus"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Hostnamn"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "PAUSED": "Pausad",
+            "QUEUED": "Kölagd",
+            "RUNNING": "Kör",
+            "WAITING": "Väntar"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Namn"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bidragsgivare"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Organisatörer"
+         },
+         "SUBJECT": {
+            "LABEL": "Ämne"
+         },
+         "LANGUAGE": {
+            "LABEL": "Språk"
+         },
+         "CREATOR": {
+            "LABEL": "Skapare"
+         },
+         "LICENSE": {
+            "LABEL": "Licens"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Åtkomstpolicy"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Skapad den"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Hostnamn"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "MAINTENANCE": "Underhåll",
+            "ONLINE": "Online",
+            "OFFLINE": "Offline"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Tillgängliga aktioner"
+         },
+         "HOSTNAME": {
+            "LABEL": "Hostnamn"
+         },
+         "NAME": {
+            "LABEL": "Namn"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "ERROR": "Fel",
+            "NORMAL": "Normal",
+            "WARNING": "Varning"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Namn"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Beskrivning"
+         },
+         "CREATOR": {
+            "LABEL": "Skapare"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Skapad"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Leverantör"
+         },
+         "ROLE": {
+            "LABEL": "Roll"
+         },
+         "USERNAME": {
+            "LABEL": "Användarnamn"
+         },
+         "NAME": {
+            "LABEL": "Namn"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Användarkatalog"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Ej skickad",
+         "UNCONFIRMED": "Obekräftad",
+         "CONFIRMED": "Bekräftad"
       }
-    }
-  },
-  "THEMES":{
-    "THEMES":{
-      "DETAILS":{
-        "HEADER":"Temadetaljer {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Allmänt",
-          "BUMPER":"Bumper (start)",
-          "TRAILER":"Bumper (slut)",
-          "TITLE":"Titel",
-          "LICENSE":"Licens",
-          "WATERMARK":"Vattenstämpel",
-          "USAGE":"Användning"
-        },
-        "GENERAL":{
-          "CAPTION":"Allmänt",
-          "NAME":"Namn",
-          "DESCRIPTION":"Beskrivning",
-          "DEFAULT":"Standard",
-          "SET_DEFAULT_INFO":"Ange som standardtema för alla serier och händelser",
-          "NAME_ERROR":"Namnet används redan",
-          "NAME_REQUIRED":"Obligatorisk"
-        },
-        "BUMPER":{
-          "CAPTION":"Bumper (start)",
-          "DESCRIPTION":"Fördefinierad video som läggs till i början av en inspelning.",
-          "ACTIVE":"Aktiv"
-        },
-        "TRAILER":{
-          "CAPTION":"Bumper (slut)",
-          "DESCRIPTION":"Fördefinierad video som läggs till i slutet av en inspelning.",
-          "ACTIVE":"Aktiv"
-        },
-        "TITLE":{
-          "CAPTION":"Titel",
-          "DESCRIPTION":"Fördefinierad bild inklusive beskrivande metadata läggs till i början eller slutet av en inspelning.",
-          "ACTIVE":"Aktiv"
-        },
-        "WATERMARK":{
-          "CAPTION":"Vattenstämpel",
-          "DESCRIPTION":"Halvgenomskinlig bild som är överlagrad på varje bildruta av inspelningen.",
-          "ACTIVE":"Aktiv"
-        },
-        "USAGE":{
-          "CAPTION":"Användning",
-          "SERIES":"Serienamn"
-        }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} rader",
+   "TABLE_NO_RESULT": "Inga resultat hittade",
+   "TABLE_LOADING": "Laddar…",
+   "TABLE_EDIT": "Redigera",
+   "PM": {
+      "BLACKLIST": {
+         "REASONS": {
+            "SICK_LEAVE": "Sjukfrånvaro",
+            "LEAVE": "Lämna",
+            "FAMILY_EMERGENCY": "Nödsituation i familjen",
+            "CONSTRUCTION": "Konstruktion"
+         }
       }
-    }
-  },
-  "CONFIGURATION":{
-    "ACTIONS":{
-      "ADD_MAIL_TEMPLATE":"Lägg till mall",
-      "ADD_THEME":"Lägg till tema"
-    },
-    "NAVIGATION":{
-      "MAIL_TEMPLATES":"E-postmallar",
-      "MAIL_SERVERS":"E-postinställningar",
-      "THEMES":"Teman"
-    },
-    "EMAIL_TEMPLATES":{
-      "TABLE":{
-        "CAPTION":"E-postmallar",
-        "NAME":"Namn",
-        "CREATOR":"Skapare",
-        "CREATED":"Skapad",
-        "ACTION":"Åtgärder"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa mall",
-        "EDITCAPTION":"Redigera mall",
-        "TABS":{
-          "MESSAGE":"Meddelande",
-          "SUMMARY":"Summering"
-        },
-        "MESSAGE":{
-          "NAME":"Namn",
-          "SUBJECT":"Ämne",
-          "MESSAGE":"Meddelande"
-        },
-        "SUMMARY":{
-          "MESSAGE_SUMMARY":"Sammanfattning av meddelandet"
-        }
-      }
-    },
-    "THEMES":{
-      "TABLE":{
-        "CAPTION":"Teman",
-        "NAME":"Namn",
-        "DESCRIPTION":"Beskrivning",
-        "CREATOR":"Skapare",
-        "CREATED":"Skapad",
-        "DEFAULT":"Standard",
-        "USAGE":"Användning",
-        "ACTION":"Åtgärder"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Skapa tema",
-        "EDITCAPTION":"Redigera tema",
-        "GENERAL":{
-          "CAPTION":"Allmänt",
-          "NAME":"Namn",
-          "DESCRIPTION":"Beskrivning",
-          "DEFAULT":"Standard",
-          "SET_DEFAULT_INFO":"Ange som standardtema för alla serier och händelser",
-          "NAME_REQUIRED":"Obligatorisk"
-        },
-        "BUMPER":{
-          "CAPTION":"Bumper (start)",
-          "FILE_UPLOADED":"Fil har laddats upp: ",
-          "DESCRIPTION":"Fördefinierad video som läggs till i början av en inspelning.",
-          "ACTIVE":"Aktiv",
-          "ENABLE":"Aktivera bumper",
-          "SELECT":"Välj",
-          "UPLOAD_LABEL":"Ladda upp video",
-          "UPLOAD_BUTTON":"Ladda upp"
-        },
-        "TRAILER":{
-          "CAPTION":"Bumper (slut)",
-          "FILE_UPLOADED":"Fil har laddats upp: ",
-          "DESCRIPTION":"Fördefinierad video som läggs till i slutet av en inspelning.",
-          "ACTIVE":"Aktiv",
-          "ENABLE":"Aktivera bumper",
-          "UPLOAD_LABEL":"Ladda upp video",
-          "UPLOAD_BUTTON":"Ladda upp"
-        },
-        "TITLE":{
-          "CAPTION":"Titel",
-          "FILE_UPLOADED":"Fil har laddats upp: ",
-          "DESCRIPTION":"Fördefinierad bild inklusive beskrivande metadata läggs till i början eller slutet av en inspelning.",
-          "ACTIVE":"Aktiv",
-          "ENABLE":"Aktivera rubrikbilden",
-          "BACKGROUND":"Bakgrund",
-          "EXTRACT":"Extrahera bakgrund",
-          "UPLOAD":"Ladda upp",
-          "UPLOAD_LABEL":"Ladda upp bild",
-          "UPLOAD_BUTTON":"Ladda upp"
-        },
-        "WATERMARK":{
-          "CAPTION":"Vattenstämpel",
-          "FILE_UPLOADED":"Fil har laddats upp: ",
-          "DESCRIPTION":"Halvgenomskinlig bild som är överlagrad på varje bildruta av inspelningen.",
-          "ACTIVE":"Aktiv",
-          "ENABLE":"Enable watermark",
-          "TOP_LEFT":"Överst till vänster",
-          "TOP_RIGHT":"Överst till höger",
-          "BOTTOM_LEFT":"Nederst till vänster",
-          "BOTTOM_RIGHT":"Nederst till höger",
-          "UPLOAD":"Ladda upp",
-          "POSITION":"Vattenstämpelsposition och förhandsgranskning",
-          "FILEUPLOAD_DESCRIPTION":"Filen skulle ha en alfakanal (genomskinlig bakgrund). Acceptabla filtyper är: .PNG, .GIF, .SVG, .WEBP",
-          "UPLOAD_LABEL":"Ladda upp bild",
-          "UPLOAD_BUTTON":"Ladda upp"
-        },
-        "SUMMARY":{
-          "CAPTION":"Summering"
-        },
-        "USAGE":{
-          "CAPTION":"Användning",
-          "SERIE":"Serienamn",
-          "EMPTY":"Inga serier hittades för aktuellt tema"
-        }
-      }
-    }
-  },
-  "SYSTEMS":{
-    "NAVIGATION":{
-      "JOBS":"Jobb",
-      "SERVERS":"Servrar",
-      "SERVICES":"Tjänster"
-    },
-    "JOBS":{
-      "TABLE":{
-        "ID":"Jobb-ID",
-        "ACTION":"Åtgärder",
-        "CAPTION":"Jobb",
-        "CREATED":"Skapad",
-        "CREATOR":"Skapare",
-        "HOST_NAME":"Hostnamn",
-        "OPERATION":"Operation",
-        "STARTED":"Startad",
-        "STATUS":"Status",
-        "SUBMITTED":"Skickad",
-        "TYPE":"Typ"
-      },
-      "DETAILS":{
-        "HEADER":"Jobbdetaljer {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Allmänt",
-          "OPERATIONS":"Aktiviteter",
-          "INCIDENTS":"Incidenter"
-        }
-      }
-    },
-    "SERVERS":{
-      "TABLE":{
-        "CAPTION":"Servrar",
-        "STATUS":"Status",
-        "HOST_NAME":"Hostnamn",
-        "CORES":"Kärnor",
-        "COMPLETED":"Avslutade jobb",
-        "RUNNING":"Aktiva jobb",
-        "QUEUED":"Köade jobb",
-        "MEAN_RUN_TIME":"Genomsnittlig körtid",
-        "MEAN_QUEUE_TIME":"Genomsnittlig kötid",
-        "MAINTENANCE":"Underhåll",
-        "ACTION":"Åtgärder",
-        "MAINTENANCE_OFF":"Starta underhållsläge",
-        "MAINTENANCE_ON":"Lämna underhållsläget"
-      }
-    },
-    "SERVICES":{
-      "TABLE":{
-        "CAPTION":"Tjänster",
-        "STATUS":"Status",
-        "NAME":"Tjänstenamn",
-        "HOST_NAME":"Hostnamn",
-        "COMPLETED":"Avslutade jobb",
-        "RUNNING":"Aktiva jobb",
-        "QUEUED":"Köade jobb",
-        "MEAN_RUN_TIME":"Genomsnittlig körtid",
-        "MEAN_QUEUE_TIME":"Genomsnittlig kötid",
-        "SANITIZE":"Rensa misslyckad tjänst",
-        "ACTION":"Åtgärder"
-      }
-    }
-  },
-  "VIDEO_TOOL":{
-    "TIMELINE":"Timeline",
-    "ZOOMLEVEL":"Zoom Level",
-    "ZOOM":"Zoom",
-    "BUTTONS":{
-      "CLOSE":"Stäng",
-      "SAVE":"Spara",
-      "PROCESS":"Save & Continue",
-      "ADD_COMMENT":"Add Comment"
-    },
-    "TABS":{
-      "PLAY":"Uppspelning",
-      "EDIT":"Redigerare",
-      "CAPTIONS":"Bildtexter",
-      "ANNOTATIONS":"Noteringar"
-    },
-    "AREAS":{
-      "METADATA":"Metadata",
-      "COMMENTS":"Comments",
-      "SEGMENTS":"Segments"
-    },
-    "ACTIONS":{
-      "SPLIT":"Dela",
-      "CUT":"Klipp ut",
-      "REPLAY_SEGMENT":"Spel upp segment igen",
-      "REPLAY_END_OF_SEGMENT":"End of segment",
-      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
-      "UNDO":"Ångra",
-      "REDO":"Gör om",
-      "CLEAR_SEGMENTS":"Rensa segment",
-      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
-    },
-    "SEGMENTS":{
-      "REMOVE_SEGMENT":"Remove Segment",
-      "USE_SEGMENT":"Use this Segment"
-    },
-    "PLAYER":{
-      "PLAY":"Spela",
-      "PAUSE":"Pause",
-      "NEXT_FRAME":"Nästa bild",
-      "PREVIOUS_FRAME":"Föregående bild",
-      "NEXT_SEGMENT":"Nästa segment / Hoppa till slutet",
-      "PREVIOUS_SEGMENT":"Föregående segment / Hoppa till start",
-      "MUTE":"Tyst",
-      "VOLUME":"Volym"
-    }
-  },
-  "LOGIN":{
-    "WELCOME":"Välkommen till Opencast",
-    "REMEMBER":"Kom ihåg mig på den här datorn",
-    "USERNAME":"Användarnamn…",
-    "PASSWORD":"Lösenord…",
-    "LOGIN":"Logga in",
-    "ERROR":"Felaktigt användarnamn, e-post och/eller lösenord"
-  },
-  "TABLE_FILTERS":{
-    "FILTER_SELECTION":{
-      "PLACEHOLDER":"Please select a filter…",
-      "NO_OPTIONS":"No filters found"
-    },
-    "FILTER_VALUE_SELECTION":{
-      "PLACEHOLDER":"Please select a value…",
-      "NO_OPTIONS":"No values found"
-    },
-    "CLEAR":"Rensa alla filter",
-    "REMOVE":"Ta bort filter",
-    "ADD":"Lägg till filter",
-    "PLACEHOLDER":"Sök…",
-    "PROFILES":{
-      "FILTERS_HEADER":"Sparade filter-set",
-      "EMPTY":"Inga sparade filter än",
-      "SAVE_FILTERS":"Spara",
-      "FILTER_HEADER":"Spara filter-set",
-      "NAME":"Namn",
-      "NAME_PLACEHOLDER":"Namn…",
-      "DESCRIPTION":"Beskrivning",
-      "DESCRIPTION_PLACEHOLDER":"Beskrivning…"
-    }
-  },
-  "FILTERS":{
-    "ACLS":{
-      "NAME":{
-        "LABEL":"Name"
-      }
-    },
-    "AGENTS":{
-      "NAME":{
-        "LABEL":"Namn"
-      },
-      "STATUS":{
-        "LABEL":"Status"
-      }
-    },
-    "EVENTS":{
-      "AGENT_ID":{
-        "LABEL":"Capture Agent-ID"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Åtkomstpolicy"
-      },
-      "COMMENTS":{
-        "LABEL":"Kommentarer"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Bidragsgivare"
-      },
-      "CREATOR":{
-        "LABEL":"Skapare"
-      },
-      "HOSTNAME":{
-        "LABEL":"Hostnamn"
-      },
-      "LANGUAGE":{
-        "LABEL":"Språk"
-      },
-      "LICENSE":{
-        "LABEL":"Licens"
-      },
-      "LOCATION":{
-        "LABEL":"Plats"
-      },
-      "OPTEDOUT":{
-        "LABEL":"Avhoppad"
-      },
-      "PERIOD":{
-        "LABEL":"Period"
-      },
-      "PRESENTERS_BIBLIOGRAPHIC":{
-        "LABEL":"Presentatör bibliografisk"
-      },
-      "PRESENTERS_TECHNICAL":{
-        "LABEL":"Presentatör teknisk"
-      },
-      "PROGRESS":{
-        "LABEL":"Förlopp"
-      },
-      "REVIEW_STATUS":{
-        "LABEL":"Granskningsstatus",
-        "CONFIRMED":"Bekräftad",
-        "UNCONFIRMED":"Obekräftad",
-        "UNSENT":"Ej skickad"
-      },
-      "SERIES":{
-        "LABEL":"Serie"
-      },
-      "SOURCE":{
-        "LABEL":"Källa"
-      },
-      "START_DATE":{
-        "LABEL":"Startdatum"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "SCHEDULED":"Schemalagd",
-        "RECORDING":"Spelar in",
-        "INGESTING":"Intag",
-        "PROCESSING":"Bearbetar",
-        "ARCHIVE":"Arkiv",
-        "WAITINGFOR":"Väntar på",
-        "UPLOAD":"Ladda upp",
-        "ONHOLD":"På is"
-      },
-      "SUBJECT":{
-        "LABEL":"Ämne"
-      },
-      "TRACK_MIMETYPE":{
-        "LABEL":"MimeType"
-      },
-      "TRACK_RESOLUTION":{
-        "LABEL":"Upplösning"
-      },
-      "TRACK_TYPE":{
-        "LABEL":"Typ"
-      },
-      "WORKFLOW_DEFINITION":{
-        "LABEL":"Workflowdefinition"
-      },
-      "WORKFLOW_STATE":{
-        "LABEL":"Workflowstatus"
-      }
-    },
-    "JOBS":{
-      "HOSTNAME":{
-        "LABEL":"Hostnamn"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "PAUSED":"Pausad",
-        "QUEUED":"Kölagd",
-        "RUNNING":"Kör",
-        "WAITING":"Väntar"
-      }
-    },
-    "SERIES":{
-      "TITLE":{
-        "LABEL":"Namn"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Bidragsgivare"
-      },
-      "ORGANIZERS":{
-        "LABEL":"Organisatörer"
-      },
-      "SUBJECT":{
-        "LABEL":"Ämne"
-      },
-      "LANGUAGE":{
-        "LABEL":"Språk"
-      },
-      "CREATOR":{
-        "LABEL":"Skapare"
-      },
-      "LICENSE":{
-        "LABEL":"Licens"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Åtkomstpolicy"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Skapad den"
-      }
-    },
-    "SERVERS":{
-      "HOSTNAME":{
-        "LABEL":"Hostnamn"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "MAINTENANCE":"Underhåll",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
-      }
-    },
-    "SERVICES":{
-      "ACTIONS":{
-        "LABEL":"Tillgängliga aktioner"
-      },
-      "HOSTNAME":{
-        "LABEL":"Hostnamn"
-      },
-      "NAME":{
-        "LABEL":"Namn"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "ERROR":"Fel",
-        "NORMAL":"Normal",
-        "WARNING":"Varning"
-      }
-    },
-    "THEMES":{
-      "NAME":{
-        "LABEL":"Namn"
-      },
-      "DESCRIPTION":{
-        "LABEL":"Beskrivning"
-      },
-      "CREATOR":{
-        "LABEL":"Skapare"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Skapad"
-      }
-    },
-    "USERS":{
-      "PROVIDER":{
-        "LABEL":"Leverantör"
-      },
-      "ROLE":{
-        "LABEL":"Roll"
-      },
-      "USERNAME":{
-        "LABEL":"Användarnamn"
-      },
-      "NAME":{
-        "LABEL":"Namn"
-      },
-      "USER_DIRECTORY":{
-        "LABEL":"Användarkatalog"
-      }
-    },
-    "REVIEW_STATUS":{
-      "UNSENT":"Ej skickad",
-      "UNCONFIRMED":"Obekräftad",
-      "CONFIRMED":"Bekräftad"
-    }
-  },
-  "TABLE_SUMMARY":"{{numberOfRows}} rader",
-  "TABLE_NO_RESULT":"Inga resultat hittade",
-  "TABLE_LOADING":"Laddar…",
-  "TABLE_EDIT":"Redigera",
-  "PM":{
-    "BLACKLIST":{
-      "REASONS":{
-        "SICK_LEAVE":"Sjukfrånvaro",
-        "LEAVE":"Lämna",
-        "FAMILY_EMERGENCY":"Nödsituation i familjen",
-        "CONSTRUCTION":"Konstruktion"
-      }
-    }
-  },
-  "DASHBOARD":{
-    "RUNNING":"På gång",
-    "FINISHED":"Avslutade",
-    "PAUSED":"Paused",
-    "FAILED":"Misslyckad",
-    "FINISHED_WITH_COMMENTS":"Todo",
-    "SCHEDULED":"Schemalagd",
-    "RECORDING":"Recording"
-  }
+   },
+   "DASHBOARD": {
+      "RUNNING": "På gång",
+      "FINISHED": "Avslutade",
+      "PAUSED": "Pausad",
+      "FAILED": "Misslyckad",
+      "FINISHED_WITH_COMMENTS": "Todo",
+      "SCHEDULED": "Schemalagd",
+      "RECORDING": "Spelar in"
+   }
 }

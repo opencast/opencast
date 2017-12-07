@@ -1,13 +1,13 @@
 {
-  "value_locale":"pl",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "error_videoLoading":"Film się ładuje. Poczekaj chwilę.",
-  "error_audioLoading":"Audio jest ładowanie. Poczekaj chwilę.",
-  "msg_videoLoadedSuccessfully":"Film został załadowany pomyślnie.",
-  "msg_audioLoadedSuccessfully":"Dźwięk został załadowany pomyślnie.",
-  "msg_videoBuffering":"Wideo jest obecnie buforowanie. Poczekaj chwilę.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"Nagranie zostało pomyślnie zbuforowane i teraz jest odtwarzanie automatyczne.",
-  "msg_videoBufferedSuccessfully":"Nagranie zostało pomyślnie zbuforowane.",
-  "error":"Błąd",
-  "error_AudioCodecNotSupported":"Błąd: Format audio nie jest obsługiwany przez Twoją przeglądarkę"
+    "value_locale": "pl",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "Film się ładuje. Poczekaj chwilę.",
+    "error_audioLoading": "Audio jest ładowanie. Poczekaj chwilę.",
+    "msg_videoLoadedSuccessfully": "Film został załadowany pomyślnie.",
+    "msg_audioLoadedSuccessfully": "Dźwięk został załadowany pomyślnie.",
+    "msg_videoBuffering": "Wideo jest obecnie buforowanie. Poczekaj chwilę.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Nagranie zostało pomyślnie zbuforowane i teraz jest odtwarzanie automatyczne.",
+    "msg_videoBufferedSuccessfully": "Nagranie zostało pomyślnie zbuforowane.",
+    "error": "Błąd",
+    "error_AudioCodecNotSupported": "Błąd: Format audio nie jest obsługiwany przez Twoją przeglądarkę"
 }

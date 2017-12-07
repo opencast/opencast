@@ -1,8 +1,8 @@
 {
-  "value_locale":"es",
-  "error_mediaPackageInformationNotLoaded":"Hay dos posibles causas para este error:",
-  "error_mediaPackageInformationNotLoaded_reason1":"Los vídeos ya no están disponibles",
-  "error_mediaPackageInformationNotLoaded_reason2":"Los vídeos están protegidos y se requiere iniciar sesión",
-  "error_noMediaInformationAvailable":"No hay información disponible sobre los vídeos.",
-  "error_endpointNotAvailable":"El servicio de búsqueda no está disponible en este momento."
+    "value_locale": "es",
+    "error_mediaPackageInformationNotLoaded": "Hay dos posibles causas para este error:",
+    "error_mediaPackageInformationNotLoaded_reason1": "Los vídeos ya no están disponibles",
+    "error_mediaPackageInformationNotLoaded_reason2": "Los vídeos están protegidos y se requiere iniciar sesión",
+    "error_noMediaInformationAvailable": "No hay información disponible sobre los vídeos.",
+    "error_endpointNotAvailable": "El servicio de búsqueda no está disponible en este momento."
 }

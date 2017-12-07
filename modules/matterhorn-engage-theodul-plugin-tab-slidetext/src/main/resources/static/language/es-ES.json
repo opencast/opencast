@@ -1,6 +1,6 @@
 {
-  "value_locale":"es",
-  "segment":"Segmento",
-  "noSlidesAvailable":"Diapositivas no disponibles.",
-  "slide_text":"Texto de la diapositiva"
+    "value_locale": "es",
+    "segment": "Segmento",
+    "noSlidesAvailable": "Diapositivas no disponibles.",
+    "slide_text": "Texto de la diapositiva"
 }
