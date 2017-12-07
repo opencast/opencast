@@ -1,13 +1,13 @@
 {
-  "value_locale":"el-Gr",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "error_videoLoading":"Το βίντεο φορτώνει. Παρακαλώ περιμένετε ένα λεπτό.",
-  "error_audioLoading":"Ο ήχος φορτώνει. Παρακαλώ περιμένετε ένα λεπτό.",
-  "msg_videoLoadedSuccessfully":"Το βίντεο φορτώθηκε με επιτυχία.",
-  "msg_audioLoadedSuccessfully":"Ο ήχος φορτώθηκε με επιτυχία.",
-  "msg_videoBuffering":"Το βίντεο αποθηκεύεται προσωρινα. Παρακαλώ περιμένετε ένα λεπτό.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"Το βίντεο αποθηκεύτηκε προσωρινά με επιτυχία και τώρα ξεκινά η αναπαραγωγή.",
-  "msg_videoBufferedSuccessfully":"Το βίντεο αποθηκεύτηκε προσωρινά επιτυχώς.",
-  "error":"Σφάλμα",
-  "error_AudioCodecNotSupported":"Σφάλμα: Ο κωδικοποιητής ήχου δεν υποστηρίζεται από αυτό το πρόγραμμα περιήγησης"
+    "value_locale": "el-Gr",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "Το βίντεο φορτώνει. Παρακαλώ περιμένετε ένα λεπτό.",
+    "error_audioLoading": "Ο ήχος φορτώνει. Παρακαλώ περιμένετε ένα λεπτό.",
+    "msg_videoLoadedSuccessfully": "Το βίντεο φορτώθηκε με επιτυχία.",
+    "msg_audioLoadedSuccessfully": "Ο ήχος φορτώθηκε με επιτυχία.",
+    "msg_videoBuffering": "Το βίντεο αποθηκεύεται προσωρινα. Παρακαλώ περιμένετε ένα λεπτό.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Το βίντεο αποθηκεύτηκε προσωρινά με επιτυχία και τώρα ξεκινά η αναπαραγωγή.",
+    "msg_videoBufferedSuccessfully": "Το βίντεο αποθηκεύτηκε προσωρινά επιτυχώς.",
+    "error": "Σφάλμα",
+    "error_AudioCodecNotSupported": "Σφάλμα: Ο κωδικοποιητής ήχου δεν υποστηρίζεται από αυτό το πρόγραμμα περιήγησης"
 }

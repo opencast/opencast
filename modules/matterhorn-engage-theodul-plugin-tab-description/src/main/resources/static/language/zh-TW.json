@@ -1,13 +1,13 @@
 {
-  "value_locale":"zh",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "title":"標題",
-  "noTitle":"無標題",
-  "creator":"建立者",
-  "presenter":"貢獻者",
-  "views":"檢視",
-  "series":"系列",
-  "recordingDate":"錄製日期",
-  "description":"說明",
-  "noDescriptionAvailable":"沒有可用的說明。"
+    "value_locale": "英文",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "標題",
+    "noTitle": "無標題",
+    "creator": "建立者",
+    "presenter": "貢獻者",
+    "views": "檢視",
+    "series": "系列",
+    "recordingDate": "錄製日期",
+    "description": "說明",
+    "noDescriptionAvailable": "沒有可用的說明。"
 }

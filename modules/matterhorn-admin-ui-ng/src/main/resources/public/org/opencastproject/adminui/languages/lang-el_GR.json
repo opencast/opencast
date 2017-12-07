@@ -1,1843 +1,1843 @@
 {
-  "MATTERHORN":"Οpencast",
-  "NAV_HOME":"Έναρξη",
-  "NAV_ABOUT":"Σχετικά με",
-  "NO":"'Οχι",
-  "SUBMIT":"Υποβολή",
-  "UPDATE":"Ενημέρωση",
-  "CANCEL":"Ακύρωση",
-  "CONFIRM":"Επιβεβαίωση",
-  "SAVE":"Αποθήκευση",
-  "LOGOUT":"Αποσύνδεση",
-  "RESET":"Επαναφορά",
-  "SELECT_NO_OPTIONS":"Καμία επιλογή",
-  "YES":"Ναί",
-  "LANGUAGES":{
-    "ARABIC":"Αραβικά",
-    "DANISH":"Δανικά",
-    "GERMAN":"Γερμανικά",
-    "GERMAN_CH":"Ελβετικά Γερμανικά",
-    "FINNISH":"Φινλανδικά",
-    "HINDI":"Χίντι",
-    "ITALIAN":"Ιταλικά",
-    "JAPANESE":"Ιαπωνικά",
-    "DUTCH":"Ολλανδικά",
-    "NORWEGIAN":"Νορβηγικά",
-    "FRENCH":"Γαλλικά",
-    "ENGLISH":"Αγγλικά",
-    "SPANISH":"Ισπανικά",
-    "ROMANSH":"Ρωμανικά",
-    "POLISH":"Πολωνικά",
-    "PORTUGESE":"Πορτογαλικά",
-    "SLOVENIAN":"Σλοβενικά",
-    "SWEDISH":"Σουηδικά",
-    "RUSSIAN":"Ρωσικά",
-    "TURKISH":"Τουρκικά",
-    "UKRAINIAN":"Ουκρανικά",
-    "CHINESE":"Κινέζικα"
-  },
-  "PREFERENCES":{
-    "TABLE":{
-      "CAPTION":"Επεξεργασία προβολής πίνακα",
-      "SUBHEADING":"Επιλέξτε τα προεπιλεγμένα δεδομένα που θέλετε να εμφανίζεται στην προβολή {{ tableName }}",
-      "AVAILABLE_COLUMNS":"Διαθέσιμες στήλες",
-      "SELECTED_COLUMNS":"Επιλεγμένες στήλες",
-      "FOOTER_TEXT":"H σειρά και η επιλογή θα αποθηκευτούν αυτόματα. Πιέστε το πλήκτρο \"{{resetTranslation}}\" για να επαναφέρετε την προεπιλεγμένη προβολή."
-    }
-  },
-  "CONFIRMATIONS":{
-    "CONTINUE_ACTION":"Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
-    "METADATA":{
-      "NOTICE":{
-        "UNKNOWN":"Το ακόλουθο στοιχείο θα διαγραφεί",
-        "EVENT":"Το ακόλουθο στοιχείο θα διαγραφεί",
-        "SERIES":"Θα διαγραφεί η ακόλουθη σειρά",
-        "ACL":"H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
-        "GROUP":"Η παρακάτω ομάδα θα διαγραφεί",
-        "USER":"Ο παρακάτω χρήστης θα διαγραφεί",
-        "USER_BLACKLIST":"Η παρακάτω μαύρη λίστα χρηστών θα διαγραφεί",
-        "THEME":"Το ακόλουθο θέμα θα διαγραφεί",
-        "EMAIL":"Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
-        "LOCATION":"Η ακόλουθη τοποθεσία θα διαγραφεί",
-        "LOCATION_BLACKLIST":"Η ακόλουθη μαύρη λίστα τοποθεσίας θα διαγραφεί"
-      },
-      "NAME":"Όνομα"
-    },
-    "ACTIONS":{
-      "CONFIRMATION":"Απαιτείται Επιβεβαίωση"
-    }
-  },
-  "MEDIAMODULE":"Μονάδα πολυμέσων",
-  "HELP":{
-    "HELP":"Βοήθεια",
-    "USERS_GUIDE":"Εγχειρίδιο χρήσης",
-    "DOCUMENTATION":"Τεκμηρίωση",
-    "REST_DOC":"Εγχειρίδιο REST API"
-  },
-  "NOTIFICATIONS":{
-    "ACL_ADDED":"H πολιτική πρόσβασης έχει δημιουργηθεί",
-    "ACL_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση της πολιτικής πρόσβασης",
-    "ACL_UPDATED":"Έχει ενημερωθεί η πολιτική πρόσβασης",
-    "ACL_DELETED":"Η πολιτική πρόσβασης έχει διαγραφεί",
-    "ACL_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της πολιτικής πρόσβασης",
-    "USER_ADDED":"Ο χρήστης έχει δημιουργηθεί",
-    "USER_UPDATED":"Ο χρήστης έχει ενημερωθεί",
-    "USER_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση του χρήστη",
-    "USER_DELETED":"Ο χρήστης έχει διαγραφεί",
-    "USER_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή χρήστη",
-    "USER_NOT_MANAGEABLE":"Ο χρήστης δεν είναι διαχειρίσιμος",
-    "GROUP_ADDED":"Η ομάδα έχει δημιουργηθεί",
-    "GROUP_CONFLICT":"Υπάρχει ήδη το όνομα της ομάδας που δημιουργήθηκε",
-    "GROUP_UPDATED":"Η ομάδα έχει ενημερωθεί",
-    "GROUP_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση της ομάδας",
-    "GROUP_DELETED":"Η ομάδα έχει διαγραφεί",
-    "GROUP_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της ομάδας",
-    "ACCESS_DENIED":"Δεν επιτρέπεται η πρόσβαση. Δεν έχετε δικαίωμα να δείτε αυτή τη σελίδα",
-    "SERIES_ADDED":"Η σειρά έχει δημιουργηθεί",
-    "SERIES_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση της σειράς",
-    "EVENTS_CREATED":"Η εκδήλωση έχει δημιουργηθεί",
-    "EVENTS_UPLOAD_STARTED":"Μια εκδήλωση ανέβηκε…",
-    "EVENTS_NOT_CREATED":"Δεν ήταν δυνατή η δημιουργία της εκδήλωσης",
-    "EVENTS_UPDATED_NB":"{{ number }} εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
-    "EVENTS_UPDATED_ALL":"Όλες οι εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
-    "EVENTS_NOT_UPDATED":"Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης",
-    "EVENTS_NOT_UPDATED_ID":"Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης {{ id }}",
-    "EVENTS_NOT_UPDATED_ALL":"Καμμία από τις εκδηλώσεις δεν μπορεί να αποθηκευτεί",
-    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
-    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
-    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
-    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
-    "SERIES_UPDATED_NB":"{{ number }} σειρές έχουν ενημερωθεί με επιτυχία",
-    "SERIES_UPDATED_ALL":"Έχουν ενημερωθεί με επιτυχία όλες οι σειρές",
-    "SERIES_NOT_UPDATED":"Δεν ήταν δυνατή η αποθήκευση της σειράς",
-    "SERIES_NOT_UPDATED_ID":"Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
-    "SERIES_NOT_UPDATED_ALL":"Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
-    "EVENTS_DELETED":"Η εκδήλωση έχει διαγραφεί",
-    "EVENTS_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων",
-    "SERIES_DELETED":"Η σειρά έχει διαγραφεί",
-    "SERIES_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της σειράς",
-    "USER_BLACKLIST_CREATED":"Δημιουργήθηκε η μαύρη λίστα",
-    "USER_BLACKLIST_NOT_CREATED":"Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-    "USER_BLACKLIST_SAVED":"Έχει αποθηκευτεί στη μαύρη λίστα",
-    "USER_BLACKLIST_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση της μαύρης λίστας",
-    "USER_BLACKLIST_DELETED":"Η μαύρη λίστα έχει διαγραφεί",
-    "USER_BLACKLIST_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
-    "LOCATION_DELETED":"Η τοποθεσία έχει διαγραφεί",
-    "LOCATION_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
-    "LOCATION_BLACKLIST_CREATED":"Δημιουργήθηκε η μαύρη λίστα",
-    "LOCATION_BLACKLIST_NOT_CREATED":"Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
-    "LOCATION_BLACKLIST_SAVED":"Η μαύρη λίστα έχει αποθηκευτεί",
-    "LOCATION_BLACKLIST_NOT_SAVED":"Η μαύρη λίστα δεν μπορεί να αποθηκευτεί",
-    "LOCATION_BLACKLIST_DELETED":"Η μαύρη λίστα έχει διαγραφεί",
-    "LOCATION_BLACKLIST_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
-    "EMAIL_TEMPLATE_CREATED":"Το πρότυπο έχει δημιουργηθεί",
-    "EMAIL_TEMPLATE_NOT_CREATED":"Δεν ήταν δυνατή η δημιουργία του προτύπου",
-    "EMAIL_TEMPLATE_SAVED":"Το πρότυπο έχει αποθηκευτεί",
-    "EMAIL_TEMPLATE_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση του προτύπου",
-    "EMAIL_TEMPLATE_DELETED":"Το πρότυπο έχει διαγραφεί",
-    "EMAIL_TEMPLATE_NOT_DELETED":"Δεν ήταν δυνατή η διαγραφή του προτύπου",
-    "EMAIL_TEMPLATE_NAME_TAKEN":"Αυτό το όνομα είναι ήδη σε χρήση",
-    "EMAIL_SENT":"Το μήνυμα έχει σταλεί",
-    "EMAIL_NOT_SENT":"Δεν μπόρεσε να σταλεί το μήνυμα",
-    "CONFLICT_DETECTED":"Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
-    "CONFLICT_ALREADY_ENDED":"Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
-    "CONFLICT_END_BEFORE_START":"Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
-    "INVALID_ACL_RULES":"Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
-    "MISSING_ACL_RULES":"Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
-    "SAVED_ACL_RULES":"Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
-    "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
-    "SERIES_ACL_LOCKED":"Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Σφάλμα κατά την ενημέρωση κατάστασης της εκδήλωσης στο καθεστώς εξαίρεσης.",
-    "EVENT_PARTICIPATION_STATUS_READONLY":"Η κατάσταση συμμετοχής δεν μπορεί να ενημερωθεί καθώς η ημερομηνία έναρξης του προγραμματισμού είναι στο παρελθόν.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Σφάλμα κατά την ενημέρωση κατάστασης εξαίρεσης της σειράς.",
-    "THEME_NAME_ALREADY_TAKEN":"Αυτό το όνομα είναι ήδη σε χρήση",
-    "THEME_NAME_EMPTY":"Το όνομα δεν είναι δυνατό να είναι κενό",
-    "BUMPER_UPLOAD_ERROR":"Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
-    "TRAILER_UPLOAD_ERROR":"Παρουσιάστηκε σφάλμα κατά την αποστολή αρχείων πολυμέσων",
-    "TITLE_UPLOAD_ERROR":"Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
-    "LICENSE_UPLOAD_ERROR":"Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
-    "WATERMARK_UPLOAD_ERROR":"Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
-    "THEME_UPLOAD_STARTED":"Το αρχείο πολυμέσων μεταφορτώθηκε…",
-    "THEME_CREATED":"Το θέμα έχει δημιουργηθεί",
-    "THEME_NOT_CREATED":"Το θέμα δεν μπορεί να δημιουργηθεί",
-    "THEME_DELETED":"Το θέμα έχει διαγραφεί",
-    "THEME_NOT_DELETED":"Το θέμα δεν είναι δυνατόν να διαγραφεί",
-    "TASK_CREATED":"Η εργασία έχει δημιουργήθει",
-    "TASK_NOT_CREATED":"Η εργασία δεν θα μπορούσε να δημιουργηθεί",
-    "VIDEO_CUT_NOT_SAVED":"Δεν ήταν δυνατή η αποθήκευση των πληροφοριών επεξεργασίας",
-    "VIDEO_CUT_SAVED":"Η επεξεργασία πληροφοριών έχει αποθηκευτεί",
-    "VIDEO_CUT_PROCESSING":"Επεξεργάζεται το βίντεο…",
-    "SERVER_UNRESPONSIVE":"Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
-    "SERVICE_UNAVAILABLE":"Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
-    "ACTIVE_TRANSACTION":"Δεν μπορεί να επεξεργαστεί αυτή την εκδήλωση, ενώ υπάρχει μια ενεργή ροή εργασίας ή συναλλαγή."
-  },
-  "BULK_ACTIONS":{
-    "CAPTION":"Ενέργειες",
-    "SEND_MESSAGE":"Αποστολή μηνύματος",
-    "WARNING":"Προειδοποίηση",
-    "EDIT_STATUS":{
-      "CAPTION":"Επεξεργαστείτε την κατάσταση",
-      "READY_FOR_RECORDING":"Έτοιμη για εγγραφή",
-      "OPTED_OUT":"Opted-out"
-    },
-    "DELETE":{
-      "SERIES":{
-        "CAPTION":"Διαγραφή",
-        "BUTTON":"Διαγραφή"
-      },
-      "EVENTS":{
-        "CAPTION":"Διαγραφή",
-        "DELETE_EVENTS":"Διαγραφή εκδηλώσεων",
-        "PUBLISHED":{
-          "NONE":"Καμμία από τις επιλεγμένες εκδηλώσεις χρειάζονται να αποσυρθουν πριν μπορέσουν να διαγραφούν.",
-          "WARNING":"Οι παρακάτω εκδηλώσεις δεν μπορούν να διαγραφούν καθώς έχουν ήδη δημοσιευθει και η διαγραφή τους δεν θα αφήσει κανένα τρόπο διαγραφής των αρχείων που έχουν διαγραφεί. Αντ' αυτού επιλέξτε πρώτα κάποια από τις παρακάτω ροές εργασίας για την ανάκληση των εκδηλώσεων και έπειτα την διαγραφή τους."
-        },
-        "RETRACT_EVENTS":"Ανακληθέντες εκδηλώσεις",
-        "SELECT_RETRACT_TASK":"Επιλέξτε μια εργασία ανάκλησης",
-        "SUMMARY":{
-          "EVENTS_DELETED":"Εκδηλώσεις που θα διαγραφούν",
-          "EVENTS_RETRACTED":"Εκδηλώσεις που θα ανακληθούν",
-          "RETRACT_WORKFLOW":"Ροή εργασίας για την ανάκληση εκδηλώσεων"
-        },
-        "UNPUBLISHED":{
-          "NONE":"Καμμία από τις παρακάτω εκδηλώσεις δεν μπορεί να διαγραφεί χωρίς να αφήσει ορφανά αρχεία."
-        },
-        "BUTTON":"Διαγραφή"
+   "MATTERHORN": "Οpencast",
+   "NAV_HOME": "Έναρξη",
+   "NAV_ABOUT": "Σχετικά με",
+   "NO": "'Οχι",
+   "SUBMIT": "Υποβολή",
+   "UPDATE": "Ενημέρωση",
+   "CANCEL": "Ακύρωση",
+   "CONFIRM": "Επιβεβαίωση",
+   "SAVE": "Αποθήκευση",
+   "LOGOUT": "Αποσύνδεση",
+   "RESET": "Επαναφορά",
+   "SELECT_NO_OPTIONS": "Καμία επιλογή",
+   "YES": "Ναί",
+   "LANGUAGES": {
+      "ARABIC": "Αραβικά",
+      "DANISH": "Δανικά",
+      "GERMAN": "Γερμανικά",
+      "GERMAN_CH": "Ελβετικά Γερμανικά",
+      "FINNISH": "Φινλανδικά",
+      "HINDI": "Χίντι",
+      "ITALIAN": "Ιταλικά",
+      "JAPANESE": "Ιαπωνικά",
+      "DUTCH": "Ολλανδικά",
+      "NORWEGIAN": "Νορβηγικά",
+      "FRENCH": "Γαλλικά",
+      "ENGLISH": "Αγγλικά",
+      "SPANISH": "Ισπανικά",
+      "ROMANSH": "Ρωμανικά",
+      "POLISH": "Πολωνικά",
+      "PORTUGESE": "Πορτογαλικά",
+      "SLOVENIAN": "Σλοβενικά",
+      "SWEDISH": "Σουηδικά",
+      "RUSSIAN": "Ρωσικά",
+      "TURKISH": "Τουρκικά",
+      "UKRAINIAN": "Ουκρανικά",
+      "CHINESE": "Κινέζικα"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Επεξεργασία προβολής πίνακα",
+         "SUBHEADING": "Επιλέξτε τα προεπιλεγμένα δεδομένα που θέλετε να εμφανίζεται στην προβολή {{ tableName }}",
+         "AVAILABLE_COLUMNS": "Διαθέσιμες στήλες",
+         "SELECTED_COLUMNS": "Επιλεγμένες στήλες",
+         "FOOTER_TEXT": "H σειρά και η επιλογή θα αποθηκευτούν αυτόματα. Πιέστε το πλήκτρο \"{{resetTranslation}}\" για να επαναφέρετε την προεπιλεγμένη προβολή."
       }
-    },
-    "DELETE_EVENTS_WARNING_LINE1":"Μόλις διαγραφεί, όλα τα μεταδεδομένα, τα αρχεία εικόνας και ήχου της εκδήλωσης θα διαγραφούν και δεν θα μπορούν να ανακτηθούν.",
-    "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1":"Μόλις διαγραφεί, όλατ τα μεταδεδομένα της σειράς δεν θα μπορούν να ανακτηθούν. Οι εκδηλώσεις της σειράς δεν θα διαγραφούν.",
-    "DELETE_SERIES_WARNING_LINE2":"",
-    "SCHEDULE_TASK":{
-      "CAPTION":"Έναρξη εργασίας",
-      "GENERAL":{
-        "CAPTION":"Γενικά",
-        "SUMMARY":"({{ count }} εκδηλώσεις επιλεγμένες)",
-        "CANNOTSTART":"Οι επιλεγμένες εκδηλώσεις δεν μπορούν αυτή την στιγμή να επεξεργαστούν. Καταργήστε την επιλογή τούς ή δοκιμάστε ξανά αργότερα."
+   },
+   "CONFIRMATIONS": {
+      "CONTINUE_ACTION": "Είστε βέβαιοι ότι θέλετε να συνεχίσετε;",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Το ακόλουθο στοιχείο θα διαγραφεί",
+            "EVENT": "Το ακόλουθο στοιχείο θα διαγραφεί",
+            "SERIES": "Θα διαγραφεί η ακόλουθη σειρά",
+            "ACL": "H παρακάτω πολιτική πρόσβασης θα διαγραφεί",
+            "GROUP": "Η παρακάτω ομάδα θα διαγραφεί",
+            "USER": "Ο παρακάτω χρήστης θα διαγραφεί",
+            "USER_BLACKLIST": "Η παρακάτω μαύρη λίστα χρηστών θα διαγραφεί",
+            "THEME": "Το ακόλουθο θέμα θα διαγραφεί",
+            "EMAIL": "Το ακόλουθο πρότυπο ηλεκτρονικού ταχυδρομείου θα διαγραφεί",
+            "LOCATION": "Η ακόλουθη τοποθεσία θα διαγραφεί",
+            "LOCATION_BLACKLIST": "Η ακόλουθη μαύρη λίστα τοποθεσίας θα διαγραφεί"
+         },
+         "NAME": "Όνομα"
       },
-      "TASKS":{
-        "CAPTION":"Εργασίες",
-        "SELECT":"Επιλέξτε εργασία"
-      },
-      "SUMMARY":{
-        "CAPTION":"Σύνοψη",
-        "EVENTS":"Εκδηλώσεις",
-        "EVENTS_SUMMARY":"Έχετε επιλέξει {{numberOfEvents}} εκδηλώσεις",
-        "CONFIGURATION":"Ρύθμιση παραμέτρων",
-        "WORKFLOW":"Εργασία"
+      "ACTIONS": {
+         "CONFIRMATION": "Απαιτείται Επιβεβαίωση"
       }
-    }
-  },
-  "DATES":{
-    "TODAY":"Σήμερα",
-    "TOMORROW":"Αύριο",
-    "YESTERDAY":"Χθες"
-  },
-  "DATETIMES":{
-    "TODAY":"Σήμερα στις {{ time }}",
-    "TOMORROW":"Αύριο στις {{ time }}",
-    "YESTERDAY":"Χθες στις {{ time }}"
-  },
-  "WIZARD":{
-    "NEXT_STEP":"Επόμενη",
-    "BACK":"Προηγούμενη",
-    "CREATE":"Δημιουργία",
-    "RETRACT":"Ανάκληση",
-    "UPDATE":"Ενημέρωση",
-    "DURATION":{
-      "HOURS":"Ώρες",
-      "MINUTES":"Λεπτά"
-    }
-  },
-  "CAPTURE_AGENT":{
-    "DEVICE":{
-      "MICROPHONE":"Μικρόφωνο",
-      "CAMERA":"κάμερα",
-      "PRESENTATION":"Παρουσίαση"
-    }
-  },
-  "NAV":{
-    "DASHBOARD":{
-      "TITLE":"Πίνακας Ελέγχου"
-    },
-    "EVENTS":{
-      "TITLE":"Εγγραφές"
-    },
-    "SYSTEMS":{
-      "TITLE":"Συστήματα"
-    },
-    "CAPTUREAGENTS":{
-      "TITLE":"Στιγμιότυπα"
-    },
-    "USERS":{
-      "TITLE":"Οργανισμός"
-    },
-    "INTEGRATIONS":{
-      "TITLE":"Ενσωματώσεις"
-    },
-    "CONFIGURATION":{
-      "TITLE":"Ρύθμιση παραμέτρων"
-    }
-  },
-  "EVENTS":{
-    "RETRACT":{
-      "CAPTION":"Ανάκληση εκδήλωσης",
-      "ID":"Αναγνωριστικό",
-      "SELECT_TASK":"Επιλέξτε εργασία",
-      "SUMMARY":"Σύνοψη",
-      "WARNING":"Αυτή η εκδήλωση έχει δημοσιευθεί τουλάχιστον σε ένα κανάλι δημοσίευσης, έτσι πρέπει να ανακληθεί πριν διαγραφεί. Επιλέξτε μία από τις παρακάτω εργασίες για την ανάκληση των δημοσιεύσεων."
-    },
-    "LICENSE":{
-      "ALLRIGHTS":"Με επιφύλαξη παντός δικαιώματος",
-      "CCBY":"CC BY",
-      "CCBYSA":"CC BY-SA",
-      "CCBYND":"CC BY-ND",
-      "CCBYNC":"CC BY-NC",
-      "CCBYNCSA":"CC BY-NC-SA",
-      "CCBYNCND":"CC BY-NC-ND",
-      "CC0":"CC0",
-      "BSD":"BSD",
-      "CCND":"CCND",
-      "GPL":"GPL"
-    },
-    "SEND_MESSAGE":{
-      "CAPTION":"Στείλτε μήνυμα",
-      "TABS":{
-        "RECIPIENTS":"Παραλήπτες",
-        "MESSAGE":"Μήνυμα",
-        "SUMMARY":"Περίληψη"
+   },
+   "MEDIAMODULE": "Μονάδα πολυμέσων",
+   "HELP": {
+      "HELP": "Βοήθεια",
+      "USERS_GUIDE": "Εγχειρίδιο χρήσης",
+      "DOCUMENTATION": "Τεκμηρίωση",
+      "REST_DOC": "Εγχειρίδιο REST API"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "H πολιτική πρόσβασης έχει δημιουργηθεί",
+      "ACL_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της πολιτικής πρόσβασης",
+      "ACL_UPDATED": "Έχει ενημερωθεί η πολιτική πρόσβασης",
+      "ACL_DELETED": "Η πολιτική πρόσβασης έχει διαγραφεί",
+      "ACL_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της πολιτικής πρόσβασης",
+      "USER_ADDED": "Ο χρήστης έχει δημιουργηθεί",
+      "USER_UPDATED": "Ο χρήστης έχει ενημερωθεί",
+      "USER_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση του χρήστη",
+      "USER_DELETED": "Ο χρήστης έχει διαγραφεί",
+      "USER_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή χρήστη",
+      "USER_NOT_MANAGEABLE": "Ο χρήστης δεν είναι διαχειρίσιμος",
+      "GROUP_ADDED": "Η ομάδα έχει δημιουργηθεί",
+      "GROUP_CONFLICT": "Υπάρχει ήδη το όνομα της ομάδας που δημιουργήθηκε",
+      "GROUP_UPDATED": "Η ομάδα έχει ενημερωθεί",
+      "GROUP_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της ομάδας",
+      "GROUP_DELETED": "Η ομάδα έχει διαγραφεί",
+      "GROUP_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της ομάδας",
+      "ACCESS_DENIED": "Δεν επιτρέπεται η πρόσβαση. Δεν έχετε δικαίωμα να δείτε αυτή τη σελίδα",
+      "SERIES_ADDED": "Η σειρά έχει δημιουργηθεί",
+      "SERIES_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
+      "EVENTS_CREATED": "Η εκδήλωση έχει δημιουργηθεί",
+      "EVENTS_UPLOAD_STARTED": "Μια εκδήλωση ανέβηκε…",
+      "EVENTS_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία της εκδήλωσης",
+      "EVENTS_UPDATED_NB": "{{ number }} εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+      "EVENTS_UPDATED_ALL": "Όλες οι εκδηλώσεις έχουν ενημερωθεί με επιτυχία",
+      "EVENTS_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης",
+      "EVENTS_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης {{ id }}",
+      "EVENTS_NOT_UPDATED_ALL": "Καμμία από τις εκδηλώσεις δεν μπορεί να αποθηκευτεί",
+      "EVENTS_PROCESSING_ACTION_RETRY": "H επεξεργασία συνεχίζεται...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Η επεξεργασία δεν θα μπορεί να συνεχιστεί.",
+      "EVENTS_PROCESSING_ACTION_NONE": "H επεξεργασία ματαιώθηκε...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Η επεξεργασία δεν θα μπορεί να ματαιωθεί.",
+      "SERIES_UPDATED_NB": "{{ number }} σειρές έχουν ενημερωθεί με επιτυχία",
+      "SERIES_UPDATED_ALL": "Έχουν ενημερωθεί με επιτυχία όλες οι σειρές",
+      "SERIES_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
+      "SERIES_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της σειράς {{ id }}",
+      "SERIES_NOT_UPDATED_ALL": "Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
+      "EVENTS_DELETED": "Η εκδήλωση έχει διαγραφεί",
+      "EVENTS_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων",
+      "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
+      "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
+      "USER_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
+      "USER_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
+      "USER_BLACKLIST_SAVED": "Έχει αποθηκευτεί στη μαύρη λίστα",
+      "USER_BLACKLIST_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση της μαύρης λίστας",
+      "USER_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
+      "USER_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
+      "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
+      "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
+      "LOCATION_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
+      "LOCATION_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
+      "LOCATION_BLACKLIST_SAVED": "Η μαύρη λίστα έχει αποθηκευτεί",
+      "LOCATION_BLACKLIST_NOT_SAVED": "Η μαύρη λίστα δεν μπορεί να αποθηκευτεί",
+      "LOCATION_BLACKLIST_DELETED": "Η μαύρη λίστα έχει διαγραφεί",
+      "LOCATION_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
+      "EMAIL_TEMPLATE_CREATED": "Το πρότυπο έχει δημιουργηθεί",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Δεν ήταν δυνατή η δημιουργία του προτύπου",
+      "EMAIL_TEMPLATE_SAVED": "Το πρότυπο έχει αποθηκευτεί",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση του προτύπου",
+      "EMAIL_TEMPLATE_DELETED": "Το πρότυπο έχει διαγραφεί",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή του προτύπου",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
+      "EMAIL_SENT": "Το μήνυμα έχει σταλεί",
+      "EMAIL_NOT_SENT": "Δεν μπόρεσε να σταλεί το μήνυμα",
+      "CONFLICT_DETECTED": "Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
+      "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
+      "CONFLICT_END_BEFORE_START": "Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
+      "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
+      "MISSING_ACL_RULES": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
+      "SAVED_ACL_RULES": "Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Οι υπάρχουσες εκδηλώσεις σε αυτή τη σειρά θα πρέπει να επεξεργαστών ξάνα",
+      "SERIES_ACL_LOCKED": "Η επεξεργασία την πολιτικών πρόσβαησς δεν επιτρέπεται όταν εκτελούνται εργασίες σε μία εκδήλωση που αποτελεί μέρος της σειράς",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Η πολιτική πρόσβασης απαιτεί τουλάχιστον ένα ρόλο με δικαιώματα ανάγνωσης και εγγραφής.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης της εκδήλωσης στο καθεστώς εξαίρεσης.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Η κατάσταση συμμετοχής δεν μπορεί να ενημερωθεί καθώς η ημερομηνία έναρξης του προγραμματισμού είναι στο παρελθόν.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Η κατάσταση εξαίρεσης εκδήλωσης έχει ενημερωθεί με επιτυχία.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Σφάλμα κατά την ενημέρωση κατάστασης εξαίρεσης της σειράς.",
+      "THEME_NAME_ALREADY_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
+      "THEME_NAME_EMPTY": "Το όνομα δεν είναι δυνατό να είναι κενό",
+      "BUMPER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
+      "TRAILER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή αρχείων πολυμέσων",
+      "TITLE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
+      "LICENSE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
+      "WATERMARK_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
+      "THEME_UPLOAD_STARTED": "Το αρχείο πολυμέσων μεταφορτώθηκε…",
+      "THEME_CREATED": "Το θέμα έχει δημιουργηθεί",
+      "THEME_NOT_CREATED": "Το θέμα δεν μπορεί να δημιουργηθεί",
+      "THEME_DELETED": "Το θέμα έχει διαγραφεί",
+      "THEME_NOT_DELETED": "Το θέμα δεν είναι δυνατόν να διαγραφεί",
+      "TASK_CREATED": "Η εργασία έχει δημιουργήθει",
+      "TASK_NOT_CREATED": "Η εργασία δεν θα μπορούσε να δημιουργηθεί",
+      "VIDEO_CUT_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση των πληροφοριών επεξεργασίας",
+      "VIDEO_CUT_SAVED": "Η επεξεργασία πληροφοριών έχει αποθηκευτεί",
+      "VIDEO_CUT_PROCESSING": "Επεξεργάζεται το βίντεο…",
+      "SERVER_UNRESPONSIVE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      "SERVICE_UNAVAILABLE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
+      "ACTIVE_TRANSACTION": "Δεν μπορεί να επεξεργαστεί αυτή την εκδήλωση, ενώ υπάρχει μια ενεργή ροή εργασίας ή συναλλαγή."
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Ενέργειες",
+      "SEND_MESSAGE": "Αποστολή μηνύματος",
+      "WARNING": "Προειδοποίηση",
+      "EDIT_STATUS": {
+         "CAPTION": "Επεξεργαστείτε την κατάσταση",
+         "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
+         "OPTED_OUT": "Επιλογή εξόδου"
       },
-      "RECIPIENTS":{
-        "AUDIT_TRAIL_CAPTION":"Προσθέστε στη διαδρομή ελέγχου",
-        "AUDIT_TRAIL_DESCRIPTION":"Επιλέξτε για να προσθέσετε το μήνυμα στην διαδρομή ελέγχου",
-        "AUDIT_TRAIL_LABEL":""
-      },
-      "MESSAGE":{
-        "EMAIL_TEMPLATE":"Επιλέξτε το πρότυπο ηλεκτρονικού ταχυδρομείου",
-        "SUBJECT":"Θέμα",
-        "MESSAGE":"Μήνυμα",
-        "INCLUDE_SIGNATURE":"Συμπεριλάβετε την υπογραφή μου στο email"
-      },
-      "SUMMARY":{
-        "MESSAGE_SUMMARY":"Περίληψη"
-      }
-    },
-    "EVENTS":{
-      "NEW":{
-        "CAPTION":"Δημιουργία εκδήλωσης",
-        "METADATA":{
-          "CAPTION":"Μεταδεδομένα"
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Εκτεταμένα μεταδεδομένα",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Εκτεταμένα μεταδεδομένα"
-          }
-        },
-        "SOURCE":{
-          "CAPTION":"Πηγή",
-          "SELECT_SOURCE":"Επιλογή πηγής",
-          "PLACEHOLDER":{
-            "LOCATION":"Τοποθεσία",
-            "INPUTS":"Εισαγωγές δεδομένων",
-            "HOUR":"Ώρα",
-            "MINUTE":"Λεπτά",
-            "REPEATS":"Επαναλήψεις",
-            "START_DATE":"ΕΕΕΕ-ΜΜ-ΗΗ",
-            "START_DATE_FORMAT":"ΕΕΕΕ-ΜΜ-ΗΗ",
-            "END_DATE":"ΕΕΕΕ-ΜΜ-ΗΗ",
-            "END_DATE_FORMAT":"ΕΕΕΕ-ΜΜ-ΗΗ"
-          },
-          "UPLOAD":{
-            "CAPTION":"Ανέβασμα αρχείων",
-            "RECORDING_ELEMENTS":"Στοιχεία καταγραφής",
-            "RECORDING_METADATA":"Recording metadata",
-            "SEGMENTABLE":{
-              "SHORT":"Διαφάνειες",
-              "DETAIL":"Το αρχείο περιέχει μια καταγραφή  παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Διαγραφή",
+            "BUTTON": "Διαγραφή"
+         },
+         "EVENTS": {
+            "CAPTION": "Διαγραφή",
+            "DELETE_EVENTS": "Διαγραφή εκδηλώσεων",
+            "PUBLISHED": {
+               "NONE": "Καμμία από τις επιλεγμένες εκδηλώσεις χρειάζονται να αποσυρθουν πριν μπορέσουν να διαγραφούν.",
+               "WARNING": "Οι παρακάτω εκδηλώσεις δεν μπορούν να διαγραφούν καθώς έχουν ήδη δημοσιευθει και η διαγραφή τους δεν θα αφήσει κανένα τρόπο διαγραφής των αρχείων που έχουν διαγραφεί. Αντ' αυτού επιλέξτε πρώτα κάποια από τις παρακάτω ροές εργασίας για την ανάκληση των εκδηλώσεων και έπειτα την διαγραφή τους."
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Παρουσιαστής",
-              "DETAIL":"Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
+            "RETRACT_EVENTS": "Ανακληθέντες εκδηλώσεις",
+            "SELECT_RETRACT_TASK": "Επιλέξτε μια εργασία ανάκλησης",
+            "SUMMARY": {
+               "EVENTS_DELETED": "Εκδηλώσεις που θα διαγραφούν",
+               "EVENTS_RETRACTED": "Εκδηλώσεις που θα ανακληθούν",
+               "RETRACT_WORKFLOW": "Ροή εργασίας για την ανάκληση εκδηλώσεων"
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Μόνο αρχείου ήχου",
-              "DETAIL":"Το αρχείο περιέχει μόνο ήχο."
+            "UNPUBLISHED": {
+               "NONE": "Καμμία από τις παρακάτω εκδηλώσεις δεν μπορεί να διαγραφεί χωρίς να αφήσει ορφανά αρχεία."
             },
-            "MULTIPLE_PARTS":{
-              "SHORT":"Multiple parts",
-              "DETAIL":"A set of files containing different parts of the event."
-            }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Χρονοδιάγραμμα",
-            "START_DATE":"Ημερομηνία έναρξης",
-            "START_TIME":"Ώρα έναρξης",
-            "TIMEZONE":"Ζώνη ώρας",
-            "END_DATE":"Ημερομηνία λήξης",
-            "DURATION":"Διάρκεια"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Προγραμματισμός μίας εκδήλωσης"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Προγραμματισμός πολλαπλών εκδηλώσεων",
-            "REPEATS":"Επαναλήψεις",
-            "REPEAT_ON":"Επανάληψη τη",
-            "WEEKDAYS":"Ημέρες εβδομάδας"
-          },
-          "NO_SOURCE_AVAILABLE":"Κανένας ατζέντης βιντεοσκόπησης δεν είναι διαθέσιμος για προγραμματισμό"
-        },
-        "PROCESSING":{
-          "CAPTION":"Σε επεξεργασία",
-          "SELECT_WORKFLOW":"Επιλέξτε ροή εργασίας",
-          "SELECT_WORKFLOW_EMPTY":"Δεν βρέθηκε ροή εργασίας",
-          "WORKFLOW":"Ροή εργασίας"
-        },
-        "UPLOAD_ASSET":{
-          "CAPTION":"Asset Upload",
-          "SELECT_TYPE":"Select asset type",
-          "ADD":"Add Asset",
-          "OPTION":{
-            "CLASS_HANDOUT_NOTES":"Class handout notes",
-            "CAPTIONS_DFXP":"Captions DFXP",
-            "CAPTIONS_WEBVTT":"Captions WebVTT",
-            "PREVIEW_IMAGE":"Preview image",
-            "SMIL":"Smil catalog",
-            "TRACK_PARTS":"Track parts"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "POLICY":"Πολιτική πρόσβασης",
-          "ACL":"Πολιτική πρόσβασης"
-        },
-        "SUMMARY":{
-          "CAPTION":"Σύνοψη"
-        },
-        "WEEKDAYS":{
-          "MO":"Δευτ",
-          "TU":"Τρί",
-          "WE":"Τετ",
-          "TH":"Πέμ",
-          "FR":"Παρ",
-          "SA":"Σάβ",
-          "SU":"Κυρ"
-        }
+            "BUTTON": "Διαγραφή"
+         }
       },
-      "NAVIGATION":{
-        "EVENTS":"Εκδηλώσεις",
-        "SERIES":"Σειρά",
-        "OVERVIEW":"Επισκόπηση"
+      "DELETE_EVENTS_WARNING_LINE1": "Μόλις διαγραφεί, όλα τα μεταδεδομένα, τα αρχεία εικόνας και ήχου της εκδήλωσης θα διαγραφούν και δεν θα μπορούν να ανακτηθούν.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Μόλις διαγραφεί, όλατ τα μεταδεδομένα της σειράς δεν θα μπορούν να ανακτηθούν. Οι εκδηλώσεις της σειράς δεν θα διαγραφούν.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Έναρξη εργασίας",
+         "GENERAL": {
+            "CAPTION": "Γενικά",
+            "SUMMARY": "({{ count }} εκδηλώσεις επιλεγμένες)",
+            "CANNOTSTART": "Οι επιλεγμένες εκδηλώσεις δεν μπορούν αυτή την στιγμή να επεξεργαστούν. Καταργήστε την επιλογή τούς ή δοκιμάστε ξανά αργότερα."
+         },
+         "TASKS": {
+            "CAPTION": "Εργασίες",
+            "SELECT": "Επιλέξτε εργασία"
+         },
+         "SUMMARY": {
+            "CAPTION": "Σύνοψη",
+            "EVENTS": "Εκδηλώσεις",
+            "EVENTS_SUMMARY": "Έχετε επιλέξει {{numberOfEvents}} εκδηλώσεις",
+            "CONFIGURATION": "Ρύθμιση παραμέτρων",
+            "WORKFLOW": "Εργασία"
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Σήμερα",
+      "TOMORROW": "Αύριο",
+      "YESTERDAY": "Χθες"
+   },
+   "DATETIMES": {
+      "TODAY": "Σήμερα στις {{ time }}",
+      "TOMORROW": "Αύριο στις {{ time }}",
+      "YESTERDAY": "Χθες στις {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Επόμενη",
+      "BACK": "Προηγούμενη",
+      "CREATE": "Δημιουργία",
+      "RETRACT": "Ανάκληση",
+      "UPDATE": "Ενημέρωση",
+      "DURATION": {
+         "HOURS": "Ώρες",
+         "MINUTES": "Λεπτά"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Μικρόφωνο",
+         "CAMERA": "κάμερα",
+         "PRESENTATION": "Παρουσίαση"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Πίνακας Ελέγχου"
       },
-      "UPLOAD":"Μεταφόρτωση",
-      "ADD_SERIES":"Προσθήκη σειράς",
-      "ADD_EVENT":"Προσθήκη εκδήλωσης",
-      "TABLE":{
-        "CAPTION":"Εκδηλώσεις",
-        "CREATORS":"Δημιουργοί",
-        "TITLE":"Τίτλος",
-        "PRESENTERS":"Παρουσιαστής(ές)",
-        "SERIES":"Σειρά",
-        "DATE":"Ημερομηνία",
-        "START":"Έναρξη",
-        "STOP":"Διακοπή",
-        "STATUS":"Κατάσταση",
-        "LOCATION":"Τοποθεσία",
-        "ACTION":"Ενέργειες",
-        "FIRST":"Πρώτη",
-        "LAST":"Τελευταία",
-        "NEXT":"Επόμενη",
-        "MANAGED_ACL":"Πολιτική πρόσβασης",
-        "SCHEDULING_STATUS":"Κατάσταση",
-        "WORKFLOW_STATE":"Πρόοδος",
-        "REVIEW_STATUS":"Κατάσταση ανάλυσης",
-        "PREVIOUS":"Προηγούμενη",
-        "NOCONTENT":"Δεν υπάρχουν διαθέσιμα δεδομένα",
-        "PUBLISHED":"Δημοσιευμένο"
+      "EVENTS": {
+         "TITLE": "Εγγραφές"
       },
-      "SCHEDULING_STATUS":{
-        "READY_FOR_RECORDING":"Έτοιμη για εγγραφή",
-        "BLACKLISTED":"Στη μαύρη λίστα",
-        "OPTED_OUT":"Opted-out"
+      "SYSTEMS": {
+         "TITLE": "Συστήματα"
       },
-      "STATUS":{
-        "SCHEDULED":"Προγραμματισμένη",
-        "OPTEDOUT":"Opted out",
-        "BLACKLISTED":"Στη μαύρη λίστα",
-        "RECORDING":"Εγγραφή",
-        "UPLOADING":"Μεταφόρτωση",
-        "INGESTING":"Εισάγεται",
-        "PENDING":"Εκκρεμεί",
-        "PROCESSING":"Εκτελείται",
-        "PAUSED":"Σε παύση",
-        "PROCESSED":"Ολοκληρώθηκε",
-        "RECORDING_FAILURE":"Αποτυχία εγγραφής",
-        "PROCESSING_FAILURE":"Αποτυχία επεξεργασίας",
-        "PROCESSING_CANCELED":"Ακύρωση επεξεργασίας"
+      "CAPTUREAGENTS": {
+         "TITLE": "Στιγμιότυπα"
       },
-      "DETAILS":{
-        "HEADER":"Λεπτομέρειες εκδήλωσης {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Γενικά",
-          "METADATA":"Μεταδεδομένα",
-          "EXTENDED-METADATA":"Μεταδεδομένα ΙΙ",
-          "ASSETS":"Αντικείμενα",
-          "SCHEDULING":"Προγραμματισμός",
-          "WORKFLOWS":"Ροές εργασίας",
-          "ACCESS":"Πολιτική πρόσβασης",
-          "COMMENTS":"Σχόλια"
-        },
-        "GENERAL":{
-          "PUBLICATION_STATUS":"Κατάστασης δημοσίευσης",
-          "NO_PUBLICATIONS_AVAILABLE":"Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
-          "SCHEDULING_STATUS":"Κατάσταση",
-          "READY_FOR_RECORDING":"Έτοιμη για καταγραφή",
-          "OPTED_OUT":"Opted-out",
-          "CUSTOM":"Προσαρμοσμένη",
-          "ENGAGE":"Engage",
-          "EXTERNAL_API":"Εξωτερική δημοσίευση API",
-          "YOUTUBE":"YouTube",
-          "OAIPMH":"OAI-PMH",
-          "SELECT_WORKFLOW":"Επιλέξτε ροή εργασίας",
-          "SELECT_WORKFLOW_EMPTY":"Καμμία διαθέσιμη ροή εργασίας"
-        },
-        "MEDIA":{
-          "TRIM_MEDIA":"Περικοπή πολυμέσων",
-          "MEDIA":"Πολυμέσα",
-          "ID":"Αναγνωριστικό",
-          "TYPE":"Τύπος",
-          "MIMETYPE":"MimeType",
-          "URL":"Διεύθυνση URL",
-          "DETAILS":"Λεπτομέρειες"
-        },
-        "ATTACHMENTS":{
-          "CAPTION":"Συνημμένα",
-          "ID":"Αναγνωριστικό",
-          "TYPE":"Τύπος",
-          "MIMETYPE":"MimeType",
-          "TAGS":"Ετικέτες",
-          "LINK":"Σύνδεσμος"
-        },
-        "SOURCE":{
-          "CAPTION":"Πηγή",
-          "SELECT_SOURCE":"Επιλογή πηγής",
-          "PLACEHOLDER":{
-            "LOCATION":"Τοποθεσία",
-            "INPUTS":"Εισαγωγές δεδομένων",
-            "HOUR":"Ώρα",
-            "MINUTE":"Λεπτά",
-            "REPEATS":"Επαναλήψεις",
-            "START_DATE":"ΕΕΕΕ-ΜΜ-ΗΗ",
-            "END_DATE":"ΕΕΕΕ-ΜΜ-ΗΗ"
-          },
-          "UPLOAD":{
-            "CAPTION":"Ανέβασμα αρχείων",
-            "RECORDING_ELEMENTS":"Στοιχεία καταγραφής",
-            "SEGMENTABLE":{
-              "SHORT":"Διαφάνειες",
-              "DETAIL":"Το αρχείο περιέχει μια καταγραφή παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
+      "USERS": {
+         "TITLE": "Οργανισμός"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Ενσωματώσεις"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Ρύθμιση παραμέτρων"
+      }
+   },
+   "EVENTS": {
+      "RETRACT": {
+         "CAPTION": "Ανάκληση εκδήλωσης",
+         "ID": "Αναγνωριστικό",
+         "SELECT_TASK": "Επιλέξτε εργασία",
+         "SUMMARY": "Σύνοψη",
+         "WARNING": "Αυτή η εκδήλωση έχει δημοσιευθεί τουλάχιστον σε ένα κανάλι δημοσίευσης, έτσι πρέπει να ανακληθεί πριν διαγραφεί. Επιλέξτε μία από τις παρακάτω εργασίες για την ανάκληση των δημοσιεύσεων."
+      },
+      "LICENSE": {
+         "ALLRIGHTS": "Με επιφύλαξη παντός δικαιώματος",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Στείλτε μήνυμα",
+         "TABS": {
+            "RECIPIENTS": "Παραλήπτες",
+            "MESSAGE": "Μήνυμα",
+            "SUMMARY": "Περίληψη"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Προσθέστε στη διαδρομή ελέγχου",
+            "AUDIT_TRAIL_DESCRIPTION": "Επιλέξτε για να προσθέσετε το μήνυμα στην διαδρομή ελέγχου",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Επιλέξτε το πρότυπο ηλεκτρονικού ταχυδρομείου",
+            "SUBJECT": "Θέμα",
+            "MESSAGE": "Μήνυμα",
+            "INCLUDE_SIGNATURE": "Συμπεριλάβετε την υπογραφή μου στο email"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Περίληψη"
+         }
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Δημιουργία εκδήλωσης",
+            "METADATA": {
+               "CAPTION": "Μεταδεδομένα"
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Παρουσιαστής",
-              "DETAIL":"Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
+            "METADATA_EXTENDED": {
+               "CAPTION": "Εκτεταμένα μεταδεδομένα",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Εκτεταμένα μεταδεδομένα"
+               }
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Μόνο αρχείου ήχου",
-              "DETAIL":"Το αρχείο περιέχει μόνο ήχο."
+            "SOURCE": {
+               "CAPTION": "Πηγή",
+               "SELECT_SOURCE": "Επιλογή πηγής",
+               "PLACEHOLDER": {
+                  "LOCATION": "Τοποθεσία",
+                  "INPUTS": "Εισαγωγές δεδομένων",
+                  "HOUR": "Ώρα",
+                  "MINUTE": "Λεπτά",
+                  "REPEATS": "Επαναλήψεις",
+                  "START_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "START_DATE_FORMAT": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE_FORMAT": "ΕΕΕΕ-ΜΜ-ΗΗ"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Ανέβασμα αρχείων",
+                  "RECORDING_ELEMENTS": "Στοιχεία καταγραφής",
+                  "RECORDING_METADATA": "Μετά-δεδομένα εγγραφής",
+                  "SEGMENTABLE": {
+                     "SHORT": "Διαφάνειες",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή  παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Παρουσιαστής",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Μόνο αρχείου ήχου",
+                     "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Πολλαπλά τμήματα",
+                     "DETAIL": "Ένα σύνολο αρχείων που περιέχει διάφορα τμήματα της εκδήλωσης."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Χρονοδιάγραμμα",
+                  "START_DATE": "Ημερομηνία έναρξης",
+                  "START_TIME": "Ώρα έναρξης",
+                  "TIMEZONE": "Ζώνη ώρας",
+                  "END_DATE": "Ημερομηνία λήξης",
+                  "DURATION": "Διάρκεια"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Προγραμματισμός μίας εκδήλωσης"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Προγραμματισμός πολλαπλών εκδηλώσεων",
+                  "REPEATS": "Επαναλήψεις",
+                  "REPEAT_ON": "Επανάληψη τη",
+                  "WEEKDAYS": "Ημέρες εβδομάδας"
+               },
+               "NO_SOURCE_AVAILABLE": "Κανένας ατζέντης βιντεοσκόπησης δεν είναι διαθέσιμος για προγραμματισμό"
+            },
+            "PROCESSING": {
+               "CAPTION": "Σε επεξεργασία",
+               "SELECT_WORKFLOW": "Επιλέξτε ροή εργασίας",
+               "SELECT_WORKFLOW_EMPTY": "Δεν βρέθηκε ροή εργασίας",
+               "WORKFLOW": "Ροή εργασίας"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Μεταφόρτωση αντικειμένου",
+               "SELECT_TYPE": "Επιλέξτε τύπο αντικειμένου",
+               "ADD": "Προσθήκη αντικειμένου",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
+                  "CAPTIONS_DFXP": "Υπότιτλοι DFXP",
+                  "CAPTIONS_WEBVTT": "Υπότιτλοι WebVTT",
+                  "PREVIEW_IMAGE": "Προεπισκόπηση εικόνας",
+                  "SMIL": "Κατάλογος Smil",
+                  "TRACK_PARTS": "Παρακολούθηση τμημάτων"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "POLICY": "Πολιτική πρόσβασης",
+               "ACL": "Πολιτική πρόσβασης"
+            },
+            "SUMMARY": {
+               "CAPTION": "Σύνοψη"
+            },
+            "WEEKDAYS": {
+               "MO": "Δευτ",
+               "TU": "Τρί",
+               "WE": "Τετ",
+               "TH": "Πέμ",
+               "FR": "Παρ",
+               "SA": "Σάβ",
+               "SU": "Κυρ"
             }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Προγραμματισμός",
-            "START_DATE":"Ημερομηνία έναρξης",
-            "START_TIME":"Ώρα έναρξης",
-            "TIMEZONE":"Ζώνη ώρας",
-            "END_DATE":"Ημερομηνία λήξης",
-            "DURATION":"Διάρκεια"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Προγραμματισμός μίας εκδήλωσης"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Προγραμματισμός πολλαπλών εκδηλώσεων",
-            "REPEATS":"Επαναλήψεις",
-            "REPEAT_ON":"Επανάληψη τη",
-            "WEEKDAYS":"Ημέρες εβδομάδας"
-          }
-        },
-        "ASSETS":{
-          "CAPTION":"Αντικείμενα",
-          "TYPE":"Τύπος",
-          "SIZE":"Μέγεθος",
-          "DETAILS":"Λεπτομέρειες",
-          "ATTACHMENTS":{
-            "TITLE":"Συνημμένα",
-            "CAPTION":"Συνημμένα",
-            "ID":"Αναγνωριστικό",
-            "TYPE":"Τύπος",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Ετικέτες",
-            "LINK":"Σύνδεσμος (link)",
-            "DETAILS":{
-              "TITLE":"Λεπτομέρεις συννημένου",
-              "CAPTION":"Λεπτομέρεις συννημένου",
-              "ID":"Αναγνωριστικό",
-              "TYPE":"Τύπος",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Ετικέτες",
-              "URL":"Διεύθυνση URL",
-              "SIZE":"Μέγεθος",
-              "CHECKSUM":"Άθροισμα ελέγχου",
-              "REFERENCE":"Αναφορά"
+         },
+         "NAVIGATION": {
+            "EVENTS": "Εκδηλώσεις",
+            "SERIES": "Σειρά",
+            "OVERVIEW": "Επισκόπηση"
+         },
+         "UPLOAD": "Μεταφόρτωση",
+         "ADD_SERIES": "Προσθήκη σειράς",
+         "ADD_EVENT": "Προσθήκη εκδήλωσης",
+         "TABLE": {
+            "CAPTION": "Εκδηλώσεις",
+            "CREATORS": "Δημιουργοί",
+            "TITLE": "Τίτλος",
+            "PRESENTERS": "Παρουσιαστής(ές)",
+            "SERIES": "Σειρά",
+            "DATE": "Ημερομηνία",
+            "START": "Έναρξη",
+            "STOP": "Διακοπή",
+            "STATUS": "Κατάσταση",
+            "LOCATION": "Τοποθεσία",
+            "ACTION": "Ενέργειες",
+            "FIRST": "Πρώτη",
+            "LAST": "Τελευταία",
+            "NEXT": "Επόμενη",
+            "MANAGED_ACL": "Πολιτική πρόσβασης",
+            "SCHEDULING_STATUS": "Κατάσταση",
+            "WORKFLOW_STATE": "Πρόοδος",
+            "REVIEW_STATUS": "Κατάσταση ανάλυσης",
+            "PREVIOUS": "Προηγούμενη",
+            "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
+            "PUBLISHED": "Δημοσιευμένο"
+         },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
+            "BLACKLISTED": "Στη μαύρη λίστα",
+            "OPTED_OUT": "Επιλογή εξόδου"
+         },
+         "STATUS": {
+            "SCHEDULED": "Προγραμματισμένη",
+            "OPTEDOUT": "Επιλογή εξόδου",
+            "BLACKLISTED": "Στη μαύρη λίστα",
+            "RECORDING": "Εγγραφή",
+            "UPLOADING": "Μεταφόρτωση",
+            "INGESTING": "Εισάγεται",
+            "PENDING": "Εκκρεμεί",
+            "PROCESSING": "Εκτελείται",
+            "PAUSED": "Σε παύση",
+            "PROCESSED": "Ολοκληρώθηκε",
+            "RECORDING_FAILURE": "Αποτυχία εγγραφής",
+            "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας",
+            "PROCESSING_CANCELED": "Ακύρωση επεξεργασίας"
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Γενικά",
+               "METADATA": "Μεταδεδομένα",
+               "EXTENDED-METADATA": "Μεταδεδομένα ΙΙ",
+               "ASSETS": "Αντικείμενα",
+               "SCHEDULING": "Προγραμματισμός",
+               "WORKFLOWS": "Ροές εργασίας",
+               "ACCESS": "Πολιτική πρόσβασης",
+               "COMMENTS": "Σχόλια"
+            },
+            "GENERAL": {
+               "PUBLICATION_STATUS": "Κατάστασης δημοσίευσης",
+               "NO_PUBLICATIONS_AVAILABLE": "Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
+               "SCHEDULING_STATUS": "Κατάσταση",
+               "READY_FOR_RECORDING": "Έτοιμη για καταγραφή",
+               "OPTED_OUT": "Επιλογή εξόδου",
+               "CUSTOM": "Προσαρμοσμένη",
+               "ENGAGE": "Engage",
+               "EXTERNAL_API": "Εξωτερική δημοσίευση API",
+               "YOUTUBE": "YouTube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Επιλέξτε ροή εργασίας",
+               "SELECT_WORKFLOW_EMPTY": "Καμμία διαθέσιμη ροή εργασίας"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Περικοπή πολυμέσων",
+               "MEDIA": "Πολυμέσα",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "DETAILS": "Λεπτομέρειες"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Συνημμένα",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "TAGS": "Ετικέτες",
+               "LINK": "Σύνδεσμος"
+            },
+            "SOURCE": {
+               "CAPTION": "Πηγή",
+               "SELECT_SOURCE": "Επιλογή πηγής",
+               "PLACEHOLDER": {
+                  "LOCATION": "Τοποθεσία",
+                  "INPUTS": "Εισαγωγές δεδομένων",
+                  "HOUR": "Ώρα",
+                  "MINUTE": "Λεπτά",
+                  "REPEATS": "Επαναλήψεις",
+                  "START_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ",
+                  "END_DATE": "ΕΕΕΕ-ΜΜ-ΗΗ"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Ανέβασμα αρχείων",
+                  "RECORDING_ELEMENTS": "Στοιχεία καταγραφής",
+                  "SEGMENTABLE": {
+                     "SHORT": "Διαφάνειες",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Παρουσιαστής",
+                     "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Μόνο αρχείου ήχου",
+                     "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Προγραμματισμός",
+                  "START_DATE": "Ημερομηνία έναρξης",
+                  "START_TIME": "Ώρα έναρξης",
+                  "TIMEZONE": "Ζώνη ώρας",
+                  "END_DATE": "Ημερομηνία λήξης",
+                  "DURATION": "Διάρκεια"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Προγραμματισμός μίας εκδήλωσης"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Προγραμματισμός πολλαπλών εκδηλώσεων",
+                  "REPEATS": "Επαναλήψεις",
+                  "REPEAT_ON": "Επανάληψη τη",
+                  "WEEKDAYS": "Ημέρες εβδομάδας"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Αντικείμενα",
+               "TYPE": "Τύπος",
+               "SIZE": "Μέγεθος",
+               "DETAILS": "Λεπτομέρειες",
+               "ATTACHMENTS": {
+                  "TITLE": "Συνημμένα",
+                  "CAPTION": "Συνημμένα",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος (link)",
+                  "DETAILS": {
+                     "TITLE": "Λεπτομέρεις συννημένου",
+                     "CAPTION": "Λεπτομέρεις συννημένου",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHECKSUM": "Άθροισμα ελέγχου",
+                     "REFERENCE": "Αναφορά"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Κατάλογοι",
+                  "CAPTION": "Κατάλογοι",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος (link)",
+                  "DETAILS": {
+                     "TITLE": "Λεπτομέρειες καταλόγου",
+                     "CAPTION": "Λεπτομέρειες καταλόγου",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHECKSUM": "Άθροισμα ελέγχου",
+                     "REFERENCE": "Αναφορά"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Πολυμέσα",
+                  "CAPTION": "Πολυμέσα",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεσμος",
+                  "DETAILS": {
+                     "TITLE": "Πληροφορίες πολυμέσων",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "URL": "Διεύθυνση URL",
+                     "RECORDING_DATE": "Ημερομηνία εγγραφής",
+                     "FLAVOR": "Γεύση",
+                     "TAGS": "Ετικέτες",
+                     "DURATION": "Διάρκεια",
+                     "STREAM_AUDIO": "Ροές ήχου",
+                     "STREAM_VIDEO": "Ροές βίντεο",
+                     "CHANNELS": "Κανάλια",
+                     "BITRATE": "Ρυθμός μετάδοσης bit",
+                     "BITDEPTH": "Βάθος bit",
+                     "SAMPLINGRATE": "Ρυθμός Δειγματοληψίας",
+                     "FRAMECOUNT": "Καταμέτρηση Πλαισίου",
+                     "PEAKLEVELDB": "Επίπεδο κορυφής (db)",
+                     "RMSLEVELDB": "Επίπεδο RMS (dB)",
+                     "RMSPEAKDB": "Κορυφή RMS (db)",
+                     "FRAMERATE": "Ρυθμός καρέ",
+                     "RESOLUTION": "Ανάλυση",
+                     "SIZE": "Μέγεθος",
+                     "SCANTYPE": "Τύπος σάρωσης",
+                     "SCANORDER": "Ανίχνευσή σειράς"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Δημοσιεύσεις",
+                  "CAPTION": "Δημοσιεύσεις",
+                  "CHANNEL": "Κανάλι",
+                  "ID": "Αναγνωριστικό",
+                  "TYPE": "Τύπος",
+                  "MIMETYPE": "MimeType",
+                  "TAGS": "Ετικέτες",
+                  "LINK": "Σύνδεση",
+                  "DETAILS": {
+                     "TITLE": "Λεπτομέρειες δημοσίευσης",
+                     "CAPTION": "Λεπτομέρειες δημοσίευσης",
+                     "ID": "Αναγνωριστικό",
+                     "TYPE": "Τύπος",
+                     "MIMETYPE": "MimeType",
+                     "TAGS": "Ετικέτες",
+                     "URL": "Διεύθυνση URL",
+                     "SIZE": "Μέγεθος",
+                     "CHANNEL": "Κανάλι",
+                     "REFERENCE": "Αναφορά"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Πρότυπα"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "DESCRIPTION": "",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες"
+               },
+               "ROLES": {
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Σχόλια",
+               "PLACEHOLDER": "Σχόλιο…",
+               "SELECTPLACEHOLDER": "Επιλέξτε αιτίες",
+               "RESOLVED": "Επιλυμένο",
+               "REPLY": "Απάντηση",
+               "REPLY_TO": "Απάντηση σε",
+               "CANCEL_REPLY": "Ακύρωση",
+               "DELETE": "Διαγραφή",
+               "REASON": "Αιτία",
+               "REASONS": {
+                  "CUTTING": "Απαιτείται μοντάζ",
+                  "REVIEW": "Απαιτείται προεπισκόπηση",
+                  "ASYNC": "Ασύγχρονα κομμάτια εικόνας/ήχου",
+                  "AUDIO_ISSUE": "Χαμένο ή ελλατωματικό κομμάτι ήχου",
+                  "CANCELED": "Διαγραφείσα εκδήλωση",
+                  "CONFLICTING_METADATA": "Αντικρουόμενα μετα-δεδομένα",
+                  "IMPROPER_POINT": "Λανθασμένο σημείο εισαγωγής ή εξαγωγής",
+                  "MISSING_AGREEMENT": "Ελλειπής συμφνία",
+                  "OTHER": "Άλλο",
+                  "PRIVACY": "Ανησυχία ιδιωτικώτητας",
+                  "SEGMENTATION": "Ανακριβής διαχωρισμός",
+                  "UNKNOWN_CREATOR": "Άγνωστος δημιουργός",
+                  "VIDEO_ISSUE": "Το βίντεο έχει παραμορφωθεί ή περικοπεί",
+                  "WRONG_INPUT_FORMAT": "Το φορμάτ του αρχείου εισαγωγής δεν υποστηρίζεται",
+                  "WRONG_METADATA": "Τα μετα-δεδομένα χρειάζονται διόρθωση",
+                  "WRONG_SERIES_PUBLICATION": "Λάρθςο σειρά ή κανάλι δημοσίευσης",
+                  "WRONG_WORKFLOW": "Λάθος ροής εργασίας",
+                  "PROCESSING_FAILURE": "Αποτυχία επεξεργασίας"
+               }
+            },
+            "METADATA": {
+               "CAPTION": "Λεπτομέριες εκδήλωσης",
+               "TITLE": "Τίτλος",
+               "ID": "UID",
+               "SERIES": "Σειρά",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "SUBJECT": "Θέμα",
+               "DESCRIPTION": "Περιγραφή",
+               "START_DATE": "Ημερομηνία έναρξης",
+               "START_TIME": "Ώρα έναρξης",
+               "DURATION": "Διάρκεια",
+               "LOCATION": "Τοποθεσία",
+               "SOURCE": "Πηγή",
+               "CREATED": "Δημιουργήθηκε",
+               "CREATED_BY": "Δημιουργήθηκε από",
+               "LICENSE": "Άδεια χρήσης",
+               "CONTRIBUTORS": "Χορηγός(οι)",
+               "RIGHTS": "Δικαιώματα",
+               "PRESENTERS": "Παρουσιαστής(ές)",
+               "LANGUAGE": "Γλώσσα",
+               "COPYRIGHT": "Πνευματικά δικαιώματα",
+               "VISIBILITY": "Εμφάνιση",
+               "PUBLIC": "Ανοιχτό",
+               "OS": "Επεξεργασία λειτουργικού συστήματος",
+               "LOCKED": {
+                  "RUNNING": "Επεξεργασία μετα-δεδομένων δεν επιτρέπεται όταν λειτουργίες εκτελούνται σε μια εκδήλωση"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Κατάσταση συμμετοχής",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Κατάσταση ανάλυσης"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Κατάσταση opt-out",
+                  "READY": "Έτοιμη για εγγραφή",
+                  "OPTEDOUT": "Opted out"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Μηνύματα",
+                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
+                  "SENDER": "Αποστολέας",
+                  "SUBJECT": "Θέμα"
+               },
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Παρουσιαστής(ές)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Ενέργειες",
+               "DETAILS": "Λεπτομέρειες",
+               "DESCRIPTION": "",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "TITLE": "Τίτλος",
+               "STATE": "Κατάσταση",
+               "STARTED": "Ξεκίνησε",
+               "SERIES": "Σειρές",
+               "SUBMITTED": "Υποβλήθηκε",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "CONFIGURATION": "Ρυθμίσεις παραμέτρων",
+               "NO_CONFIGURATION": "Δεν υπάρχουν παράμετροι ρύθμισης για την επιλεγμένη ροή εργασίας.",
+               "WORKFLOW": "Ροή εργασίας"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Λεπτομέρειες ροής εργασίας",
+               "CONFIGURATION": "Ρύθμισεις παραμέτρων ροής εργασίας"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Λειτουργίες ροής εργασίας"
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Λεπτομέρειες λειτουργίας"
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Λεπτομέρειες ροής εργασίας"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Λεπτομέρειες πολυμέσων",
+               "ID": "Αναγνωριστικό",
+               "TYPE": "Τύπος",
+               "MIMETYPE": "MimeType",
+               "URL": "Διεύθυνση URL",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "TAGS": "Ετικέτες",
+               "DURATION": "Διάρκεια",
+               "STREAM_AUDIO": "Ροές ήχου",
+               "STREAM_VIDEO": "Ροές βίντεο",
+               "CHANNELS": "Κανάλια",
+               "BITRATE": "Ρυθμός μετάδοσης bit",
+               "FRAMERATE": "Ρυθμός καρέ",
+               "RESOLUTION": "Ανάλυση"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Σφάλματα & προειδοποιήσεις",
+               "TITLE": "Σφάλματα & προειδοποιήσεις",
+               "DATE": "Ημερομηνία",
+               "HOST": "Διακομιστής",
+               "TYPE": "Τύπος",
+               "EMPTY": "Κανένα σφάλμα",
+               "DETAILS": {
+                  "HEADER": "Λεπτομέρειες σφάλματος",
+                  "SEVERITY": "Σοβαρότητα",
+                  "TITLE": "Τίτλος",
+                  "DESCRIPTION": "Περιγραφή",
+                  "JOB_ID": "Αναγνωριστικό εργασίας",
+                  "DATE": "Ημερομηνία",
+                  "HOST": "Επεξεργασία διακομιστή",
+                  "TYPE": "Τύπος υπηρεσίας",
+                  "TECHNICAL_DETAILS": "Τεχνικές λεπτομέρειες"
+               }
             }
-          },
-          "CATALOGS":{
-            "TITLE":"Κατάλογοι",
-            "CAPTION":"Κατάλογοι",
-            "ID":"Αναγνωριστικό",
-            "TYPE":"Τύπος",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Ετικέτες",
-            "LINK":"Σύνδεσμος (link)",
-            "DETAILS":{
-              "TITLE":"Λεπτομέρειες καταλόγου",
-              "CAPTION":"Λεπτομέρειες καταλόγου",
-              "ID":"Αναγνωριστικό",
-              "TYPE":"Τύπος",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Ετικέτες",
-              "URL":"Διεύθυνση URL",
-              "SIZE":"Μέγεθος",
-              "CHECKSUM":"Άθροισμα ελέγχου",
-              "REFERENCE":"Αναφορά"
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Δημιουργία σειράς",
+            "METADATA": {
+               "CAPTION": "Μεταδεδομένα",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Μεταδεδομένα"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Εκτεταμένα μεταδεδομένα",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Εκτεταμένα μεταδεδομένα"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Πρότυπα"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "DESCRIPTION": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής.",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες"
+               },
+               "ROLES": {
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Θέμα",
+               "DESCRIPTION": "",
+               "TITLE": "Θέμα",
+               "LABEL": "Χωρίς θέμα",
+               "EMPTY": "Κανένα θέμα δεν βρέθηκε"
+            },
+            "SUMMARY": {
+               "CAPTION": "Σύνοψη"
             }
-          },
-          "MEDIA":{
-            "TITLE":"Πολυμέσα",
-            "CAPTION":"Πολυμέσα",
-            "ID":"Αναγνωριστικό",
-            "TYPE":"Τύπος",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Ετικέτες",
-            "LINK":"Σύνδεσμος",
-            "DETAILS":{
-              "TITLE":"Πληροφορίες πολυμέσων",
-              "ID":"Αναγνωριστικό",
-              "TYPE":"Τύπος",
-              "MIMETYPE":"MimeType",
-              "URL":"Διεύθυνση URL",
-              "RECORDING_DATE":"Ημερομηνία εγγραφής",
-              "FLAVOR":"Γεύση",
-              "TAGS":"Ετικέτες",
-              "DURATION":"Διάρκεια",
-              "STREAM_AUDIO":"Ροές ήχου",
-              "STREAM_VIDEO":"Ροές βίντεο",
-              "CHANNELS":"Κανάλια",
-              "BITRATE":"Ρυθμός μετάδοσης bit",
-              "BITDEPTH":"Βάθος bit",
-              "SAMPLINGRATE":"Ρυθμός Δειγματοληψίας",
-              "FRAMECOUNT":"Καταμέτρηση Πλαισίου",
-              "PEAKLEVELDB":"Επίπεδο κορυφής (db)",
-              "RMSLEVELDB":"Επίπεδο RMS (dB)",
-              "RMSPEAKDB":"Κορυφή RMS (db)",
-              "FRAMERATE":"Ρυθμός καρέ",
-              "RESOLUTION":"Ανάλυση",
-              "SIZE":"Μέγεθος",
-              "SCANTYPE":"Τύπος σάρωσης",
-              "SCANORDER":"Ανίχνευσή σειράς"
+         },
+         "TABLE": {
+            "CAPTION": "Σειρές",
+            "TITLE": "Σειρά",
+            "CREATORS": "Οργανωτής(ες)",
+            "CONTRIBUTORS": "Χορηγός(οι)",
+            "CREATED": "Δημιουργήθηκε",
+            "MANAGED_ACL": "Πολιτική πρόσβασης",
+            "EVENTS": "Εκδηλώσεις",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες σειράς - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Μεταδεδομένα",
+               "EXTENDED_METADATA": "Μεταδεδομένα ΙΙ",
+               "PARTICIPATION": "Συμμετοχή",
+               "EVENTS": "Εκδηλώσεις",
+               "PERMISSIONS": "Πολιτική πρόσβασης",
+               "THEME": "Θέμα"
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Πρότυπα"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "DESCRIPTION": "",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες"
+               },
+               "ROLES": {
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Τίτλος",
+               "ID": "UID",
+               "SERIES": "Σειρά",
+               "PUBLISHERS": "Εκδότη (ες)",
+               "ORGANIZERS": "Οργανωτής(ες)",
+               "CONTRIBUTORS": "Χορηγός(οι)",
+               "RECORDING_DATE": "Ημερομηνία εγγραφής",
+               "CREATED_BY": "Δημιουργήθηκε από",
+               "RIGHTS": "Δικαιώματα",
+               "SUBJECT": "Θέμα",
+               "LANGUAGE": "Γλώσσα",
+               "LICENSE": "Άδεια χρήσης",
+               "DESCRIPTION": "Περιγραφή"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Κατάσταση προτύπου συμμετοχής",
+               "WARNING_TEMPLATE": "Η κατάσταση συμμετοχής της σειράς θα χρησιμοποιηθεί σαν προεπιλεγμένη τιμη για τις νέες εκδηλώσεις που αποτελούν μέρος την σειράς.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Κατάσταση ανάλυσης"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Κατάσταση επιλογής εξόδου",
+                  "READY": "Έτοιμη για καταγραφή",
+                  "OPTEDOUT": "Επιλογή εξόδου"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Μηνύματα",
+                  "CREATION_DATE": "Ημερομηνία δημιουργίας",
+                  "SENDER": "Αποστολέας",
+                  "SUBJECT": "Θέμα"
+               }
+            },
+            "EVENTS": {
+               "TITLE": "Τίτλος",
+               "PRESENTER": "Παρουσιαστής(ές)",
+               "CREATED": "Δημιουργήθηκε",
+               "MODIFIED": "Τροποποιήθηκε",
+               "STATUS": "Κατάσταση",
+               "LOCATION": "Τοποθεσία",
+               "LINK": "Σύνδεσμος σελίδας"
             }
-          },
-          "PUBLICATIONS":{
-            "TITLE":"Δημοσιεύσεις",
-            "CAPTION":"Δημοσιεύσεις",
-            "CHANNEL":"Κανάλι",
-            "ID":"Αναγνωριστικό",
-            "TYPE":"Τύπος",
-            "MIMETYPE":"MimeType",
-            "TAGS":"Ετικέτες",
-            "LINK":"Σύνδεση",
-            "DETAILS":{
-              "TITLE":"Λεπτομέρειες δημοσίευσης",
-              "CAPTION":"Λεπτομέρειες δημοσίευσης",
-              "ID":"Αναγνωριστικό",
-              "TYPE":"Τύπος",
-              "MIMETYPE":"MimeType",
-              "TAGS":"Ετικέτες",
-              "URL":"Διεύθυνση URL",
-              "SIZE":"Μέγεθος",
-              "CHANNEL":"Κανάλι",
-              "REFERENCE":"Αναφορά"
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Τοποθεσίες",
+         "BLACKLISTS": "Μαύρες λίστες"
+      },
+      "ACTIONS": {
+         "EXPORT": "Εξαγωγή",
+         "ADD_BLACKLIST": "Προσθέστε στην μαύρη λίστα",
+         "REMOVE": "Κατάργηση"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Τοποθεσίες",
+            "TITLE": "UID",
+            "NAME": "Όνομα",
+            "LOCATION": "Τοποθεσία",
+            "UPDATED": "τελευταία ενημέρωση",
+            "NEXT_DATE": "Επόμενη εκδήλωση",
+            "NEXT_NAME": "Επόμενος τίτλος εκδήλωσης",
+            "STATUS": "Κατάσταση",
+            "VERSION": "Έκδοση",
+            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
+            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Γενικά",
+               "CONFIGURATION": "Παραμετροποίηση",
+               "CAPABILITIES": "Δυνατότητες"
+            },
+            "GENERAL": {
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "URL": "Διεύθυνση Url",
+               "STATUS": "Κατάσταση",
+               "UPDATE": "Τελευταία ακρόαση από"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Παραμετροποίηση",
+               "NO_CONFIGURATION": "Δεν παρέχεται καμμία παραμετροποίηση"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Δυνατότητες",
+               "NO_CAPABILITIES": "Δεν παρέχονται δυνατότητες"
             }
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Πρότυπα"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Πολιτική πρόσβασης",
-            "DESCRIPTION":"",
-            "LABEL":"Επιλέξτε ένα πρότυπο",
-            "EMPTY":"Το πρότυπο δεν βρέθηκε",
-            "ROLE":"Ρόλος",
-            "WRITE":"Εγγραφή",
-            "READ":"Ανάγνωση",
-            "ADDITIONAL_ACTIONS":"Πρόσθετες ενέργειες",
-            "ACTION":"Ενέργειες",
-            "NEW":"Νέα πολιτική",
-            "DETAILS":"Λεπτομέρειες"
-          },
-          "ROLES":{
-            "LABEL":"Επιλέξτε ένα ρόλο",
-            "EMPTY":"Κανένας ρόλος δεν βρέθηκε"
-          }
-        },
-        "COMMENTS":{
-          "CAPTION":"Σχόλια",
-          "PLACEHOLDER":"Σχόλιο…",
-          "SELECTPLACEHOLDER":"Επιλέξτε αιτίες",
-          "RESOLVED":"Επιλυμένο",
-          "REPLY":"Απάντηση",
-          "REPLY_TO":"Απάντηση σε",
-          "CANCEL_REPLY":"Ακύρωση",
-          "DELETE":"Διαγραφή",
-          "REASON":"Αιτία",
-          "REASONS":{
-            "CUTTING":"Απαιτείται μοντάζ",
-            "REVIEW":"Απαιτείται προεπισκόπηση",
-            "ASYNC":"Ασύγχρονα κομμάτια εικόνας/ήχου",
-            "AUDIO_ISSUE":"Χαμένο ή ελλατωματικό κομμάτι ήχου",
-            "CANCELED":"Διαγραφείσα εκδήλωση",
-            "CONFLICTING_METADATA":"Αντικρουόμενα μετα-δεδομένα",
-            "IMPROPER_POINT":"Λανθασμένο σημείο εισαγωγής ή εξαγωγής",
-            "MISSING_AGREEMENT":"Ελλειπής συμφνία",
-            "OTHER":"Άλλο",
-            "PRIVACY":"Ανησυχία ιδιωτικώτητας",
-            "SEGMENTATION":"Ανακριβής διαχωρισμός",
-            "UNKNOWN_CREATOR":"Άγνωστος δημιουργός",
-            "VIDEO_ISSUE":"Το βίντεο έχει παραμορφωθεί ή περικοπεί",
-            "WRONG_INPUT_FORMAT":"Το φορμάτ του αρχείου εισαγωγής δεν υποστηρίζεται",
-            "WRONG_METADATA":"Τα μετα-δεδομένα χρειάζονται διόρθωση",
-            "WRONG_SERIES_PUBLICATION":"Λάρθςο σειρά ή κανάλι δημοσίευσης",
-            "WRONG_WORKFLOW":"Λάθος ροής εργασίας",
-            "PROCESSING_FAILURE":"Αποτυχία επεξεργασίας"
-          }
-        },
-        "METADATA":{
-          "CAPTION":"Λεπτομέριες εκδήλωσης",
-          "TITLE":"Τίτλος",
-          "ID":"UID",
-          "SERIES":"Σειρά",
-          "RECORDING_DATE":"Ημερομηνία εγγραφής",
-          "SUBJECT":"Θέμα",
-          "DESCRIPTION":"Περιγραφή",
-          "START_DATE":"Ημερομηνία έναρξης",
-          "START_TIME":"Ώρα έναρξης",
-          "DURATION":"Διάρκεια",
-          "LOCATION":"Τοποθεσία",
-          "SOURCE":"Πηγή",
-          "CREATED":"Δημιουργήθηκε",
-          "CREATED_BY":"Δημιουργήθηκε από",
-          "LICENSE":"Άδεια χρήσης",
-          "CONTRIBUTORS":"Χορηγός(οι)",
-          "RIGHTS":"Δικαιώματα",
-          "PRESENTERS":"Παρουσιαστής(ές)",
-          "LANGUAGE":"Γλώσσα",
-          "COPYRIGHT":"Πνευματικά δικαιώματα",
-          "VISIBILITY":"Εμφάνιση",
-          "PUBLIC":"Ανοιχτό",
-          "OS":"Επεξεργασία λειτουργικού συστήματος",
-          "LOCKED":{
-            "RUNNING":"Επεξεργασία μετα-δεδομένων δεν επιτρέπεται όταν λειτουργίες εκτελούνται σε μια εκδήλωση"
-          }
-        },
-        "SCHEDULING":{
-          "CAPTION":"Κατάσταση συμμετοχής",
-          "REVIEW_STATUS":{
-            "CAPTION":"Κατάσταση ανάλυσης"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Κατάσταση opt-out",
-            "READY":"Έτοιμη για εγγραφή",
-            "OPTEDOUT":"Opted out"
-          },
-          "MESSAGES":{
-            "CAPTION":"Μηνύματα",
-            "CREATION_DATE":"Ημερομηνία δημιουργίας",
-            "SENDER":"Αποστολέας",
-            "SUBJECT":"Θέμα"
-          },
-          "PLACEHOLDER":{
-            "PRESENTERS":"Παρουσιαστής(ές)"
-          }
-        },
-        "WORKFLOWS":{
-          "ACTIONS":"Actions",
-          "DETAILS":"Λεπτομέρειες",
-          "DESCRIPTION":"",
-          "ID":"Αναγνωριστικό",
-          "TYPE":"Τύπος",
-          "TITLE":"Τίτλος",
-          "STATE":"Κατάσταση",
-          "STARTED":"Ξεκίνησε",
-          "SERIES":"Σειρές",
-          "SUBMITTED":"Υποβλήθηκε",
-          "MIMETYPE":"MimeType",
-          "URL":"Διεύθυνση URL",
-          "CONFIGURATION":"Ρυθμίσεις παραμέτρων",
-          "NO_CONFIGURATION":"Δεν υπάρχουν παράμετροι ρύθμισης για την επιλεγμένη ροή εργασίας.",
-          "WORKFLOW":"Ροή εργασίας"
-        },
-        "WORKFLOW_DETAILS":{
-          "TITLE":"Λεπτομέρειες ροής εργασίας",
-          "CONFIGURATION":"Ρύθμισεις παραμέτρων ροής εργασίας"
-        },
-        "WORKFLOW_OPERATIONS":{
-          "TITLE":"Λειτουργίες ροής εργασίας"
-        },
-        "OPERATION_DETAILS":{
-          "TITLE":"Λεπτομέρειες λειτουργίας"
-        },
-        "QUICKACTION_WORKFLOW_DETAILS":{
-          "TITLE":"Λεπτομέρειες ροής εργασίας"
-        },
-        "MEDIA_DETAILS":{
-          "TITLE":"Λεπτομέρειες πολυμέσων",
-          "ID":"Αναγνωριστικό",
-          "TYPE":"Τύπος",
-          "MIMETYPE":"MimeType",
-          "URL":"Διεύθυνση URL",
-          "RECORDING_DATE":"Ημερομηνία εγγραφής",
-          "TAGS":"Ετικέτες",
-          "DURATION":"Διάρκεια",
-          "STREAM_AUDIO":"Ροές ήχου",
-          "STREAM_VIDEO":"Ροές βίντεο",
-          "CHANNELS":"Κανάλια",
-          "BITRATE":"Ρυθμός μετάδοσης bit",
-          "FRAMERATE":"Ρυθμός καρέ",
-          "RESOLUTION":"Ανάλυση"
-        },
-        "ERRORS_AND_WARNINGS":{
-          "HEADER":"Σφάλματα & προειδοποιήσεις",
-          "TITLE":"Σφάλματα & προειδοποιήσεις",
-          "DATE":"Ημερομηνία",
-          "HOST":"Διακομιστής",
-          "TYPE":"Τύπος",
-          "EMPTY":"Κανένα σφάλμα",
-          "DETAILS":{
-            "HEADER":"Λεπτομέρειες σφάλματος",
-            "SEVERITY":"Σοβαρότητα",
-            "TITLE":"Τίτλος",
-            "DESCRIPTION":"Περιγραφή",
-            "JOB_ID":"Αναγνωριστικό εργασίας",
-            "DATE":"Ημερομηνία",
-            "HOST":"Επεξεργασία διακομιστή",
-            "TYPE":"Τύπος υπηρεσίας",
-            "TECHNICAL_DETAILS":"Τεχνικές λεπτομέρειες"
-          }
-        }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Θέση μαύρη λίστα",
+            "NAME": "Όνομα",
+            "ACTIONS": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
+            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
+            "TABS": {
+               "LOCATIONS": "Τοποθεσίες",
+               "DATES": "Ημερομηνίες",
+               "REASON": "Αιτία",
+               "SUMMARY": "Σύνοψη"
+            },
+            "LOCATIONS": {
+               "REMOVE": "Κατάργηση",
+               "ADD_LOCATION": "Επιλέξτε τοποθεσία",
+               "ALL_LOCATIONS": "Όλες οι τοποθεσίες",
+               "SELECT_LOCATION": "Επιλέξτε"
+            },
+            "DATES": {
+               "START_DATE": "Ημερομηνία έναρξης",
+               "END_DATE": "Ημερομηνία λήξης"
+            },
+            "REASON": {
+               "SELECT_REASON": "Επιλέξτε",
+               "REASON": "Αιτία",
+               "COMMENTS": "Σχόλια"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Σύνοψη",
+               "LOCATION": "Τοποθεσία",
+               "DATE_FROM": "Απο",
+               "DATE_TO": "Μέχρι",
+               "REASON": "Αιτία",
+               "COMMENTS": "Σχόλια"
+            }
+         }
       }
-    },
-    "SERIES":{
-      "NEW":{
-        "CAPTION":"Δημιουργία σειράς",
-        "METADATA":{
-          "CAPTION":"Μεταδεδομένα",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Μεταδεδομένα"
-          }
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Εκτεταμένα μεταδεδομένα",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Εκτεταμένα μεταδεδομένα"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Πρότυπα"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Πολιτική πρόσβασης",
-            "DESCRIPTION":"Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής.",
-            "LABEL":"Επιλέξτε ένα πρότυπο",
-            "EMPTY":"Το πρότυπο δεν βρέθηκε",
-            "ROLE":"Ρόλος",
-            "WRITE":"Εγγραφή",
-            "READ":"Ανάγνωση",
-            "ADDITIONAL_ACTIONS":"Πρόσθετες ενέργειες",
-            "ACTION":"Ενέργειες",
-            "NEW":"Νέα πολιτική",
-            "DETAILS":"Λεπτομέρειες"
-          },
-          "ROLES":{
-            "LABEL":"Επιλέξτε ένα ρόλο",
-            "EMPTY":"Κανένας ρόλος δεν βρέθηκε"
-          }
-        },
-        "THEME":{
-          "CAPTION":"Θέμα",
-          "DESCRIPTION":"",
-          "TITLE":"Θέμα",
-          "LABEL":"Χωρίς θέμα",
-          "EMPTY":"Κανένα θέμα δεν βρέθηκε"
-        },
-        "SUMMARY":{
-          "CAPTION":"Σύνοψη"
-        }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Προσθήκη χρήστη",
+         "ADD_GROUP": "Προσθήκη ομάδας",
+         "ADD_ACL": "Προσθήκη πολιτικής πρόσβασης",
+         "ADD_BLACKLIST": "Προσθήκη μαύρης λίστας"
       },
-      "TABLE":{
-        "CAPTION":"Σειρές",
-        "TITLE":"Σειρά",
-        "CREATORS":"Οργανωτής(ες)",
-        "CONTRIBUTORS":"Χορηγός(οι)",
-        "CREATED":"Δημιουργήθηκε",
-        "MANAGED_ACL":"Πολιτική πρόσβασης",
-        "EVENTS":"Εκδηλώσεις",
-        "ACTION":"Ενέργειες"
+      "NAVIGATION": {
+         "USERS": "Χρήστες",
+         "GROUPS": "Ομάδες",
+         "PERMISSIONS": "Πολιτικές πρόσβασης",
+         "BLACKLISTS": "Μαύρη λίστα"
       },
-      "DETAILS":{
-        "HEADER":"Λεπτομέρειες σειράς - {{resourceId}}",
-        "TABS":{
-          "METADATA":"Μεταδεδομένα",
-          "EXTENDED_METADATA":"Μεταδεδομένα ΙΙ",
-          "PARTICIPATION":"Συμμετοχή",
-          "EVENTS":"Εκδηλώσεις",
-          "PERMISSIONS":"Πολιτική πρόσβασης",
-          "THEME":"Θέμα"
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Πρότυπα"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Πολιτική πρόσβασης",
-            "DESCRIPTION":"",
-            "LABEL":"Επιλέξτε ένα πρότυπο",
-            "EMPTY":"Το πρότυπο δεν βρέθηκε",
-            "ROLE":"Ρόλος",
-            "WRITE":"Εγγραφή",
-            "READ":"Ανάγνωση",
-            "ADDITIONAL_ACTIONS":"Πρόσθετες ενέργειες",
-            "ACTION":"Ενέργειες",
-            "NEW":"Νέα πολιτική",
-            "DETAILS":"Λεπτομέρειες"
-          },
-          "ROLES":{
-            "LABEL":"Επιλέξτε ένα ρόλο",
-            "EMPTY":"Κανένας ρόλος δεν βρέθηκε"
-          }
-        },
-        "METADATA":{
-          "TITLE":"Τίτλος",
-          "ID":"UID",
-          "SERIES":"Σειρά",
-          "PUBLISHERS":"Εκδότη (ες)",
-          "ORGANIZERS":"Οργανωτής(ες)",
-          "CONTRIBUTORS":"Χορηγός(οι)",
-          "RECORDING_DATE":"Ημερομηνία εγγραφής",
-          "CREATED_BY":"Δημιουργήθηκε από",
-          "RIGHTS":"Δικαιώματα",
-          "SUBJECT":"Θέμα",
-          "LANGUAGE":"Γλώσσα",
-          "LICENSE":"Άδεια χρήσης",
-          "DESCRIPTION":"Περιγραφή"
-        },
-        "PARTICIPATION":{
-          "CAPTION":"Κατάσταση προτύπου συμμετοχής",
-          "WARNING_TEMPLATE":"Η κατάσταση συμμετοχής της σειράς θα χρησιμοποιηθεί σαν προεπιλεγμένη τιμη για τις νέες εκδηλώσεις που αποτελούν μέρος την σειράς.",
-          "REVIEW_STATUS":{
-            "CAPTION":"Κατάσταση ανάλυσης"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Κατάσταση επιλογής εξόδου",
-            "READY":"Έτοιμη για καταγραφή",
-            "OPTEDOUT":"Opted out"
-          },
-          "MESSAGES":{
-            "CAPTION":"Μηνύματα",
-            "CREATION_DATE":"Ημερομηνία δημιουργίας",
-            "SENDER":"Αποστολέας",
-            "SUBJECT":"Θέμα"
-          }
-        },
-        "EVENTS":{
-          "TITLE":"Τίτλος",
-          "PRESENTER":"Παρουσιαστής(ές)",
-          "CREATED":"Δημιουργήθηκε",
-          "MODIFIED":"Τροποποιήθηκε",
-          "STATUS":"Κατάσταση",
-          "LOCATION":"Τοποθεσία",
-          "LINK":"Σύνδεσμος σελίδας"
-        }
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Χρήστες",
+            "NAME": "Όνομα",
+            "USERNAME": "Όνομα χρήστη",
+            "EMAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+            "ROLES": "Ρόλοι",
+            "TYPE": "Τύπος",
+            "PROVIDER": "Πάροχος",
+            "BLACKLIST_FROM": "Στη μαύρη λίστα από",
+            "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "δημιουργία χρήστη",
+            "EDITCAPTION": "Επεξεργασία χρήστη",
+            "TABS": {
+               "USER": "Χρήστης",
+               "ROLES": "Ρόλοι",
+               "EXTERNALROLES": "Εξωτερικοί ρόλοι",
+               "EFFECTIVEROLES": "Εφαρμοσμένοι ρόλοι"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Ρόλοι και ομάδες που μπορούν ή έχουν ήδη εκχωρηθεί στον χρήστη.",
+               "EXTERNALROLES": "Λίστα εξωτερικών ρόλων που έχουν παραχωρηθεί στον χρήστη από πάροχο(ους) εξωτερικών ρόλων.",
+               "EFFECTIVEROLES": "Λίστα εφαρμοσίμων ρόλων που έχουν εκχωρηθεί απευθείας στον χρήστη και ρόλοι που έχουν έμμεσα φορτωθεί μέσω ομάδας μέλους."
+            },
+            "FORM": {
+               "USERNAME": "Όνομα χρήστη",
+               "NAME": "Όνομα",
+               "EMAIL": "Διεύθυνση ηλεκτρονικού ταχυδρομείου",
+               "PASSWORD": "Κωδικός",
+               "REPEAT_PASSWORD": "Επανάληψη κωδικού"
+            },
+            "ROLES": {
+               "LEFT": "Ρόλοι",
+               "RIGHT": "Επιλεγμένοι ρόλοι",
+               "REMOVE": "Κατάργηση ρόλου",
+               "ADD": "Προσθήκη ρόλου"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Δημιουργία ομάδας"
+         },
+         "TABLE": {
+            "CAPTION": "Ομάδες",
+            "NAME": "Όνομα",
+            "DESCRIPTION": "Περιγραφή",
+            "ROLE": "Ρόλος",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Δημιουργία ομάδας",
+            "EDITCAPTION": "Επεξεργασία ομάδας",
+            "TABS": {
+               "GROUP": "Ομάδες",
+               "ROLES": "Ρόλοι",
+               "METADATA": "Μεταδεδομένα",
+               "USERS": "Χρήστες",
+               "SUMMARY": "Σύνοψη"
+            },
+            "FORM": {
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "SUMMARY": "Σύνοψη",
+               "ROLES": "Ρόλοι",
+               "USERS": "Χρήστες"
+            },
+            "USERS": {
+               "LEFT": "Χρήστες",
+               "RIGHT": "Επιλεγμένοι Χρήστες",
+               "REMOVE": "Αφαίρεση χρήστη",
+               "ADD": "Προσθήκη χρήστη"
+            },
+            "ROLES": {
+               "LEFT": "Ρόλοι",
+               "RIGHT": "Επιλεγμένοι ρόλοι",
+               "REMOVE": "Κατάργηση ρόλου",
+               "ADD": "Προσθήκη ρόλου"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Πολιτικές πρόσβασης",
+            "NAME": "Όνομα",
+            "CREATED": "Δημιουργήθηκε",
+            "CREATOR": "Δημιουργός",
+            "IN_USE": "Σε χρήση",
+            "ACTION": "Ενέργειες"
+         },
+         "NEW": {
+            "CAPTION": "Νέα πολιτική πρόσβασης",
+            "TABS": {
+               "SUMMARY": "Σύνοψη",
+               "METADATA": "Μεταδεδομένα",
+               "ACCESS": "Πρόσβαση"
+            },
+            "METADATA": {
+               "TITLE": "Μεταδεδομένα",
+               "NAME": {
+                  "CAPTION": "Όνομα",
+                  "PLACEHOLDER": "Όνομα…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "TEMPLATES": {
+                  "TITLE": "Πρότυπα"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
+               },
+               "ROLES": {
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες πολιτικής πρόσβασης - {{resourceId}}",
+            "TABS": {
+               "SUMMARY": "Σύνοψη",
+               "METADATA": "Μεταδεδομένα",
+               "ACCESS": "Πρόσβαση"
+            },
+            "METADATA": {
+               "TITLE": "Μεταδεδομένα",
+               "NAME": {
+                  "CAPTION": "Όνομα",
+                  "PLACEHOLDER": "Όνομα…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Πολιτική πρόσβασης",
+               "TEMPLATES": {
+                  "TITLE": "Πρότυπα"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Πολιτική πρόσβασης",
+                  "LABEL": "Επιλέξτε ένα πρότυπο",
+                  "EMPTY": "Το πρότυπο δεν βρέθηκε",
+                  "ROLE": "Ρόλος",
+                  "WRITE": "Εγγραφή",
+                  "READ": "Ανάγνωση",
+                  "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
+                  "ACTION": "Ενέργειες",
+                  "NEW": "Νέα πολιτική",
+                  "DETAILS": "Λεπτομέρειες",
+                  "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
+               },
+               "ROLES": {
+                  "LABEL": "Επιλέξτε ένα ρόλο",
+                  "EMPTY": "Κανένας ρόλος δεν βρέθηκε"
+               }
+            }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Μαύρη λίστα χρηστών",
+            "NAME": "Όνομα",
+            "DATE_FROM": "Απο",
+            "DATE_TO": "Μέχρι",
+            "REASON": "Αιτία",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Δημιουργήστε μια μαύρη λίστα",
+            "EDITCAPTION": "Επεξεργαστείτε τη μαύρη λίστα",
+            "TABS": {
+               "USERS": "Χρήστες",
+               "DATES": "Ημερομηνίες",
+               "REASON": "Αιτία",
+               "SUMMARY": "Σύνοψη"
+            },
+            "USERS": {
+               "REMOVE": "Κατάργηση",
+               "ADD_USER": "Επιλέξτε χρήστη",
+               "ALL_USERS": "Όλοι οι χρήστες",
+               "SELECT_USER": "Επιλέξτε"
+            },
+            "DATES": {
+               "START_DATE": "Ημερομηνία έναρξης",
+               "END_DATE": "Ημερομηνία λήξης"
+            },
+            "REASON": {
+               "SELECT_REASON": "Επιλέξτε",
+               "REASON": "Αιτία",
+               "COMMENTS": "Σχόλια"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Σύνοψη",
+               "USER": "Χρήστης",
+               "DATE_FROM": "Απο",
+               "DATE_TO": "Μέχρι",
+               "REASON": "Αιτία",
+               "COMMENTS": "Σχόλια"
+            }
+         }
       }
-    }
-  },
-  "RECORDINGS":{
-    "NAVIGATION":{
-      "LOCATIONS":"Τοποθεσίες",
-      "BLACKLISTS":"Μαύρες λίστες"
-    },
-    "ACTIONS":{
-      "EXPORT":"Εξαγωγή",
-      "ADD_BLACKLIST":"Προσθέστε στην μαύρη λίστα",
-      "REMOVE":"Κατάργηση"
-    },
-    "RECORDINGS":{
-      "TABLE":{
-        "CAPTION":"Τοποθεσίες",
-        "TITLE":"UID",
-        "NAME":"Όνομα",
-        "LOCATION":"Τοποθεσία",
-        "UPDATED":"τελευταία ενημέρωση",
-        "NEXT_DATE":"Επόμενη εκδήλωση",
-        "NEXT_NAME":"Επόμενος τίτλος εκδήλωσης",
-        "STATUS":"Κατάσταση",
-        "VERSION":"Έκδοση",
-        "BLACKLIST_FROM":"Στη μαύρη λίστα από",
-        "BLACKLIST_TO":"Στη μαύρη λίστα μέχρι",
-        "ACTION":"Ενέργειες"
-      },
-      "DETAILS":{
-        "HEADER":"Location details - {{resourceId}}",
-        "TAB":{
-          "GENERAL":"General",
-          "CONFIGURATION":"Configuration",
-          "CAPABILITIES":"Capabilities"
-        },
-        "GENERAL":{
-          "CAPTION":"General",
-          "NAME":"Name",
-          "URL":"Url",
-          "STATUS":"Status",
-          "UPDATE":"Last heard from"
-        },
-        "CONFIGURATION":{
-          "CAPTION":"Configuration",
-          "NO_CONFIGURATION":"No configuration provided"
-        },
-        "CAPABILITIES":{
-          "CAPTION":"Capabilities",
-          "NO_CAPABILITIES":"No capabilities provided"
-        }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες θέματος: {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Γενικά",
+               "BUMPER": "Αρχείο πολυμέσων έναρξης",
+               "TRAILER": "Αρχείο πολυμέσων τέλους",
+               "TITLE": "Τίτλος",
+               "LICENSE": "Άδεια χρήσης",
+               "WATERMARK": "Υδατογράφημα",
+               "USAGE": "Χρήση"
+            },
+            "GENERAL": {
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "DEFAULT": "Προεπιλογή",
+               "SET_DEFAULT_INFO": "Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
+               "NAME_ERROR": "Το όνομα είναι ήδη σε χρήση",
+               "NAME_REQUIRED": "Απαιτείται"
+            },
+            "BUMPER": {
+               "CAPTION": "Αρχείο πολυμέσων έναρξης",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
+               "ACTIVE": "Ενεργό"
+            },
+            "TRAILER": {
+               "CAPTION": "Αρχείο πολυμέσων τέλους",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
+               "ACTIVE": "Ενεργό"
+            },
+            "TITLE": {
+               "CAPTION": "Τίτλος",
+               "DESCRIPTION": "Προκαθορισμένη διαφάνεις, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
+               "ACTIVE": "Ενεργό"
+            },
+            "WATERMARK": {
+               "CAPTION": "Υδατογράφημα",
+               "DESCRIPTION": "Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
+               "ACTIVE": "Ενεργό"
+            },
+            "USAGE": {
+               "CAPTION": "Χρήση",
+               "SERIES": "Όνομα σειράς"
+            }
+         }
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Θέση μαύρη λίστα",
-        "NAME":"Όνομα",
-        "ACTIONS":"Ενέργειες"
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Προσθήκη Προτύπου",
+         "ADD_THEME": "Προσθέστε το θέμα"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Δημιουργήστε μια μαύρη λίστα",
-        "EDITCAPTION":"Επεξεργαστείτε τη μαύρη λίστα",
-        "TABS":{
-          "LOCATIONS":"Τοποθεσίες",
-          "DATES":"Ημερομηνίες",
-          "REASON":"Αιτία",
-          "SUMMARY":"Σύνοψη"
-        },
-        "LOCATIONS":{
-          "REMOVE":"Κατάργηση",
-          "ADD_LOCATION":"Επιλέξτε τοποθεσία",
-          "ALL_LOCATIONS":"Όλες οι τοποθεσίες",
-          "SELECT_LOCATION":"Επιλέξτε"
-        },
-        "DATES":{
-          "START_DATE":"Ημερομηνία έναρξης",
-          "END_DATE":"Ημερομηνία λήξης"
-        },
-        "REASON":{
-          "SELECT_REASON":"Επιλέξτε",
-          "REASON":"Αιτία",
-          "COMMENTS":"Σχόλια"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Σύνοψη",
-          "LOCATION":"Τοποθεσία",
-          "DATE_FROM":"Απο",
-          "DATE_TO":"Μέχρι",
-          "REASON":"Αιτία",
-          "COMMENTS":"Σχόλια"
-        }
+      "NAVIGATION": {
+         "MAIL_TEMPLATES": "Πρότυπα email",
+         "MAIL_SERVERS": "Ρυθμίσεις ηλεκτρονικού ταχυδρομείου",
+         "THEMES": "Θέματα"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "Πρότυπα ηλεκτρονικού ταχυδρομείου",
+            "NAME": "Όνομα",
+            "CREATOR": "Δημιουργός",
+            "CREATED": "Δημιουργήθηκε",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Δημιουργία προτύπου",
+            "EDITCAPTION": "Επεξεργασία πρότυπου",
+            "TABS": {
+               "MESSAGE": "Μήνυμα",
+               "SUMMARY": "Σύνοψη"
+            },
+            "MESSAGE": {
+               "NAME": "Όνομα",
+               "SUBJECT": "Θέμα",
+               "MESSAGE": "Μήνυμα"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Σύνοψη μηνύματος"
+            }
+         }
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Θέματα",
+            "NAME": "Όνομα",
+            "DESCRIPTION": "Περιγραφή",
+            "CREATOR": "Δημιουργός",
+            "CREATED": "Δημιουργήθηκε",
+            "DEFAULT": "Προεπιλογή",
+            "USAGE": "Χρήση",
+            "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Δημιουργία θέματος",
+            "EDITCAPTION": "Επεξεργασία θέματος",
+            "GENERAL": {
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "DESCRIPTION": "Περιγραφή",
+               "DEFAULT": "Προεπιλογή",
+               "SET_DEFAULT_INFO": "Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
+               "NAME_REQUIRED": "Απαιτείται"
+            },
+            "BUMPER": {
+               "CAPTION": "Αρχείο πολυμέσων έναρξης",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση βίντεο εισαγωγής",
+               "SELECT": "Επιλογή",
+               "UPLOAD_LABEL": "Μεταφόρτωση βίντεο",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
+            },
+            "TRAILER": {
+               "CAPTION": "Αρχείο πολυμέσων τέλους",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση βίντεο εισαγωγής",
+               "UPLOAD_LABEL": "Μεταφόρτωση βίντεο",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
+            },
+            "TITLE": {
+               "CAPTION": "Τίτλος",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Προκαθορισμένες διαφάνειες, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποιήσετε τη διαφάνεια τίτλου",
+               "BACKGROUND": "Φόντο",
+               "EXTRACT": "Εξαγωγή φόντου",
+               "UPLOAD": "Μεταφόρτωση",
+               "UPLOAD_LABEL": "Μεταφόρτωση εικόνας",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
+            },
+            "WATERMARK": {
+               "CAPTION": "Υδατογράφημα",
+               "FILE_UPLOADED": "Το αρχείο μεταφορτώθηκε: ",
+               "DESCRIPTION": "Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
+               "ACTIVE": "Ενεργό",
+               "ENABLE": "Ενεργοποίηση υδατογραφήματος",
+               "TOP_LEFT": "Πάνω αριστερά",
+               "TOP_RIGHT": "Πάνω δεξιά",
+               "BOTTOM_LEFT": "Κάτω αριστερά",
+               "BOTTOM_RIGHT": "Κάτω δεξιά",
+               "UPLOAD": "Μεταφόρτωση",
+               "POSITION": "Θέση και προεπισκόπηση υδατογραφήματος",
+               "FILEUPLOAD_DESCRIPTION": "Αρχείο πρέπει να έχει ένα κανάλι άλφα (διαφανές φόντο). Αποδεκτοί τύποι αρχείων είναι:. PNG. GIF. SVG. .WEBP",
+               "UPLOAD_LABEL": "Μεταφόρτωση εικόνας",
+               "UPLOAD_BUTTON": "Μεταφόρτωση"
+            },
+            "SUMMARY": {
+               "CAPTION": "Σύνοψη"
+            },
+            "USAGE": {
+               "CAPTION": "Χρήση",
+               "SERIE": "Όνομα σειράς",
+               "EMPTY": "Καμία σειρά δεω βρέθηκε για το τρέχον θέμα"
+            }
+         }
       }
-    }
-  },
-  "USERS":{
-    "ACTIONS":{
-      "ADD_USER":"Προσθήκη χρήστη",
-      "ADD_GROUP":"Προσθήκη ομάδας",
-      "ADD_ACL":"Προσθήκη πολιτικής πρόσβασης",
-      "ADD_BLACKLIST":"Προσθήκη μαύρης λίστας"
-    },
-    "NAVIGATION":{
-      "USERS":"Χρήστες",
-      "GROUPS":"Ομάδες",
-      "PERMISSIONS":"Πολιτικές πρόσβασης",
-      "BLACKLISTS":"Μαύρη λίστα"
-    },
-    "USERS":{
-      "TABLE":{
-        "CAPTION":"Χρήστες",
-        "NAME":"Όνομα",
-        "USERNAME":"Όνομα χρήστη",
-        "EMAIL":"Διεύθυνση ηλεκτρονικού ταχυδρομείου",
-        "ROLES":"Ρόλοι",
-        "TYPE":"Τύπος",
-        "PROVIDER":"Πάροχος",
-        "BLACKLIST_FROM":"Στη μαύρη λίστα από",
-        "BLACKLIST_TO":"Στη μαύρη λίστα μέχρι",
-        "ACTION":"Ενέργειες"
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Εργασίες",
+         "SERVERS": "Διακομιστές",
+         "SERVICES": "Υπηρεσίες"
       },
-      "DETAILS":{
-        "NEWCAPTION":"δημιουργία χρήστη",
-        "EDITCAPTION":"Επεξεργασία χρήστη",
-        "TABS":{
-          "USER":"Χρήστης",
-          "ROLES":"Ρόλοι",
-          "EXTERNALROLES":"Εξωτερικοί ρόλοι",
-          "EFFECTIVEROLES":"Εφαρμοσμένοι ρόλοι"
-        },
-        "DESCRIPTION":{
-          "ROLES":"Ρόλοι και ομάδες που μπορούν ή έχουν ήδη εκχωρηθεί στον χρήστη.",
-          "EXTERNALROLES":"Λίστα εξωτερικών ρόλων που έχουν παραχωρηθεί στον χρήστη από πάροχο(ους) εξωτερικών ρόλων.",
-          "EFFECTIVEROLES":"Λίστα εφαρμοσίμων ρόλων που έχουν εκχωρηθεί απευθείας στον χρήστη και ρόλοι που έχουν έμμεσα φορτωθεί μέσω ομάδας μέλους."
-        },
-        "FORM":{
-          "USERNAME":"Όνομα χρήστη",
-          "NAME":"Όνομα",
-          "EMAIL":"Διεύθυνση ηλεκτρονικού ταχυδρομείου",
-          "PASSWORD":"Κωδικός",
-          "REPEAT_PASSWORD":"Επανάληψη κωδικού"
-        },
-        "ROLES":{
-          "LEFT":"Ρόλοι",
-          "RIGHT":"Επιλεγμένοι ρόλοι",
-          "REMOVE":"Κατάργηση ρόλου",
-          "ADD":"Προσθήκη ρόλου"
-        }
+      "JOBS": {
+         "TABLE": {
+            "ID": "Αναγνωριστικό εργασίας",
+            "ACTION": "Ενέργειες",
+            "CAPTION": "Εργασίες",
+            "CREATED": "Δημιουργήθηκε",
+            "CREATOR": "Δημιουργός",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "OPERATION": "Λειτουργία",
+            "STARTED": "Ξεκίνησε",
+            "STATUS": "Κατάσταση",
+            "SUBMITTED": "Υποβλήθηκε",
+            "TYPE": "Τύπος"
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες εργασίας {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Γενικά",
+               "OPERATIONS": "Λειτουργίες",
+               "INCIDENTS": "Περιστατικά"
+            }
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Διακομιστές",
+            "STATUS": "Κατάσταση",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "CORES": "Πυρήνες",
+            "COMPLETED": "Ολοκληρωμένες εργασίες",
+            "RUNNING": "Εργασίες σε εκτέλεση",
+            "QUEUED": "Εργασίες στην ουρά",
+            "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
+            "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
+            "MAINTENANCE": "Συντήρηση",
+            "ACTION": "Ενέργειες",
+            "MAINTENANCE_OFF": "Είσοδος σε λειτουργία συντήρησης",
+            "MAINTENANCE_ON": "Έξοδος από λειτουργία συντήρησης"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Υπηρεσίες",
+            "STATUS": "Κατάσταση",
+            "NAME": "Όνομα υπηρεσίας",
+            "HOST_NAME": "Όνομα κεντρικού υπολογιστή",
+            "COMPLETED": "Ολοκληρωμένες εργασίες",
+            "RUNNING": "Εργασίες σε εκτέλεση",
+            "QUEUED": "Εργασίες στην ουρά",
+            "MEAN_RUN_TIME": "Μέσος χρόνος εκτέλεσης",
+            "MEAN_QUEUE_TIME": "Μέσος χρόνος αναμονής",
+            "SANITIZE": "Αποτυχημένη υπηρεσία",
+            "ACTION": "Ενέργειες"
+         }
       }
-    },
-    "GROUPS":{
-      "NEW":{
-        "CAPTION":"Δημιουργία ομάδας"
+   },
+   "VIDEO_TOOL": {
+      "TIMELINE": "Χρονολόγιο",
+      "ZOOMLEVEL": "Επίπεδο ζουμ",
+      "ZOOM": "Ζουμ",
+      "BUTTONS": {
+         "CLOSE": "Κλείσιμο",
+         "SAVE": "Αποθήκευση",
+         "PROCESS": "Αποθήκευση & συνεχεία",
+         "ADD_COMMENT": "Προσθήκη σχολίου"
       },
-      "TABLE":{
-        "CAPTION":"Ομάδες",
-        "NAME":"Όνομα",
-        "DESCRIPTION":"Περιγραφή",
-        "ROLE":"Ρόλος",
-        "ACTION":"Ενέργειες"
+      "TABS": {
+         "PLAY": "Αναπαραγωγη",
+         "EDIT": "Πρόγραμμα επεξεργασίας",
+         "CAPTIONS": "Λεζάντες",
+         "ANNOTATIONS": "Σχολιασμοί"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Δημιουργία ομάδας",
-        "EDITCAPTION":"Επεξεργασία ομάδας",
-        "TABS":{
-          "GROUP":"Ομάδες",
-          "ROLES":"Ρόλοι",
-          "METADATA":"Μεταδεδομένα",
-          "USERS":"Χρήστες",
-          "SUMMARY":"Σύνοψη"
-        },
-        "FORM":{
-          "NAME":"Όνομα",
-          "DESCRIPTION":"Περιγραφή",
-          "SUMMARY":"Σύνοψη",
-          "ROLES":"Ρόλοι",
-          "USERS":"Χρήστες"
-        },
-        "USERS":{
-          "LEFT":"Χρήστες",
-          "RIGHT":"Επιλεγμένοι Χρήστες",
-          "REMOVE":"Αφαίρεση χρήστη",
-          "ADD":"Προσθήκη χρήστη"
-        },
-        "ROLES":{
-          "LEFT":"Ρόλοι",
-          "RIGHT":"Επιλεγμένοι ρόλοι",
-          "REMOVE":"Κατάργηση ρόλου",
-          "ADD":"Προσθήκη ρόλου"
-        }
+      "AREAS": {
+         "METADATA": "Μεταδεδομένα",
+         "COMMENTS": "Σχόλια",
+         "SEGMENTS": "Τμήματα"
+      },
+      "ACTIONS": {
+         "SPLIT": "Διαχωρισμός",
+         "CUT": "Αποκοπή",
+         "REPLAY_SEGMENT": "Επανάληψη τμήματος",
+         "REPLAY_END_OF_SEGMENT": "Τέλος του τμήματος",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Έλεγχος μετάβασης",
+         "UNDO": "Αναίρεση",
+         "REDO": "Ακύρωση Αναίρεσης",
+         "CLEAR_SEGMENTS": "Καθαρισμός τμημάτων",
+         "CLEAR_SELECTED_SEGMENT": "Καθαρισμός επιλεγμένου τμήματος"
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Αφαίρεση τμήματος",
+         "USE_SEGMENT": "Χρησιμοποίηση αυτού του τμήματος"
+      },
+      "PLAYER": {
+         "PLAY": "Αναπαραγωγή",
+         "PAUSE": "Παύση",
+         "NEXT_FRAME": "Επόμενο καρέ",
+         "PREVIOUS_FRAME": "Προηγούμενο καρέ",
+         "NEXT_SEGMENT": "Επόμενο τμήμα / μετακίνηση στο τέλος",
+         "PREVIOUS_SEGMENT": "Προηγούμενο τμήμα / μετακίνηση στην αρχή",
+         "MUTE": "Σίγαση",
+         "VOLUME": "Ένταση ήχου"
       }
-    },
-    "ACLS":{
-      "TABLE":{
-        "CAPTION":"Πολιτικές πρόσβασης",
-        "NAME":"Όνομα",
-        "CREATED":"Δημιουργήθηκε",
-        "CREATOR":"Δημιουργός",
-        "IN_USE":"Σε χρήση",
-        "ACTION":"Ενέργειες"
+   },
+   "LOGIN": {
+      "WELCOME": "Καλωσορίσατε στο Opencast",
+      "REMEMBER": "Να με θυμάσαι σε αυτόν τον υπολογιστή",
+      "USERNAME": "Όνομα χρήστη…",
+      "PASSWORD": "Κωδικός πρόσβασης…",
+      "LOGIN": "Σύνδεση",
+      "ERROR": "Εσφαλμένο όνομα χρήστη ή / και τον κωδικό πρόσβασης"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Παρακαλώ επιλέξτε ένα φίλτρο…",
+         "NO_OPTIONS": "Δεν βρέθηκαν φίλτρα"
       },
-      "NEW":{
-        "CAPTION":"Νέα πολιτική πρόσβασης",
-        "TABS":{
-          "SUMMARY":"Σύνοψη",
-          "METADATA":"Μεταδεδομένα",
-          "ACCESS":"Πρόσβαση"
-        },
-        "METADATA":{
-          "TITLE":"Μεταδεδομένα",
-          "NAME":{
-            "CAPTION":"Όνομα",
-            "PLACEHOLDER":"Όνομα…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "TEMPLATES":{
-            "TITLE":"Πρότυπα"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Πολιτική πρόσβασης",
-            "LABEL":"Επιλέξτε ένα πρότυπο",
-            "EMPTY":"Το πρότυπο δεν βρέθηκε",
-            "ROLE":"Ρόλος",
-            "WRITE":"Εγγραφή",
-            "READ":"Ανάγνωση",
-            "ADDITIONAL_ACTIONS":"Πρόσθετες ενέργειες",
-            "ACTION":"Ενέργειες",
-            "NEW":"Νέα πολιτική",
-            "DETAILS":"Λεπτομέρειες",
-            "DESCRIPTION":"Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
-          },
-          "ROLES":{
-            "LABEL":"Επιλέξτε ένα ρόλο",
-            "EMPTY":"Κανένας ρόλος δεν βρέθηκε"
-          }
-        }
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Παρακαλώ επιλέξτε μια τιμή…",
+         "NO_OPTIONS": "Δεν βρέθηκαν τιμές"
       },
-      "DETAILS":{
-        "HEADER":"Λεπτομέρειες πολιτικής πρόσβασης - {{resourceId}}",
-        "TABS":{
-          "SUMMARY":"Σύνοψη",
-          "METADATA":"Μεταδεδομένα",
-          "ACCESS":"Πρόσβαση"
-        },
-        "METADATA":{
-          "TITLE":"Μεταδεδομένα",
-          "NAME":{
-            "CAPTION":"Όνομα",
-            "PLACEHOLDER":"Όνομα…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Πολιτική πρόσβασης",
-          "TEMPLATES":{
-            "TITLE":"Πρότυπα"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Πολιτική πρόσβασης",
-            "LABEL":"Επιλέξτε ένα πρότυπο",
-            "EMPTY":"Το πρότυπο δεν βρέθηκε",
-            "ROLE":"Ρόλος",
-            "WRITE":"Εγγραφή",
-            "READ":"Ανάγνωση",
-            "ADDITIONAL_ACTIONS":"Πρόσθετες ενέργειες",
-            "ACTION":"Ενέργειες",
-            "NEW":"Νέα πολιτική",
-            "DETAILS":"Λεπτομέρειες",
-            "DESCRIPTION":"Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές"
-          },
-          "ROLES":{
-            "LABEL":"Επιλέξτε ένα ρόλο",
-            "EMPTY":"Κανένας ρόλος δεν βρέθηκε"
-          }
-        }
+      "CLEAR": "Απαλοιφή όλων των φίλτρων",
+      "REMOVE": "Αφαίρεση φίλτρου",
+      "ADD": "Προσθήκη Φίλτρων",
+      "PLACEHOLDER": "Αναζήτηση…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Αποθηκευμένα σύνολα φίλτρου",
+         "EMPTY": "Δεν υπάρχουν αποθηκευμένα φίλτρα ακόμη",
+         "SAVE_FILTERS": "Αποθήκευση",
+         "FILTER_HEADER": "Αποθήκευση σύνολο φίλτρου",
+         "NAME": "Όνομα",
+         "NAME_PLACEHOLDER": "Όνομα…",
+         "DESCRIPTION": "Περιγραφή",
+         "DESCRIPTION_PLACEHOLDER": "Περιγραφή…"
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Μαύρη λίστα χρηστών",
-        "NAME":"Όνομα",
-        "DATE_FROM":"Απο",
-        "DATE_TO":"Μέχρι",
-        "REASON":"Αιτία",
-        "ACTION":"Ενέργειες"
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Όνομα"
+         }
       },
-      "DETAILS":{
-        "NEWCAPTION":"Δημιουργήστε μια μαύρη λίστα",
-        "EDITCAPTION":"Επεξεργαστείτε τη μαύρη λίστα",
-        "TABS":{
-          "USERS":"Χρήστες",
-          "DATES":"Ημερομηνίες",
-          "REASON":"Αιτία",
-          "SUMMARY":"Σύνοψη"
-        },
-        "USERS":{
-          "REMOVE":"Κατάργηση",
-          "ADD_USER":"Επιλέξτε χρήστη",
-          "ALL_USERS":"Όλοι οι χρήστες",
-          "SELECT_USER":"Επιλέξτε"
-        },
-        "DATES":{
-          "START_DATE":"Ημερομηνία έναρξης",
-          "END_DATE":"Ημερομηνία λήξης"
-        },
-        "REASON":{
-          "SELECT_REASON":"Επιλέξτε",
-          "REASON":"Αιτία",
-          "COMMENTS":"Σχόλια"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Σύνοψη",
-          "USER":"Χρήστης",
-          "DATE_FROM":"Απο",
-          "DATE_TO":"Μέχρι",
-          "REASON":"Αιτία",
-          "COMMENTS":"Σχόλια"
-        }
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Όνομα"
+         },
+         "STATUS": {
+            "LABEL": "Κατάσταση"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Αναγνωριστικό αντζέντη βιντεοσκόπησης"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Πολιτική πρόσβασης"
+         },
+         "COMMENTS": {
+            "LABEL": "Σχόλια"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Χορηγοί"
+         },
+         "CREATOR": {
+            "LABEL": "Δημιουργός"
+         },
+         "HOSTNAME": {
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
+         },
+         "LANGUAGE": {
+            "LABEL": "Γλώσσα"
+         },
+         "LICENSE": {
+            "LABEL": "Άδεια χρήσης"
+         },
+         "LOCATION": {
+            "LABEL": "Τοποθεσία"
+         },
+         "OPTEDOUT": {
+            "LABEL": "Επιλογή εξόδου"
+         },
+         "PERIOD": {
+            "LABEL": "Περίοδος"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Παρουσιαστής βιβλιογραφική"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Παρουσιαστής τεχνική"
+         },
+         "PROGRESS": {
+            "LABEL": "Πρόοδος"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Κατάσταση ανάλυσης",
+            "CONFIRMED": "Επιβεβαιωμένο",
+            "UNCONFIRMED": "Ανεπιβεβαίωτη",
+            "UNSENT": "Aόριστο"
+         },
+         "SERIES": {
+            "LABEL": "Σειρά"
+         },
+         "SOURCE": {
+            "LABEL": "Πηγή"
+         },
+         "START_DATE": {
+            "LABEL": "Ημερομηνία έναρξης"
+         },
+         "STATUS": {
+            "LABEL": "Κατάσταση",
+            "SCHEDULED": "Προγραμματισμένη",
+            "RECORDING": "Εγγραφή",
+            "INGESTING": "Εισάγεται",
+            "PROCESSING": "Σε επεξεργασία",
+            "ARCHIVE": "Αρχειοθέτηση",
+            "WAITINGFOR": "Αναμονή για",
+            "UPLOAD": "Μεταφόρτωση",
+            "ONHOLD": "Σε αναμονή"
+         },
+         "SUBJECT": {
+            "LABEL": "Θέμα"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "MimeType"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Ανάλυση"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Τύπος"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Ορισμός ροής εργασίας"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Κατάσταση ροής εργασίας"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
+         },
+         "STATUS": {
+            "LABEL": "Κατάσταση",
+            "PAUSED": "Σε παύση",
+            "QUEUED": "Στην ουρά",
+            "RUNNING": "Εκτελείται",
+            "WAITING": "Αναμονή"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Όνομα"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Χορηγοί"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Διοργανωτές"
+         },
+         "SUBJECT": {
+            "LABEL": "Θέμα"
+         },
+         "LANGUAGE": {
+            "LABEL": "Γλώσσα"
+         },
+         "CREATOR": {
+            "LABEL": "Δημιουργός"
+         },
+         "LICENSE": {
+            "LABEL": "Άδεια χρήσης"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Πολιτική πρόσβασης"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Ημερομηνία δημιουργίας"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
+         },
+         "STATUS": {
+            "LABEL": "Κατάσταση",
+            "MAINTENANCE": "Συντήρηση",
+            "ONLINE": "Συνδεδεμένος",
+            "OFFLINE": "Αποσυνδεδεμένος"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Έχει ενέργειες"
+         },
+         "HOSTNAME": {
+            "LABEL": "Όνομα κεντρικού υπολογιστή"
+         },
+         "NAME": {
+            "LABEL": "Όνομα"
+         },
+         "STATUS": {
+            "LABEL": "Κατάσταση",
+            "ERROR": "Σφάλμα",
+            "NORMAL": "Κανονική",
+            "WARNING": "Προειδοποίηση"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Όνομα"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Περιγραφή"
+         },
+         "CREATOR": {
+            "LABEL": "Δημιουργός"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Δημιουργήθηκε"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Πάροχος"
+         },
+         "ROLE": {
+            "LABEL": "Ρόλος"
+         },
+         "USERNAME": {
+            "LABEL": "Όνομα χρήστη"
+         },
+         "NAME": {
+            "LABEL": "Όνομα"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Κατάλογος χρήστη"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Aόριστο",
+         "UNCONFIRMED": "Ανεπιβεβαίωτη",
+         "CONFIRMED": "Επιβεβαιωμένο"
       }
-    }
-  },
-  "THEMES":{
-    "THEMES":{
-      "DETAILS":{
-        "HEADER":"Λεπτομέρειες θέματος: {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Γενικά",
-          "BUMPER":"Αρχείο πολυμέσων έναρξης",
-          "TRAILER":"Αρχείο πολυμέσων τέλους",
-          "TITLE":"Τίτλος",
-          "LICENSE":"Άδεια χρήσης",
-          "WATERMARK":"Υδατογράφημα",
-          "USAGE":"Χρήση"
-        },
-        "GENERAL":{
-          "CAPTION":"Γενικά",
-          "NAME":"Όνομα",
-          "DESCRIPTION":"Περιγραφή",
-          "DEFAULT":"Προεπιλογή",
-          "SET_DEFAULT_INFO":"Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
-          "NAME_ERROR":"Το όνομα είναι ήδη σε χρήση",
-          "NAME_REQUIRED":"Απαιτείται"
-        },
-        "BUMPER":{
-          "CAPTION":"Αρχείο πολυμέσων έναρξης",
-          "DESCRIPTION":"Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
-          "ACTIVE":"Ενεργό"
-        },
-        "TRAILER":{
-          "CAPTION":"Αρχείο πολυμέσων τέλους",
-          "DESCRIPTION":"Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
-          "ACTIVE":"Ενεργό"
-        },
-        "TITLE":{
-          "CAPTION":"Τίτλος",
-          "DESCRIPTION":"Προκαθορισμένη διαφάνεις, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
-          "ACTIVE":"Ενεργό"
-        },
-        "WATERMARK":{
-          "CAPTION":"Υδατογράφημα",
-          "DESCRIPTION":"Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
-          "ACTIVE":"Ενεργό"
-        },
-        "USAGE":{
-          "CAPTION":"Χρήση",
-          "SERIES":"Όνομα σειράς"
-        }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} γραμμές",
+   "TABLE_NO_RESULT": "Δεν βρέθηκαν αποτελέσματα",
+   "TABLE_LOADING": "Φόρτωση…",
+   "TABLE_EDIT": "Επεξεργασία",
+   "PM": {
+      "BLACKLIST": {
+         "REASONS": {
+            "SICK_LEAVE": "Αναρρωτική άδεια",
+            "LEAVE": "Αποχώρηση",
+            "FAMILY_EMERGENCY": "Οικογενειακή έκτακτη κατάσταση",
+            "CONSTRUCTION": "Κατασκευή"
+         }
       }
-    }
-  },
-  "CONFIGURATION":{
-    "ACTIONS":{
-      "ADD_MAIL_TEMPLATE":"Προσθήκη Προτύπου",
-      "ADD_THEME":"Προσθέστε το θέμα"
-    },
-    "NAVIGATION":{
-      "MAIL_TEMPLATES":"Πρότυπα email",
-      "MAIL_SERVERS":"Ρυθμίσεις ηλεκτρονικού ταχυδρομείου",
-      "THEMES":"Θέματα"
-    },
-    "EMAIL_TEMPLATES":{
-      "TABLE":{
-        "CAPTION":"Πρότυπα ηλεκτρονικού ταχυδρομείου",
-        "NAME":"Όνομα",
-        "CREATOR":"Δημιουργός",
-        "CREATED":"Δημιουργήθηκε",
-        "ACTION":"Ενέργειες"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Δημιουργία προτύπου",
-        "EDITCAPTION":"Επεξεργασία πρότυπου",
-        "TABS":{
-          "MESSAGE":"Μήνυμα",
-          "SUMMARY":"Σύνοψη"
-        },
-        "MESSAGE":{
-          "NAME":"Όνομα",
-          "SUBJECT":"Θέμα",
-          "MESSAGE":"Μήνυμα"
-        },
-        "SUMMARY":{
-          "MESSAGE_SUMMARY":"Σύνοψη μηνύματος"
-        }
-      }
-    },
-    "THEMES":{
-      "TABLE":{
-        "CAPTION":"Θέματα",
-        "NAME":"Όνομα",
-        "DESCRIPTION":"Περιγραφή",
-        "CREATOR":"Δημιουργός",
-        "CREATED":"Δημιουργήθηκε",
-        "DEFAULT":"Προεπιλογή",
-        "USAGE":"Χρήση",
-        "ACTION":"Ενέργειες"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Δημιουργία θέματος",
-        "EDITCAPTION":"Επεξεργασία θέματος",
-        "GENERAL":{
-          "CAPTION":"Γενικά",
-          "NAME":"Όνομα",
-          "DESCRIPTION":"Περιγραφή",
-          "DEFAULT":"Προεπιλογή",
-          "SET_DEFAULT_INFO":"Ορισμός θέματος ως προεπιλεγμένου για όλες τις σειρές και εκδηλώσεις",
-          "NAME_REQUIRED":"Απαιτείται"
-        },
-        "BUMPER":{
-          "CAPTION":"Αρχείο πολυμέσων έναρξης",
-          "FILE_UPLOADED":"Το αρχείο μεταφορτώθηκε: ",
-          "DESCRIPTION":"Προκαθορισμένο βίντεο που εισάγεται στην αρχή της εγγραφής.",
-          "ACTIVE":"Ενεργό",
-          "ENABLE":"Ενεργοποίηση βίντεο εισαγωγής",
-          "SELECT":"Επιλογή",
-          "UPLOAD_LABEL":"Μεταφόρτωση βίντεο",
-          "UPLOAD_BUTTON":"Μεταφόρτωση"
-        },
-        "TRAILER":{
-          "CAPTION":"Αρχείο πολυμέσων τέλους",
-          "FILE_UPLOADED":"Το αρχείο μεταφορτώθηκε: ",
-          "DESCRIPTION":"Προκαθορισμένο βίντεο που εισάγεται στο τέλος της εγγραφής.",
-          "ACTIVE":"Ενεργό",
-          "ENABLE":"Ενεργοποίηση βίντεο εισαγωγής",
-          "UPLOAD_LABEL":"Μεταφόρτωση βίντεο",
-          "UPLOAD_BUTTON":"Μεταφόρτωση"
-        },
-        "TITLE":{
-          "CAPTION":"Τίτλος",
-          "FILE_UPLOADED":"Το αρχείο μεταφορτώθηκε: ",
-          "DESCRIPTION":"Προκαθορισμένες διαφάνειες, συμπεριλαμβανομένων των περιγραφικών μεταδεδομένων που εισάγονται στην αρχή ή στο τέλος μιας εγγραφής.",
-          "ACTIVE":"Ενεργό",
-          "ENABLE":"Ενεργοποιήσετε τη διαφάνεια τίτλου",
-          "BACKGROUND":"Φόντο",
-          "EXTRACT":"Εξαγωγή φόντου",
-          "UPLOAD":"Μεταφόρτωση",
-          "UPLOAD_LABEL":"Μεταφόρτωση εικόνας",
-          "UPLOAD_BUTTON":"Μεταφόρτωση"
-        },
-        "WATERMARK":{
-          "CAPTION":"Υδατογράφημα",
-          "FILE_UPLOADED":"Το αρχείο μεταφορτώθηκε: ",
-          "DESCRIPTION":"Ημι-διαφανή εικόνα που τοποθετείται σε κάθε πλαίσιο της εγγραφής.",
-          "ACTIVE":"Ενεργό",
-          "ENABLE":"Enable watermark",
-          "TOP_LEFT":"Πάνω αριστερά",
-          "TOP_RIGHT":"Πάνω δεξιά",
-          "BOTTOM_LEFT":"Κάτω αριστερά",
-          "BOTTOM_RIGHT":"Κάτω δεξιά",
-          "UPLOAD":"Μεταφόρτωση",
-          "POSITION":"Θέση και προεπισκόπηση υδατογραφήματος",
-          "FILEUPLOAD_DESCRIPTION":"Αρχείο πρέπει να έχει ένα κανάλι άλφα (διαφανές φόντο). Αποδεκτοί τύποι αρχείων είναι:. PNG. GIF. SVG. .WEBP",
-          "UPLOAD_LABEL":"Μεταφόρτωση εικόνας",
-          "UPLOAD_BUTTON":"Μεταφόρτωση"
-        },
-        "SUMMARY":{
-          "CAPTION":"Σύνοψη"
-        },
-        "USAGE":{
-          "CAPTION":"Χρήση",
-          "SERIE":"Όνομα σειράς",
-          "EMPTY":"Καμία σειρά δεω βρέθηκε για το τρέχον θέμα"
-        }
-      }
-    }
-  },
-  "SYSTEMS":{
-    "NAVIGATION":{
-      "JOBS":"Εργασίες",
-      "SERVERS":"Servers",
-      "SERVICES":"Υπηρεσίες"
-    },
-    "JOBS":{
-      "TABLE":{
-        "ID":"Αναγνωριστικό εργασίας",
-        "ACTION":"Ενέργειες",
-        "CAPTION":"Εργασίες",
-        "CREATED":"Δημιουργήθηκε",
-        "CREATOR":"Δημιουργός",
-        "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
-        "OPERATION":"Λειτουργία",
-        "STARTED":"Ξεκίνησε",
-        "STATUS":"Κατάσταση",
-        "SUBMITTED":"Υποβλήθηκε",
-        "TYPE":"Τύπος"
-      },
-      "DETAILS":{
-        "HEADER":"Λεπτομέρειες εργασίας {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Γενικά",
-          "OPERATIONS":"Λειτουργίες",
-          "INCIDENTS":"Περιστατικά"
-        }
-      }
-    },
-    "SERVERS":{
-      "TABLE":{
-        "CAPTION":"Servers",
-        "STATUS":"Κατάσταση",
-        "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
-        "CORES":"Πυρήνες",
-        "COMPLETED":"Ολοκληρωμένες εργασίες",
-        "RUNNING":"Εργασίες σε εκτέλεση",
-        "QUEUED":"Εργασίες στην ουρά",
-        "MEAN_RUN_TIME":"Μέσος χρόνος εκτέλεσης",
-        "MEAN_QUEUE_TIME":"Μέσος χρόνος αναμονής",
-        "MAINTENANCE":"Συντήρηση",
-        "ACTION":"Ενέργειες",
-        "MAINTENANCE_OFF":"Είσοδος σε λειτουργία συντήρησης",
-        "MAINTENANCE_ON":"Έξοδος από λειτουργία συντήρησης"
-      }
-    },
-    "SERVICES":{
-      "TABLE":{
-        "CAPTION":"Υπηρεσίες",
-        "STATUS":"Κατάσταση",
-        "NAME":"Όνομα υπηρεσίας",
-        "HOST_NAME":"Όνομα κεντρικού υπολογιστή",
-        "COMPLETED":"Ολοκληρωμένες εργασίες",
-        "RUNNING":"Εργασίες σε εκτέλεση",
-        "QUEUED":"Εργασίες στην ουρά",
-        "MEAN_RUN_TIME":"Μέσος χρόνος εκτέλεσης",
-        "MEAN_QUEUE_TIME":"Μέσος χρόνος αναμονής",
-        "SANITIZE":"Αποτυχημένη υπηρεσία",
-        "ACTION":"Ενέργειες"
-      }
-    }
-  },
-  "VIDEO_TOOL":{
-    "TIMELINE":"Χρονολόγιο",
-    "ZOOMLEVEL":"Επίπεδο ζουμ",
-    "ZOOM":"Ζουμ",
-    "BUTTONS":{
-      "CLOSE":"Κλείσιμο",
-      "SAVE":"Αποθήκευση",
-      "PROCESS":"Αποθήκευση & συνεχεία",
-      "ADD_COMMENT":"Προσθήκη σχολίου"
-    },
-    "TABS":{
-      "PLAY":"Αναπαραγωγη",
-      "EDIT":"Πρόγραμμα επεξεργασίας",
-      "CAPTIONS":"Λεζάντες",
-      "ANNOTATIONS":"Σχολιασμοί"
-    },
-    "AREAS":{
-      "METADATA":"Μεταδεδομένα",
-      "COMMENTS":"Σχόλια",
-      "SEGMENTS":"Τμήματα"
-    },
-    "ACTIONS":{
-      "SPLIT":"Διαχωρισμός",
-      "CUT":"Αποκοπή",
-      "REPLAY_SEGMENT":"Επανάληψη τμήματος",
-      "REPLAY_END_OF_SEGMENT":"Τέλος του τμήματος",
-      "REPLAY_SEGMENT_WITH_PREROLL":"Έλεγχος μετάβασης",
-      "UNDO":"Αναίρεση",
-      "REDO":"Ακύρωση Αναίρεσης",
-      "CLEAR_SEGMENTS":"Καθαρισμός τμημάτων",
-      "CLEAR_SELECTED_SEGMENT":"Καθαρισμός επιλεγμένου τμήματος"
-    },
-    "SEGMENTS":{
-      "REMOVE_SEGMENT":"Αφαίρεση τμήματος",
-      "USE_SEGMENT":"Χρησιμοποίηση αυτού του τμήματος"
-    },
-    "PLAYER":{
-      "PLAY":"Play",
-      "PAUSE":"Pause",
-      "NEXT_FRAME":"Επόμενο καρέ",
-      "PREVIOUS_FRAME":"Προηγούμενο καρέ",
-      "NEXT_SEGMENT":"Επόμενο τμήμα / μετακίνηση στο τέλος",
-      "PREVIOUS_SEGMENT":"Προηγούμενο τμήμα / μετακίνηση στην αρχή",
-      "MUTE":"Σίγαση",
-      "VOLUME":"Ένταση ήχου"
-    }
-  },
-  "LOGIN":{
-    "WELCOME":"Καλωσορίσατε στο Opencast",
-    "REMEMBER":"Να με θυμάσαι σε αυτόν τον υπολογιστή",
-    "USERNAME":"Όνομα χρήστη…",
-    "PASSWORD":"Κωδικός πρόσβασης…",
-    "LOGIN":"Σύνδεση",
-    "ERROR":"Εσφαλμένο όνομα χρήστη ή / και τον κωδικό πρόσβασης"
-  },
-  "TABLE_FILTERS":{
-    "FILTER_SELECTION":{
-      "PLACEHOLDER":"Παρακαλώ επιλέξτε ένα φίλτρο…",
-      "NO_OPTIONS":"Δεν βρέθηκαν φίλτρα"
-    },
-    "FILTER_VALUE_SELECTION":{
-      "PLACEHOLDER":"Παρακαλώ επιλέξτε μια τιμή…",
-      "NO_OPTIONS":"Δεν βρέθηκαν τιμές"
-    },
-    "CLEAR":"Απαλοιφή όλων των φίλτρων",
-    "REMOVE":"Αφαίρεση φίλτρου",
-    "ADD":"Προσθήκη Φίλτρων",
-    "PLACEHOLDER":"Αναζήτηση…",
-    "PROFILES":{
-      "FILTERS_HEADER":"Αποθηκευμένα σύνολα φίλτρου",
-      "EMPTY":"Δεν υπάρχουν αποθηκευμένα φίλτρα ακόμη",
-      "SAVE_FILTERS":"Αποθήκευση",
-      "FILTER_HEADER":"Αποθήκευση σύνολο φίλτρου",
-      "NAME":"Όνομα",
-      "NAME_PLACEHOLDER":"Όνομα…",
-      "DESCRIPTION":"Περιγραφή",
-      "DESCRIPTION_PLACEHOLDER":"Περιγραφή…"
-    }
-  },
-  "FILTERS":{
-    "ACLS":{
-      "NAME":{
-        "LABEL":"Όνομα"
-      }
-    },
-    "AGENTS":{
-      "NAME":{
-        "LABEL":"Όνομα"
-      },
-      "STATUS":{
-        "LABEL":"Κατάσταση"
-      }
-    },
-    "EVENTS":{
-      "AGENT_ID":{
-        "LABEL":"Αναγνωριστικό αντζέντη βιντεοσκόπησης"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Πολιτική πρόσβασης"
-      },
-      "COMMENTS":{
-        "LABEL":"Σχόλια"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Χορηγοί"
-      },
-      "CREATOR":{
-        "LABEL":"Δημιουργός"
-      },
-      "HOSTNAME":{
-        "LABEL":"Όνομα κεντρικού υπολογιστή"
-      },
-      "LANGUAGE":{
-        "LABEL":"Γλώσσα"
-      },
-      "LICENSE":{
-        "LABEL":"Άδεια χρήσης"
-      },
-      "LOCATION":{
-        "LABEL":"Τοποθεσία"
-      },
-      "OPTEDOUT":{
-        "LABEL":"Επιλογή εξόδου"
-      },
-      "PERIOD":{
-        "LABEL":"Περίοδος"
-      },
-      "PRESENTERS_BIBLIOGRAPHIC":{
-        "LABEL":"Παρουσιαστής βιβλιογραφική"
-      },
-      "PRESENTERS_TECHNICAL":{
-        "LABEL":"Παρουσιαστής τεχνική"
-      },
-      "PROGRESS":{
-        "LABEL":"Πρόοδος"
-      },
-      "REVIEW_STATUS":{
-        "LABEL":"Κατάσταση ανάλυσης",
-        "CONFIRMED":"Επιβεβαιωμένο",
-        "UNCONFIRMED":"Ανεπιβεβαίωτη",
-        "UNSENT":"Aόριστο"
-      },
-      "SERIES":{
-        "LABEL":"Σειρά"
-      },
-      "SOURCE":{
-        "LABEL":"Πηγή"
-      },
-      "START_DATE":{
-        "LABEL":"Ημερομηνία έναρξης"
-      },
-      "STATUS":{
-        "LABEL":"Κατάσταση",
-        "SCHEDULED":"Προγραμματισμένη",
-        "RECORDING":"Εγγραφή",
-        "INGESTING":"Εισάγεται",
-        "PROCESSING":"Σε επεξεργασία",
-        "ARCHIVE":"Αρχειοθέτηση",
-        "WAITINGFOR":"Αναμονή για",
-        "UPLOAD":"Μεταφόρτωση",
-        "ONHOLD":"Σε αναμονή"
-      },
-      "SUBJECT":{
-        "LABEL":"Θέμα"
-      },
-      "TRACK_MIMETYPE":{
-        "LABEL":"MimeType"
-      },
-      "TRACK_RESOLUTION":{
-        "LABEL":"Ανάλυση"
-      },
-      "TRACK_TYPE":{
-        "LABEL":"Τύπος"
-      },
-      "WORKFLOW_DEFINITION":{
-        "LABEL":"Ορισμός ροής εργασίας"
-      },
-      "WORKFLOW_STATE":{
-        "LABEL":"Κατάσταση ροής εργασίας"
-      }
-    },
-    "JOBS":{
-      "HOSTNAME":{
-        "LABEL":"Όνομα κεντρικού υπολογιστή"
-      },
-      "STATUS":{
-        "LABEL":"Κατάσταση",
-        "PAUSED":"Σε παύση",
-        "QUEUED":"Στην ουρά",
-        "RUNNING":"Εκτελείται",
-        "WAITING":"Αναμονή"
-      }
-    },
-    "SERIES":{
-      "TITLE":{
-        "LABEL":"Όνομα"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Χορηγοί"
-      },
-      "ORGANIZERS":{
-        "LABEL":"Διοργανωτές"
-      },
-      "SUBJECT":{
-        "LABEL":"Θέμα"
-      },
-      "LANGUAGE":{
-        "LABEL":"Γλώσσα"
-      },
-      "CREATOR":{
-        "LABEL":"Δημιουργός"
-      },
-      "LICENSE":{
-        "LABEL":"Άδεια χρήσης"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Πολιτική πρόσβασης"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Ημερομηνία δημιουργίας"
-      }
-    },
-    "SERVERS":{
-      "HOSTNAME":{
-        "LABEL":"Όνομα κεντρικού υπολογιστή"
-      },
-      "STATUS":{
-        "LABEL":"Κατάσταση",
-        "MAINTENANCE":"Συντήρηση",
-        "ONLINE":"Συνδεδεμένος",
-        "OFFLINE":"Αποσυνδεδεμένος"
-      }
-    },
-    "SERVICES":{
-      "ACTIONS":{
-        "LABEL":"Έχει ενέργειες"
-      },
-      "HOSTNAME":{
-        "LABEL":"Όνομα κεντρικού υπολογιστή"
-      },
-      "NAME":{
-        "LABEL":"Όνομα"
-      },
-      "STATUS":{
-        "LABEL":"Κατάσταση",
-        "ERROR":"Σφάλμα",
-        "NORMAL":"Κανονική",
-        "WARNING":"Προειδοποίηση"
-      }
-    },
-    "THEMES":{
-      "NAME":{
-        "LABEL":"Όνομα"
-      },
-      "DESCRIPTION":{
-        "LABEL":"Περιγραφή"
-      },
-      "CREATOR":{
-        "LABEL":"Δημιουργός"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Δημιουργήθηκε"
-      }
-    },
-    "USERS":{
-      "PROVIDER":{
-        "LABEL":"Πάροχος"
-      },
-      "ROLE":{
-        "LABEL":"Ρόλος"
-      },
-      "USERNAME":{
-        "LABEL":"Όνομα χρήστη"
-      },
-      "NAME":{
-        "LABEL":"Όνομα"
-      },
-      "USER_DIRECTORY":{
-        "LABEL":"Κατάλογος χρήστη"
-      }
-    },
-    "REVIEW_STATUS":{
-      "UNSENT":"Aόριστο",
-      "UNCONFIRMED":"Ανεπιβεβαίωτη",
-      "CONFIRMED":"Επιβεβαιωμένο"
-    }
-  },
-  "TABLE_SUMMARY":"{{numberOfRows}} γραμμές",
-  "TABLE_NO_RESULT":"Δεν βρέθηκαν αποτελέσματα",
-  "TABLE_LOADING":"Φόρτωση…",
-  "TABLE_EDIT":"Επεξεργασία",
-  "PM":{
-    "BLACKLIST":{
-      "REASONS":{
-        "SICK_LEAVE":"Αναρρωτική άδεια",
-        "LEAVE":"Αποχώρηση",
-        "FAMILY_EMERGENCY":"Οικογενειακή έκτακτη κατάσταση",
-        "CONSTRUCTION":"Κατασκευή"
-      }
-    }
-  },
-  "DASHBOARD":{
-    "RUNNING":"Εκτελείται",
-    "FINISHED":"Ολοκληρώθηκε",
-    "PAUSED":"Paused",
-    "FAILED":"Απέτυχε",
-    "FINISHED_WITH_COMMENTS":"Todo",
-    "SCHEDULED":"Προγραμματισμένη",
-    "RECORDING":"Εγγραφή"
-  }
+   },
+   "DASHBOARD": {
+      "RUNNING": "Εκτελείται",
+      "FINISHED": "Ολοκληρώθηκε",
+      "PAUSED": "Σε παύση",
+      "FAILED": "Απέτυχε",
+      "FINISHED_WITH_COMMENTS": "Todo",
+      "SCHEDULED": "Προγραμματισμένη",
+      "RECORDING": "Εγγραφή"
+   }
 }

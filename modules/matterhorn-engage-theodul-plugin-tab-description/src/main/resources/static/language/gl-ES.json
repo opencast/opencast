@@ -1,13 +1,13 @@
 {
-  "value_locale":"gl",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "title":"Título",
-  "noTitle":"Sen título",
-  "creator":"Creador",
-  "presenter":"Colaborador",
-  "views":"Vistas",
-  "series":"Serie",
-  "recordingDate":"Data de gravación",
-  "description":"Descrición",
-  "noDescriptionAvailable":"Non hai ningunha descrición dispoñible."
+    "value_locale": "gl",
+    "value_dateFormatFull": "D de MMMM de YYYY, h:mm:ss a",
+    "title": "Título",
+    "noTitle": "Sen título",
+    "creator": "Creador",
+    "presenter": "Colaborador",
+    "views": "Vistas",
+    "series": "Serie",
+    "recordingDate": "Data de gravación",
+    "description": "Descrición",
+    "noDescriptionAvailable": "Non hai ningunha descrición dispoñible."
 }

@@ -1,1843 +1,1843 @@
 {
-  "MATTERHORN":"Opencast",
-  "NAV_HOME":"Start",
-  "NAV_ABOUT":"Over",
-  "NO":"Nee",
-  "SUBMIT":"Verzenden",
-  "UPDATE":"Updaten",
-  "CANCEL":"Annuleren",
-  "CONFIRM":"Bevestig",
-  "SAVE":"Opslaan",
-  "LOGOUT":"Afmelden",
-  "RESET":"Terugzetten",
-  "SELECT_NO_OPTIONS":"Geen optie",
-  "YES":"Ja",
-  "LANGUAGES":{
-    "ARABIC":"Arabisch",
-    "DANISH":"Deens",
-    "GERMAN":"Duits",
-    "GERMAN_CH":"Zwitsers Duits",
-    "FINNISH":"Fins",
-    "HINDI":"Hindi",
-    "ITALIAN":"Italiaans",
-    "JAPANESE":"Japans",
-    "DUTCH":"Nederlands",
-    "NORWEGIAN":"Noors",
-    "FRENCH":"Frans",
-    "ENGLISH":"Engels",
-    "SPANISH":"Spaans",
-    "ROMANSH":"Reto-Romaans",
-    "POLISH":"Pools",
-    "PORTUGESE":"Portugees",
-    "SLOVENIAN":"Sloveens",
-    "SWEDISH":"Zweeds",
-    "RUSSIAN":"Russisch",
-    "TURKISH":"Turks",
-    "UKRAINIAN":"Oekraïens",
-    "CHINESE":"Chinees"
-  },
-  "PREFERENCES":{
-    "TABLE":{
-      "CAPTION":"Editeer tabel uitzicht",
-      "SUBHEADING":"Selecteer de standaard data die je afgebeeld wil zien in het {{ tableName }} zicht",
-      "AVAILABLE_COLUMNS":"Beschikbare kolommen",
-      "SELECTED_COLUMNS":"Geselecteerde kolommen",
-      "FOOTER_TEXT":"De volgorde en selectie zal automatisch opgeslagen worden. Druk \"{{resetTranslation}}\" om het standaard zicht te herstellen."
-    }
-  },
-  "CONFIRMATIONS":{
-    "CONTINUE_ACTION":"Weet u zeker dat u wilt doorgaan?",
-    "METADATA":{
-      "NOTICE":{
-        "UNKNOWN":"Het volgende element wordt verwijderd",
-        "EVENT":"Het volgende evenement wordt verwijderd",
-        "SERIES":"De volgende serie wordt verwijderd",
-        "ACL":"De volgende permissie wordt verwijderd",
-        "GROUP":"De volgende groep wordt verwijderd",
-        "USER":"De volgende gebruiker wordt verwijderd",
-        "USER_BLACKLIST":"De volgende zwarte lijst voor gebruikers wordt verwijderd",
-        "THEME":"Het volgende thema wordt verwijderd",
-        "EMAIL":"Het volgende e-mailtemplate wordt verwijderd",
-        "LOCATION":"De volgende locatie wordt verwijderd",
-        "LOCATION_BLACKLIST":"De volgende zwarte lijst voor locaties wordt verwijderd"
-      },
-      "NAME":"Naam"
-    },
-    "ACTIONS":{
-      "CONFIRMATION":"Bevestiging vereist"
-    }
-  },
-  "MEDIAMODULE":"Mediamodule",
-  "HELP":{
-    "HELP":"Help",
-    "USERS_GUIDE":"Gebruikershandleiding",
-    "DOCUMENTATION":"Documentatie",
-    "REST_DOC":"REST API Docs"
-  },
-  "NOTIFICATIONS":{
-    "ACL_ADDED":"Het toegangsbeleid werd aangemaakt",
-    "ACL_NOT_SAVED":"Het toegangsbeleid kon niet opgeslagen worden",
-    "ACL_UPDATED":"Het toegangsbeleid werd aangepast",
-    "ACL_DELETED":"Het toegangsbeleid werd verwijderd",
-    "ACL_NOT_DELETED":"Het toegangsbeleid kon niet verwijderd worden",
-    "USER_ADDED":"De gebruiker werd aangemaakt",
-    "USER_UPDATED":"De gebruiker werd geüpdatet",
-    "USER_NOT_SAVED":"De gebruiker kon niet bewaard worden",
-    "USER_DELETED":"De gebruiker werd verwijderd",
-    "USER_NOT_DELETED":"De gebruiker kon niet verwijderd worden",
-    "USER_NOT_MANAGEABLE":"De gebruiker is niet administreerbaar",
-    "GROUP_ADDED":"De groep werd aangemaakt",
-    "GROUP_CONFLICT":"De gegenereerde groepsnaam bestaat al",
-    "GROUP_UPDATED":"De groep werd geüpdatet",
-    "GROUP_NOT_SAVED":"De groep kon niet bewaard worden",
-    "GROUP_DELETED":"De groep werd verwijderd",
-    "GROUP_NOT_DELETED":"De groep kon niet verwijderd worden",
-    "ACCESS_DENIED":"Toegang geweigerd. Je hebt geen rechten om deze pagina te bekijken",
-    "SERIES_ADDED":"De serie is aangemaakt",
-    "SERIES_NOT_SAVED":"Deze serie kon niet opgeslagen worden",
-    "EVENTS_CREATED":"Het event werd aangemaakt",
-    "EVENTS_UPLOAD_STARTED":"Het event wordt geüpload…",
-    "EVENTS_NOT_CREATED":"Het event kon niet aangemaakt worden",
-    "EVENTS_UPDATED_NB":"{{ number }} evenementen zijn met succes bijgewerkt",
-    "EVENTS_UPDATED_ALL":"Alle evenementen zijn met succes bijgewerkt",
-    "EVENTS_NOT_UPDATED":"Het event kon niet opgeslagen worden",
-    "EVENTS_NOT_UPDATED_ID":"Het event {{ id }} kon niet opgeslagen worden",
-    "EVENTS_NOT_UPDATED_ALL":"Geen van de evenementen konden worden opgeslagen",
-    "EVENTS_PROCESSING_ACTION_RETRY":"Processing being resumed...",
-    "EVENTS_PROCESSING_ACTION_NOT_RETRY":"Processing could not be resumed.",
-    "EVENTS_PROCESSING_ACTION_NONE":"Processing being aborted...",
-    "EVENTS_PROCESSING_ACTION_NOT_NONE":"Processing could not be aborted.",
-    "SERIES_UPDATED_NB":"{{ number }} series zijn met succes bijgewerkt",
-    "SERIES_UPDATED_ALL":"Alle series zijn met succes bijgewerkt",
-    "SERIES_NOT_UPDATED":"De series konden niet opgeslagen worden",
-    "SERIES_NOT_UPDATED_ID":"De series {{ id }} konden niet worden opgeslagen",
-    "SERIES_NOT_UPDATED_ALL":"Geen van de series konden opgeslagen worden",
-    "EVENTS_DELETED":"Het event werd verwijderd",
-    "EVENTS_NOT_DELETED":"Het/De event(s) konden niet verwijderd worden",
-    "SERIES_DELETED":"De serie werd verwijderd",
-    "SERIES_NOT_DELETED":"De serie kon niet verwijderd worden",
-    "USER_BLACKLIST_CREATED":"De zwarte lijst werd aangemaakt",
-    "USER_BLACKLIST_NOT_CREATED":"De zwarte lijst kon niet aangemaakt worden",
-    "USER_BLACKLIST_SAVED":"De zwarte lijst werd opgeslagen",
-    "USER_BLACKLIST_NOT_SAVED":"De zwarte lijst kon niet opgeslagen worden",
-    "USER_BLACKLIST_DELETED":"De zwarte lijst werd verwijderd",
-    "USER_BLACKLIST_NOT_DELETED":"De zwarte lijst kon niet verwijderd worden",
-    "LOCATION_DELETED":"De locatie werd verwijderd",
-    "LOCATION_NOT_DELETED":"De locatie kon niet verwijderd worden",
-    "LOCATION_BLACKLIST_CREATED":"De zwarte lijst werd aangemaakt",
-    "LOCATION_BLACKLIST_NOT_CREATED":"De zwarte lijst kon niet aangemaakt worden",
-    "LOCATION_BLACKLIST_SAVED":"De zwarte lijst werd opgeslagen",
-    "LOCATION_BLACKLIST_NOT_SAVED":"De zwarte lijst kon niet opgeslagen worden",
-    "LOCATION_BLACKLIST_DELETED":"De zwarte lijst werd verwijderd",
-    "LOCATION_BLACKLIST_NOT_DELETED":"De zwarte lijst kon niet verwijderd worden",
-    "EMAIL_TEMPLATE_CREATED":"De sjabloon werd aangemaakt",
-    "EMAIL_TEMPLATE_NOT_CREATED":"De sjabloon kon niet aangemaakt worden",
-    "EMAIL_TEMPLATE_SAVED":"De sjabloon werd opgeslagen",
-    "EMAIL_TEMPLATE_NOT_SAVED":"De sjabloon kon niet opgeslagen worden",
-    "EMAIL_TEMPLATE_DELETED":"De sjabloon werd verwijderd",
-    "EMAIL_TEMPLATE_NOT_DELETED":"De sjabloon kon niet verwijderd worden",
-    "EMAIL_TEMPLATE_NAME_TAKEN":"Deze naam is reeds in gebruik",
-    "EMAIL_SENT":"Het bericht werd verzonden",
-    "EMAIL_NOT_SENT":"Het bericht kon niet verzonden worden",
-    "CONFLICT_DETECTED":"Plannings conflict: het nieuwe event overlapt met een reeds bestaand event. Gelieve de locatie, datum of tijd aan te passen.",
-    "CONFLICT_ALREADY_ENDED":"Planningsfout: het evenement is reeds beëindigd.",
-    "CONFLICT_END_BEFORE_START":"Planningsfout: eindtijd moet later zijn dan het begin.",
-    "INVALID_ACL_RULES":"Regels moeten een geldige rol en lees en / of schrijf rechten hebben.",
-    "MISSING_ACL_RULES":"Ten minste 1 rol met schrijf en lees rechten is vereist!",
-    "SAVED_ACL_RULES":"De toegangsregels zijn opgeslagen.",
-    "SERIES_THEME_REPROCESS_EXISTING_EVENTS":"De bestaande events in deze serie zullen opnieuw verwerkt moeten worden",
-    "SERIES_ACL_LOCKED":"Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een event dat onderdeel is van de serie",
-    "SERIES_ACL_MISSING_READWRITE_ROLE":"Het toegangsbeleid vereist ten minste één rol met machtigingen om te lezen en schrijven.",
-    "EVENT_ACL_MISSING_READWRITE_ROLE":"Het toegangsbeleid vereist ten minste één rol met machtigingen om te lezen en schrijven.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS":"De status van het opt-out evenement is succesvol geüpdatet.",
-    "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR":"Fout tijdens het bijwerken van de status van het opt-out evenement.",
-    "EVENT_PARTICIPATION_STATUS_READONLY":"De participatie-status kan niet worden bijgewerkt als de geplande begindatum in het verleden is.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS":"De status van het opt-out evenement is succesvol geüpdatet.",
-    "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR":"Fout tijdens het bijwerken van de series opt-out status.",
-    "THEME_NAME_ALREADY_TAKEN":"Deze naam is reeds in gebruik",
-    "THEME_NAME_EMPTY":"De naam kan niet leeg zijn",
-    "BUMPER_UPLOAD_ERROR":"Fout tijdens uploaden media",
-    "TRAILER_UPLOAD_ERROR":"Fout tijdens uploaden media",
-    "TITLE_UPLOAD_ERROR":"Fout tijdens uploaden media",
-    "LICENSE_UPLOAD_ERROR":"Fout tijdens uploaden media",
-    "WATERMARK_UPLOAD_ERROR":"Fout tijdens uploaden media",
-    "THEME_UPLOAD_STARTED":"De media wordt geüpload…",
-    "THEME_CREATED":"Het thema werd aangemaakt",
-    "THEME_NOT_CREATED":"Het thema kon niet aangemaakt worden",
-    "THEME_DELETED":"Het thema werd verwijderd",
-    "THEME_NOT_DELETED":"Het thema kon niet verwijderd worden",
-    "TASK_CREATED":"De taak werd aangemaakt",
-    "TASK_NOT_CREATED":"De taak kon niet aangemaakt worden",
-    "VIDEO_CUT_NOT_SAVED":"De bewerkte informatie kon niet worden opgeslagen",
-    "VIDEO_CUT_SAVED":"De bewerkte informatie werd opgeslagen",
-    "VIDEO_CUT_PROCESSING":"De video wordt verwerkt…",
-    "SERVER_UNRESPONSIVE":"Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
-    "SERVICE_UNAVAILABLE":"Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
-    "ACTIVE_TRANSACTION":"This event can not be edited while there is an active workflow or transaction."
-  },
-  "BULK_ACTIONS":{
-    "CAPTION":"Acties",
-    "SEND_MESSAGE":"Stuur bericht",
-    "WARNING":"Let op",
-    "EDIT_STATUS":{
-      "CAPTION":"Status bewerken",
-      "READY_FOR_RECORDING":"Klaar voor opname",
-      "OPTED_OUT":"Uitgeschreven"
-    },
-    "DELETE":{
-      "SERIES":{
-        "CAPTION":"Verwijderen",
-        "BUTTON":"Verwijder"
-      },
-      "EVENTS":{
-        "CAPTION":"Verwijderen",
-        "DELETE_EVENTS":"Events verwijderen",
-        "PUBLISHED":{
-          "NONE":"Geen van de geselecteerde evenementen moeten worden ingetrokken voordat ze kunnen worden verwijderd.",
-          "WARNING":"De evenementen hieronder kunnen niet verwijderd worden aangezien ze al gepubliceerd zijn en deze verwijderen maakt het onmogelijk reeds gepubliceerde bestanden te verwijderen. In plaats daarvan kiest u een workflow hieronder om de gebeurtenissen eerst in te trekken en dan deze te verwijderen."
-        },
-        "RETRACT_EVENTS":"Intrekken van event",
-        "SELECT_RETRACT_TASK":"Selecteer een intrekken taak",
-        "SUMMARY":{
-          "EVENTS_DELETED":"Evenementen die verwijderd worden",
-          "EVENTS_RETRACTED":"Evenementen die ingetrokken worden",
-          "RETRACT_WORKFLOW":"Workflow om evenementen in te trekken"
-        },
-        "UNPUBLISHED":{
-          "NONE":"Geen van de geselecteerde gebeurtenissen kunnen worden verwijderd zonder het achterlaten van niet-gekoppelde bestanden."
-        },
-        "BUTTON":"Verwijder"
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Start",
+   "NAV_ABOUT": "Over",
+   "NO": "Nee",
+   "SUBMIT": "Verzenden",
+   "UPDATE": "Updaten",
+   "CANCEL": "Annuleren",
+   "CONFIRM": "Bevestig",
+   "SAVE": "Opslaan",
+   "LOGOUT": "Afmelden",
+   "RESET": "Terugzetten",
+   "SELECT_NO_OPTIONS": "Geen optie",
+   "YES": "Ja",
+   "LANGUAGES": {
+      "ARABIC": "Arabisch",
+      "DANISH": "Deens",
+      "GERMAN": "Duits",
+      "GERMAN_CH": "Zwitsers Duits",
+      "FINNISH": "Fins",
+      "HINDI": "Hindi",
+      "ITALIAN": "Italiaans",
+      "JAPANESE": "Japans",
+      "DUTCH": "Nederlands",
+      "NORWEGIAN": "Noors",
+      "FRENCH": "Frans",
+      "ENGLISH": "Engels",
+      "SPANISH": "Spaans",
+      "ROMANSH": "Reto-Romaans",
+      "POLISH": "Pools",
+      "PORTUGESE": "Portugees",
+      "SLOVENIAN": "Sloveens",
+      "SWEDISH": "Zweeds",
+      "RUSSIAN": "Russisch",
+      "TURKISH": "Turks",
+      "UKRAINIAN": "Oekraïens",
+      "CHINESE": "Chinees"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "Editeer tabel uitzicht",
+         "SUBHEADING": "Selecteer de standaard data die je afgebeeld wil zien in het {{ tableName }} zicht",
+         "AVAILABLE_COLUMNS": "Beschikbare kolommen",
+         "SELECTED_COLUMNS": "Geselecteerde kolommen",
+         "FOOTER_TEXT": "De volgorde en selectie zal automatisch opgeslagen worden. Druk \"{{resetTranslation}}\" om het standaard zicht te herstellen."
       }
-    },
-    "DELETE_EVENTS_WARNING_LINE1":"Eens verwijderd zijn alle event metadata, audio en video bestanden verwijderd en niet recupereerbaar.",
-    "DELETE_EVENTS_WARNING_LINE2":"",
-    "DELETE_SERIES_WARNING_LINE1":"Eens verwijderd is alle serie metadata niet recupereerbaar. Events in de serie zullen niet verwijderd worden.",
-    "DELETE_SERIES_WARNING_LINE2":"",
-    "SCHEDULE_TASK":{
-      "CAPTION":"Begin taak",
-      "GENERAL":{
-        "CAPTION":"Algemeen",
-        "SUMMARY":"({{ count }} events geselecteerd)",
-        "CANNOTSTART":"De gemarkeerde events kunnen momenteel niet verwerkt worden. Verwijder ze uit de selectie of probeer het later opnieuw."
+   },
+   "CONFIRMATIONS": {
+      "CONTINUE_ACTION": "Weet u zeker dat u wilt doorgaan?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Het volgende element wordt verwijderd",
+            "EVENT": "Het volgende evenement wordt verwijderd",
+            "SERIES": "De volgende serie wordt verwijderd",
+            "ACL": "De volgende permissie wordt verwijderd",
+            "GROUP": "De volgende groep wordt verwijderd",
+            "USER": "De volgende gebruiker wordt verwijderd",
+            "USER_BLACKLIST": "De volgende zwarte lijst voor gebruikers wordt verwijderd",
+            "THEME": "Het volgende thema wordt verwijderd",
+            "EMAIL": "Het volgende e-mailtemplate wordt verwijderd",
+            "LOCATION": "De volgende locatie wordt verwijderd",
+            "LOCATION_BLACKLIST": "De volgende zwarte lijst voor locaties wordt verwijderd"
+         },
+         "NAME": "Naam"
       },
-      "TASKS":{
-        "CAPTION":"Taken",
-        "SELECT":"Selecteer taken"
-      },
-      "SUMMARY":{
-        "CAPTION":"Samenvatting",
-        "EVENTS":"Evenementen",
-        "EVENTS_SUMMARY":"Je hebt {{numberOfEvents}} events geselecteerd",
-        "CONFIGURATION":"Configuratie",
-        "WORKFLOW":"Taak"
+      "ACTIONS": {
+         "CONFIRMATION": "Bevestiging vereist"
       }
-    }
-  },
-  "DATES":{
-    "TODAY":"Vandaag",
-    "TOMORROW":"Morgen",
-    "YESTERDAY":"Gisteren"
-  },
-  "DATETIMES":{
-    "TODAY":"Vandaag om {{ time }}",
-    "TOMORROW":"Morgen om {{ time }}",
-    "YESTERDAY":"Gisteren om {{ time }}"
-  },
-  "WIZARD":{
-    "NEXT_STEP":"Volgende",
-    "BACK":"Vorige",
-    "CREATE":"Creëer",
-    "RETRACT":"Intrekken",
-    "UPDATE":"Updaten",
-    "DURATION":{
-      "HOURS":"Uren",
-      "MINUTES":"Minuten"
-    }
-  },
-  "CAPTURE_AGENT":{
-    "DEVICE":{
-      "MICROPHONE":"Microfoon",
-      "CAMERA":"Camera",
-      "PRESENTATION":"Presentatie"
-    }
-  },
-  "NAV":{
-    "DASHBOARD":{
-      "TITLE":"Dashboard"
-    },
-    "EVENTS":{
-      "TITLE":"Opnames"
-    },
-    "SYSTEMS":{
-      "TITLE":"Systemen"
-    },
-    "CAPTUREAGENTS":{
-      "TITLE":"Opnemen"
-    },
-    "USERS":{
-      "TITLE":"Organisatie"
-    },
-    "INTEGRATIONS":{
-      "TITLE":"Integraties"
-    },
-    "CONFIGURATION":{
-      "TITLE":"Configuratie"
-    }
-  },
-  "EVENTS":{
-    "RETRACT":{
-      "CAPTION":"Intrekken van event",
-      "ID":"ID",
-      "SELECT_TASK":"Selecteer taak",
-      "SUMMARY":"Samenvatting",
-      "WARNING":"Dit evenement is gepubliceerd op ten minste één publicatie kanaal dus het moet worden ingetrokken voordat het kan worden verwijderd. Kies uit de onderstaande taken om de bestaande publicaties in te trekken."
-    },
-    "LICENSE":{
-      "ALLRIGHTS":"Alle rechten voorbehouden",
-      "CCBY":"CC BY",
-      "CCBYSA":"CC BY-SA",
-      "CCBYND":"CC BY-ND",
-      "CCBYNC":"CC BY-NC",
-      "CCBYNCSA":"CC BY-NC-SA",
-      "CCBYNCND":"CC BY-NC-ND",
-      "CC0":"CC0",
-      "BSD":"BSD",
-      "CCND":"CCND",
-      "GPL":"GPL"
-    },
-    "SEND_MESSAGE":{
-      "CAPTION":"Stuur bericht",
-      "TABS":{
-        "RECIPIENTS":"Ontvangers",
-        "MESSAGE":"Bericht",
-        "SUMMARY":"Samenvatting"
+   },
+   "MEDIAMODULE": "Mediamodule",
+   "HELP": {
+      "HELP": "Hulp",
+      "USERS_GUIDE": "Gebruikershandleiding",
+      "DOCUMENTATION": "Documentatie",
+      "REST_DOC": "REST API documentatie"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Het toegangsbeleid werd aangemaakt",
+      "ACL_NOT_SAVED": "Het toegangsbeleid kon niet opgeslagen worden",
+      "ACL_UPDATED": "Het toegangsbeleid werd aangepast",
+      "ACL_DELETED": "Het toegangsbeleid werd verwijderd",
+      "ACL_NOT_DELETED": "Het toegangsbeleid kon niet verwijderd worden",
+      "USER_ADDED": "De gebruiker werd aangemaakt",
+      "USER_UPDATED": "De gebruiker werd geüpdatet",
+      "USER_NOT_SAVED": "De gebruiker kon niet bewaard worden",
+      "USER_DELETED": "De gebruiker werd verwijderd",
+      "USER_NOT_DELETED": "De gebruiker kon niet verwijderd worden",
+      "USER_NOT_MANAGEABLE": "De gebruiker is niet administreerbaar",
+      "GROUP_ADDED": "De groep werd aangemaakt",
+      "GROUP_CONFLICT": "De gegenereerde groepsnaam bestaat al",
+      "GROUP_UPDATED": "De groep werd geüpdatet",
+      "GROUP_NOT_SAVED": "De groep kon niet bewaard worden",
+      "GROUP_DELETED": "De groep werd verwijderd",
+      "GROUP_NOT_DELETED": "De groep kon niet verwijderd worden",
+      "ACCESS_DENIED": "Toegang geweigerd. Je hebt geen rechten om deze pagina te bekijken",
+      "SERIES_ADDED": "De serie is aangemaakt",
+      "SERIES_NOT_SAVED": "Deze serie kon niet opgeslagen worden",
+      "EVENTS_CREATED": "Het event werd aangemaakt",
+      "EVENTS_UPLOAD_STARTED": "Het event wordt geüpload…",
+      "EVENTS_NOT_CREATED": "Het event kon niet aangemaakt worden",
+      "EVENTS_UPDATED_NB": "{{ number }} evenementen zijn met succes bijgewerkt",
+      "EVENTS_UPDATED_ALL": "Alle evenementen zijn met succes bijgewerkt",
+      "EVENTS_NOT_UPDATED": "Het event kon niet opgeslagen worden",
+      "EVENTS_NOT_UPDATED_ID": "Het event {{ id }} kon niet opgeslagen worden",
+      "EVENTS_NOT_UPDATED_ALL": "Geen van de evenementen konden worden opgeslagen",
+      "EVENTS_PROCESSING_ACTION_RETRY": "De verwerking wordt hervat...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Verwerking kon niet worden hervat.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Verwerking wordt afgebroken...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Verwerking kon niet worden afgebroken.",
+      "SERIES_UPDATED_NB": "{{ number }} series zijn met succes bijgewerkt",
+      "SERIES_UPDATED_ALL": "Alle series zijn met succes bijgewerkt",
+      "SERIES_NOT_UPDATED": "De series konden niet opgeslagen worden",
+      "SERIES_NOT_UPDATED_ID": "De series {{ id }} konden niet worden opgeslagen",
+      "SERIES_NOT_UPDATED_ALL": "Geen van de series konden opgeslagen worden",
+      "EVENTS_DELETED": "Het event werd verwijderd",
+      "EVENTS_NOT_DELETED": "Het/De event(s) konden niet verwijderd worden",
+      "SERIES_DELETED": "De serie werd verwijderd",
+      "SERIES_NOT_DELETED": "De serie kon niet verwijderd worden",
+      "USER_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
+      "USER_BLACKLIST_NOT_CREATED": "De zwarte lijst kon niet aangemaakt worden",
+      "USER_BLACKLIST_SAVED": "De zwarte lijst werd opgeslagen",
+      "USER_BLACKLIST_NOT_SAVED": "De zwarte lijst kon niet opgeslagen worden",
+      "USER_BLACKLIST_DELETED": "De zwarte lijst werd verwijderd",
+      "USER_BLACKLIST_NOT_DELETED": "De zwarte lijst kon niet verwijderd worden",
+      "LOCATION_DELETED": "De locatie werd verwijderd",
+      "LOCATION_NOT_DELETED": "De locatie kon niet verwijderd worden",
+      "LOCATION_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
+      "LOCATION_BLACKLIST_NOT_CREATED": "De zwarte lijst kon niet aangemaakt worden",
+      "LOCATION_BLACKLIST_SAVED": "De zwarte lijst werd opgeslagen",
+      "LOCATION_BLACKLIST_NOT_SAVED": "De zwarte lijst kon niet opgeslagen worden",
+      "LOCATION_BLACKLIST_DELETED": "De zwarte lijst werd verwijderd",
+      "LOCATION_BLACKLIST_NOT_DELETED": "De zwarte lijst kon niet verwijderd worden",
+      "EMAIL_TEMPLATE_CREATED": "De sjabloon werd aangemaakt",
+      "EMAIL_TEMPLATE_NOT_CREATED": "De sjabloon kon niet aangemaakt worden",
+      "EMAIL_TEMPLATE_SAVED": "De sjabloon werd opgeslagen",
+      "EMAIL_TEMPLATE_NOT_SAVED": "De sjabloon kon niet opgeslagen worden",
+      "EMAIL_TEMPLATE_DELETED": "De sjabloon werd verwijderd",
+      "EMAIL_TEMPLATE_NOT_DELETED": "De sjabloon kon niet verwijderd worden",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Deze naam is reeds in gebruik",
+      "EMAIL_SENT": "Het bericht werd verzonden",
+      "EMAIL_NOT_SENT": "Het bericht kon niet verzonden worden",
+      "CONFLICT_DETECTED": "Plannings conflict: het nieuwe event overlapt met een reeds bestaand event. Gelieve de locatie, datum of tijd aan te passen.",
+      "CONFLICT_ALREADY_ENDED": "Planningsfout: het evenement is reeds beëindigd.",
+      "CONFLICT_END_BEFORE_START": "Planningsfout: eindtijd moet later zijn dan het begin.",
+      "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees en / of schrijf rechten hebben.",
+      "MISSING_ACL_RULES": "Ten minste 1 rol met schrijf en lees rechten is vereist!",
+      "SAVED_ACL_RULES": "De toegangsregels zijn opgeslagen.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "De bestaande events in deze serie zullen opnieuw verwerkt moeten worden",
+      "SERIES_ACL_LOCKED": "Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een event dat onderdeel is van de serie",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Het toegangsbeleid vereist ten minste één rol met machtigingen om te lezen en schrijven.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Het toegangsbeleid vereist ten minste één rol met machtigingen om te lezen en schrijven.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "De status van het opt-out evenement is succesvol geüpdatet.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Fout tijdens het bijwerken van de status van het opt-out evenement.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "De participatie-status kan niet worden bijgewerkt als de geplande begindatum in het verleden is.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "De status van het opt-out evenement is succesvol geüpdatet.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Fout tijdens het bijwerken van de series opt-out status.",
+      "THEME_NAME_ALREADY_TAKEN": "Deze naam is reeds in gebruik",
+      "THEME_NAME_EMPTY": "De naam kan niet leeg zijn",
+      "BUMPER_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "TRAILER_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "TITLE_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "LICENSE_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "WATERMARK_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "THEME_UPLOAD_STARTED": "De media wordt geüpload…",
+      "THEME_CREATED": "Het thema werd aangemaakt",
+      "THEME_NOT_CREATED": "Het thema kon niet aangemaakt worden",
+      "THEME_DELETED": "Het thema werd verwijderd",
+      "THEME_NOT_DELETED": "Het thema kon niet verwijderd worden",
+      "TASK_CREATED": "De taak werd aangemaakt",
+      "TASK_NOT_CREATED": "De taak kon niet aangemaakt worden",
+      "VIDEO_CUT_NOT_SAVED": "De bewerkte informatie kon niet worden opgeslagen",
+      "VIDEO_CUT_SAVED": "De bewerkte informatie werd opgeslagen",
+      "VIDEO_CUT_PROCESSING": "De video wordt verwerkt…",
+      "SERVER_UNRESPONSIVE": "Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
+      "SERVICE_UNAVAILABLE": "Oops! De server lijkt momenteel niet te reageren. Gelieve het later nogmaals te proberen.",
+      "ACTIVE_TRANSACTION": "Het huidige evenement kan momenteel niet worden bewerkt aangezien het bij een actieve transactie betrokken is."
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Acties",
+      "SEND_MESSAGE": "Stuur bericht",
+      "WARNING": "Let op",
+      "EDIT_STATUS": {
+         "CAPTION": "Status bewerken",
+         "READY_FOR_RECORDING": "Klaar voor opname",
+         "OPTED_OUT": "Uitgeschreven"
       },
-      "RECIPIENTS":{
-        "AUDIT_TRAIL_CAPTION":"Aan auditspoor toevoegen",
-        "AUDIT_TRAIL_DESCRIPTION":"Markeer om het bericht aan het auditspoor toe te voegen",
-        "AUDIT_TRAIL_LABEL":""
-      },
-      "MESSAGE":{
-        "EMAIL_TEMPLATE":"Selecteer email sjabloon",
-        "SUBJECT":"Onderwerp",
-        "MESSAGE":"Bericht",
-        "INCLUDE_SIGNATURE":"Voeg mijn handtekening toe aan de email"
-      },
-      "SUMMARY":{
-        "MESSAGE_SUMMARY":"Samenvatting"
-      }
-    },
-    "EVENTS":{
-      "NEW":{
-        "CAPTION":"Creëer event",
-        "METADATA":{
-          "CAPTION":"Metadata"
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Uitgebreide metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Uitgebreide metadata"
-          }
-        },
-        "SOURCE":{
-          "CAPTION":"Bron",
-          "SELECT_SOURCE":"Selecteer bron",
-          "PLACEHOLDER":{
-            "LOCATION":"Locatie",
-            "INPUTS":"Ingangen",
-            "HOUR":"Uur",
-            "MINUTE":"Minuut",
-            "REPEATS":"Herhaalt",
-            "START_DATE":"yyyy-mm-dd",
-            "START_DATE_FORMAT":"yyyy-mm-dd",
-            "END_DATE":"yyyy-mm-dd",
-            "END_DATE_FORMAT":"yyyy-mm-dd"
-          },
-          "UPLOAD":{
-            "CAPTION":"Upload",
-            "RECORDING_ELEMENTS":"Opname elementen",
-            "RECORDING_METADATA":"Recording metadata",
-            "SEGMENTABLE":{
-              "SHORT":"Slides",
-              "DETAIL":"Het bestand bevat een opname van dia-presentaties ( Keynote, Powerpoint, etc.)."
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "Verwijderen",
+            "BUTTON": "Verwijder"
+         },
+         "EVENTS": {
+            "CAPTION": "Verwijderen",
+            "DELETE_EVENTS": "Events verwijderen",
+            "PUBLISHED": {
+               "NONE": "Geen van de geselecteerde evenementen moeten worden ingetrokken voordat ze kunnen worden verwijderd.",
+               "WARNING": "De evenementen hieronder kunnen niet verwijderd worden aangezien ze al gepubliceerd zijn en deze verwijderen maakt het onmogelijk reeds gepubliceerde bestanden te verwijderen. In plaats daarvan kiest u een workflow hieronder om de gebeurtenissen eerst in te trekken en dan deze te verwijderen."
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Presentator",
-              "DETAIL":"Het bestand bevat de opname van een persoon die een publiek aanspreekt."
+            "RETRACT_EVENTS": "Intrekken van event",
+            "SELECT_RETRACT_TASK": "Selecteer een intrekken taak",
+            "SUMMARY": {
+               "EVENTS_DELETED": "Evenementen die verwijderd worden",
+               "EVENTS_RETRACTED": "Evenementen die ingetrokken worden",
+               "RETRACT_WORKFLOW": "Workflow om evenementen in te trekken"
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Alleen audio",
-              "DETAIL":"Het bestand bevat enkel audio."
+            "UNPUBLISHED": {
+               "NONE": "Geen van de geselecteerde gebeurtenissen kunnen worden verwijderd zonder het achterlaten van niet-gekoppelde bestanden."
             },
-            "MULTIPLE_PARTS":{
-              "SHORT":"Multiple parts",
-              "DETAIL":"A set of files containing different parts of the event."
-            }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Programma",
-            "START_DATE":"Startdatum",
-            "START_TIME":"Starttijd",
-            "TIMEZONE":"Tijdzone",
-            "END_DATE":"Einddatum",
-            "DURATION":"Duur"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Enkel event inplannen"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Meerdere events inplannen",
-            "REPEATS":"Herhaalt",
-            "REPEAT_ON":"Herhalen op",
-            "WEEKDAYS":"Weekdagen"
-          },
-          "NO_SOURCE_AVAILABLE":"No capture agents available for scheduling"
-        },
-        "PROCESSING":{
-          "CAPTION":"In verwerking",
-          "SELECT_WORKFLOW":"Selecteer workflow",
-          "SELECT_WORKFLOW_EMPTY":"Geen workflow gevonden",
-          "WORKFLOW":"Workflow"
-        },
-        "UPLOAD_ASSET":{
-          "CAPTION":"Asset Upload",
-          "SELECT_TYPE":"Select asset type",
-          "ADD":"Add Asset",
-          "OPTION":{
-            "CLASS_HANDOUT_NOTES":"Class handout notes",
-            "CAPTIONS_DFXP":"Captions DFXP",
-            "CAPTIONS_WEBVTT":"Captions WebVTT",
-            "PREVIEW_IMAGE":"Preview image",
-            "SMIL":"Smil catalog",
-            "TRACK_PARTS":"Track parts"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "POLICY":"Toegangspolicy",
-          "ACL":"Toegangspolicy"
-        },
-        "SUMMARY":{
-          "CAPTION":"Samenvatting"
-        },
-        "WEEKDAYS":{
-          "MO":"Ma",
-          "TU":"Di",
-          "WE":"Woe",
-          "TH":"Do",
-          "FR":"Vr",
-          "SA":"Za",
-          "SU":"Zo"
-        }
+            "BUTTON": "Verwijder"
+         }
       },
-      "NAVIGATION":{
-        "EVENTS":"Evenementen",
-        "SERIES":"Reeks",
-        "OVERVIEW":"Overzicht"
+      "DELETE_EVENTS_WARNING_LINE1": "Eens verwijderd zijn alle event metadata, audio en video bestanden verwijderd en niet recupereerbaar.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Eens verwijderd is alle serie metadata niet recupereerbaar. Events in de serie zullen niet verwijderd worden.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Begin taak",
+         "GENERAL": {
+            "CAPTION": "Algemeen",
+            "SUMMARY": "({{ count }} events geselecteerd)",
+            "CANNOTSTART": "De gemarkeerde events kunnen momenteel niet verwerkt worden. Verwijder ze uit de selectie of probeer het later opnieuw."
+         },
+         "TASKS": {
+            "CAPTION": "Taken",
+            "SELECT": "Selecteer taken"
+         },
+         "SUMMARY": {
+            "CAPTION": "Samenvatting",
+            "EVENTS": "Evenementen",
+            "EVENTS_SUMMARY": "Je hebt {{numberOfEvents}} events geselecteerd",
+            "CONFIGURATION": "Configuratie",
+            "WORKFLOW": "Taak"
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Vandaag",
+      "TOMORROW": "Morgen",
+      "YESTERDAY": "Gisteren"
+   },
+   "DATETIMES": {
+      "TODAY": "Vandaag om {{ time }}",
+      "TOMORROW": "Morgen om {{ time }}",
+      "YESTERDAY": "Gisteren om {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Volgende",
+      "BACK": "Vorige",
+      "CREATE": "Creëer",
+      "RETRACT": "Intrekken",
+      "UPDATE": "Updaten",
+      "DURATION": {
+         "HOURS": "Uren",
+         "MINUTES": "Minuten"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Microfoon",
+         "CAMERA": "Camera",
+         "PRESENTATION": "Presentatie"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Dashboard"
       },
-      "UPLOAD":"Uploaden",
-      "ADD_SERIES":"Reeks toevoegen",
-      "ADD_EVENT":"Event toevoegen",
-      "TABLE":{
-        "CAPTION":"Evenementen",
-        "CREATORS":"Auteurs",
-        "TITLE":"Titel",
-        "PRESENTERS":"Presentator(en)",
-        "SERIES":"Reeks",
-        "DATE":"Datum",
-        "START":"Start",
-        "STOP":"Stop",
-        "STATUS":"Status",
-        "LOCATION":"Locatie",
-        "ACTION":"Acties",
-        "FIRST":"Eerste",
-        "LAST":"Laatste",
-        "NEXT":"Volgende",
-        "MANAGED_ACL":"Toegangspolicy",
-        "SCHEDULING_STATUS":"Status",
-        "WORKFLOW_STATE":"Vooruitgang",
-        "REVIEW_STATUS":"Status nakijken",
-        "PREVIOUS":"Vorige",
-        "NOCONTENT":"Geen gegevens beschikbaar",
-        "PUBLISHED":"Gepubliceerd"
+      "EVENTS": {
+         "TITLE": "Opnames"
       },
-      "SCHEDULING_STATUS":{
-        "READY_FOR_RECORDING":"Klaar voor opname",
-        "BLACKLISTED":"Op de zwarte lijst",
-        "OPTED_OUT":"Uitgeschreven"
+      "SYSTEMS": {
+         "TITLE": "Systemen"
       },
-      "STATUS":{
-        "SCHEDULED":"Gepland",
-        "OPTEDOUT":"Opted out",
-        "BLACKLISTED":"Op de zwarte lijst",
-        "RECORDING":"Opnemen",
-        "UPLOADING":"Uploading",
-        "INGESTING":"Ingesting",
-        "PENDING":"In behandeling",
-        "PROCESSING":"In uitvoering",
-        "PAUSED":"Gepauseerd",
-        "PROCESSED":"Voltooid",
-        "RECORDING_FAILURE":"Opname mislukking",
-        "PROCESSING_FAILURE":"Verwerking mislukt",
-        "PROCESSING_CANCELED":"Verwerking geannuleerd"
+      "CAPTUREAGENTS": {
+         "TITLE": "Opnemen"
       },
-      "DETAILS":{
-        "HEADER":"Details van evenement {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Algemeen",
-          "METADATA":"Metadata",
-          "EXTENDED-METADATA":"Metadata II",
-          "ASSETS":"Assets",
-          "SCHEDULING":"Planning",
-          "WORKFLOWS":"Werkstromen",
-          "ACCESS":"Toegangspolicy",
-          "COMMENTS":"Commentaren"
-        },
-        "GENERAL":{
-          "PUBLICATION_STATUS":"Publicatiestatus",
-          "NO_PUBLICATIONS_AVAILABLE":"This event has no publications",
-          "SCHEDULING_STATUS":"Status",
-          "READY_FOR_RECORDING":"Klaar voor opname",
-          "OPTED_OUT":"Uitgeschreven",
-          "CUSTOM":"Aangepast",
-          "ENGAGE":"Engage",
-          "EXTERNAL_API":"Publicatie van de externe API",
-          "YOUTUBE":"Youtube",
-          "OAIPMH":"OAI-PMH",
-          "SELECT_WORKFLOW":"Selecteer workflow",
-          "SELECT_WORKFLOW_EMPTY":"Geen workflows beschikbaar"
-        },
-        "MEDIA":{
-          "TRIM_MEDIA":"Media afknippen",
-          "MEDIA":"Media",
-          "ID":"ID",
-          "TYPE":"Type",
-          "MIMETYPE":"Mimetype",
-          "URL":"URL",
-          "DETAILS":"Details"
-        },
-        "ATTACHMENTS":{
-          "CAPTION":"Bijlagen",
-          "ID":"Id",
-          "TYPE":"Type",
-          "MIMETYPE":"Mimetype",
-          "TAGS":"Tags",
-          "LINK":"Link"
-        },
-        "SOURCE":{
-          "CAPTION":"Bron",
-          "SELECT_SOURCE":"Selecteer bron",
-          "PLACEHOLDER":{
-            "LOCATION":"Locatie",
-            "INPUTS":"Ingangen",
-            "HOUR":"Uur",
-            "MINUTE":"Minuut",
-            "REPEATS":"Herhaalt",
-            "START_DATE":"yyyy-mm-dd",
-            "END_DATE":"yyyy-mm-dd"
-          },
-          "UPLOAD":{
-            "CAPTION":"Upload",
-            "RECORDING_ELEMENTS":"Opname elementen",
-            "SEGMENTABLE":{
-              "SHORT":"Slides",
-              "DETAIL":"Het bestand bevat een opname van dia-presentaties ( Keynote, Powerpoint, etc.)."
+      "USERS": {
+         "TITLE": "Organisatie"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Integraties"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Configuratie"
+      }
+   },
+   "EVENTS": {
+      "RETRACT": {
+         "CAPTION": "Intrekken van event",
+         "ID": "ID",
+         "SELECT_TASK": "Selecteer taak",
+         "SUMMARY": "Samenvatting",
+         "WARNING": "Dit evenement is gepubliceerd op ten minste één publicatie kanaal dus het moet worden ingetrokken voordat het kan worden verwijderd. Kies uit de onderstaande taken om de bestaande publicaties in te trekken."
+      },
+      "LICENSE": {
+         "ALLRIGHTS": "Alle rechten voorbehouden",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Stuur bericht",
+         "TABS": {
+            "RECIPIENTS": "Ontvangers",
+            "MESSAGE": "Bericht",
+            "SUMMARY": "Samenvatting"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Aan auditspoor toevoegen",
+            "AUDIT_TRAIL_DESCRIPTION": "Markeer om het bericht aan het auditspoor toe te voegen",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Selecteer email sjabloon",
+            "SUBJECT": "Onderwerp",
+            "MESSAGE": "Bericht",
+            "INCLUDE_SIGNATURE": "Voeg mijn handtekening toe aan de email"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Samenvatting"
+         }
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Creëer event",
+            "METADATA": {
+               "CAPTION": "Metadata"
             },
-            "NON_SEGMENTABLE":{
-              "SHORT":"Presentator",
-              "DETAIL":"Het bestand bevat de opname van een persoon die een publiek aanspreekt."
+            "METADATA_EXTENDED": {
+               "CAPTION": "Uitgebreide metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Uitgebreide metadata"
+               }
             },
-            "AUDIO_ONLY":{
-              "SHORT":"Alleen audio",
-              "DETAIL":"Het bestand bevat enkel audio."
+            "SOURCE": {
+               "CAPTION": "Bron",
+               "SELECT_SOURCE": "Selecteer bron",
+               "PLACEHOLDER": {
+                  "LOCATION": "Locatie",
+                  "INPUTS": "Ingangen",
+                  "HOUR": "Uur",
+                  "MINUTE": "Minuut",
+                  "REPEATS": "Herhaalt",
+                  "START_DATE": "jjjj-mm-dd",
+                  "START_DATE_FORMAT": "jjjj-mm-dd",
+                  "END_DATE": "jjjj-mm-dd",
+                  "END_DATE_FORMAT": "jjjj-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Upload",
+                  "RECORDING_ELEMENTS": "Opname elementen",
+                  "RECORDING_METADATA": "Opname metadata",
+                  "SEGMENTABLE": {
+                     "SHORT": "Slides",
+                     "DETAIL": "Het bestand bevat een opname van dia-presentaties ( Keynote, Powerpoint, etc.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Presentator",
+                     "DETAIL": "Het bestand bevat de opname van een persoon die een publiek aanspreekt."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Alleen audio",
+                     "DETAIL": "Het bestand bevat enkel audio."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Meerdere delen",
+                     "DETAIL": "Een set bestanden met verschillende delen van het evenement."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Programma",
+                  "START_DATE": "Startdatum",
+                  "START_TIME": "Starttijd",
+                  "TIMEZONE": "Tijdzone",
+                  "END_DATE": "Einddatum",
+                  "DURATION": "Duur"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Enkel event inplannen"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Meerdere events inplannen",
+                  "REPEATS": "Herhaalt",
+                  "REPEAT_ON": "Herhalen op",
+                  "WEEKDAYS": "Weekdagen"
+               },
+               "NO_SOURCE_AVAILABLE": "Geen opname toestellen beschikbaar voor het plannen"
+            },
+            "PROCESSING": {
+               "CAPTION": "In verwerking",
+               "SELECT_WORKFLOW": "Selecteer workflow",
+               "SELECT_WORKFLOW_EMPTY": "Geen workflow gevonden",
+               "WORKFLOW": "Werkstroom"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Asset upload",
+               "SELECT_TYPE": "Selecteer asset type",
+               "ADD": "Asset toevoegen",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Hand-out aantekeningen",
+                  "CAPTIONS_DFXP": "Ondertitels DFXP",
+                  "CAPTIONS_WEBVTT": "Ondertitels WebVTT",
+                  "PREVIEW_IMAGE": "Afbeelding voor voorvertoning",
+                  "SMIL": "Smil catalogus",
+                  "TRACK_PARTS": "Bijhouden van onderdelen"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "POLICY": "Toegangspolicy",
+               "ACL": "Toegangspolicy"
+            },
+            "SUMMARY": {
+               "CAPTION": "Samenvatting"
+            },
+            "WEEKDAYS": {
+               "MO": "Ma",
+               "TU": "Di",
+               "WE": "Woe",
+               "TH": "Do",
+               "FR": "Vr",
+               "SA": "Za",
+               "SU": "Zo"
             }
-          },
-          "DATE_TIME":{
-            "CAPTION":"Programma",
-            "START_DATE":"Startdatum",
-            "START_TIME":"Starttijd",
-            "TIMEZONE":"Tijdzone",
-            "END_DATE":"Einddatum",
-            "DURATION":"Duur"
-          },
-          "SCHEDULE_SINGLE":{
-            "CAPTION":"Enkel event inplannen"
-          },
-          "SCHEDULE_MULTIPLE":{
-            "CAPTION":"Meerdere events inplannen",
-            "REPEATS":"Herhaalt",
-            "REPEAT_ON":"Herhalen op",
-            "WEEKDAYS":"Weekdagen"
-          }
-        },
-        "ASSETS":{
-          "CAPTION":"Assets",
-          "TYPE":"Type",
-          "SIZE":"Grootte",
-          "DETAILS":"Details",
-          "ATTACHMENTS":{
-            "TITLE":"Bijlagen",
-            "CAPTION":"Bijlagen",
-            "ID":"Id",
-            "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
-            "DETAILS":{
-              "TITLE":"Bijlage details",
-              "CAPTION":"Bijlage details",
-              "ID":"Id",
-              "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
-              "URL":"URL",
-              "SIZE":"Grootte",
-              "CHECKSUM":"Checksum",
-              "REFERENCE":"Referentie"
+         },
+         "NAVIGATION": {
+            "EVENTS": "Evenementen",
+            "SERIES": "Reeks",
+            "OVERVIEW": "Overzicht"
+         },
+         "UPLOAD": "Uploaden",
+         "ADD_SERIES": "Reeks toevoegen",
+         "ADD_EVENT": "Event toevoegen",
+         "TABLE": {
+            "CAPTION": "Evenementen",
+            "CREATORS": "Auteurs",
+            "TITLE": "Titel",
+            "PRESENTERS": "Presentator(en)",
+            "SERIES": "Reeks",
+            "DATE": "Datum",
+            "START": "Start",
+            "STOP": "Stop",
+            "STATUS": "Status",
+            "LOCATION": "Locatie",
+            "ACTION": "Acties",
+            "FIRST": "Eerste",
+            "LAST": "Laatste",
+            "NEXT": "Volgende",
+            "MANAGED_ACL": "Toegangspolicy",
+            "SCHEDULING_STATUS": "Status",
+            "WORKFLOW_STATE": "Vooruitgang",
+            "REVIEW_STATUS": "Status nakijken",
+            "PREVIOUS": "Vorige",
+            "NOCONTENT": "Geen gegevens beschikbaar",
+            "PUBLISHED": "Gepubliceerd"
+         },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Klaar voor opname",
+            "BLACKLISTED": "Op de zwarte lijst",
+            "OPTED_OUT": "Uitgeschreven"
+         },
+         "STATUS": {
+            "SCHEDULED": "Gepland",
+            "OPTEDOUT": "Opted out",
+            "BLACKLISTED": "Op de zwarte lijst",
+            "RECORDING": "Opnemen",
+            "UPLOADING": "Uploaden",
+            "INGESTING": "Ingesting",
+            "PENDING": "In behandeling",
+            "PROCESSING": "In uitvoering",
+            "PAUSED": "Gepauseerd",
+            "PROCESSED": "Voltooid",
+            "RECORDING_FAILURE": "Opname mislukking",
+            "PROCESSING_FAILURE": "Verwerking mislukt",
+            "PROCESSING_CANCELED": "Verwerking geannuleerd"
+         },
+         "DETAILS": {
+            "HEADER": "Details van evenement {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Algemeen",
+               "METADATA": "Metadata",
+               "EXTENDED-METADATA": "Metadata II",
+               "ASSETS": "Assets",
+               "SCHEDULING": "Planning",
+               "WORKFLOWS": "Werkstromen",
+               "ACCESS": "Toegangspolicy",
+               "COMMENTS": "Commentaren"
+            },
+            "GENERAL": {
+               "PUBLICATION_STATUS": "Publicatiestatus",
+               "NO_PUBLICATIONS_AVAILABLE": "Deze gebeurtenis heeft geen publicaties",
+               "SCHEDULING_STATUS": "Status",
+               "READY_FOR_RECORDING": "Klaar voor opname",
+               "OPTED_OUT": "Uitgeschreven",
+               "CUSTOM": "Aangepast",
+               "ENGAGE": "Engage",
+               "EXTERNAL_API": "Publicatie van de externe API",
+               "YOUTUBE": "Youtube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Selecteer workflow",
+               "SELECT_WORKFLOW_EMPTY": "Geen workflows beschikbaar"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Media afknippen",
+               "MEDIA": "Media",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "DETAILS": "Details"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Bijlagen",
+               "ID": "Id",
+               "TYPE": "Type",
+               "MIMETYPE": "Mimetype",
+               "TAGS": "Tags",
+               "LINK": "Link"
+            },
+            "SOURCE": {
+               "CAPTION": "Bron",
+               "SELECT_SOURCE": "Selecteer bron",
+               "PLACEHOLDER": {
+                  "LOCATION": "Locatie",
+                  "INPUTS": "Ingangen",
+                  "HOUR": "Uur",
+                  "MINUTE": "Minuut",
+                  "REPEATS": "Herhaalt",
+                  "START_DATE": "jjjj-mm-dd",
+                  "END_DATE": "jjjj-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "Upload",
+                  "RECORDING_ELEMENTS": "Opname elementen",
+                  "SEGMENTABLE": {
+                     "SHORT": "Slides",
+                     "DETAIL": "Het bestand bevat een opname van dia-presentaties ( Keynote, Powerpoint, etc.)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Presentator",
+                     "DETAIL": "Het bestand bevat de opname van een persoon die een publiek aanspreekt."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Alleen audio",
+                     "DETAIL": "Het bestand bevat enkel audio."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Programma",
+                  "START_DATE": "Startdatum",
+                  "START_TIME": "Starttijd",
+                  "TIMEZONE": "Tijdzone",
+                  "END_DATE": "Einddatum",
+                  "DURATION": "Duur"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Enkel event inplannen"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Meerdere events inplannen",
+                  "REPEATS": "Herhaalt",
+                  "REPEAT_ON": "Herhalen op",
+                  "WEEKDAYS": "Weekdagen"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Assets",
+               "TYPE": "Type",
+               "SIZE": "Grootte",
+               "DETAILS": "Details",
+               "ATTACHMENTS": {
+                  "TITLE": "Bijlagen",
+                  "CAPTION": "Bijlagen",
+                  "ID": "Id",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Bijlage details",
+                     "CAPTION": "Bijlage details",
+                     "ID": "Id",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Grootte",
+                     "CHECKSUM": "Checksum",
+                     "REFERENCE": "Referentie"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Catalogi",
+                  "CAPTION": "Catalogi",
+                  "ID": "Id",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Catalogusdetails",
+                     "CAPTION": "Catalogusdetails",
+                     "ID": "Id",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Grootte",
+                     "CHECKSUM": "Checksum",
+                     "REFERENCE": "Referentie"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Media",
+                  "CAPTION": "Media",
+                  "ID": "ID",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Media details",
+                     "ID": "ID",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mimetype",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Opname datum",
+                     "FLAVOR": "Flavor",
+                     "TAGS": "Tags",
+                     "DURATION": "Duur",
+                     "STREAM_AUDIO": "Audiosporen",
+                     "STREAM_VIDEO": "Videosporen",
+                     "CHANNELS": "Kanalen",
+                     "BITRATE": "Bitrate",
+                     "BITDEPTH": "Bitdiepte",
+                     "SAMPLINGRATE": "Sample Rate",
+                     "FRAMECOUNT": "Aantal frames",
+                     "PEAKLEVELDB": "Piek niveau (dB)",
+                     "RMSLEVELDB": "RMS-niveau (dB)",
+                     "RMSPEAKDB": "RMS piek (dB)",
+                     "FRAMERATE": "Framesnelheid",
+                     "RESOLUTION": "Resolutie",
+                     "SIZE": "Afmetingen",
+                     "SCANTYPE": "Scantype",
+                     "SCANORDER": "Scan volgorde"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Publicaties",
+                  "CAPTION": "Publicaties",
+                  "CHANNEL": "Kanalen",
+                  "ID": "Id",
+                  "TYPE": "Type",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Tags",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Publicatie details",
+                     "CAPTION": "Publicatie details",
+                     "ID": "Id",
+                     "TYPE": "Type",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Tags",
+                     "URL": "URL",
+                     "SIZE": "Formaat",
+                     "CHANNEL": "Kanalen",
+                     "REFERENCE": "Referentie"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Sjablonen"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Toegangspolicy",
+                  "DESCRIPTION": "",
+                  "LABEL": "Selecteer sjabloon",
+                  "EMPTY": "Geen sjabloon gevonden",
+                  "ROLE": "Rol",
+                  "WRITE": "Schrijven",
+                  "READ": "Lezen",
+                  "ADDITIONAL_ACTIONS": "Verdere opties",
+                  "ACTION": "Acties",
+                  "NEW": "Nieuwe policy",
+                  "DETAILS": "Details"
+               },
+               "ROLES": {
+                  "LABEL": "Selecteer een rol",
+                  "EMPTY": "Geen rol gevonden"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Commentaren",
+               "PLACEHOLDER": "Commentaar…",
+               "SELECTPLACEHOLDER": "Selecteer reden",
+               "RESOLVED": "Opgelost",
+               "REPLY": "Beantwoorden",
+               "REPLY_TO": "Antwoord aan",
+               "CANCEL_REPLY": "Annuleren",
+               "DELETE": "Verwijder",
+               "REASON": "Reden",
+               "REASONS": {
+                  "CUTTING": "Snijden vereist",
+                  "REVIEW": "Beoordeling vereist",
+                  "ASYNC": "A/V tracks asynchrone",
+                  "AUDIO_ISSUE": "Ontbrekende of gebrekkige audio-track",
+                  "CANCELED": "Evenement annuleren",
+                  "CONFLICTING_METADATA": "Conflicterende metagegevens",
+                  "IMPROPER_POINT": "Ongepast in- of uitpunt",
+                  "MISSING_AGREEMENT": "Ontbrekende overeenkomst",
+                  "OTHER": "Andere",
+                  "PRIVACY": "Privacy bezorgdheid",
+                  "SEGMENTATION": "Onjuiste segmentatie",
+                  "UNKNOWN_CREATOR": "Auteur onbekend",
+                  "VIDEO_ISSUE": "Video vervormd of bijgesneden",
+                  "WRONG_INPUT_FORMAT": "Bestandsindeling niet ondersteund",
+                  "WRONG_METADATA": "Metadata moet aangepast worden",
+                  "WRONG_SERIES_PUBLICATION": "Verkeerde serie of publicatie-kanaal",
+                  "WRONG_WORKFLOW": "Verkeerde werkstroom",
+                  "PROCESSING_FAILURE": "Verwerking mislukt"
+               }
+            },
+            "METADATA": {
+               "CAPTION": "Evenement details",
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Reeks",
+               "RECORDING_DATE": "Opname datum",
+               "SUBJECT": "Onderwerp",
+               "DESCRIPTION": "Omschrijving",
+               "START_DATE": "Startdatum",
+               "START_TIME": "Starttijd",
+               "DURATION": "Duur",
+               "LOCATION": "Locatie",
+               "SOURCE": "Bron",
+               "CREATED": "Aangemaakt",
+               "CREATED_BY": "Aangemaakt door",
+               "LICENSE": "Licentie",
+               "CONTRIBUTORS": "Bijdrager(s)",
+               "RIGHTS": "Rechten",
+               "PRESENTERS": "Presentator(en)",
+               "LANGUAGE": "Taal",
+               "COPYRIGHT": "Auteursrecht",
+               "VISIBILITY": "Zichtbaarheid",
+               "PUBLIC": "Openbaar doel",
+               "OS": "Besturingssysteem verwerken",
+               "LOCKED": {
+                  "RUNNING": "Editeren van metadata is niet mogelijk wanneer er verwerkingen gebeuren op een event"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "De status van de deelname",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Review Status"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opted-out Status",
+                  "READY": "Klaar voor opname",
+                  "OPTEDOUT": "Opted out"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Berichten",
+                  "CREATION_DATE": "Aangemaakt op",
+                  "SENDER": "Zender",
+                  "SUBJECT": "Onderwerp"
+               },
+               "PLACEHOLDER": {
+                  "PRESENTERS": "Presentator(en)"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Acties",
+               "DETAILS": "Details",
+               "DESCRIPTION": "",
+               "ID": "ID",
+               "TYPE": "Type",
+               "TITLE": "Titel",
+               "STATE": "Status",
+               "STARTED": "Gestart",
+               "SERIES": "Series",
+               "SUBMITTED": "Ingediend",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "CONFIGURATION": "Configuratie",
+               "NO_CONFIGURATION": "Geen bestaande configuratieparameters voor de geselecteerde workflow-definitie.",
+               "WORKFLOW": "Workflow"
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Workflow details",
+               "CONFIGURATION": "Workflow configuratie"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Workflow operaties"
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Operatie details"
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Workflow details"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Media details",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "RECORDING_DATE": "Opname datum",
+               "TAGS": "Tags",
+               "DURATION": "Duur",
+               "STREAM_AUDIO": "Audiosporen",
+               "STREAM_VIDEO": "Videosporen",
+               "CHANNELS": "Kanalen",
+               "BITRATE": "Bitrate",
+               "FRAMERATE": "Framesnelheid",
+               "RESOLUTION": "Resolutie"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Fouten & waarschuwingen",
+               "TITLE": "Fouten & waarschuwingen",
+               "DATE": "Datum",
+               "HOST": "Host",
+               "TYPE": "Type",
+               "EMPTY": "Geen fout",
+               "DETAILS": {
+                  "HEADER": "Details van fout",
+                  "SEVERITY": "Ernst",
+                  "TITLE": "Titel",
+                  "DESCRIPTION": "Omschrijving",
+                  "JOB_ID": "Taak-id",
+                  "DATE": "Datum",
+                  "HOST": "Verwerking-server",
+                  "TYPE": "Servicetype",
+                  "TECHNICAL_DETAILS": "Technische details"
+               }
             }
-          },
-          "CATALOGS":{
-            "TITLE":"Catalogi",
-            "CAPTION":"Catalogi",
-            "ID":"Id",
-            "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
-            "DETAILS":{
-              "TITLE":"Catalogusdetails",
-              "CAPTION":"Catalogusdetails",
-              "ID":"Id",
-              "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
-              "URL":"URL",
-              "SIZE":"Grootte",
-              "CHECKSUM":"Checksum",
-              "REFERENCE":"Referentie"
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Reeks aanmaken",
+            "METADATA": {
+               "CAPTION": "Metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadata"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Uitgebreide metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Uitgebreide metadata"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Sjablonen"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Toegangspolicy",
+                  "DESCRIPTION": "Ten minste 1 rol met schrijf en lees rechten is vereist.",
+                  "LABEL": "Selecteer sjabloon",
+                  "EMPTY": "Geen sjabloon gevonden",
+                  "ROLE": "Rol",
+                  "WRITE": "Schrijven",
+                  "READ": "Lezen",
+                  "ADDITIONAL_ACTIONS": "Bijkomende opties",
+                  "ACTION": "Acties",
+                  "NEW": "Nieuwe policy",
+                  "DETAILS": "Details"
+               },
+               "ROLES": {
+                  "LABEL": "Selecteer een rol",
+                  "EMPTY": "Geen rol gevonden"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Thema",
+               "DESCRIPTION": "",
+               "TITLE": "Thema",
+               "LABEL": "Geen thema",
+               "EMPTY": "Geen thema gevonden"
+            },
+            "SUMMARY": {
+               "CAPTION": "Samenvatting"
             }
-          },
-          "MEDIA":{
-            "TITLE":"Media",
-            "CAPTION":"Media",
-            "ID":"ID",
-            "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
-            "DETAILS":{
-              "TITLE":"Media details",
-              "ID":"ID",
-              "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "URL":"URL",
-              "RECORDING_DATE":"Opname datum",
-              "FLAVOR":"Flavor",
-              "TAGS":"Tags",
-              "DURATION":"Duur",
-              "STREAM_AUDIO":"Audiosporen",
-              "STREAM_VIDEO":"Videosporen",
-              "CHANNELS":"Kanalen",
-              "BITRATE":"Bitrate",
-              "BITDEPTH":"Bitdiepte",
-              "SAMPLINGRATE":"Sample Rate",
-              "FRAMECOUNT":"Aantal frames",
-              "PEAKLEVELDB":"Piek niveau (dB)",
-              "RMSLEVELDB":"RMS-niveau (dB)",
-              "RMSPEAKDB":"RMS piek (dB)",
-              "FRAMERATE":"Framesnelheid",
-              "RESOLUTION":"Resolutie",
-              "SIZE":"Afmetingen",
-              "SCANTYPE":"Scantype",
-              "SCANORDER":"Scan volgorde"
+         },
+         "TABLE": {
+            "CAPTION": "Series",
+            "TITLE": "Series",
+            "CREATORS": "Organisator(en)",
+            "CONTRIBUTORS": "Bijdrager(s)",
+            "CREATED": "Aangemaakt",
+            "MANAGED_ACL": "Toegangspolicy",
+            "EVENTS": "Evenementen",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "HEADER": "Serie details - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadata",
+               "EXTENDED_METADATA": "Metadata II",
+               "PARTICIPATION": "Deelname",
+               "EVENTS": "Evenementen",
+               "PERMISSIONS": "Toegangspolicy",
+               "THEME": "Thema"
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Sjablonen"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Toegangspolicy",
+                  "DESCRIPTION": "",
+                  "LABEL": "Selecteer sjabloon",
+                  "EMPTY": "Geen sjabloon gevonden",
+                  "ROLE": "Rol",
+                  "WRITE": "Schrijven",
+                  "READ": "Lezen",
+                  "ADDITIONAL_ACTIONS": "Bijkomende opties",
+                  "ACTION": "Acties",
+                  "NEW": "Nieuwe policy",
+                  "DETAILS": "Details"
+               },
+               "ROLES": {
+                  "LABEL": "Selecteer een rol",
+                  "EMPTY": "Geen rol gevonden"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Titel",
+               "ID": "UID",
+               "SERIES": "Reeks",
+               "PUBLISHERS": "Uitgever(s)",
+               "ORGANIZERS": "Organisator(en)",
+               "CONTRIBUTORS": "Bijdrager(s)",
+               "RECORDING_DATE": "Opname datum",
+               "CREATED_BY": "Aangemaakt door",
+               "RIGHTS": "Rechten",
+               "SUBJECT": "Onderwerp",
+               "LANGUAGE": "Taal",
+               "LICENSE": "Licentie",
+               "DESCRIPTION": "Omschrijving"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Deelname status sjabloon",
+               "WARNING_TEMPLATE": "Status van de deelname van de reeks zal worden gebruikt als standaardwaarde voor nieuwe gebeurtenissen die deel van de serie uitmaken.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Review Status"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Opted-out Status",
+                  "READY": "Klaar voor opname",
+                  "OPTEDOUT": "Opted out"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Berichten",
+                  "CREATION_DATE": "Aangemaakt op",
+                  "SENDER": "Zender",
+                  "SUBJECT": "Onderwerp"
+               }
+            },
+            "EVENTS": {
+               "TITLE": "Titel",
+               "PRESENTER": "Presentator(en)",
+               "CREATED": "Aangemaakt",
+               "MODIFIED": "Gewijzigd",
+               "STATUS": "Status",
+               "LOCATION": "Locatie",
+               "LINK": "Link"
             }
-          },
-          "PUBLICATIONS":{
-            "TITLE":"Publicaties",
-            "CAPTION":"Publicaties",
-            "CHANNEL":"Kanalen",
-            "ID":"Id",
-            "TYPE":"Type",
-            "MIMETYPE":"Mimetype",
-            "TAGS":"Tags",
-            "LINK":"Link",
-            "DETAILS":{
-              "TITLE":"Publicatie details",
-              "CAPTION":"Publicatie details",
-              "ID":"Id",
-              "TYPE":"Type",
-              "MIMETYPE":"Mimetype",
-              "TAGS":"Tags",
-              "URL":"URL",
-              "SIZE":"Formaat",
-              "CHANNEL":"Kanalen",
-              "REFERENCE":"Referentie"
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Locaties",
+         "BLACKLISTS": "Zwarte lijsten"
+      },
+      "ACTIONS": {
+         "EXPORT": "Exporteren",
+         "ADD_BLACKLIST": "Zwarte lijst toevoegen",
+         "REMOVE": "Verwijderen"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Locaties",
+            "TITLE": "UID",
+            "NAME": "Naam",
+            "LOCATION": "Locatie",
+            "UPDATED": "Laatst geupdate",
+            "NEXT_DATE": "Volgende evenement",
+            "NEXT_NAME": "Titel van volgende evenement",
+            "STATUS": "Status",
+            "VERSION": "Versie",
+            "BLACKLIST_FROM": "Geblokkeerd van",
+            "BLACKLIST_TO": "Geblokkeerd tot",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "HEADER": "Locatie details - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Algemeen",
+               "CONFIGURATION": "Configuratie",
+               "CAPABILITIES": "Mogelijkheden"
+            },
+            "GENERAL": {
+               "CAPTION": "Algemeen",
+               "NAME": "Naam",
+               "URL": "Url",
+               "STATUS": "Status",
+               "UPDATE": "Laatst gehoord"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Configuratie",
+               "NO_CONFIGURATION": "Geen configuratie"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Mogelijkheden",
+               "NO_CAPABILITIES": "Geen mogelijkheden"
             }
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Sjablonen"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Toegangspolicy",
-            "DESCRIPTION":"",
-            "LABEL":"Selecteer sjabloon",
-            "EMPTY":"Geen sjabloon gevonden",
-            "ROLE":"Rol",
-            "WRITE":"Schrijven",
-            "READ":"Lezen",
-            "ADDITIONAL_ACTIONS":"Verdere opties",
-            "ACTION":"Acties",
-            "NEW":"Nieuwe policy",
-            "DETAILS":"Details"
-          },
-          "ROLES":{
-            "LABEL":"Selecteer een rol",
-            "EMPTY":"Geen rol gevonden"
-          }
-        },
-        "COMMENTS":{
-          "CAPTION":"Commentaren",
-          "PLACEHOLDER":"Commentaar…",
-          "SELECTPLACEHOLDER":"Selecteer reden",
-          "RESOLVED":"Opgelost",
-          "REPLY":"Beantwoorden",
-          "REPLY_TO":"Antwoord aan",
-          "CANCEL_REPLY":"Cancel",
-          "DELETE":"Verwijder",
-          "REASON":"Reden",
-          "REASONS":{
-            "CUTTING":"Snijden vereist",
-            "REVIEW":"Beoordeling vereist",
-            "ASYNC":"A/V tracks asynchrone",
-            "AUDIO_ISSUE":"Ontbrekende of gebrekkige audio-track",
-            "CANCELED":"Evenement annuleren",
-            "CONFLICTING_METADATA":"Conflicterende metagegevens",
-            "IMPROPER_POINT":"Ongepast in- of uitpunt",
-            "MISSING_AGREEMENT":"Ontbrekende overeenkomst",
-            "OTHER":"Andere",
-            "PRIVACY":"Privacy bezorgdheid",
-            "SEGMENTATION":"Onjuiste segmentatie",
-            "UNKNOWN_CREATOR":"Auteur onbekend",
-            "VIDEO_ISSUE":"Video vervormd of bijgesneden",
-            "WRONG_INPUT_FORMAT":"Bestandsindeling niet ondersteund",
-            "WRONG_METADATA":"Metadata moet aangepast worden",
-            "WRONG_SERIES_PUBLICATION":"Verkeerde serie of publicatie-kanaal",
-            "WRONG_WORKFLOW":"Verkeerde werkstroom",
-            "PROCESSING_FAILURE":"Verwerking mislukt"
-          }
-        },
-        "METADATA":{
-          "CAPTION":"Evenement details",
-          "TITLE":"Titel",
-          "ID":"UID",
-          "SERIES":"Reeks",
-          "RECORDING_DATE":"Opname datum",
-          "SUBJECT":"Onderwerp",
-          "DESCRIPTION":"Omschrijving",
-          "START_DATE":"Startdatum",
-          "START_TIME":"Starttijd",
-          "DURATION":"Duur",
-          "LOCATION":"Locatie",
-          "SOURCE":"Bron",
-          "CREATED":"Aangemaakt",
-          "CREATED_BY":"Aangemaakt door",
-          "LICENSE":"Licentie",
-          "CONTRIBUTORS":"Bijdrager(s)",
-          "RIGHTS":"Rechten",
-          "PRESENTERS":"Presentator(en)",
-          "LANGUAGE":"Taal",
-          "COPYRIGHT":"Auteursrecht",
-          "VISIBILITY":"Zichtbaarheid",
-          "PUBLIC":"Openbaar doel",
-          "OS":"Besturingssysteem verwerken",
-          "LOCKED":{
-            "RUNNING":"Editeren van metadata is niet mogelijk wanneer er verwerkingen gebeuren op een event"
-          }
-        },
-        "SCHEDULING":{
-          "CAPTION":"De status van de deelname",
-          "REVIEW_STATUS":{
-            "CAPTION":"Review Status"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Klaar voor opname",
-            "OPTEDOUT":"Opted out"
-          },
-          "MESSAGES":{
-            "CAPTION":"Berichten",
-            "CREATION_DATE":"Aangemaakt op",
-            "SENDER":"Zender",
-            "SUBJECT":"Onderwerp"
-          },
-          "PLACEHOLDER":{
-            "PRESENTERS":"Presentator(en)"
-          }
-        },
-        "WORKFLOWS":{
-          "ACTIONS":"Actions",
-          "DETAILS":"Details",
-          "DESCRIPTION":"",
-          "ID":"ID",
-          "TYPE":"Type",
-          "TITLE":"Titel",
-          "STATE":"Status",
-          "STARTED":"Gestart",
-          "SERIES":"Series",
-          "SUBMITTED":"Ingediend",
-          "MIMETYPE":"Mimetype",
-          "URL":"URL",
-          "CONFIGURATION":"Configuratie",
-          "NO_CONFIGURATION":"Geen bestaande configuratieparameters voor de geselecteerde workflow-definitie.",
-          "WORKFLOW":"Workflow"
-        },
-        "WORKFLOW_DETAILS":{
-          "TITLE":"Workflow details",
-          "CONFIGURATION":"Workflow configuratie"
-        },
-        "WORKFLOW_OPERATIONS":{
-          "TITLE":"Workflow operaties"
-        },
-        "OPERATION_DETAILS":{
-          "TITLE":"Operatie details"
-        },
-        "QUICKACTION_WORKFLOW_DETAILS":{
-          "TITLE":"Workflow details"
-        },
-        "MEDIA_DETAILS":{
-          "TITLE":"Media details",
-          "ID":"ID",
-          "TYPE":"Type",
-          "MIMETYPE":"Mimetype",
-          "URL":"URL",
-          "RECORDING_DATE":"Opname datum",
-          "TAGS":"Tags",
-          "DURATION":"Duur",
-          "STREAM_AUDIO":"Audiosporen",
-          "STREAM_VIDEO":"Videosporen",
-          "CHANNELS":"Kanalen",
-          "BITRATE":"Bitrate",
-          "FRAMERATE":"Framesnelheid",
-          "RESOLUTION":"Resolutie"
-        },
-        "ERRORS_AND_WARNINGS":{
-          "HEADER":"Fouten & waarschuwingen",
-          "TITLE":"Fouten & waarschuwingen",
-          "DATE":"Datum",
-          "HOST":"Host",
-          "TYPE":"Type",
-          "EMPTY":"Geen fout",
-          "DETAILS":{
-            "HEADER":"Details van fout",
-            "SEVERITY":"Ernst",
-            "TITLE":"Titel",
-            "DESCRIPTION":"Omschrijving",
-            "JOB_ID":"Taak-id",
-            "DATE":"Datum",
-            "HOST":"Verwerking-server",
-            "TYPE":"Servicetype",
-            "TECHNICAL_DETAILS":"Technische details"
-          }
-        }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Zwarte lijst van locaties",
+            "NAME": "Naam",
+            "ACTIONS": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Zwarte lijst aanmaken",
+            "EDITCAPTION": "Editeer zwarte lijst",
+            "TABS": {
+               "LOCATIONS": "Locaties",
+               "DATES": "Datums",
+               "REASON": "Reden",
+               "SUMMARY": "Samenvatting"
+            },
+            "LOCATIONS": {
+               "REMOVE": "Verwijderen",
+               "ADD_LOCATION": "Kies locatie",
+               "ALL_LOCATIONS": "Alle locaties",
+               "SELECT_LOCATION": "Selecteer"
+            },
+            "DATES": {
+               "START_DATE": "Startdatum",
+               "END_DATE": "Einddatum"
+            },
+            "REASON": {
+               "SELECT_REASON": "Selecteer",
+               "REASON": "Reden",
+               "COMMENTS": "Commentaren"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Samenvatting",
+               "LOCATION": "Locatie",
+               "DATE_FROM": "Van",
+               "DATE_TO": "Tot",
+               "REASON": "Reden",
+               "COMMENTS": "Commentaren"
+            }
+         }
       }
-    },
-    "SERIES":{
-      "NEW":{
-        "CAPTION":"Reeks aanmaken",
-        "METADATA":{
-          "CAPTION":"Metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Metadata"
-          }
-        },
-        "METADATA_EXTENDED":{
-          "CAPTION":"Uitgebreide metadata",
-          "DESCRIPTION":"",
-          "METADATA":{
-            "TITLE":"Uitgebreide metadata"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Sjablonen"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Toegangspolicy",
-            "DESCRIPTION":"Ten minste 1 rol met schrijf en lees rechten is vereist.",
-            "LABEL":"Selecteer sjabloon",
-            "EMPTY":"Geen sjabloon gevonden",
-            "ROLE":"Rol",
-            "WRITE":"Schrijven",
-            "READ":"Lezen",
-            "ADDITIONAL_ACTIONS":"Bijkomende opties",
-            "ACTION":"Acties",
-            "NEW":"Nieuwe policy",
-            "DETAILS":"Details"
-          },
-          "ROLES":{
-            "LABEL":"Selecteer een rol",
-            "EMPTY":"Geen rol gevonden"
-          }
-        },
-        "THEME":{
-          "CAPTION":"Thema",
-          "DESCRIPTION":"",
-          "TITLE":"Thema",
-          "LABEL":"Geen thema",
-          "EMPTY":"Geen thema gevonden"
-        },
-        "SUMMARY":{
-          "CAPTION":"Samenvatting"
-        }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Gebruiker toevoegen",
+         "ADD_GROUP": "Groep toevoegen",
+         "ADD_ACL": "Toegangspolicy toevoegen",
+         "ADD_BLACKLIST": "Zwarte lijst toevoegen"
       },
-      "TABLE":{
-        "CAPTION":"Series",
-        "TITLE":"Series",
-        "CREATORS":"Organisator(en)",
-        "CONTRIBUTORS":"Bijdrager(s)",
-        "CREATED":"Aangemaakt",
-        "MANAGED_ACL":"Toegangspolicy",
-        "EVENTS":"Evenementen",
-        "ACTION":"Acties"
+      "NAVIGATION": {
+         "USERS": "Gebruikers",
+         "GROUPS": "Groepen",
+         "PERMISSIONS": "Toegangspolicy",
+         "BLACKLISTS": "Zwarte lijst"
       },
-      "DETAILS":{
-        "HEADER":"Serie details - {{resourceId}}",
-        "TABS":{
-          "METADATA":"Metadata",
-          "EXTENDED_METADATA":"Metadata II",
-          "PARTICIPATION":"Deelname",
-          "EVENTS":"Evenementen",
-          "PERMISSIONS":"Toegangspolicy",
-          "THEME":"Thema"
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "DESCRIPTION":"",
-          "TEMPLATES":{
-            "TITLE":"Sjablonen"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Toegangspolicy",
-            "DESCRIPTION":"",
-            "LABEL":"Selecteer sjabloon",
-            "EMPTY":"Geen sjabloon gevonden",
-            "ROLE":"Rol",
-            "WRITE":"Schrijven",
-            "READ":"Lezen",
-            "ADDITIONAL_ACTIONS":"Bijkomende opties",
-            "ACTION":"Acties",
-            "NEW":"Nieuwe policy",
-            "DETAILS":"Details"
-          },
-          "ROLES":{
-            "LABEL":"Selecteer een rol",
-            "EMPTY":"Geen rol gevonden"
-          }
-        },
-        "METADATA":{
-          "TITLE":"Titel",
-          "ID":"UID",
-          "SERIES":"Reeks",
-          "PUBLISHERS":"Uitgever(s)",
-          "ORGANIZERS":"Organisator(en)",
-          "CONTRIBUTORS":"Bijdrager(s)",
-          "RECORDING_DATE":"Opname datum",
-          "CREATED_BY":"Aangemaakt door",
-          "RIGHTS":"Rechten",
-          "SUBJECT":"Onderwerp",
-          "LANGUAGE":"Taal",
-          "LICENSE":"Licentie",
-          "DESCRIPTION":"Omschrijving"
-        },
-        "PARTICIPATION":{
-          "CAPTION":"Deelname status sjabloon",
-          "WARNING_TEMPLATE":"Status van de deelname van de reeks zal worden gebruikt als standaardwaarde voor nieuwe gebeurtenissen die deel van de serie uitmaken.",
-          "REVIEW_STATUS":{
-            "CAPTION":"Review Status"
-          },
-          "OPTEDOUT":{
-            "CAPTION":"Opted-out Status",
-            "READY":"Klaar voor opname",
-            "OPTEDOUT":"Opted out"
-          },
-          "MESSAGES":{
-            "CAPTION":"Berichten",
-            "CREATION_DATE":"Aangemaakt op",
-            "SENDER":"Zender",
-            "SUBJECT":"Onderwerp"
-          }
-        },
-        "EVENTS":{
-          "TITLE":"Titel",
-          "PRESENTER":"Presentator(en)",
-          "CREATED":"Aangemaakt",
-          "MODIFIED":"Gewijzigd",
-          "STATUS":"Status",
-          "LOCATION":"Locatie",
-          "LINK":"Link"
-        }
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Gebruikers",
+            "NAME": "Naam",
+            "USERNAME": "Gebruikersnaam",
+            "EMAIL": "E-mail",
+            "ROLES": "Rollen",
+            "TYPE": "Type",
+            "PROVIDER": "Provider",
+            "BLACKLIST_FROM": "Geblokkeerd van",
+            "BLACKLIST_TO": "Geblokkeerd tot",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gebruiker aanmaken",
+            "EDITCAPTION": "Gebruiker editeren",
+            "TABS": {
+               "USER": "Gebruiker",
+               "ROLES": "Rollen",
+               "EXTERNALROLES": "Externe rollen",
+               "EFFECTIVEROLES": "Effectieve rollen"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Rollen en groepen die kunnen worden of al zijn toegewezen aan de gebruiker.",
+               "EXTERNALROLES": "De lijst met externe rollen die zijn toegewezen aan de gebruiker toegekend door de rol van de externe leverancier(s).",
+               "EFFECTIVEROLES": "De lijst van effectieve rollen rechtstreeks toegewezen aan de gebruiker en de rollen indirect geladen via groepslidmaatschap."
+            },
+            "FORM": {
+               "USERNAME": "Gebruikersnaam",
+               "NAME": "Naam",
+               "EMAIL": "E-mail",
+               "PASSWORD": "Wachtwoord",
+               "REPEAT_PASSWORD": "Wachtwoord herhalen"
+            },
+            "ROLES": {
+               "LEFT": "Rollen",
+               "RIGHT": "Selecteer rollen",
+               "REMOVE": "Verwijder rol",
+               "ADD": "Rol toevoegen"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Groep aanmaken"
+         },
+         "TABLE": {
+            "CAPTION": "Groepen",
+            "NAME": "Naam",
+            "DESCRIPTION": "Omschrijving",
+            "ROLE": "Rol",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Groep aanmaken",
+            "EDITCAPTION": "Groep aanpassen",
+            "TABS": {
+               "GROUP": "Groep",
+               "ROLES": "Rollen",
+               "METADATA": "Metadata",
+               "USERS": "Gebruikers",
+               "SUMMARY": "Samenvatting"
+            },
+            "FORM": {
+               "NAME": "Naam",
+               "DESCRIPTION": "Omschrijving",
+               "SUMMARY": "Samenvatting",
+               "ROLES": "Rollen",
+               "USERS": "Gebruikers"
+            },
+            "USERS": {
+               "LEFT": "Gebruikers",
+               "RIGHT": "Selecteer gebruikers",
+               "REMOVE": "Gebruiker verwijderen",
+               "ADD": "Gebruiker toevoegen"
+            },
+            "ROLES": {
+               "LEFT": "Rollen",
+               "RIGHT": "Selecteer rollen",
+               "REMOVE": "Verwijder rol",
+               "ADD": "Rol toevoegen"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Toegangspolicy",
+            "NAME": "Naam",
+            "CREATED": "Aangemaakt",
+            "CREATOR": "Auteur",
+            "IN_USE": "In gebruik",
+            "ACTION": "Acties"
+         },
+         "NEW": {
+            "CAPTION": "Nieuwe toegangsbeleid",
+            "TABS": {
+               "SUMMARY": "Samenvatting",
+               "METADATA": "Metadata",
+               "ACCESS": "Toegangsrechten"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Naam",
+                  "PLACEHOLDER": "Naam…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "TEMPLATES": {
+                  "TITLE": "Sjablonen"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Toegangspolicy",
+                  "LABEL": "Selecteer sjabloon",
+                  "EMPTY": "Geen sjabloon gevonden",
+                  "ROLE": "Rol",
+                  "WRITE": "Schrijven",
+                  "READ": "Lezen",
+                  "ADDITIONAL_ACTIONS": "Bijkomende opties",
+                  "ACTION": "Acties",
+                  "NEW": "Nieuwe policy",
+                  "DETAILS": "Details",
+                  "DESCRIPTION": "Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe"
+               },
+               "ROLES": {
+                  "LABEL": "Selecteer een rol",
+                  "EMPTY": "Geen rol gevonden"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Toegang beleidsdetails - {{resourceId}}",
+            "TABS": {
+               "SUMMARY": "Samenvatting",
+               "METADATA": "Metadata",
+               "ACCESS": "Toegangsrechten"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Naam",
+                  "PLACEHOLDER": "Naam…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Toegangspolicy",
+               "TEMPLATES": {
+                  "TITLE": "Sjablonen"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Toegangspolicy",
+                  "LABEL": "Selecteer sjabloon",
+                  "EMPTY": "Geen sjabloon gevonden",
+                  "ROLE": "Rol",
+                  "WRITE": "Schrijven",
+                  "READ": "Lezen",
+                  "ADDITIONAL_ACTIONS": "Bijkomende opties",
+                  "ACTION": "Acties",
+                  "NEW": "Nieuwe policy",
+                  "DETAILS": "Details",
+                  "DESCRIPTION": "Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe"
+               },
+               "ROLES": {
+                  "LABEL": "Selecteer een rol",
+                  "EMPTY": "Geen rol gevonden"
+               }
+            }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Zwarte lijst van gebruikers",
+            "NAME": "Naam",
+            "DATE_FROM": "Van",
+            "DATE_TO": "Tot",
+            "REASON": "Reden",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Zwarte lijst aanmaken",
+            "EDITCAPTION": "Editeer zwarte lijst",
+            "TABS": {
+               "USERS": "Gebruikers",
+               "DATES": "Datums",
+               "REASON": "Reden",
+               "SUMMARY": "Samenvatting"
+            },
+            "USERS": {
+               "REMOVE": "Verwijderen",
+               "ADD_USER": "Kies gebruiker",
+               "ALL_USERS": "Alle gebruikers",
+               "SELECT_USER": "Selecteer"
+            },
+            "DATES": {
+               "START_DATE": "Startdatum",
+               "END_DATE": "Einddatum"
+            },
+            "REASON": {
+               "SELECT_REASON": "Selecteer",
+               "REASON": "Reden",
+               "COMMENTS": "Commentaren"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Samenvatting",
+               "USER": "Gebruiker",
+               "DATE_FROM": "Van",
+               "DATE_TO": "Tot",
+               "REASON": "Reden",
+               "COMMENTS": "Commentaren"
+            }
+         }
       }
-    }
-  },
-  "RECORDINGS":{
-    "NAVIGATION":{
-      "LOCATIONS":"Locaties",
-      "BLACKLISTS":"Zwarte lijsten"
-    },
-    "ACTIONS":{
-      "EXPORT":"Exporteren",
-      "ADD_BLACKLIST":"Zwarte lijst toevoegen",
-      "REMOVE":"Remove"
-    },
-    "RECORDINGS":{
-      "TABLE":{
-        "CAPTION":"Locaties",
-        "TITLE":"UID",
-        "NAME":"Naam",
-        "LOCATION":"Locatie",
-        "UPDATED":"Laatst geupdate",
-        "NEXT_DATE":"Volgende evenement",
-        "NEXT_NAME":"Titel van volgende evenement",
-        "STATUS":"Status",
-        "VERSION":"Versie",
-        "BLACKLIST_FROM":"Geblokkeerd van",
-        "BLACKLIST_TO":"Geblokkeerd tot",
-        "ACTION":"Acties"
-      },
-      "DETAILS":{
-        "HEADER":"Location details - {{resourceId}}",
-        "TAB":{
-          "GENERAL":"General",
-          "CONFIGURATION":"Configuration",
-          "CAPABILITIES":"Capabilities"
-        },
-        "GENERAL":{
-          "CAPTION":"General",
-          "NAME":"Name",
-          "URL":"Url",
-          "STATUS":"Status",
-          "UPDATE":"Last heard from"
-        },
-        "CONFIGURATION":{
-          "CAPTION":"Configuration",
-          "NO_CONFIGURATION":"No configuration provided"
-        },
-        "CAPABILITIES":{
-          "CAPTION":"Capabilities",
-          "NO_CAPABILITIES":"No capabilities provided"
-        }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Thema details {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Algemeen",
+               "BUMPER": "Bumper (begin)",
+               "TRAILER": "Bumper (einde)",
+               "TITLE": "Titel",
+               "LICENSE": "Licentie",
+               "WATERMARK": "Watermerk",
+               "USAGE": "Gebruik"
+            },
+            "GENERAL": {
+               "CAPTION": "Algemeen",
+               "NAME": "Naam",
+               "DESCRIPTION": "Omschrijving",
+               "DEFAULT": "Standaard",
+               "SET_DEFAULT_INFO": "Stel als standaard theme in voor alle reeksen en evenementen",
+               "NAME_ERROR": "Naam is reeds in gebruik",
+               "NAME_REQUIRED": "Verplicht"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (begin)",
+               "DESCRIPTION": "Vooraf gedefinieerde video die aan het begin van de opname wordt toegevoegd.",
+               "ACTIVE": "Actief"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (einde)",
+               "DESCRIPTION": "Voorgedefinieerde video die wordt toegevoegd op het einde van een opname.",
+               "ACTIVE": "Actief"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "DESCRIPTION": "Voorgedefinieerde slide met omschrijvende metadata die op het begin of einde van een opname toegevoegd wordt.",
+               "ACTIVE": "Actief"
+            },
+            "WATERMARK": {
+               "CAPTION": "Watermerk",
+               "DESCRIPTION": "Semi-transparante afbeelding die op elke frame van de opname toegepast wordt.",
+               "ACTIVE": "Actief"
+            },
+            "USAGE": {
+               "CAPTION": "Gebruik",
+               "SERIES": "Naam reeks"
+            }
+         }
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Zwarte lijst van locaties",
-        "NAME":"Naam",
-        "ACTIONS":"Acties"
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Sjabloon toevoegen",
+         "ADD_THEME": "Theme toevoegen"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Zwarte lijst aanmaken",
-        "EDITCAPTION":"Editeer zwarte lijst",
-        "TABS":{
-          "LOCATIONS":"Locaties",
-          "DATES":"Datums",
-          "REASON":"Reden",
-          "SUMMARY":"Samenvatting"
-        },
-        "LOCATIONS":{
-          "REMOVE":"Verwijderen",
-          "ADD_LOCATION":"Kies locatie",
-          "ALL_LOCATIONS":"Alle locaties",
-          "SELECT_LOCATION":"Selecteer"
-        },
-        "DATES":{
-          "START_DATE":"Startdatum",
-          "END_DATE":"Einddatum"
-        },
-        "REASON":{
-          "SELECT_REASON":"Selecteer",
-          "REASON":"Reden",
-          "COMMENTS":"Commentaren"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Samenvatting",
-          "LOCATION":"Locatie",
-          "DATE_FROM":"Van",
-          "DATE_TO":"Tot",
-          "REASON":"Reden",
-          "COMMENTS":"Commentaren"
-        }
+      "NAVIGATION": {
+         "MAIL_TEMPLATES": "Email sjablonen",
+         "MAIL_SERVERS": "Email settings",
+         "THEMES": "Themas"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "Email sjablonen",
+            "NAME": "Naam",
+            "CREATOR": "Auteur",
+            "CREATED": "Aangemaakt",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Sjabloon aanmaken",
+            "EDITCAPTION": "Editeer sjabloon",
+            "TABS": {
+               "MESSAGE": "Bericht",
+               "SUMMARY": "Samenvatting"
+            },
+            "MESSAGE": {
+               "NAME": "Naam",
+               "SUBJECT": "Onderwerp",
+               "MESSAGE": "Bericht"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Samenvatting bericht"
+            }
+         }
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Themas",
+            "NAME": "Naam",
+            "DESCRIPTION": "Omschrijving",
+            "CREATOR": "Auteur",
+            "CREATED": "Aangemaakt",
+            "DEFAULT": "Standaard",
+            "USAGE": "Gebruik",
+            "ACTION": "Acties"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Thema aanmaken",
+            "EDITCAPTION": "Editeer thema",
+            "GENERAL": {
+               "CAPTION": "Algemeen",
+               "NAME": "Naam",
+               "DESCRIPTION": "Omschrijving",
+               "DEFAULT": "Standaard",
+               "SET_DEFAULT_INFO": "Stel als standaard theme in voor alle reeksen en evenementen",
+               "NAME_REQUIRED": "Verplicht"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (begin)",
+               "FILE_UPLOADED": "Bestand geüpload: ",
+               "DESCRIPTION": "Vooraf gedefinieerde video die aan het begin van de opname wordt toegevoegd.",
+               "ACTIVE": "Actief",
+               "ENABLE": "Bumper activeren",
+               "SELECT": "Selecteer",
+               "UPLOAD_LABEL": "Video uploaden",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (einde)",
+               "FILE_UPLOADED": "Bestand geüpload: ",
+               "DESCRIPTION": "Voorgedefinieerde video die wordt toegevoegd op het einde van een opname.",
+               "ACTIVE": "Actief",
+               "ENABLE": "Bumper activeren",
+               "UPLOAD_LABEL": "Video uploaden",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "TITLE": {
+               "CAPTION": "Titel",
+               "FILE_UPLOADED": "Bestand geüpload: ",
+               "DESCRIPTION": "Voorgedefinieerde slide met omschrijvende metadata die op het begin of einde van een opname toegevoegd wordt.",
+               "ACTIVE": "Actief",
+               "ENABLE": "Titeldia inschakelen",
+               "BACKGROUND": "Achtergrond",
+               "EXTRACT": "Achtergrond verwijderen",
+               "UPLOAD": "Upload",
+               "UPLOAD_LABEL": "Afbeelding uploaden",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "WATERMARK": {
+               "CAPTION": "Watermerk",
+               "FILE_UPLOADED": "Bestand geüpload: ",
+               "DESCRIPTION": "Semi-transparante afbeelding die op elke frame van de opname toegepast wordt.",
+               "ACTIVE": "Actief",
+               "ENABLE": "Watermerk inschakelen",
+               "TOP_LEFT": "Linksboven",
+               "TOP_RIGHT": "Rechtsboven",
+               "BOTTOM_LEFT": "Linksonder",
+               "BOTTOM_RIGHT": "Rechtsonder",
+               "UPLOAD": "Upload",
+               "POSITION": "Watermerk positie en preview",
+               "FILEUPLOAD_DESCRIPTION": "Bestand moet een alfakanaal (transparante achtergrond) hebben. Aanvaardbare bestandstypen zijn: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "Afbeelding uploaden",
+               "UPLOAD_BUTTON": "Upload"
+            },
+            "SUMMARY": {
+               "CAPTION": "Samenvatting"
+            },
+            "USAGE": {
+               "CAPTION": "Gebruik",
+               "SERIE": "Naam reeks",
+               "EMPTY": "Geen serie gevonden voor huidig thema"
+            }
+         }
       }
-    }
-  },
-  "USERS":{
-    "ACTIONS":{
-      "ADD_USER":"Gebruiker toevoegen",
-      "ADD_GROUP":"Groep toevoegen",
-      "ADD_ACL":"Toegangspolicy toevoegen",
-      "ADD_BLACKLIST":"Zwarte lijst toevoegen"
-    },
-    "NAVIGATION":{
-      "USERS":"Gebruikers",
-      "GROUPS":"Groepen",
-      "PERMISSIONS":"Toegangspolicy",
-      "BLACKLISTS":"Zwarte lijst"
-    },
-    "USERS":{
-      "TABLE":{
-        "CAPTION":"Gebruikers",
-        "NAME":"Naam",
-        "USERNAME":"Gebruikersnaam",
-        "EMAIL":"E-mail",
-        "ROLES":"Rollen",
-        "TYPE":"Type",
-        "PROVIDER":"Provider",
-        "BLACKLIST_FROM":"Geblokkeerd van",
-        "BLACKLIST_TO":"Geblokkeerd tot",
-        "ACTION":"Acties"
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Taken",
+         "SERVERS": "Servers",
+         "SERVICES": "Diensten"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Gebruiker aanmaken",
-        "EDITCAPTION":"Gebruiker editeren",
-        "TABS":{
-          "USER":"Gebruiker",
-          "ROLES":"Rollen",
-          "EXTERNALROLES":"External Roles",
-          "EFFECTIVEROLES":"Effective Roles"
-        },
-        "DESCRIPTION":{
-          "ROLES":"Roles and groups that can be or are already assigned to the user.",
-          "EXTERNALROLES":"The list of external roles assigned to the user granted by the external role provider(s).",
-          "EFFECTIVEROLES":"The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
-        },
-        "FORM":{
-          "USERNAME":"Gebruikersnaam",
-          "NAME":"Naam",
-          "EMAIL":"E-mail",
-          "PASSWORD":"Wachtwoord",
-          "REPEAT_PASSWORD":"Wachtwoord herhalen"
-        },
-        "ROLES":{
-          "LEFT":"Rollen",
-          "RIGHT":"Selecteer rollen",
-          "REMOVE":"Verwijder rol",
-          "ADD":"Rol toevoegen"
-        }
+      "JOBS": {
+         "TABLE": {
+            "ID": "Job ID",
+            "ACTION": "Acties",
+            "CAPTION": "Taken",
+            "CREATED": "Aangemaakt",
+            "CREATOR": "Auteur",
+            "HOST_NAME": "Hostnaam",
+            "OPERATION": "Operatie",
+            "STARTED": "Gestart",
+            "STATUS": "Status",
+            "SUBMITTED": "Ingediend",
+            "TYPE": "Type"
+         },
+         "DETAILS": {
+            "HEADER": "Job details {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Algemeen",
+               "OPERATIONS": "Operaties",
+               "INCIDENTS": "Incidenten"
+            }
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Servers",
+            "STATUS": "Status",
+            "HOST_NAME": "Hostnaam",
+            "CORES": "Kernen",
+            "COMPLETED": "Jobs afgewerkt",
+            "RUNNING": "Jobs in verwerking",
+            "QUEUED": "Jobs in wachtrij",
+            "MEAN_RUN_TIME": "Gemiddelde looptijd",
+            "MEAN_QUEUE_TIME": "Gemiddelde wachttijd",
+            "MAINTENANCE": "Onderhoud",
+            "ACTION": "Acties",
+            "MAINTENANCE_OFF": "Activeer onderhoudsmodus",
+            "MAINTENANCE_ON": "Beeindig onderhoudsmodus"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Diensten",
+            "STATUS": "Status",
+            "NAME": "Servicenaam",
+            "HOST_NAME": "Hostnaam",
+            "COMPLETED": "Jobs afgewerkt",
+            "RUNNING": "Jobs in verwerking",
+            "QUEUED": "Jobs in wachtrij",
+            "MEAN_RUN_TIME": "Gemiddelde looptijd",
+            "MEAN_QUEUE_TIME": "Gemiddelde wachttijd",
+            "SANITIZE": "Herinitialiseer service",
+            "ACTION": "Acties"
+         }
       }
-    },
-    "GROUPS":{
-      "NEW":{
-        "CAPTION":"Groep aanmaken"
+   },
+   "VIDEO_TOOL": {
+      "TIMELINE": "Tijdlijn",
+      "ZOOMLEVEL": "Zoom niveau",
+      "ZOOM": "Zoom",
+      "BUTTONS": {
+         "CLOSE": "Afsluiten",
+         "SAVE": "Opslaan",
+         "PROCESS": "Opslaan en verwerken",
+         "ADD_COMMENT": "Commentaar toevoegen"
       },
-      "TABLE":{
-        "CAPTION":"Groepen",
-        "NAME":"Naam",
-        "DESCRIPTION":"Omschrijving",
-        "ROLE":"Rol",
-        "ACTION":"Acties"
+      "TABS": {
+         "PLAY": "Afspelen",
+         "EDIT": "Editor",
+         "CAPTIONS": "Ondertitels",
+         "ANNOTATIONS": "Annotaties"
       },
-      "DETAILS":{
-        "NEWCAPTION":"Groep aanmaken",
-        "EDITCAPTION":"Groep aanpassen",
-        "TABS":{
-          "GROUP":"Groep",
-          "ROLES":"Rollen",
-          "METADATA":"Metadata",
-          "USERS":"Gebruikers",
-          "SUMMARY":"Samenvatting"
-        },
-        "FORM":{
-          "NAME":"Naam",
-          "DESCRIPTION":"Omschrijving",
-          "SUMMARY":"Samenvatting",
-          "ROLES":"Rollen",
-          "USERS":"Gebruikers"
-        },
-        "USERS":{
-          "LEFT":"Gebruikers",
-          "RIGHT":"Selecteer gebruikers",
-          "REMOVE":"Gebruiker verwijderen",
-          "ADD":"Gebruiker toevoegen"
-        },
-        "ROLES":{
-          "LEFT":"Rollen",
-          "RIGHT":"Selecteer rollen",
-          "REMOVE":"Verwijder rol",
-          "ADD":"Rol toevoegen"
-        }
+      "AREAS": {
+         "METADATA": "Metadata",
+         "COMMENTS": "Commentaren",
+         "SEGMENTS": "Segmenten"
+      },
+      "ACTIONS": {
+         "SPLIT": "Segmenteer",
+         "CUT": "Knippen",
+         "REPLAY_SEGMENT": "Segment opnieuw afspelen",
+         "REPLAY_END_OF_SEGMENT": "Einde van segment",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Bekijk overgang",
+         "UNDO": "Ongedaan maken",
+         "REDO": "Opnieuw toepassen",
+         "CLEAR_SEGMENTS": "Segmenten verwijderen",
+         "CLEAR_SELECTED_SEGMENT": "Verwijder selectie segmenten"
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Segment verwijderen",
+         "USE_SEGMENT": "Gebruik dit segment"
+      },
+      "PLAYER": {
+         "PLAY": "Afspelen",
+         "PAUSE": "Pauze",
+         "NEXT_FRAME": "Volgend frame",
+         "PREVIOUS_FRAME": "Vorig frame",
+         "NEXT_SEGMENT": "Volgende segment / Direct naar einde",
+         "PREVIOUS_SEGMENT": "Vorige segment / Direct naar begin",
+         "MUTE": "Stom",
+         "VOLUME": "Volume"
       }
-    },
-    "ACLS":{
-      "TABLE":{
-        "CAPTION":"Toegangspolicy",
-        "NAME":"Naam",
-        "CREATED":"Aangemaakt",
-        "CREATOR":"Auteur",
-        "IN_USE":"In gebruik",
-        "ACTION":"Acties"
+   },
+   "LOGIN": {
+      "WELCOME": "Welkom bij Opencast",
+      "REMEMBER": "Onthoud me op deze computer",
+      "USERNAME": "Gebruikersnaam…",
+      "PASSWORD": "Wachtwoord…",
+      "LOGIN": "Aanmelden",
+      "ERROR": "Onjuiste gebruikersnaam en / of wachtwoord"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Selecteer een filter…",
+         "NO_OPTIONS": "Geen filters gevonden"
       },
-      "NEW":{
-        "CAPTION":"Nieuwe toegangsbeleid",
-        "TABS":{
-          "SUMMARY":"Samenvatting",
-          "METADATA":"Metadata",
-          "ACCESS":"Toegangsrechten"
-        },
-        "METADATA":{
-          "TITLE":"Metadata",
-          "NAME":{
-            "CAPTION":"Naam",
-            "PLACEHOLDER":"Naam…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "TEMPLATES":{
-            "TITLE":"Sjablonen"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Toegangspolicy",
-            "LABEL":"Selecteer sjabloon",
-            "EMPTY":"Geen sjabloon gevonden",
-            "ROLE":"Rol",
-            "WRITE":"Schrijven",
-            "READ":"Lezen",
-            "ADDITIONAL_ACTIONS":"Bijkomende opties",
-            "ACTION":"Acties",
-            "NEW":"Nieuwe policy",
-            "DETAILS":"Details",
-            "DESCRIPTION":"Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe"
-          },
-          "ROLES":{
-            "LABEL":"Selecteer een rol",
-            "EMPTY":"Geen rol gevonden"
-          }
-        }
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Selecteer een waarde…",
+         "NO_OPTIONS": "Geen waarden gevonden"
       },
-      "DETAILS":{
-        "HEADER":"Toegang beleidsdetails - {{resourceId}}",
-        "TABS":{
-          "SUMMARY":"Samenvatting",
-          "METADATA":"Metadata",
-          "ACCESS":"Toegangsrechten"
-        },
-        "METADATA":{
-          "TITLE":"Metadata",
-          "NAME":{
-            "CAPTION":"Naam",
-            "PLACEHOLDER":"Naam…"
-          }
-        },
-        "ACCESS":{
-          "CAPTION":"Toegangspolicy",
-          "TEMPLATES":{
-            "TITLE":"Sjablonen"
-          },
-          "ACCESS_POLICY":{
-            "TITLE":"Toegangspolicy",
-            "LABEL":"Selecteer sjabloon",
-            "EMPTY":"Geen sjabloon gevonden",
-            "ROLE":"Rol",
-            "WRITE":"Schrijven",
-            "READ":"Lezen",
-            "ADDITIONAL_ACTIONS":"Bijkomende opties",
-            "ACTION":"Acties",
-            "NEW":"Nieuwe policy",
-            "DETAILS":"Details",
-            "DESCRIPTION":"Kies een vooraf geconfigureerde verzameling beleidsregels of voeg een aangepast beleid hieronder toe"
-          },
-          "ROLES":{
-            "LABEL":"Selecteer een rol",
-            "EMPTY":"Geen rol gevonden"
-          }
-        }
+      "CLEAR": "Alle filters verwijderen",
+      "REMOVE": "Filter verwijderen",
+      "ADD": "Filters toevoegen",
+      "PLACEHOLDER": "Zoeken…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Opgeslagen filter sets",
+         "EMPTY": "Geen opgeslagen filters aanwezig",
+         "SAVE_FILTERS": "Opslaan",
+         "FILTER_HEADER": "Filter set opslaan",
+         "NAME": "Naam",
+         "NAME_PLACEHOLDER": "Naam…",
+         "DESCRIPTION": "Omschrijving",
+         "DESCRIPTION_PLACEHOLDER": "Omschrijving…"
       }
-    },
-    "BLACKLISTS":{
-      "TABLE":{
-        "CAPTION":"Zwarte lijst van gebruikers",
-        "NAME":"Naam",
-        "DATE_FROM":"Van",
-        "DATE_TO":"Tot",
-        "REASON":"Reden",
-        "ACTION":"Acties"
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Naam"
+         }
       },
-      "DETAILS":{
-        "NEWCAPTION":"Zwarte lijst aanmaken",
-        "EDITCAPTION":"Editeer zwarte lijst",
-        "TABS":{
-          "USERS":"Gebruikers",
-          "DATES":"Datums",
-          "REASON":"Reden",
-          "SUMMARY":"Samenvatting"
-        },
-        "USERS":{
-          "REMOVE":"Verwijderen",
-          "ADD_USER":"Kies gebruiker",
-          "ALL_USERS":"Alle gebruikers",
-          "SELECT_USER":"Selecteer"
-        },
-        "DATES":{
-          "START_DATE":"Startdatum",
-          "END_DATE":"Einddatum"
-        },
-        "REASON":{
-          "SELECT_REASON":"Selecteer",
-          "REASON":"Reden",
-          "COMMENTS":"Commentaren"
-        },
-        "SUMMARY":{
-          "SUMMARY":"Samenvatting",
-          "USER":"Gebruiker",
-          "DATE_FROM":"Van",
-          "DATE_TO":"Tot",
-          "REASON":"Reden",
-          "COMMENTS":"Commentaren"
-        }
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Naam"
+         },
+         "STATUS": {
+            "LABEL": "Status"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Capture Agent ID"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Toegangspolicy"
+         },
+         "COMMENTS": {
+            "LABEL": "Commentaren"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bijdragers"
+         },
+         "CREATOR": {
+            "LABEL": "Auteur"
+         },
+         "HOSTNAME": {
+            "LABEL": "Hostnaam"
+         },
+         "LANGUAGE": {
+            "LABEL": "Taal"
+         },
+         "LICENSE": {
+            "LABEL": "Licentie"
+         },
+         "LOCATION": {
+            "LABEL": "Locatie"
+         },
+         "OPTEDOUT": {
+            "LABEL": "Opted out"
+         },
+         "PERIOD": {
+            "LABEL": "Periode"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Presentator bibliografie"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Presenter Technical"
+         },
+         "PROGRESS": {
+            "LABEL": "Vooruitgang"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Review Status",
+            "CONFIRMED": "Bevestigd",
+            "UNCONFIRMED": "Onbevestigd",
+            "UNSENT": "Niet-verzonden"
+         },
+         "SERIES": {
+            "LABEL": "Seriën"
+         },
+         "SOURCE": {
+            "LABEL": "Bron"
+         },
+         "START_DATE": {
+            "LABEL": "Startdatum"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "SCHEDULED": "Gepland",
+            "RECORDING": "Opnemen",
+            "INGESTING": "Ingesting",
+            "PROCESSING": "In verwerking",
+            "ARCHIVE": "Archiveren",
+            "WAITINGFOR": "Wachten op",
+            "UPLOAD": "Upload",
+            "ONHOLD": "In de wacht"
+         },
+         "SUBJECT": {
+            "LABEL": "Onderwerp"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Mimetype"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Resolutie"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Type"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Workflow definitie"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Workflow status"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Hostnaam"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "PAUSED": "Gepauseerd",
+            "QUEUED": "In wachtrij",
+            "RUNNING": "In uitvoering",
+            "WAITING": "Wachtend"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Naam"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Bijdragers"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Organisatoren"
+         },
+         "SUBJECT": {
+            "LABEL": "Onderwerp"
+         },
+         "LANGUAGE": {
+            "LABEL": "Taal"
+         },
+         "CREATOR": {
+            "LABEL": "Auteur"
+         },
+         "LICENSE": {
+            "LABEL": "Licentie"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Toegangspolicy"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Aangemaakt op"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Hostnaam"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "MAINTENANCE": "Onderhoud",
+            "ONLINE": "Online",
+            "OFFLINE": "Offline"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Acties"
+         },
+         "HOSTNAME": {
+            "LABEL": "Hostnaam"
+         },
+         "NAME": {
+            "LABEL": "Naam"
+         },
+         "STATUS": {
+            "LABEL": "Status",
+            "ERROR": "Fout",
+            "NORMAL": "Normaal",
+            "WARNING": "Let op"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Naam"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Omschrijving"
+         },
+         "CREATOR": {
+            "LABEL": "Auteur"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Aangemaakt"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Leverancier"
+         },
+         "ROLE": {
+            "LABEL": "Rol"
+         },
+         "USERNAME": {
+            "LABEL": "Gebruikersnaam"
+         },
+         "NAME": {
+            "LABEL": "Naam"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Gebruikersdirectory"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Niet-verzonden",
+         "UNCONFIRMED": "Onbevestigd",
+         "CONFIRMED": "Bevestigd"
       }
-    }
-  },
-  "THEMES":{
-    "THEMES":{
-      "DETAILS":{
-        "HEADER":"Thema details {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Algemeen",
-          "BUMPER":"Bumper (begin)",
-          "TRAILER":"Bumper (einde)",
-          "TITLE":"Titel",
-          "LICENSE":"Licentie",
-          "WATERMARK":"Watermerk",
-          "USAGE":"Gebruik"
-        },
-        "GENERAL":{
-          "CAPTION":"Algemeen",
-          "NAME":"Naam",
-          "DESCRIPTION":"Omschrijving",
-          "DEFAULT":"Standaard",
-          "SET_DEFAULT_INFO":"Stel als standaard theme in voor alle reeksen en evenementen",
-          "NAME_ERROR":"Naam is reeds in gebruik",
-          "NAME_REQUIRED":"Verplicht"
-        },
-        "BUMPER":{
-          "CAPTION":"Bumper (begin)",
-          "DESCRIPTION":"Vooraf gedefinieerde video die aan het begin van de opname wordt toegevoegd.",
-          "ACTIVE":"Actief"
-        },
-        "TRAILER":{
-          "CAPTION":"Bumper (einde)",
-          "DESCRIPTION":"Voorgedefinieerde video die wordt toegevoegd op het einde van een opname.",
-          "ACTIVE":"Actief"
-        },
-        "TITLE":{
-          "CAPTION":"Titel",
-          "DESCRIPTION":"Voorgedefinieerde slide met omschrijvende metadata die op het begin of einde van een opname toegevoegd wordt.",
-          "ACTIVE":"Actief"
-        },
-        "WATERMARK":{
-          "CAPTION":"Watermerk",
-          "DESCRIPTION":"Semi-transparante afbeelding die op elke frame van de opname toegepast wordt.",
-          "ACTIVE":"Actief"
-        },
-        "USAGE":{
-          "CAPTION":"Gebruik",
-          "SERIES":"Naam reeks"
-        }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} rijen",
+   "TABLE_NO_RESULT": "Geen resultaten gevonden",
+   "TABLE_LOADING": "Laden…",
+   "TABLE_EDIT": "Editeer",
+   "PM": {
+      "BLACKLIST": {
+         "REASONS": {
+            "SICK_LEAVE": "Ziekteverzuim",
+            "LEAVE": "Vakantie",
+            "FAMILY_EMERGENCY": "Familiaal noodgeval",
+            "CONSTRUCTION": "Werken"
+         }
       }
-    }
-  },
-  "CONFIGURATION":{
-    "ACTIONS":{
-      "ADD_MAIL_TEMPLATE":"Sjabloon toevoegen",
-      "ADD_THEME":"Theme toevoegen"
-    },
-    "NAVIGATION":{
-      "MAIL_TEMPLATES":"Email sjablonen",
-      "MAIL_SERVERS":"Email settings",
-      "THEMES":"Themas"
-    },
-    "EMAIL_TEMPLATES":{
-      "TABLE":{
-        "CAPTION":"Email sjablonen",
-        "NAME":"Naam",
-        "CREATOR":"Auteur",
-        "CREATED":"Aangemaakt",
-        "ACTION":"Acties"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Sjabloon aanmaken",
-        "EDITCAPTION":"Editeer sjabloon",
-        "TABS":{
-          "MESSAGE":"Bericht",
-          "SUMMARY":"Samenvatting"
-        },
-        "MESSAGE":{
-          "NAME":"Naam",
-          "SUBJECT":"Onderwerp",
-          "MESSAGE":"Bericht"
-        },
-        "SUMMARY":{
-          "MESSAGE_SUMMARY":"Samenvatting bericht"
-        }
-      }
-    },
-    "THEMES":{
-      "TABLE":{
-        "CAPTION":"Themas",
-        "NAME":"Naam",
-        "DESCRIPTION":"Omschrijving",
-        "CREATOR":"Auteur",
-        "CREATED":"Aangemaakt",
-        "DEFAULT":"Standaard",
-        "USAGE":"Gebruik",
-        "ACTION":"Acties"
-      },
-      "DETAILS":{
-        "NEWCAPTION":"Thema aanmaken",
-        "EDITCAPTION":"Editeer thema",
-        "GENERAL":{
-          "CAPTION":"Algemeen",
-          "NAME":"Naam",
-          "DESCRIPTION":"Omschrijving",
-          "DEFAULT":"Standaard",
-          "SET_DEFAULT_INFO":"Stel als standaard theme in voor alle reeksen en evenementen",
-          "NAME_REQUIRED":"Verplicht"
-        },
-        "BUMPER":{
-          "CAPTION":"Bumper (begin)",
-          "FILE_UPLOADED":"Bestand geüpload: ",
-          "DESCRIPTION":"Vooraf gedefinieerde video die aan het begin van de opname wordt toegevoegd.",
-          "ACTIVE":"Actief",
-          "ENABLE":"Bumper activeren",
-          "SELECT":"Selecteer",
-          "UPLOAD_LABEL":"Video uploaden",
-          "UPLOAD_BUTTON":"Upload"
-        },
-        "TRAILER":{
-          "CAPTION":"Bumper (einde)",
-          "FILE_UPLOADED":"Bestand geüpload: ",
-          "DESCRIPTION":"Voorgedefinieerde video die wordt toegevoegd op het einde van een opname.",
-          "ACTIVE":"Actief",
-          "ENABLE":"Bumper activeren",
-          "UPLOAD_LABEL":"Video uploaden",
-          "UPLOAD_BUTTON":"Upload"
-        },
-        "TITLE":{
-          "CAPTION":"Titel",
-          "FILE_UPLOADED":"Bestand geüpload: ",
-          "DESCRIPTION":"Voorgedefinieerde slide met omschrijvende metadata die op het begin of einde van een opname toegevoegd wordt.",
-          "ACTIVE":"Actief",
-          "ENABLE":"Titeldia inschakelen",
-          "BACKGROUND":"Achtergrond",
-          "EXTRACT":"Achtergrond verwijderen",
-          "UPLOAD":"Upload",
-          "UPLOAD_LABEL":"Upload image",
-          "UPLOAD_BUTTON":"Upload"
-        },
-        "WATERMARK":{
-          "CAPTION":"Watermerk",
-          "FILE_UPLOADED":"Bestand geüpload: ",
-          "DESCRIPTION":"Semi-transparante afbeelding die op elke frame van de opname toegepast wordt.",
-          "ACTIVE":"Actief",
-          "ENABLE":"Enable watermark",
-          "TOP_LEFT":"Linksboven",
-          "TOP_RIGHT":"Rechtsboven",
-          "BOTTOM_LEFT":"Linksonder",
-          "BOTTOM_RIGHT":"Rechtsonder",
-          "UPLOAD":"Upload",
-          "POSITION":"Watermerk positie en preview",
-          "FILEUPLOAD_DESCRIPTION":"Bestand moet een alfakanaal (transparante achtergrond) hebben. Aanvaardbare bestandstypen zijn: .PNG, .GIF, .SVG, .WEBP",
-          "UPLOAD_LABEL":"Upload image",
-          "UPLOAD_BUTTON":"Upload"
-        },
-        "SUMMARY":{
-          "CAPTION":"Samenvatting"
-        },
-        "USAGE":{
-          "CAPTION":"Gebruik",
-          "SERIE":"Naam reeks",
-          "EMPTY":"Geen serie gevonden voor huidig thema"
-        }
-      }
-    }
-  },
-  "SYSTEMS":{
-    "NAVIGATION":{
-      "JOBS":"Jobs",
-      "SERVERS":"Servers",
-      "SERVICES":"Services"
-    },
-    "JOBS":{
-      "TABLE":{
-        "ID":"Job ID",
-        "ACTION":"Acties",
-        "CAPTION":"Jobs",
-        "CREATED":"Aangemaakt",
-        "CREATOR":"Auteur",
-        "HOST_NAME":"Hostnaam",
-        "OPERATION":"Operatie",
-        "STARTED":"Gestart",
-        "STATUS":"Status",
-        "SUBMITTED":"Ingediend",
-        "TYPE":"Type"
-      },
-      "DETAILS":{
-        "HEADER":"Job details {{resourceId}}",
-        "TABS":{
-          "GENERAL":"Algemeen",
-          "OPERATIONS":"Operaties",
-          "INCIDENTS":"Incidenten"
-        }
-      }
-    },
-    "SERVERS":{
-      "TABLE":{
-        "CAPTION":"Servers",
-        "STATUS":"Status",
-        "HOST_NAME":"Hostnaam",
-        "CORES":"Cores",
-        "COMPLETED":"Jobs afgewerkt",
-        "RUNNING":"Jobs in verwerking",
-        "QUEUED":"Jobs in wachtrij",
-        "MEAN_RUN_TIME":"Gemiddelde looptijd",
-        "MEAN_QUEUE_TIME":"Gemiddelde wachttijd",
-        "MAINTENANCE":"Onderhoud",
-        "ACTION":"Acties",
-        "MAINTENANCE_OFF":"Activeer onderhoudsmodus",
-        "MAINTENANCE_ON":"Beeindig onderhoudsmodus"
-      }
-    },
-    "SERVICES":{
-      "TABLE":{
-        "CAPTION":"Services",
-        "STATUS":"Status",
-        "NAME":"Servicenaam",
-        "HOST_NAME":"Hostnaam",
-        "COMPLETED":"Jobs afgewerkt",
-        "RUNNING":"Jobs in verwerking",
-        "QUEUED":"Jobs in wachtrij",
-        "MEAN_RUN_TIME":"Gemiddelde looptijd",
-        "MEAN_QUEUE_TIME":"Gemiddelde wachttijd",
-        "SANITIZE":"Herinitialiseer service",
-        "ACTION":"Acties"
-      }
-    }
-  },
-  "VIDEO_TOOL":{
-    "TIMELINE":"Timeline",
-    "ZOOMLEVEL":"Zoom Level",
-    "ZOOM":"Zoom",
-    "BUTTONS":{
-      "CLOSE":"Afsluiten",
-      "SAVE":"Opslaan",
-      "PROCESS":"Save & Continue",
-      "ADD_COMMENT":"Add Comment"
-    },
-    "TABS":{
-      "PLAY":"Afspelen",
-      "EDIT":"Editor",
-      "CAPTIONS":"Ondertitels",
-      "ANNOTATIONS":"Annotaties"
-    },
-    "AREAS":{
-      "METADATA":"Metadata",
-      "COMMENTS":"Comments",
-      "SEGMENTS":"Segments"
-    },
-    "ACTIONS":{
-      "SPLIT":"Segmenteer",
-      "CUT":"Knippen",
-      "REPLAY_SEGMENT":"Segment opnieuw afspelen",
-      "REPLAY_END_OF_SEGMENT":"End of segment",
-      "REPLAY_SEGMENT_WITH_PREROLL":"Check transition",
-      "UNDO":"Ongedaan maken",
-      "REDO":"Opnieuw toepassen",
-      "CLEAR_SEGMENTS":"Segmenten verwijderen",
-      "CLEAR_SELECTED_SEGMENT":"Clear selected segment"
-    },
-    "SEGMENTS":{
-      "REMOVE_SEGMENT":"Remove Segment",
-      "USE_SEGMENT":"Use this Segment"
-    },
-    "PLAYER":{
-      "PLAY":"Afspelen",
-      "PAUSE":"Pauze",
-      "NEXT_FRAME":"Volgend frame",
-      "PREVIOUS_FRAME":"Vorig frame",
-      "NEXT_SEGMENT":"Volgende segment / Direct naar einde",
-      "PREVIOUS_SEGMENT":"Vorige segment / Direct naar begin",
-      "MUTE":"Stom",
-      "VOLUME":"Volume"
-    }
-  },
-  "LOGIN":{
-    "WELCOME":"Welkom bij Opencast",
-    "REMEMBER":"Onthoud me op deze computer",
-    "USERNAME":"Gebruikersnaam…",
-    "PASSWORD":"Wachtwoord…",
-    "LOGIN":"Aanmelden",
-    "ERROR":"Onjuiste gebruikersnaam en / of wachtwoord"
-  },
-  "TABLE_FILTERS":{
-    "FILTER_SELECTION":{
-      "PLACEHOLDER":"Please select a filter…",
-      "NO_OPTIONS":"No filters found"
-    },
-    "FILTER_VALUE_SELECTION":{
-      "PLACEHOLDER":"Please select a value…",
-      "NO_OPTIONS":"No values found"
-    },
-    "CLEAR":"Alle filters verwijderen",
-    "REMOVE":"Filter verwijderen",
-    "ADD":"Filters toevoegen",
-    "PLACEHOLDER":"Zoeken…",
-    "PROFILES":{
-      "FILTERS_HEADER":"Opgeslagen filter sets",
-      "EMPTY":"Geen opgeslagen filters aanwezig",
-      "SAVE_FILTERS":"Opslaan",
-      "FILTER_HEADER":"Filter set opslaan",
-      "NAME":"Naam",
-      "NAME_PLACEHOLDER":"Naam…",
-      "DESCRIPTION":"Omschrijving",
-      "DESCRIPTION_PLACEHOLDER":"Omschrijving…"
-    }
-  },
-  "FILTERS":{
-    "ACLS":{
-      "NAME":{
-        "LABEL":"Name"
-      }
-    },
-    "AGENTS":{
-      "NAME":{
-        "LABEL":"Naam"
-      },
-      "STATUS":{
-        "LABEL":"Status"
-      }
-    },
-    "EVENTS":{
-      "AGENT_ID":{
-        "LABEL":"Capture Agent ID"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Toegangspolicy"
-      },
-      "COMMENTS":{
-        "LABEL":"Commentaren"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Bijdragers"
-      },
-      "CREATOR":{
-        "LABEL":"Auteur"
-      },
-      "HOSTNAME":{
-        "LABEL":"Hostnaam"
-      },
-      "LANGUAGE":{
-        "LABEL":"Taal"
-      },
-      "LICENSE":{
-        "LABEL":"Licentie"
-      },
-      "LOCATION":{
-        "LABEL":"Locatie"
-      },
-      "OPTEDOUT":{
-        "LABEL":"Opted out"
-      },
-      "PERIOD":{
-        "LABEL":"Periode"
-      },
-      "PRESENTERS_BIBLIOGRAPHIC":{
-        "LABEL":"Presentator bibliografie"
-      },
-      "PRESENTERS_TECHNICAL":{
-        "LABEL":"Presenter Technical"
-      },
-      "PROGRESS":{
-        "LABEL":"Vooruitgang"
-      },
-      "REVIEW_STATUS":{
-        "LABEL":"Review Status",
-        "CONFIRMED":"Bevestigd",
-        "UNCONFIRMED":"Onbevestigd",
-        "UNSENT":"Niet-verzonden"
-      },
-      "SERIES":{
-        "LABEL":"Series"
-      },
-      "SOURCE":{
-        "LABEL":"Bron"
-      },
-      "START_DATE":{
-        "LABEL":"Startdatum"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "SCHEDULED":"Gepland",
-        "RECORDING":"Opnemen",
-        "INGESTING":"Ingesting",
-        "PROCESSING":"In verwerking",
-        "ARCHIVE":"Archiveren",
-        "WAITINGFOR":"Wachten op",
-        "UPLOAD":"Upload",
-        "ONHOLD":"In de wacht"
-      },
-      "SUBJECT":{
-        "LABEL":"Onderwerp"
-      },
-      "TRACK_MIMETYPE":{
-        "LABEL":"Mimetype"
-      },
-      "TRACK_RESOLUTION":{
-        "LABEL":"Resolutie"
-      },
-      "TRACK_TYPE":{
-        "LABEL":"Type"
-      },
-      "WORKFLOW_DEFINITION":{
-        "LABEL":"Workflow definitie"
-      },
-      "WORKFLOW_STATE":{
-        "LABEL":"Workflow status"
-      }
-    },
-    "JOBS":{
-      "HOSTNAME":{
-        "LABEL":"Hostnaam"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "PAUSED":"Gepauseerd",
-        "QUEUED":"In wachtrij",
-        "RUNNING":"In uitvoering",
-        "WAITING":"Wachtend"
-      }
-    },
-    "SERIES":{
-      "TITLE":{
-        "LABEL":"Naam"
-      },
-      "CONTRIBUTORS":{
-        "LABEL":"Bijdragers"
-      },
-      "ORGANIZERS":{
-        "LABEL":"Organisatoren"
-      },
-      "SUBJECT":{
-        "LABEL":"Onderwerp"
-      },
-      "LANGUAGE":{
-        "LABEL":"Taal"
-      },
-      "CREATOR":{
-        "LABEL":"Auteur"
-      },
-      "LICENSE":{
-        "LABEL":"Licentie"
-      },
-      "ACCESS_POLICY":{
-        "LABEL":"Toegangspolicy"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Aangemaakt op"
-      }
-    },
-    "SERVERS":{
-      "HOSTNAME":{
-        "LABEL":"Hostnaam"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "MAINTENANCE":"Onderhoud",
-        "ONLINE":"Online",
-        "OFFLINE":"Offline"
-      }
-    },
-    "SERVICES":{
-      "ACTIONS":{
-        "LABEL":"Acties"
-      },
-      "HOSTNAME":{
-        "LABEL":"Hostnaam"
-      },
-      "NAME":{
-        "LABEL":"Naam"
-      },
-      "STATUS":{
-        "LABEL":"Status",
-        "ERROR":"Fout",
-        "NORMAL":"Normaal",
-        "WARNING":"Let op"
-      }
-    },
-    "THEMES":{
-      "NAME":{
-        "LABEL":"Naam"
-      },
-      "DESCRIPTION":{
-        "LABEL":"Omschrijving"
-      },
-      "CREATOR":{
-        "LABEL":"Auteur"
-      },
-      "CREATION_DATE":{
-        "LABEL":"Aangemaakt"
-      }
-    },
-    "USERS":{
-      "PROVIDER":{
-        "LABEL":"Leverancier"
-      },
-      "ROLE":{
-        "LABEL":"Rol"
-      },
-      "USERNAME":{
-        "LABEL":"Gebruikersnaam"
-      },
-      "NAME":{
-        "LABEL":"Naam"
-      },
-      "USER_DIRECTORY":{
-        "LABEL":"Gebruikersdirectory"
-      }
-    },
-    "REVIEW_STATUS":{
-      "UNSENT":"Niet-verzonden",
-      "UNCONFIRMED":"Onbevestigd",
-      "CONFIRMED":"Bevestigd"
-    }
-  },
-  "TABLE_SUMMARY":"{{numberOfRows}} rijen",
-  "TABLE_NO_RESULT":"Geen resultaten gevonden",
-  "TABLE_LOADING":"Laden…",
-  "TABLE_EDIT":"Editeer",
-  "PM":{
-    "BLACKLIST":{
-      "REASONS":{
-        "SICK_LEAVE":"Ziekteverzuim",
-        "LEAVE":"Vakantie",
-        "FAMILY_EMERGENCY":"Familiaal noodgeval",
-        "CONSTRUCTION":"Werken"
-      }
-    }
-  },
-  "DASHBOARD":{
-    "RUNNING":"In uitvoering",
-    "FINISHED":"Voltooid",
-    "PAUSED":"Paused",
-    "FAILED":"Mislukt",
-    "FINISHED_WITH_COMMENTS":"Taak",
-    "SCHEDULED":"Gepland",
-    "RECORDING":"Recording"
-  }
+   },
+   "DASHBOARD": {
+      "RUNNING": "In uitvoering",
+      "FINISHED": "Voltooid",
+      "PAUSED": "Gepauseerd",
+      "FAILED": "Mislukt",
+      "FINISHED_WITH_COMMENTS": "Taak",
+      "SCHEDULED": "Gepland",
+      "RECORDING": "Opnemen"
+   }
 }

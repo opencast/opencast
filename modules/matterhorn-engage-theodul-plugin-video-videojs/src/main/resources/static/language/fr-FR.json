@@ -1,15 +1,15 @@
 {
-  "value_locale":"fr",
-  "error_AudioCodecNotSupported":"Erreur : Le codec audio n'est pas supporté par ce navigateur",
-  "error_AudioElementNotSupported":"Erreur : Votre navigateur ne supporte pas l'élément audio.",
-  "video":"Vidéo",
-  "video_short":"Vid.",
-  "openInPlayer":"Ouvrir dans le lecteur",
-  "givenTime":"Le temps introduit",
-  "hasToBeSmallerThanDuration":"doit être inférieur à la durée totale",
-  "msg_waitToSetTime":"Veuillez attendre la fin du chargement de la vidéo avant de définir le temps de lecture.",
-  "msg_startPlayingToSetTime":"Veuillez démarrer la video avant de définir le temps de lecture.",
-  "msg_waitToSeek":"Naviguer dans la vidéo n'est pas possible avant la fin du chargement.",
-  "msg_startPlayingToSeek":"Naviguer dans la vidéo n'est pas possible avant d'avoir cliqué au moins une fois sur le bouton de lecture.",
-  "chromeBuffer":"Le vérificateur de la mémoire tampon a été désactivé en raison des limitations de Chrome. Il est possible que vous rencontriez des problèmes de lecture de la vidéo."
+    "value_locale": "fr",
+    "error_AudioCodecNotSupported": "Erreur : Le codec audio n'est pas supporté par ce navigateur",
+    "error_AudioElementNotSupported": "Erreur : Votre navigateur ne supporte pas l'élément audio.",
+    "video": "Vidéo",
+    "video_short": "Vid.",
+    "openInPlayer": "Ouvrir dans le lecteur",
+    "givenTime": "Le temps introduit",
+    "hasToBeSmallerThanDuration": "doit être inférieur à la durée totale",
+    "msg_waitToSetTime": "Veuillez attendre la fin du chargement de la vidéo avant de définir le temps de lecture.",
+    "msg_startPlayingToSetTime": "Veuillez démarrer la video avant de définir le temps de lecture.",
+    "msg_waitToSeek": "Naviguer dans la vidéo n'est pas possible avant la fin du chargement.",
+    "msg_startPlayingToSeek": "Naviguer dans la vidéo n'est pas possible avant d'avoir cliqué au moins une fois sur le bouton de lecture.",
+    "chromeBuffer": "Le vérificateur de la mémoire tampon a été désactivé en raison des limitations de Chrome. Il est possible que vous rencontriez des problèmes de lecture de la vidéo."
 }

@@ -1,13 +1,13 @@
 {
-  "value_locale":"en",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "title":"Titel",
-  "noTitle":"Geen titel",
-  "creator":"Auteur",
-  "presenter":"Bijdragers",
-  "views":"Bekeken",
-  "series":"Reeks",
-  "recordingDate":"Opname datum",
-  "description":"Omschrijving",
-  "noDescriptionAvailable":"Geen beschrijving beschikbaar."
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "Titel",
+    "noTitle": "Geen titel",
+    "creator": "Auteur",
+    "presenter": "Bijdragers",
+    "views": "Bekeken",
+    "series": "Reeks",
+    "recordingDate": "Opname datum",
+    "description": "Omschrijving",
+    "noDescriptionAvailable": "Geen beschrijving beschikbaar."
 }

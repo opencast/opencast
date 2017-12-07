@@ -1,6 +1,6 @@
 {
-  "value_locale":"en",
-  "segment":"Segment",
-  "noSlidesAvailable":"Geen dia's beschikbaar.",
-  "slide_text":"Tekst in dia 's"
+    "value_locale": "en",
+    "segment": "Segment",
+    "noSlidesAvailable": "Geen dia's beschikbaar.",
+    "slide_text": "Tekst in dia 's"
 }
