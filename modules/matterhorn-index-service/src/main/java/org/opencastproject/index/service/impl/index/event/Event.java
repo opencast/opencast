@@ -1165,7 +1165,12 @@ public class Event implements IndexObject {
       return;
     }
 
-    eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+    if (StringUtils.isNotBlank(getSchedulingStatus())) {
+      eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
+      return;
+    }
+
+    eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
   }
 
   public boolean hasRecordingStarted() {
