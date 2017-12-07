@@ -6,11 +6,11 @@ WORK IN PROGRESS
 New Features and Improvements
 -----------------------------
 
-- **Asset Manager** - The Archive service has been enhanced to to support properties that can be attached to episodes.
+- **Asset Manager** - The Archive service has been enhanced to support properties that can be attached to episodes.
     This allows services to store their data centrally and thus reducing the overall system complexity and the same
     time avoiding data being duplicated across multiple services (and many of the problems related with that).
-    The Asset Manager provides a query language for easy manupulation of properties.
-    To have a more approperiate name, the Archive service has then been renamed to Asset Manager service.
+    The Asset Manager provides a query language for easy manipulation of properties.
+    To have a more appropriate name, the Archive service has then been renamed to Asset Manager service.
 - **Scheduler** - The Scheduler service has been rewritten to take advantage of the Asset Manager service. The new
     Scheduler service provides full support for extended metadata for scheduled events and adds a transactional
     API for integrating external scheduling sources. A new tab in the event detail modal helps to more clearly 
@@ -28,14 +28,16 @@ New Features and Improvements
     Opencast release which relieves Adopters from the need to include this functionality from a separate code
     repository.
 - **Manually retry failed operations** - It is now possible to make failing workflow operations pause the workflow,
-    leaving the user the choise to manually retry or abort the failed operation.
+    leaving the user the choice to manually retry or abort the failed operation.
 - **User Interface Improvements** - Various improvements in the user interface further improve the user experiences
-    of Opencast: A new datetimer picker makes entering start time more efficient. So-called cross page links allow
-    the user to navigate to a different table with useful filters enabled by a single click. The video editor now 
-    does not reload the index page making it open much faster. The start date of an upload can be directly set in the
-    upload dialog. The new view Location Details allows users to see the configuratoin and capabilities as reported
-    by capture agents which simplifies the management of capture agents. Just to name a few.
-- **OAI-PMH Improvements** - The addition of support for automacally publishing changes to the OAI-PMH server relies 
+    of Opencast. Just to name a few:
+    - A new datetimer picker makes entering start time more efficient
+    - Cross page links allow the user to navigate to a different table with useful filters enabled by a single click
+    - The video editor now opens much faster
+    - The start date of an upload can be directly set in the upload dialog
+    - The new view Location Details allows users to see the configuration and capabilities as reported
+     by capture agents which simplifies the management of capture agents
+- **OAI-PMH Improvements** - The addition of support for automatically publishing changes to the OAI-PMH server relieves
     users from the need to re-publish to OAI-PMH after changes to metadata. The metadata prefix *matterhorn-inlined*
     now provides support for extended metadata catalogs. Last but not least, the performance of the publication and 
     retraction workflow operation handlers for OAI-PMH has been significantly improved by supporting bulk operations.
@@ -43,9 +45,9 @@ New Features and Improvements
     - *WOH series* can now apply series metadata to event metadata
     - *WOH timelinepreview* has been added. This workflow operation handler generates a single image that contains 
       a large configurable number of preview images which allows players to implement highly efficient timeline
-      previews. The Theodual player timeline preview features relies on this new workflow operation handler
+      previews. The Theodul player timeline preview features relies on this new workflow operation handler
     - *WOH execute-once* can now set workflow properties
-- **Scalability Improvements** - Several problems considering the scalabilty of Opencast in large-scale
+- **Scalability Improvements** - Several problems considering the scalability of Opencast in large-scale
      scenarios have been addressed. In particular, Opencast 4.0 performs much better in the presence of thousands
      of series
 - **Language Support** - Added support for Slovenian and Hebrew

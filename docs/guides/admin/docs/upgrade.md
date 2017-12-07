@@ -34,17 +34,13 @@ all database migrations, we recommend to make a database backup before attemptin
 
 You can find the database upgrade script at `…/docs/upgrade/3.0_to_4.0/mysql5.sql`.
 
-### Standalone scheduler migration
+Standalone scheduler migration
+------------------------------
 
 The new scheduler service adds support for extended metadata and is bound to the new AssetManager.
 
 If you're setting up Opencast from scratch you can safely skip this document but if you plan to upgrade your system
 and continue to use your data you should read on.
-
-Requirement Changes
--------------------
-
-Please be aware that Opencast 4.0 requires Java 8.
 
 Configuration Changes
 ---------------------
@@ -69,7 +65,7 @@ definition.
 
 There are two new optional configuration properties `org.opencastproject.episode.rootdir` and
 `org.opencastproject.storage.dir` in `custom.properties` that you might want to have a look at.
-Those properties are descibed in the [Asset Manager Configuration](configuration/asset-manager/)
+Those properties are described in the [Asset Manager Configuration](configuration/asset-manager/)
 
 4. ActiveMQ (due to [MH-12082](https://opencast.jira.com/browse/MH-12082))
 
