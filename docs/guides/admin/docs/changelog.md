@@ -8,6 +8,8 @@ Opencast 4.0
 
 - [[MH-12597]](https://opencast.jira.com/browse/MH-12597) - When reindexing, some events may incorrectly be displayed as "Scheduled" instead of "Processed" or "Failed"
 - [[MH-12596]](https://opencast.jira.com/browse/MH-12596) - Video Editor Ignores Workspace
+- [[MH-12594]](https://opencast.jira.com/browse/MH-12594) - Description field in metadata editor doesn't handle newlines properly
+- [[MH-12591]](https://opencast.jira.com/browse/MH-12591) - AssetManager reindex produces "No organization found!" warnings
 - [[MH-12590]](https://opencast.jira.com/browse/MH-12590) - Fix Workflow WOH Workspace Mock
 - [[MH-12589]](https://opencast.jira.com/browse/MH-12589) - Fix Timelinepreview Dependencies
 - [[MH-12588]](https://opencast.jira.com/browse/MH-12588) - Stream Security Leaks Secrets
