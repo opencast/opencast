@@ -279,4 +279,11 @@ public interface Workspace extends StorageUsage {
    */
   void cleanup(Id mediaPackageId) throws IOException;
 
+  /**
+   * Returns the workspace's root directory
+   *
+   * @return Path to the workspace root directory
+   */
+  String rootDirectory();
+
 }

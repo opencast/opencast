@@ -222,6 +222,14 @@ td.editable {
     }
   }
 
+  .preserve-newlines {
+    white-space: pre-wrap;
+  }
+
+  .vertical-resize {
+    resize: vertical;
+  }
+
   span {
     border-bottom: 1px dashed #999;
   }
@@ -240,6 +248,10 @@ td.editable {
 textarea.editable {
   width: 98%;
   height: auto;
+}
+
+.editable-select {
+  margin-top: -26px;
 }
 
 button.red {

@@ -1,6 +1,6 @@
 {
-  "value_locale":"en",
-  "segment":"Τμήμα",
-  "noSlidesAvailable":"Καμμία διαφάνεια διαθέσιμη.",
-  "slide_text":"Κείμενο διαφάνειας"
+    "value_locale": "en",
+    "segment": "Τμήμα",
+    "noSlidesAvailable": "Καμμία διαφάνεια διαθέσιμη.",
+    "slide_text": "Κείμενο διαφάνειας"
 }

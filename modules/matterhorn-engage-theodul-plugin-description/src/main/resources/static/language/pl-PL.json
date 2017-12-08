@@ -1,7 +1,7 @@
 {
-  "value_locale":"pl",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "videoTitle":"Tytuł nagrania",
-  "creator":"Twórca",
-  "date":"Data"
+    "value_locale": "pl",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "videoTitle": "Tytuł nagrania",
+    "creator": "Twórca",
+    "date": "Data"
 }

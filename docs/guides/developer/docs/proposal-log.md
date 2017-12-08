@@ -16,6 +16,21 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+### Crowdin Acceptance Policy
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on November 17, 2017
+
+```no-highlight
+Hi all,
+
+Per the discussion in the meeting today, we need to set a policy regarding what is expected of our Crowdin translators prior to joining the translation team.  My proposal is that they must write a brief, understandable sentence regarding why they want to help translate Opencast via the Crowdin UI.  This is an optional field in the workflow where they request to be a translator (ie, no new tools or fields) which is sometimes filled in, but mostly left blank.  Something like
+
+'I want to help translate $project into [language]'
+
+would be sufficient.  This filters out the bots, yet is simple enough that someone with Google translate ought to be able to work something out.  Once this passes I will update the Crowdin and Opencast docs regarding the requirements, and then we should be good to go.
+
+Proposal closes EOD 2017-11-17.
+```
+
 ### Rename Matterhorn Repository To Opencast
 
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on July 13, 2017

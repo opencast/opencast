@@ -1,13 +1,13 @@
 {
-  "value_locale":"en",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "title":"Τίτλος",
-  "noTitle":"Χωρίς τίτλο",
-  "creator":"Δημιουργός",
-  "presenter":"Χορηγός",
-  "views":"Προβολές",
-  "series":"Σειρά",
-  "recordingDate":"Ημερομηνία εγγραφής",
-  "description":"Περιγραφή",
-  "noDescriptionAvailable":"Δεν υπάρχει διαθέσιμη περιγραφή."
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "Τίτλος",
+    "noTitle": "Χωρίς τίτλο",
+    "creator": "Δημιουργός",
+    "presenter": "Χορηγός",
+    "views": "Προβολές",
+    "series": "Σειρά",
+    "recordingDate": "Ημερομηνία εγγραφής",
+    "description": "Περιγραφή",
+    "noDescriptionAvailable": "Δεν υπάρχει διαθέσιμη περιγραφή."
 }

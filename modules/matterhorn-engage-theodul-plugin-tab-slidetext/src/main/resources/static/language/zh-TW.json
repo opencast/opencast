@@ -1,6 +1,6 @@
 {
-  "value_locale":"zh",
-  "segment":"線段",
-  "noSlidesAvailable":"沒有可用的幻燈片。",
-  "slide_text":"幻燈片文本"
+    "value_locale": "英文",
+    "segment": "區段",
+    "noSlidesAvailable": "沒有可用的幻燈片。",
+    "slide_text": "幻燈片文本"
 }

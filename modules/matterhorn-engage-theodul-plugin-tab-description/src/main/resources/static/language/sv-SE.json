@@ -1,13 +1,13 @@
 {
-  "value_locale":"sv",
-  "value_dateFormatFull":"MMMM Vd åååå, t:mm:ss",
-  "title":"Titel",
-  "noTitle":"Ingen titel",
-  "creator":"Skapare",
-  "presenter":"Bidragsgivare",
-  "views":"Vyer",
-  "series":"Serie",
-  "recordingDate":"Inspelningsdatum",
-  "description":"Beskrivning",
-  "noDescriptionAvailable":"Ingen beskrivning tillgänglig."
+    "value_locale": "sv",
+    "value_dateFormatFull": "MMMM Vd åååå, t:mm:ss",
+    "title": "Titel",
+    "noTitle": "Ingen titel",
+    "creator": "Skapare",
+    "presenter": "Bidragsgivare",
+    "views": "Vyer",
+    "series": "Serie",
+    "recordingDate": "Inspelningsdatum",
+    "description": "Beskrivning",
+    "noDescriptionAvailable": "Ingen beskrivning tillgänglig."
 }

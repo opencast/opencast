@@ -1,15 +1,15 @@
 {
-  "value_locale":"gl",
-  "error_AudioCodecNotSupported":"Erro: O códec de audio non é compatible con este navegador",
-  "error_AudioElementNotSupported":"Erro: O elemento de audio non é compatible co seu navegador.",
-  "video":"Vídeo",
-  "video_short":"Vid.",
-  "openInPlayer":"Abrir no reprodutor",
-  "givenTime":"O tempo indicado",
-  "hasToBeSmallerThanDuration":"ten que ser menor que a duración",
-  "msg_waitToSetTime":"Por favor, non modifique o instante de reprodución ata que o vídeo estea cargado.",
-  "msg_startPlayingToSetTime":"Empece a reproducir o vídeo para poder modificar o instante de reprodución.",
-  "msg_waitToSeek":"Non é posible saltar a outros puntos do vídeo ata que este se cargue.",
-  "msg_startPlayingToSeek":"Non é posible saltar a outros puntos do vídeo ata pulsar o botón \"reproducir\" por primeira vez.",
-  "chromeBuffer":"Desactivouse a comprobación do búfer debido a limitacións do Chrome. É posible que isto lle afecte á calidade de reprodución."
+    "value_locale": "gl",
+    "error_AudioCodecNotSupported": "Erro: O códec de audio non é compatible con este navegador",
+    "error_AudioElementNotSupported": "Erro: O elemento de audio non é compatible co seu navegador.",
+    "video": "Vídeo",
+    "video_short": "Víd.",
+    "openInPlayer": "Abrir no reprodutor",
+    "givenTime": "O tempo indicado",
+    "hasToBeSmallerThanDuration": "ten que ser menor que a duración",
+    "msg_waitToSetTime": "Por favor, non modifique o instante de reprodución ata que o vídeo estea cargado.",
+    "msg_startPlayingToSetTime": "Empece a reproducir o vídeo para poder modificar o instante de reprodución.",
+    "msg_waitToSeek": "Non é posible saltar a outros puntos do vídeo ata que este se cargue.",
+    "msg_startPlayingToSeek": "Non é posible saltar a outros puntos do vídeo ata pulsar o botón \"reproducir\" por primeira vez.",
+    "chromeBuffer": "Desactivouse a comprobación do búfer debido a limitacións do Chrome. É posible que isto lle afecte á calidade de reprodución."
 }

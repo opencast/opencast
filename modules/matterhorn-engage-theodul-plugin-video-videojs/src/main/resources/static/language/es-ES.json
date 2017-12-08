@@ -1,15 +1,15 @@
 {
-  "value_locale":"es",
-  "error_AudioCodecNotSupported":"Error: El códec de audio no es compatible con este navegador",
-  "error_AudioElementNotSupported":"Error: Su navegador no soporta el elemento audio.",
-  "video":"Vídeo",
-  "video_short":"Vid.",
-  "openInPlayer":"Abrir en el reproductor",
-  "givenTime":"El tiempo indicado",
-  "hasToBeSmallerThanDuration":"tiene que ser menor que la duración",
-  "msg_waitToSetTime":"Por favor, no modifique el instante de reproducción hasta que se haya cargado el vídeo.",
-  "msg_startPlayingToSetTime":"Para poder introducir el instante de reproducción, empiece a reproducir el vídeo.",
-  "msg_waitToSeek":"No es posible saltar a otros puntos del vídeo hasta que éste se haya cargado.",
-  "msg_startPlayingToSeek":"Para poder saltar a otros puntos del vídeo, pulse la tecla \"reproducir\" al menos una vez.",
-  "chromeBuffer":"Se ha desactivado la comprobación del búfer debido a limitaciones del Chrome. Es posible que esto afecte a la calidad de reproducción."
+    "value_locale": "es",
+    "error_AudioCodecNotSupported": "Error: El códec de audio no es compatible con este navegador",
+    "error_AudioElementNotSupported": "Error: Su navegador no soporta el elemento audio.",
+    "video": "Vídeo",
+    "video_short": "Vid.",
+    "openInPlayer": "Abrir en el reproductor",
+    "givenTime": "El tiempo indicado",
+    "hasToBeSmallerThanDuration": "tiene que ser menor que la duración",
+    "msg_waitToSetTime": "Por favor, no modifique el instante de reproducción hasta que se haya cargado el vídeo.",
+    "msg_startPlayingToSetTime": "Para poder introducir el instante de reproducción, empiece a reproducir el vídeo.",
+    "msg_waitToSeek": "No es posible saltar a otros puntos del vídeo hasta que éste se haya cargado.",
+    "msg_startPlayingToSeek": "Para poder saltar a otros puntos del vídeo, pulse la tecla \"reproducir\" al menos una vez.",
+    "chromeBuffer": "Se ha desactivado la comprobación del búfer debido a limitaciones del Chrome. Es posible que esto afecte a la calidad de reproducción."
 }

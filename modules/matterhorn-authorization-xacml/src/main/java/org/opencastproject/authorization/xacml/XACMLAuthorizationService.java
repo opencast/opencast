@@ -24,11 +24,8 @@ package org.opencastproject.authorization.xacml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
-import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.mkString;
-import static org.opencastproject.util.data.Monadics.caseA;
-import static org.opencastproject.util.data.Monadics.caseN;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -40,7 +37,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -50,18 +46,13 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Option.Match;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -78,11 +69,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -97,8 +92,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
   /** The default filename for XACML attachments */
   public static final String XACML_FILENAME = "xacml.xml";
 
-  public static final String READ_PERMISSION = "read";
-
   /** The workspace */
   protected Workspace workspace;
 
@@ -110,62 +103,39 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   @Override
   public Tuple<AccessControlList, AclScope> getActiveAcl(final MediaPackage mp) {
-    // tuple up with episode flavor
-    final Function<AccessControlList, Tuple<AccessControlList, AclScope>> isEpisodeAcl = tupleA(AclScope.Episode);
-    // tuple up with series flavor
-    final Function<AccessControlList, Tuple<AccessControlList, AclScope>> isSeriesAcl = tupleA(AclScope.Series);
+    logger.debug("getActiveACl for media package {}", mp.getIdentifier());
     return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
       @Override
       public Tuple<AccessControlList, AclScope> apply() {
         // has an episode ACL?
-        return getAcl(mp, list(XACML_POLICY_EPISODE)).map(isEpisodeAcl)
-        // has a series ACL?
-                .orElse(new Function0<Option<Tuple<AccessControlList, AclScope>>>() {
-                  @Override
-                  public Option<Tuple<AccessControlList, AclScope>> apply() {
-                    return getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY)).map(isSeriesAcl);
-                  }
-                })
-                // no -> return an empty series ACL
-                .getOrElse(getDefaultAcl(mp));
+        Option<AccessControlList> episode = getAcl(mp, list(XACML_POLICY_EPISODE));
+        if (episode.isSome()) {
+          logger.debug("Found event ACL for mediapackage {}", mp.getIdentifier());
+          return tuple(episode.get(), AclScope.Episode);
+        }
+        Option<AccessControlList> series = getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
+        if (series.isSome()) {
+          logger.debug("Found series ACL for mediapackage {}", mp.getIdentifier());
+          return tuple(series.get(), AclScope.Series);
+        }
+        logger.debug("Found neither event nor series ACL for mediapackage {}", mp.getIdentifier());
+        return getDefaultAcl(mp);
       }
     });
   }
 
-  private Function0<Tuple<AccessControlList, AclScope>> getDefaultAcl(final MediaPackage mp) {
-    return new Function0<Tuple<AccessControlList, AclScope>>() {
-      @Override
-      public Tuple<AccessControlList, AclScope> apply() {
-        logger.debug("No XACML attachment found in {}", mp);
-        if (StringUtils.isNotBlank(mp.getSeries())) {
-          logger.info("Falling back to using default acl from series {} for mediapackage {}", mp.getSeries(),
-                  mp.getIdentifier());
-          try {
-            return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
-          } catch (Exception e) {
-            logger.warn("Unable to get default acl from series '{}': {}", mp.getSeries(), e.getMessage());
-          }
-        }
-        logger.trace("Falling back to using default public acl for mediapackage '{}'", mp);
-        // TODO: We need a configuration option for open vs. closed by default
-        // Right now, rights management is based on series. Here we make sure that
-        // objects not belonging to a series are world readable
-        AccessControlList accessControlList = new AccessControlList();
-        List<AccessControlEntry> acl = accessControlList.getEntries();
-        String anonymousRole = securityService.getOrganization().getAnonymousRole();
-        acl.add(new AccessControlEntry(anonymousRole, READ_PERMISSION, true));
-        return tuple(accessControlList, AclScope.Series);
+  private Tuple<AccessControlList, AclScope> getDefaultAcl(final MediaPackage mp) {
+    logger.debug("Get default ACL for media package {}", mp.getIdentifier());
+    if (StringUtils.isNotBlank(mp.getSeries())) {
+      logger.debug("Falling back to acl from series {} for media package {}", mp.getSeries(), mp.getIdentifier());
+      try {
+        return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
+      } catch (Exception e) {
+        logger.debug("Unable to get acl from series '{}'", mp.getSeries());
       }
-    };
-  }
-
-  private static <A, B> Function<A, Tuple<A, B>> tupleA(final B b) {
-    return new Function<A, Tuple<A, B>>() {
-      @Override
-      public Tuple<A, B> apply(A a) {
-        return tuple(a, b);
-      }
-    };
+    }
+    logger.trace("Falling back to global default acl for media package '{}'", mp.getIdentifier());
+    return tuple(new AccessControlList(), AclScope.Global);
   }
 
   @Override
@@ -208,7 +178,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
       @Override
       public Tuple<MediaPackage, Attachment> xapply() throws Exception {
         // Get XACML representation of these role + action tuples
-        String xacmlContent = null;
+        String xacmlContent;
         try {
           xacmlContent = XACMLUtils.getXacml(mp, acl);
         } catch (JAXBException e) {
@@ -223,7 +193,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         URI uri;
         InputStream in = null;
         try {
-          in = IOUtils.toInputStream(xacmlContent);
+          in = IOUtils.toInputStream(xacmlContent, "UTF-8");
           uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
         } catch (IOException e) {
           throw new MediaPackageException("Error storing xacml for mediapackage " + mp.getIdentifier());
@@ -242,7 +212,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         attachment.setChecksum(null);
         mp.add(attachment);
 
-        logger.info("Saved XACML under {}", uri);
+        logger.debug("Saved XACML as {}", uri);
 
         // return augmented mediapackage
         return tuple(mp, attachment);
@@ -252,9 +222,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   @Override
   public List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope) {
-    final List<MediaPackageElementFlavor> flavors = scope.map(toFlavorsF).getOrElse(
-            Collections.<MediaPackageElementFlavor> nil());
-    return getAttachments(mp, flavors);
+    return getAttachments(mp, toFlavors(scope.get()));
   }
 
   @Override
@@ -288,16 +256,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
   }
 
-  private Function0<Option<Attachment>> getSingleAttachmentF(final MediaPackage mp,
-          final List<MediaPackageElementFlavor> flavors) {
-    return new Function0<Option<Attachment>>() {
-      @Override
-      public Option<Attachment> apply() {
-        return getSingleAttachment(mp, flavors);
-      }
-    };
-  }
-
   /** Return all attachments of the given flavors. */
   private static List<Attachment> getAttachments(MediaPackage mp, final List<MediaPackageElementFlavor> flavors) {
     return mlist(mp.getAttachments()).filter(new Function<Attachment, Boolean>() {
@@ -310,8 +268,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** Return the XACML attachment or none if the media package does not contain any XACMLs. */
   private Option<Attachment> getXacmlAttachment(MediaPackage mp) {
-    return getSingleAttachment(mp, list(XACML_POLICY_EPISODE)).orElse(
-            getSingleAttachmentF(mp, list(XACML_POLICY_SERIES, XACML_POLICY)));
+    Option<Attachment> attachment = getSingleAttachment(mp, list(XACML_POLICY_EPISODE));
+    if (attachment.isNone()) {
+      attachment = getSingleAttachment(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
+    }
+    return attachment;
   }
 
   /**
@@ -325,17 +286,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
       case Series:
         return list(XACML_POLICY_SERIES, XACML_POLICY);
       default:
-        return unexhaustiveMatch();
+        return list();
     }
   }
-
-  /** Functional version of {@link #toFlavors(org.opencastproject.security.api.AclScope)}. */
-  private static Function<AclScope, List<MediaPackageElementFlavor>> toFlavorsF = new Function<AclScope, List<MediaPackageElementFlavor>>() {
-    @Override
-    public List<MediaPackageElementFlavor> apply(AclScope scope) {
-      return toFlavors(scope);
-    }
-  };
 
   /** Get the flavor associated with a scope. */
   private static MediaPackageElementFlavor toFlavor(AclScope scope) {
@@ -361,63 +314,30 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
   }
 
-  private Function0<Option<AccessControlList>> getAclF(final MediaPackage mp,
-          final List<MediaPackageElementFlavor> flavors) {
-    return new Function0<Option<AccessControlList>>() {
-      @Override
-      public Option<AccessControlList> apply() {
-        return getAcl(mp, flavors);
-      }
-    };
-  }
-
   /** Get the ACL of the given flavor from a media package. */
   private Option<AccessControlList> getAcl(final MediaPackage mp, final List<MediaPackageElementFlavor> flavors) {
-    return mlist(getAttachments(mp, flavors)).match(
-            Monadics.<Attachment, Option<AccessControlList>> caseNil(Options.<AccessControlList> never2()),
-            caseA(new Function<Attachment, Option<AccessControlList>>() {
-              @Override
-              public Option<AccessControlList> apply(Attachment a) {
-                return loadAcl(a.getURI());
-              }
-            }), caseN(new Function<List<Attachment>, Option<AccessControlList>>() {
-              @Override
-              public Option<AccessControlList> apply(List<Attachment> as) {
-                // try to find the source policy. Some may be copies sent to distribution channels.
-                return mlist(as)
-                        .filter(unreferencedAttachments)
-                        .match(Monadics
-                                .<Attachment, Option<AccessControlList>> caseNil(new Function0<Option<AccessControlList>>() {
-                                  @Override
-                                  public Option<AccessControlList> apply() {
-                                    logger.warn(
-                                            "Multiple XACML policies of type {} are attached to {}, and none seem to be authoritative.",
-                                            flavors, mp);
-                                    return none();
-                                  }
-                                }), caseA(new Function<Attachment, Option<AccessControlList>>() {
-                          @Override
-                          public Option<AccessControlList> apply(Attachment a) {
-                            return loadAcl(a.getURI());
-                          }
-                        }), caseN(new Function<List<Attachment>, Option<AccessControlList>>() {
-                          @Override
-                          public Option<AccessControlList> apply(List<Attachment> as) {
-                            logger.warn("More than one non-referenced XACML policy of type {} is attached to {}.",
-                                    flavors, mp);
-                            return none();
-                          }
-                        }));
-              }
-            }));
-  }
 
-  private static final Function<Attachment, Boolean> unreferencedAttachments = new Function<Attachment, Boolean>() {
-    @Override
-    public Boolean apply(Attachment a) {
-      return a.getReference() == null;
+    Option<AccessControlList> result = Option.none();
+
+    Set<Attachment> attachments = new HashSet<>();
+    for (MediaPackageElementFlavor flavor : flavors) {
+      Attachment[] attachmentsArray = mp.getAttachments(flavor);
+      attachments.addAll(Arrays.asList(attachmentsArray));
     }
-  };
+
+    if (attachments.size() == 1) {
+      logger.debug("One security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
+      for (Attachment attachment : attachments) {
+        result = loadAcl(attachment.getURI());
+      }
+    } else if (attachments.size() < 1) {
+      logger.debug("No security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
+    } else if (attachments.size() > 1) {
+      logger.warn("More than one security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
+    }
+
+    return result;
+  }
 
   /**
    * Get a file from the workspace.
@@ -460,21 +380,22 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** Load an ACL from the given URI. */
   private Option<AccessControlList> loadAcl(final URI uri) {
+    logger.debug("Load Acl from {}", uri);
     final File file = fromWorkspace(uri);
-    if (file == null)
-      return none();
-
-    return withFile(file, new Function2<InputStream, File, AccessControlList>() {
-      @Override
-      public AccessControlList apply(InputStream in, File aclFile) {
-        try {
-          return XACMLUtils.parseXacml(in);
-        } catch (JAXBException e) {
-          FileUtils.deleteQuietly(file);
-          throw new Error("Unable to unmarshall XACML document from " + file + ":" + e);
+    if (file != null) {
+      try {
+        InputStream in = new FileInputStream(file);
+        AccessControlList acl = XACMLUtils.parseXacml(in);
+        if (acl != null) {
+          return Option.option(acl);
         }
+      } catch (Exception e) {
+        logger.error("Exception occured: {}", e);
       }
-    });
+    } else {
+      logger.debug("URI {} not found", uri);
+    }
+    return Option.none();
   }
 
   /**

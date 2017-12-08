@@ -1,7 +1,7 @@
 {
-  "value_locale":"es",
-  "value_dateFormatFull":"DD de MMMM de YYYY, h:mm:ss a",
-  "videoTitle":"Título del vídeo",
-  "creator":"Creador",
-  "date":"Fecha"
+    "value_locale": "es",
+    "value_dateFormatFull": "DD de MMMM de YYYY, h:mm:ss a",
+    "videoTitle": "Título del vídeo",
+    "creator": "Creador",
+    "date": "Fecha"
 }

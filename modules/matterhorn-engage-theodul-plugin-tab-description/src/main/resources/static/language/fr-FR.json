@@ -1,13 +1,13 @@
 {
-  "value_locale":"fr",
-  "value_dateFormatFull":"D MMMM YYYY, HH:mm:ss",
-  "title":"Titre",
-  "noTitle":"Aucun titre",
-  "creator":"Auteur",
-  "presenter":"Contributeur",
-  "views":"Vues",
-  "series":"Série",
-  "recordingDate":"Date d'enregistrement",
-  "description":"Description",
-  "noDescriptionAvailable":"Aucune description disponible."
+    "value_locale": "fr",
+    "value_dateFormatFull": "D MMMM YYYY, HH:mm:ss",
+    "title": "Titre",
+    "noTitle": "Aucun titre",
+    "creator": "Auteur",
+    "presenter": "Contributeur",
+    "views": "Vues",
+    "series": "Série",
+    "recordingDate": "Date d'enregistrement",
+    "description": "Description",
+    "noDescriptionAvailable": "Aucune description disponible."
 }

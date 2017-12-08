@@ -1,13 +1,13 @@
 {
-  "value_locale":"de",
-  "value_dateFormatFull":"Do MMMM YYYY, HH:mm",
-  "title":"Titel",
-  "noTitle":"Kein Titel",
-  "creator":"Autor",
-  "presenter":"Beitragende(r)",
-  "views":"Aufrufe",
-  "series":"Serie",
-  "recordingDate":"Aufnahmedatum",
-  "description":"Beschreibung",
-  "noDescriptionAvailable":"Keine Beschreibung verfügbar."
+    "value_locale": "de",
+    "value_dateFormatFull": "Do MMMM YYYY, HH:mm",
+    "title": "Titel",
+    "noTitle": "Kein Titel",
+    "creator": "Autor",
+    "presenter": "Beitragende(r)",
+    "views": "Aufrufe",
+    "series": "Serie",
+    "recordingDate": "Aufnahmedatum",
+    "description": "Beschreibung",
+    "noDescriptionAvailable": "Keine Beschreibung verfügbar."
 }
