@@ -55,9 +55,12 @@ To start the migration follow these steps:
 
 1. Delete the existing indexes in `data/index` and `data/solr-indexes/scheduler`
 2. Configure the destination organization for the migration by configuring the organizational context in the
-   `custom.properties`. Do that by adding a configuration key like `organization=mh_default_org`.
+   `custom.properties`. Do that by adding a configuration key like:
+   `org.opencastproject.migration.organization=mh_default_org`.
 3. Start Opencast
 4. Check the logs for errors!
+5. After the migration is done, remove `org.opencastproject.migration.organization` again from `custom.properties´ to
+   avoid further migration attempts.
 
 
 Re-Build ElasticSearch Index
