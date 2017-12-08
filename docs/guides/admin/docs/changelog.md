@@ -4,7 +4,7 @@ Opencast 4.x
 Opencast 4.0
 ------------
 
-*Released on December 7, 2017*
+*Released on December 8, 2017*
 
 - [[MH-12597]](https://opencast.jira.com/browse/MH-12597) - When reindexing, some events may incorrectly be displayed as "Scheduled" instead of "Processed" or "Failed"
 - [[MH-12596]](https://opencast.jira.com/browse/MH-12596) - Video Editor Ignores Workspace
