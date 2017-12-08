@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
+package org.opencastproject.userdirectory;
 
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;

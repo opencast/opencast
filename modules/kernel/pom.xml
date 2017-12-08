@@ -311,7 +311,6 @@
               org.opencastproject.kernel.scanner;version=${project.version},
               org.opencastproject.kernel.security;version=${project.version},
               org.opencastproject.kernel.security.persistence;version=${project.version},
-              org.opencastproject.kernel.userdirectory;version=${project.version},
               org.opencastproject.kernel.bundleinfo;version=${project.version},
             </Export-Package>
             <_exportcontents>
@@ -328,8 +327,6 @@
               OSGI-INF/organization-directory-service.xml,
               OSGI-INF/organization-persistence.xml,
               OSGI-INF/organization-filter.xml,
-              OSGI-INF/organization-role-provider.xml,
-              OSGI-INF/custom-role-provider.xml,
               OSGI-INF/current-job-filter.xml,
               OSGI-INF/pingback.xml,
               OSGI-INF/rest.xml,
@@ -338,8 +335,7 @@
               OSGI-INF/smtp-service.xml,
               OSGI-INF/remote-user-and-role-filter.xml,
               OSGI-INF/security-config-scanner.xml,
-              OSGI-INF/transparentproxy-filter.xml,
-              OSGI-INF/user-and-role-directory-service.xml
+              OSGI-INF/transparentproxy-filter.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml

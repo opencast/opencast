@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.kernel.userdirectory.CustomRoleProvider" immediate="true">
-  <implementation class="org.opencastproject.kernel.userdirectory.CustomRoleProvider" />
-  <property name="service.description" value="Provides custom roles" />
+  name="org.opencastproject.userdirectory.OrganizationRoleProvider" immediate="true">
+  <implementation class="org.opencastproject.userdirectory.OrganizationRoleProvider" />
+  <property name="service.description" value="Provides the organizations role" />
   <service>
     <provide interface="org.opencastproject.security.api.RoleProvider" />
   </service>

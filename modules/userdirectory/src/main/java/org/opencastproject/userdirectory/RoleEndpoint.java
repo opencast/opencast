@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
+package org.opencastproject.userdirectory;
 
 import org.opencastproject.security.api.JaxbRoleList;
 import org.opencastproject.security.api.OrganizationDirectoryService;

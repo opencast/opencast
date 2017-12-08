@@ -137,10 +137,13 @@
             </Private-Package>
             <Service-Component>
               OSGI-INF/admin-user-and-group-loader.xml,
-              OSGI-INF/userdirectory-service.xml,
+              OSGI-INF/custom-role-provider.xml,
               OSGI-INF/group-role-provider.xml,
+              OSGI-INF/organization-role-provider.xml,
+              OSGI-INF/user-and-role-directory-service.xml,
               OSGI-INF/user-reference-provider.xml,
-              OSGI-INF/user_endpoint.xml,
+              OSGI-INF/user-endpoint.xml,
+              OSGI-INF/userdirectory-service.xml,
               OSGI-INF/userid-role-provider.xml
             </Service-Component>
           </instructions>

@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
+package org.opencastproject.userdirectory;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_SUDO_ROLE;
 

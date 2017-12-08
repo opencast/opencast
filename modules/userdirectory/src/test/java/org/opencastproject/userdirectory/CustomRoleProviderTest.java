@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
+package org.opencastproject.userdirectory;
 
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;

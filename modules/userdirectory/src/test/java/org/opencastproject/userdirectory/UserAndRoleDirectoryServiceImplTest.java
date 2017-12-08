@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.kernel.userdirectory;
+package org.opencastproject.userdirectory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
