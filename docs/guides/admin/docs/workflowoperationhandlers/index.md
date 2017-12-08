@@ -36,6 +36,7 @@ The following table contains the workflow operations that are available in an ou
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
+|duplicate-event     |Create an event by cloning an existing one                     |[Documentation](duplicate-event-woh.md)|
 |editor              |Waiting for user to review, then cut video based on edit-list  |[Documentation](editor-woh.md)|
 |encode              |Encode media files to differents formats in parallel           |[Documentation](encode-woh.md)|
 |error-resolution    |Internal operation to pause a workflow in error                |[Documentation](error-resolution-woh.md)|
