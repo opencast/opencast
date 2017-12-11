@@ -22,10 +22,11 @@
 
 .video-toolbar {
     @include clearfix();
-    padding: 5px;
-    background: #fff;
-    border: $thin-border-stroke $main-border-color;
+    padding: 12px;
     width: 100%;
+    background: #fff;
+    border-radius: 4px 4px 0 0;
+    border-bottom: $thin-border-stroke $main-border-color;
 
     .start-column {
         float: left;

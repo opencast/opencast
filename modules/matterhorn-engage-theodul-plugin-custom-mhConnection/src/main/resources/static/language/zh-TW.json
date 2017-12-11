@@ -1,8 +1,8 @@
 {
-  "value_locale":"zh",
-  "error_mediaPackageInformationNotLoaded":"There are two possible reasons for this error:",
-  "error_mediaPackageInformationNotLoaded_reason1":"The media is not available any more",
-  "error_mediaPackageInformationNotLoaded_reason2":"The media is protected and you need to log in",
-  "error_noMediaInformationAvailable":"沒有可用的媒體信息。",
-  "error_endpointNotAvailable":"搜索服務目前不可用。"
+    "value_locale": "英文",
+    "error_mediaPackageInformationNotLoaded": "此錯誤有兩個可能的原因:",
+    "error_mediaPackageInformationNotLoaded_reason1": "媒體不再可用",
+    "error_mediaPackageInformationNotLoaded_reason2": "媒體受到保護, 您需要登錄",
+    "error_noMediaInformationAvailable": "沒有可用的媒體信息。",
+    "error_endpointNotAvailable": "搜索服務目前不可用。"
 }

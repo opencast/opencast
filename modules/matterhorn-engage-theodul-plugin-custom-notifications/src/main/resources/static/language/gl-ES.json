@@ -1,13 +1,13 @@
 {
-  "value_locale":"gl",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "error_videoLoading":"O vídeo está a cargarse. Por favor, espere un momento.",
-  "error_audioLoading":"O audio está a cargarse. Por favor, espere un momento.",
-  "msg_videoLoadedSuccessfully":"O vídeo cargouse correctamente.",
-  "msg_audioLoadedSuccessfully":"O audio cargouse correctamente.",
-  "msg_videoBuffering":"O vídeo está a cargarse. Por favor, espere un momento.",
-  "msg_videoBufferedSuccessfullyAndAutoplaying":"O vídeo cargouse correctamente e agora estase a reproducir automaticamente.",
-  "msg_videoBufferedSuccessfully":"O vídeo cargouse correctamente.",
-  "error":"Erro",
-  "error_AudioCodecNotSupported":"Erro: o códec de audio non é compatible con este navegador"
+    "value_locale": "gl",
+    "value_dateFormatFull": "D de MMMM de YYYY, h:mm:ss a",
+    "error_videoLoading": "O vídeo está a cargarse. Por favor, espere un momento.",
+    "error_audioLoading": "O audio está a cargarse. Por favor, espere un momento.",
+    "msg_videoLoadedSuccessfully": "O vídeo cargouse correctamente.",
+    "msg_audioLoadedSuccessfully": "O audio cargouse correctamente.",
+    "msg_videoBuffering": "O vídeo está a cargarse. Por favor, espere un momento.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "O vídeo cargouse correctamente e agora estase a reproducir automaticamente.",
+    "msg_videoBufferedSuccessfully": "O vídeo cargouse correctamente.",
+    "error": "Erro",
+    "error_AudioCodecNotSupported": "Erro: o códec de audio non é compatible con este navegador"
 }

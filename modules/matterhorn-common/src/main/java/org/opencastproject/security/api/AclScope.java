@@ -23,5 +23,5 @@ package org.opencastproject.security.api;
 
 /** Scopes of an ACL. */
 public enum AclScope {
-  Series, Episode
+  Series, Episode, Global
 }

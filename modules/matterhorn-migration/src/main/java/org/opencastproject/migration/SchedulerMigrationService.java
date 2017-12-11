@@ -24,7 +24,6 @@ import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.data.Opt.none;
 import static java.lang.String.format;
-import static org.opencastproject.util.OsgiUtil.getContextProperty;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -61,6 +60,7 @@ import com.entwinemedia.fn.Equality;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
@@ -99,7 +99,7 @@ public class SchedulerMigrationService {
 
   private static final MediaPackageBuilderFactory mpbf = MediaPackageBuilderFactory.newInstance();
 
-  public static final String CFG_ORGANIZATION = "organization";
+  public static final String CFG_ORGANIZATION = "org.opencastproject.migration.organization";
 
   /** The security service */
   private SecurityService securityService;
@@ -153,14 +153,19 @@ public class SchedulerMigrationService {
     logger.info("Start migrating scheduled events");
 
     // read config
-    final String orgId = getContextProperty(cc, CFG_ORGANIZATION);
+    final String orgId = StringUtils.trimToNull((String) cc.getBundleContext().getProperty(CFG_ORGANIZATION));
+
+    if (StringUtils.isBlank(orgId)) {
+      logger.debug("No organization set for migration. Aborting.");
+      return;
+    }
 
     // create security context
     final Organization org;
     try {
       org = organizationDirectoryService.getOrganization(orgId);
     } catch (NotFoundException e) {
-      throw new ConfigurationException(CFG_ORGANIZATION, "not found", e);
+      throw new ConfigurationException(CFG_ORGANIZATION, String.format("Could not find organization '%s'", orgId), e);
     }
     SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
       @Override

@@ -31,6 +31,7 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -58,10 +59,10 @@ import java.net.URI;
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
  */
-public class AssetManagerPermissionsUpdatedEventHandler {
+public class AssetManagerUpdatedEventHandler {
 
   /** The logger */
-  protected static final Logger logger = LoggerFactory.getLogger(AssetManagerPermissionsUpdatedEventHandler.class);
+  protected static final Logger logger = LoggerFactory.getLogger(AssetManagerUpdatedEventHandler.class);
 
   /** The archive */
   protected AssetManager assetManager = null;
@@ -173,13 +174,22 @@ public class AssetManagerPermissionsUpdatedEventHandler {
           authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
         }
 
-        // Update the series dublin core
-        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
-          DublinCoreCatalog seriesDublinCore = seriesItem.getMetadata();
-          mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+        // Update the series dublin core or extended metadata
+        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+                || SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
+          DublinCoreCatalog seriesDublinCore = null;
+          MediaPackageElementFlavor catalogType = null;
+          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
+            seriesDublinCore = seriesItem.getMetadata();
+            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+            catalogType = MediaPackageElements.SERIES;
+          } else {
+            seriesDublinCore = seriesItem.getExtendedMetadata();
+            catalogType = MediaPackageElementFlavor.flavor(seriesItem.getElementType(), "series");
+          }
 
           // Update the series dublin core
-          Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+          Catalog[] seriesCatalogs = mp.getCatalogs(catalogType);
           if (seriesCatalogs.length == 1) {
             Catalog c = seriesCatalogs[0];
             String filename = FilenameUtils.getName(c.getURI().toString());

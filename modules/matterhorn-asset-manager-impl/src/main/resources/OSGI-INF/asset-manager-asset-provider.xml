@@ -27,9 +27,10 @@
     <provide interface="org.opencastproject.assetmanager.impl.HttpAssetProvider"/>
   </service>
 
-  <reference name="security-service"
-          interface="org.opencastproject.security.api.SecurityService"
+  <reference name="orgDir"
+          interface="org.opencastproject.security.api.OrganizationDirectoryService"
           cardinality="1..1"
           policy="static"
-          bind="setSecurityService"/>
+          bind="setOrgDir"/>
+
 </scr:component>

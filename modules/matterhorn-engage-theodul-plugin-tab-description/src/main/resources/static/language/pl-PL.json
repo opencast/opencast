@@ -1,13 +1,13 @@
 {
-  "value_locale":"pl",
-  "value_dateFormatFull":"MMMM Do YYYY, h:mm:ss a",
-  "title":"Tytuł",
-  "noTitle":"Bez tytułu",
-  "creator":"Twórca",
-  "presenter":"Współautor",
-  "views":"Widoki",
-  "series":"Serie",
-  "recordingDate":"Data nagrania",
-  "description":"Opis",
-  "noDescriptionAvailable":"Brak opisu."
+    "value_locale": "pl",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "Tytuł",
+    "noTitle": "Bez tytułu",
+    "creator": "Twórca",
+    "presenter": "Współautor",
+    "views": "Widoki",
+    "series": "Serie",
+    "recordingDate": "Data nagrania",
+    "description": "Opis",
+    "noDescriptionAvailable": "Brak opisu."
 }

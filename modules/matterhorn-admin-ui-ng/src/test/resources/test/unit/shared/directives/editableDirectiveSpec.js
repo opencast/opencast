@@ -36,6 +36,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     describe('for a read-only value', function () {
         beforeEach(function () {
             $rootScope.params = {
+                type: 'text',
                 value: 'A Title',
                 readOnly: true
             };
@@ -51,6 +52,7 @@ describe('adminNg.directives.adminNgEditable', function () {
     describe('for a value with insufficient rights', function () {
         beforeEach(function () {
             $rootScope.params = {
+                type: 'text',
                 value: 'A Title',
                 readOnly: false
             };
@@ -66,7 +68,8 @@ describe('adminNg.directives.adminNgEditable', function () {
     describe('for a single value', function () {
         beforeEach(function () {
             $rootScope.params = {
-                id:    'title',
+                id:   'title',
+                type: 'text',
                 label: 'TITLE',
                 value: 'A Title',
                 type:  'text'
@@ -85,6 +88,7 @@ describe('adminNg.directives.adminNgEditable', function () {
 
         beforeEach(function(){
             $rootScope.params = {
+                id: 'date',
                 value: '2015-12-05',
                 type:'date',
                 mode:'dateValue'
@@ -105,6 +109,7 @@ describe('adminNg.directives.adminNgEditable', function () {
                 id:         'series',
                 label:      'SERIES',
                 value:      'phy325',
+                type:       'text',
                 collection: { phy325: 'Physics325', edu123: 'Education123' }
             };
             element = $compile('<div admin-ng-editable="" params="params"></div>')($rootScope);
@@ -145,6 +150,7 @@ describe('adminNg.directives.adminNgEditable', function () {
             }));
             $rootScope.params = {
                 id:         'presenters',
+                type:       'multiselect',
                 label:      'PRESENTER',
                 value:      ['matt.smith', 'chuck.norris'],
                 collection: 'users'

@@ -28,14 +28,14 @@ import static org.opencastproject.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.impl.AbstractAssetManager;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.MimeType;
+import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
@@ -61,12 +61,14 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   private String serverUrl;
   private String mountPoint;
 
-  private SecurityService securityService;
+  private OrganizationDirectoryService orgDir;
 
   /** Calculate the server url based on the current organization. */
-  private String calcServerUrl() {
-    Organization organization = securityService.getOrganization();
-    if (organization == null) {
+  private String calcServerUrl(String organizationId) {
+    Organization organization = null;
+    try {
+      organization = orgDir.getOrganization(organizationId);
+    } catch (NotFoundException e) {
       logger.warn("No organization found! Using default server url ({})", serverUrl);
       return serverUrl.trim();
     }
@@ -89,21 +91,21 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   @Override public Snapshot prepareForDelivery(final Snapshot snapshot) {
     return AbstractAssetManager.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
       @Override public URI apply(MediaPackageElement mpe) {
-        return createUriFor(mpe, snapshot.getVersion());
+        return createUriFor(mpe, snapshot);
       }
     });
   }
 
-  private URI createUriFor(MediaPackageElement mpe, Version version) {
+  private URI createUriFor(MediaPackageElement mpe, Snapshot snapshot) {
     String baseName = getBaseName(getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString()));
 
     // the returned uri must match the path of the {@link #getAsset} method
-    return uri(calcServerUrl(),
+    return uri(calcServerUrl(snapshot.getOrganizationId().toString()),
                mountPoint,
                "assets",
                mpe.getMediaPackage().getIdentifier().toString(),
                mpe.getIdentifier(),
-               version.toString(),
+               snapshot.getVersion().toString(),
                baseName + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType())));
   }
 
@@ -119,7 +121,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   /** OSGi DI */
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
+  public void setOrgDir(OrganizationDirectoryService orgDir) {
+    this.orgDir = orgDir;
   }
 }

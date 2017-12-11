@@ -144,6 +144,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     private final String indexName;
     private final String destinationId;
     private final int updatesTotal;
+    private final int responseInterval;
     private final Opt<Organization> endMessageOrg;
 
     private int updatesCurrent;
@@ -169,6 +170,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
       this.updatesTotal = RequireUtil.min(updatesTotal, 0);
       this.endMessageOrg = endMessageOrg;
       this.updatesCurrent = 0;
+      this.responseInterval = (updatesTotal < 100) ? 1 : (updatesTotal / 100);
     }
 
     public int getUpdatesTotal() {
@@ -190,7 +192,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
               getMessageSender().sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, m.get1());
             }
             updatesCurrent = updatesCurrent + 1;
-            getMessageSender().sendObjectMessage(
+            if (((updatesCurrent % responseInterval) == 0) || (updatesCurrent == updatesTotal)) {
+              getMessageSender().sendObjectMessage(
                     IndexProducer.RESPONSE_QUEUE,
                     MessageSender.DestinationType.Queue,
                     IndexRecreateObject.update(
@@ -198,6 +201,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
                             getService(),
                             updatesTotal,
                             updatesCurrent));
+            }
             if (updatesCurrent >= updatesTotal) {
               // send end-of-batch message
               final Organization emo = endMessageOrg.getOr(org);

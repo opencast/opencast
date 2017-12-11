@@ -1,7 +1,7 @@
 <!-- Asset upload form, directed by uploadAssetDirective.js -->
 <form novalidate name="assetform" id="assetform">
   <table class="main-tbl">
-    <tr ng-if="assetoptions" ng-repeat="asset in assetoptions | filter:{type:'!track'} | orderBy: translatedTitle track by asset.id"  ng-init="assets=$parent.assets; onassetupdate=$parent.onassetupdate">
+    <tr ng-if="assetoptions" ng-repeat="asset in assetoptions | filter:{type:'!track'} | orderBy: 'displayOrder' track by asset.id"  ng-init="assets=$parent.assets; onassetupdate=$parent.onassetupdate">
       <td>{{asset.title | translate }}
         <span class="ui-helper-hidden">({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
       </td>

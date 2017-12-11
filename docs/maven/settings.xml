@@ -1,0 +1,19 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+  http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <mirrors>
+    <mirror>
+      <id>opencast-osna</id>
+      <name>Osnabrück Opencast Repository</name>
+      <url>https://nexus.opencast.org/nexus/content/groups/public</url>
+      <mirrorOf>opencast</mirrorOf>
+    </mirror>
+    <mirror>
+      <id>opencast-harvard</id>
+      <name>Harvard Opencast Repository</name>
+      <url>https://mvncache.opencast.org/nexus/content/groups/public</url>
+      <mirrorOf>opencast-backup</mirrorOf>
+    </mirror>
+  </mirrors>
+</settings>

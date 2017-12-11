@@ -44,6 +44,7 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.R.badRequest;
+import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
@@ -313,8 +314,19 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The event could not be found."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws NotFoundException, UnauthorizedException {
-    if (!getIndexService().removeEvent(id))
-      return Response.serverError().build();
+    try {
+      if (!getIndexService().removeEvent(id))
+        return Response.serverError().build();
+    } catch (NotFoundException e) {
+      // If we couldn't find any trace of the event in the underlying database(s), we can get rid of it
+      // entirely in the index.
+      try {
+        getIndex().delete(Event.DOCUMENT_TYPE,id.concat(getSecurityService().getOrganization().getId()));
+      } catch (SearchIndexException e1) {
+        logger.error("error removing event {}: {}",id,e1);
+        return Response.serverError().build();
+      }
+    }
 
     return Response.ok().build();
   }
@@ -358,6 +370,16 @@ public abstract class AbstractEventEndpoint {
       }
     }
     return Response.ok(result.toJson()).build();
+  }
+
+  @GET
+  @Path("{eventId}/hasSnapshots.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "hassnapshots", description = "Returns a JSON object containing a boolean indicating if snapshots exist for this event", returnDescription = "A JSON object", pathParameters = {
+    @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+    @RestResponse(description = "A JSON object containing a property \"hasSnapshots\"", responseCode = HttpServletResponse.SC_OK) })
+  public Response hasEventSnapshots(@PathParam("eventId") String id) throws Exception {
+    return okJson(obj(f("hasSnapshots",this.getIndexService().hasSnapshots(id))));
   }
 
   @GET
@@ -677,7 +699,9 @@ public abstract class AbstractEventEndpoint {
         logger.warn("An ACL cannot be edited while an event is part of a current workflow because it might"
                 + " lead to inconsistent ACLs i.e. changed after distribution so that the old ACL is still "
                 + "being used by the distribution channel.");
-        return forbidden("Unable to edit an ACL for a current workflow.");
+        JSONObject json = new JSONObject();
+        json.put("Error", "Unable to edit an ACL for a current workflow.");
+        return conflict(json.toJSONString());
       } else {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();

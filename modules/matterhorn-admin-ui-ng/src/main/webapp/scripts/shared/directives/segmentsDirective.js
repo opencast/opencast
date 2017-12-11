@@ -280,8 +280,9 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 return scope.video.segments[index + 1];
             };
 
-            scope.$root.$broadcast("segmentTimesUpdated");
-
+            scope.video.$promise.then(function () {
+              scope.$root.$broadcast("segmentTimesUpdated");
+            });
         }
     };
 }]);

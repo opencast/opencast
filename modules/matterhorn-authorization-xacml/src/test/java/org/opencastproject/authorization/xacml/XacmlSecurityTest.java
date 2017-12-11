@@ -23,7 +23,6 @@ package org.opencastproject.authorization.xacml;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -31,23 +30,21 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.After;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashSet;
@@ -64,9 +61,6 @@ public class XacmlSecurityTest {
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(XacmlSecurityTest.class);
 
-  /** The stub workspace to store xacml files */
-  protected WorkspaceStub workspace = null;
-
   /** The username to use with the security service */
   protected final String currentUser = "me";
 
@@ -74,54 +68,44 @@ public class XacmlSecurityTest {
   protected final JaxbOrganization organization = new DefaultOrganization();
 
   /** The roles to use with the security service */
-  protected final Set<JaxbRole> currentRoles = new HashSet<JaxbRole>();
+  protected final Set<JaxbRole> currentRoles = new HashSet<>();
 
   // Override the behavior of the security service to use the current user and roles defined here
   protected SecurityService securityService = null;
 
   protected XACMLAuthorizationService authzService = null;
 
+  @Rule
+  public TemporaryFolder testFolder = new TemporaryFolder();
+
   @Before
   public void setUp() throws Exception {
-    workspace = new WorkspaceStub();
-    securityService = new SecurityService() {
-      @Override
-      public User getUser() {
-        return new JaxbUser(currentUser, "test", organization, currentRoles);
-      }
-
-      @Override
-      public void setUser(User user) {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public Organization getOrganization() {
-        return organization;
-      }
-
-      @Override
-      public void setOrganization(Organization organization) {
-        throw new UnsupportedOperationException();
-      }
-
-      @Override
-      public String getUserIP() {
-        return null;
-      }
-
-      @Override
-      public void setUserIP(String userIP) {
-      }
-    };
     authzService = new XACMLAuthorizationService();
-    authzService.setWorkspace(new WorkspaceStub());
-    authzService.setSecurityService(securityService);
-  }
 
-  @After
-  public void tearDown() throws Exception {
-    // workspace.file.delete();
+    // Mock security service
+    securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andAnswer(
+            () -> new JaxbUser(currentUser, "test", organization, currentRoles)).anyTimes();
+
+    // Mock workspace
+    Workspace workspace = EasyMock.createMock(Workspace.class);
+    final Capture<InputStream> in = EasyMock.newCapture();
+    final Capture<URI> uri = EasyMock.newCapture();
+    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.capture(in))).andAnswer(() -> {
+        final File file = testFolder.newFile();
+        FileOutputStream out = new FileOutputStream(file);
+        IOUtils.copyLarge(in.getValue(), out);
+        IOUtils.closeQuietly(out);
+        IOUtils.closeQuietly(in.getValue());
+        return file.toURI();
+      }).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.capture(uri))).andAnswer(() -> new File(uri.getValue())).anyTimes();
+    workspace.delete(EasyMock.anyObject(URI.class));
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.replay(securityService, workspace);
+    authzService.setWorkspace(workspace);
+    authzService.setSecurityService(securityService);
   }
 
   @Test
@@ -129,6 +113,15 @@ public class XacmlSecurityTest {
 
     // Create a mediapackage and some role/action tuples
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    // Get default ACL
+    AccessControlList defaultAcl = authzService.getActiveAcl(mediapackage).getA();
+    Assert.assertEquals(0, defaultAcl.getEntries().size());
+
+    // Default with series
+    mediapackage.setSeries("123");
+    defaultAcl = authzService.getActiveAcl(mediapackage).getA();
+    Assert.assertEquals(0, defaultAcl.getEntries().size());
 
     AccessControlList aclSeries1 = new AccessControlList();
     List<AccessControlEntry> entriesSeries1 = aclSeries1.getEntries();
@@ -171,7 +164,8 @@ public class XacmlSecurityTest {
     currentRoles.clear();
     currentRoles.add(new JaxbRole("admin", organization));
 
-    authzService.setAcl(mediapackage, AclScope.Episode, aclEpisode);
+    mediapackage = authzService.setAcl(mediapackage, AclScope.Episode, aclEpisode).getA();
+    Assert.assertEquals(AclScope.Episode, authzService.getActiveAcl(mediapackage).getB());
     Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
@@ -196,120 +190,4 @@ public class XacmlSecurityTest {
     Assert.assertTrue(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));
   }
-
-  static class WorkspaceStub implements Workspace {
-
-    /** The default workspace base, this is set to the target directory within the module. */
-    private static File workspaceBase = new File("target");
-
-    @Override
-    public File get(URI uri) throws NotFoundException, IOException {
-      return new File(uri);
-    }
-
-    @Override
-    public File read(URI uri) throws NotFoundException, IOException {
-      return new File(uri);
-    }
-
-    @Override
-    public URI getBaseUri() {
-      throw new Error();
-    }
-
-    @Override
-    public URI put(String mediaPackageID, String mediaPackageElementID, String fileName, InputStream in)
-            throws IOException {
-      final File file = new File(getURI(mediaPackageID, mediaPackageElementID, fileName));
-      FileOutputStream out = new FileOutputStream(file);
-      IOUtils.copyLarge(in, out);
-      IOUtils.closeQuietly(out);
-      IOUtils.closeQuietly(in);
-      return file.toURI();
-    }
-
-    @Override
-    public URI putInCollection(String collectionId, String fileName, InputStream in) throws IOException {
-      return null;
-    }
-
-    @Override
-    public URI[] getCollectionContents(String collectionId) throws NotFoundException {
-      throw new Error();
-    }
-
-    @Override
-    public void delete(URI uri) throws NotFoundException, IOException {
-      new File(uri).delete();
-    }
-
-    @Override
-    public void delete(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-      throw new Error();
-    }
-
-    @Override
-    public void deleteFromCollection(String collectionId, String fileName) throws NotFoundException, IOException {
-      throw new Error();
-    }
-
-    @Override
-    public void deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws NotFoundException, IOException {
-      throw new Error();
-    }
-
-    @Override
-    public URI getURI(String mediaPackageID, String mediaPackageElementID) {
-      throw new Error();
-    }
-
-    @Override
-    public URI getCollectionURI(String collectionID, String fileName) {
-      throw new Error();
-    }
-
-    @Override
-    public URI moveTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-            throws NotFoundException, IOException {
-      throw new Error();
-    }
-
-    @Override
-    public URI copyTo(URI collectionURI, String toMediaPackage, String toMediaPackageElement, String toFileName)
-            throws NotFoundException, IOException {
-      throw new Error();
-    }
-
-    @Override
-    public URI getURI(String mediaPackageID, String mediaPackageElementID, String filename) {
-      return new File(workspaceBase, mediaPackageID + "-" + mediaPackageElementID + "-" + filename)
-              .toURI();
-    }
-
-    @Override
-    public Option<Long> getTotalSpace() {
-      return Option.<Long> none();
-    }
-
-    @Override
-    public Option<Long> getUsableSpace() {
-      return Option.<Long> none();
-    }
-
-    @Override
-    public Option<Long> getUsedSpace() {
-      return Option.<Long> none();
-    }
-
-    @Override
-    public void cleanup(int maxAge) {
-      // TODO Auto-generated method stub
-    }
-
-    @Override
-    public void cleanup(Id mediaPackageId) throws IOException {
-      // Nothing to do
-    }
-  }
-
 }

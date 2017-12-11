@@ -28,11 +28,13 @@ import org.opencastproject.distribution.api.AbstractDistributionService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.mediapackage.track.TrackImpl.StreamingProtocol;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -111,8 +113,23 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** The key in the properties file that defines the adaptive streaming port. */
   protected static final String ADAPTIVE_STREAMING_PORT_KEY = "org.opencastproject.adaptive-streaming.port";
 
+  /** The key in the properties file that specifies in which order the videos in the SMIL file should be stored */
+  protected static final String SMIL_ORDER_KEY = "org.opencastproject.adaptive-streaming.smil.order";
+
+  /** One of the possible values for the order of the videos in the SMIL file */
+  protected static final String SMIL_ASCENDING_VALUE = "ascending";
+
+  /** One of the possible values for the order of the videos in the SMIL file */
+  protected static final String SMIL_DESCENDING_VALUE = "descending";
+
   /** The attribute "video-bitrate" in the SMIL files */
   protected static final String SMIL_ATTR_VIDEO_BITRATE = "video-bitrate";
+
+  /** The attribute "video-width" in the SMIL files */
+  protected static final String SMIL_ATTR_VIDEO_WIDTH = "width";
+
+  /** The attribute "video-height" in the SMIL files */
+  protected static final String SMIL_ATTR_VIDEO_HEIGHT = "height";
 
   /** The attribute to return for Distribution Type */
   protected static final String DISTRIBUTION_TYPE = "streaming";
@@ -197,6 +214,9 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   /** Whether or not RTMP is supported */
   private boolean isRTMPSupported = false;
 
+  /** Whether or not the video order in the SMIL files is descending */
+  private boolean isSmilOrderDescending = false;
+
   private static final Gson gson = new Gson();
 
   /**
@@ -275,17 +295,34 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
     Option<String> formats;
+    Option<String> smilOrder;
+
     if (properties == null) {
       formats = Option.none();
+      smilOrder = Option.none();
     } else {
       formats = OsgiUtil.getOptCfg(properties, STREAMING_FORMATS_KEY);
+      smilOrder = OsgiUtil.getOptCfg(properties, SMIL_ORDER_KEY);
     }
+
     if (formats.isSome()) {
       setSupportedFormats(formats.get());
     } else {
       setDefaultSupportedFormats();
     }
     logger.info("The supported streaming formats are: {}", StringUtils.join(supportedAdaptiveFormats, ","));
+
+    if (smilOrder.isNone() || SMIL_ASCENDING_VALUE.equals(smilOrder.get())) {
+      logger.info("The videos in the SMIL files will be sorted in ascending bitrate order");
+      isSmilOrderDescending = false;
+    } else if (SMIL_DESCENDING_VALUE.equals(smilOrder.get())) {
+      isSmilOrderDescending = true;
+      logger.info("The videos in the SMIL files will be sorted in descending bitrate order");
+    } else {
+      throw new ConfigurationException(SMIL_ORDER_KEY, format("Illegal value '%s'. Valid options are '%s' and '%s'",
+              smilOrder.get(), SMIL_ASCENDING_VALUE, SMIL_DESCENDING_VALUE));
+    }
+
     distributeJobLoad = LoadUtil.getConfiguredLoadValue(properties, DISTRIBUTE_JOB_LOAD_KEY,
             DEFAULT_DISTRIBUTE_JOB_LOAD, serviceRegistry);
     retractJobLoad = LoadUtil.getConfiguredLoadValue(properties, RETRACT_JOB_LOAD_KEY, DEFAULT_RETRACT_JOB_LOAD,
@@ -701,20 +738,52 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     video.setAttribute("src", getAdaptiveDistributionName(channelId, mediapackage, element));
 
     float bitrate = 0;
-    for (int i = 0; i < track.getAudio().size(); i++) {
-      bitrate += track.getAudio().get(i).getBitRate();
+
+    // Add bitrate corresponding to the audio streams
+    for (AudioStream stream : track.getAudio()) {
+      bitrate += stream.getBitRate();
     }
-    for (int i = 0; i < track.getVideo().size(); i++) {
-      bitrate += track.getVideo().get(i).getBitRate();
+
+    // Add bitrate corresponding to the video streams
+    // Also, set the video width and height values:
+    // In the rare case where there is more than one video stream, the values of the first stream
+    // have priority, but always prefer the first stream with both "frameWidth" and "frameHeight"
+    // parameters defined
+    Integer width = null;
+    Integer height = null;
+    for (VideoStream stream : track.getVideo()) {
+      bitrate += stream.getBitRate();
+      // Update if both width and height are defined for a stream or if we have no values at all
+      if (((stream.getFrameWidth() != null) && (stream.getFrameHeight() != null))
+              || ((width == null) && (height == null))) {
+        width = stream.getFrameWidth();
+        height = stream.getFrameHeight();
+      }
     }
+
     video.setAttribute(SMIL_ATTR_VIDEO_BITRATE, Integer.toString((int) bitrate));
+
+    if (width != null) {
+      video.setAttribute(SMIL_ATTR_VIDEO_WIDTH, Integer.toString(width));
+    } else {
+      logger.debug("Could not set video width in the SMIL file for element {} of mediapackage {}. The value was null",
+              element.getIdentifier(), mediapackage.getIdentifier());
+    }
+    if (height != null) {
+      video.setAttribute(SMIL_ATTR_VIDEO_HEIGHT, Integer.toString(height));
+    } else {
+      logger.debug("Could not set video height in the SMIL file for element {} of mediapackage {}. The value was null",
+              element.getIdentifier(), mediapackage.getIdentifier());
+    }
 
     NodeList currentVideos = switchElement.getChildNodes();
     for (int i = 0; i < currentVideos.getLength(); i++) {
       Node current = currentVideos.item(i);
       if ("video".equals(current.getNodeName())) {
-        if (Float
-                .parseFloat(current.getAttributes().getNamedItem(SMIL_ATTR_VIDEO_BITRATE).getTextContent()) > bitrate) {
+        Float currentBitrate = Float
+                .parseFloat(current.getAttributes().getNamedItem(SMIL_ATTR_VIDEO_BITRATE).getTextContent());
+        if ((isSmilOrderDescending && (currentBitrate < bitrate))
+                || (!isSmilOrderDescending && (currentBitrate > bitrate))) {
           switchElement.insertBefore(video, current);
           return;
         }

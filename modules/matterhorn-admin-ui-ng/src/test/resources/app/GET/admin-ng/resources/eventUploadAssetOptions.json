@@ -1,13 +1,13 @@
 {
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP": "{\"id\": \"catalog_captions_dfxp\", \"type\": \"catalog\", \"flavorType\": \"captions\", \"flavorSubType\": \"timedtext\",\"multiple\":false}",
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT": "{\"id\": \"attachment_captions_webvtt\", \"type\": \"attachment\", \"flavorType\": \"text\", \"flavorSubType\": \"webvtt\",\"multiple\":false}",
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CLASS_HANDOUT_NOTES": "{\"id\": \"attachment_class_handout_notes\", \"type\": \"attachment\", \"flavorType\": \"attachment\", \"flavorSubType\": \"notes\",\"multiple\":false}",
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE": "{\"id\": \"attachment_preview_image\",\"type\":\"attachment\", \"flavorType\": \"presenter\",\"flavorSubType\": \"search+preview\",\"multiple\":false}",
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SMIL": "{\"id\": \"catalog_smil\",\"type\":\"catalog\", \"flavorType\": \"smil\",\"flavorSubType\": \"smil\"}",
-  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS": "{\"id\": \"track_trackpart\",\"type\":\"track\", \"flavorType\": \"trackpart\",\"flavorSubType\": \"*\", \"multiple\":true}",
-  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE": "{\"id\": \"track_presenter\",\"type\":\"track\", \"flavorType\": \"presenter\",\"flavorSubType\": \"source\", \"multiple\":false}",
-  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE": "{\"id\": \"track_presentation\",\"type\":\"track\", \"flavorType\": \"presentation\",\"flavorSubType\": \"source\", \"multiple\":false}",
-  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY": "{\"id\": \"track_audio\",\"type\":\"track\", \"flavorType\": \"audio\",\"flavorSubType\": \"source\", \"multiple\":false}",
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_DFXP": "{\"id\": \"catalog_captions_dfxp\", \"type\": \"catalog\", \"flavorType\": \"captions\", \"flavorSubType\": \"timedtext\",\"multiple\":false,\"displayOrder\":7}",
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT": "{\"id\": \"attachment_captions_webvtt\", \"type\": \"attachment\", \"flavorType\": \"text\", \"flavorSubType\": \"webvtt\",\"multiple\":false,\"displayOrder\":3}",
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CLASS_HANDOUT_NOTES": "{\"id\": \"attachment_class_handout_notes\", \"type\": \"attachment\", \"flavorType\": \"attachment\", \"flavorSubType\": \"notes\",\"multiple\":false,\"displayOrder\":5}",
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE": "{\"id\": \"attachment_preview_image\",\"type\":\"attachment\", \"flavorType\": \"presenter\",\"flavorSubType\": \"search+preview\",\"multiple\":false,\"displayOrder\":2}",
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.SMIL": "{\"id\": \"catalog_smil\",\"type\":\"catalog\", \"flavorType\": \"smil\",\"flavorSubType\": \"smil\",\"displayOrder\":4}",
+  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.MULTIPLE_PARTS": "{\"id\": \"track_trackpart\",\"type\":\"track\", \"flavorType\": \"trackpart\",\"flavorSubType\": \"*\", \"multiple\":true,\"displayOrder\":12}",
+  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE": "{\"id\": \"track_presenter\",\"type\":\"track\", \"flavorType\": \"presenter\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":10}",
+  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE": "{\"id\": \"track_presentation\",\"type\":\"track\", \"flavorType\": \"presentation\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":11}",
+  "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY": "{\"id\": \"track_audio\",\"type\":\"track\", \"flavorType\": \"audio\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":6}",
   "EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID": "ng-publish-uploaded-assets"
 }
 

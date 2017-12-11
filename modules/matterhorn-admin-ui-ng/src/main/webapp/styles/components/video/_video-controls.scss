@@ -25,9 +25,9 @@
     box-sizing: border-box;
     @include linear-gradient(top, #fff, #f7f7f7);
     border: $thin-border-stroke $main-border-color;
-    border-bottom: none;
     height: 50px;
     padding: 0 15px;
+    border-radius: 0 0 4px 4px;
 }
 
 .video-details {
@@ -252,7 +252,6 @@ $playback-icon-font-size: 16px;
 
 .video-editor-actions-toolbar {
     @include clearfix();
-    margin: 5px 0;
 
     .video-nav-controls {
         float: left;
@@ -285,6 +284,7 @@ $playback-icon-font-size: 16px;
         padding: 12px 15px;
         min-width: 80px;
         text-align: center;
+        height: 39px;
     }
 }
 

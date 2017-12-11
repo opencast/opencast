@@ -55,6 +55,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/general.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/hasActiveTransaction" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/hasSnapshots.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
@@ -118,6 +119,7 @@
     <sec:intercept-url pattern="/email/template" method="POST" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_CREATE" />
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
     <sec:intercept-url pattern="/services/sanitize" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVICES_STATUS_EDIT" />
+    <sec:intercept-url pattern="/staticfiles" method="POST" access="ROLE_ADMIN, ROLE_UI_THEMES_CREATE, ROLE_UI_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/acl" method="POST" access="ROLE_ADMIN, ROLE_UI_ACLS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/deleteEvents" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/new" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />

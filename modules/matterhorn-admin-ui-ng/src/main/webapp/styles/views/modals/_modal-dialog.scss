@@ -43,11 +43,10 @@
         @extend .extra-small-modal;
 
         top: 35%;
-        height: 240px;
+        height: 230px;
 
         p {
             text-align: center;
-            color: $dark-prim-color;
             margin:20px auto 20px;
         }
 
@@ -60,7 +59,8 @@
             text-align: center;
 
             a {
-                padding: 15px 40px;
+                padding: 12px 30px;
+                height: 39px;
                 display: inline-block;
                 margin: 0 10px;
 

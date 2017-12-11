@@ -14,6 +14,10 @@ angular.module('adminNg.directives')
         link: function (scope, element) {
             scope.mixed = false;
 
+            if (scope.params === undefined || scope.params.type === undefined) {
+              console.warn("Illegal parameters for editable field");
+              return;
+            }
             if (scope.params.readOnly) {
                 scope.mode = 'readOnly';
             } else {

@@ -176,4 +176,9 @@ public class UnitTestWorkspace implements Workspace {
   public void cleanup(Id mediaPackageId) throws IOException {
     // Nothing to do
   }
+
+  @Override
+  public String rootDirectory() {
+    return null;
+  }
 }

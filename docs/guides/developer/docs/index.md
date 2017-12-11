@@ -28,4 +28,4 @@ These guides will help you if you want to participate in Opencast development.
     - […](modules/index.md)
  - [External API](api/index.md)
  - [Project Infrastructure](infrastructure/index.md)
-    - [Nexus Maven Repository](infrastructure/nexus.md)
+    - [Maven Repository](infrastructure/maven-repository.md)
