@@ -55,15 +55,16 @@
       </configurations>
     </operation>
 
-    <!-- Apply ACL from series to the mediapackage -->
+    <!-- Apply metadata from series to the mediapackage -->
 
     <operation
       id="series"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
-      description="Applying access control entries from series">
+      description="Applying series metadata">
       <configurations>
         <configuration key="apply-acl">true</configuration>
+        <configuration key="attach">*</configuration>
       </configurations>
     </operation>
 
