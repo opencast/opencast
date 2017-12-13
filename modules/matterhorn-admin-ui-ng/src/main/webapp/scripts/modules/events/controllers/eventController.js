@@ -673,12 +673,12 @@ angular.module('adminNg.controllers')
                 if (angular.isDefined(callback)) {
                     callback();
                 }
-            });
-            // Mark the saved attribute as saved
-            angular.forEach(catalog.fields, function (entry) {
-                if (entry.id === id) {
-                    entry.saved = true;
-                }
+                // Mark the saved attribute as saved
+                angular.forEach(catalog.fields, function (entry) {
+                    if (entry.id === id) {
+                        entry.saved = true;
+                    }
+                });
             });
         };
 
