@@ -49,7 +49,7 @@
                     <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">
                         <!-- Publication Status -->
                     </header>
-                    <div class="obj-container">
+                    <div class="obj-container" ng-if="general">
                         <p translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_DESCRIPTION" ng-show="general.publications.length">
                           <!-- This event has been published to the following publication channels: -->
                         </p>
@@ -59,7 +59,7 @@
                                     <span class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></span>
                                     <div>
                                       <span translate="{{ publication.label }}">{{ publication.label }}</span>
-                                      <p class="max-width" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
+                                      <p class="description" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
                                     </div>
                                     <a href="{{ publication.url }}" class="play"></a>
                                 </div>
@@ -362,7 +362,7 @@
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                                             <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
                                                 <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')" class="fa fa-hand-stop-o fa-fw" style="color:red"><!-- Abort -->
-                                                </a>           
+                                                </a>
                                                 <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')" class="fa fa-refresh fa-fw"><!-- Retry -->
                                                 </a>
                                             </td>

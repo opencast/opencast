@@ -228,13 +228,13 @@ angular.module('adminNg.controllers')
             },
             fetchChildResources = function (id) {
 
-                $scope.general = EventGeneralResource.get({ id: id }, function () {
-                    angular.forEach($scope.general.publications, function (publication, index) {
+                var general = EventGeneralResource.get({ id: id }, function () {
+                    angular.forEach(general.publications, function (publication, index) {
                         publication.label = publication.name;
                         publication.order = 999 + index;
                     });
                     $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' }, function() {
-                        angular.forEach($scope.general.publications, function (publication) {
+                        angular.forEach(general.publications, function (publication) {
                             if(angular.isDefined($scope.publicationChannels[publication.id])) {
                                 var record = JSON.parse($scope.publicationChannels[publication.id]);
                                 if (record.label) publication.label = record.label;
@@ -244,6 +244,10 @@ angular.module('adminNg.controllers')
                                 if (record.order) publication.order = record.order;
                             }
                         });
+                        // we postpone setting $scope.general until this point to avoid UI "flickering" due to publications changing
+                        $scope.general = general;
+                    }, function() {
+                        $scope.general = general;
                     });
                 });
 

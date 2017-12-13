@@ -39,8 +39,10 @@
             color: $medium-prim-color;
         }
 
-        .max-width {
-            width: 95%;
+        .description {
+            width: 100%;
+            padding-right: 20px;
+            line-height: 15px;
         }
 
         > ul li {
