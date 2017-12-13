@@ -66,7 +66,7 @@ To start the migration follow these steps:
 Re-Build ElasticSearch Index
 ----------------------------
 
-The introduction of the new scheduler service requires an update to the Elasticsearch index:
+The introduction of the new scheduler service requires an update to the ElasticSearch index:
 
 1. If you did not do that during the scheduler migration, delete the index directory at `data/index`
 2. Start Opencast if you have not already, waiting until it has started completely.
@@ -78,3 +78,11 @@ The introduction of the new scheduler service requires an update to the Elastics
       `/recreateIndex`.
 
     In both cases, the resulting page is empty but should return a HTTP status 200.
+
+4. If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
+
+    - Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
+    - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+      symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
+      `/recreateIndex`.
+
