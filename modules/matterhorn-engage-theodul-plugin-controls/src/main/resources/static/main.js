@@ -540,6 +540,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           str_right: translate('right', 'right'),
           str_beside: translate('beside', 'beside'),
           str_off: translate('off', 'off'),
+          str_subtitles: translate('subtitles', 'Subtitles'),
+          str_zoom: translate('zoom', 'Zoom'),
           qualities: resolutions,
           pip_position: translate(pipPosition, pipPosition),
           translatedqualities: translatedQualities,
