@@ -15,8 +15,8 @@ angular.module('adminNg.resources')
                 return data;
             }
 
-            startDate = new Date(parsedData.metadata.start);
-            endDate = new Date(parsedData.metadata.end);
+            startDate = new Date(parsedData.start);
+            endDate = new Date(parsedData.end);
             duration = (endDate - startDate) / 1000;
             durationHours = (duration - (duration % 3600)) / 3600;
             durationMinutes = (duration % 3600) / 60;   

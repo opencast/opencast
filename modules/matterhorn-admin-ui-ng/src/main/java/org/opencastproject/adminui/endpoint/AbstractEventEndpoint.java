@@ -439,9 +439,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(eventId);
-      JObject technicalMetadataJson = technicalMetadataToJson.apply(technicalMetadata);
-      return okJson(obj(f("source", v(getIndexService().getEventSource(optEvent.get()).toString())),
-              f("metadata", technicalMetadataJson)));
+      return okJson(technicalMetadataToJson.apply(technicalMetadata));
     } catch (SchedulerException e) {
       logger.error("Unable to get technical metadata for event with id {}", eventId);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
