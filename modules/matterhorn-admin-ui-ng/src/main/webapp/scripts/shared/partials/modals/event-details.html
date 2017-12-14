@@ -257,10 +257,6 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td>{{ 'EVENTS.EVENTS.DETAILS.SCHEDULING.PLACEHOLDER.PRESENTERS' | translate }}</td>
-                                <td>{{ source.presenters }}</td>
-                            </tr>
-                            <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
                                 <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                 <select chosen pre-select-from="captureAgents"
