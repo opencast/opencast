@@ -183,10 +183,16 @@
 
     <div class="modal-content" data-modal-tab-content="scheduling">
         <div class="modal-body">
-            <div data-admin-ng-notifications="" context="event-scheduling"></div>
-            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
-
+                <div data-admin-ng-notifications="" context="event-scheduling"></div>
+                <div data-admin-ng-notifications="" context="events-access"></div>
+                <table ng-show="conflicts.length > 0" class="main-tbl scheduling-conflict">
+                    <tr ng-repeat="conflict in conflicts">
+                        <td>{{ conflict.title }}</td>
+                        <td>{{ conflict.start }}</td>
+                        <td>{{ conflict.end }}</td>
+                    </tr>
+                </table>
                 <!-- Scheduling configuration -->
                 <div class="obj tbl-details" ng-if="scheduling.hasProperties">
                     <header>
@@ -213,8 +219,9 @@
                             </tr>
                             <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.hour" ng-change="saveScheduling()"
@@ -222,6 +229,7 @@
                                         ng-options="h.index as h.value for h in hours"
                                     />
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.minute" ng-change="saveScheduling()"
@@ -229,14 +237,15 @@
                                         ng-options="m.index as m.value for m in minutes"
                                     />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.start.hour | addLeadingZeros : 2 }} : {{ source.start.minute | addLeadingZeros : 2}}
                                 </td>
                             </tr>
                             <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.hour" ng-change="saveScheduling()"
@@ -245,6 +254,7 @@
                                     />
 
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.minute" ng-change="saveScheduling()"
@@ -252,14 +262,15 @@
                                         ng-options="m.index as m.value for m in minutes"
                                     />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
                                 </td>
                             </tr>
                             <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                 <select chosen pre-select-from="captureAgents"
+                                    ng-disabled="checkingConflicts"
                                     data-width="'200px'"
                                     ng-change="roomChanged(); saveScheduling()"
                                     data-disable-search-threshold="8"
@@ -268,7 +279,7 @@
                                     data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
                                 />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.device.name }}
                                 </td>
                             </tr>

@@ -225,6 +225,7 @@ angular.module('adminNg.controllers')
                   Notifications.remove($scope.lastNotificationId, 'event-scheduling');
                   $scope.lastNotificationId = undefined;
               }
+              me.clearConflicts();
             },
             fetchChildResources = function (id) {
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
@@ -445,46 +446,48 @@ angular.module('adminNg.controllers')
         $scope.hours = JsHelper.initArray(24);
         $scope.minutes = JsHelper.initArray(60);
 
-        this.conflicts = [];
+        $scope.conflicts = [];
+  
         this.readyToPollConflicts = function () {
-            var data = $scope.source, result;
-            result = angular.isDefined(data) && angular.isDefined(data.start) &&
-                angular.isDefined(data.start.date) && data.start.date.length > 0 &&
-                angular.isDefined(data.device) &&
-                angular.isDefined(data.device.id) && data.device.id.length > 0;
-
-            return result;
+            var data = $scope.source;
+            return angular.isDefined(data) &&
+                angular.isDefined(data.start) && angular.isDefined(data.start.date) && data.start.date.length > 0 &&
+                angular.isDefined(data.duration) &&
+                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&
+                angular.isDefined(data.device) && angular.isDefined(data.device.id) && data.device.id.length > 0;
         };
 
+        this.clearConflicts = function () {
+          $scope.conflicts = [];
+          if (me.notificationConflict) {
+              Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
+              me.notifictationConflict = undefined;
+          }
+        }
+
         this.noConflictsDetected = function () {
-            while (me.conflicts.length > 0) {
-                me.conflicts.pop();
-            }
-            me.checkingConflicts = false;
+            me.clearConflicts();
+            $scope.checkingConflicts = false;
         };
 
         this.conflictsDetected = function (response) {
+            me.clearConflicts();
             if (response.status === 409) {
-                if (me.notification) {
-                    Notifications.remove(me.notification, SCHEDULING_CONTEXT);
-                }
-                me.conflicts = []; // reset
-                me.notification = Notifications.add('error', 'CONFLICT_DETECTED', SCHEDULING_CONTEXT);
-                var data = response.data;
-                angular.forEach(data, function (d) {
-                    me.conflicts.push({
-                        title: d.title,
-                        start: Language.toLocalTime(d.start.substr(6, d.start.length)),
-                        end: Language.toLocalTime(d.end.substr(5, d.end.length))
+                me.notificationConflict = Notifications.add('error', 'CONFLICT_DETECTED', SCHEDULING_CONTEXT);
+                angular.forEach(response.data, function (data) {
+                    $scope.conflicts.push({
+                        title: data.title,
+                        start: Language.formatDateTime('medium', data.start),
+                        end: Language.formatDateTime('medium', data.end)
                     });
                 });
             }
-            me.checkingConflicts = false;
+            $scope.checkingConflicts = false;
         };
 
         $scope.checkConflicts = function () {
             return new Promise(function(resolve, reject) {
-                me.checkingConflicts = true;
+                $scope.checkingConflicts = true;
                 if (me.readyToPollConflicts()) {
                     ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
                         .$promise.then(function() {
@@ -494,7 +497,7 @@ angular.module('adminNg.controllers')
                             reject();
                         });
                 } else {
-                   me.checkingConflicts = false;
+                   $scope.checkingConflicts = false;
                    resolve();
                 }
             });
@@ -503,9 +506,7 @@ angular.module('adminNg.controllers')
         $scope.saveScheduling = function () {
             if (me.readyToPollConflicts()) {
                 ConflictCheckResource.check($scope.source, function () {
-                    while (me.conflicts.length > 0) {
-                        me.conflicts.pop();
-                    }
+                    me.clearConflicts();
 
                     $scope.source.agentId = $scope.source.device.id;
                     $scope.source.agentConfiguration['capture.device.names'] = '';
