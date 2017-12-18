@@ -35,7 +35,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityContext;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
@@ -121,7 +121,7 @@ public class BaseEndpoint {
           @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getEndpointInfo() {
     Organization organization = securityService.getOrganization();
-    String orgExternalAPIUrl = organization.getProperties().get(MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY);
+    String orgExternalAPIUrl = organization.getProperties().get(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
 
     JString url;
     if (StringUtils.isNotBlank(orgExternalAPIUrl)) {

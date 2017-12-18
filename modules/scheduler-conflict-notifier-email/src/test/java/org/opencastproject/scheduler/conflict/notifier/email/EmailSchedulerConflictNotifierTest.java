@@ -37,7 +37,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -98,7 +98,7 @@ public class EmailSchedulerConflictNotifierTest {
     EasyMock.replay(extendedAdapter);
 
     BundleContext bundleContext = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY))
+    EasyMock.expect(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY))
             .andReturn("http://localhost:8080").anyTimes();
     EasyMock.replay(bundleContext);
 

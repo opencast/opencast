@@ -28,7 +28,7 @@ import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
@@ -68,7 +68,7 @@ public class BundleInfoLogger implements BundleListener {
 
   /** OSGi callback */
   public void activate(ComponentContext cc) {
-    host = option(getContextProperty(cc, MatterhornConstants.SERVER_URL_PROPERTY)).bind(Strings.trimToNone).getOrElse(
+    host = option(getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY)).bind(Strings.trimToNone).getOrElse(
             UrlSupport.DEFAULT_BASE_URL);
     for (BundleInfoDb a : db)
       a.clear(host);

@@ -62,7 +62,7 @@ import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
 import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
 import org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.functions.Strings;
@@ -268,17 +268,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     logger.info("Activate service registry");
 
     // Find this host's url
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY))) {
       hostName = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      hostName = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+      hostName = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     }
 
     // Check hostname for sanity. It should be the hosts URL with protocol but without any part of the service paths.
     if (hostName.endsWith("/")) {
       logger.warn("The configured value of {} ends with '/'. This is very likely a configuration error which could "
               + "lead to services not working properly. Note that this configuration should not contain any part of "
-              + "the service paths.", MatterhornConstants.SERVER_URL_PROPERTY);
+              + "the service paths.", OpencastConstants.SERVER_URL_PROPERTY);
     }
 
     // Clean all undispatchable jobs that were orphaned when this host was last deactivated

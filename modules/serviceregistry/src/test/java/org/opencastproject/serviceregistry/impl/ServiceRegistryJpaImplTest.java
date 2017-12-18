@@ -39,7 +39,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.util.persistence.PersistenceUtil;
@@ -196,7 +196,7 @@ public class ServiceRegistryJpaImplTest {
 
   private void setupBundleContext() throws InvalidSyntaxException {
     bundleContext = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn("");
+    EasyMock.expect(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn("");
     EasyMock.expect(bundleContext.getProperty("org.opencastproject.jobs.url")).andReturn("");
     EasyMock.expect(bundleContext.getProperty(ServiceRegistryJpaImpl.OPT_MAXLOAD)).andReturn("");
     EasyMock.expect(bundleContext.createFilter((String) EasyMock.anyObject()))

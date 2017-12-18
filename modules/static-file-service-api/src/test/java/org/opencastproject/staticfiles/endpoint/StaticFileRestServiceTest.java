@@ -32,7 +32,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.staticfiles.api.StaticFileService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.fileupload.FileUploadException;
@@ -107,7 +107,7 @@ public class StaticFileRestServiceTest {
   private static ComponentContext getComponentContext(String useWebserver, long maxSize) {
     // Create BundleContext
     BundleContext bundleContext = EasyMock.createMock(BundleContext.class);
-    EasyMock.expect(bundleContext.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn(SERVER_URL);
+    EasyMock.expect(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn(SERVER_URL);
     EasyMock.expect(bundleContext.getProperty(StaticFileRestService.STATICFILES_UPLOAD_MAX_SIZE_KEY)).andReturn(
             Long.toString(maxSize));
     EasyMock.replay(bundleContext);

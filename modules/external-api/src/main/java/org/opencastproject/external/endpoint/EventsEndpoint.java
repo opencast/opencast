@@ -83,7 +83,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
@@ -258,7 +258,7 @@ public class EventsEndpoint implements ManagedService {
   void activate(ComponentContext cc) {
     this.serverUrl = "http://localhost:8080";
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
       if (ccServerUrl != null) {
         logger.debug("Configured server url is {}", ccServerUrl);
         this.serverUrl = ccServerUrl;

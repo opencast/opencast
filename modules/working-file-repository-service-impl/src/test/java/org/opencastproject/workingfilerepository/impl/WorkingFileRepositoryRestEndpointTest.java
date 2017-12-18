@@ -24,7 +24,7 @@ package org.opencastproject.workingfilerepository.impl;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -55,7 +55,7 @@ public class WorkingFileRepositoryRestEndpointTest {
     Organization organization = EasyMock.createMock(Organization.class);
     EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
     Map<String, String> orgProps = new HashMap<String, String>();
-    orgProps.put(MatterhornConstants.WFR_URL_ORG_PROPERTY, UrlSupport.DEFAULT_BASE_URL);
+    orgProps.put(OpencastConstants.WFR_URL_ORG_PROPERTY, UrlSupport.DEFAULT_BASE_URL);
     EasyMock.expect(organization.getProperties()).andReturn(orgProps).anyTimes();
     EasyMock.replay(organization);
 

@@ -76,7 +76,7 @@ import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Arr;
@@ -241,7 +241,7 @@ public class SchedulerRestService {
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("configured server url is {}", ccServerUrl);
       if (ccServerUrl == null) {
         serverUrl = UrlSupport.DEFAULT_BASE_URL;

@@ -24,7 +24,7 @@ package org.opencastproject.workingfilerepository.impl;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.Log;
@@ -115,7 +115,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       return; // If the root directory was set, respect that setting
 
     // server url
-    serverUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+    serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     if (StringUtils.isBlank(serverUrl))
       throw new IllegalStateException("Server URL must be set");
 
@@ -972,9 +972,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public URI getBaseUri() {
     if (securityService.getOrganization() != null) {
       Map<String, String> orgProps = securityService.getOrganization().getProperties();
-      if (orgProps != null && orgProps.containsKey(MatterhornConstants.WFR_URL_ORG_PROPERTY)) {
+      if (orgProps != null && orgProps.containsKey(OpencastConstants.WFR_URL_ORG_PROPERTY)) {
         try {
-          return new URI(UrlSupport.concat(orgProps.get(MatterhornConstants.WFR_URL_ORG_PROPERTY), servicePath));
+          return new URI(UrlSupport.concat(orgProps.get(OpencastConstants.WFR_URL_ORG_PROPERTY), servicePath));
         } catch (URISyntaxException ex) {
           logger.warn("Organization working file repository URL not set, fallback to server URL");
         }

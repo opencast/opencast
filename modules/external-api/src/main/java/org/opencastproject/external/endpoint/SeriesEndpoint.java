@@ -66,7 +66,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
@@ -164,7 +164,7 @@ public class SeriesEndpoint {
     if (cc == null) {
       this.serverUrl = "http://localhost:8080";
     } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
       if (ccServerUrl == null)
         this.serverUrl = "http://localhost:8080";

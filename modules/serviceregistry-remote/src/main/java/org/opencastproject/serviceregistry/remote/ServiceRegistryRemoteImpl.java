@@ -23,7 +23,7 @@ package org.opencastproject.serviceregistry.remote;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.IncidentService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang3.StringUtils;
@@ -79,10 +79,10 @@ public final class ServiceRegistryRemoteImpl extends ServiceRegistryRemoteBase {
    *          the component context
    */
   public void activate(ComponentContext cc) {
-    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY))) {
+    if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY))) {
       serverUrl = UrlSupport.DEFAULT_BASE_URL;
     } else {
-      serverUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+      serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     }
 
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty(OPT_SERVICE_REGISTRY_URL))) {

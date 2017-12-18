@@ -32,7 +32,7 @@ import org.opencastproject.scheduler.api.ConflictNotifier;
 import org.opencastproject.scheduler.api.ConflictResolution.Strategy;
 import org.opencastproject.scheduler.api.ConflictingEvent;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -118,7 +118,7 @@ public class EmailSchedulerConflictNotifier implements ConflictNotifier, Managed
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
-    serverUrl = getContextProperty(cc, MatterhornConstants.SERVER_URL_PROPERTY);
+    serverUrl = getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY);
   }
 
   @Override
@@ -139,7 +139,7 @@ public class EmailSchedulerConflictNotifier implements ConflictNotifier, Managed
       return;
     }
     String adminBaseUrl = securityService.getOrganization().getProperties()
-            .get(MatterhornConstants.ADMIN_URL_ORG_PROPERTY);
+            .get(OpencastConstants.ADMIN_URL_ORG_PROPERTY);
     if (StringUtils.isBlank(adminBaseUrl))
       adminBaseUrl = serverUrl;
 

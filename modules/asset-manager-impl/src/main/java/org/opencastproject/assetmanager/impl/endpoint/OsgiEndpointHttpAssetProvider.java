@@ -33,7 +33,7 @@ import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 
@@ -74,9 +74,9 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
     }
 
     // Get asset manager URL. Default to admin node URL or to server URL
-    String orgServerUrl = organization.getProperties().get(MatterhornConstants.ASSET_MANAGER_URL_ORG_PROPERTY);
+    String orgServerUrl = organization.getProperties().get(OpencastConstants.ASSET_MANAGER_URL_ORG_PROPERTY);
     if (StringUtils.isBlank(orgServerUrl)) {
-      orgServerUrl = organization.getProperties().get(MatterhornConstants.ADMIN_URL_ORG_PROPERTY);
+      orgServerUrl = organization.getProperties().get(OpencastConstants.ADMIN_URL_ORG_PROPERTY);
       logger.debug("No asset manager URL for organization '{}'. Falling back to admin node url ({})",
                    organization, orgServerUrl);
     }

@@ -23,9 +23,9 @@ package org.opencastproject.external.endpoint;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.opencastproject.systems.MatterhornConstants.ADMIN_DOC_URL_ORG_PROPERTY;
-import static org.opencastproject.systems.MatterhornConstants.EXTERNAL_API_URL_ORG_PROPERTY;
-import static org.opencastproject.systems.MatterhornConstants.FEED_URL_ORG_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.ADMIN_DOC_URL_ORG_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.FEED_URL_ORG_PROPERTY;
 
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.security.api.Organization;

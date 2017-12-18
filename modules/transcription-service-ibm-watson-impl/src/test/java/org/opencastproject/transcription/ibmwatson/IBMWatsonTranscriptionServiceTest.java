@@ -47,7 +47,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.WorkflowDispatcher;
 import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase;
@@ -141,7 +141,7 @@ public class IBMWatsonTranscriptionServiceTest {
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getProperties()).andReturn(props).anyTimes();
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bc.getProperty(MatterhornConstants.SERVER_URL_PROPERTY)).andReturn("http://THIS_SERVER");
+    EasyMock.expect(bc.getProperty(OpencastConstants.SERVER_URL_PROPERTY)).andReturn("http://THIS_SERVER");
     EasyMock.expect(bc.getProperty("org.opencastproject.security.digest.user")).andReturn("matterhorn_system_account");
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
 

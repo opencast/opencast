@@ -44,7 +44,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase;
@@ -257,7 +257,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         }
         logger.info("Cleanup result files after {} days", cleanupResultDays);
 
-        serverUrl = OsgiUtil.getContextProperty(cc, MatterhornConstants.SERVER_URL_PROPERTY);
+        serverUrl = OsgiUtil.getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY);
         systemAccount = OsgiUtil.getContextProperty(cc, DIGEST_USER_PROPERTY);
 
         // Schedule the workflow dispatching, starting in 2 minutes

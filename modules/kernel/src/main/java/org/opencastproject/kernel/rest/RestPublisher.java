@@ -25,7 +25,7 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.rest.SharedHttpContext;
 import org.opencastproject.rest.StaticResource;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 
 import com.google.common.cache.CacheBuilder;
@@ -162,7 +162,7 @@ public class RestPublisher implements RestConstants {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
-    baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+    baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
     fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
     servletRegistrationMap = new ConcurrentHashMap<>();

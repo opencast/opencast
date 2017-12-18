@@ -48,7 +48,7 @@ import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.systems.MatterhornConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
@@ -135,7 +135,7 @@ public class IncidentServiceEndpoint {
   public void activate(ComponentContext cc) {
     // Get the configured server URL
     if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       if (StringUtils.isNotBlank(ccServerUrl))
         serverUrl = ccServerUrl;
       serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);

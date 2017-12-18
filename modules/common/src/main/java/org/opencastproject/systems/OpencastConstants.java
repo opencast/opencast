@@ -22,9 +22,9 @@
 package org.opencastproject.systems;
 
 /**
- * Matterhorn system constant definitions.
+ * Opencast system constant definitions.
  */
-public interface MatterhornConstants {
+public interface OpencastConstants {
 
   /** The property key for the current machine's hostname defined in the config.properties */
   String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
