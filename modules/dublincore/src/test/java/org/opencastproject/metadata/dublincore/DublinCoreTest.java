@@ -78,7 +78,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URI;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
@@ -132,14 +131,20 @@ public class DublinCoreTest {
   @Before
   public void setUp() throws Exception {
     catalogFile = new File(this.getClass().getResource(catalogName).toURI());
+    File tmpCatalogFile = testFolder.newFile();
+    FileUtils.copyFile(catalogFile, tmpCatalogFile);
+    File tmpCatalogFile2 = testFolder.newFile();
+    FileUtils.copyFile(catalogFile, tmpCatalogFile2);
     catalogFile2 = new File(this.getClass().getResource(catalogName2).toURI());
     if (!catalogFile.exists() || !catalogFile.canRead())
       throw new Exception("Unable to access test catalog");
     if (!catalogFile2.exists() || !catalogFile2.canRead())
       throw new Exception("Unable to access test catalog 2");
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
-    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean()))
+            .andReturn(tmpCatalogFile).andReturn(tmpCatalogFile2);
+    EasyMock.expect(workspace.read(EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
     EasyMock.replay(workspace);
     service = new DublinCoreCatalogService();
     service.setWorkspace(workspace);

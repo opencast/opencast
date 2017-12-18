@@ -43,6 +43,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -104,10 +105,12 @@ public final class DublinCoreUtil {
   public static DublinCoreCatalog loadDublinCore(Workspace workspace, MediaPackageElement mpe) {
     InputStream in = null;
     try {
-      in = new FileInputStream(workspace.read(mpe.getURI()));
+      File file = workspace.read(mpe.getURI());
+      logger.debug("Loading {}", file);
+      in = new FileInputStream(file);
       return DublinCores.read(in);
     } catch (Exception e) {
-      logger.error("Unable to load metadata from catalog '{}': {}", mpe, e);
+      logger.error("Unable to load metadata from catalog '{}'", mpe, e);
       return chuck(e);
     } finally {
       IOUtils.closeQuietly(in);

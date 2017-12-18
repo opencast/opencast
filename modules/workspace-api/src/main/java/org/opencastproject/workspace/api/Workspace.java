@@ -52,6 +52,22 @@ public interface Workspace extends StorageUsage {
   File get(URI uri) throws NotFoundException, IOException;
 
   /**
+   * Get a locally cached {@link File} for a given URI, optionally ensuring that the file is cached in a unique path
+   * so that it can safely be removed afterwards.
+   *
+   * @param uri
+   *          URI to the resource to get
+   * @param uniqueFilename
+   *          If a unique path should be used
+   * @return The locally cached file
+   * @throws NotFoundException
+   *           if the file does not exist
+   * @throws IOException
+   *           if reading the file from the workspace fails
+   */
+  File get(URI uri, boolean uniqueFilename) throws NotFoundException, IOException;
+
+  /**
    * Get the {@link File} for the given URI directly from the working file repository.
    * If shared storage is not available, then fall back to get(uri).
    *

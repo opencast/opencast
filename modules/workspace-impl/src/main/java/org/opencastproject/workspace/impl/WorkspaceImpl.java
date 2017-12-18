@@ -76,6 +76,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.management.ObjectInstance;
@@ -295,7 +296,18 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public File get(final URI uri) throws NotFoundException, IOException {
-    final File inWs = toWorkspaceFile(uri);
+    return get(uri, false);
+  }
+
+  @Override
+  public File get(final URI uri, final boolean uniqueFilename) throws NotFoundException, IOException {
+    File inWs = toWorkspaceFile(uri);
+
+    if (uniqueFilename) {
+      inWs = new File(FilenameUtils.removeExtension(inWs.getAbsolutePath()) + '-' + UUID.randomUUID() + '.'
+              + FilenameUtils.getExtension(inWs.getName()));
+      logger.debug("Created unique filename: {}", inWs);
+    }
 
     if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
             && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
