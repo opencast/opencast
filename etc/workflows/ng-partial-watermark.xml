@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-watermark</id>
+  <id>partial-watermark</id>
   <title>Render watermark</title>
   <tags/>
   <description>
@@ -13,7 +13,7 @@
 
       <operation
         id="analyze-tracks"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Analyze trimmed tracks">
         <configurations>
           <configuration key="source-flavor">*/trimmed</configuration>
@@ -25,7 +25,7 @@
         description="Render watermark into presenter track"
         if="${presenter_trimmed_video}"
         fail-on-error="true"
-        exception-handler-workflow="ng-partial-error">
+        exception-handler-workflow="partial-error">
         <configurations>
           <configuration key="source-flavor-lower">presenter/trimmed</configuration>
           <configuration key="source-flavor-upper">not/available</configuration>
@@ -46,7 +46,7 @@
         description="Render watermark into presentation track"
         if="${presentation_trimmed_video}"
         fail-on-error="true"
-        exception-handler-workflow="ng-partial-error">
+        exception-handler-workflow="partial-error">
         <configurations>
           <configuration key="source-flavor-lower">presentation/trimmed</configuration>
           <configuration key="source-flavor-upper">not/available</configuration>

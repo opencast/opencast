@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-ingest</id>
+  <id>partial-ingest</id>
   <title>Ingest asset</title>
   <tags/>
   <description/>
@@ -21,7 +21,7 @@
 
     <operation
       id="ingest-download"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Ingesting external elements">
       <configurations>
         <configuration key="delete-external">true</configuration>
@@ -32,7 +32,7 @@
 
     <operation
       id="inspect"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
@@ -44,7 +44,7 @@
 
     <operation
       id="series"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Applying access control entries">
       <configurations>
         <configuration key="attach">*</configuration>
@@ -75,7 +75,7 @@
     <operation
       id="tag"
       if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging uploaded assets for distribution">
       <configurations>
         <configuration key="source-flavors">${download-source-flavors}</configuration>

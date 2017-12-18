@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-publish</id>
+  <id>partial-publish</id>
   <title>Publish the recording</title>
   <tags/>
   <description/>
@@ -17,7 +17,7 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <operation id="editor"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Cut the recording according to the edit decision list">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
@@ -54,7 +54,7 @@
     <operation
       id="tag"
       if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging uploaded assets for distribution">
       <configurations>
         <configuration key="source-flavors">${download-source-flavors}</configuration>
@@ -74,7 +74,7 @@
     <operation
       id="image"
       if="NOT (${uploadedSearchPreview})"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating search result thumbnails">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
@@ -90,7 +90,7 @@
 
     <operation
       id="image"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating player preview image">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
@@ -106,7 +106,7 @@
 
     <operation
       id="image"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating feed cover image">
       <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>
@@ -132,7 +132,7 @@
 
     <operation
       id="image"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating player preview image">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
@@ -146,7 +146,7 @@
     <operation
       id="cover-image"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Create a cover image">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
@@ -183,7 +183,7 @@
 
     <operation
       id="theme"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Apply the theme">
       <configurations>
         <configuration key="bumper-flavor">branding/bumper</configuration>
@@ -203,7 +203,7 @@
 
     <operation
       id="inspect"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
@@ -217,7 +217,7 @@
       description="Prepare title slide video"
       if="${theme_title_slide_active}">
       <configurations>
-        <configuration key="workflow-id">ng-partial-title-slide</configuration>
+        <configuration key="workflow-id">partial-title-slide</configuration>
       </configurations>
     </operation>
 
@@ -227,7 +227,7 @@
       description="Render watermarks into video tracks"
       if="${theme_watermark_active}">
       <configurations>
-        <configuration key="workflow-id">ng-partial-watermark</configuration>
+        <configuration key="workflow-id">partial-watermark</configuration>
       </configurations>
     </operation>
 
@@ -257,7 +257,7 @@
 
     <operation
       id="concat"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Concatenate presenter track with intro, title slide and outro videos">
       <configurations>
         <configuration key="source-flavor-part-0">branding/bumper</configuration>
@@ -279,7 +279,7 @@
 
     <operation
       id="concat"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Concatenate presentation track with intro, title slide and outro videos">
       <configurations>
         <configuration key="source-flavor-part-0">branding/bumper</configuration>
@@ -308,7 +308,7 @@
     <operation
       if="${flagQuality360p}"
       id="compose"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding 360p video to MP4 download">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
@@ -320,7 +320,7 @@
     <operation
       if="${flagQuality480p}"
       id="compose"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding 480p video to MP4 download">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
@@ -332,7 +332,7 @@
     <operation
       if="${flagQuality720p}"
       id="compose"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding 720p video to MP4 download">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
@@ -344,7 +344,7 @@
     <operation
       if="${flagQuality1080p}"
       id="compose"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding 1080p video to MP4 download">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
@@ -356,7 +356,7 @@
     <operation
       if="${flagQuality2160p}"
       id="compose"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding 2160p video to MP4 download">
       <configurations>
         <configuration key="source-flavor">*/themed</configuration>
@@ -426,7 +426,7 @@
       id="publish-engage"
       if="${publishToEngage}"
       max-attempts="2"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -440,7 +440,7 @@
       id="publish-aws"
       if="${publishToAws}"
       max-attempts="2"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publishing to Amazon Web Services">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -454,7 +454,7 @@
     <operation
       id="publish-configure"
       if="${publishToApi}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to external api publication channel">
       <configurations>
         <configuration key="channel-id">api</configuration>
@@ -471,7 +471,7 @@
     <operation
       id="publish-oaipmh"
       if="${publishToOaiPmh}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to OAI-PMH Default Repository">
       <configurations>
         <configuration key="download-flavors">dublincore/*,security/*</configuration>
@@ -488,7 +488,7 @@
       id="publish-youtube"
       if="${publishToYouTube}"
       max-attempts="2"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publishing to YouTube">
       <configurations>
         <configuration key="source-tags">engage-download</configuration>

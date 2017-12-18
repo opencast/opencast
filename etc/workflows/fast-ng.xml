@@ -4,8 +4,8 @@
   <id>fast</id>
   <title>Fast Testing Workflow</title>
   <tags>
-    <tag>upload-ng</tag>
-    <tag>schedule-ng</tag>
+    <tag>upload</tag>
+    <tag>schedule</tag>
   </tags>
   <description>
     A minimal workflow that transcodes the media into distribution formats, then
@@ -60,7 +60,7 @@
     <operation
       id="series"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Applying access control entries from series">
       <configurations>
         <configuration key="apply-acl">true</configuration>
@@ -73,7 +73,7 @@
 
     <operation
       id="tag"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging media package elements for archival">
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
@@ -85,7 +85,7 @@
     <operation
       id="tag"
       if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging uploaded assets for distribution">
       <configurations>
         <configuration key="source-flavors">${download-source-flavors}</configuration>
@@ -98,7 +98,7 @@
     <operation
       id="inspect"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
@@ -111,7 +111,7 @@
     <operation
       id="compose"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Encoding video">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
@@ -140,7 +140,7 @@
       id="image"
       if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating Engage search result thumbnails">
       <configurations>
         <configuration key="source-flavor">*/preview</configuration>
@@ -157,7 +157,7 @@
       id="image"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating Engage player preview image">
       <configurations>
         <configuration key="source-flavor">*/preview</configuration>
@@ -174,7 +174,7 @@
       id="segment-video"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Detecting slide transitions in presentation track">
       <configurations>
         <configuration key="source-flavor">presentation/preview</configuration>
@@ -188,7 +188,7 @@
       id="segmentpreviews"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Creating presentation segments preview image">
       <configurations>
         <configuration key="source-flavor">presentation/preview</configuration>
@@ -222,7 +222,7 @@
       id="extract-text"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Extracting text from presentation segments">
       <configurations>
         <configuration key="source-flavor">presentation/preview</configuration>
@@ -234,7 +234,7 @@
 
     <operation
       id="publish-configure"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to preview publication channel">
       <configurations>
         <configuration key="source-flavors">*/preview</configuration>
@@ -251,7 +251,7 @@
       if="${publishToMediaModule}"
       max-attempts="2"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publishing to Engage">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -266,7 +266,7 @@
     <operation
       id="publish-oaipmh"
       if="${publishToOaiPmh}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to OAI-PMH Default Repository">
       <configurations>
         <configuration key="download-flavors">dublincore/*,security/*</configuration>
@@ -282,7 +282,7 @@
     <operation
       id="snapshot"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Archiving">
       <configurations>
         <configuration key="source-tags">archive</configuration>

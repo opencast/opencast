@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-preview</id>
+  <id>partial-preview</id>
   <title>Prepare preview artifacts</title>
   <tags/>
   <description/>
@@ -20,7 +20,7 @@
 
     <operation
       id="analyze-tracks"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Analyze tracks in media package an set control variables">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
@@ -31,7 +31,7 @@
       description="Create single-stream video preview"
       if="NOT (${presenter_work_video} AND ${presentation_work_video})"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error">
+      exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-flavors">*/work</configuration>
         <configuration key="target-flavor">*/preview</configuration>
@@ -45,7 +45,7 @@
       description="Create dual-stream video preview"
       if="${presenter_work_video} AND ${presentation_work_video}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error">
+      exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-flavor-lower">presentation/work</configuration>
         <configuration key="source-flavor-upper">presenter/work</configuration>
@@ -120,7 +120,7 @@
 
     <operation
       id="publish-configure"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to preview publication channel">
       <configurations>
         <configuration key="source-tags">preview</configuration>

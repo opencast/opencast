@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-cleanup</id>
+  <id>partial-cleanup</id>
   <description>Cleanup after processing</description>
   <operations>
 

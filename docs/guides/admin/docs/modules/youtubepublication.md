@@ -73,8 +73,8 @@ With the JSON file created and saved previously, you have to proceed as describe
 Opencast can now publish to YouTube. The last step is to activate this feature. For this you have to create a new
 workflow or modify an existing one.
 
-- Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named
-  `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
+- Make a copy of the default workflow `etc/opencast/workflows/schedule-and-upload.xml` and create a copy named
+  `etc/opencast/workflows/schedule-and-upload-youtube.xml`
 
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
@@ -84,7 +84,7 @@ workflow or modify an existing one.
 
 - In `<operation id="defaults"`, set `publishToYouTube` to `true`.
 
-- Additionally, in the workflow `ng-partial-publish.xml` you also configure the `<operation id="publish-youtube"`. For
+- Additionally, in the workflow `partial-publish.xml` you also configure the `<operation id="publish-youtube"`. For
   example, you could specify to publish the presentation stream only by setting the configuration to:
 
         <configuration key="source-flavors">presentation/trimmed</configuration>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-work</id>
+  <id>partial-work</id>
   <title>Prepare work versions</title>
   <tags/>
   <description/>
@@ -22,7 +22,7 @@
 
     <operation
       id="prepare-av"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Preparing presenter (camera) audio and video work versions">
       <configurations>
         <configuration key="source-flavor">presenter/source</configuration>
@@ -37,7 +37,7 @@
 
     <operation
       id="prepare-av"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Preparing presentation (screen) audio and video work version">
       <configurations>
         <configuration key="source-flavor">presentation/source</configuration>

@@ -25,15 +25,15 @@ angular.module('adminNg.services')
         // Load all the workflows definitions
         if (use === 'tasks') {
             queryParams = {
-                    tags: 'archive-ng'
+                    tags: 'archive'
                 };
         } else if (use === 'delete-event') {
             queryParams = {
-                    tags: 'delete-ng'
+                    tags: 'delete'
             };
         } else {
             queryParams = {
-                tags: 'upload-ng,schedule-ng'
+                tags: 'upload,schedule'
             };
         }
         NewEventProcessingResource.get(queryParams, function (data) {

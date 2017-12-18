@@ -37,7 +37,7 @@ describe('Schedule Task Controller', function () {
     beforeEach(function () {
         $controller('ScheduleTaskCtrl', {$scope: $scope});
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive-ng').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
     });
 
     describe('basic functionality', function () {

@@ -85,7 +85,7 @@ To achieve this, the PartialImportWorkflowOperation is used to post-process the 
      <operation id="partial-import"
                description="Post-processing raw audio and video files from capture agent"
                fail-on-error="true"
-               exception-handler-workflow="ng-partial-error">
+               exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-presenter-flavor">presenter/source</configuration>
         <configuration key="source-presentation-flavor">presentation/source</configuration>

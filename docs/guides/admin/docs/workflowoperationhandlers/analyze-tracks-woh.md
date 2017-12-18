@@ -55,7 +55,7 @@ Operation Example
     <operation
       id="analyze-tracks"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Analyze tracks in media package and set control variables">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>

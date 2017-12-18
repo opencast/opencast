@@ -64,7 +64,7 @@ at least one of the properties *theme_\*_active* is true.
 
     <operation
       id="theme"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Apply the theme">
       <configurations>
         <configuration key="bumper-flavor">branding/bumper</configuration>

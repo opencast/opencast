@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-error</id>
+  <id>partial-error</id>
   <description>Cleanup after a processing failure</description>
   <operations>
 

@@ -22,7 +22,7 @@ not been published before, this operation will skip.
     <operation
         id="republish-oaipmh"
         fail-on-error="true"
-        exception-handler-workflow="ng-error"
+        exception-handler-workflow="error"
         description="Distribute and publish to the OAI-PMH repository">
         <configurations>
             <configuration key="source-flavors">presenter/source, presentation/source</configuration>

@@ -371,7 +371,7 @@ angular.module('adminNg.controllers')
                         baseWorkflow = $scope.workflows.workflow;
                         $scope.workflow.id = $scope.workflows.workflow.workflowId;
                         $scope.workflowDefinitions = NewEventProcessingResource.get({
-                            tags: 'schedule-ng'
+                            tags: 'schedule'
                         }, function () {
                             $scope.changeWorkflow(true);
                             setWorkflowConfig();
@@ -985,7 +985,7 @@ angular.module('adminNg.controllers')
         };
 
         checkForActiveTransactions();
-        
+
         $scope.workflowAction = function (wfId, action) {
         	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
                 Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);

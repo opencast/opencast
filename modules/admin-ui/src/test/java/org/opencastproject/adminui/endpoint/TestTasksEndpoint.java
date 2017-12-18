@@ -83,14 +83,14 @@ public class TestTasksEndpoint extends TasksEndpoint {
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
     wfD.setId("full");
-    wfD.addTag("ng-archive");
+    wfD.addTag("archive");
 
     WorkflowDefinitionImpl wfD2 = new WorkflowDefinitionImpl();
     wfD2.setTitle("Full HTML5");
     wfD2.setId("full-html5");
     wfD2.setDescription("Test description");
     wfD2.setConfigurationPanel("<h2>Test</h2>");
-    wfD2.addTag("ng-archive");
+    wfD2.addTag("archive");
 
     WorkflowDefinitionImpl wfD3 = new WorkflowDefinitionImpl();
     wfD3.setTitle("Hidden");

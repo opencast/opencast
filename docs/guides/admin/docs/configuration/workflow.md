@@ -57,8 +57,8 @@ Start by naming the workflow and giving it a meaningful description:
       <title>Encode Mp4, Distribute and Publish</title>
       <tags>
         <!-- Tell the UI where to show this workflow -->
-        <tag>upload-ng</tag>
-        <tag>schedule-ng</tag>
+        <tag>upload</tag>
+        <tag>schedule</tag>
         <tag>archive</tag>
       </tags>
       <description>
@@ -75,10 +75,10 @@ Start by naming the workflow and giving it a meaningful description:
 - The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
   is unique among all endpoints in the system.
 - The `tags` define where the user interfaces may use these workflows. Useful tags are:
-    - *upload-ng*: Usable for uploaded media (new admin ui)
-    - *schedule-ng*: Usable for scheduled events (new admin ui)
-    - *archive-ng*: Usable for archived media (new admin ui)
-    - *delete-ng*: Usable for deletion of events with publications (new admin ui)
+    - *upload*: Usable for uploaded media (new admin ui)
+    - *schedule*: Usable for scheduled events (new admin ui)
+    - *archive*: Usable for archived media (new admin ui)
+    - *delete*: Usable for deletion of events with publications (new admin ui)
     - *editor*: Usable from the video editor
 
 ### Inspect the Media
