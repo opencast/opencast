@@ -1,10 +1,7 @@
 angular.module('adminNg.resources')
 .factory('NewEventProcessingResource', ['$resource', function ($resource) {
     var transform = function (data) {
-        var result = [];
-        try {
-        	result = JSON.parse(data);
-        } catch (e) { }
+        var result = result = JSON.parse(data);
         return result;
     };
 

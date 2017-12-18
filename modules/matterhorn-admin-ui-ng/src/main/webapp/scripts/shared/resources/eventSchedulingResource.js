@@ -8,18 +8,13 @@ angular.module('adminNg.resources')
                 durationHours,
                 durationMinutes;
 
-            try {
-                parsedData = JSON.parse(data);
-            } catch (exception) {
-                // this happens, e.g. "The resource you requested does not exist."
-                return data;
-            }
+            parsedData = JSON.parse(data);
 
             startDate = new Date(parsedData.metadata.start);
             endDate = new Date(parsedData.metadata.end);
             duration = (endDate - startDate) / 1000;
             durationHours = (duration - (duration % 3600)) / 3600;
-            durationMinutes = (duration % 3600) / 60;   
+            durationMinutes = (duration % 3600) / 60;
 
 
             parsedData.start = JsHelper.zuluTimeToDateObject(startDate);
