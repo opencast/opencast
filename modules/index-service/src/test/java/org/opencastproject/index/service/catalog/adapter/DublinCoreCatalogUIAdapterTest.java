@@ -156,13 +156,14 @@ public class DublinCoreCatalogUIAdapterTest {
 
     outputCatalog = testFolder.newFile("out.xml");
 
-    Capture<String> mediapackageIDCapture = new Capture<String>();
-    Capture<String> catalogIDCapture = new Capture<String>();
-    Capture<String> filenameCapture = new Capture<String>();
-    writtenCatalog = new Capture<InputStream>();
+    Capture<String> mediapackageIDCapture = EasyMock.newCapture();
+    Capture<String> catalogIDCapture = EasyMock.newCapture();
+    Capture<String> filenameCapture = EasyMock.newCapture();
+    writtenCatalog = EasyMock.newCapture();
 
     workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.read(eventDublincoreURI)).andReturn(new File(eventDublincoreURI));
+    EasyMock.expect(workspace.read(eventDublincoreURI))
+            .andAnswer(() -> new FileInputStream(new File(eventDublincoreURI)));
     EasyMock.expect(
             workspace.put(EasyMock.capture(mediapackageIDCapture), EasyMock.capture(catalogIDCapture),
                     EasyMock.capture(filenameCapture), EasyMock.capture(writtenCatalog))).andReturn(

@@ -94,7 +94,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.component.ComponentException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -617,7 +616,7 @@ public class IndexServiceImplTest {
     EasyMock.expect(workspace.put(EasyMock.capture(mediapackageIdResult), EasyMock.capture(catalogIdResult),
             EasyMock.capture(filenameResult), EasyMock.capture(catalogResult))).andReturn(new URI("catalog.xml"));
     EasyMock.expect(workspace.read(getClass().getResource("/dublincore.xml").toURI()))
-            .andReturn(new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore.xml")).anyTimes();
     EasyMock.replay(workspace);
 
     // Create Common Event Catalog UI Adapter

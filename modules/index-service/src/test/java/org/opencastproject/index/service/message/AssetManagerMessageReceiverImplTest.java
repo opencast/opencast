@@ -28,7 +28,6 @@ import static org.junit.Assert.assertNotNull;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
-import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
@@ -43,7 +42,6 @@ import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -58,11 +56,11 @@ public class AssetManagerMessageReceiverImplTest {
   public void setUp() throws Exception {
     workspace = createNiceMock(Workspace.class);
     expect(workspace.read(EasyMock.anyObject(URI.class)))
-            .andReturn(new File(getClass().getResource("/dublincore.xml").toURI())).anyTimes();
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore.xml")).anyTimes();
     replay(workspace);
 
     AclService aclService = createNiceMock(AclService.class);
-    expect(aclService.getAcls()).andReturn(new ArrayList<ManagedAcl>()).anyTimes();
+    expect(aclService.getAcls()).andReturn(new ArrayList<>()).anyTimes();
     replay(aclService);
 
     DefaultOrganization organization = new DefaultOrganization();

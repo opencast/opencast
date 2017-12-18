@@ -36,8 +36,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,8 +68,8 @@ public class TagByDublinCoreTermWOHTest {
     instance.setMediaPackage(mp);
 
     workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.read((URI) EasyMock.anyObject())).andReturn(
-            new File(this.getClass().getResource("/dublincore.xml").toURI()));
+    EasyMock.expect(workspace.read(EasyMock.anyObject()))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore.xml"));
     EasyMock.replay(workspace);
     operationHandler.setWorkspace(workspace);
   }

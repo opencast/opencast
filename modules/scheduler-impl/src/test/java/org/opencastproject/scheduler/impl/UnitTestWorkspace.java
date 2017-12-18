@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -77,8 +78,8 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
-  public File read(URI uri) throws NotFoundException, IOException {
-    return get(uri);
+  public InputStream read(URI uri) throws NotFoundException, IOException {
+    return new FileInputStream(get(uri));
   }
 
   @Override

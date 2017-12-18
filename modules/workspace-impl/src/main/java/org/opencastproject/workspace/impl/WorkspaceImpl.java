@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -338,26 +339,24 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public File read(final URI uri) throws NotFoundException, IOException {
+  public InputStream read(final URI uri) throws NotFoundException, IOException {
 
     if (pathMappable != null) {
       if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
         final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
-        logger.trace("Looking up {} at {} for read", uri.toString(), wfrCopy.getAbsolutePath());
+        logger.trace("Looking up {} at {} for read", uri, wfrCopy);
         if (wfrCopy.isFile()) {
-          logger.debug("Getting {} directly from working file repository root at {} for read", uri,  wfrCopy.getAbsolutePath());
-          return new File(wfrCopy.getAbsolutePath());
-        } else {
-          logger.warn("The working file repository URI and paths don't match for read. Looking up {} at {} failed",
-                  uri.toString(), wfrCopy.getAbsolutePath());
+          logger.debug("Getting {} directly from working file repository root at {} for read", uri, wfrCopy);
+          return new FileInputStream(wfrCopy);
         }
+        logger.warn("The working file repository URI and paths don't match. Looking up {} at {} failed", uri, wfrCopy);
       }
     }
 
     // fall back to get() which should download the file into local workspace if necessary
-    return get(uri);
+    return new DeleteOnCloseFileInputStream(get(uri, true));
   }
 
   /** Copy or link <code>src</code> to <code>dst</code>. */
@@ -939,5 +938,26 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public String rootDirectory() {
     return wsRoot;
+  }
+
+  private class DeleteOnCloseFileInputStream extends FileInputStream {
+    private File file;
+
+    DeleteOnCloseFileInputStream(File file) throws FileNotFoundException {
+      super(file);
+      this.file = file;
+    }
+
+    public void close() throws IOException {
+      try {
+        super.close();
+      } finally {
+        if (file != null) {
+          logger.debug("Cleaning up {}", file);
+          file.delete();
+          file = null;
+        }
+      }
+    }
   }
 }

@@ -72,13 +72,14 @@ public interface Workspace extends StorageUsage {
    * If shared storage is not available, then fall back to get(uri).
    *
    * @param uri
+   *        URI identifying the resource to load
    * @return The file
    * @throws NotFoundException
    *           if the file does not exist
    * @throws IOException
    *           if reading the file from the working file repository fails
    */
-  File read(URI uri) throws NotFoundException, IOException;
+  InputStream read(URI uri) throws NotFoundException, IOException;
 
 
   /**

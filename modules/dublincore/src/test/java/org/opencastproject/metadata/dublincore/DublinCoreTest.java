@@ -144,7 +144,7 @@ public class DublinCoreTest {
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean()))
             .andReturn(tmpCatalogFile).andReturn(tmpCatalogFile2);
-    EasyMock.expect(workspace.read(EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject())).andAnswer(() -> new FileInputStream(catalogFile)).anyTimes();
     EasyMock.replay(workspace);
     service = new DublinCoreCatalogService();
     service.setWorkspace(workspace);

@@ -57,11 +57,10 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Test;
 
 import java.io.File;
-import java.net.URI;
+import java.io.FileInputStream;
 import java.util.Date;
 import java.util.List;
 
@@ -264,16 +263,13 @@ public class OaiPmhRepositoryPersistenceTest {
               "/episode-dublincore.xml").toURI());
       final File seriesDublinCore = new File(OaiPmhRepositoryPersistenceTest.class
               .getResource("/series-dublincore.xml").toURI());
-      expect(workspace.read(EasyMock.<URI> anyObject())).andAnswer(new IAnswer<File>() {
-        @Override
-        public File answer() throws Throwable {
-          final String uri = getCurrentArguments()[0].toString();
-          if ("dublincore.xml".equals(uri))
-            return episodeDublinCore;
-          if ("series-dublincore.xml".equals(uri))
-            return seriesDublinCore;
-          throw new Error("Workspace mock does not know about file " + uri);
-        }
+      expect(workspace.read(EasyMock.anyObject())).andAnswer(() -> {
+        final String uri = getCurrentArguments()[0].toString();
+        if ("dublincore.xml".equals(uri))
+          return new FileInputStream(episodeDublinCore);
+        if ("series-dublincore.xml".equals(uri))
+          return new FileInputStream(seriesDublinCore);
+        throw new Error("Workspace mock does not know about file " + uri);
       }).anyTimes();
       EasyMock.replay(workspace);
       // oai-pmh database
