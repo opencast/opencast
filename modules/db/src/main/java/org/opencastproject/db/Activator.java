@@ -109,7 +109,7 @@ public class Activator implements BundleActivator {
       logger.info("Testing connectivity to database at {}", jdbcUrl);
       connection = pooledDataSource.getConnection();
       Hashtable<String, String> dsProps = new Hashtable<>();
-      dsProps.put("osgi.jndi.service.name", "jdbc/matterhorn");
+      dsProps.put("osgi.jndi.service.name", "jdbc/opencast");
       datasourceRegistration = bundleContext.registerService(DataSource.class.getName(), pooledDataSource, dsProps);
     } catch (SQLException e) {
       logger.error("Connection attempt to {} failed", jdbcUrl);
