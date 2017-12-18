@@ -32,8 +32,8 @@ describe('Serie controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/events.json')));
         $httpBackend.whenGET('/admin-ng/series/4581/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/access.json')));
         $httpBackend.whenGET('/admin-ng/themes/themes.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/series/4581/theme.json').respond(getJSONFixture('admin-ng/series/4581/theme.json'));
-        $httpBackend.whenGET('/admin-ng/series/4581/participation.json').respond(getJSONFixture('admin-ng/series/4581/participation.json'));
+        $httpBackend.whenGET('/admin-ng/series/4581/theme.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/theme.json')));
+        $httpBackend.whenGET('/admin-ng/series/4581/participation.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/participation.json')));
         $httpBackend.whenPUT('/admin-ng/series/4581/theme').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');

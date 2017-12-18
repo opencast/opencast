@@ -18,14 +18,14 @@ describe('Event Catalogs API Resource', function () {
 
         it('queries the group API', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/publication/publications.json')
-            .respond(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json'));
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json')));
             EventPublicationsResource.get({ id0: '30112'});
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/publication/publications.json')
-            .respond(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json'));
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json')));
             var data = EventPublicationsResource.get({ id0: '30112' });
             $httpBackend.flush();
             expect(data).toBeDefined();
