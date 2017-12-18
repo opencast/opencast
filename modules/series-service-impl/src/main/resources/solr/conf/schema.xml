@@ -279,7 +279,7 @@
 
    <!-- Sort fields -->
    <!-- It is certainly not a good idea to make sort fields multi valued since it may lead to unpredictable results
-        when fields really contain multiple values. But since Matterhorn mostly uses single valued DublinCores this
+        when fields really contain multiple values. But since Opencast mostly uses single valued DublinCores this
         will most likely be ok. The reason for these fields being multi valued is that a multi valued
         field cannot be copied into a single valued one.
         The whole metadata handling in MH will be subject to a major rewrite soon so please

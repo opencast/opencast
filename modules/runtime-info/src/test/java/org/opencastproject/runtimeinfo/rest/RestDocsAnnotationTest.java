@@ -63,7 +63,7 @@ public class RestDocsAnnotationTest {
     assertEquals("ingestservice", restServiceAnnotation.name());
     assertEquals("Ingest Service", restServiceAnnotation.title());
     assertEquals(
-            "This service creates and augments Matterhorn media packages that include media tracks, metadata catalogs and attachments.",
+            "This service creates and augments Opencast media packages that include media tracks, metadata catalogs and attachments.",
             restServiceAnnotation.abstractText());
 
     // notes
@@ -320,7 +320,7 @@ public class RestDocsAnnotationTest {
    */
   @RestService(name = "ingestservice", title = "Ingest Service", notes = {
           "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-          "If the service is down or not working it will return a status 503, this means the the underlying service is not working and is either restarting or has failed" }, abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata catalogs and attachments.")
+          "If the service is down or not working it will return a status 503, this means the the underlying service is not working and is either restarting or has failed" }, abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata catalogs and attachments.")
   public class TestServletSample {
 
     @POST

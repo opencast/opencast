@@ -7,7 +7,7 @@
   
   <!-- Engage Plugin Properties: at least name and path must be set -->
   <property name="opencast.engage.plugin.name" value="EngagePluginCustomMhConnection" />
-  <property name="opencast.engage.plugin.description" value="Handles Matterhorns Endpoints" />
+  <property name="opencast.engage.plugin.description" value="Handles Opencast's Endpoints" />
   <property name="opencast.engage.plugin.rest" value="false" />
   
   <service>

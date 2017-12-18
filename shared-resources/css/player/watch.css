@@ -29,7 +29,7 @@ input.ui-button {
 
 /* IDs */
 
-#matterhorn-main-logo {
+#opencast-main-logo {
     background-image: url("../../img/logo/opencast-icon.svg");
     background-size: 80px 57px;
     background-repeat: no-repeat;
@@ -151,7 +151,7 @@ input.ui-button {
     margin-right: 0 auto;
 }
 
-#matterhorn-init-logo {
+#opencast-init-logo {
     background-image: url("/engage/ui/img/logo/opencast.svg");
     background-size: 500px 99px;
     background-repeat: no-repeat;

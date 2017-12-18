@@ -24,7 +24,7 @@ package org.opencastproject.security.api;
 import java.util.Set;
 
 /**
- * Represent a group in matterhorn
+ * Represent a group in Opencast
  */
 public interface Group {
 

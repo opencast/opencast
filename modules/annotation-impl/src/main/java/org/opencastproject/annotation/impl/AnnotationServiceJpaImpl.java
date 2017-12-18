@@ -48,7 +48,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
 
-  /** Matterhorn's security service */
+  /** Opencast's security service */
   protected SecurityService securityService;
 
   /** OSGi DI */
@@ -57,7 +57,7 @@ public class AnnotationServiceJpaImpl implements AnnotationService {
   }
 
   /**
-   * Sets the matterhorn security service
+   * Sets the opencast security service
    *
    * @param securityService
    *          the securityService to set

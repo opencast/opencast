@@ -30,7 +30,7 @@
       <provide interface="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint" />
     </service>
     <property name="service.description" value="OAI-PMH server REST endpoint" />
-    <!-- Matterhorn properties -->
+    <!-- Opencast properties -->
     <property name="opencast.service.type" value="org.opencastproject.oaipmhinfo" />
     <property name="opencast.service.path" value="/oaipmhinfo" />
     <property name="opencast.service.jobproducer" value="false" />

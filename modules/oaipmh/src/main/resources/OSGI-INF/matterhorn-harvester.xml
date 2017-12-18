@@ -4,7 +4,7 @@
                configuration-policy="require"
                immediate="true">
   <implementation class="org.opencastproject.oaipmh.harvester.OaiPmhHarvester"/>
-  <property name="service.description" value="harvester to connect Matterhorn instances"/>
+  <property name="service.description" value="harvester to connect Opencast instances"/>
   <property name="service.pid" value="org.opencastproject.oaipmh.harvester.OaiPmhHarvester"/>
   <service>
     <provide interface="org.osgi.service.cm.ManagedService"/>

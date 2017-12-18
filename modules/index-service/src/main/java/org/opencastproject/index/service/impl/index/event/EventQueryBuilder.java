@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- * Matterhorn {@link EventSearchQuery} implementation of the Elasticsearch query builder.
+ * Opencast {@link EventSearchQuery} implementation of the Elasticsearch query builder.
  */
 public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSearchQuery> {
 

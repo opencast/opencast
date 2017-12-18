@@ -7,7 +7,7 @@
   <service>
     <provide interface="org.opencastproject.oaipmh.server.OaiPmhRepository" />
   </service>
-  <property name="service.description" value="Matterhorn default OAI-PMH repository" />
+  <property name="service.description" value="Opencast default OAI-PMH repository" />
   <property name="service.pid" value="org.opencastproject.oaipmh.server.DefaultRepository" />
   <reference name="persistence"
              interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"

@@ -41,7 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 /**
- * Matterhorn's shared {@link HttpContext}. All Servlet and {@link org.opencastproject.rest.StaticResource}
+ * Opencast's shared {@link HttpContext}. All Servlet and {@link org.opencastproject.rest.StaticResource}
  * registrations should use the {@link HttpContext} that is registered with the OSGi service registry.
  */
 public class SharedHttpContext implements HttpContext {

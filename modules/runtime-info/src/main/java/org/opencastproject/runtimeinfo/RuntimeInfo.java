@@ -74,7 +74,7 @@ import javax.ws.rs.core.MediaType;
 @RestService(
   name = "RuntimeInfo",
   title = "Runtime Information",
-  abstractText = "This service provides information about the runtime environment, including the servives that are "
+  abstractText = "This service provides information about the runtime environment, including the services that are "
     + "deployed and the current user context.",
   notes = {})
 public class RuntimeInfo {
@@ -245,7 +245,7 @@ public class RuntimeInfo {
       endpoint.put("type", type);
       URL url = new URL(request.getScheme(), request.getServerName(), request.getServerPort(), servletContextPath);
       endpoint.put("path", servletContextPath);
-      endpoint.put("docs", UrlSupport.concat(url.toExternalForm(), "/docs")); // This is a Matterhorn convention
+      endpoint.put("docs", UrlSupport.concat(url.toExternalForm(), "/docs")); // This is a Opencast convention
       endpoint.put("wadl", UrlSupport.concat(url.toExternalForm(), "/?_wadl&_type=xml")); // This triggers a
       json.add(endpoint);
     }

@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- * Matterhorn {@link GroupSearchQuery} implementation of the Elasticsearch query builder.
+ * Opencast {@link GroupSearchQuery} implementation of the Elasticsearch query builder.
  */
 public class GroupQueryBuilder extends AbstractElasticsearchQueryBuilder<GroupSearchQuery> {
 

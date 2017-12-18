@@ -57,7 +57,7 @@ public class ConductingSeriesUpdatedEventHandler {
   private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
 
   // Use a single thread executor to ensure that only one update is handled at a time.
-  // This is because Matterhorn lacks a distributed synchronization model on media packages and/or series.
+  // This is because Opencast lacks a distributed synchronization model on media packages and/or series.
   // Note that this measure only _reduces_ the chance of data corruption cause by concurrent modifications.
   private final ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
 

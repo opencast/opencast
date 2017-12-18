@@ -95,7 +95,7 @@ Building Opencast
 -----------------
 
 Switch to the opencast folder. If you downloaded the tarball, this is the folder you just unpacked (called something
-like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd matterhorn`. You can proceed by
+like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd opencast`. You can proceed by
 building opencast (depending on the folder permissions, you might need to start the command with `sudo`):
        
     mvn clean install

@@ -43,7 +43,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.NONE)
 public class MediaSegments {
 
-  /** Matterhorn Track ID */
+  /** Track ID */
   @XmlElement(name = "trackId", required = true)
   private String trackId;
 

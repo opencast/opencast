@@ -9,8 +9,8 @@ Opencast refers to tenants as *organizations*, and an HTTP request to the Openca
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
 
- - tenant1.matterhorn.edu
- - tenant2.matterhorn.edu
+ - tenant1.opencast.edu
+ - tenant2.opencast.edu
 
 A tenant configuration thus consists mainly of the DNS name that is mapped to that tenant.
 

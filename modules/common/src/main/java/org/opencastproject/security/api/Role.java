@@ -22,7 +22,7 @@
 package org.opencastproject.security.api;
 
 /**
- * Represent a role in matterhorn
+ * Represent a role in Opencast
  */
 public interface Role {
 

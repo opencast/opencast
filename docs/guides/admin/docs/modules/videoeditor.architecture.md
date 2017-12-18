@@ -20,7 +20,7 @@ Conductor module that provides the UI elements for the Video Editor.
       consistent SMIL files.
 - videoeditor-api
     - The API for the Video Editor which takes a SMIL file as an input to create a cutted version of the media files.
-- matterhorn-videoeditor-impl
+- videoeditor-ffmpeg-impl
     - The Video Editor service creates new media files that will be cutted based on the information provided in a SMIL
       file. In the current implementation GStreamer with the gnonlin module is used to process the files.
 - videoeditor-remote

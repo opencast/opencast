@@ -104,7 +104,7 @@ public class OaiPmhPublicationRestServiceTest {
     }
 
     /**
-     * Override method with a no-op. In a test environment where the Matterhorn servlet filter chain is not in place
+     * Override method with a no-op. In a test environment where the Opencast servlet filter chain is not in place
      * this will result in an inadvertent call to the REST endpoint which will most likely cause exceptions.
      */
     @Override protected String[] getRealmAndNonce(HttpRequestBase request) throws TrustedHttpClientException {

@@ -30,7 +30,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Jersey does not map matterhorn exceptions to REST exceptions. To do this, {@link ExceptionMapper}'s like this has to
+ * Jersey does not map Opencast exceptions to REST exceptions. To do this, {@link ExceptionMapper}'s like this has to
  * be written. http://avianey.blogspot.ch/2011/12/exception-mapping-jersey.html
  */
 @Provider

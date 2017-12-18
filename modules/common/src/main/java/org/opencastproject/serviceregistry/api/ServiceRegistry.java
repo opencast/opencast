@@ -32,7 +32,7 @@ import java.util.List;
 public interface ServiceRegistry {
 
   /**
-   * Registers a host as a provider of Matterhorn services.
+   * Registers a host as a provider of Opencast services.
    *
    * @param host
    *          The base URL for this server
@@ -51,7 +51,7 @@ public interface ServiceRegistry {
           throws ServiceRegistryException;
 
   /**
-   * Removes a Matterhorn server from service.
+   * Removes an Opencast server from service.
    *
    * @param host
    *          The base URL for this server
@@ -61,7 +61,7 @@ public interface ServiceRegistry {
   void unregisterHost(String host) throws ServiceRegistryException;
 
   /**
-   * Enable an inactive host as a provider of Matterhorn services.
+   * Enable an inactive host as a provider of Opencast services.
    *
    * @param host
    *          The base URL for this server
@@ -73,7 +73,7 @@ public interface ServiceRegistry {
   void enableHost(String host) throws ServiceRegistryException, NotFoundException;
 
   /**
-   * Disables a Matterhorn server from service.
+   * Disables a Opencast server from service.
    *
    * @param host
    *          The base URL for this server

@@ -74,7 +74,7 @@ public class SearchIndexTest {
   public static void setupClass() throws Exception {
     // Index
     idxRoot = testFolder.newFolder();
-    System.setProperty("matterhorn.home", idxRoot.getPath());
+    System.setProperty("opencast.home", idxRoot.getPath());
     ElasticsearchUtils.createIndexConfigurationAt(idxRoot, indexName);
     idx = new SearchIndexImplStub(indexName, indexVersion, idxRoot.getPath());
   }

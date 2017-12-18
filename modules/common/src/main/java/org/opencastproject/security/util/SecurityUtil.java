@@ -48,7 +48,7 @@ import org.osgi.service.component.ComponentContext;
 
 import java.net.URL;
 
-/** Matterhorn security helpers. */
+/** Opencast security helpers. */
 public final class SecurityUtil {
   private SecurityUtil() {
   }

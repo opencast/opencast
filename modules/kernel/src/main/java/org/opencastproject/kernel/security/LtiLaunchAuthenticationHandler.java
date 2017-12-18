@@ -74,7 +74,7 @@ public class LtiLaunchAuthenticationHandler
   /** The delimiter to use in generated OAUTH id's **/
   public static final String LTI_ID_DELIMITER = ":";
 
-  /** The Matterhorn Role for OAUTH users **/
+  /** The Opencast Role for OAUTH users **/
   private static final String ROLE_OAUTH_USER = "ROLE_OAUTH_USER";
 
   /** The default context for LTI x **/

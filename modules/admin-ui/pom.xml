@@ -11,7 +11,7 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
-    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <skipTests>false</skipTests>
     <nexus.npm>${opencast.nexus.url}/nexus/content/repositories/npmjs/</nexus.npm>
@@ -26,7 +26,7 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    <!-- matterhorn -->
+    <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-message-broker-api</artifactId>

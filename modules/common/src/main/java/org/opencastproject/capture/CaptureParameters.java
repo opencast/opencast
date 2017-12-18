@@ -38,7 +38,7 @@ public interface CaptureParameters {
   /** The default time to poll the server for calendar information **/
   long DEFAULT_STATE_PUSH_TIME = 10 * SECONDS * MILLISECONDS;
 
-  /** Matterhorn Core URL */
+  /** Opencast Core URL */
   String CAPTURE_CORE_URL = "org.opencastproject.capture.core.url";
 
   /**

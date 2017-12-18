@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- * Matterhorn {@link ThemeSearchQuery} implementation of the Elasticsearch query builder.
+ * Opencast {@link ThemeSearchQuery} implementation of the Elasticsearch query builder.
  */
 public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSearchQuery> {
 

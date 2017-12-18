@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 
 /**
- * Matterhorn {@link SeriesSearchQuery} implementation of the Elasticsearch query builder.
+ * Opencast {@link SeriesSearchQuery} implementation of the Elasticsearch query builder.
  */
 public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<SeriesSearchQuery> {
 

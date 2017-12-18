@@ -29,7 +29,7 @@
 # Cluster name identifies your cluster for auto-discovery. If you're running
 # multiple clusters on the same network, make sure you're using unique names.
 #
-cluster.name: matterhorn
+cluster.name: opencast
 
 
 #################################### Node #####################################
@@ -142,7 +142,7 @@ index.number_of_replicas: 0
 
 # Path to directory containing configuration (this file and logging.yml):
 #
-path.conf: ${matterhorn.home}/etc/index
+path.conf: ${opencast.home}/etc/index
 
 # Path to directory where to store index data allocated for this node.
 #
@@ -152,15 +152,15 @@ path.conf: ${matterhorn.home}/etc/index
 # the locations (a la RAID 0) on a file level, favouring locations with most free
 # space on creation. For example:
 #
-path.data: ${matterhorn.home}/index/data
+path.data: ${opencast.home}/index/data
 
 # Path to temporary files:
 #
-path.work: ${matterhorn.home}/work/index
+path.work: ${opencast.home}/work/index
 
 # Path to log files:
 #
-path.logs: ${matterhorn.home}/logs
+path.logs: ${opencast.home}/logs
 
 # Path to where plugins are installed:
 #

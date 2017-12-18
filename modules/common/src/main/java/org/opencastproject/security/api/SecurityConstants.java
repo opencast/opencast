@@ -44,16 +44,16 @@ public interface SecurityConstants {
   /** Header name for running an operation with a desired role. Same as X-Opencast-Matterhorn-Roles. */
   String RUN_WITH_ROLES = "X-RUN-WITH-ROLES";
 
-  /** Name of the Matterhorn admin role */
+  /** Name of the Opencast admin role */
   String GLOBAL_ADMIN_ROLE = "ROLE_ADMIN";
 
-  /** Name of the Matterhorn global sudo role */
+  /** Name of the Opencast global sudo role */
   String GLOBAL_SUDO_ROLE = "ROLE_SUDO";
 
-  /** Name of the Matterhorn anonymous role */
+  /** Name of the Opencast anonymous role */
   String GLOBAL_ANONYMOUS_USERNAME = "anonymous";
 
-  /** The roles associated with the Matterhorn system account */
+  /** The roles associated with the Opencast system account */
   String[] GLOBAL_SYSTEM_ROLES = new String[] { GLOBAL_ADMIN_ROLE, GLOBAL_SUDO_ROLE };
 
 }

@@ -54,7 +54,7 @@ namespaces can be used in this operation. The allowed namespaces are:
 
 * DublinCore Terms: `http://purl.org/dc/terms/`
 * DublinCore Elements 1.1: `http://purl.org/dc/elements/1.1/`
-* Opencast Properties: `http://www.opencastproject.org/matterhorn/`
+* Opencast Properties: `http://www.opencastproject.org/`
 
 
 Operation Examples
@@ -98,7 +98,7 @@ Operation Examples
     <configuration key="attach">dublincore/*</configuration>
     <configuration key="apply-acl">false</configuration>
     <configuration key="copy-metadata">{http://purl.org/dc/terms/}contributor custom1 custom2</configuration>
-    <configuration key="default-namespace">http://www.opencastproject.org/matterhorn/</configuration>
+    <configuration key="default-namespace">http://www.opencastproject.org/</configuration>
   </configurations>
 </operation>
 ```

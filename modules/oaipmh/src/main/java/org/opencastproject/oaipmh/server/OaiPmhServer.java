@@ -125,7 +125,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo,
   @Override
   public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Because the OAI-PMH server implementation is technically not a REST service implemented
-    // using JAX-RS annotations the Matterhorn mechanisms for registering REST endpoints do not work.
+    // using JAX-RS annotations the Opencast mechanisms for registering REST endpoints do not work.
     // The server has to register itself with the OSGi HTTP service.
     logger.info("Updated");
     checkDictionary(properties, componentContext);

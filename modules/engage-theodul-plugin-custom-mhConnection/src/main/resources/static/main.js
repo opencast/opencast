@@ -24,7 +24,7 @@ define(["require", "jquery", "backbone", "engage/core"], function(require, $, Ba
     "use strict";
 
     var insertIntoDOM = true;
-    var PLUGIN_NAME = "Engage Custom Matterhorn Endpoint Connection";
+    var PLUGIN_NAME = "Engage Custom Endpoint Connection";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE_DESKTOP = "none";

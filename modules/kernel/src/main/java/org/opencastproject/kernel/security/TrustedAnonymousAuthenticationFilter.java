@@ -33,7 +33,7 @@ import javax.servlet.http.HttpServletRequest;
  * if there is the potential for a real authentication coming later on.
  * <p>
  * The filter is needed in order to allow for security configurations where a url is open to the public but at the same
- * needs to support authorization to Matterhorn's {@link org.opencastproject.security.api.TrustedHttpClient}.
+ * needs to support authorization to Opencast's {@link org.opencastproject.security.api.TrustedHttpClient}.
  */
 public class TrustedAnonymousAuthenticationFilter extends AnonymousAuthenticationFilter {
 

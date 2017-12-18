@@ -105,10 +105,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 /**
- * Creates and augments Matterhorn MediaPackages using the api. Stores media into the Working File Repository.
+ * Creates and augments Opencast MediaPackages using the api. Stores media into the Working File Repository.
  */
 @Path("/")
-@RestService(name = "ingestservice", title = "Ingest Service", abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
+@RestService(name = "ingestservice", title = "Ingest Service", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
         + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

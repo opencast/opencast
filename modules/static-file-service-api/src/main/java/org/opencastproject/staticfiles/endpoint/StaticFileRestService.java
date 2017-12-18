@@ -111,7 +111,7 @@ public class StaticFileRestService {
   /** The URL of the current server */
   private String serverUrl;
 
-  /** The URL to serve static files from a webserver instead of Matterhorn. */
+  /** The URL to serve static files from a webserver instead of Opencast. */
   private Option<String> webserverURL = Option.none();
 
   /** The maximum file size to allow to be uploaded in bytes, default 1GB */
@@ -119,7 +119,7 @@ public class StaticFileRestService {
 
   /**
    * Whether to provide urls to download the static files from a webserver without organization and security protection,
-   * or use Matterhorn to provide the files.
+   * or use Opencast to provide the files.
    */
   protected boolean useWebserver = false;
 
@@ -296,7 +296,7 @@ public class StaticFileRestService {
   }
 
   /**
-   * Get the URI for a static file resource depending on whether to get it direct from Matterhorn or from a webserver.
+   * Get the URI for a static file resource depending on whether to get it direct from Opencast or from a webserver.
    *
    * @param uuid
    *          The unique identifier for the static file.

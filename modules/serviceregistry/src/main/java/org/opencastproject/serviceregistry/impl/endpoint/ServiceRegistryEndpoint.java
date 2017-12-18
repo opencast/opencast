@@ -88,7 +88,7 @@ import javax.ws.rs.core.Response.Status;
  * Displays hosts and the service IDs they provide.
  */
 @Path("/")
-@RestService(name = "serviceregistry", title = "Service Registry", notes = { "All paths above are relative to the REST endpoint base" }, abstractText = "Provides registration and management functions for servers and services in this matterhorn instance or cluster.")
+@RestService(name = "serviceregistry", title = "Service Registry", notes = { "All paths above are relative to the REST endpoint base" }, abstractText = "Provides registration and management functions for servers and services in this Opencast instance or cluster.")
 public class ServiceRegistryEndpoint {
 
   /** The remote service maanger */

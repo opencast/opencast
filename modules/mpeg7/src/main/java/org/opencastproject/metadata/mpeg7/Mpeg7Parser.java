@@ -44,7 +44,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Parser implementation for mpeg-7 files. Note that this implementation does by far not cover the full mpeg-7 standard
- * but only deals with those parts relevant to matterhorn, mainly temporal decompositions.
+ * but only deals with those parts relevant to Opencast, mainly temporal decompositions.
  */
 public class Mpeg7Parser extends DefaultHandler {
 

@@ -55,7 +55,7 @@ import javax.ws.rs.core.Response;
  * A REST endpoint delegating functionality to the {@link SoxService}
  */
 @Path("/")
-@RestService(name = "sox", title = "Sox", abstractText = "This service creates and augments Matterhorn media packages that include media tracks, metadata "
+@RestService(name = "sox", title = "Sox", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
         + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "

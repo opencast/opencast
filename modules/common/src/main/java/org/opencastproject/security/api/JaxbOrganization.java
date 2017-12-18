@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
- * An organization that is hosted on this Matterhorn instance.
+ * An organization that is hosted on this Opencast instance.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "organization", namespace = "http://org.opencastproject.security")

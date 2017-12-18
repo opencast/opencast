@@ -53,7 +53,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Matterhorn implementation of the elastic search query builder.
+ * Opencast implementation of the elastic search query builder.
  */
 public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> implements QueryBuilder {
 

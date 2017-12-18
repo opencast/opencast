@@ -68,7 +68,7 @@ is running.  The current files with relevant configuration keys are:
 | org.opencastproject.inspection.impl.MediaInspectionServiceImpl.cfg                       | Media inspection using mediainfo   |
 | org.opencastproject.publication.youtube.YouTubePublicationServiceImpl.cfg                | Youtube distribution               |
 | org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg              | Youtube distribution               |
-| org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Matterhorn engage index jobs       |
+| org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Opencast engage index jobs         |
 | org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.cfg                | Silence detection                  |
 | org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg                        | Text analysis, including slide OCR |
 | org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg                          | Video editor                       |

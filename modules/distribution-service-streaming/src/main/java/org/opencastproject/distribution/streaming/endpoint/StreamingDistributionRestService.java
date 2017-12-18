@@ -60,7 +60,7 @@ import javax.ws.rs.core.Response.Status;
  * Rest endpoint for distributing media to the local streaming distribution channel.
  */
 @Path("/")
-@RestService(name = "localdistributionservice", title = "Local Distribution Service", abstractText = "This service distributes media packages to the Matterhorn feed and engage services.", notes = {
+@RestService(name = "localdistributionservice", title = "Local Distribution Service", abstractText = "This service distributes media packages to the Opencast feed and engage services.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",

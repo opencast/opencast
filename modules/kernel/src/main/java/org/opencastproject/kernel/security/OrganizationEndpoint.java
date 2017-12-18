@@ -39,7 +39,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Provides access to the organizations served by this Matterhorn instance.
+ * Provides access to the organizations served by this Opencast instance.
  */
 @Path("/")
 @RestService(name = "organization", title = "Organizations", notes = { "" }, abstractText = "Displays the organizations served by this system")

@@ -67,7 +67,7 @@
                                     <xsl:value-of select="dcCreator" />
                                 </xsl:if>
                                 <br />
-                              <b>The Matterhorn Media Player cannot play this media file.</b>
+                              <b>The Opencast Media Player cannot play this media file.</b>
                 <br />
                  Alternate media files that may be playable on other players may be listed in this
                 <a>

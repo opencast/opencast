@@ -26,7 +26,7 @@
  * The actual authentication is handled by the login form submit which
  * POSTs to `j_spring_security_check`. If the request succeeds, the
  * response will cause a redirect to the application. The URL for the
- * redirect is not configured in this Matterhorn module.
+ * redirect is not configured in this Opencast module.
  *
  * If the request fails, the response will redirect to the current
  * page but add a `error` search parameter (without a value).

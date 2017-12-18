@@ -409,7 +409,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * Loads the settings for the elastic search configuration. An initial attempt is made to get the configuration from
-   * <code>${matterhorn.home}/etc/index/&lt; index &gt;/settings.yml</code>.
+   * <code>${opencast.home}/etc/index/&lt; index &gt;/settings.yml</code>.
    *
    * @param index
    *          the index name
@@ -444,7 +444,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * Loads the index settings. An initial attempt is made to get the configuration from
-   * <code>${matterhorn.home}/etc/index/&lt;index&gt;/settings.json</code>. If this file can't be found, the
+   * <code>${opencast.home}/etc/index/&lt;index&gt;/settings.json</code>. If this file can't be found, the
    * default mapping loaded from the classpath.
    *
    * @param index
@@ -492,7 +492,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
   /**
    * Loads the mapping configuration. An initial attempt is made to get the configuration from
-   * <code>${matterhorn.home}/etc/index/&lt;index&gt;/&lt;type&gt;-mapping.json</code>. If this file can't be found, the
+   * <code>${opencast.home}/etc/index/&lt;index&gt;/&lt;type&gt;-mapping.json</code>. If this file can't be found, the
    * default mapping loaded from the classpath.
    *
    * @param index

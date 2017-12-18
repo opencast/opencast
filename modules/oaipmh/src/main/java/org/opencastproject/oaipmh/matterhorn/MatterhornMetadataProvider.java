@@ -40,7 +40,7 @@ import java.net.URI;
 import java.net.URL;
 
 /**
- * The Matterhorn metadata provider provides whole media packages.
+ * The Opencast metadata provider provides whole media packages.
  */
 public class MatterhornMetadataProvider implements MetadataProvider {
   private static final URL SCHEMA_URL = url("http://www.opencastproject.org/oai/matterhorn.xsd");

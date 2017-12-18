@@ -249,7 +249,7 @@ public class JobEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order.  May include any "
                   + "of the following: DATE_CREATED, TITLE, SERIES_TITLE, SERIES_ID, MEDIA_PACKAGE_ID, WORKFLOW_DEFINITION_ID, CREATOR, "
                   + "CONTRIBUTOR, LANGUAGE, LICENSE, SUBJECT.  The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. TITLE:DESC).", type = STRING) },
-          reponses = { @RestResponse(description = "Returns the list of tasks from Matterhorn", responseCode = HttpServletResponse.SC_OK) },
+          reponses = { @RestResponse(description = "Returns the list of tasks from Opencast", responseCode = HttpServletResponse.SC_OK) },
           returnDescription = "The list of tasks as JSON")
   public Response getTasks(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("status") List<String> states, @QueryParam("q") String text,

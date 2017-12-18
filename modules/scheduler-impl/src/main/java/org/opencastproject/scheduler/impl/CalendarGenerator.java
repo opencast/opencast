@@ -83,7 +83,7 @@ public class CalendarGenerator {
    */
   public CalendarGenerator(SeriesService seriesService) {
     cal = new Calendar();
-    cal.getProperties().add(new ProdId("Opencast Matterhorn Calendar File 0.5"));
+    cal.getProperties().add(new ProdId("Opencast Calendar File 0.5"));
     cal.getProperties().add(Version.VERSION_2_0);
     cal.getProperties().add(CalScale.GREGORIAN);
     this.seriesService = seriesService;
@@ -151,7 +151,7 @@ public class CalendarGenerator {
 
       // TODO Organizer should be URI (email-address?) created fake address
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_CREATOR))) {
-        URI organizer = new URI("mailto", catalog.getFirst(DublinCore.PROPERTY_CREATOR) + "@matterhorn.opencast", null);
+        URI organizer = new URI("mailto", catalog.getFirst(DublinCore.PROPERTY_CREATOR) + "@opencast.tld", null);
         event.getProperties().add(new Organizer(pl, organizer));
       }
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_DESCRIPTION))) {

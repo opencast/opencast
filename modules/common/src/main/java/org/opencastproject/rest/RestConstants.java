@@ -22,7 +22,7 @@
 package org.opencastproject.rest;
 
 /**
- * Constant definitions used to define and consume Matterhorn REST services.
+ * Constant definitions used to define and consume Opencast REST services.
  */
 public interface RestConstants {
 

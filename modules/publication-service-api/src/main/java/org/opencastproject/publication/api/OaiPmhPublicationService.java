@@ -38,7 +38,7 @@ public interface OaiPmhPublicationService {
   String JOB_TYPE = "org.opencastproject.publication.oaipmh";
 
   /**
-   * The matterhorn publication channel id is created from the OAI-PMH channel name prefixed by the
+   * The Opencast publication channel id is created from the OAI-PMH channel name prefixed by the
    * {@link #PUBLICATION_CHANNEL_PREFIX}.
    */
   String PUBLICATION_CHANNEL_PREFIX = "oaipmh-";

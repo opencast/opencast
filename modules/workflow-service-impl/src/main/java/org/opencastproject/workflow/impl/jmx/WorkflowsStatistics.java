@@ -62,7 +62,7 @@ public class WorkflowsStatistics extends NotificationBroadcasterSupport implemen
 
   @Override
   public MBeanNotificationInfo[] getNotificationInfo() {
-    String[] types = new String[] { JmxUtil.MATTERHORN_UPDATE_NOTIFICATION };
+    String[] types = new String[] { JmxUtil.OPENCAST_UPDATE_NOTIFICATION };
 
     String name = Notification.class.getName();
     String description = "An update was executed";

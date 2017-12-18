@@ -35,7 +35,7 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
 /**
- * A record of a host providing Matterhorn services.
+ * A record of a host providing Opencast services.
  */
 @Entity(name = "HostRegistration")
 @Access(AccessType.FIELD)

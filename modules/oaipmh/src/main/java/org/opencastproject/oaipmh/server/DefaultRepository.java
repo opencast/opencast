@@ -35,7 +35,7 @@ import org.osgi.service.component.ComponentContext;
 import java.util.List;
 
 /**
- * Factory for the default OAI-PMH repository that ships with each Matterhorn installation serving the
+ * Factory for the default OAI-PMH repository that ships with each Opencast installation serving the
  * <code>matterhorn</code> metadata format.
  */
 public class DefaultRepository extends OaiPmhRepository {

@@ -138,7 +138,7 @@ import java.util.concurrent.TimeUnit;
 import javax.management.ObjectInstance;
 
 /**
- * Creates and augments Matterhorn MediaPackages. Stores media into the Working File Repository.
+ * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
  */
 public class IngestServiceImpl extends AbstractJobProducer implements IngestService, ManagedService {
 

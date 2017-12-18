@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A simple tutorial class to learn about Matterhorn Services
+ * A simple tutorial class to learn about Opencast Services
  */
 public class HelloWorldServiceImpl implements HelloWorldService {
 

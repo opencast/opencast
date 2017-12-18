@@ -6,7 +6,7 @@ contributed, how they are merged and how releases are done.
 
 *If this document does not answer all of your questions, here is how you can get further help:*
 
- - *Ask on the [Opencast Development List](https://groups.google.com/a/opencast.org/forum/#!forum/matterhorn)*
+ - *Ask on the [Opencast Development List](https://groups.google.com/a/opencast.org/forum/#!forum/dev)*
  - *Chat with developers on [IRC (#opencast on Freenode)](http://webchat.freenode.net/?channels=opencast)*
  - *Join our weekly technical meeting (see lists or IRC)*
 

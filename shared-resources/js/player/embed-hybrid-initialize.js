@@ -865,6 +865,7 @@ Opencast.Initialize = (function ()
         if (coverUrl === null)
         {
             var coverType;
+            //MH-12367: FIXME.  Likely dead code, but if not we need to graphics
             coverUrl = '/engage/ui/img/mh_logos/MatterhornEmbedLogo.png';
             $.ajax(
             {

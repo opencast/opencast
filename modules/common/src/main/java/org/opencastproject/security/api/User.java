@@ -24,7 +24,7 @@ package org.opencastproject.security.api;
 import java.util.Set;
 
 /**
- * Represent a user in Matterhorn
+ * Represent a user in Opencast
  */
 public interface User {
 
@@ -64,14 +64,14 @@ public interface User {
   String getProvider();
 
   /**
-   * Returns <code>true</code> if this user object can be managed by Matterhorn.
+   * Returns <code>true</code> if this user object can be managed by Opencast.
    *
    * @return <code>true</code> if this user is manageable
    */
   boolean isManageable();
 
   /**
-   * Returns <code>true</code> if this user object can be used to log into Matterhorn.
+   * Returns <code>true</code> if this user object can be used to log into Opencast.
    *
    * @return <code>true</code> if this user can login
    */

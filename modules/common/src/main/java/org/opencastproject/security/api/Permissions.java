@@ -22,7 +22,7 @@
 package org.opencastproject.security.api;
 
 /**
- * Represent the common permissions in Matterhorn
+ * Represent the common permissions in Opencast
  */
 public interface Permissions {
 

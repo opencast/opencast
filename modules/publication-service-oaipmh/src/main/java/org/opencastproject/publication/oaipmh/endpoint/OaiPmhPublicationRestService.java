@@ -58,7 +58,7 @@ import javax.ws.rs.core.Response.Status;
  */
 @Path("/")
 @RestService(name = "oaipmhpublicationservice", title = "OAI-PMH Publication Service", abstractText = "This service "
-        + "publishes a media package element to the Matterhorn OAI-PMH channel.", notes = { "All paths above are "
+        + "publishes a media package element to the Opencast OAI-PMH channel.", notes = { "All paths above are "
         + "relative to the REST endpoint base (something like http://your.server/files).  If the service is down "
         + "or not working it will return a status 503, this means the the underlying service is not working and is "
         + "either restarting or has failed. A status code 500 means a general failure has occurred which is not "

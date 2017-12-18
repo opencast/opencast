@@ -111,7 +111,7 @@ if (urlSigningService.accepts(urlToSign)) {
 Based on the technical details outlined in the Opencast Signing Protocol, a URL Signing Service that is compatible with the other existing parts of the Stream Security system can be implemented.
 
 ### Option #3: Give Access to Third Party Systems to Signing REST Endpoints
-Opencast servers that have been configured to use URL signing service will have two REST endpoints at http://admin.matterhorn.com:8080/signing/docs. The accepts endpoint will return true if the Opencast server can sign a particular URL. The sign endpoint will return a signed URL when the correct parameters are given. Due to the sensitive nature of these endpoints they are locked down to be only accessible by a user with ROLE_ADMIN privileges in the etc/security/mh_default_org.xml configuration file. Creating a new user with this role and accessing the endpoint using these credentials will allow a third party system to sign any URLs.
+Opencast servers that have been configured to use URL signing service will have two REST endpoints at http://admin.opencast.edu:8080/signing/docs. The accepts endpoint will return true if the Opencast server can sign a particular URL. The sign endpoint will return a signed URL when the correct parameters are given. Due to the sensitive nature of these endpoints they are locked down to be only accessible by a user with ROLE_ADMIN privileges in the etc/security/mh_default_org.xml configuration file. Creating a new user with this role and accessing the endpoint using these credentials will allow a third party system to sign any URLs.
 
 ## Further information
 

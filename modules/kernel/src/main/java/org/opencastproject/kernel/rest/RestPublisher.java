@@ -168,7 +168,7 @@ public class RestPublisher implements RestConstants {
     servletRegistrationMap = new ConcurrentHashMap<>();
     providers = new ArrayList<>();
 
-    JSONProvider jsonProvider = new MatterhornJSONProvider();
+    JSONProvider jsonProvider = new OpencastJSONProvider();
     jsonProvider.setIgnoreNamespaces(true);
     jsonProvider.setNamespaceMap(NAMESPACE_MAP);
 
@@ -355,7 +355,7 @@ public class RestPublisher implements RestConstants {
   /**
    * Extends the CXF JSONProvider for the grand purpose of removing '@' symbols from json and padded jsonp.
    */
-  protected static class MatterhornJSONProvider<T> extends JSONProvider<T> {
+  protected static class OpencastJSONProvider<T> extends JSONProvider<T> {
     private static final Charset UTF8 = Charset.forName("utf-8");
 
     /**
