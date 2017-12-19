@@ -16,17 +16,17 @@ Deployment
 ==========
 The following bundles have to be added to the `system.properties`
 
-- matterhorn-asset-manager-api
-- matterhorn-asset-manager-impl
-- matterhorn-asset-manager-storage-fs
-- matterhorn-asset-manager-util
-- matterhorn-asset-manager-workflowoperation
+- asset-manager-api
+- asset-manager-impl
+- asset-manager-storage-fs
+- asset-manager-util
+- asset-manager-workflowoperation
 
 How can I use a different storage backend?
 ------------------------------------------
-Replace the `matterhorn-asset-manager-storage-fs` bundle with another bundle that exports an implementation of the `AssetStore` interface.
+Replace the `asset-manager-storage-fs` bundle with another bundle that exports an implementation of the `AssetStore` interface.
 
 How can I use a totally different AssetManager implementation?
 --------------------------------------------------------------
-Replace both `matterhorn-asset-manager-impl` and `matterhorn-asset-manager-storage-fs` bundles 
-with a bundle that exports an implementation of the `matterhorn-asset-manager-api`.
+Replace both `asset-manager-impl` and `asset-manager-storage-fs` bundles 
+with a bundle that exports an implementation of the `asset-manager-api`.

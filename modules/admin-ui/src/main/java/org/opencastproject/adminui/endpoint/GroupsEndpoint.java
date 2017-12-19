@@ -96,7 +96,7 @@ import javax.ws.rs.core.Response.Status;
   abstractText = "Provides operations for groups",
   notes = { "This service offers the default groups CRUD operations for the admin interface.",
             "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module matterhorn-admin-ui. Its API might change "
+              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
 public class GroupsEndpoint {

@@ -225,7 +225,7 @@ draft [1] into account, although I still dared to include the two last
 items but this time, hopefully with a convincing reason for why they
 should be removed.
 
-1. Old Administrative User Interface (matterhorn-admin-ui)
+1. Old Administrative User Interface (admin-ui)
    The reason for this should be obvious: We got a new one. The old one
    has not been tested for the last three releases, is not linked
    anywhere anymore and is partly buggy due to changes to Opencast. To
@@ -298,7 +298,7 @@ should be removed.
     except by components to be removed.
 
 
-20. matterhorn-search-service-feeds
+20. search-service-feeds
     Broken implementation for RSS/Atom feeds
 
 21. matterhorn-caption-* and embed operation
@@ -336,7 +336,7 @@ Hi,
 we discussed this on today's technical meeting and I'm slightly
 changing the proposal:
 
-20. Let's remove matterhorn-search-service-feeds only after September
+20. Let's remove search-service-feeds only after September
     1st which is a realistic time to get things into the next Opencast
     release. If someone has fixed the issue by them, we will, of
     course, keep it.

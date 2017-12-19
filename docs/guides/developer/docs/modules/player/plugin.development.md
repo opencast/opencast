@@ -15,7 +15,7 @@ The Theodul Plugin Archetype is included in the Opencast source code (Theodul Pl
 To make the artifact available on your system you need to install it like any other atrifacts. In the Opencast source
 directory type:
 
-    > cd modules/matterhorn-engage-theodul-plugin-archetype
+    > cd modules/engage-theodul-plugin-archetype
     > mvn install
 
 After successful build and installation the archetype is available in your system.

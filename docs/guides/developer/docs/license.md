@@ -41,7 +41,7 @@ license. This can usually be taken from the copyright header at the top of the l
 
 Example:
 
-    modules/matterhorn-admin-ui/src/main/webapp/lib/angular/*
+    modules/admin-ui/src/main/webapp/lib/angular/*
       AngularJS v1.3.6
       (c) 2010-2014 Google, Inc. http://angularjs.org
       License: MIT

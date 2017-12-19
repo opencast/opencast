@@ -15,8 +15,8 @@
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />
       <property name="eclipselink.logging.logger" value="JavaLogger" />
-      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-matterhorn-messages-jpa.jdbc"/>
-      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-matterhorn-messages-jpa.jdbc"/>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-messages-jpa.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-messages-jpa.jdbc"/>
     </properties>
   </persistence-unit>
 </persistence>

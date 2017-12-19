@@ -1,6 +1,6 @@
 AWS S3 Distribution Configuration
 =================================
-This page documents the configuration for Opencast module **matterhorn-distribution-service-aws-s3**.  This
+This page documents the configuration for Opencast module **distribution-service-aws-s3**.  This
 configuration is only required on the presentation node, and only if you are using Amazon S3 and/or Cloudfront for
 distributing media to end users.
 

@@ -125,7 +125,7 @@ Tasks:
 
 * Modify `etc/listproviders/event.upload.asset.options.properties`
 * Add Admin UI translation for the new asset name
-  `modules/matterhorn-admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
+  `modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
 * Modify your workflow from `etc/workflows/...`
 * Test your changes
 
@@ -168,7 +168,7 @@ multiple     | false           | true or false, used by the admin UI to enable s
 displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI
 
 The parameter key is internationalized as the display text in the admin UI
-ref: modules/matterhorn-admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
+ref: modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
 
 
 ###Step 3. Add translation for the new option
@@ -178,11 +178,11 @@ Add a translation for the option property when adding new option, otherwise the 
 
 The translation language files are located:
 
-    modules/matterhorn-admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...
+    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...
 
 Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT`:
 
-    modules/matterhorn-admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
+    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
 
 
 ```json

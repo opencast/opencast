@@ -22,9 +22,9 @@ URL Signing Service Installation
 There are three modules that are built by default and need to be present on each Opencast node in order to initiate URL
 signing:
 
-- matterhorn-urlsigning-common
-- matterhorn-urlsigning-service-api
-- matterhorn-urlsigning-service-impl
+- urlsigning-common
+- urlsigning-service-api
+- urlsigning-service-impl
 
 If these modules are present, the URL signing service will be available, to which the URL signing providers can then
 register themselves.
@@ -127,8 +127,8 @@ covered in this documentation.
 
 The Servlet filter providing the verification of requests to Opencast internal resources is implemented in the bundles:
 
-- matterhorn-urlsigning-verifier-service-api
-- matterhorn-urlsigning-verifier-service-impl
+- urlsigning-verifier-service-api
+- urlsigning-verifier-service-impl
 
 The filter uses a set of regular expressions to determine which requests to an Opencast instance need to be verified.
 

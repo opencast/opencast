@@ -146,8 +146,8 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/oai-pmh-server.xml,
-              OSGI-INF/org.opencastproject.harvester.xml,
-              OSGI-INF/org.opencastproject.record-handler.xml,
+              OSGI-INF/matterhorn-harvester.xml,
+              OSGI-INF/matterhorn-record-handler.xml,
               OSGI-INF/default-repository.xml
             </Service-Component>
             <Meta-Persistence>

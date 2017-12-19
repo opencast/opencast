@@ -40,7 +40,7 @@ import java.util.UUID;
  * Run this program in two separate JVMs.
  * <h3>Running the program</h3>
  * <pre>
- * $ cd modules/matterhorn-common
+ * $ cd modules/common
  * $ mvn install
  * </pre>
  * Now open a second terminal and get the classpath in each of them

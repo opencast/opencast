@@ -106,7 +106,7 @@
           <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
           <webDriverCapabilities>
             <capability>
-              <name>Opencast :: engage-theodul-plugin-custom-notifications</name>
+              <name>phantomjs.binary.path</name>
               <value>${phantomjs.binary}</value>
             </capability>
           </webDriverCapabilities>

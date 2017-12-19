@@ -13,11 +13,11 @@ All Theodul OSGi modules are stored under:
 
     modules/matterhorn-engage-theodul-*
     #Core module
-    modules/matterhorn-engage-theodul-api/
-    modules/matterhorn-engage-theodul-core/
+    modules/engage-theodul-api/
+    modules/engage-theodul-core/
     #A plugin module
     modules/matterhorn-engage-theodul-plugin-*
-    modules/matterhorn-engage-theodul-plugin-tab-description/
+    modules/engage-theodul-plugin-tab-description/
 
 ## Plugin Manager
 
@@ -56,7 +56,7 @@ Next to the Plugin Manager there is the Theodul Core module, which publishes the
 ## UI Core
 
 The **core.html** is the main entry point and starts the Javascript core logic. Following listing shows the directory
-structure of core in the **matterhorn-engage-theodul-core OSGi** module.
+structure of core in the **engage-theodul-core OSGi** module.
 
     |-src
     |---main
@@ -90,10 +90,10 @@ possible:
 
 |Plugin Type|Description|Characteristics|Module Name|JS Plugin Type Name|Maven Plugin Type Name|
 |-----------|-----------|---------------|-----------|-------------------|----------------------|
-|Controls	|Implements the main controls of the top of the player	|Only one plugin per player possible.	|matterhorn-engage-theodul-plugin-controls	|engage_controls	|controls|
+|Controls	|Implements the main controls of the top of the player	|Only one plugin per player possible.	|engage-theodul-plugin-controls	|engage_controls	|controls|
 |Timeline	|Timeline information below the main controls.|Good for processing time-based data like user tracking, slide previews or annotations.|Optional plugin, more than one possible.	matterhorn-engage-theodul-plugin-timeline-<pluginName>	|engage_timeline	|timeline|
 |Videodisplay	|Implementation of the video display.	|Currently only one plugin per player possible, but in the future more video displays should be possible.|matterhorn-engage-theodul-plugin-video-<pluginName>	|engage_video	|video|
-|Description/Label	|A plugin below the video display, good to show simple information about the video, like a title and the creator.	|Only one plugin per player possible.	|matterhorn-engage-theodul-plugin-description	|engage_description	|description|
+|Description/Label	|A plugin below the video display, good to show simple information about the video, like a title and the creator.	|Only one plugin per player possible.	|engage-theodul-plugin-description	|engage_description	|description|
 |Tab	|Shows a tab in the tab view at the bottom of the player.	|Optional plugin, more than one possible.	|matterhorn-engage-theodul-plugin-tab-<pluginName>	|engage_tab	|tab|
 |Custom	|A custom plugin without a relationship to an UI element.|Good for a custom REST endpoint, global data representation or to load custom JS code or libraries.|Optional plugin, more than one possible.|No connection to a preserved UI element.|matterhorn-engage-theodul-plugin-custom-<pluginName>	|engage_custom	|custom|
 

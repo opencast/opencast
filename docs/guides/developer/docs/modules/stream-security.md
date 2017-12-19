@@ -74,9 +74,9 @@ If the third party system is based on Java, the existing URL Signing bundles/JAR
 
 These bundles are required:
 
-* matterhorn-urlsigning-common
-* matterhorn-urlsigning-service-api
-* matterhorn-urlsigning-service-impl
+* urlsigning-common
+* urlsigning-service-api
+* urlsigning-service-impl
 
 Code example:
 ```java

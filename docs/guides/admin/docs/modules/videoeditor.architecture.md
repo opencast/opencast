@@ -5,25 +5,25 @@
 The Videoeditor consists of the following moduls. Additional to this there is a Workflow Operation Handler within the
 Conductor module that provides the UI elements for the Video Editor.
 
-- matterhorn-silencedetection-api
+- silencedetection-api
     - API for the silence detection
-- matterhorn-silencedetection-impl
+- silencedetection-impl
     - Implementation of the silence detection service
     - Provides a SMIL file that can be used by the Video Editor UI or the Video Editor service to create a new cutted
       file.
-- matterhorn-silencedetection-remote
+- silencedetection-remote
     - Remote implementation of the silence detection service to enable load balancing in a distributed setup.
-- matterhorn-smil-api
+- smil-api
     - API for the SMIL service
-- matterhorn-smil-impl
+- smil-impl
     - The SMIL service allows creation and manipulation of SMIL files. This is more or less a helper class to create
       consistent SMIL files.
-- matterhorn-videoeditor-api
+- videoeditor-api
     - The API for the Video Editor which takes a SMIL file as an input to create a cutted version of the media files.
 - matterhorn-videoeditor-impl
     - The Video Editor service creates new media files that will be cutted based on the information provided in a SMIL
       file. In the current implementation GStreamer with the gnonlin module is used to process the files.
-- matterhorn-videoeditor-remote
+- videoeditor-remote
     - Remote implementation of the video editor service to enable load balancing in a distributed setup.
 
 Several other changes have been made on other Opencast modules to provide a better user experience for the video

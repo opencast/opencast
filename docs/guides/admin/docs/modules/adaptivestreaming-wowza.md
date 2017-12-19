@@ -1,20 +1,20 @@
 # Wowza Adaptive Streaming Distribution Service
 
-This is an updated version of the `matterhorn-distribution-service-streaming` module, that is not installed by default anymore.
+This is an updated version of the `distribution-service-streaming` module, that is not installed by default anymore.
 
-Even though the default `matterhorn-distribution-service-streaming` module included in previous releases can also
+Even though the default `distribution-service-streaming` module included in previous releases can also
 be used in combination with Wowza Media Server (or any other streaming servers) to stream videos in the RTMP format,
 this refactored version also offers access to
 [Wowza's adaptive streaming capabilities](https://www.wowza.com/forums/content.php?546-How-to-do-adaptive-bitrate-streaming).
 
-The `matterhorn-distribution-service-streaming-wowza` module copies the media files to the Wowza application directory
+The `distribution-service-streaming-wowza` module copies the media files to the Wowza application directory
 and generates a SMIL file containing the paths to those files, grouping those with the same flavor but different
 qualities. Then, for each configured streaming protocol, it generates the adequate entries in the MediaPackage and sets
 the necessary URLs and MIME-Types automatically.
 
 The protocols supported and the transport format they use are summarized below:
 
-* RTMP(S)-based protocols (also supported by the default `matterhorn-distribution-service-streaming` module)
+* RTMP(S)-based protocols (also supported by the default `distribution-service-streaming` module)
     * **RTMP(S):** Adobe Flash Streaming protocol. Requires the Adobe Flash Player to be installed in the client's browser.
 * HTTP(S)-based protocols, corresponding to the modern (Adaptive) Streaming Formats
     * **HLS:** (Live) Streaming from Apple

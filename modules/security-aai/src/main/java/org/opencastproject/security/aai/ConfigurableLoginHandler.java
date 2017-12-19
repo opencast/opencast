@@ -166,16 +166,16 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   private String roleOrganizationSuffix = CFG_ROLE_ORGANIZATION_SUFFIX_DEFAULT;
 
   /*
-   * It is the bundle matterhorn-kernel what will need to instantiate the ConfigurableLoginHandler
+   * It is the bundle kernel what will need to instantiate the ConfigurableLoginHandler
    * since it is wired using Spring Security.
-   * Since Shibboleth support is supposed to be an optional extension of the bundle matterhorn-kernel,
+   * Since Shibboleth support is supposed to be an optional extension of the bundle kernel,
    * we implement this as fragment bundle.
    * The use of the Service Component Runtime (SCR) would require us to declare this bundle as service
-   * component in matterhorn-kernel which we don't want since it is optional.
+   * component in kernel which we don't want since it is optional.
    * To make us visible to the config admin and take advantage of the ManagedService mechanism, we
    * register us as ManagedService in the constructor.
-   * An alternative solution would be to include the manifest of all fragments in matterhorn-kernel, i.e.
-   * by specifying OSGI-INF/*.xml as service component in matterhorn-kernel.
+   * An alternative solution would be to include the manifest of all fragments in kernel, i.e.
+   * by specifying OSGI-INF/*.xml as service component in kernel.
    */
   public ConfigurableLoginHandler() {
     BundleContext bundleContext = FrameworkUtil.getBundle(this.getClass()).getBundleContext();

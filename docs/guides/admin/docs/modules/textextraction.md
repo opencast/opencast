@@ -99,18 +99,18 @@ errors, for testing and debugging, you want no filtering at all.
 Starting with version 1.6, Opencast provides three different kinds of implementation for filtering which can be just
 swapped out at any time:
 
- - matterhorn-dictionary-none
- - matterhorn-dictionary-regexp (default)
- - matterhorn-dictionary-hunspell
+ - dictionary-none
+ - dictionary-regexp (default)
+ - dictionary-hunspell
 
 
-#### No Filtering (matterhorn-dictionary-none)
+#### No Filtering (dictionary-none)
 
-The `matterhorn-dictionary-none` module is the simplest one. It will just let the recognized texts pass through
+The `dictionary-none` module is the simplest one. It will just let the recognized texts pass through
 unmodified. There is no additional configuration needed or even possible. Of course, this is also the fastest one.
 
 
-#### Using a Regular Expression (matterhorn-dictionary-regexp)
+#### Using a Regular Expression (dictionary-regexp)
 
 Starting with 1.6, this is the default implementation for the DictionaryService. It is quite fast and easy to configure
 but is limited in terms of filtering capabilities as it will not check if a recognized word actually makes sense.
@@ -135,9 +135,9 @@ A similar pattern that could be used for Spanish would be:
     pattern=[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ][\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*
 
 
-#### Using a Spell Checker (matterhorn-dictionary-hunspell)
+#### Using a Spell Checker (dictionary-hunspell)
 
-Last, the `matterhorn-dictionary-hunspell` will check words based on a spell checker and a dictionary. As spell checker,
+Last, the `dictionary-hunspell` will check words based on a spell checker and a dictionary. As spell checker,
 the tool `hunspell` is used which is one of the most common spell checkers on Linux and should be available from the
 system repositories for most common operating systems.
 

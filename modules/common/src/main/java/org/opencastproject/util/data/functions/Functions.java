@@ -48,7 +48,7 @@ public final class Functions {
   private Functions() {
   }
 
-  /** Create a function from the matterhorn-fn module from a matterhorn-common function. */
+  /** Create a function from the matterhorn-fn module from a common function. */
   public static <A, B> Fn<A, B> fn(final Function<A, B> f) {
     return new Fn<A, B>() {
       @Override
