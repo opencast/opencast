@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * A service which provides information about translations for the matterhorn-admin-ui-ng bundle. Usage: Configure the
+ * A service which provides information about translations for the matterhorn-admin-ui bundle. Usage: Configure the
  * directory which contains the translation files by invoking setLanguageFileFolder before
  * {@link #getAvailableLanguages()}.
  */
@@ -50,7 +50,7 @@ public interface LanguageService {
   String DEFAULT_LANGUAGE = "en_US";
 
   /**
-   * A list of the locales for which translations of the matterhorn-admin-ui-ng are available.
+   * A list of the locales for which translations of the matterhorn-admin-ui are available.
    *
    * @return All Languages for which translations are available.
    */

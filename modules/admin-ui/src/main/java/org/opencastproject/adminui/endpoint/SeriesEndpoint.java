@@ -146,7 +146,7 @@ import javax.ws.rs.core.Response.Status;
   abstractText = "This service provides the series data for the UI.",
   notes = { "This service offers the series CRUD Operations for the admin UI.",
             "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module matterhorn-admin-ui-ng. Its API might change "
+              + "<em>This service is for exclusive use by the module matterhorn-admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
 public class SeriesEndpoint {

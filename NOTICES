@@ -31,124 +31,124 @@ distributed under licenses that are compatible with ECL 2.0.
 List of Included Third-Party Dependencies
 -----------------------------------------
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/css/vendor/chosen.less
+modules/matterhorn-admin-ui/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular/*
   AngularJS v1.3.6
   (c) 2010-2014 Google, Inc. http://angularjs.org
   License: MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-file-upload/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular-file-upload/*
   Copyright (c) 2013 danialfarid
   The MIT License (MIT)
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-sortable.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular-sortable.js
   UI.Sortable
   https://github.com/angular-ui/ui-sortable
   Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/backbone-1.1.0.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/backbone-1.1.0.js
   Backbone.js 1.1.0
   (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
   (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Backbone may be freely distributed under the MIT license.
   http://backbonejs.org
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.js
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
+modules/matterhorn-admin-ui/src/main/webapp/lib/chosen.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Version 1.6.2
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.js
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.min.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular-chosen.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular-chosen.min.js
   Angular Binding for Harvest Chosen
   Version 1.6.0
   Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/datepicker/*
   jQuery UI - v1.10.3 - 2013-12-13
   http://jqueryui.com
   Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/timepicker/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/timepicker/*
   jQuery Timepicker Addon - v1.6.3 - 2016-04-20
   http://trentrichardson.com/examples/timepicker
   Copyright (c) 2016 Trent Richardson; Licensed MIT 
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/font-awesome/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/font-awesome/*
   Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
   License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/google-fonts/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/google-fonts/*
   Open Sans
   Steve Matteson
   https://www.google.com/fonts/specimen/Open+Sans
   Apache License, version 2.0
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/javascript-md5/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/javascript-md5/*
   JavaScript MD5
   https://github.com/blueimp/JavaScript-MD5
   Copyright 2011, Sebastian Tschan https://blueimp.net
   Licensed under the MIT license:
   http://www.opensource.org/licenses/MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-1.10.2.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/jquery-1.10.2.js
   jQuery JavaScript Library v1.10.2
   http://jquery.com/
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-ui.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/jquery-ui.js
   jQuery UI - v1.10.4 - 2014-01-17
   http://jqueryui.com
   Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/moment.min.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/moment.min.js
   version : 2.9.0
   authors : Tim Wood, Iskren Chernev, Moment.js contributors
   license : MIT
   momentjs.com
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/underscore-1.5.2.js
+modules/matterhorn-admin-ui/src/main/webapp/lib/underscore-1.5.2.js
   Underscore.js 1.5.2
   http://underscorejs.org
   (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Underscore may be freely distributed under the MIT license.
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/video-js/*
+modules/matterhorn-admin-ui/src/main/webapp/lib/video-js/*
   Video.js v4.11.2
   Copyright 2014 Brightcove, Inc.
   Licensed under the Apache License, Version 2.0
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
+modules/matterhorn-admin-ui/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
   Adapted from AngularJS Scroll Glue v2.0.6
   https://github.com/Luegg/angularjs-scroll-glue
   (c) 2013 Lukas Wegmann
   Licensed under the MIT license
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/angular/angular-scenario.js
+modules/matterhorn-admin-ui/src/test/resources/test/lib/angular/angular-scenario.js
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jasmine-jquery.js
+modules/matterhorn-admin-ui/src/test/resources/test/lib/jasmine-jquery.js
   Jasmine-jQuery: a set of jQuery helpers for Jasmine tests.
   Version 2.0.5
   https://github.com/velesin/jasmine-jquery
   Copyright (c) 2010-2014 Wojciech Zawistowski, Travis Jeffery
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jquery-deparam.js
+modules/matterhorn-admin-ui/src/test/resources/test/lib/jquery-deparam.js
   Deparam is the inverse of jquery's $.param method
   Extracted $.deparam from Ben Alman's jquery-bbq with license info included
   https://github.com/AceMetrix/jquery-deparam
@@ -480,12 +480,12 @@ modules/matterhorn-engage-ui/src/main/resources/ui/css/bootstrap.*
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-wizard/.*
+modules/matterhorn-admin-ui/src/main/webapp/lib/angular-wizard/.*
   angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
   Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
   Licensed under MIT
 
-modules/matterhorn-admin-ui-ng/bower_components/angular-hotkeys/.*
+modules/matterhorn-admin-ui/bower_components/angular-hotkeys/.*
   angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
   Copyright (c) 2014 Wes Cruver
   Licensed under MIT
@@ -629,7 +629,7 @@ assemblies
   org.codehaus.mojo                      build-helper-maven-plugin                        MIT License
 
 
-matterhorn-admin-ui-ng
+matterhorn-admin-ui
   GroupId                                ArtifactId                                       License
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.jayway.restassured                 rest-assured                                     Apache 2.0

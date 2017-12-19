@@ -39,7 +39,7 @@
     <jdk.version>1.8</jdk.version>
   </properties>
   <modules>
-    <module>modules/matterhorn-admin-ui-ng</module>
+    <module>modules/matterhorn-admin-ui</module>
     <module>modules/matterhorn-annotation-api</module>
     <module>modules/matterhorn-annotation-impl</module>
     <module>modules/matterhorn-asset-manager-api</module>
