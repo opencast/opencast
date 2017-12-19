@@ -815,6 +815,12 @@ public abstract class ServiceRegistryRemoteBase implements ServiceRegistry {
     throw new ServiceRegistryException("Unable to get node loads (" + responseStatusCode + ")");
   }
 
+  /** Note: This is a highly inefficient implementation, but this bundle is currently dead code anyway */
+  public float getOwnLoad() throws ServiceRegistryException {
+    SystemLoad loads = getCurrentHostLoads();
+    return loads.get(getServerUrl()).getLoadFactor();
+  }
+
   private SystemLoad getMaxLoads(String host) throws ServiceRegistryException {
     QueryStringBuilder queryStringBuilder = new QueryStringBuilder("maxload");
 

@@ -36,7 +36,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
@@ -171,10 +170,9 @@ public abstract class AbstractJobProducer implements JobProducer {
       throw new ServiceRegistryException(e);
     }
 
-    SystemLoad systemLoad = getServiceRegistry().getCurrentHostLoads();
     // Note: We are not adding the job load in the next line because it is already accounted for in the load values we
     // get back from the service registry.
-    float currentLoad = systemLoad.get(getServiceRegistry().getRegistryHostname()).getLoadFactor();
+    float currentLoad = getServiceRegistry().getOwnLoad();
 
     /* Note that this first clause looks at the *job's*, the other two look at the *node's* load
      * We're assuming that if this case is true, then we're also the most powerful node in the system for this service,
