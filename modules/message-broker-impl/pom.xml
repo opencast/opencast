@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-message-broker-impl</artifactId>
+  <artifactId>opencast-message-broker-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-message-broker-impl</name>
+  <name>Opencast :: message-broker-impl</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -18,19 +18,19 @@
     <!-- Matterhorn dependancies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-message-broker-api</artifactId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-metadata-api</artifactId>
+      <artifactId>opencast-metadata-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

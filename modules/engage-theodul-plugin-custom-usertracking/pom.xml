@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-engage-theodul-plugin-custom-usertracking</artifactId>
+  <artifactId>opencast-engage-theodul-plugin-custom-usertracking</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-engage-theodul-plugin-custom-usertracking</name>
+  <name>Opencast :: engage-theodul-plugin-custom-usertracking</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -18,12 +18,12 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-engage-theodul-api</artifactId>
+      <artifactId>opencast-engage-theodul-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -104,7 +104,7 @@
           <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
           <webDriverCapabilities>
             <capability>
-              <name>phantomjs.binary.path</name>
+              <name>Opencast :: engage-theodul-plugin-custom-usertracking</name>
               <value>${phantomjs.binary}</value>
             </capability>
           </webDriverCapabilities>

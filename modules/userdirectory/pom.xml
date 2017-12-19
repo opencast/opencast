@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-userdirectory</artifactId>
-  <name>matterhorn-userdirectory</name>
+  <artifactId>opencast-userdirectory</artifactId>
+  <name>Opencast :: userdirectory</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -17,22 +17,22 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-kernel</artifactId>
+      <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common-jpa-impl</artifactId>
+      <artifactId>opencast-common-jpa-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-message-broker-api</artifactId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

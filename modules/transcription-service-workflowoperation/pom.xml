@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-transcription-service-workflowoperation</artifactId>
-  <name>matterhorn-transcription-service-workflowoperation</name>
+  <artifactId>opencast-transcription-service-workflowoperation</artifactId>
+  <name>Opencast :: transcription-service-workflowoperation</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -17,27 +17,27 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workspace-api</artifactId>
+      <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-caption-api</artifactId>
+      <artifactId>opencast-caption-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-transcription-service-api</artifactId>
+      <artifactId>opencast-transcription-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

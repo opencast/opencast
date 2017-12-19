@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-security-ldap</artifactId>
-  <name>matterhorn-security-ldap</name>
+  <artifactId>opencast-security-ldap</artifactId>
+  <name>Opencast :: security-ldap</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -33,7 +33,7 @@
               org.springframework.security.ldap.server;version=${spring-security.version},
               org.springframework.security.ldap.userdetails;version=${spring-security.version}
             </Import-Package>
-            <Fragment-Host>matterhorn-kernel</Fragment-Host>
+            <Fragment-Host>opencast-kernel</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>

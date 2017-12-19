@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-silencedetection-impl</artifactId>
+  <artifactId>opencast-silencedetection-impl</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-silencedetection-impl</name>
+  <name>Opencast :: silencedetection-impl</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -41,22 +41,22 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-silencedetection-api</artifactId>
+      <artifactId>opencast-silencedetection-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-smil-api</artifactId>
+      <artifactId>opencast-smil-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workspace-api</artifactId>
+      <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

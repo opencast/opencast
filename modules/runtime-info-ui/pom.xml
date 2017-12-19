@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-runtime-info-ui</artifactId>
+  <artifactId>opencast-runtime-info-ui</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-runtime-info-ui</name>
+  <name>Opencast :: runtime-info-ui</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -30,7 +30,7 @@
               <outputDirectory>${basedir}/target/classes/ui/</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../matterhorn-runtime-info-ui-ng/src/main/resources/ui/</directory>
+                  <directory>../org.opencastproject.runtime-info-ui-ng/src/main/resources/ui/</directory>
                   <includes>
                     <include>rest_docs.html</include>
                   </includes>

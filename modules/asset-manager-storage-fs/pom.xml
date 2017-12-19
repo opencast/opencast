@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-asset-manager-storage-fs</artifactId>
-  <name>matterhorn-asset-manager-storage-fs</name>
+  <artifactId>opencast-asset-manager-storage-fs</artifactId>
+  <name>Opencast :: asset-manager-storage-fs</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -18,12 +18,12 @@
     <!-- Matterhorn -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-asset-manager-api</artifactId>
+      <artifactId>opencast-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-asset-manager-impl</artifactId>
+      <artifactId>opencast-asset-manager-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

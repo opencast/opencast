@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-videosegmenter-remote</artifactId>
+  <artifactId>opencast-videosegmenter-remote</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-videosegmenter-remote</name>
+  <name>Opencast :: videosegmenter-remote</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -18,7 +18,7 @@
     <!-- Matterhorn dependencies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-videosegmenter-api</artifactId>
+      <artifactId>opencast-videosegmenter-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!--  Thirdparty dependencies -->

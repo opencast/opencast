@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-caption-remote</artifactId>
+  <artifactId>opencast-caption-remote</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-caption-remote</name>
+  <name>Opencast :: caption-remote</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-caption-api</artifactId>
+      <artifactId>opencast-caption-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

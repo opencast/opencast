@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-dictionary-hunspell</artifactId>
+  <artifactId>opencast-dictionary-hunspell</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-dictionary-hunspell</name>
+  <name>Opencast :: dictionary-hunspell</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -19,7 +19,7 @@
     <!-- Matterhorn dependencies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-dictionary-api</artifactId>
+      <artifactId>opencast-dictionary-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Thirdparty dependencies -->

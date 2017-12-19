@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>matterhorn-sox-remote</artifactId>
+  <artifactId>opencast-sox-remote</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-sox-remote</name>
+  <name>Opencast :: sox-remote</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -18,7 +18,7 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-sox-api</artifactId>
+      <artifactId>opencast-sox-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

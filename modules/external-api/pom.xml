@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-external-api</artifactId>
+  <artifactId>opencast-external-api</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-external-api</name>
+  <name>Opencast :: external-api</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -27,81 +27,81 @@
     <!-- matterhorn -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-message-broker-api</artifactId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-dublincore</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-index-service</artifactId>
+      <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-ingest-service-api</artifactId>
+      <artifactId>opencast-index-service</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-metadata-api</artifactId>
+      <artifactId>opencast-ingest-service-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-api</artifactId>
+      <artifactId>opencast-metadata-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-userdirectory</artifactId>
+      <artifactId>opencast-series-service-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-scheduler-api</artifactId>
+      <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-authorization-manager</artifactId>
+      <artifactId>opencast-scheduler-api</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>opencast-authorization-manager</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-api</artifactId>
+      <artifactId>opencast-search-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search</artifactId>
+      <artifactId>opencast-search</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-urlsigning-service-api</artifactId>
+      <artifactId>opencast-urlsigning-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -145,13 +145,13 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-impl</artifactId>
+      <artifactId>opencast-series-service-impl</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
           <groupId>org.opencastproject</groupId>
-          <artifactId>matterhorn-solr</artifactId>
+          <artifactId>opencast-solr</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

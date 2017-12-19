@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-videoeditor-workflowoperation</artifactId>
+  <artifactId>opencast-videoeditor-workflowoperation</artifactId>
   <packaging>bundle</packaging>
-  <name>matterhorn-videoeditor-workflowoperation</name>
+  <name>Opencast :: videoeditor-workflowoperation</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -17,32 +17,32 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workspace-api</artifactId>
+      <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-smil-api</artifactId>
+      <artifactId>opencast-smil-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-silencedetection-api</artifactId>
+      <artifactId>opencast-silencedetection-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-videoeditor-api</artifactId>
+      <artifactId>opencast-videoeditor-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -65,7 +65,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-workflowoperation</artifactId>
+      <artifactId>opencast-workflow-workflowoperation</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

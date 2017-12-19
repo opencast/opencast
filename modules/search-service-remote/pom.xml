@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-search-service-remote</artifactId>
-  <name>matterhorn-search-service-remote</name>
+  <artifactId>opencast-search-service-remote</artifactId>
+  <name>Opencast :: search-service-remote</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-search-service-api</artifactId>
+      <artifactId>opencast-search-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

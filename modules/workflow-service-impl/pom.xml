@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-workflow-service-impl</artifactId>
-  <name>matterhorn-workflow-service-impl</name>
+  <artifactId>opencast-workflow-service-impl</artifactId>
+  <name>Opencast :: workflow-service-impl</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -17,42 +17,42 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-series-service-api</artifactId>
+      <artifactId>opencast-series-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-serviceregistry</artifactId>
+      <artifactId>opencast-serviceregistry</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-dublincore</artifactId>
+      <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workspace-api</artifactId>
+      <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-message-broker-api</artifactId>
+      <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-solr</artifactId>
+      <artifactId>opencast-solr</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-kernel</artifactId>
+      <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -152,14 +152,14 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-conductor</artifactId>
+      <artifactId>opencast-conductor</artifactId>
       <version>${project.version}</version>
       <type>bundle</type>
       <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-workflowoperation</artifactId>
+      <artifactId>opencast-workflow-workflowoperation</artifactId>
       <version>${project.version}</version>
     </dependency>
   </dependencies>

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>matterhorn-oaipmh</artifactId>
-  <name>matterhorn-oaipmh</name>
+  <artifactId>opencast-oaipmh</artifactId>
+  <name>Opencast :: oaipmh</name>
   <packaging>bundle</packaging>
   <parent>
     <groupId>org.opencastproject</groupId>
@@ -17,17 +17,17 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-oaipmh-api</artifactId>
+      <artifactId>opencast-oaipmh-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-oaipmh-persistence</artifactId>
+      <artifactId>opencast-oaipmh-persistence</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
@@ -38,7 +38,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-dublincore</artifactId>
+      <artifactId>opencast-dublincore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -146,8 +146,8 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/oai-pmh-server.xml,
-              OSGI-INF/matterhorn-harvester.xml,
-              OSGI-INF/matterhorn-record-handler.xml,
+              OSGI-INF/org.opencastproject.harvester.xml,
+              OSGI-INF/org.opencastproject.record-handler.xml,
               OSGI-INF/default-repository.xml
             </Service-Component>
             <Meta-Persistence>
