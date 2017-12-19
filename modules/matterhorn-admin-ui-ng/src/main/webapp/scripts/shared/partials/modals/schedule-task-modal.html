@@ -138,7 +138,7 @@
                                     </li>
                                     <li>
                                         <span translate="BULK_ACTIONS.SCHEDULE_TASK.SUMMARY.CONFIGURATION"></span>
-                                        <p ng-repeat="(key, value) in processing.ud.workflow.selection.configuration">{{key}}: {{value}}</p>
+                                        <p ng-repeat="(key, value) in processing.getWorkflowConfig()">{{key}}: {{value}}</p>
                                     </li>
                                 </ul>
                             </div><!-- obj-container -->
@@ -149,7 +149,7 @@
             </div><!-- modal-content [summary] -->
             <footer>
                 <a wz-next class="submit"
-                   ng-class="{active: schedulaTaskForm.$valid, inactive: scheduleTaskForm.$invalid, disabled: submitButton}">
+                   ng-class="{active: scheduleTaskForm.$valid, inactive: scheduleTaskForm.$invalid, disabled: submitButton}">
                     {{ 'WIZARD.CREATE' | translate }}
                 </a>
                 <a wz-previous translate="WIZARD.BACK" class="cancel">
