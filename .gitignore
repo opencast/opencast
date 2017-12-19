@@ -37,10 +37,10 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
-/modules/matterhorn-admin-ui-ng/bower_components/
+/modules/admin-ui-ng/bower_components/
 
 # Ignore package-lock.json
-/modules/matterhorn-admin-ui-ng/package-lock.json
+/modules/admin-ui-ng/package-lock.json
 
 # Ignore OS artifacts
 .DS_Store
