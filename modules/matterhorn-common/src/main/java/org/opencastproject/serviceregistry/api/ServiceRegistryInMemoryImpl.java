@@ -473,13 +473,21 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return job;
   }
 
-  @Override
-  public void removeJob(long id) throws NotFoundException, ServiceRegistryException {
+  private void removeJob(long id) throws NotFoundException, ServiceRegistryException {
     synchronized (jobs) {
       if (!jobs.containsKey(id))
         throw new NotFoundException("No job with ID '" + id + "' found");
 
       jobs.remove(id);
+    }
+  }
+
+  @Override
+  public void removeJobs(List<Long> ids) throws NotFoundException, ServiceRegistryException {
+    synchronized (jobs) {
+      for (long id : ids) {
+        removeJob(id);
+      }
     }
   }
 

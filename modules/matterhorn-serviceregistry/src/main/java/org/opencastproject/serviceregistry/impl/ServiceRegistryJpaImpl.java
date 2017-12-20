@@ -584,44 +584,42 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   @Override
-  public void removeJob(long jobId) throws NotFoundException, ServiceRegistryException {
-    if (jobId < 1)
-      throw new NotFoundException("Job ID must be greater than zero (0)");
+  public void removeJobs(List<Long> jobIds) throws NotFoundException, ServiceRegistryException {
 
-    logger.debug("Start deleting job with ID '{}'", jobId);
+    for (long jobId: jobIds) {
+      if (jobId < 1)
+        throw new NotFoundException("Job ID must be greater than zero (0)");
+    }
+
+    logger.debug("Start deleting jobs with IDs '{}'", jobIds);
 
     EntityManager em = null;
     EntityTransaction tx = null;
-
     try {
       em = emf.createEntityManager();
       tx = em.getTransaction();
-
-      JpaJob job = em.find(JpaJob.class, jobId);
-      if (job == null)
-        throw new NotFoundException("Job with ID '" + jobId + "' not found");
-
-      deleteChildJobs(jobId);
-
       tx.begin();
-      em.remove(job);
-      tx.commit();
-      logger.debug("Job with ID '{}' deleted", jobId);
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Unable to remove job {}: {}", jobId, e);
-      if (tx.isActive()) {
-        tx.rollback();
+
+      for (long jobId: jobIds) {
+        JpaJob job = em.find(JpaJob.class, jobId);
+        if (job == null) {
+          logger.error("Job with Id {} cannot be deleted: Not found.", jobId);
+          tx.rollback();
+          throw new NotFoundException("Job with ID '" + jobId + "' not found");
+        }
+        deleteChildJobs(em, tx, jobId);
+        em.remove(job);
       }
-      throw new ServiceRegistryException(e);
+
+      tx.commit();
+      logger.debug("Jobs with IDs '{}' deleted", jobIds);
     } finally {
       if (em != null)
         em.close();
     }
   }
 
-  private void deleteChildJobs(long jobId) throws ServiceRegistryException {
+  private void deleteChildJobs(EntityManager em, EntityTransaction tx, long jobId) throws ServiceRegistryException {
     List<Job> childJobs = getChildJobs(jobId);
     if (childJobs.isEmpty()) {
       logger.debug("No child jobs of job '{}' found to delete.", jobId);
@@ -630,17 +628,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     logger.debug("Start deleting child jobs of job '{}'", jobId);
 
-    EntityManager em = null;
-    EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
       for (int i = childJobs.size() - 1; i >= 0; i--) {
         Job job = childJobs.get(i);
         JpaJob jobToDelete = em.find(JpaJob.class, job.getId());
-        tx.begin();
         em.remove(jobToDelete);
-        tx.commit();
         logger.debug("Job '{}' deleted", job.getId());
       }
       logger.debug("Deleted all child jobs of job '{}'", jobId);
@@ -650,9 +642,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tx.rollback();
       }
       throw new ServiceRegistryException(e);
-    } finally {
-      if (em != null)
-        em.close();
     }
   }
 
@@ -683,7 +672,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
         if (job.getStatus().isTerminated()) {
           try {
-            removeJob(job.getId());
+            removeJobs(Collections.singletonList(job.getId()));
             logger.debug("Parentless job '{}' removed", job.getId());
             count++;
           } catch (NotFoundException e) {

@@ -58,9 +58,12 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -679,12 +682,30 @@ public class ServiceRegistryEndpoint {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Job with given id could not be found") })
   public Response deleteJob(@PathParam("id") long id) throws NotFoundException {
     try {
-      serviceRegistry.removeJob(id);
+      serviceRegistry.removeJobs(Collections.singletonList(id));
       return Response.noContent().build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }
   }
+
+
+  @POST
+  @Path("removejobs")
+  @RestQuery(name = "removejobs", description = "Removes all given jobs and their child jobs", returnDescription = "No data is returned, just the HTTP status code", restParameters = { @RestParameter(name = "jobIds", isRequired = true, description = "The IDs of the jobs to delete", type = Type.TEXT), }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Jobs successfully removed"),
+          @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "Error while removing jobs") })
+  public Response removeParentlessJobs(@FormParam("jobIds") String jobIds) throws NotFoundException {
+    try {
+      final JSONArray array = (JSONArray) JSONValue.parse(jobIds);
+      final List<Long> jobIdList = Arrays.asList((Long[]) array.toArray(new Long[0]));
+      serviceRegistry.removeJobs(jobIdList);
+      return Response.noContent().build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
 
   @POST
   @Path("removeparentlessjobs")
