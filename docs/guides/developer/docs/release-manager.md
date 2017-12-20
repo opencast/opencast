@@ -393,6 +393,9 @@ assume the final release should be based on `3.0-rc2`.
           https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
 
 
+14. Write a short paragraph about the changes to the new version, then email it to the QA Coordinator to update the Opencast website.
+
+
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
 who need access to avoid general discussions on that list. In case you do not already have permissions to post on this
 list, please ask to be given permission. For the message, you may use the following template:
