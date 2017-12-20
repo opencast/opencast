@@ -21,7 +21,7 @@ describe('Application controller', function () {
         $httpBackend.whenGET('/info/me.json').respond(
             JSON.stringify(getJSONFixture('info/me.json'))
         );
-        $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+        $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(
             {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
         );
         $httpBackend.whenGET('/broker/status').respond('{}');
@@ -53,7 +53,7 @@ describe('Application controller', function () {
     describe('version', function () {
 
         it('sets the version out of object', function () {
-            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(
                 {'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}
             );
 
@@ -62,7 +62,7 @@ describe('Application controller', function () {
         });
 
         it('sets the version out of array', function () {
-            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(
                 {versions: [{'buildNumber': '01b60ff', 'consistent': true, 'version': '1.6.0.SNAPSHOT'}]}
             );
 

@@ -53,7 +53,6 @@ import javax.persistence.criteria.Root;
         "bundle_version" }) })
 @NamedQueries({
         @NamedQuery(name = "BundleInfo.findAll", query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
-        @NamedQuery(name = "BundleInfo.findAllMh", query = "select a from BundleInfo a where a.bundleSymbolicName like 'matterhorn-%' order by a.host, a.bundleSymbolicName"),
         @NamedQuery(name = "BundleInfo.deleteAll", query = "delete from BundleInfo"),
         @NamedQuery(name = "BundleInfo.deleteByHost", query = "delete from BundleInfo where host = :host"),
         @NamedQuery(name = "BundleInfo.delete", query = "delete from BundleInfo where host = :host and bundleId = :bundleId") })

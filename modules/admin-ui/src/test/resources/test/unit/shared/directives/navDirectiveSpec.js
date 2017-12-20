@@ -37,7 +37,7 @@ describe('adminNg.directives.adminNgNav', function () {
         });
 
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
-        $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn').respond(201, {});
+        $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast').respond(201, {});
         $rootScope.userIs = function () { return true; };
         element = $compile('<admin-ng-nav /><div class="main-view"></div>')($rootScope);
         $rootScope.$digest();

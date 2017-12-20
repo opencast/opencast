@@ -62,14 +62,14 @@ describe('Login Controller', function () {
         });
 
         it('should fetch version information', function () {
-            $httpBackend.expectGET('/sysinfo/bundles/version?prefix=matterhorn')
+            $httpBackend.expectGET('/sysinfo/bundles/version?prefix=opencast')
                 .respond('');
             $controller('LoginCtrl', {$scope: $scope});
             $httpBackend.flush();
         });
 
         it('sets the version string', function () {
-            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=matterhorn')
+            $httpBackend.whenGET('/sysinfo/bundles/version?prefix=opencast')
                 .respond('{"consistent":true,"version":"1.5.0.MOCKED-SNAPSHOT","buildNumber":"3fba397"}');
             $controller('LoginCtrl', {$scope: $scope});
             $httpBackend.flush();
