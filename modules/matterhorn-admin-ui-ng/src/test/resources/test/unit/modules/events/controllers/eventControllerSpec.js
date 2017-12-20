@@ -31,31 +31,33 @@ describe('Event controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
         $httpBackend.whenGET('/admin-ng/event/40518/metadata.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/metadata.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/media/media.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/attachment/attachments.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/publication/publications.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/scheduling.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/asset/media/media.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/asset/attachment/attachments.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/asset/publication/publications.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/scheduling.json').respond(JSON.stringify({"metadata": {"start":"","end":""}}));
+        $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/access.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/components.json').respond({});
+        $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/eventUploadAssetOptions.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));
-        $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond({});
-        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond({});
-        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule-ng').respond({});
+        $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule-ng')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
         $httpBackend.whenGET('/admin-ng/event/40518/hasActiveTransaction').respond('false');
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));
-        $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify({"results":[],"total":0}));
+        $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
+            .respond(JSON.stringify({"results":[],"total":0}));
 
         $controller('EventCtrl', {$scope: $scope});
     });
@@ -68,7 +70,7 @@ describe('Event controller', function () {
 
     describe('deleting a comment', function () {
         it('sends a DELETE request', function () {
-            $httpBackend.expectDELETE('/admin-ng/event/40518/comment/2').respond({});
+            $httpBackend.expectDELETE('/admin-ng/event/40518/comment/2').respond('{}');
             $scope.deleteComment('2');
             $httpBackend.flush();
         });
@@ -88,14 +90,14 @@ describe('Event controller', function () {
                 } else {
                     return false;
                 }
-            }).respond({});
+            }).respond('{}');
 
             $scope.comment();
             $httpBackend.flush();
         });
 
         it('updates existing comments', function () {
-            $httpBackend.whenPOST('/admin-ng/event/40518/comment').respond({});
+            $httpBackend.whenPOST('/admin-ng/event/40518/comment').respond('{}');
             $httpBackend.expectGET('/admin-ng/event/40518/comments')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
             $scope.comment();
@@ -125,7 +127,7 @@ describe('Event controller', function () {
                 } else {
                     return false;
                 }
-            }).respond({});
+            }).respond('{}');
 
             $scope.reply();
             $httpBackend.flush();
@@ -140,7 +142,7 @@ describe('Event controller', function () {
                 } else {
                     return false;
                 }
-            }).respond({});
+            }).respond('{}');
             $scope.reply();
             $httpBackend.flush();
         });
@@ -290,7 +292,7 @@ describe('Event controller', function () {
             expect($scope.severityColor('warning')).toEqual('yellow');
         });
     });
-    
+
     describe('#workflowAction', function () {
         beforeEach(function () {
             spyOn(Notifications, 'add');
@@ -341,5 +343,5 @@ describe('Event controller', function () {
             });
         });
     });
-    
+
 });

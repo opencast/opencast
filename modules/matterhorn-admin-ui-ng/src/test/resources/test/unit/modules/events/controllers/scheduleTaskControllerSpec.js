@@ -9,7 +9,7 @@ describe('Schedule Task Controller', function () {
     TaskResourceMock = jasmine.createSpyObj('TaskResource', ['save']);
     NotificationsMock = jasmine.createSpyObj('Notifications', ['add']);
     TableServiceMock.copySelected.and.returnValue([{id: 'row1', selected: true}, {id: 'row2', selected: true}]);
-    
+
     beforeEach(module(function ($provide) {
         $provide.value('FormNavigatorService', FormNavigatorServiceMock);
         $provide.value('Notifications', NotificationsMock);
@@ -37,7 +37,7 @@ describe('Schedule Task Controller', function () {
     beforeEach(function () {
         $controller('ScheduleTaskCtrl', {$scope: $scope});
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive-ng').respond(getJSONFixture('admin-ng/event/new/processing'));
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=archive-ng').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
     });
 
     describe('basic functionality', function () {

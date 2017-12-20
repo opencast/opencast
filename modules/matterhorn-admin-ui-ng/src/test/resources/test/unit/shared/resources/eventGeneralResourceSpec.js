@@ -16,13 +16,13 @@ describe('Event General API Resource', function () {
         });
 
         it('queries the general API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/general.json').respond(getJSONFixture('admin-ng/event/40518/general.json'));
+            $httpBackend.expectGET('/admin-ng/event/40518/general.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/general.json')));
             EventGeneralResource.get({ id: '40518'});
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond(getJSONFixture('admin-ng/event/40518/general.json'));
+            $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/general.json')));
             var data = EventGeneralResource.get({ id: '40518' });
             $httpBackend.flush();
             expect(data).toBeDefined();

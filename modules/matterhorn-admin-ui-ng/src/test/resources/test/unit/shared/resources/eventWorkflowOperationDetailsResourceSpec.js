@@ -17,13 +17,13 @@ describe('Event Workflow Operation API Resource', function () {
         });
 
         it('queries the API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json'));
+            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json')));
             EventWorkflowOperationDetailsResource.get({ id0: '40518', id1: '8695', id2: 1 });
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json'));
+            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json')));
             var data = EventWorkflowOperationDetailsResource.get({ id0: '40518', id1: '8695', id2: 1 });
             $httpBackend.flush();
             expect(data).toBeDefined();

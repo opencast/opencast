@@ -16,12 +16,12 @@ describe('Event Access API Resource', function () {
         });
 
         it('queries the group API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/access.json').respond(getJSONFixture('admin-ng/event/40518/access.json'));
+            $httpBackend.expectGET('/admin-ng/event/40518/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
             EventAccessResource.get({ id: '40518'});
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond(getJSONFixture('admin-ng/event/40518/access.json'));
+            $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
             var data = EventAccessResource.get({ id: '40518' });
             $httpBackend.flush();
             expect(data).toBeDefined();

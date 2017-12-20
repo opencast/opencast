@@ -38,7 +38,7 @@ describe('adminNg.services.language', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
 
-        $httpBackend.expectGET('/i18n/languages.json').respond(getJSONFixture('i18n/languages.json'));
+        $httpBackend.expectGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
         $httpBackend.whenGET('public/org/opencastproject/adminui/languages/lang-en_US.json').respond('');
         $httpBackend.flush();
     });
@@ -330,7 +330,7 @@ describe('adminNg.services.language', function () {
 
     describe('#changeLanguage', function () {
         beforeEach(function () {
-            $httpBackend.expectGET('/i18n/languages.json').respond(getJSONFixture('i18n/languages.json'));
+            $httpBackend.expectGET('/i18n/languages.json').respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
         });
 
         afterEach(function () {
@@ -351,7 +351,7 @@ describe('adminNg.services.language', function () {
         describe('on success', function () {
             beforeEach(function () {
                 $httpBackend.expectGET('/i18n/languages.json')
-                    .respond(getJSONFixture('i18n/languages.json'));
+                    .respond(JSON.stringify(getJSONFixture('i18n/languages.json')));
                 $httpBackend.expectGET('public/org/opencastproject/adminui/languages/lang-en_US.json');
             });
 

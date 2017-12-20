@@ -55,7 +55,7 @@ describe('Theme API Resource', function () {
         describe('#delete', function(){
 
             it('executes delete request on delete()', function () {
-                $httpBackend.expectDELETE('/admin-ng/themes/1').respond({});
+                $httpBackend.expectDELETE('/admin-ng/themes/1').respond('{}');
 
                 ThemeResource.delete({id: 1});
             });

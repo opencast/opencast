@@ -18,14 +18,14 @@ describe('Event Attachments API Resource', function () {
 
         it('queries the group API', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/attachment/attachments.json')
-            .respond(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json'));
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json')));
             EventAttachmentsResource.get({ id0: '30112'});
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/attachment/attachments.json')
-            .respond(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json'));
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json')));
             var data = EventAttachmentsResource.get({ id0: '30112' });
             $httpBackend.flush();
             expect(data).toBeDefined();
