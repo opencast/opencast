@@ -68,7 +68,7 @@
 	     && (typeof qualities !== "undefined")
              && (typeof translatedqualities !== "undefined")) { %>
             <div class="btn-group">
-                <button id="dropdownMenuQuality" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
+                <button id="dropdownMenuQuality" title="<%= str_quality %>" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_qualityButton %>">
                 <span class="glyphicon glyphicon-cog"></span>
                 <span id="qualityIndicator"><%= str_quality %></span>
                 <span class="caret"></span>
@@ -84,7 +84,7 @@
 	    <% } %>
             <% if(!flash) { %>
             <div class="btn-group">
-                <button id="dropDownZoomToggle" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="Zoom">
+                <button id="dropDownZoomToggle" title="<%= str_zoom %>" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="Zoom">
                 <span class="glyphicon glyphicon-zoom-in"></span>
                 <span id="zoomLevelIndicator">Zoom</span>
                 <span class="caret"></span>
@@ -101,7 +101,7 @@
             </div>
       <% } %>
             <div class="btn-group">
-                <button id="dropdownMenuPlaybackRate" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
+                <button id="dropdownMenuPlaybackRate" title="<%= str_playbackRate %>" class="btn btn-default dropdown-toggle disabled" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_playbackRateButton %>">
                 <span class="glyphicon glyphicon-dashboard"></span>
                 <span id="playbackRateIndicator">100%</span>
                 <span class="caret"></span>
@@ -125,7 +125,7 @@
              && (typeof str_beside !== "undefined")
              && (typeof str_beside !== "undefined")) { %>
             <div class="btn-group">
-                <button id="dropdownMenuLayout" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
+                <button id="dropdownMenuLayout" title="<%= str_layoutButton %>" class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown" role="button" aria-label="<%= str_layoutButton %>">
                 <span class="glyphicon glyphicon-film"></span>
                 <span id="pipIndicator"><%= pip_position %></span>
                 <span class="caret"></span>
@@ -140,10 +140,10 @@
                 </ul>
             </div>
             <% } %>
-            <button id="captions_button" type="button" class="btn btn-default disabled" role="button">
+            <button id="captions_button" title="<%= str_subtitles %>" type="button" class="btn btn-default disabled" role="button">
               <span class="glyphicon glyphicon-subtitles"></span>
             </button>
-            <button id="fullscreen_button" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
+            <button id="fullscreen_button" title="<%= str_fullscreen %>" type="button" class="btn btn-default disabled" role="button" aria-label="<%= str_fullscreen %>">
             <span class="glyphicon glyphicon-fullscreen"></span>
             </button>
         </div>
