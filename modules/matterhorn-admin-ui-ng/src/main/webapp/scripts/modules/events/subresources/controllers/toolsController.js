@@ -79,7 +79,6 @@ angular.module('adminNg.controllers')
                 $location.url('/events/' + $scope.resource);
             }, function () {
                 $scope.submitButton = false;
-                $scope.unsavedChanges = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
             });
         };
