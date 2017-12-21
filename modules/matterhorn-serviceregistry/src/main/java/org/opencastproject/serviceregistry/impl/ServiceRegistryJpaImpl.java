@@ -101,6 +101,7 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -246,10 +247,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
 
+  protected static Set<Long> jobs = new LinkedHashSet<>();
+
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
-    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.DISPATCHING);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
   }
 
@@ -258,6 +260,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Whether to accept a job whose load exceeds the host’s max load */
   protected Boolean acceptJobLoadsExeedingMaxLoad = true;
+
+  //Get the current system load
+  protected SystemLoad systemLoad = null;
 
   /** OSGi DI */
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -344,6 +349,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
+
+    systemLoad = getHostLoads(emf.createEntityManager());
+  }
+
+  @Override
+  public float getOwnLoad() {
+    return systemLoad.get(getRegistryHostname()).getLoadFactor();
   }
 
   @Override
@@ -874,6 +886,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       em = emf.createEntityManager();
       Job oldJob = getJob(job.getId());
       JpaJob jpaJob = updateInternal(em, job);
+      if (!TYPE_WORKFLOW.equals(job.getJobType()) && job.getJobLoad() > 0.0f
+              && job.getProcessorServiceRegistration() != null && job.getProcessorServiceRegistration().equals(getRegistryHostname())) {
+        processCachedLoadChange(job);
+      }
 
       // All WorkflowService Jobs will be ignored
       if (oldJob.getStatus() != job.getStatus() && !TYPE_WORKFLOW.equals(job.getJobType())) {
@@ -897,6 +913,30 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     jpaJob.setProcessorServiceRegistration(
             (ServiceRegistrationJpaImpl) getServiceRegistration(job.getJobType(), job.getProcessingHost()));
     return updateJob(jpaJob).toJob();
+  }
+
+  /**
+   * Processes the job load changes for the *local* load cache
+   *
+   * @param job
+   *   The job to apply to the load cache
+   */
+  private void processCachedLoadChange(JpaJob job) {
+    try {
+      if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && !jobs.contains(job.getId())) {
+        logger.trace("Adding to load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
+        systemLoad.updateNodeLoad(getRegistryHostname(), job.getJobLoad());
+        jobs.add(job.getId());
+      } else if (Status.FINISHED.equals(job.getStatus()) || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
+        logger.trace("Removing from load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
+        systemLoad.updateNodeLoad(getRegistryHostname(), -job.getJobLoad());
+        jobs.remove(job.getId());
+      } else {
+        logger.trace("Ignoring for load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
+      }
+    } catch (NotFoundException e) {
+      logger.error("NotFoundException when searching for node {}, this is a bug", getRegistryHostname());
+    }
   }
 
   protected JpaJob setJobUri(JpaJob job) {

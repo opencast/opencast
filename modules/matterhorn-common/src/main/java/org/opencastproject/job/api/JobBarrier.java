@@ -153,10 +153,11 @@ public final class JobBarrier {
         waiter.setStatus(Job.Status.WAITING);
         List<Long> blockedForJobs = new LinkedList<Long>();
         for (Job j : jobs) {
-          blockedForJobs.add(j.getId());
-          j.setBlockingJobId(waiter.getId());
+          Job blockerJob = this.serviceRegistry.getJob(j.getId());
+          blockedForJobs.add(blockerJob.getId());
+          blockerJob.setBlockingJobId(waiter.getId());
           // FYI not updating local j in jobs collection
-          this.serviceRegistry.updateJob(j);
+          this.serviceRegistry.updateJob(blockerJob);
         }
         waiter.setBlockedJobIds(blockedForJobs);
         this.serviceRegistry.updateJob(waiter);
