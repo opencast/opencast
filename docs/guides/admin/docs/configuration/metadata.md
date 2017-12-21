@@ -39,7 +39,6 @@ For details on how to configure metadata catalogs, see section Configuring Metad
 Limitations:
 
 * Cannot be sorted, searched or filtered
-* No support for scheduled events
 * Cannot be displayed in tables
 
 ## Metadata Catalog Configuration
