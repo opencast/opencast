@@ -41,6 +41,12 @@ angular.module('adminNg.controllers')
 
         $scope.event.eventId = $scope.id;
 
+        $scope.unsavedChanges = false;
+
+        $scope.setChanges = function(changed) {
+            $scope.unsavedChanges = changed;
+        };
+
         $scope.openTab = function (tab) {
             $scope.tab = tab;
             if ($scope.tab === "editor") {
@@ -69,6 +75,7 @@ angular.module('adminNg.controllers')
                 } else {
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
+                $scope.unsavedChanges = false;
                 $location.url('/events/' + $scope.resource);
             }, function () {
                 $scope.submitButton = false;

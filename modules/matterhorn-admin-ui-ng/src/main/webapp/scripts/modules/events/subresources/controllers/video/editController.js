@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('VideoEditCtrl', ['$scope', 'PlayerAdapter', 'VideoService', 'HotkeysService', 'Notifications',
-    function ($scope, PlayerAdapter, VideoService, HotkeysService, Notifications) {
+.controller('VideoEditCtrl', ['$scope', '$translate', 'PlayerAdapter', 'VideoService', 'HotkeysService', 'Notifications',
+    function ($scope, $translate, PlayerAdapter, VideoService, HotkeysService, Notifications) {
 
         var NOTIFICATION_CONTEXT = 'video-editor-event-access';
         var notificationId = 0;
@@ -169,5 +169,28 @@ angular.module('adminNg.controllers')
             }
         });
 
+        // This shows a confirmation dialog when the user leaves the editor while he has unsaved changes
+        $scope.onUnload = function(event) {
+            if (!$scope.unsavedChanges) return undefined;
+            var answer = confirm(window.unloadConfirmMsg);
+            if (!answer) {
+               event.preventDefault();
+            }
+            event.returnValue = window.unloadConfirmMsg;
+            return window.unloadConfirmMsg;
+        };
+
+        // register listeners to show confirmation dialog when user leaves editor with unsaved changes
+        window.addEventListener('beforeunload', $scope.onUnload);
+        $scope.$on('$locationChangeStart', function(event) {
+            $scope.onUnload(event)
+        });
+        $scope.$on('$destroy', function() {
+            window.removeEventListener('beforeunload', $scope.onUnload);
+        });
+
+        $translate('VIDEO_TOOL.WARNING_UNSAVED').then(function(translation) {
+            window.unloadConfirmMsg = translation;
+        });
     }
 ]);

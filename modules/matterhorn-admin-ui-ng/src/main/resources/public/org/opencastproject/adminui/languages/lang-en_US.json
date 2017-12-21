@@ -1532,6 +1532,7 @@
      }
    },
    "VIDEO_TOOL": {
+     "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
      "TIMELINE": "Timeline",
      "ZOOMLEVEL": "Zoom Level",
      "ZOOM": "Zoom",

@@ -30,6 +30,7 @@ describe('adminNg.directives.segmentsDirective', function () {
                 setCurrentTime: jasmine.createSpy()
             }
         };
+        $rootScope.setChanges = function() {};
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.expectGET('/admin-ng/tools/40518/editor.json').respond(JSON.stringify(
             getJSONFixture('admin-ng/tools/40518/editor.json')));
