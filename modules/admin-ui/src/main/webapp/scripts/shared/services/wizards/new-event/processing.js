@@ -39,6 +39,8 @@ angular.module('adminNg.services')
         }
         NewEventProcessingResource.get(queryParams, function (data) {
 
+            me.changingWorkflow = true;
+            
             me.workflows = data.workflows;
             var default_workflow_id = data.default_workflow_id;
 
@@ -50,10 +52,13 @@ angular.module('adminNg.services')
 
                     if (workflow.id === default_workflow_id){
                       me.ud.workflow = workflow;
+                      updateConfigurationPanel(me.ud.workflow.configuration_panel);
+                      me.save();
                       break;
                     }
                 }
             }
+          me.changingWorkflow = false;
 
         });
 
