@@ -35,9 +35,26 @@ angular.module('adminNg.services')
             queryParams = {
                 tags: 'upload-ng,schedule-ng'
             };
+
         }
         NewEventProcessingResource.get(queryParams, function (data) {
-            me.workflows = data;
+
+            me.workflows = data.workflows;
+            var default_workflow_id = data.default_workflow_id;
+
+            // set default workflow as selected
+            if(angular.isDefined(default_workflow_id)){
+
+                for(var i = 0; i < me.workflows.length; i += 1){
+                    var workflow = me.workflows[i];
+
+                    if (workflow.id === default_workflow_id){
+                      me.ud.workflow = workflow;
+                      break;
+                    }
+                }
+            }
+
         });
 
         // Listener for the workflow selection
@@ -88,6 +105,7 @@ angular.module('adminNg.services')
 
         // Save the workflow configuration
         this.save = function () {
+
             if (isWorkflowSet()) {
                 me.ud.workflow.selection  = {
                     id: me.ud.workflow.id,
