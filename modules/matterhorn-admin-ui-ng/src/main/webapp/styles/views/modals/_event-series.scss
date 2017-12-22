@@ -186,5 +186,10 @@
                 margin-top: 10px;
             }
         }
+
+        .scheduling-conflict {
+          @include alert-variant($state-danger-bg, $state-danger-border, $state-danger-text);
+          margin-bottom: 15px;
+        }
     }
 }

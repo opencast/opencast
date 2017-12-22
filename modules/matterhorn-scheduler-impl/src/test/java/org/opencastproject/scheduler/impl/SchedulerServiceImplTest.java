@@ -1869,7 +1869,7 @@ public class SchedulerServiceImplTest {
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
               new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA"), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
-      assertEquals(1, events.size());
+      assertEquals(2, events.size());
     }
   }
 
