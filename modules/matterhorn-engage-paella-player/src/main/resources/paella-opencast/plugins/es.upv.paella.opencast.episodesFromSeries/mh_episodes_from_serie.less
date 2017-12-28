@@ -1,0 +1,246 @@
+
+.recordings_loading {
+	color: #2D8F8B;
+	font-size: 14px;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+.recordings_header {
+	color: #2D8F8B;
+	font-size: 14px;
+	font-weight: bold;
+	margin-bottom: 5px;	
+}
+
+.recordings_header_results{
+	display: inline-block;	
+}
+
+.recordings_header_navigation{
+	display: block;	
+	float: right;
+}
+
+.recordings_header_navigation_prev {
+	border-right: 1px solid black;
+	padding-right: 7px;
+}
+
+.recordings_header_navigation_next {
+	border-left: 1px solid black;
+	padding-left: 7px;
+}
+
+.recordings_header_navigation_prev,
+.recordings_header_navigation_pageid,
+.recordings_header_navigation_next {
+	color: #CCCCCC;
+}
+
+.recordings_header_navigation_prev,
+.recordings_header_navigation_page,
+.recordings_header_navigation_pageid,
+.recordings_header_navigation_next {
+	display: inline-block;	
+	margin-left: 2px;
+	margin-right: 3px;	
+}
+
+.recordings_header_navigation_prev a,
+.recordings_header_navigation_page a,
+.recordings_header_navigation_pageid a,
+.recordings_header_navigation_next a{
+	cursor: pointer;
+	color: #2D8F8B; 
+}
+
+.recordings_header_navigation_prev a:hover,
+.recordings_header_navigation_page a:hover,
+.recordings_header_navigation_pageid a:hover,
+.recordings_header_navigation_next a:hover{
+	color: #A72123; 
+	text-decoration: underline;	
+}
+
+
+.recordings_entry {
+	min-height: 90px;
+}
+
+
+.recordings_entry.even_entry {
+	background-color: rgb(239, 247, 249);
+}
+
+.recordings_entry.odd_entry {
+	background-color: rgb(247, 251, 252);
+}
+
+
+.recordings_entry.pendent.even_entry,
+.recordings_entry.pendent.odd_entry {
+	background-color: rgb(255,204,102);
+}
+
+.recordings_entry.no_publish_info.even_entry,
+.recordings_entry.no_publish_info.odd_entry {
+	background-color: rgb(255,204,102);
+}
+
+
+.recordings_entry.unpublished.even_entry,
+.recordings_entry.unpublished.odd_entry {
+	background-color: red;
+}
+
+
+
+.recordings_entry_preview_container {
+	display: inline-block;
+	width: 150px;
+}
+
+.recordings_entry_preview {
+	width: 100%;
+}
+
+
+.recordings_entry_text_container {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 5px;
+	margin-top: 5px;
+	overflow: hidden;
+	position: absolute;
+}
+
+.recordings_entry_text_title_container {
+	font-size: 14px;
+	font-weight:bold;
+	text-decoration: none;
+}
+
+.recordings_entry_text_title_container a {
+	color: #174B49;
+	text-decoration: none;
+}
+.recordings_entry_text_title_container a:hover {
+	color: #A72123; 
+	text-decoration: underline;	
+}
+
+.recordings_entry_text_author_container {
+	font-size: 12px;
+	font-weight:bold;
+	font-style: italic;
+	text-decoration: none;	
+}
+
+.recordings_entry_text_author_container a {
+	color: #2D8F8B;
+	text-decoration: none;
+}
+.recordings_entry_text_author_container a:hover {
+	color: #A72123; 
+	text-decoration: underline;	
+}
+
+.recordings_entry_text_date {
+	margin-top: 3px;	
+}
+
+
+
+/************************************************/
+
+
+.buttonPlugin.EpisodesFromSerie {
+	background-size: 2000% 1000%;
+	background-position: -600% -200%;
+	display: block;		
+	text-align: center;
+	font-size: 1.5em;
+	line-height: 40px; /*@playbackBarButtonHeight;*/
+}
+
+.buttonPluginPopUp.EpisodesFromSerie {
+	position: absolute;
+	width: 500px;
+	height: 300px;
+	overflow-y: scroll;
+}
+
+
+
+
+.episodesFromSerieTitle{
+	font-family: sans-serif;
+	font-size: 1.5em;
+	color: #2D8F8B;
+	margin-bottom: 5px;
+}
+
+.episodesFromSerieTitle_Bold{
+	font-weight: bold;
+}
+
+.episodesFromSerieListing {
+	padding-left: 3px;
+	padding-right: 3px;
+}
+
+.episodesFromSerieListing .recordings_header {
+	display: none;
+}
+
+.episodesFromSerieListing .recordings_entry_preview_container{
+	width: 120px;
+	display: inline-block;
+}
+.episodesFromSerieListing .recordings_entry_text_container {
+	font-size: 12px;
+	display: inline-block;
+}
+
+.episodesFromSerieListing .recordings_entry {
+	min-height: 95px;
+}
+
+
+.episodesFromSerieListing .recordings_entry.even_entry {
+	background-color: rgb(239, 247, 249) !important;
+}
+
+.episodesFromSerieListing .recordings_entry.odd_entry {
+	background-color: rgb(247, 251, 252) !important;
+}
+
+.episodesFromSerieListing .recordings_entry.pendent.even_entry,
+.episodesFromSerieListing .recordings_entry.pendent.odd_entry {
+	background-color: rgb(255,204,102) !important;
+}
+
+.episodesFromSerieListing .recordings_entry.unpublished.even_entry,
+.episodesFromSerieListing .recordings_entry.unpublished.odd_entry {
+	background-color: rgb(255,165,161) !important;
+}
+
+.episodesFromSerieListing .recordings_entry.no_publish_info.even_entry,
+.episodesFromSerieListing .recordings_entry.no_publish_info.odd_entry {
+	background-color: rgb(255,204,102) !important;
+}
+
+
+.episodesFromSerieListing .recordings_entry:hover{
+    background-color: rgb(243, 222, 168);
+    /*cursor: pointer; */
+}
+.episodesFromSerieListing .recordings_entry:focus{
+    background-color: rgb(243, 222, 168);
+}
+
+
+recordings_entry_text_date {
+	color: lightslategray;
+}

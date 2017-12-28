@@ -1,0 +1,17 @@
+<div class="opencast-video" id="{{episode.id}}" ng-click="viewVideo()">
+	<div class="content">
+		<h4>{{episode.dcTitle}}</h4>
+		<div>
+			<img class="thumbnail img-responsive img-rounded" ng-src="{{getSearchImage()}}">
+		</div>
+		<div class="info">
+			<div class="creator"> {{episode.dcCreator || "&nbsp;" }} </div>
+			<div class="seriestitle">
+				<a ng-show="episode.mediapackage.seriestitle" href="?series={{episode.mediapackage.series}}"> {{episode.mediapackage.seriestitle}} </a>
+				<div ng-hide="episode.mediapackage.seriestitle"> &nbsp; </div>
+			</div>
+			<div class="date"> {{episode.dcCreated}}</div>
+			<div class="duration"> {{secondsToText(episode.mediapackage.duration)}}</div>
+		</div>
+	</div>
+</div>

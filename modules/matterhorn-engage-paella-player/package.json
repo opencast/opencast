@@ -1,0 +1,10 @@
+{
+  "name": "paella-opencast",
+  "private": true,
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.3.2",
+    "merge-stream": "^1.0.1",
+    "paellaplayer": "github:polimediaupv/paella#5.2.8"
+  }
+}

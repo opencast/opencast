@@ -1,0 +1,73 @@
+
+body {
+	padding-top: 70px;
+}
+
+.navbar-brand {
+	padding: 8px 15px;
+}
+
+
+.opencast-video {
+	width: 100%;
+    display: inline-block;
+    margin-bottom: 30px;
+    border: 1px solid gray;
+}
+
+.opencast-video:hover {
+    color: #FFF;
+    cursor: pointer;
+    background: #46B07B;
+} 
+
+
+.opencast-video .content {
+	padding: 5px 15px 15px 15px;
+	box-sizing: border-box;
+}
+
+.opencast-video .content h4 {
+	margin-top: 0px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.opencast-video .content img {
+	width: 33%;
+	float: left;
+	margin-right: 2%;
+}
+
+
+@media (min-width: 768px) {
+    .opencast-video .content img {
+	max-height: 77px;
+    }
+}
+@media (min-width: 992px) {
+    .opencast-video .content img {
+	max-height: 65px;
+    }
+}
+@media (min-width: 1200px) {
+    .opencast-video .content img {
+	max-height: 84px;
+	}
+}
+
+
+.opencast-video .content .info {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.opencast-navigation {
+	margin: 0;
+}
+
+.opencast-toolbar {
+	margin-bottom: 20px;	
+}
