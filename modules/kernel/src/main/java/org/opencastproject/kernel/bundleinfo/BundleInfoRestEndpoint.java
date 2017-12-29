@@ -63,7 +63,7 @@ import javax.ws.rs.core.Response;
   abstractText = "The system bundle info endpoint yields information about the running OSGi bundles of Opencast.")
 public abstract class BundleInfoRestEndpoint {
 
-  private static final String DEFAULT_BUNDLE_PREFIX = "matterhorn";
+  private static final String DEFAULT_BUNDLE_PREFIX = "opencast";
 
   protected abstract BundleInfoDb getDb();
 
@@ -93,9 +93,9 @@ public abstract class BundleInfoRestEndpoint {
     restParameters = {
       @RestParameter(
         name = "prefix",
-        description = "The bundle name prefixes to check. Defaults to 'matterhorn'.",
+        description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
         isRequired = false,
-        defaultValue = "matterhorn",
+        defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
     reponses = {
       @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
@@ -126,9 +126,9 @@ public abstract class BundleInfoRestEndpoint {
     restParameters = {
       @RestParameter(
         name = "prefix",
-        description = "The bundle name prefixes to check. Defaults to 'matterhorn'.",
+        description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
         isRequired = false,
-        defaultValue = "matterhorn",
+        defaultValue = DEFAULT_BUNDLE_PREFIX,
         type = RestParameter.Type.STRING) },
     reponses = {
       @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),

@@ -154,92 +154,92 @@ public class BundleInfoRestEndpointTest {
 
   @Test
   public void testBundlesCheck1() {
-    // no matterhorn bundles
+    // no opencast bundles
     db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-2", 2L, "1.4.0", some("5e34af")));
-    // default bundle name prefix is "matterhorn"
+    // default bundle name prefix is "opencast"
     expect().statusCode(404).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck2() {
-    // all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
+    // all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
     expect().body(equalTo("true")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck3() {
-    // not all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e0000")));
+    // not all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", some("5e0000")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
     expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck4() {
-    // not all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.1", some("5e34af")));
+    // not all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.1", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
     expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck5() {
-    // not all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", none("")));
+    // not all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", none("")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
     expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck6() {
-    // all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
+    // all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
-    given().param("prefix", "matterhorn", "bundle").expect().body(equalTo("true")).when()
+    given().param("prefix", "opencast", "bundle").expect().body(equalTo("true")).when()
             .get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck7() {
-    // not all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
+    // not all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
-    given().param("prefix", "matterhorn", "bundle").expect().body(equalTo("false")).when()
+    given().param("prefix", "opencast", "bundle").expect().body(equalTo("false")).when()
             .get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundlesCheck8() {
-    // not all matterhorn bundles have the same version
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
+    // not all opencast bundles have the same version
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("otherhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
     given().param("prefix", "bla", "blubb").expect().statusCode(404).when().get(rt.host("/bundles/check"));
   }
 
   @Test
   public void testBundleVersionsConsistent1() {
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-3", 3L, "1.4.0", some("5e34af")));
     expect().body("consistent", equalTo(true)).body("version", equalTo("1.4.0"))
             .body("buildNumber", equalTo("5e34af")).when().get(rt.host("/bundles/version"));
   }
 
   @Test
   public void testBundleVersionsInconsistent1() {
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.1", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-2", 2L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-3", 3L, "1.4.1", some("5e34af")));
     expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", hasItems("5e34af"))
             .body("versions.version", hasItems("1.4.0", "1.4.1")).when().get(rt.host("/bundles/version"));
@@ -247,9 +247,9 @@ public class BundleInfoRestEndpointTest {
 
   @Test
   public void testBundleVersionsInconsistent2() {
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34a")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-2", 2L, "1.4.0", some("5e34a")));
+    db.store(bundleInfo("localhost", "opencast-3", 3L, "1.4.0", some("5e34af")));
     expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", hasItems("5e34af", "5e34a"))
             .body("versions.version", hasItems("1.4.0")).when().get(rt.host("/bundles/version"));
@@ -257,9 +257,9 @@ public class BundleInfoRestEndpointTest {
 
   @Test
   public void testBundleVersionsInconsistent3() {
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-1", 1L, "1.4.0", some("5e34af")));
+    db.store(bundleInfo("localhost", "opencast-2", 2L, "1.4.0", none("")));
+    db.store(bundleInfo("localhost", "opencast-3", 3L, "1.4.0", some("5e34af")));
     expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", iterableWithSize(2))
             .body("versions.buildNumber", hasItems(null, "5e34af")).body("versions.version", hasItems("1.4.0"))
