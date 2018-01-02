@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Boolean list provider. */
-public class BooleanListProvider implements ResourceListProvider {
+public class BooleanListProvider extends ResourceListProvider {
 
   public static final String YES_NO = "YES_NO";
   public static final String YES = "YES";

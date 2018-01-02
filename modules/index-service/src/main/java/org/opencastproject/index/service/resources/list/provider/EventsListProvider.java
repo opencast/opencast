@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EventsListProvider implements ResourceListProvider {
+public class EventsListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "EVENTS";
 

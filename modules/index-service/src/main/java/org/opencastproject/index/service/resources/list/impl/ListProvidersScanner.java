@@ -52,6 +52,10 @@ public class ListProvidersScanner implements ArtifactInstaller {
   public static final String LIST_TRANSLATABLE_KEY = "list.translatable";
   /** The key to attach this list to a particular org, if not present then all orgs can get list **/
   public static final String LIST_ORG_KEY = "list.org";
+  /** The key to define a default value **/
+  public static final String LIST_DEFAULT_KEY = "list.default";
+
+
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersScanner.class);
   /** The Map to go from file locations of properties files to list names. **/
@@ -85,11 +89,12 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /**
    * Inner class used to represent a new list.
    */
-  private class SingleResourceListProviderImpl implements ResourceListProvider {
+  private class SingleResourceListProviderImpl extends ResourceListProvider {
     private String listName;
     private String orgId = "";
     private Map<String, String> list;
     private boolean isTranslatable = true;
+    private String defaultKey;
 
     /**
      * Default constructor.
@@ -135,6 +140,15 @@ public class ListProvidersScanner implements ArtifactInstaller {
     public boolean isTranslatable(String listName) {
       return isTranslatable;
     }
+
+    public void setDefault(String defaultKey) {
+      this.defaultKey = defaultKey;
+    }
+
+    @Override
+    public String getDefault() {
+      return defaultKey;
+    }
   }
 
   /**
@@ -145,6 +159,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
    */
   private void addResourceListProvider(File artifact) throws IOException {
     logger.debug("Adding {}", artifact.getAbsolutePath());
+
     // Format name
     FileInputStream in = null;
     Properties properties = new Properties();
@@ -164,6 +179,8 @@ public class ListProvidersScanner implements ArtifactInstaller {
       return;
     }
 
+    String defaultKey = properties.getProperty(LIST_DEFAULT_KEY);
+
     Boolean translatable = BooleanUtils.toBoolean(properties.getProperty(LIST_TRANSLATABLE_KEY));
     String orgId = properties.getProperty(LIST_ORG_KEY);
 
@@ -172,6 +189,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
       switch (entry.getKey().toString().toLowerCase()) {
         case LIST_NAME_KEY:
         case LIST_TRANSLATABLE_KEY:
+        case LIST_DEFAULT_KEY:
         case LIST_ORG_KEY:
           logger.debug("Skipping key: {}", entry.getKey());
           break;
@@ -184,6 +202,9 @@ public class ListProvidersScanner implements ArtifactInstaller {
       SingleResourceListProviderImpl listProvider = new SingleResourceListProviderImpl(listName, list, translatable);
       if (StringUtils.isNotBlank(orgId)) {
         listProvider.setOrg(orgId);
+      }
+      if (StringUtils.isNotBlank(defaultKey)) {
+        listProvider.setDefault(defaultKey);
       }
       listProvidersService.addProvider(listProvider.getListName(), listProvider);
       fileToListNames.put(artifact.getAbsolutePath(), listProvider.getListName());

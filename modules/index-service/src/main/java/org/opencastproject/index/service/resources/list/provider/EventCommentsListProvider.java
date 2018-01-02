@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EventCommentsListProvider implements ResourceListProvider {
+public class EventCommentsListProvider extends ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventCommentsListProvider.class);
 

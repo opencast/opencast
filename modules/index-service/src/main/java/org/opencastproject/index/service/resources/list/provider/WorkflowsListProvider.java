@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkflowsListProvider implements ResourceListProvider {
+public class WorkflowsListProvider extends ResourceListProvider {
 
   private static final String[] NAMES = { "workflows" };
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsListProvider.class);

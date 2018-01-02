@@ -42,7 +42,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ThemesListProvider implements ResourceListProvider {
+public class ThemesListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "THEMES";
   public static final String NAME = PROVIDER_PREFIX + ".NAME";

@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Services list provider. */
-public class ServicesListProvider implements ResourceListProvider {
+public class ServicesListProvider extends ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
 

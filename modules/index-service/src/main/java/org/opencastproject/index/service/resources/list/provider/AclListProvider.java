@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AclListProvider implements ResourceListProvider {
+public class AclListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "ACL";
 

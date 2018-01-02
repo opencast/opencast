@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Jobs list provider. */
-public class JobsListProvider implements ResourceListProvider {
+public class JobsListProvider extends ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(JobsListProvider.class);
 

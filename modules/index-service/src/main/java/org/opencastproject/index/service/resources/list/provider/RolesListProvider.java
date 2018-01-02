@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class RolesListProvider implements ResourceListProvider {
+public class RolesListProvider extends ResourceListProvider {
 
   public static final String ROLES = "ROLES";
   public static final String ROLE_QUERY_KEY = "role_name";

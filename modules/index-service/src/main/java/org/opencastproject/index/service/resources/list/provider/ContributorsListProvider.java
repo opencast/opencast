@@ -55,7 +55,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class ContributorsListProvider implements ResourceListProvider {
+public class ContributorsListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "CONTRIBUTORS";
 

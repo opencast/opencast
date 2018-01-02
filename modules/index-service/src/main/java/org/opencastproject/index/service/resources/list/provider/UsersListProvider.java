@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class UsersListProvider implements ResourceListProvider {
+public class UsersListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "USERS";
 

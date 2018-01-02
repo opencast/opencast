@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Servers list provider. */
-public class ServersListProvider implements ResourceListProvider {
+public class ServersListProvider extends ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ServersListProvider.class);
 

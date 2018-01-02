@@ -26,14 +26,14 @@ import org.opencastproject.security.api.Organization;
 
 import java.util.Map;
 
-public interface ResourceListProvider {
+public abstract class ResourceListProvider {
 
   /**
    * Returns the names of the list(s) provided
    *
    * @return an array containing the lists available
    */
-  String[] getListNames();
+  public abstract String[] getListNames();
 
   /**
    * Returns the key-value list for the generator resource filtered with the given filter and based on the given
@@ -47,7 +47,7 @@ public interface ResourceListProvider {
    *          the organization context
    * @return the key-value list for the generator resource
    */
-  Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public abstract Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
           throws ListProviderException;
 
   /**
@@ -56,5 +56,14 @@ public interface ResourceListProvider {
    * @param listName the name of the list
    * @return if the results should be translated
    */
-  boolean isTranslatable(String listName);
+  public abstract boolean isTranslatable(String listName);
+
+  /**
+   * Returns the key of the default value in the list if customized, else null.
+   *
+   * @return key of default value or null //TODO Or is blank better?
+   */
+  public String getDefault() {
+    return null;
+  }
 }

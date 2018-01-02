@@ -45,7 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SeriesListProvider implements ResourceListProvider {
+public class SeriesListProvider extends ResourceListProvider {
   public static final String FILTER_TEXT = "text";
 
   public static final String PROVIDER_PREFIX = "SERIES";

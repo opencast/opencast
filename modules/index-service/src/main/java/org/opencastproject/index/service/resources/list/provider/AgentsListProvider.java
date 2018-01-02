@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class AgentsListProvider implements ResourceListProvider {
+public class AgentsListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "AGENTS";
   public static final String NAME = PROVIDER_PREFIX + ".NAME";

@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * A ListProvider that returns email details
  */
-public class EmailListProvider implements ResourceListProvider {
+public class EmailListProvider extends ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailListProvider.class);
 

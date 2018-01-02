@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GroupsListProvider implements ResourceListProvider {
+public class GroupsListProvider extends ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "GROUPS";
 
