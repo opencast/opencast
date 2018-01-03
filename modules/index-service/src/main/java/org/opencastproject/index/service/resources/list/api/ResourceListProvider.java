@@ -61,7 +61,7 @@ public abstract class ResourceListProvider {
   /**
    * Returns the key of the default value in the list if customized, else null.
    *
-   * @return key of default value or null //TODO Or is blank better?
+   * @return key of default value or null
    */
   public String getDefault() {
     return null;

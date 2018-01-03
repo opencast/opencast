@@ -72,6 +72,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     addWorkflowStatus();
     addReviewStatus();
 
+    //TODO
+
     // TODO create a file for each resource and made it dynamic
 
     providers.put("locationFilter", new ResourceListProvider() {
@@ -267,6 +269,14 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     if (provider == null)
       throw new ListProviderException("No resources list found with the name " + listName);
     return provider.isTranslatable(listName);
+  }
+
+  @Override
+  public String getDefault(String listName) throws ListProviderException {
+    ResourceListProvider provider = providers.get(listName);
+    if (provider == null)
+      throw new ListProviderException("No resources list found with the name " + listName);
+    return provider.getDefault();
   }
 
   @Override
