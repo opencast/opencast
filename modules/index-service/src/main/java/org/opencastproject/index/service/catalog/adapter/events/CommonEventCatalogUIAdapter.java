@@ -79,10 +79,16 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (series != null && series.isUpdated() && series.getValue().isSome() && isNotBlank(series.getValue().get().toString())) {
-      mediaPackage.setSeries(series.getValue().get().toString());
-      final Opt<String> seriesTitle = getSeriesTitle(series);
-      if (seriesTitle.isSome()) mediaPackage.setSeriesTitle(seriesTitle.get());
+    if (series != null && series.isUpdated()) {
+      if (isNotBlank(series.getValue().get().toString())) {
+        mediaPackage.setSeries(series.getValue().get().toString());
+        final Opt<String> seriesTitle = getSeriesTitle(series);
+        if (seriesTitle.isSome())
+          mediaPackage.setSeriesTitle(seriesTitle.get());
+      } else {
+        mediaPackage.setSeries(null);
+        mediaPackage.setSeriesTitle(null);
+      }
     }
 
     Opt<Date> startDate = MetadataUtils.getUpdatedDateMetadata(abstractMetadata, "startDate");

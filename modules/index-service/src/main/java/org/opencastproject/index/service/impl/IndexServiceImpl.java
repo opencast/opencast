@@ -104,6 +104,8 @@ import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
@@ -144,6 +146,7 @@ import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -674,7 +677,6 @@ public class IndexServiceImpl implements IndexService {
         }
       }
       // 2. Save the snapshot
-      // v4x uses asset manager, v3x used opencastArchive.add(mediaPackage);
       assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
 
       // 3. start the new workflow on the snapshot
@@ -686,11 +688,9 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
-      // v4x uses Set, v3x used List
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
 
-      // v4x uses Asset Manager Workflows, v3x used opencastArchive.applyWorkflow
       final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
       List<WorkflowInstance> wfList = workflows
               .applyWorkflowToLatestVersion(mpIds,
@@ -1740,12 +1740,148 @@ public class IndexServiceImpl implements IndexService {
   }
 
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
+    String oldSeriesId = mp.getSeries();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    if (catalogUIAdapters.size() > 0) {
+    if (catalogUIAdapters != null) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         Opt<MetadataCollection> metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
         if (metadata.isSome() && metadata.get().isUpdated()) {
           catalogUIAdapter.storeFields(mp, metadata.get());
+        }
+      }
+    }
+
+    // update series catalogs
+    if (!StringUtils.equals(oldSeriesId, mp.getSeries())) {
+      List<String> seriesDcTags = new ArrayList<>();
+      List<String> seriesAclTags = new ArrayList<>();
+      Map<String, List<String>> seriesExtDcTags = new HashMap<>();
+      if (StringUtils.isNotBlank(oldSeriesId)) {
+        // remove series dublincore from the media package
+        for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.SERIES)) {
+          mp.remove(mpe);
+          for (String tag : mpe.getTags()) {
+            seriesDcTags.add(tag);
+          }
+        }
+        // remove series ACL from the media package
+        for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+          mp.remove(mpe);
+          for (String tag : mpe.getTags()) {
+            seriesAclTags.add(tag);
+          }
+        }
+        // remove series extended metadata from the media package
+        try {
+          Opt<Map<String, byte[]>> oldSeriesElementsOpt = seriesService.getSeriesElements(oldSeriesId);
+          for (Map<String, byte[]> oldSeriesElements : oldSeriesElementsOpt) {
+            for (String oldSeriesElementType : oldSeriesElements.keySet()) {
+              for (MediaPackageElement mpe : mp
+                      .getElementsByFlavor(MediaPackageElementFlavor.flavor(oldSeriesElementType, "series"))) {
+                mp.remove(mpe);
+                String elementType = mpe.getFlavor().getType();
+                if (StringUtils.isNotBlank(elementType)) {
+                  for (String tag : mpe.getTags()) {
+                    if (!seriesExtDcTags.containsKey(elementType)) {
+                      List<String> tags = new ArrayList<>();
+                      tags.add(tag);
+                      seriesExtDcTags.put(elementType, tags);
+                    } else {
+                      seriesExtDcTags.get(elementType).add(tag);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        } catch (SeriesException e) {
+          logger.info("Unable to retrieve series element types from series service for the series {}", oldSeriesId, e);
+        }
+      }
+
+      if (StringUtils.isNotBlank(mp.getSeries())) {
+        // add updated series dublincore to the media package
+        try {
+          DublinCoreCatalog seriesDC = seriesService.getSeries(mp.getSeries());
+          if (seriesDC != null) {
+            mp.setSeriesTitle(seriesDC.getFirst(DublinCore.PROPERTY_TITLE));
+            try (InputStream in = IOUtils.toInputStream(seriesDC.toXmlString(), "UTF-8")) {
+              String elementId = UUID.randomUUID().toString();
+              URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+              MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
+              mpe.setIdentifier(elementId);
+              mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
+              if (StringUtils.isNotBlank(oldSeriesId)) {
+                for (String tag : seriesDcTags) {
+                  mpe.addTag(tag);
+                }
+              } else {
+                // add archive tag to the element if the media package had no series set before
+                mpe.addTag("archive");
+              }
+            } catch (IOException e) {
+              throw new IllegalStateException("Unable to add the series dublincore to the media package " + mp.getIdentifier(), e);
+            }
+          }
+        } catch (SeriesException e) {
+          throw new IllegalStateException("Unable to retrieve series dublincore catalog for the series " + mp.getSeries(), e);
+        } catch (NotFoundException | UnauthorizedException e) {
+          throw new IllegalArgumentException("Unable to retrieve series dublincore catalog for the series " + mp.getSeries(), e);
+        }
+        // add updated series ACL to the media package
+        try {
+          AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(mp.getSeries());
+          if (seriesAccessControl != null) {
+            mp = authorizationService.setAcl(mp, AclScope.Series, seriesAccessControl).getA();
+            for (MediaPackageElement seriesAclMpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+              if (StringUtils.isNotBlank(oldSeriesId)) {
+                for (String tag : seriesAclTags) {
+                  seriesAclMpe.addTag(tag);
+                }
+              } else {
+                // add archive tag to the element if the media package had no series set before
+                seriesAclMpe.addTag("archive");
+              }
+            }
+          }
+        } catch (SeriesException e) {
+          throw new IllegalStateException("Unable to retrieve series ACL for series " + oldSeriesId, e);
+        } catch (NotFoundException e) {
+          logger.debug("There is no ACL set for the series {}", mp.getSeries());
+        }
+        // add updated series extended metadata to the media package
+        try {
+          Opt<Map<String, byte[]>> seriesElementsOpt = seriesService.getSeriesElements(mp.getSeries());
+          for (Map<String, byte[]> seriesElements : seriesElementsOpt) {
+            for (String seriesElementType : seriesElements.keySet()) {
+              try (InputStream in = new ByteArrayInputStream(seriesElements.get(seriesElementType))) {
+                String elementId = UUID.randomUUID().toString();
+                URI catalogUrl = workspace.put(mp.getIdentifier().compact(), elementId, "dublincore.xml", in);
+                MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog,
+                        MediaPackageElementFlavor.flavor(seriesElementType, "series"));
+                mpe.setIdentifier(elementId);
+                mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
+                if (StringUtils.isNotBlank(oldSeriesId)) {
+                  if (seriesExtDcTags.containsKey(seriesElementType)) {
+                    for (String tag : seriesExtDcTags.get(seriesElementType)) {
+                      mpe.addTag(tag);
+                    }
+                  }
+                } else {
+                  // add archive tag to the element if the media package had no series set before
+                  mpe.addTag("archive");
+                }
+              } catch (IOException e) {
+                throw new IllegalStateException(String.format("Unable to serialize series element %s for the series %s",
+                        seriesElementType, mp.getSeries()), e);
+              } catch (NotFoundException e) {
+                throw new IllegalArgumentException("Unable to retrieve series element dublincore catalog for the series "
+                        + mp.getSeries(), e);
+              }
+            }
+          }
+        } catch (SeriesException e) {
+          throw new IllegalStateException("Unable to retrieve series elements for the series " + mp.getSeries(), e);
         }
       }
     }
