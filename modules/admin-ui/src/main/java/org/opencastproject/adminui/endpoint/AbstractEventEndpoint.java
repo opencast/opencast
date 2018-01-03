@@ -264,7 +264,7 @@ public abstract class AbstractEventEndpoint {
   protected String serviceUrl = null;
 
   /** The default workflow identifier, if one is configured */
-  protected String defaultWorkflowDefinionId = ""; //cannot be null because of f() function used below
+  protected String defaultWorkflowDefinionId = null;
 
   /**
    * Activates REST service.
@@ -281,6 +281,7 @@ public abstract class AbstractEventEndpoint {
       this.serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
 
       String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
+
       if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId))
         this.defaultWorkflowDefinionId = ccDefaultWorkflowDefinionId;
     }
@@ -1773,7 +1774,7 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.serverError();
     }
 
-    JValue data = obj(f("workflows",arr(workflows)), f("default_workflow_id",v(defaultWorkflowDefinionId)));
+    JValue data = obj(f("workflows",arr(workflows)), f("default_workflow_id",v(defaultWorkflowDefinionId,Jsons.NULL)));
 
     return okJson(data);
   }
