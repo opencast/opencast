@@ -1,18 +1,15 @@
 {
-   "metadata":{
-      "eventId":"asdasd",
-      "optOut":false,
-      "agentId":"demo",
-      "agentConfiguration":{
-         "test":"true",
-         "clear":"all"
-      },
-      "presenters":[
-         "user1",
-         "user2"
-      ],
-      "start":"2017-01-27T10:00:37Z",
-      "end":"2017-01-27T10:10:37Z"
-   },
-   "source":"SCHEDULE"
+  "eventId":"asdasd",
+  "optOut":false,
+  "agentId":"demo",
+  "agentConfiguration":{
+    "test":"true",
+    "clear":"all"
+  },
+  "presenters":[
+    "user1",
+    "user2"
+  ],
+  "start":"2017-01-27T10:00:37Z",
+  "end":"2017-01-27T10:10:37Z"
 }
