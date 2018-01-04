@@ -390,12 +390,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     for (Entry<String, WorkflowDefinition> entry : workflowDefinitionScanner.getWorkflowDefinitions().entrySet()) {
       list.add(entry.getValue());
     }
-    Collections.sort(list, new Comparator<WorkflowDefinition>() {
-      @Override
-      public int compare(WorkflowDefinition o1, WorkflowDefinition o2) {
-        return o1.getId().compareTo(o2.getId());
-      }
-    });
+    Collections.sort(list); //sorts by title
     return list;
   }
 
