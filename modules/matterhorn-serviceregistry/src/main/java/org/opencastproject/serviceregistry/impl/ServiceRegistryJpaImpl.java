@@ -190,6 +190,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default delay between job dispatching attempts, in milliseconds */
   static final long DEFAULT_DISPATCH_INTERVAL = 5000;
 
+  /** Default delay before starting job dispatching, in milliseconds */
+  static final long DEFAULT_DISPATCH_START_DELAY = 60000;
+
   /** Default jobs limit during dispatching
    * (larger value will fetch more entries from the database at the same time and increase RAM usage) */
   static final int DEFAULT_DISPATCH_JOBS_LIMIT = 100;
@@ -798,9 +801,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
+    long dispatchDelay = DEFAULT_DISPATCH_START_DELAY;
+
     // Stop the current scheduled executors so we can configure new ones
     if (scheduledExecutor != null) {
       scheduledExecutor.shutdown();
+      dispatchDelay = dispatchInterval;
     }
 
     scheduledExecutor = Executors.newScheduledThreadPool(2);
@@ -815,7 +821,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // Schedule the job dispatching.
     if (dispatchInterval > 0) {
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval / 1000);
-      scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchInterval, dispatchInterval,
+      scheduledExecutor.scheduleWithFixedDelay(new JobDispatcher(), dispatchDelay, dispatchInterval,
               TimeUnit.MILLISECONDS);
     }
   }
