@@ -62,14 +62,14 @@ First you have to install the necessary repositories so that your package manage
  - Add Opencast repository:
 
         cd /etc/apt/sources.list.d/
-        echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org stable/" | sudo tee opencast.list
+        echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org/debian stable/" | sudo tee opencast.list
 
     It might take some time after the release of a new Opencast version before the Debs are moved to the stable
     repository. If you need the new release prior to its promotion to stable you can use the testing repository.
     Note that the testing repository is an additional repository and still requires the stable repository to be active.
 
         cd /etc/apt/sources.list.d/
-        echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org testing/" | sudo tee opencast.list
+        echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org/debian testing/" | sudo tee opencast.list
 
  - Add the repository key to your apt keyring:
 
