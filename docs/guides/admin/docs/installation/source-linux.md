@@ -18,17 +18,17 @@ prior option, the tarball download, needs less tools and you do not have to down
 
 Using the tarball:
 
-Select the tarball for the version you want to install from the [BitBucket downloads section
-](https://bitbucket.org/opencast-community/opencast/downloads).
+Select the tarball for the version you want to install
+from the [GitHub releases section](https://github.com/opencast/opencast/releases).
 
     # Download desired tarball
-    curl -O https://bitbucket.org/opencast-community/opencast/...
-    tar xf ....tar.gz
-    cd opencast-community-...
+    curl -OL https://github.com/opencast/opencast/archive/[...].tar.gz
+    tar xf [...].tar.gz
+    cd opencast--[...]
 
 Cloning the Git repository:
 
-    git clone https://bitbucket.org/opencast-community/opencast.git
+    git clone https://github.com/opencast/opencast.git
     cd opencast
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version

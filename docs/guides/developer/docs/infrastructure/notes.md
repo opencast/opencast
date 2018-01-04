@@ -52,10 +52,6 @@ University of Osnabrück
 
 - Builds are triggered by cron, manual branch selection
 
-### docs.opencast.org
-
-- Rebuild every 5 minutes via bitbucket webhook, nightly rebuild
-
 ### nexus.opencast.org, nexus.virtuos.uos.de
 
 - GeoIP based redirect for all Nexus servers
