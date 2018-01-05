@@ -152,7 +152,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
                   @Override
                   protected void run() {
                     String destinationId = AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                             IndexRecreateObject.end(indexName, IndexRecreateObject.Service.AssetManager));
                   }
                 });
