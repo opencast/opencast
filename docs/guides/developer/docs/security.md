@@ -16,9 +16,9 @@ What to do if you find a security issue
 Report it to `security@opencast.org`! Please include a complete description of the issue, including which version(s) it
 affects, as well as any steps required to reproduce it. This email will be sent privately to the full list of
 committers for the project. You should receive an email acknowledging the issue from the QA coordinator, or release
-manager(s) within 3 business days. At this point, depending on the issue, you may be asked for your JIRA and BitBucket
+manager(s) within 3 business days. At this point, depending on the issue, you may be asked for your Attlassian and GitHub
 logins. It is enouraged to have one, since internal discussion on JIRA will be restricted to committers and the
-reporter. Likewise, all code reviews will be done on in an internal BitBucket repository.
+reporter. Likewise, all code reviews will be done on in an internal GitHub repository.
 
 What to do once you have reported your security issue
 -----------------------------------------------------

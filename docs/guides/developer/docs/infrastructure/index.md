@@ -60,10 +60,9 @@ An administrator is someone within the Opencast community who has administrative
 tools.  These tools are
 
  - JIRA
- - BitBucket
+ - GitHub
  - Google Groups
  - Crowdin
- - Github
 
 While many of our administrators are committers, an administrator is _not_ a committer by necessity.  Administrators
 have important responsibilities within the community, but mainly work behind the scenes.  These responsibilities
@@ -81,10 +80,9 @@ from the appropriate groups across all of our hosted products.  Administrators a
 groups in multiple places when a change is necessary.  These changes are
 
  - Modifying the [JIRA committers group](https://opencast.jira.com/admin/groups/view?groupname=committers-matterhorn)
- - Modifying the [BitBucket committers group](https://bitbucket.org/account/user/opencast-community/groups/opencast-committers/)
+ - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
  - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
  - Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
- - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 
 Current Administrators
 ----------------------
@@ -96,28 +94,6 @@ order:
  - Greg Logan
  - Lars Kiesow
  - Olaf Schulte
-
-Account Management
-------------------
-
-The following additional people have administrative access to the following services as well
-
-- opencast.jira.com
-    - Stephen Marquard
-	 - Global administrators
-- bitbucket.org/opencast-community
-	 - Global administrators
-- github.com/opencast
-	 - Global administrators
-- twitter.com/openmatter
-    - Lars Kiesow
-- facebook.com/opencast
-    - Rüdiger Rolf
-- youtube.com/opencast
-    - Rüdiger Rolf
-- crowdin.com/project/opencast-community
-    - Sven Stauber
-
 
 Video Conferencing
 ------------------

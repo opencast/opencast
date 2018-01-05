@@ -179,8 +179,8 @@ are unable to do that, please contact one of the JIRA administrators so we can c
 ### Release Documentation
 
 The [Opencast release documentation](http://docs.opencast.org) will be built automatically from available release tags.
-However, new branches need to be included.  As release manager, please talk to the [administrator
-](https://bitbucket.org/opencast-community/opencast-infrastructure) of that
+However, new branches need to be included.  As release manager, please talk to
+the [administrator](https://docs.opencast.org/develop/developer/infrastructure/#administrators) of that
 tool to ensure the ticket is added.
 
 
@@ -277,7 +277,7 @@ At this point the developer community should then be notified. Consider using th
 
     Hi everyone,
     I am pleased to announce that Opencast <VERSION> is now available for
-    testing. Please download the source from BitBucket [1] or use git to check
+    testing. Please download the source from GitHub [1] or use git to check
     out the tag.
 
     Issue Count:
@@ -290,7 +290,7 @@ At this point the developer community should then be notified. Consider using th
     Please test this release as thoroughly as
     possible.
 
-    [1] https://bitbucket.org/opencast-community/opencast/downloads
+    [1] https://github.com/opencast/opencast/releases
 
 If the version is a release candidate, you probably want to highlight that there are no *Blockers* left at the moment
 and *#propose* this to become the final release.
@@ -353,8 +353,8 @@ assume the final release should be based on `3.0-rc2`.
 12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
     servers.
 
-13. Push the built artifacts back to BitBucket. Please review the following commands carefully before executing them. If
-    in doubt, use the [graphical user interface](https://bitbucket.org/opencast-community/opencast/downloads/) to upload
+13. Push the built artifacts back to GitHub. Please review the following commands carefully before executing them. If
+    in doubt, use the [graphical user interface](https://github.com/opencast/opencast/releases) to upload
     the distribution tarballs manually.
 
         # Get Opencast version, BitBucket username and password
@@ -401,7 +401,7 @@ list, please ask to be given permission. For the message, you may use the follow
     Subject: Opencast <VERSION> Released
     Hi all,
     it is my pleasure to announce that Opencast <VERSION> has been released and
-    can be downloaded from BitBucket [1] or checked out via git.
+    can be downloaded from GitHub [1] or checked out via git.
 
     The documentation for this release can be found at [http://docs.opencast.org].
 
@@ -412,7 +412,7 @@ list, please ask to be given permission. For the message, you may use the follow
     This could not have happened without you and I am glad we were able to work
     together and get this release out.
 
-    [1] https://bitbucket.org/opencast-community/opencast/downloads
+    [1] https://github.com/opencast/opencast/releases
 
 
 ### Appointment of Next Release Manager

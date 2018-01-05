@@ -105,7 +105,7 @@ or, if you have a systemd based system:
 ### Step 2: Set up the Database Structure
 
 To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find them in the 
-installation document folder `.../docs/scripts/ddl/mysql5.sql`. You can also download the script from BitBucket.
+installation document folder `.../docs/scripts/ddl/mysql5.sql`. You can also download the script from GitHub.
 
 To import the database structure using the MariaDB/MySQL client, switch to the directory that contains the `mysql5.sql` 
 file and run the MariaDB/MySQL client with the user you created in the previous step (`-u opencast`) and switch to 

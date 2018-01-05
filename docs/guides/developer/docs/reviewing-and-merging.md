@@ -5,7 +5,7 @@ Before a patch is merged into an official branch, it needs to be reviewed by a c
 review, the reviewer tries to make sure that the patch merges without conflicts, that it works as expected and that
 it does not break anything else.
 
-If the reviewer discovers any kind of issue, he should leave a comment in the pull request view of BitBucket and let the
+If the reviewer discovers any kind of issue, he should leave a comment in the pull request view of GitHub and let the
 contributor fix the problem. Reviewer and contributor should work together to fix any problem with the pull requests
 before it is ready to go into the codebase.
 
@@ -14,9 +14,6 @@ Reviewing Rules
 
  - Reviews and merges need to be done by committers.
  - Reviewers should come from a different institution than the contributor.
- - To assign yourself as a reviewer, add a comment to the BitBucket pull request like “`I will //review// this`”. The
-   use of `//review//` will make the [pull request filter](http://pullrequests.opencast.org) pick up the author of this
-   comment as reviewer.
  - Pull requests for bug fixes or documentation may be reviewed and merged out of order.
  - Feature pull requests have to be merged in order unless their contributor or reviewer decide to temporarily skip it.
    Such a decision has to be justified by the existence of unresolved issues in that particular pull request.
