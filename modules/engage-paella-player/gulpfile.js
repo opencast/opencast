@@ -6,7 +6,7 @@ var mergeStream = require('merge-stream');
 
 
 var buildPath = "target/gulp";
-var paellaSrc = "src/main/resources/paella-opencast"
+var paellaSrc = "src/main/paella-opencast"
 
 gulp.task('paella-opencast:clean', function () {
 	return gulp.src(buildPath, {read: false}).pipe(clean());
