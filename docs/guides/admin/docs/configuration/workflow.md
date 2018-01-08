@@ -75,10 +75,10 @@ Start by naming the workflow and giving it a meaningful description:
 - The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
   is unique among all endpoints in the system.
 - The `tags` define where the user interfaces may use these workflows. Useful tags are:
-    - *upload*: Usable for uploaded media (new admin ui)
-    - *schedule*: Usable for scheduled events (new admin ui)
-    - *archive*: Usable for archived media (new admin ui)
-    - *delete*: Usable for deletion of events with publications (new admin ui)
+    - *upload*: Usable for uploaded media
+    - *schedule*: Usable for scheduled events
+    - *archive*: Usable for archived media
+    - *delete*: Usable for deletion of events with publications
     - *editor*: Usable from the video editor
 
 ### Inspect the Media
