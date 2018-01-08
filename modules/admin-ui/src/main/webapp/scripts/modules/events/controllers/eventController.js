@@ -227,7 +227,6 @@ angular.module('adminNg.controllers')
               }
             },
             fetchChildResources = function (id) {
-
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
@@ -371,10 +370,9 @@ angular.module('adminNg.controllers')
                     if (angular.isDefined($scope.workflows.workflow)) {
                         baseWorkflow = $scope.workflows.workflow;
                         $scope.workflow.id = $scope.workflows.workflow.workflowId;
-                        $scope.workflowDefinitionsObject = NewEventProcessingResource.get({
+                        $scope.workflowDefinitions = NewEventProcessingResource.get({
                             tags: 'schedule-ng'
                         }, function () {
-                            $scope.workflowDefinitions = $scope.workflowDefinitionsObject.workflows;
                             $scope.changeWorkflow(true);
                             setWorkflowConfig();
                         });
@@ -987,7 +985,7 @@ angular.module('adminNg.controllers')
         };
 
         checkForActiveTransactions();
-
+        
         $scope.workflowAction = function (wfId, action) {
         	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
                 Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
