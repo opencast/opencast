@@ -111,7 +111,7 @@ angular.module('adminNg', [
 })
 .config(['chosenProvider', function (chosenProvider) {
     chosenProvider.setOption({
-        'search_contains': true,
+        'search_contains': true
     });
 }])
 .run(['$rootScope', function ($rootScope) {
