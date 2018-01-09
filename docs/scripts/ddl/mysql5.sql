@@ -528,7 +528,6 @@ CREATE TABLE mh_user_ref_role (
   user_id bigint(20) NOT NULL,
   role_id bigint(20) NOT NULL,
   PRIMARY KEY (user_id, role_id),
-  CONSTRAINT UNQ_mh_user_ref_role UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_ref_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_ref_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user_ref (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
