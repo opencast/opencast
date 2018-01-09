@@ -227,6 +227,7 @@ angular.module('adminNg.controllers')
               }
             },
             fetchChildResources = function (id) {
+
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
                     angular.forEach($scope.general.publications, function (publication) {
                         publication.label = publication.name;
@@ -370,9 +371,10 @@ angular.module('adminNg.controllers')
                     if (angular.isDefined($scope.workflows.workflow)) {
                         baseWorkflow = $scope.workflows.workflow;
                         $scope.workflow.id = $scope.workflows.workflow.workflowId;
-                        $scope.workflowDefinitions = NewEventProcessingResource.get({
+                        $scope.workflowDefinitionsObject = NewEventProcessingResource.get({
                             tags: 'schedule'
                         }, function () {
+                            $scope.workflowDefinitions = $scope.workflowDefinitionsObject.workflows;
                             $scope.changeWorkflow(true);
                             setWorkflowConfig();
                         });

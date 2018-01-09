@@ -563,14 +563,14 @@ public class AbstractEventEndpointTest {
 
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("new/processing")).asString();
 
-    assertThat(eventProcessingString, SameJSONAs.sameJSONAs(result));
+    assertThat(result, SameJSONAs.sameJSONAs(eventProcessingString));
 
     eventProcessingString = IOUtils.toString(getClass().getResource("/newEventProcessing2.json"));
 
     result = given().queryParam("tags", "test,upload").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("new/processing")).asString();
 
-    assertThat(eventProcessingString, SameJSONAs.sameJSONAs(result));
+    assertThat(result, SameJSONAs.sameJSONAs(eventProcessingString));
   }
 
   @Test
