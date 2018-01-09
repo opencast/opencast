@@ -539,8 +539,12 @@ CREATE TABLE mh_user_settings (
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization)
+  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization),
+  CONSTRAINT `FK_mh_user_setting_organization` FOREIGN KEY (`organization`) REFERENCES `mh_user` (`organization`),
+  CONSTRAINT `FK_mh_user_setting_username` FOREIGN KEY (`username`) REFERENCES `mh_user` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_user_setting_organization ON mh_user_settings (organization);
 
 CREATE TABLE mh_email_configuration (
   id BIGINT(20) NOT NULL,
