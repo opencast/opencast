@@ -20,25 +20,6 @@ paella.plugins.DownloadsPlugin = Class.create(paella.TabBarPlugin,{
 		);
 	},
 
-	setup:function() {
-		var mimeDict = {
-			'video/avi':'AVI',
-			'video/mp4':'MP4',
-			'video/ogg':'OGG',
-			'audio/mp3':'MP3',
-			'audio/m4a':'M4A'
-		};
-		paella.dictionary.addDictionary(mimeDict);
-
-		if (paella.utils.language()=="es") {
-			var esDict = {
-				'Downloads':'Descargas',			
-				'Video file':'Fichero de video',
-				'Audio file':'Fichero de audio',
-			};
-			paella.dictionary.addDictionary(esDict);
-		}
-	},
 	buildContent:function(domElement) {
 		this.domElement = domElement;
 		this.loadContent();

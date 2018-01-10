@@ -95,7 +95,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 		// -------  Left
 		var inputElement = document.createElement('input');
 		inputElement.type = "text";
-		inputElement.value = paella.dictionary.translate("Search in this recording");
+		inputElement.value = paella.dictionary.translate("Search in this event");
 		inputElement.setAttribute('size', '30');
 		inputElement.setAttribute('dir','lrt');
 		inputElement.setAttribute('spellcheck','true');
@@ -116,7 +116,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 		r3.className = 'lt70';
 		r4.className = 'gt70';
 
-		r1.innerHTML = paella.dictionary.translate("Search Relevance:");
+		r1.innerHTML = paella.dictionary.translate("Search relevance:");
 		r2.innerHTML = "&lt; 30%";
 		r3.innerHTML = "&lt; 70%";
 		r4.innerHTML = "&gt; 70%";
@@ -278,7 +278,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 	
 	
     setNoActualResultAvailable:function(searchValue) {
-     	this.divSearch.innerHTML = paella.dictionary.translate("Results for '{0}; (no actual results for '{1}' found)").replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
+     	this.divSearch.innerHTML = paella.dictionary.translate("Results for '{0}' (no actual results for '{1}' found)").replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
      	
     },
 
