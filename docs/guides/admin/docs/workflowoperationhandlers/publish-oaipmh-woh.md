@@ -66,7 +66,7 @@ The configuration key 'external-channel' is used to set the name of the publicat
     <operation
         id="publish-oaipmh"
         fail-on-error="true"
-        exception-handler-workflow="ng-error"
+        exception-handler-workflow="error"
         description="Publish event to the OAI-PMH repository">
         <configurations>
             <configuration key="download-tags">oaipmh-download</configuration>

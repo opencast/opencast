@@ -55,7 +55,7 @@ public class TasksEndpointTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONArray expected = (JSONArray) new JSONParser().parse(reader);
     JSONArray actual = (JSONArray) parser
-            .parse(given().queryParam("tags", "ng-archive").expect().statusCode(HttpStatus.SC_OK)
+            .parse(given().queryParam("tags", "archive").expect().statusCode(HttpStatus.SC_OK)
                     .contentType(ContentType.JSON).when().get(rt.host("/processing.json")).asString());
 
     assertEquals(expected, actual);

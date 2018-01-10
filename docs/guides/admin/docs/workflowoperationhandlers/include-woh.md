@@ -14,7 +14,7 @@ Parameter Table
 
 |Configuration Key |Example              |Description                                                    |
 |------------------|---------------------|---------------------------------------------------------------|
-|workflow-id       |`ng-partial-cleanup` |The workflow definition id of the workflow to be included      |
+|workflow-id       |`partial-cleanup` |The workflow definition id of the workflow to be included      |
 
 Operation Example
 -----------------
@@ -23,7 +23,7 @@ Operation Example
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 

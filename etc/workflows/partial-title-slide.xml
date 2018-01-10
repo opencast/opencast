@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-partial-title-slide</id>
+  <id>partial-title-slide</id>
   <title>Prepare title slide video</title>
   <tags/>
   <description>
@@ -13,7 +13,7 @@
 
       <operation
         id="analyze-tracks"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Analyze trimmed tracks">
         <configurations>
           <configuration key="source-flavor">*/trimmed</configuration>
@@ -23,7 +23,7 @@
       <operation
         id="image"
         if="NOT ${theme_title_slide_uploaded} AND ${presentation_trimmed_has_video}"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Extracting title slide image from presentation track">
         <configurations>
           <configuration key="source-flavor">presentation/trimmed</configuration>
@@ -36,7 +36,7 @@
       <operation
         id="image"
         if="NOT ${theme_title_slide_uploaded} AND NOT (${presentation_trimmed_has_video})"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Extracting title slide image from presenter track">
         <configurations>
           <configuration key="source-flavor">presenter/trimmed</configuration>
@@ -49,7 +49,7 @@
       <operation
         id="cover-image"
         fail-on-error="true"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Create title slide with metadata">
         <configurations>
           <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
@@ -63,7 +63,7 @@
       <operation id="image-to-video"
                  description="Create video with title slide"
                  fail-on-error="true"
-                 exception-handler-workflow="ng-partial-error">
+                 exception-handler-workflow="partial-error">
         <configurations>
           <configuration key="source-flavor">branding/titleslide+metadata</configuration>
           <configuration key="target-flavor">branding/titleslide+video</configuration>

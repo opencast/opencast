@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-schedule-and-upload</id>
+  <id>schedule-and-upload</id>
   <title>Process upon upload and schedule</title>
   <tags>
-    <tag>upload-ng</tag>
-    <tag>schedule-ng</tag>
+    <tag>upload</tag>
+    <tag>schedule</tag>
   </tags>
   <description/>
   <configuration_panel>
@@ -161,7 +161,7 @@
     <operation
       id="export-wf-properties"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Export workflow settings to Java properties file">
       <configurations>
         <configuration key="target-flavor">processing/defaults</configuration>
@@ -184,7 +184,7 @@
       id="include"
       description="Finalize upload and ingest">
       <configurations>
-        <configuration key="workflow-id">ng-partial-ingest</configuration>
+        <configuration key="workflow-id">partial-ingest</configuration>
       </configurations>
     </operation>
 
@@ -204,7 +204,7 @@
       id="include"
       description="Prepare the recording for further processing">
       <configurations>
-        <configuration key="workflow-id">ng-partial-work</configuration>
+        <configuration key="workflow-id">partial-work</configuration>
       </configurations>
     </operation>
 
@@ -214,7 +214,7 @@
       id="include"
       description="Prepare preview versions of the recording">
       <configurations>
-        <configuration key="workflow-id">ng-partial-preview</configuration>
+        <configuration key="workflow-id">partial-preview</configuration>
       </configurations>
     </operation>
 
@@ -275,7 +275,7 @@
       if="${straightToPublishing}"
       description="Publish the recording">
       <configurations>
-        <configuration key="workflow-id">ng-partial-publish</configuration>
+        <configuration key="workflow-id">partial-publish</configuration>
       </configurations>
     </operation>
 
@@ -309,7 +309,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-republish-metadata</id>
+  <id>republish-metadata</id>
   <title>Republish metadata</title>
   <tags>
-    <tag>archive-ng</tag>
+    <tag>archive</tag>
   </tags>
   <description/>
   <configuration_panel>
@@ -58,7 +58,7 @@
     <operation
       id="publish-engage"
       if="${publishToEngage}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -72,7 +72,7 @@
     <operation
       id="republish-oaipmh"
       if="${publishToOaiPmh}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Update recording in default OAI-PMH repository">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -88,7 +88,7 @@
       id="publish-youtube"
       if="${publishToYouTube}"
       max-attempts="2"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Update recording in YouTube">
       <configurations>
         <configuration key="source-flavors">dublincore/*</configuration>
@@ -108,7 +108,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 

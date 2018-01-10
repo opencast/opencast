@@ -29,7 +29,7 @@ The PublishAWSS3WorkflowOperation will bring your media to the engage distributi
     <operation
       id="publish-aws"
       max-attempts="2"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publishing to Amazon Web Services">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>

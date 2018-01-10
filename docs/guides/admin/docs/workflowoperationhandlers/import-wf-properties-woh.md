@@ -22,7 +22,7 @@ Note that the [ExportWfPropertiesWorkflowOperationHandler](export-wf-properties-
     <operation
       id="import-wf-properties"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Load processing settings">
       <configurations>
         <configuration key="source-flavor">processing/defaults</configuration>

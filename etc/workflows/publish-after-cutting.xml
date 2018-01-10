@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-publish-after-cutting</id>
+  <id>publish-after-cutting</id>
   <title>Publish</title>
   <tags>
     <tag>editor</tag>
@@ -27,7 +27,7 @@
     <operation
         id="import-wf-properties"
         fail-on-error="true"
-        exception-handler-workflow="ng-partial-error"
+        exception-handler-workflow="partial-error"
         description="Load processing settings">
       <configurations>
       <configuration key="source-flavor">processing/defaults</configuration>
@@ -66,7 +66,7 @@
       id="include"
       description="Prepare the recording for further processing">
       <configurations>
-        <configuration key="workflow-id">ng-partial-work</configuration>
+        <configuration key="workflow-id">partial-work</configuration>
       </configurations>
     </operation>
 
@@ -83,7 +83,7 @@
       id="include"
       description="Publish the recording">
       <configurations>
-        <configuration key="workflow-id">ng-partial-publish</configuration>
+        <configuration key="workflow-id">partial-publish</configuration>
       </configurations>
     </operation>
 
@@ -116,7 +116,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 

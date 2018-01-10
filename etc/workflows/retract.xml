@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-retract</id>
+  <id>retract</id>
   <title>Retract</title>
   <tags>
-    <tag>archive-ng</tag>
-    <tag>delete-ng</tag>
+    <tag>archive</tag>
+    <tag>delete</tag>
   </tags>
   <description>Retract a recording</description>
   <configuration_panel>
@@ -65,7 +65,7 @@
     <operation
       id="retract-engage"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       if="${retractFromEngage}"
       description="Retract recording from Engage">
     </operation>
@@ -75,7 +75,7 @@
     <operation
       id="retract-aws"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       if="${retractFromAws}"
       description="Retract recording from AWS">
     </operation>
@@ -86,7 +86,7 @@
       id="retract-configure"
       if="${retractFromApi}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract recording from external application">
       <configurations>
         <configuration key="channel-id">api</configuration>
@@ -97,7 +97,7 @@
     <operation
       id="retract-configure"
       if="${retractPreview}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract from internal publication channel">
       <configurations>
         <configuration key="channel-id">internal</configuration>
@@ -109,7 +109,7 @@
     <operation
       id="retract-oaipmh"
       if="${retractFromOaiPmh}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract recording from the default OAI-PMH repository">
       <configurations>
         <configuration key="repository">default</configuration>
@@ -122,7 +122,7 @@
       id="retract-youtube"
       if="${retractFromYouTube}"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract recording from YouTube">
     </operation>
 
@@ -131,7 +131,7 @@
     <operation
       id="snapshot"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Archiving state of retracted recording">
     </operation>
 
@@ -147,7 +147,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
   

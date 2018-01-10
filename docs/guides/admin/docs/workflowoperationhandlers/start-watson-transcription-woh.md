@@ -21,7 +21,7 @@ text.
 <operation
   id="compose"
   fail-on-error="true"
-  exception-handler-workflow="ng-partial-error"
+  exception-handler-workflow="partial-error"
   description="Extract audio for transcript generation">
   <configurations>
     <configuration key="source-tags">engage-download</configuration>
@@ -38,7 +38,7 @@ text.
 <operation
   id="start-watson-transcription"
   fail-on-error="true"
-  exception-handler-workflow="ng-partial-error"
+  exception-handler-workflow="partial-error"
   description="Start IBM Watson transcription job">
   <configurations>
     <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->

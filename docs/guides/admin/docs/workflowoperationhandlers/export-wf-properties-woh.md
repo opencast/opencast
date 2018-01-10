@@ -20,7 +20,7 @@ properties can later be imported using the [ImportWfPropertiesWorkflowOperation]
     <operation
       id="export-wf-properties"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Export workflow settings to Java properties file">
       <configurations>
         <configuration key="target-flavor">processing/defaults</configuration>

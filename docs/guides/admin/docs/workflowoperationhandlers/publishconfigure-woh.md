@@ -75,7 +75,7 @@ Operation Examples
 
     <operation
       id="publish-engage"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to internal channel">
       <configurations>
         <configuration key="source-tags">engage,atom,rss</configuration>
@@ -88,7 +88,7 @@ Operation Examples
 
     <operation
       id="publish-configure"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Publish to external api publication channel">
       <configurations>
         <configuration key="channel-id">api</configuration>

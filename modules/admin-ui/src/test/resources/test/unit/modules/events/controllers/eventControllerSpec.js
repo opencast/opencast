@@ -52,7 +52,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNEL.ICONS.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule-ng')
+        $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
         $httpBackend.whenGET('/admin-ng/event/40518/hasActiveTransaction').respond('false');
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));

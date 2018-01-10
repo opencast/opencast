@@ -15,7 +15,7 @@ There is only one configuration key "channel-id". This is the channel to remove 
     <!-- Remove the internal publication if the mediapackage is being deleted. -->
     <operation
       id="retract-configure"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract from internal publication channel">
       <configurations>
         <configuration key="channel-id">internal</configuration>
@@ -26,7 +26,7 @@ There is only one configuration key "channel-id". This is the channel to remove 
 
     <operation
       id="retract-configure"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract from external api publication channel">
       <configurations>
         <configuration key="channel-id">api</configuration>

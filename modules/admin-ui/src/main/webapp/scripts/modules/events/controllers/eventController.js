@@ -372,7 +372,7 @@ angular.module('adminNg.controllers')
                         baseWorkflow = $scope.workflows.workflow;
                         $scope.workflow.id = $scope.workflows.workflow.workflowId;
                         $scope.workflowDefinitionsObject = NewEventProcessingResource.get({
-                            tags: 'schedule-ng'
+                            tags: 'schedule'
                         }, function () {
                             $scope.workflowDefinitions = $scope.workflowDefinitionsObject.workflows;
                             $scope.changeWorkflow(true);

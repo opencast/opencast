@@ -8,6 +8,6 @@
   "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE": "{\"id\": \"track_presenter\",\"type\":\"track\", \"flavorType\": \"presenter\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":10}",
   "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE": "{\"id\": \"track_presentation\",\"type\":\"track\", \"flavorType\": \"presentation\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":11}",
   "EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY": "{\"id\": \"track_audio\",\"type\":\"track\", \"flavorType\": \"audio\",\"flavorSubType\": \"source\", \"multiple\":false,\"displayOrder\":6}",
-  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID": "ng-publish-uploaded-assets"
+  "EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID": "publish-uploaded-assets"
 }
 

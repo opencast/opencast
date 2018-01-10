@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
-  <id>ng-publish-uploaded-assets</id>
+  <id>publish-uploaded-assets</id>
   <title>Publish uploaded assets</title>
   <tags>
      <!-- Only launched from add asset in admin-ng, not available for selection by end users via the UI -->
@@ -27,7 +27,7 @@
 
     <operation
       id="tag"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging media package elements for archival">
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
@@ -46,7 +46,7 @@
     <operation
       id="publish-engage"
       if="${publishToEngage}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Update recording in Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">${download-source-flavors}</configuration>
@@ -60,7 +60,7 @@
     <operation
       id="republish-oaipmh"
       if="${publishToOaiPmh}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Update recording in default OAI-PMH repository">
       <configurations>
         <configuration key="download-source-flavors">${download-source-flavors}</configuration>
@@ -91,7 +91,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 
