@@ -42,7 +42,7 @@ import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlAttribute;
 
 @Entity(name = "TranscriptionJobControl")
-@Table(name = "mh_ibm_watson_transcript_job")
+@Table(name = "oc_ibm_watson_transcript_job")
 @NamedQueries({
         @NamedQuery(name = "TranscriptionJobControl.findByMediaPackage", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.mediaPackageId = :mediaPackageId ORDER BY jc.dateCreated DESC"),
         @NamedQuery(name = "TranscriptionJobControl.findByJob", query = "SELECT jc FROM TranscriptionJobControl jc WHERE jc.transcriptionJobId = :transcriptionJobId"),

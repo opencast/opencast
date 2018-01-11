@@ -43,7 +43,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "mh_role", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "organization" }))
+@Table(name = "oc_role", uniqueConstraints = @UniqueConstraint(columnNames = { "name", "organization" }))
 @NamedQueries({
         @NamedQuery(name = "Role.findByQuery", query = "select r from JpaRole r where r.organization.id=:org and UPPER(r.name) like :query or UPPER(r.description) like :query"),
         @NamedQuery(name = "Role.findByName", query = "Select r FROM JpaRole r where r.name = :name and r.organization.id = :org"),

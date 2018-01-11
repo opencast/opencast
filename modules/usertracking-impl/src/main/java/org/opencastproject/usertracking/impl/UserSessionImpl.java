@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @Entity(name = "UserSession")
 @Access(AccessType.FIELD)
-@Table(name = "mh_user_session")
+@Table(name = "oc_user_session")
 @NamedQueries({
         @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
 @XmlType(name = "session", namespace = "http://usertracking.opencastproject.org")

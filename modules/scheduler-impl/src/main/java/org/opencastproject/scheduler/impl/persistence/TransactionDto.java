@@ -42,7 +42,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "Transaction.findAll", query = "SELECT e FROM Transaction e WHERE e.organization = :org"),
         @NamedQuery(name = "Transaction.findBySource", query = "SELECT e FROM Transaction e WHERE e.source = :source  AND e.organization = :org"),
         @NamedQuery(name = "Transaction.countAll", query = "SELECT COUNT(e) FROM Transaction e WHERE e.organization = :org") })
-@Table(name = "mh_scheduled_transaction", uniqueConstraints = {
+@Table(name = "oc_scheduled_transaction", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "id", "organization", "source" }) })
 public class TransactionDto {
 

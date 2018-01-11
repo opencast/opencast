@@ -50,7 +50,7 @@ import javax.persistence.Table;
  */
 @Entity(name = "SeriesEntity") @IdClass(SeriesEntityId.class)
 @Access(AccessType.FIELD)
-@Table(name = "mh_series")
+@Table(name = "oc_series")
 @NamedQueries({
         @NamedQuery(name = "Series.findAll", query = "select s from SeriesEntity s"),
         @NamedQuery(name = "Series.getCount", query = "select COUNT(s) from SeriesEntity s"),
@@ -86,7 +86,7 @@ public class SeriesEntity {
   @ElementCollection(targetClass = String.class)
   @MapKeyColumn(name = "name")
   @Column(name = "value")
-  @CollectionTable(name = "mh_series_property", joinColumns = {
+  @CollectionTable(name = "oc_series_property", joinColumns = {
           @JoinColumn(name = "series", referencedColumnName = "id"),
           @JoinColumn(name = "organization", referencedColumnName = "organization") })
   protected Map<String, String> properties;
@@ -94,7 +94,7 @@ public class SeriesEntity {
   @ElementCollection
   @MapKeyColumn(name = "type")
   @Column(name = "data")
-  @CollectionTable(name = "mh_series_elements", joinColumns = {
+  @CollectionTable(name = "oc_series_elements", joinColumns = {
           @JoinColumn(name = "series", referencedColumnName = "id"),
           @JoinColumn(name = "organization", referencedColumnName = "organization") })
   protected Map<String, byte[]> elements;

@@ -47,7 +47,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity(name = "EventComment")
-@Table(name = "mh_event_comment")
+@Table(name = "oc_event_comment")
 @NamedQueries({ @NamedQuery(name = "EventComment.countAll", query = "SELECT COUNT(e) FROM EventComment e"),
         @NamedQuery(name = "EventComment.findAll", query = "SELECT e FROM EventComment e"),
         @NamedQuery(name = "EventComment.findReasons", query = "SELECT e.reason FROM EventComment e WHERE e.organization = :org GROUP BY e.reason"),

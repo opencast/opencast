@@ -47,7 +47,7 @@ import javax.persistence.TemporalType;
  */
 @Entity(name = "EventCommentReply")
 @Access(AccessType.FIELD)
-@Table(name = "mh_event_comment_reply")
+@Table(name = "oc_event_comment_reply")
 @NamedQueries({ @NamedQuery(name = "EventCommentReply.findAll", query = "SELECT c FROM EventCommentReply c"),
         @NamedQuery(name = "EventCommentReply.clear", query = "DELETE FROM EventCommentReply") })
 public class EventCommentReplyDto {

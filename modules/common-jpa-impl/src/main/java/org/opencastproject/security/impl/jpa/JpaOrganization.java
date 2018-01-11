@@ -45,7 +45,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "mh_organization")
+@Table(name = "oc_organization")
 @NamedQueries({
   @NamedQuery(name = "Organization.findAll", query = "Select o FROM JpaOrganization o"),
   @NamedQuery(name = "Organization.findById", query = "Select o FROM JpaOrganization o where o.id = :id"),
@@ -63,7 +63,7 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name")
   @Column(name = "port")
-  @CollectionTable(name = "mh_organization_node", joinColumns = @JoinColumn(name = "organization"))
+  @CollectionTable(name = "oc_organization_node", joinColumns = @JoinColumn(name = "organization"))
   private Map<String, Integer> servers;
 
   @Column(name = "admin_role")
@@ -76,7 +76,7 @@ public class JpaOrganization implements Organization {
   @ElementCollection
   @MapKeyColumn(name = "name")
   @Column(name = "value", length = 65535)
-  @CollectionTable(name = "mh_organization_property", joinColumns = @JoinColumn(name = "organization"))
+  @CollectionTable(name = "oc_organization_property", joinColumns = @JoinColumn(name = "organization"))
   private Map<String, String> properties;
 
   /**

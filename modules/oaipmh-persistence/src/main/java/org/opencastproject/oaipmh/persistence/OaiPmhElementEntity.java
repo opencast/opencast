@@ -31,7 +31,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity(name = "OaiPmhElementEntity")
-@Table(name = "mh_oaipmh_elements")
+@Table(name = "oc_oaipmh_elements")
 public class OaiPmhElementEntity {
 
   /** The auto generated unique database ID */
@@ -56,9 +56,9 @@ public class OaiPmhElementEntity {
   /** The OAI-PMH entity belongs to this element */
   @ManyToOne(optional = false)
   @JoinColumns({
-    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "mh_oaipmh_elements"),
-    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "mh_oaipmh_elements"),
-    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "mh_oaipmh_elements")
+    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements"),
+    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "oc_oaipmh_elements"),
+    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements")
   })
   private OaiPmhEntity oaiPmhEntity;
 
