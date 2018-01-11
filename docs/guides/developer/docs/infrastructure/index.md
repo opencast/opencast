@@ -7,21 +7,11 @@ List of Opencast project infrastructure and administrators.  For detailed notes 
 Test Servers
 ------------
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)   | Notes
----------------------------|-------------------------------|------------------|--------------------|-----------------
-University of Osnabrück    | develop.opencast.org          | Lars Kiesow      | Lars Kiesow        |
-ETH Zürich                 | stable.opencast.org           | Lars Kiesow      | Markus Borzechowski|
-SWITCH                     | admin.oc-test.switch.ch       | Greg Logan       | Lars Kiesow        | May be unavailable after 2017-07
-SWITCH                     | player.oc-test.switch.ch      | Greg Logan       | Lars Kiesow        |
-SWITCH                     | ingest.oc-test.switch.ch      | Greg Logan       | Lars Kiesow        |
-SWITCH                     | worker1.oc-test.switch.ch     | Greg Logan       | Lars Kiesow        |
-SWITCH                     | worker2.oc-test.switch.ch     | Greg Logan       | Lars Kiesow        | inactive
-SWITCH                     | worker3.oc-test.switch.ch     | Greg Logan       | Lars Kiesow        | inactive
-SWITCH                     | worker4.oc-test.switch.ch     | Greg Logan       | Lars Kiesow        | inactive
-SWITCH                     | database.oc-test.switch.ch    | Greg Logan       | Lars Kiesow        |
-SWITCH                     | download.oc-test.switch.ch    | Greg Logan       | Lars Kiesow        | message broker
-SWITCH                     | streaming.oc-test.switch.ch   | Greg Logan       | Lars Kiesow        | storage/nfs
-SWITCH                     | 10.0.207.247 (intern)         | Lars Kiesow      | Lars Kiesow        | capture agent
+Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
+---------------------------|-------------------------------|------------------|--------------------
+University of Osnabrück    | develop.opencast.org          | Lars Kiesow      | Lars Kiesow
+ETH Zürich                 | stable.opencast.org           | Lars Kiesow      | Markus Borzechowski
+Jan Koppe                  | legacy.opencast.org           | Greg Logan       | Jan Koppe
 
 
 Maven Repository
@@ -34,8 +24,9 @@ University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      |
 
 Nexus administration:
 
-- Lars Kiesow (uos, dce)
-- Michael Stypa (uos)
+- Greg Logan
+- Lars Kiesow
+- Michael Stypa
 
 
 Other Hosted Services
@@ -128,5 +119,5 @@ Video Conferencing
     - [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
     - Flash based
 - AppearIn
-    - [Conference room](http://appear.in/opencast)
-    - WebRTC based; Max. 8 users
+    - [Conference room](https://appear.in/opencast)
+    - WebRTC based; Max. 4 users
