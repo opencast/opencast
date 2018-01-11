@@ -620,7 +620,7 @@ CREATE TABLE mh_event_comment_reply (
   text TEXT(65535) NOT NULL,
   modification_date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_mh_event_comment_reply_mh_event_comment FOREIGN KEY (event_comment_id) REFERENCES mh_event_comment (id)
+  CONSTRAINT FK_mh_event_comment_reply_mh_event_comment FOREIGN KEY (event_comment_id) REFERENCES mh_event_comment (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_series_elements (
