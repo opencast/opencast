@@ -18,12 +18,83 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-search-service-api</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- osgi support -->
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.compendium</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>            
   </dependencies>
 
   <profiles>
+    <profile>
+      <id>frontend-no-prebuilt</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>npm clean</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>pre-clean</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>cache</argument>
+                    <argument>verify</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>npm install</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>install</argument>
+                    <argument>--registry</argument>
+                    <argument>${nexus.npm}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>frontend build</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>compile</phase>
+                <configuration>
+                  <executable>node_modules/gulp/bin/gulp.js</executable>
+                  <arguments>
+                    <argument>paella-opencast:build</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  
+  
     <profile>
       <id>frontend</id>
       <activation>
@@ -91,7 +162,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
         <executions>
           <execution>
             <id>copy-player</id>
@@ -117,15 +187,20 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <version>3.3.0</version>
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName> ${project.artifactId} </Bundle-SymbolicName>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>ui.*</Private-Package>
-            <Http-Alias>/paella/ui</Http-Alias>
+            <Http-Alias>/engage/paella/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
-            <Http-Welcome>index.html</Http-Welcome>
+            <Http-Welcome>watch.html</Http-Welcome>
+            
+            <Export-Package>org.opencastproject.engage.paella</Export-Package>
+            <Service-Component>
+              OSGI-INF/paella-config-file.xml
+            </Service-Component>            
           </instructions>
         </configuration>
         <executions>
