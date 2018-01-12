@@ -1,6 +1,6 @@
 angular.module('adminNg.directives')
-.directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
-function (PlayerAdapter, $document, VideoService, $timeout) {
+.directive('adminNgTimeline', ['AuthService', 'PlayerAdapter', '$document', 'VideoService', '$timeout',
+function (AuthService, PlayerAdapter, $document, VideoService, $timeout) {
 
     return {
         templateUrl: 'shared/partials/timeline.html',
@@ -33,7 +33,16 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.from = 0;
             scope.to = 0;
 
-            scope.previewMode = false; // in preview mode, deactivated segments are skipped while playing.
+            scope.previewMode = true; // in preview mode, deactivated segments are skipped while playing.
+
+            if (AuthService) {
+                var ADMIN_EDITOR_PREVIEWMODE_DEFAULT = 'admin.editor.previewmode.default';
+                AuthService.getUser().$promise.then(function(user) {
+                    if (angular.isDefined(user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT])) {
+                        scope.previewMode = user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT].toUpperCase() === 'TRUE';
+                    }
+                });
+            }
 
             scope.wrapperClass = ''; // list of border classes for the segment wrapper.
 
