@@ -1230,29 +1230,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
           throws SchedulerException {
+    Set<MediaPackage> events = new HashSet<MediaPackage>();
     // overlap
-    Stream<ARecord> overlapRecords = searchInternal(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.some(startDate),
-            Opt.some(endDate), Opt.<Date> none());
+    events.addAll(search(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.some(startDate), Opt.some(endDate),
+            Opt.<Date> none()));
     // start between
-    Stream<ARecord> startBetweenRecords = searchInternal(Opt.some(captureDeviceID), Opt.some(startDate),
-            Opt.some(endDate), Opt.<Date> none(), Opt.<Date> none());
+    events.addAll(search(Opt.some(captureDeviceID), Opt.some(startDate), Opt.some(endDate), Opt.<Date> none(),
+            Opt.<Date> none()));
     // end between
-    Stream<ARecord> endBetweenRecords = searchInternal(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.<Date> none(),
-            Opt.some(startDate), Opt.some(endDate));
-
-    // Filter out opted out records
-    Stream<ARecord> records = overlapRecords.append(startBetweenRecords).append(endBetweenRecords)
-            .filter(filterOptedOutRecords);
-
-    return new ArrayList<>(records.bind(recordToMp).toList());
+    events.addAll(search(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.<Date> none(), Opt.some(startDate),
+           Opt.some(endDate)));
+    return new ArrayList<MediaPackage>(events);
   }
-
-  private final Fn<ARecord, Boolean> filterOptedOutRecords = new Fn<ARecord, Boolean>() {
-    @Override
-    public Boolean apply(ARecord record) {
-      return !record.getProperties().apply(Properties.getBoolean(SchedulerServiceImpl.OPTOUT_CONFIG));
-    }
-  };
 
   private List<String> preCollisionEventCheck(String trxId, String schedulingSource) throws SchedulerException {
     try {

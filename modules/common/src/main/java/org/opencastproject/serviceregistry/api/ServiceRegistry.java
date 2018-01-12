@@ -115,6 +115,13 @@ public interface ServiceRegistry {
   SystemLoad getCurrentHostLoads() throws ServiceRegistryException;
 
   /**
+   * Gets the load value for the current host (ie, the host this service registry lives on
+   *
+   * @return the load value for this host
+   */
+  float getOwnLoad() throws ServiceRegistryException;
+
+  /**
    * Registers a host to handle a specific type of job
    *
    * @param serviceType

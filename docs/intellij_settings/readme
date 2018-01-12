@@ -1,3 +1,7 @@
 Importing the setting:
 
-Settings > Editor > Code Style > Import Schema
+    Settings > Editor > Code Style > Import Schema
+
+Auto-Import On-the-Fly:
+
+    Settings > Editor > General > Auto Import > Optimize imports on the fly

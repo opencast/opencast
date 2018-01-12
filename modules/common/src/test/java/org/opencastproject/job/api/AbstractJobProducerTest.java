@@ -31,7 +31,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 
 import org.easymock.Capture;
@@ -104,18 +103,12 @@ public class AbstractJobProducerTest extends EasyMockSupport {
   public void testIsReadyToAccept() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
     expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
-    //Zero existing load + 1.0f
-    SystemLoad systemLoad = new SystemLoad();
-    systemLoad.addNodeLoad(new NodeLoad("test", 1.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad);
-    //4.0 existing load + 1.0f
-    SystemLoad systemLoad2 = new SystemLoad();
-    systemLoad2.addNodeLoad(new NodeLoad("test", 5.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad2);
-    //Zero existing load + 10.0f
-    SystemLoad systemLoad3 = new SystemLoad();
-    systemLoad3.addNodeLoad(new NodeLoad("test", 10.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad3);
+    //Initially zero load + 1.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(1.0f);
+    //Initially 4.0 load + 1.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(5.0f);
+    //Initially zero load + 10.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(10.0f);
     replayAll();
 
     jobProducer.setAcceptOversizeJobs(false);
@@ -141,18 +134,12 @@ public class AbstractJobProducerTest extends EasyMockSupport {
   public void testIsReadyToAcceptOversize() throws Exception {
     expect(serviceRegistry.getRegistryHostname()).andReturn("test").anyTimes();
     expect(serviceRegistry.getMaxLoadOnNode("test")).andReturn(new NodeLoad("test", 4.0f)).anyTimes();
-    //Zero existing load + 1.0f
-    SystemLoad systemLoad = new SystemLoad();
-    systemLoad.addNodeLoad(new NodeLoad("test", 1.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad);
-    //4.0 existing load + 1.0f
-    SystemLoad systemLoad2 = new SystemLoad();
-    systemLoad2.addNodeLoad(new NodeLoad("test", 5.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad2);
-    //Zero existing load + 10.0f
-    SystemLoad systemLoad3 = new SystemLoad();
-    systemLoad3.addNodeLoad(new NodeLoad("test", 10.0f));
-    expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad3);
+    //Initially zero load + 1.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(1.0f);
+    //Initially 4.0 load + 1.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(5.0f);
+    //Initially zero load + 10.0f
+    expect(serviceRegistry.getOwnLoad()).andReturn(10.0f);
     replayAll();
 
     jobProducer.setAcceptOversizeJobs(true);
