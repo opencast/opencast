@@ -481,7 +481,7 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"         
+         "PROCESSING_CANCELED": "Processing canceled"
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
@@ -1536,6 +1536,7 @@
      "TIMELINE": "Timeline",
      "ZOOMLEVEL": "Zoom Level",
      "PREVIEW_MODE": "Preview Mode",
+     "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
      "ZOOM": "Zoom",
      "BUTTONS": {
        "CLOSE":       "Close",
