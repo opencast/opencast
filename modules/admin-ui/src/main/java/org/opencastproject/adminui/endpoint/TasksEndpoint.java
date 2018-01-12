@@ -152,8 +152,6 @@ public class TasksEndpoint {
     return okJson(arr(actions));
   }
 
-  //TODO change to only accept one event?
-
   @POST
   @Path("/new")
   @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON",
@@ -213,56 +211,54 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    JSONArray json = new JSONArray();
-    JSONArray workflows = new JSONArray();
-    JSONArray failedEvents = new JSONArray();
+    JSONObject json = new JSONObject();
+    int successfulEventsCount = 0;
 
     final Workflows workflowsX = new Workflows(assetManager, workspace, workflowService);
     for (Object eventId : eventIds) {
+
+      JSONObject jsonEvent = new JSONObject();
+      json.put((String)eventId, jsonEvent);
+
       Snapshot snapshot = workflowsX.getLatestVersion((String)eventId);
-      if(snapshot != null){
-        MediaPackage mp = workflowsX.putInWorkspace(snapshot);
+      if (snapshot != null) {
+        MediaPackage mp = workflowsX.putInWorkspace(snapshot); //TODO
 
         try {
           WorkflowInstance wfInstance = workflowService.start(
-                  workflow(wfd, optionsMap).getWorkflowDefinition(), mp, optionsMap);
+            workflow(wfd, optionsMap).getWorkflowDefinition(), mp, optionsMap);
 
-          workflows.add(wfInstance.getId());
+          jsonEvent.put("successful", true);
+          jsonEvent.put("workflow", wfInstance.getId());
+          successfulEventsCount++;
+
         } catch (WorkflowDatabaseException ex) {
           logger.error("Starting workflow '{}' for event '{}' failed "
                   + "because workflow instance could not be persisted: {}",
                   Arrays.array(wfd.getTitle(), eventId, ExceptionUtils.getStackTrace(ex)));
 
-          JSONObject failedEvent = new JSONObject();
-          failedEvent.put("eventId", eventId);
-          failedEvent.put("message", "Unable make workflow persistent.");
-          failedEvents.add(failedEvent);
+          jsonEvent.put("successful", false);
+          jsonEvent.put("message", "ERRORS.WORKFLOW_NOT_PERSISTED");
         } catch (WorkflowParsingException ex) {
           logger.error("Starting workflow '{}' for event '{}' failed  "
                   + "because workflow could not be parsed: {}",
                   Arrays.array(wfd.getTitle(), eventId, ExceptionUtils.getStackTrace(ex)));
 
-          JSONObject failedEvent = new JSONObject();
-          failedEvent.put("eventId", eventId);
-          failedEvent.put("message", "Workflow could not be parsed");
-          failedEvents.add(failedEvent);
+          jsonEvent.put("successful", false);
+          jsonEvent.put("message", "ERRORS.WORKFLOW_NOT_PARSED");
+
         } catch (IllegalStateException ex) {
           logger.warn(ex.getMessage());
 
-          JSONObject failedEvent = new JSONObject();
-          failedEvent.put("eventId", eventId);
-          failedEvent.put("message", "Another workflow is currently active");
-          failedEvents.add(failedEvent);
+          jsonEvent.put("successful", false);
+          jsonEvent.put("message", "ERRORS.ANOTHER_WORKFLOW_ACTIVE");
         }
       }
     }
-    json.add(workflows);
-    if (failedEvents.size() > 0) {
-      json.add(failedEvents);
+    if (successfulEventsCount < eventIds.size()) {
       return Response.status(Status.BAD_REQUEST)
               .entity(json.toJSONString()).build();
     }
-
     return Response.status(Status.CREATED)
             .entity(json.toJSONString()).build();
   }

@@ -23,8 +23,8 @@
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
 .controller('ScheduleTaskCtrl', ['$scope', 'Table', 'NewEventProcessing', 'TaskResource',
-    'Notifications', 'decorateWithTableRowSelection',
-function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decorateWithTableRowSelection) {
+    'Notifications', 'decorateWithTableRowSelection', 'Modal',
+function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decorateWithTableRowSelection, Modal) {
     $scope.rows = Table.copySelected();
     $scope.allSelected = true; // by default, all rows are selected
     $scope.test = false;
@@ -35,30 +35,33 @@ function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decora
         return $scope.getSelectedIds().length > 0;
     };
 
-    var onSuccess = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('success', 'TASK_CREATED');
-        Table.deselectAll();
-    };
-
-    var onFailure = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
-    };
-
     $scope.submitButton = false;
     $scope.submit = function () {
+
         $scope.submitButton = true;
+
         if ($scope.valid()) {
-            var eventIds = $scope.getSelectedIds(), payload;
-            payload = {
+
+            var eventIds = $scope.getSelectedIds();
+
+            var payload = {
                 workflow: $scope.processing.ud.workflow.id,
                 configuration: $scope.processing.getWorkflowConfig(),
                 eventIds: eventIds
             };
-            TaskResource.save(payload, onSuccess, onFailure);
+
+            var answer = TaskResource.save(payload);
+
+            var params = {
+                rows: $scope.getSelected(),
+                promise: answer.$promise
+            }
+
+            Modal.show('start-state-modal', params);
+
+            $scope.submitButton = false;
+            $scope.close();
+            Table.deselectAll();
         }
     };
     decorateWithTableRowSelection($scope);

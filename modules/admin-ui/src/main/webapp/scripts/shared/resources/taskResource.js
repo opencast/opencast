@@ -9,7 +9,7 @@ angular.module('adminNg.resources')
                     metadata: JSON.stringify(data)
                 });
             },
-            isArray: true
+            isArray: false
         }
     });
 }]);

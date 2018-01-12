@@ -1,0 +1,66 @@
+<section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" ng-controller="StartStateCtrl">
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="BULK_ACTIONS.START_STATE.CAPTION"><!-- Template --></h2>
+  </header>
+  <div class="modal-content active">
+    <div class="modal-body">
+      <div class="row">
+        <div ng-show="open">
+          <p translate="BULK_ACTIONS.START_STATE.INSTRUCTION">
+            <!-- Cannot start -->
+          </p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div ng-if="someFailed" class="alert sticky warning">
+          <p translate="BULK_ACTIONS.START_STATE.SOME_FAILED">
+            <!-- Cannot start -->
+          </p>
+        </div>
+        <div data-notifications="start-state"/>
+      </div>
+
+      <div class="full-col">
+        <div class="obj tbl-list">
+          <header translate="BULK_ACTIONS.START_STATE.CAPTION"><!-- Progress --></header>
+          <div class="obj-container">
+
+            <table class="main-tbl">
+              <thead>
+              <tr ng-if="loading === false">
+                <th class="full-width" translate="BULK_ACTIONS.START_STATE.TABLE.EVENTS">
+                  <!-- Title -->
+                </th>
+                <th class="full-width" translate="BULK_ACTIONS.START_STATE.TABLE.SERIES">
+                  <!-- Series -->
+                </th>
+                <th class="full-width" translate="BULK_ACTIONS.START_STATE.TABLE.STATE">
+                  <!-- Status -->
+                </th>
+                <th class="full-width" translate="BULK_ACTIONS.START_STATE.TABLE.ERROR">
+                  <!-- Error -->
+                </th>
+              </tr>
+              <tr ng-if="loading === true">
+                <td colspan="3" style="text-align:center"><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i></td>
+              </tr>
+              </thead>
+              <tbody>
+              <tr ng-if="loading === false" ng-repeat="event in events" ng-class="{error: event.error}">
+                <td>{{ event.title }}</td>
+                <td>{{ event.series }}</td>
+                <td>{{ event.status | translate }}</td>
+                <td>{{ event.error | translate }}</td> <!--TODO or empty? -->
+              </tr>
+              </tbody>
+            </table>
+            </form>
+          </div><!-- obj-container -->
+        </div>
+      </div>
+
+    </div>
+  </div><!-- modal-content [progress] -->
+</section>
