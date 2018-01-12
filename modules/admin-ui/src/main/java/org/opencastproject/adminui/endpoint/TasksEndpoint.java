@@ -152,6 +152,8 @@ public class TasksEndpoint {
     return okJson(arr(actions));
   }
 
+  //TODO change to only accept one event?
+
   @POST
   @Path("/new")
   @RestQuery(name = "createNewTask", description = "Creates a new task by the given metadata as JSON",
@@ -217,9 +219,9 @@ public class TasksEndpoint {
 
     final Workflows workflowsX = new Workflows(assetManager, workspace, workflowService);
     for (Object eventId : eventIds) {
-      Iterable<Snapshot> snapshots = workflowsX.getLatestVersion((String)eventId);
-      for (Snapshot s : snapshots) {
-        MediaPackage mp = workflowsX.putInWorkspace(s);
+      Snapshot snapshot = workflowsX.getLatestVersion((String)eventId);
+      if(snapshot != null){
+        MediaPackage mp = workflowsX.putInWorkspace(snapshot);
 
         try {
           WorkflowInstance wfInstance = workflowService.start(
