@@ -1,18 +1,18 @@
 /**
  * angular-chosen-localytics - Angular Chosen directive is an AngularJS Directive that brings the Chosen jQuery in a Angular way
- * @version v1.6.0
+ * @version v1.8.0
  * @link http://github.com/leocaseiro/angular-chosen
  * @license MIT
  */
 (function() {
-  var chosen,
+  var chosenModule,
     indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   angular.module('localytics.directives', []);
 
-  chosen = angular.module('localytics.directives');
+  chosenModule = angular.module('localytics.directives');
 
-  chosen.provider('chosen', function() {
+  chosenModule.provider('chosen', function() {
     var options;
     options = {};
     return {
@@ -25,7 +25,7 @@
     };
   });
 
-  chosen.directive('chosen', [
+  chosenModule.directive('chosen', [
     'chosen', '$timeout', function(config, $timeout) {
       var CHOSEN_OPTION_WHITELIST, NG_OPTIONS_REGEXP, isEmpty, snakeCase;
       NG_OPTIONS_REGEXP = /^\s*([\s\S]+?)(?:\s+as\s+([\s\S]+?))?(?:\s+group\s+by\s+([\s\S]+?))?\s+for\s+(?:([\$\w][\$\w]*)|(?:\(\s*([\$\w][\$\w]*)\s*,\s*([\$\w][\$\w]*)\s*\)))\s+in\s+([\s\S]+?)(?:\s+track\s+by\s+([\s\S]+?))?$/;
@@ -53,7 +53,7 @@
         require: '?ngModel',
         priority: 1,
         link: function(scope, element, attr, ngModel) {
-          var directiveOptions, empty, initOrUpdate, match, options, origRender, startLoading, stopLoading, updateMessage, valuesExpr, viewWatch;
+          var chosen, directiveOptions, empty, initOrUpdate, match, options, origRender, startLoading, stopLoading, updateMessage, valuesExpr, viewWatch;
           scope.disabledValuesHistory = scope.disabledValuesHistory ? scope.disabledValuesHistory : [];
           element = $(element);
           element.addClass('localytics-chosen');
@@ -87,8 +87,8 @@
           initOrUpdate = function() {
             var defaultText, dropListDom;
             if (chosen) {
-              dropListDom = $(element.parent()).find("div.chosen-drop");
-              if (dropListDom && dropListDom.length > 0 && parseInt(dropListDom.css("left")) >= 0) {
+              dropListDom = $(element.next('.chosen-with-drop'));
+              if (dropListDom && dropListDom.length > 0) {
                 return;
               }
               return element.trigger('chosen:updated');
@@ -131,48 +131,6 @@
           }
           attr.$observe('disabled', function() {
             return element.trigger('chosen:updated');
-          });
-          function getMoreElements(event) {
-            var raw = scope.scroller[0],
-                val = this.value,
-                el = element;
-            scope.scrollPosition = raw.scrollTop;
-
-            //The multiplication here tries to keep the user from hitting the bottom of the scroller
-            if (raw.scrollTop + (raw.clientHeight * 2) >= raw.scrollHeight) {
-
-              if (!angular.isUndefined(attr.ngGetMore)) {
-
-                var _arr = attr.ngGetMore.split('.'),
-                  _func = scope;
-
-                for (var i = 0, len = _arr.length; i < len; i ++) {
-                  _func = _func[_arr[i]];
-                  if (typeof(_func) === 'function') break;
-                }
-
-                scope.$apply( function() {
-
-                    if (typeof(_func) === 'function') {
-                      _func(val, el)
-                    }
-                });
-              }
-            }
-          };
-          $timeout(function() {
-            var scroller = angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-results');
-            scope.scroller = scroller;
-            /* This makes opencast-scroll-glue work, the if check prevents the unit tests from failing */
-            if (angular.isDefined(scroller.injector())) {
-              scroller.injector().invoke(['$compile', function($compile) {
-                var scope = angular.element(scroller).scope();
-                $compile(scroller)(scope);
-              }]);
-            }
-            scroller.bind('scroll', getMoreElements);
-            var search = angular.element(angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-search')[0].childNodes["0"]);
-            search.bind('keyup.chosen paste.chosen', getMoreElements);
           });
           if (attr.ngOptions && ngModel) {
             match = attr.ngOptions.match(NG_OPTIONS_REGEXP);
