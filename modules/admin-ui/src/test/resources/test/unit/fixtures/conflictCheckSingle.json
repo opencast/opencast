@@ -40,6 +40,11 @@
             "date": "2014-07-16",
             "hour": 8,
             "minute": 0
+        },
+        "end": {
+            "date": "2014-07-16",
+            "hour": 12,
+            "minute": 4
         }
     },
     "type": "SCHEDULE_SINGLE",

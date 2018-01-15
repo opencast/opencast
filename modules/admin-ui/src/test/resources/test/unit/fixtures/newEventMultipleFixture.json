@@ -103,12 +103,12 @@
   },
   "source": {
     "upload": {
-      
+
     },
     "SCHEDULE_SINGLE": {
       "device": {
         "inputMethods": {
-          
+
         }
       }
     },
@@ -140,7 +140,11 @@
         "hour": "10",
         "minute": "0"
       },
-      "end": "2014-07-24",
+      "end": {
+        "date": "2014-07-24",
+        "hour": "11",
+        "minute": "45"
+      },
       "duration": {
         "hour": "1",
         "minute": "45"
@@ -772,6 +776,6 @@
     }
   },
   "summary": {
-    
+
   }
 }
