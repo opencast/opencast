@@ -30,6 +30,8 @@ describe('adminNg.directives.adminNgEditableSingleSelect', function () {
     });
 
     it('displays the label', function () {
+        $rootScope.params = { value: '' };
+        $rootScope.$digest();
         expect(element.find('span').text()).toContain('-- SELECT_NO_OPTIONS --');
     });
 
