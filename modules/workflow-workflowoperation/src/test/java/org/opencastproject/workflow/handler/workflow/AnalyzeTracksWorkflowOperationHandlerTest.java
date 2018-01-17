@@ -100,6 +100,7 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
     VideoStreamImpl videoStream = new VideoStreamImpl("234");
     videoStream.setFrameWidth(1280);
     videoStream.setFrameHeight(720);
+    videoStream.setFrameRate(30.0f);
     TrackImpl track = new TrackImpl();
     track.setFlavor(MediaPackageElementFlavor.parseFlavor("presenter/source"));
     track.addStream(videoStream);
@@ -149,7 +150,8 @@ public class AnalyzeTracksWorkflowOperationHandlerTest {
             {"presenter_source_resolution_y", "720"},
             {"presenter_source_resolution_x", "1280"},
             {"presenter_source_aspect_snap", "16/9"},
-            {"presenter_source_video", "true"}};
+            {"presenter_source_video", "true"},
+            {"presenter_source_framerate", "30.0"}};
     for (String[] prop: props) {
       assertEquals(prop[1], properties.get(prop[0]));
     }
