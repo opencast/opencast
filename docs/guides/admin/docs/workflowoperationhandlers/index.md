@@ -28,6 +28,7 @@ The following table contains the workflow operations that are available in an ou
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
 |attach-watson-transcription|Attaches automated transcripts to mediapackage|[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
+|clone               |Clone media package elements to another flavor                 |[Documentation](clone-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
