@@ -640,7 +640,7 @@ public final class EventIndexUtils {
     if (!hasOpenComments && needsCutting)
       throw new IllegalStateException(
               "Invalid comment update request: You can't have an needs cutting comment without having any open comments!");
-    Event event = getOrCreateEvent(eventId, organization, user, searchIndex);
+    Event event = getEvent(eventId, organization, user, searchIndex);
     if (event == null)
       throw new NotFoundException("No event with id " + eventId + " found.");
 
