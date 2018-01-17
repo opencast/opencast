@@ -69,7 +69,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -393,19 +392,15 @@ public class XACMLAuthorizationService implements AuthorizationService {
   /** Load an ACL from the given URI. */
   private Option<AccessControlList> loadAcl(final URI uri) {
     logger.debug("Load Acl from {}", uri);
-    final File file = fromWorkspace(uri);
-    if (file != null) {
-      try {
-        InputStream in = new FileInputStream(file);
-        AccessControlList acl = XACMLUtils.parseXacml(in);
-        if (acl != null) {
-          return Option.option(acl);
-        }
-      } catch (Exception e) {
-        logger.error("Exception occured:", e);
+    try (InputStream is = workspace.read(uri)) {
+      AccessControlList acl = XACMLUtils.parseXacml(is);
+      if (acl != null) {
+        return Option.option(acl);
       }
-    } else {
+    } catch (NotFoundException e) {
       logger.debug("URI {} not found", uri);
+    } catch (Exception e) {
+      logger.warn("Unable to load or parse Acl", e);
     }
     return Option.none();
   }
