@@ -1397,7 +1397,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       AQueryBuilder query = assetManager.createQuery();
       Props p = new Props(query);
-      Predicate predicate = withOrganization(query).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
+      Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
               .and(withVersion(query)).and(p.end().ge(DateTime.now().minusHours(1).toDate()));
       for (String agentId : captureAgentId) {
         predicate = predicate.and(p.agent().eq(agentId));
