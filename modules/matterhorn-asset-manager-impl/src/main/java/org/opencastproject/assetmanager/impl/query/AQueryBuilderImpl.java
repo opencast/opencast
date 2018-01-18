@@ -170,6 +170,10 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     return new SimpleSnapshotField<>(Q_SNAPSHOT.organizationId);
   }
 
+  @Override public Field<String> owner() {
+    return new SimpleSnapshotField<>(Q_SNAPSHOT.owner);
+  }
+
   @Override public Predicate availability(final Availability availability) {
     return new SnapshotBasedPredicate() {
       @Override protected BooleanExpression mkSnapshotFieldPredicate(QSnapshotDto e) {

@@ -69,6 +69,10 @@ public class AQueryBuilderDecorator implements AQueryBuilder {
     return delegate.organizationId();
   }
 
+  @Override public Field<String> owner() {
+    return delegate.owner();
+  }
+
   @Override public Predicate availability(Availability availability) {
     return delegate.availability(availability);
   }

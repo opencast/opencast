@@ -1193,7 +1193,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private ARecord[] getScheduledEvents(Opt<String> captureAgentId) {
     AQueryBuilder query = assetManager.createQuery();
     Props p = new Props(query);
-    Predicate predicate = withOrganization(query).and(query.hasPropertiesOf(p.namespace())).and(withVersion(query));
+    Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(withVersion(query));
     for (String agentId : captureAgentId) {
       predicate = predicate.and(p.agent().eq(agentId));
     }
@@ -1965,6 +1965,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private Predicate withOrganization(AQueryBuilder query) {
     return query.organizationId().eq(securityService.getOrganization().getId());
+  }
+
+  private Predicate withOwner(AQueryBuilder query) {
+    return query.owner().eq(SNAPSHOT_OWNER);
   }
 
   private Predicate withVersion(AQueryBuilder query) {
