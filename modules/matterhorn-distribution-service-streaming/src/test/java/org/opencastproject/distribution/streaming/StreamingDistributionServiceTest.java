@@ -64,7 +64,7 @@ import java.net.URI;
 public class StreamingDistributionServiceTest {
 
   private static final Logger logger = LoggerFactory.getLogger(StreamingDistributionServiceTest.class);
-  private StreamingDistributionService service = null;
+  private StreamingDistributionServiceImpl service = null;
   private MediaPackage mp = null;
   private File distributionRoot = null;
   private ServiceRegistry serviceRegistry = null;
@@ -79,7 +79,7 @@ public class StreamingDistributionServiceTest {
     mp = MediaPackageParser.getFromXml(IOUtils.toString(getClass().getResourceAsStream("/mediapackage.xml"), "UTF-8"));
 
     distributionRoot = new File(mediaPackageRoot, "static");
-    service = new StreamingDistributionService();
+    service = new StreamingDistributionServiceImpl();
 
     defaultOrganization = new DefaultOrganization();
     User anonymous = new JaxbUser("anonymous", "test", defaultOrganization,
@@ -139,7 +139,7 @@ public class StreamingDistributionServiceTest {
 
   @Test
   public void testUriFileConversionFlvWorkspace() throws Exception {
-    final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
@@ -160,7 +160,7 @@ public class StreamingDistributionServiceTest {
 
   @Test
   public void testUriFileConversionFlvDistribution() throws Exception {
-    final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
@@ -181,7 +181,7 @@ public class StreamingDistributionServiceTest {
 
   @Test
   public void testUriFileConversionMp4Workspace() throws Exception {
-    final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
@@ -202,7 +202,7 @@ public class StreamingDistributionServiceTest {
 
   @Test
   public void testUriFileConversionMp4Distribution() throws Exception {
-    final StreamingDistributionService.Locations loc = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage"), testFolder.newFolder(), false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
@@ -224,9 +224,9 @@ public class StreamingDistributionServiceTest {
   @Test
   public void testUriFileRetrieval() throws Exception {
     File testDir = testFolder.newFolder();
-    final StreamingDistributionService.Locations loc1 = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc1 = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage"), testDir, false);
-    final StreamingDistributionService.Locations loc2 = new StreamingDistributionService.Locations(
+    final StreamingDistributionServiceImpl.Locations loc2 = new StreamingDistributionServiceImpl.Locations(
             URI.create("rtmp://localhost/matterhorn-engage/"), testDir, false);
     final String channelId = "engage-player";
     final String mpId = "9f411edb-edf5-4308-8df5-f9b111d9d346";
