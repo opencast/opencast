@@ -118,11 +118,17 @@ angular.module('adminNg.controllers')
             apiService: EventsResource,
             multiSelect: true,
             postProcessRow: function (row) {
-                angular.forEach(row.publications, function (publication) {
-                    if (angular.isDefined($scope.publicationChannelLabels[publication.id])) {
-                        publication.label = $scope.publicationChannelLabels[publication.id];
+                angular.forEach(row.publications, function (publication, index) {
+                    if (angular.isDefined($scope.publicationChannels[publication.id])) {
+                        var record = JSON.parse($scope.publicationChannels[publication.id]);
+                        publication.label = record.label ? record.label : publication.name;
+                        publication.icon = record.icon;
+                        publication.hide = record.hide;
+                        publication.description = record.description;
+                        publication.order = record.order ? record.order : 999 + index;
                     } else {
                         publication.label = publication.name;
+                        publication.order = 999 + index;
                     }
                 });
                 row.checkedDelete = function() {
@@ -139,7 +145,7 @@ angular.module('adminNg.controllers')
         });
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
-        $scope.publicationChannelLabels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNEL.LABELS' });
+        $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' });
 
         $scope.table.delete = function (row) {
             EventsResource.delete({id: row.id}, function () {

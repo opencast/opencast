@@ -32,7 +32,7 @@ describe('Events controller', function () {
 
         it('reloads events after deletion', function () {
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
-            $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNEL.LABELS.json').respond('{}');
+            $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');
             $httpBackend.expectGET('/admin-ng/event/events.json?limit=10&offset=0').respond(JSON.stringify(getJSONFixture('admin-ng/event/events.json')));
 
