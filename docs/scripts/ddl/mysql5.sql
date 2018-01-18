@@ -528,7 +528,6 @@ CREATE TABLE mh_user_ref_role (
   user_id bigint(20) NOT NULL,
   role_id bigint(20) NOT NULL,
   PRIMARY KEY (user_id, role_id),
-  CONSTRAINT UNQ_mh_user_ref_role UNIQUE (user_id, role_id),
   CONSTRAINT FK_mh_user_ref_role_role_id FOREIGN KEY (role_id) REFERENCES mh_role (id),
   CONSTRAINT FK_mh_user_ref_role_user_id FOREIGN KEY (user_id) REFERENCES mh_user_ref (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -540,8 +539,12 @@ CREATE TABLE mh_user_settings (
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization)
+  CONSTRAINT UNQ_mh_user_settings UNIQUE (username, organization),
+  CONSTRAINT `FK_mh_user_setting_organization` FOREIGN KEY (`organization`) REFERENCES `mh_user` (`organization`),
+  CONSTRAINT `FK_mh_user_setting_username` FOREIGN KEY (`username`) REFERENCES `mh_user` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_user_setting_organization ON mh_user_settings (organization);
 
 CREATE TABLE mh_email_configuration (
   id BIGINT(20) NOT NULL,
@@ -617,7 +620,7 @@ CREATE TABLE mh_event_comment_reply (
   text TEXT(65535) NOT NULL,
   modification_date DATETIME NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT FK_mh_event_comment_reply_mh_event_comment FOREIGN KEY (event_comment_id) REFERENCES mh_event_comment (id)
+  CONSTRAINT FK_mh_event_comment_reply_mh_event_comment FOREIGN KEY (event_comment_id) REFERENCES mh_event_comment (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_series_elements (
