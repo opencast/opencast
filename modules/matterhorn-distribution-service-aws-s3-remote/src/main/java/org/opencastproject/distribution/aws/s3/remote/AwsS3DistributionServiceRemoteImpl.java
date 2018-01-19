@@ -31,6 +31,7 @@ import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.aws.s3.api.AwsS3DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.util.OsgiUtil;
@@ -157,5 +158,12 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
     throw new DistributionException(format("Unable to restore element '%s' of "
             + "mediapackage '%s' using a remote destribution service proxy", elementId, mediaPackage.getIdentifier()
             .toString()));
+  }
+
+  @Override
+  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
+    boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  //stub function
   }
 }

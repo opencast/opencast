@@ -57,6 +57,7 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   private static final String PARAM_MEDIAPACKAGE = "mediapackage";
   private static final String PARAM_ELEMENT_ID = "elementId";
   private static final String PARAM_CHECK_AVAILABILITY = "checkAvailability";
+  private static final String PARAM_PRESERVE_REFERENCE = "preserveReference";
 
   private final Gson gson = new Gson();
 
@@ -95,11 +96,18 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds,
                         boolean checkAvailability)
           throws DistributionException {
+    return distribute(channelId, mediaPackage, elementIds, checkAvailability, false);
+  }
+  @Override
+  public Job distribute(String channelId, final MediaPackage mediaPackage, Set<String> elementIds,
+                        boolean checkAvailability, boolean preserveReference)
+          throws DistributionException {
     logger.info(format("Distributing %s elements to %s@%s", elementIds.size(), channelId, distributionChannel));
     final HttpPost req = post(param(PARAM_CHANNEL_ID, channelId),
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
                               param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
-                              param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
+                              param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)),
+                              param(PARAM_PRESERVE_REFERENCE, Boolean.toString(preserveReference)));
     for (Job job : join(runRequest(req, jobFromHttpResponse))) {
       return job;
     }

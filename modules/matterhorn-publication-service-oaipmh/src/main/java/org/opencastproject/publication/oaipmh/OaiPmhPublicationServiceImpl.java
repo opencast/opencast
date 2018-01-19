@@ -20,18 +20,15 @@
  */
 package org.opencastproject.publication.oaipmh;
 
-import static com.entwinemedia.fn.Stream.$;
-
 import static java.lang.String.format;
-
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
 import static org.opencastproject.util.JobUtil.waitForJobs;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
+import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -41,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
@@ -61,12 +57,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Functions;
-
-import com.entwinemedia.fn.P2;
-import com.entwinemedia.fn.Products;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +69,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -119,7 +109,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   private DownloadDistributionService downloadDistributionService = null;
 
   /** The streaming distribution service */
-  private DistributionService streamingDistributionService = null;
+  private StreamingDistributionService streamingDistributionService = null;
 
   /** The OAI-PMH persistence */
   private OaiPmhDatabase persistence = null;
@@ -182,7 +172,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    * @param distributionService
    *          the distribution service
    */
-  public void setStreamingDistributionService(DistributionService distributionService) {
+  public void setStreamingDistributionService(StreamingDistributionService distributionService) {
     this.streamingDistributionService = distributionService;
   }
 
@@ -313,21 +303,15 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
           Set<String> downloadIds, Set<String> streamingIds, boolean checkAvailability)
           throws PublicationException, MediaPackageException {
     // Distribute to download
-    final List<P2<Job, String>> jobs = new ArrayList<>();
+    final List<Job> jobs = new ArrayList<>();
     final String pubChannelId = publicationChannelId(repository);
     try {
-      for (String elementId : downloadIds) {
-        Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, elementId, checkAvailability);
-        if (job == null)
-          continue;
-        jobs.add(Products.E.p2(job, elementId));
-      }
-      for (String elementId : streamingIds) {
-        Job job = streamingDistributionService.distribute(pubChannelId, mediaPackage, elementId);
-        if (job == null)
-          continue;
-        jobs.add(Products.E.p2(job, elementId));
-      }
+        Job job = downloadDistributionService.distribute(pubChannelId, mediaPackage, downloadIds, checkAvailability, true);
+        jobs.add(job);
+        if (streamingIds.size() > 0) {
+          job = streamingDistributionService.distribute(pubChannelId, mediaPackage, streamingIds);
+          if (job != null) jobs.add(job);
+        }
     } catch (DistributionException e) {
       throw new PublicationException(e);
     }
@@ -338,8 +322,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     }
 
     // Wait until all distribution jobs have returned
-    final List<Job> waitForJobs = $(jobs).map(com.entwinemedia.fn.fns.Products.<Job>p2_1()).toList();
-    if (!waitForJobs(parentJob, serviceRegistry, waitForJobs).isSuccess())
+    if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
       throw new PublicationException("One of the distribution jobs did not complete successfully");
 
     logger.debug("Distribute operation completed");
@@ -356,7 +339,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    *
    * @return the retracted element or <code>null</code> if the element was not retracted
    */
-  protected Publication retractInternal(Job job, MediaPackage mediapackage, String repository)
+  protected Publication retractInternal(Job parentJob, MediaPackage mediapackage, String repository)
           throws PublicationException {
     final String mediapackageId = mediapackage.getIdentifier().toString();
     logger.info("Trying to retract media package '{}' from OAI-PMH repository '{}'", mediapackageId, repository);
@@ -378,9 +361,24 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
                 mediapackageId, repository);
       }
       // retract all media package elements from their distribution location
-      final List<Job> jobs = mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isNotPublication)
-              .bind(retractFromDistribution(pubChannelId, mp)).value();
-      if (!waitForJobs(job, serviceRegistry, jobs).isSuccess())
+      Set<String> retractElements = new HashSet<>();
+      for (MediaPackageElement element : mp.getElements()) {
+        retractElements.add(element.getIdentifier());
+      }
+      final List<Job> jobs = new ArrayList<>();
+      try {
+        Job job = downloadDistributionService.retract(pubChannelId, mp, retractElements);
+        if (job != null) {
+          jobs.add(job);
+        }
+        job = streamingDistributionService.retract(pubChannelId, mp, retractElements);
+        if (job != null) {
+          jobs.add(job);
+        }
+      } catch (DistributionException ex) {
+        throw new PublicationException(ex);
+      }
+      if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
         throw new PublicationException(format("Unable to retract an element of mediapackage '%s' from the "
                 + "distribution for publication repository '%s'", mediapackageId, pubChannelId));
       // use the media package parameter to determine the publication element since
@@ -392,18 +390,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
               + " but it does not contain a matching publication element", mediapackageId, pubChannelId));
     }
     return null;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Function<MediaPackageElement, List<Job>> retractFromDistribution(final String channelId, final MediaPackage mp) {
-    return new Function.X<MediaPackageElement, List<Job>>() {
-      @Override
-      public List<Job> xapply(MediaPackageElement mpe) throws Exception {
-        return mlist(Option.some(downloadDistributionService.retract(channelId, mp, mpe.getIdentifier())),
-                Option.option(streamingDistributionService.retract(channelId, mp, mpe.getIdentifier()))).flatMap(
-                Functions.<Option<Job>> identity()).value();
-      }
-    };
   }
 
   private static String publicationChannelId(String repository) {
@@ -449,10 +435,13 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
    * @param current
    *          the current mediapackage
    * @param jobs
-   *          list of distribution jobs and their distributed element id
+   *          list of distribution jobs
    * @return the new mediapackage
+   * @throws org.opencastproject.mediapackage.MediaPackageException
+   * @throws org.opencastproject.util.NotFoundException
+   * @throws org.opencastproject.serviceregistry.api.ServiceRegistryException
    */
-  protected MediaPackage getMediaPackageForOaiPmh(MediaPackage current, List<P2<Job, String>> jobs) throws MediaPackageException,
+  protected MediaPackage getMediaPackageForOaiPmh(MediaPackage current, List <Job> jobs) throws MediaPackageException,
           NotFoundException, ServiceRegistryException {
     MediaPackage mp = (MediaPackage) current.clone();
 
@@ -460,44 +449,29 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     List<String> elementsToPublish = new ArrayList<>();
     Map<String, String> distributedElementIds = new HashMap<>();
 
-    for (P2<Job, String> entry : jobs) {
-      Job job = serviceRegistry.getJob(entry.get1().getId());
-      String sourceElementId = entry.get2();
-      MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
+    for (Job job : jobs) {
+     try {
+       final List <MediaPackageElement> distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+       for (MediaPackageElement distributedElement: distributedElements) {
+         // If there is no payload, then the item has not been distributed.
+          if (job.getPayload() == null)
+            continue;
 
-      // If there is no payload, then the item has not been distributed.
-      if (job.getPayload() == null)
-        continue;
+          // If the job finished successfully, but returned no new element, the channel simply doesn't support this
+          // kind of element. So we just keep on looping.
+          if (distributedElement == null)
+            continue;
 
-      List <MediaPackageElement> distributedElements = null;
-      try {
-        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
-      } catch (MediaPackageException e) {
-        distributedElements = new LinkedList<>();
-        distributedElements.add(MediaPackageElementParser.getFromXml(job.getPayload()));
-      }
+          // Make sure the mediapackage is prompted to create a new identifier for this element
+          distributedElement.setIdentifier(null);
 
-      // If the job finished successfully, but returned no new element, the channel simply doesn't support this
-      // kind of element. So we just keep on looping.
-      if (distributedElements == null || distributedElements.isEmpty())
-        continue;
-
-      for (MediaPackageElement distributedElement : distributedElements) {
-        // Make sure the mediapackage is prompted to create a new identifier for this element
-        distributedElement.setIdentifier(null);
-
-        // Copy references from the source elements to the distributed elements
-        MediaPackageReference ref = sourceElement.getReference();
-        if (ref != null && mp.getElementByReference(ref) != null) {
-          MediaPackageReference newReference = (MediaPackageReference) ref.clone();
-          distributedElement.setReference(newReference);
-        }
-
-        // Add the new element to the mediapackage
-        mp.add(distributedElement);
-        elementsToPublish.add(distributedElement.getIdentifier());
-        distributedElementIds.put(sourceElementId, distributedElement.getIdentifier());
-      }
+          // Add the new element to the mediapackage
+          mp.add(distributedElement);
+          elementsToPublish.add(distributedElement.getIdentifier());
+       }
+     } catch (Exception e) {
+       logger.error("Exception" + e);
+     }
 
     }
 
@@ -521,9 +495,12 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         continue;
 
       // See if the element has been distributed
-      String distributedElementId = distributedElementIds.get(reference.getIdentifier());
-      if (distributedElementId == null)
+      String distributedElementId = null;
+      if (elementsToPublish.contains(reference.getIdentifier())) {
+        distributedElementId =  elementsToPublish.get(elementsToPublish.indexOf(reference.getIdentifier()));
+      } else {
         continue;
+      }
 
       MediaPackageReference translatedReference = new MediaPackageReferenceImpl(mp.getElementById(distributedElementId));
       if (reference.getProperties() != null) {

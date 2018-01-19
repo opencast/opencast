@@ -207,6 +207,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService im
     logger.info("AwsS3DistributionService deactivated!");
   }
 
+  @Override
+  public Job distribute(String pubChannelId, MediaPackage mediaPackage, Set<String> downloadIds,
+    boolean checkAvailability, boolean preserveReference) throws DistributionException, MediaPackageException {
+    throw new UnsupportedOperationException("Not supported yet.");
+  //stub function
+  }
+
   /**
    * {@inheritDoc}
    *
