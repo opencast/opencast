@@ -2514,7 +2514,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             new Effect0() {
               @Override
               protected void run() {
-                Long total = 0L;
                 int current = 1;
 
                 AQueryBuilder query = assetManager.createQuery();
@@ -2527,10 +2526,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                         .where(withOrganization(query).and(query.hasPropertiesOf(p.namespace()))
                                 .and(withVersion(query)))
                         .run();
-                total = result.getTotalSize();
+                final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
                 logger.info(
                         "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
                         indexName, total);
+                final int responseInterval = (total < 100) ? 1 : (total / 100);
                 try {
                   for (ARecord record : result.getRecords()) {
                     String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
@@ -2560,9 +2560,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                             SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
-                    messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                            IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler,
-                                    total.intValue(), current));
+                    if (((current % responseInterval) == 0) || (current == total)) {
+                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                              IndexRecreateObject
+                                      .update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
+                    }
                     if (recordingStatus.isSome() && lastHeard.isSome())
                       sendRecordingUpdate(
                               new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
@@ -2579,7 +2581,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             new Effect0() {
               @Override
               protected void run() {
-                messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                         IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
               }
             });

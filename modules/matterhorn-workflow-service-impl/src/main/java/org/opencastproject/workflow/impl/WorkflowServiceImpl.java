@@ -129,7 +129,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -2392,15 +2391,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public void repopulate(final String indexName) throws Exception {
-    List<Job> jobs = null;
+    List<Job> jobs = new ArrayList<>();
     try {
-      jobs = serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null);
-      Iterator<Job> ji = new ArrayList<>(jobs).iterator();
-      while (ji.hasNext()) {
-        Job job = ji.next();
-        if (!WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
-          logger.debug("Removing unrelated job {} of type {}", job.getId(), job.getOperation());
-          ji.remove();
+      for (Job job : serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)) {
+        if (WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
+          jobs.add(job);
         }
       }
     } catch (ServiceRegistryException e) {
@@ -2468,7 +2463,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             new Effect0() {
               @Override
               protected void run() {
-                messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                         IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Workflow));
               }
             });
