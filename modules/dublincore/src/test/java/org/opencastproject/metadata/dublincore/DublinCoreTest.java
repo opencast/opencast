@@ -222,13 +222,13 @@ public class DublinCoreTest {
     assertNotNull(dcTerms);
 
     JSONArray titleArray = (JSONArray) dcTerms.get("title");
-    assertEquals("Two titles should be present", 2, titleArray.size());
+    assertEquals("Three titles should be present", 3, titleArray.size());
 
     JSONArray subjectArray = (JSONArray) dcTerms.get("subject");
     assertEquals("The subject should be present", 1, subjectArray.size());
 
     DublinCoreCatalog fromJson = DublinCores.read(IOUtils.toInputStream(jsonString));
-    assertEquals(2, fromJson.getLanguages(PROPERTY_TITLE).size());
+    assertEquals(3, fromJson.getLanguages(PROPERTY_TITLE).size());
     assertEquals("video/x-dv", fromJson.getFirst(PROPERTY_FORMAT));
     assertEquals("eng", fromJson.getFirst(PROPERTY_LANGUAGE));
     assertEquals("2007-12-05", fromJson.getFirst(PROPERTY_CREATED));

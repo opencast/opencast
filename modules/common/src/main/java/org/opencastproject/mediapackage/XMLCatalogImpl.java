@@ -106,6 +106,9 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   /** Namespace prefix for XML schema instance. */
   public static final String XSI_NS_PREFIX = "xsi";
 
+  /** To marshaling empty fields to remove existing values during merge, default is not to marshal empty elements */
+  protected boolean includeEmpty = false;
+
   /**
    * Expanded name of the XSI type attribute.
    * <p>
@@ -251,7 +254,12 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the element
    */
   private void addElement(CatalogEntry element) {
-    if (element == null || StringUtils.trimToNull(element.getValue()) == null)
+
+    // Option includeEmpty allows marshaling empty elements
+    // for deleting existing values during a catalog merge
+    if (element == null)
+      return;
+    if (StringUtils.trimToNull(element.getValue()) == null && !includeEmpty)
       return;
     List<CatalogEntry> values = data.get(element.getEName());
     if (values == null) {
@@ -500,6 +508,15 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     } else {
       throw new NamespaceBindingException(format("Namespace URI %s is not bound to a prefix", namespaceURI));
     }
+  }
+
+  /**
+   * @see org.opencastproject.mediapackage.XMLCatalog#includeEmpty(boolean)
+   */
+  @Override
+  public
+  void includeEmpty(boolean includeEmpty) {
+    this.includeEmpty = includeEmpty;
   }
 
   /**
