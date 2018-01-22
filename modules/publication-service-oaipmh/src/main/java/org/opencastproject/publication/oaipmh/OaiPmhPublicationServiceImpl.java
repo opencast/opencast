@@ -378,7 +378,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       } catch (DistributionException ex) {
         throw new PublicationException(ex);
       }
-       if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
+      if (!waitForJobs(parentJob, serviceRegistry, jobs).isSuccess())
         throw new PublicationException(format("Unable to retract an element of mediapackage '%s' from the "
                 + "distribution for publication repository '%s'", mediapackageId, pubChannelId));
       // use the media package parameter to determine the publication element since
