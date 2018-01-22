@@ -22,6 +22,7 @@
 package org.opencastproject.index.service.catalog.adapter.events;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 
 import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.mediapackage.Catalog;
@@ -31,6 +32,9 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -77,8 +81,24 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (series != null && series.isUpdated() && isNotBlank(series.getValue().get().toString()))
-      mediaPackage.setSeries(series.getValue().get().toString());
+    if (series != null && series.isUpdated() && isNotBlank(series.getValue().get().toString())) {
+      String seriesID = series.getValue().get().toString();
+      mediaPackage.setSeries(seriesID);
+      try {
+        DublinCore seriesDC = getSeriesService().getSeries(seriesID);
+
+        String seriesTitle = seriesDC.getFirst(DublinCore.PROPERTY_TITLE);
+        if (seriesTitle != null) {
+          mediaPackage.setSeriesTitle(seriesTitle);
+        }
+      } catch (NotFoundException e) {
+        logger.error("Unable find series with id {}", seriesID);
+      } catch (SeriesException e) {
+        logger.error("Unable to get a series with id {}, because: {}", seriesID, getStackTrace(e));
+      } catch (UnauthorizedException e) {
+        logger.error("Unable to get a series with id {}, because: {}", seriesID, getStackTrace(e));
+      }
+    }
 
     Opt<Date> startDate = MetadataUtils.getUpdatedDateMetadata(abstractMetadata, "startDate");
     if (startDate != null && startDate.isSome())

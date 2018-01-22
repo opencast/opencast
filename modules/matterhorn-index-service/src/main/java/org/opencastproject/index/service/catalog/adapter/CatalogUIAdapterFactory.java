@@ -137,6 +137,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           }
 
           adapter.setListProvidersService(listProvidersService);
+          adapter.setSeriesService(seriesService);
           adapter.setWorkspace(workspace);
           adapter.updated(properties);
 

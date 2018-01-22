@@ -42,6 +42,7 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -80,6 +81,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
   private String title;
 
   private ListProvidersService listProvidersService;
+  private SeriesService seriesService;
   private Workspace workspace;
 
   public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
@@ -221,6 +223,14 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
 
   protected ListProvidersService getListProvidersService() {
     return listProvidersService;
+  }
+
+  protected SeriesService getSeriesService() {
+    return seriesService;
+  }
+
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
   public void setWorkspace(Workspace workspace) {
