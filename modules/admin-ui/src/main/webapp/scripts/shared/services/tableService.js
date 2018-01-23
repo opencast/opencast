@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('Table', ['$rootScope', '$filter', 'Storage', '$location', '$interval', 'decorateWithTableRowSelection',
-    function ($rootScope, $filter, Storage, $location, $interval, decorateWithTableRowSelection) {
+.factory('Table', ['$rootScope', '$filter', 'Storage', '$location', '$timeout', 'decorateWithTableRowSelection',
+    function ($rootScope, $filter, Storage, $location, $timeout, decorateWithTableRowSelection) {
     var TableService = function () {
         var me = this,
             ASC = 'ASC',
@@ -321,11 +321,11 @@ angular.module('adminNg.services')
             on: true,
             newSchedule: function () {
                 me.refreshScheduler.cancel();
-                me.refreshScheduler.nextTimeout = $interval(me.fetch, me.refreshDelay);
+                me.refreshScheduler.nextTimeout = $timeout(me.fetch, me.refreshDelay);
             },
             cancel: function () {
                 if (me.refreshScheduler.nextTimeout) {
-                    $interval.cancel(me.refreshScheduler.nextTimeout);
+                    $timeout.cancel(me.refreshScheduler.nextTimeout);
                 }
             }
         };
