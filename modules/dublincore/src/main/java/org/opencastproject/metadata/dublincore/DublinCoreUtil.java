@@ -39,12 +39,11 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.ImmutableListWrapper;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -102,15 +101,13 @@ public final class DublinCoreUtil {
    * @return the catalog
    */
   public static DublinCoreCatalog loadDublinCore(Workspace workspace, MediaPackageElement mpe) {
-    InputStream in = null;
-    try {
-      in = new FileInputStream(workspace.read(mpe.getURI()));
+    URI uri = mpe.getURI();
+    logger.debug("Loading DC catalog from {}", uri);
+    try (InputStream in = workspace.read(uri)) {
       return DublinCores.read(in);
     } catch (Exception e) {
-      logger.error("Unable to load metadata from catalog '{}': {}", mpe, e);
+      logger.error("Unable to load metadata from catalog '{}'", mpe, e);
       return chuck(e);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 
