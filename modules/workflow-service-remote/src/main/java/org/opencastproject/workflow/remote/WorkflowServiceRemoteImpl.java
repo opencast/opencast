@@ -68,6 +68,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -598,8 +599,11 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpGet get = new HttpGet("/definitions.xml");
     HttpResponse response = getResponse(get);
     try {
-      if (response != null)
-        return WorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
+      if (response != null) {
+        List<WorkflowDefinition> list = WorkflowParser.parseWorkflowDefinitions(response.getEntity().getContent());
+        Collections.sort(list); //sorts by title
+        return list;
+      }
     } catch (Exception e) {
       throw new IllegalStateException("Unable to parse workflow definitions");
     } finally {
