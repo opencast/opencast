@@ -55,7 +55,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-public class ContributorsListProvider extends ResourceListProvider {
+public class ContributorsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "CONTRIBUTORS";
 
@@ -276,6 +276,11 @@ public class ContributorsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 
   private class Contributor {

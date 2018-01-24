@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AclListProvider extends ResourceListProvider {
+public class AclListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "ACL";
 
@@ -83,5 +83,10 @@ public class AclListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class AgentsListProvider extends ResourceListProvider {
+public class AgentsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "AGENTS";
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
@@ -83,5 +83,10 @@ public class AgentsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return STATUS.equals(listName);
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EventsListProvider extends ResourceListProvider {
+public class EventsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "EVENTS";
 
@@ -125,5 +125,10 @@ public class EventsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return STATUS.equals(listName);
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

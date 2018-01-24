@@ -43,7 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Services list provider. */
-public class ServicesListProvider extends ResourceListProvider {
+public class ServicesListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesListProvider.class);
 
@@ -133,5 +133,10 @@ public class ServicesListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return LIST_STATUS.equals(listName);
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

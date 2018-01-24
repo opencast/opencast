@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class GroupsListProvider extends ResourceListProvider {
+public class GroupsListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "GROUPS";
 
@@ -100,5 +100,10 @@ public class GroupsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

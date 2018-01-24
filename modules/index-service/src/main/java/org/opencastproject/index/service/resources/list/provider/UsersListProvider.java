@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class UsersListProvider extends ResourceListProvider {
+public class UsersListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "USERS";
 
@@ -143,5 +143,10 @@ public class UsersListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

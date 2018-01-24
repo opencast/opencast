@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class EventCommentsListProvider extends ResourceListProvider {
+public class EventCommentsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventCommentsListProvider.class);
 
@@ -121,5 +121,10 @@ public class EventCommentsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return true;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

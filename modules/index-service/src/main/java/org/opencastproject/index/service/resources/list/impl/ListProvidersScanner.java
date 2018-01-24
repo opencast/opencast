@@ -89,7 +89,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /**
    * Inner class used to represent a new list.
    */
-  private class SingleResourceListProviderImpl extends ResourceListProvider {
+  private class SingleResourceListProviderImpl implements ResourceListProvider {
     private String listName;
     private String orgId = "";
     private Map<String, String> list;

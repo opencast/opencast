@@ -35,7 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class RolesListProvider extends ResourceListProvider {
+public class RolesListProvider implements ResourceListProvider {
 
   public static final String ROLES = "ROLES";
   public static final String ROLE_QUERY_KEY = "role_name";
@@ -107,5 +107,10 @@ public class RolesListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

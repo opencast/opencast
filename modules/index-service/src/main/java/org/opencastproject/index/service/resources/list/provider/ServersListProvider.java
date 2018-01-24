@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Servers list provider. */
-public class ServersListProvider extends ResourceListProvider {
+public class ServersListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ServersListProvider.class);
 
@@ -158,5 +158,10 @@ public class ServersListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

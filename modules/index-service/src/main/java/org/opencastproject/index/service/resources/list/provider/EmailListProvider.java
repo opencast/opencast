@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * A ListProvider that returns email details
  */
-public class EmailListProvider extends ResourceListProvider {
+public class EmailListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EmailListProvider.class);
 
@@ -139,5 +139,10 @@ public class EmailListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /** Jobs list provider. */
-public class JobsListProvider extends ResourceListProvider {
+public class JobsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(JobsListProvider.class);
 
@@ -107,5 +107,10 @@ public class JobsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

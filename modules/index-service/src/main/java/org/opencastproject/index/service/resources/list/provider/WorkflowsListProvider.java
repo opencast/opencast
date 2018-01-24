@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-public class WorkflowsListProvider extends ResourceListProvider {
+public class WorkflowsListProvider implements ResourceListProvider {
 
   private static final String[] NAMES = { "workflows" };
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsListProvider.class);
@@ -92,5 +92,10 @@ public class WorkflowsListProvider extends ResourceListProvider {
   @Override
   public boolean isTranslatable(String listName) {
     return false;
+  }
+
+  @Override
+  public String getDefault() {
+    return null;
   }
 }

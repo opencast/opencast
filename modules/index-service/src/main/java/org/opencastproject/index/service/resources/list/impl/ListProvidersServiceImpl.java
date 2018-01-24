@@ -104,6 +104,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       public boolean isTranslatable(String listName) {
         return true;
       }
+
+      @Override
+      public String getDefault() {
+        return null;
+      }
     });
   }
 
@@ -137,6 +142,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       public boolean isTranslatable(String listName) {
         return true;
       }
+
+      @Override
+      public String getDefault() {
+        return null;
+      }
     });
   }
 
@@ -169,6 +179,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       @Override
       public boolean isTranslatable(String listName) {
         return true;
+      }
+
+      @Override
+      public String getDefault() {
+        return null;
       }
     });
   }
