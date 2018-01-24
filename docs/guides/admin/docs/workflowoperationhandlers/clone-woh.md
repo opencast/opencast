@@ -24,15 +24,15 @@ If *source-flavor* is specified as e.g. *\*/source*, all matching media package 
 
 ## Operation Example
 
-	<operation
-		id="clone"
-		fail-on-error="true"
-		exception-handler-workflow="ng-partial-error">
-		<configurations>
-			<configuration key="source-flavor">*/source</configuration>
-			<configuration key="source-tags">archive</configuration>
-			<configuration key="target-flavor">target</configuration>
-		</configurations>
-	</operation>
+        <operation
+                id="clone"
+                fail-on-error="true"
+                exception-handler-workflow="ng-partial-error">
+                <configurations>
+                        <configuration key="source-flavor">*/source</configuration>
+                        <configuration key="source-tags">archive</configuration>
+                        <configuration key="target-flavor">target</configuration>
+                </configurations>
+        </operation>
 
 
