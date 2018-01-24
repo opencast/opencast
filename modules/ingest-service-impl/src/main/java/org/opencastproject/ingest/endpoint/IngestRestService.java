@@ -200,7 +200,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     if (cc != null) {
       defaultWorkflowDefinitionId = trimToNull(cc.getBundleContext().getProperty(DEFAULT_WORKFLOW_DEFINITION));
       if (defaultWorkflowDefinitionId == null) {
-        defaultWorkflowDefinitionId = "ng-schedule-and-upload";
+        defaultWorkflowDefinitionId = "schedule-and-upload";
       }
       if (cc.getBundleContext().getProperty(MAX_INGESTS_KEY) != null) {
         try {

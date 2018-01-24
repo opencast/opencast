@@ -29,7 +29,7 @@ In case the *source-flavors* and *source-tags* match mutliple media package elem
     <operation id="copy"
              description="Copy sources to my disk"
              fail-on-error="true"
-             exception-handler-workflow="ng-partial-error">
+             exception-handler-workflow="partial-error">
     <configurations>
       <configuration key="source-flavors">presenter/source, presentation/source</configuration>
       <configuration key="target-directory">/mnt/mydisk</configuration>

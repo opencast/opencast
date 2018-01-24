@@ -3,7 +3,7 @@
  name="org.opencastproject.workflow.handler.workflow.ErrorLoggingOperationHandler" immediate="true">
   <implementation class="org.opencastproject.workflow.handler.workflow.ErrorLoggingOperationHandler" />
   <property name="service.description" value="Error Logging Workflow Operation Handler" />
-  <property name="workflow.operation" value="log" />
+  <property name="workflow.operation" value="log-warning" />
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
   </service>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>partial-title-slide</id>
+  <title>Prepare title slide video</title>
+  <tags/>
+  <description>
+     Create a title slide video based on the trimmed tracks
+  </description>
+  <configuration_panel/>
+
+  <operations>
+
+      <operation
+        id="analyze-tracks"
+        exception-handler-workflow="partial-error"
+        description="Analyze trimmed tracks">
+        <configurations>
+          <configuration key="source-flavor">*/trimmed</configuration>
+        </configurations>
+      </operation>
+
+      <operation
+        id="image"
+        if="NOT ${theme_title_slide_uploaded} AND ${presentation_trimmed_has_video}"
+        exception-handler-workflow="partial-error"
+        description="Extracting title slide image from presentation track">
+        <configurations>
+          <configuration key="source-flavor">presentation/trimmed</configuration>
+          <configuration key="target-flavor">branding/titleslide</configuration>
+          <configuration key="encoding-profile">player-preview.http</configuration>
+          <configuration key="time">1</configuration>
+        </configurations>
+      </operation>
+
+      <operation
+        id="image"
+        if="NOT ${theme_title_slide_uploaded} AND NOT (${presentation_trimmed_has_video})"
+        exception-handler-workflow="partial-error"
+        description="Extracting title slide image from presenter track">
+        <configurations>
+          <configuration key="source-flavor">presenter/trimmed</configuration>
+          <configuration key="target-flavor">branding/titleslide</configuration>
+          <configuration key="encoding-profile">player-preview.http</configuration>
+          <configuration key="time">1</configuration>
+        </configurations>
+      </operation>
+
+      <operation
+        id="cover-image"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Create title slide with metadata">
+        <configurations>
+          <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+          <configuration key="width">1920</configuration>
+          <configuration key="height">1080</configuration>
+          <configuration key="posterimage-flavor">branding/titleslide</configuration>
+          <configuration key="target-flavor">branding/titleslide+metadata</configuration>
+       </configurations>
+      </operation>
+
+      <operation id="image-to-video"
+                 description="Create video with title slide"
+                 fail-on-error="true"
+                 exception-handler-workflow="partial-error">
+        <configurations>
+          <configuration key="source-flavor">branding/titleslide+metadata</configuration>
+          <configuration key="target-flavor">branding/titleslide+video</configuration>
+          <configuration key="duration">5</configuration>
+          <configuration key="profile">image-movie.work</configuration>
+        </configurations>
+      </operation>
+
+  </operations>
+
+</definition>

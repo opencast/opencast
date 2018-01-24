@@ -14,20 +14,21 @@ contributed, how they are merged and how releases are done.
 Contributing Code
 -----------------
 
-Opencast sources can be found on [BitBucket](http://bitbucket.org/opencast-community). The easiest way to contribute
-code to the project is by creating a pull request against the project's official repository. More details about the
-structure of this repository are explained later in this guide.
+Opencast sources can be found on [GitHub](https://github.com/opencast) and some of its ancillary projects
+on [BitBucket](https://bitbucket.org/opencast-community/). The easiest way to contribute code to the project
+is by creating a pull request against the project's official repository. More details about the structure
+of this repository are explained later in this guide.
 
-### Jira and BitBucket
+### Jira and GitHub
 
  - Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a
    ticket in Jira. The issue identifier should also be used in the title of the pull request and the commits. E.g.:
    `MH-12345, Fixing Something Somewhere`. Creating a Jira ticket is usually the first step when fixing something.
 
- - Opencast uses [BitBucket](http://bitbucket.org/opencast-community) for code hosting. Please
-   [fork](https://confluence.atlassian.com/bitbucket/forking-a-repository-221449527.html) the official
-   repository on BitBucket to [create pull
-   requests](https://confluence.atlassian.com/bitbucket/work-with-pull-requests-223220593.html) from your repository
+ - Opencast uses [GitHub](https://github.com/opencast) for code hosting.
+   Please [fork](https://help.github.com/articles/fork-a-repo/)
+   the [official repository](https://github.com/opencast/opencast) on GitHub
+   to [create pull requests](https://help.github.com/articles/creating-a-pull-request/) from your repository
    which will show up on the project's list of open pull requests.
 
  - All open pull requests are listed on the [Opencast Pull Request Filter](http://pullrequests.opencast.org). It might
@@ -50,7 +51,7 @@ Opencast distinguishes between bug fix and feature pull requests.
 Before a patch is merged, it needs to be reviewed by a committer. The reviewer makes sure that the patch merges
 without conflicts, that it works as expected and that it does not break anything else.
 
-If the reviewer discovers any kind of issue, he should comment on the pull request in BitBucket, so that the author can
+If the reviewer discovers any kind of issue, he should comment on the pull request in GitHub, so that the author can
 fix the problem.
 
 For more details about the review and merge process, have a look at [Reviewing, Merging and Declining Pull

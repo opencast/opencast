@@ -1184,75 +1184,75 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
+  /*
+   * FIXME: This query is unsafe since it may fetch many many rows. It would be better to do conflict checking directly
+   * in the database instead of fetching all scheduled events for the capture agent and then doing the checks in memory.
+   * Unfortunately, the current database schema is not suitable to do this in an efficient manner. Especially the generic
+   * concept of 'properties' would lead to many nested queries.
+   */
+  private ARecord[] getScheduledEvents(Opt<String> captureAgentId) {
+    AQueryBuilder query = assetManager.createQuery();
+    Props p = new Props(query);
+    Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(withVersion(query));
+    for (String agentId : captureAgentId) {
+      predicate = predicate.and(p.agent().eq(agentId));
+    }
+    return query.select(query.snapshot(), p.start().target(), p.end().target()).where(predicate).run().getRecords().toList().toArray(new ARecord[0]);
+  }
+
   @Override
   public List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
           Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
-    return searchInternal(captureAgentId, startsFrom, startsTo, endFrom, endTo).bind(recordToMp).toList();
+    final ARecord[] alreadyScheduledEvents = getScheduledEvents(captureAgentId);
+    return searchInternal(startsFrom, startsTo, endFrom, endTo, alreadyScheduledEvents);
   }
 
-  private Stream<ARecord> searchInternal(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
-          Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      Predicate predicate = withOrganization(query).and(query.hasPropertiesOf(p.namespace())).and(withVersion(query));
-      for (String agentId : captureAgentId) {
-        predicate = predicate.and(p.agent().eq(agentId));
+  private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
+                                            Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
+    final List<ARecord> result = new ArrayList<>();
+    for (final ARecord r : records) {
+      final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+      final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+      if (startsFrom.isSome() && start.before(startsFrom.get())
+              || startsTo.isSome() && start.after(startsTo.get())
+              || endFrom.isSome() && end.before(endFrom.get())
+              || endTo.isSome() && end.after(endTo.get())) {
+        continue;
       }
-      for (Date d : startsFrom) {
-        predicate = predicate.and(p.start().ge(d));
-      }
-      for (Date d : startsTo) {
-        predicate = predicate.and(p.start().le(d));
-      }
-      for (Date d : endFrom) {
-        predicate = predicate.and(p.end().ge(d));
-      }
-      for (Date d : endTo) {
-        predicate = predicate.and(p.end().le(d));
-      }
-      // TODO Replace comparator with date.orderBy(p.start().asc()); and remove p.start().target()
-      ASelectQuery select = query.select(query.snapshot(), p.start().target(), p.optOut().target()).where(predicate);
-      return select.run().getRecords().sort(new Comparator<ARecord>() {
-        @Override
-        public int compare(ARecord o1, ARecord o2) {
-          Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-          Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-          return start1.compareTo(start2);
-        }
-      });
-    } catch (Exception e) {
-      logger.error("Failed to search for events: {}", getStackTrace(e));
-      throw new SchedulerException(e);
+      result.add(r);
     }
+    result.sort(new Comparator<ARecord>() {
+      @Override
+      public int compare(ARecord o1, ARecord o2) {
+        Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        return start1.compareTo(start2);
+      }
+    });
+    return Stream.mk(result).bind(recordToMp).toList();
   }
 
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
           throws SchedulerException {
-    // overlap
-    Stream<ARecord> overlapRecords = searchInternal(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.some(startDate),
-            Opt.some(endDate), Opt.<Date> none());
-    // start between
-    Stream<ARecord> startBetweenRecords = searchInternal(Opt.some(captureDeviceID), Opt.some(startDate),
-            Opt.some(endDate), Opt.<Date> none(), Opt.<Date> none());
-    // end between
-    Stream<ARecord> endBetweenRecords = searchInternal(Opt.some(captureDeviceID), Opt.<Date> none(), Opt.<Date> none(),
-            Opt.some(startDate), Opt.some(endDate));
-
-    // Filter out opted out records
-    Stream<ARecord> records = overlapRecords.append(startBetweenRecords).append(endBetweenRecords)
-            .filter(filterOptedOutRecords);
-
-    return new ArrayList<>(records.bind(recordToMp).toList());
+    final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureDeviceID));
+    return findConflictingEvents(startDate, endDate, alreadyScheduledEvents);
   }
 
-  private final Fn<ARecord, Boolean> filterOptedOutRecords = new Fn<ARecord, Boolean>() {
-    @Override
-    public Boolean apply(ARecord record) {
-      return !record.getProperties().apply(Properties.getBoolean(SchedulerServiceImpl.OPTOUT_CONFIG));
-    }
-  };
+  private List<MediaPackage> findConflictingEvents(Date startDate, Date endDate, ARecord[] alreadyScheduledEvents)
+          throws SchedulerException {
+    final List<MediaPackage> events = new ArrayList<>();
+    // overlap
+    events.addAll(searchInternal(Opt.<Date> none(), Opt.some(startDate), Opt.some(endDate),
+            Opt.<Date> none(), alreadyScheduledEvents));
+    // start between
+    events.addAll(searchInternal(Opt.some(startDate), Opt.some(endDate), Opt.<Date> none(),
+            Opt.<Date> none(), alreadyScheduledEvents));
+    // end between
+    events.addAll(searchInternal(Opt.<Date> none(), Opt.<Date> none(), Opt.some(startDate),
+            Opt.some(endDate), alreadyScheduledEvents));
+    return events;
+  }
 
   private List<String> preCollisionEventCheck(String trxId, String schedulingSource) throws SchedulerException {
     try {
@@ -1339,6 +1339,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(tz, "timeZone");
 
     try {
+      final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureAgentId));
       final TimeZone timeZone = TimeZone.getDefault();
       final TimeZone utc = TimeZone.getTimeZone("UTC");
       TimeZone.setDefault(tz);
@@ -1375,8 +1376,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         cDate.setTime(d);
 
         TimeZone.setDefault(timeZone);
-        events.addAll(
-                findConflictingEvents(captureAgentId, cDate.getTime(), new Date(cDate.getTimeInMillis() + duration)));
+        final Date startDate = cDate.getTime();
+        final Date endDate = new Date(cDate.getTimeInMillis() + duration);
+
+        events.addAll(findConflictingEvents(startDate, endDate, alreadyScheduledEvents));
         TimeZone.setDefault(utc);
       }
 
@@ -1394,7 +1397,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       AQueryBuilder query = assetManager.createQuery();
       Props p = new Props(query);
-      Predicate predicate = withOrganization(query).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
+      Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
               .and(withVersion(query)).and(p.end().ge(DateTime.now().minusHours(1).toDate()));
       for (String agentId : captureAgentId) {
         predicate = predicate.and(p.agent().eq(agentId));
@@ -1964,6 +1967,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return query.organizationId().eq(securityService.getOrganization().getId());
   }
 
+  private Predicate withOwner(AQueryBuilder query) {
+    return query.owner().eq(SNAPSHOT_OWNER);
+  }
+
   private Predicate withVersion(AQueryBuilder query) {
     Props p = new Props(query);
     TrxProps trxProps = new TrxProps(query);
@@ -1985,8 +1992,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * @param organization
-   *          The organization to filter the results with.
    * @return A {@link List} of {@link MediaPackageElementFlavor} that provide the extended metadata to the front end.
    */
   private List<MediaPackageElementFlavor> getEventCatalogUIAdapterFlavors() {
@@ -2509,7 +2514,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             new Effect0() {
               @Override
               protected void run() {
-                Long total = 0L;
                 int current = 1;
 
                 AQueryBuilder query = assetManager.createQuery();
@@ -2522,10 +2526,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                         .where(withOrganization(query).and(query.hasPropertiesOf(p.namespace()))
                                 .and(withVersion(query)))
                         .run();
-                total = result.getTotalSize();
+                final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
                 logger.info(
                         "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
                         indexName, total);
+                final int responseInterval = (total < 100) ? 1 : (total / 100);
                 try {
                   for (ARecord record : result.getRecords()) {
                     String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
@@ -2555,9 +2560,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                             SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
-                    messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                            IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler,
-                                    total.intValue(), current));
+                    if (((current % responseInterval) == 0) || (current == total)) {
+                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                              IndexRecreateObject
+                                      .update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
+                    }
                     if (recordingStatus.isSome() && lastHeard.isSome())
                       sendRecordingUpdate(
                               new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
@@ -2574,7 +2581,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             new Effect0() {
               @Override
               protected void run() {
-                messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                         IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
               }
             });

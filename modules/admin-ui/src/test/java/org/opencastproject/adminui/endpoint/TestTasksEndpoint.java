@@ -60,6 +60,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
+import org.easymock.EasyMock;
 import org.junit.Ignore;
 
 import java.io.ByteArrayInputStream;
@@ -69,6 +70,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.EntityManagerFactory;
 import javax.ws.rs.Path;
@@ -83,14 +85,14 @@ public class TestTasksEndpoint extends TasksEndpoint {
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
     wfD.setId("full");
-    wfD.addTag("ng-archive");
+    wfD.addTag("archive");
 
     WorkflowDefinitionImpl wfD2 = new WorkflowDefinitionImpl();
     wfD2.setTitle("Full HTML5");
     wfD2.setId("full-html5");
     wfD2.setDescription("Test description");
     wfD2.setConfigurationPanel("<h2>Test</h2>");
-    wfD2.addTag("ng-archive");
+    wfD2.addTag("archive");
 
     WorkflowDefinitionImpl wfD3 = new WorkflowDefinitionImpl();
     wfD3.setTitle("Hidden");
@@ -108,6 +110,11 @@ public class TestTasksEndpoint extends TasksEndpoint {
     Workspace workspace = createNiceMock(Workspace.class);
     expect(workspace.get(anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/processing-properties.xml").toURI())).anyTimes();
+    expect(workspace.get(anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+        File tmp = new File(baseDir, UUID.randomUUID().toString() + "-processing-properties.xml");
+        FileUtils.copyFile(new File(getClass().getResource("/processing-properties.xml").toURI()), tmp);
+        return tmp;
+      }).anyTimes();
 
     WorkflowService workflowService = createNiceMock(WorkflowService.class);
     expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2, wfD3)).anyTimes();

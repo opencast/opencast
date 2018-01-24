@@ -222,6 +222,10 @@ public abstract class AbstractEventEndpoint {
 
   protected static final String URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY = "url.signing.expires.seconds";
 
+  /** The configuration key that defines the default workflow definition */
+  //TODO Move to a constants file instead of declaring it at the top of multiple files?
+  protected static final String WORKFLOW_DEFINITION_DEFAULT = "org.opencastproject.workflow.default.definition";
+
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
 
@@ -259,6 +263,9 @@ public abstract class AbstractEventEndpoint {
   /** Service url */
   protected String serviceUrl = null;
 
+  /** The default workflow identifier, if one is configured */
+  protected String defaultWorkflowDefinionId = null;
+
   /**
    * Activates REST service.
    *
@@ -270,8 +277,15 @@ public abstract class AbstractEventEndpoint {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       if (StringUtils.isNotBlank(ccServerUrl))
         this.serverUrl = ccServerUrl;
+
+      this.serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+
+      String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
+
+      if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId))
+        this.defaultWorkflowDefinionId = ccDefaultWorkflowDefinionId;
     }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
+
   }
 
   @GET
@@ -439,9 +453,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(eventId);
-      JObject technicalMetadataJson = technicalMetadataToJson.apply(technicalMetadata);
-      return okJson(obj(f("source", v(getIndexService().getEventSource(optEvent.get()).toString())),
-              f("metadata", technicalMetadataJson)));
+      return okJson(technicalMetadataToJson.apply(technicalMetadata));
     } catch (SchedulerException e) {
       logger.error("Unable to get technical metadata for event with id {}", eventId);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
@@ -1744,14 +1756,13 @@ public abstract class AbstractEventEndpoint {
   public Response getNewProcessing(@QueryParam("tags") String tagsString) {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
 
-    // This is the JSON Object which will be returned by this request
-    List<JValue> actions = new ArrayList<>();
+    List<JValue> workflows = new ArrayList<>();
     try {
       List<WorkflowDefinition> workflowsDefinitions = getWorkflowService().listAvailableWorkflowDefinitions();
       for (WorkflowDefinition wflDef : workflowsDefinitions) {
         if (wflDef.containsTag(tags)) {
 
-          actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
+          workflows.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
                   f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
         }
@@ -1761,7 +1772,9 @@ public abstract class AbstractEventEndpoint {
       return RestUtil.R.serverError();
     }
 
-    return okJson(arr(actions));
+    JValue data = obj(f("workflows",arr(workflows)), f("default_workflow_id",v(defaultWorkflowDefinionId,Jsons.NULL)));
+
+    return okJson(data);
   }
 
   @POST

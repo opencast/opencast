@@ -369,7 +369,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
       @Override
       protected void run() {
-        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                 IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Themes));
       }
     });

@@ -61,7 +61,7 @@ If you want to enable debug permanently you can export the variable in the shell
 You can connect the remote debugger of your IDE on port `5005`.
 
 For more information on remote debugging with Karaf you can visit [this
-site.](https://karaf.apache.org/manual/latest/developers-guide/debugging.html)
+site.](https://karaf.apache.org/manual/latest/#_debugging)
 
 It is not recommended to enable remote debugging on production systems!
 

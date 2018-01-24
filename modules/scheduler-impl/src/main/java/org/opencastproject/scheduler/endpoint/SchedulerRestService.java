@@ -252,7 +252,7 @@ public class SchedulerRestService {
       defaultWorkflowDefinitionId = StringUtils
               .trimToNull(cc.getBundleContext().getProperty(DEFAULT_WORKFLOW_DEFINITION));
       if (defaultWorkflowDefinitionId == null)
-        defaultWorkflowDefinitionId = "ng-schedule-and-upload";
+        defaultWorkflowDefinitionId = "schedule-and-upload";
     }
   }
 

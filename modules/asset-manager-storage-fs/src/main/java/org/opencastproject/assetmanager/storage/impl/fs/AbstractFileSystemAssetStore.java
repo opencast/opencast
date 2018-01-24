@@ -73,7 +73,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     // working file repository. In the very few cases where the file is not in the working file repository,
     // this strategy leads to a minor overhead because the file not only gets downloaded and stored in the file system
     // but also a hard link needs to be created (or if that's not possible, a copy of the file.
-    final File origin = getFileFromWorkspace(source);
+    final File origin = getUniqueFileFromWorkspace(source);
     final File destination = createFile(storagePath, source);
     try {
       mkParent(destination);
@@ -81,12 +81,16 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     } catch (IOException e) {
       logger.error("Error while linking/copying file {} to {}: {}", origin, destination, getMessage(e));
       throw new AssetStoreException(e);
+    } finally {
+      if (origin != null) {
+        FileUtils.deleteQuietly(origin);
+      }
     }
   }
 
-  private File getFileFromWorkspace(Source source) {
+  private File getUniqueFileFromWorkspace(Source source) {
     try {
-      return getWorkspace().get(source.getUri());
+      return getWorkspace().get(source.getUri(), true);
     } catch (NotFoundException e) {
       logger.error("Source file '{}' does not exist", source.getUri());
       throw new AssetStoreException(e);

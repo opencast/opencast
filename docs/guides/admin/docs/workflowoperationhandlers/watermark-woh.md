@@ -20,7 +20,7 @@ The operation needs a source video and a custom image file to create a watermark
     <operation
       id="watermark"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Watermarking presenter (camera) video">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>

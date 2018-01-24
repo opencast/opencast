@@ -222,7 +222,7 @@
     <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/app.js" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable anonymous access to the new admin ui -->
+    <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->

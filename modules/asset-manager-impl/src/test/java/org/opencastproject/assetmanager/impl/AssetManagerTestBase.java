@@ -62,10 +62,14 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.jpa.impl.JPAQuery;
 
+import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Date;
@@ -95,6 +99,9 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
 
   protected static final String OWNER = "test";
+
+  @Rule
+  public TemporaryFolder tempFolder = new TemporaryFolder();
 
   /** The asset manager under test. */
   protected A am;
@@ -276,7 +283,13 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     final Database db = new Database(penv);
     //
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.<URI>anyObject())).andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
+            .andReturn(IoSupport.classPathResourceAsFile("/dublincore-a.xml").get()).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
+        File tmp = tempFolder.newFile();
+        FileUtils.copyFile(new File(getClass().getResource("/dublincore-a.xml").toURI()), tmp);
+        return tmp;
+      }).anyTimes();
     EasyMock.replay(workspace);
     //
     final AssetStore assetStore = mkAssetStore();

@@ -26,7 +26,7 @@ Example
 <!-- Attach caption/transcript -->
 <operation id="attach-watson-transcription"
   fail-on-error="true"
-  exception-handler-workflow="ng-partial-error"
+  exception-handler-workflow="partial-error"
   description="Attach captions/transcription">
   <configurations>
     <!-- This is filled out by the transcription service when starting this workflow so just use this as is -->
@@ -40,7 +40,7 @@ Example
 <!-- Merge caption/transcript to existing publication and republish -->
 <operation id="publish-engage"
   fail-on-error="true"
-  exception-handler-workflow="ng-partial-error"
+  exception-handler-workflow="partial-error"
   description="Distribute and publish to engage server">
   <configurations>
     <configuration key="download-source-flavors">captions/timedtext</configuration>

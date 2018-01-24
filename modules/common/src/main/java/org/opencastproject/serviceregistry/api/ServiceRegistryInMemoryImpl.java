@@ -113,7 +113,6 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
-    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.DISPATCHING);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
   }
 
@@ -1078,6 +1077,11 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           jobs.remove(job.getId());
       }
     }
+  }
+
+  @Override
+  public float getOwnLoad() {
+    return getCurrentHostLoads().get(getRegistryHostname()).getLoadFactor();
   }
 
   @Override

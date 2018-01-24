@@ -70,12 +70,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.management.ObjectInstance;
@@ -295,7 +297,18 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public File get(final URI uri) throws NotFoundException, IOException {
-    final File inWs = toWorkspaceFile(uri);
+    return get(uri, false);
+  }
+
+  @Override
+  public File get(final URI uri, final boolean uniqueFilename) throws NotFoundException, IOException {
+    File inWs = toWorkspaceFile(uri);
+
+    if (uniqueFilename) {
+      inWs = new File(FilenameUtils.removeExtension(inWs.getAbsolutePath()) + '-' + UUID.randomUUID() + '.'
+              + FilenameUtils.getExtension(inWs.getName()));
+      logger.debug("Created unique filename: {}", inWs);
+    }
 
     if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
             && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
@@ -326,26 +339,24 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public File read(final URI uri) throws NotFoundException, IOException {
+  public InputStream read(final URI uri) throws NotFoundException, IOException {
 
     if (pathMappable != null) {
       if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
         final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
-        logger.trace("Looking up {} at {} for read", uri.toString(), wfrCopy.getAbsolutePath());
+        logger.trace("Looking up {} at {} for read", uri, wfrCopy);
         if (wfrCopy.isFile()) {
-          logger.debug("Getting {} directly from working file repository root at {} for read", uri,  wfrCopy.getAbsolutePath());
-          return new File(wfrCopy.getAbsolutePath());
-        } else {
-          logger.warn("The working file repository URI and paths don't match for read. Looking up {} at {} failed",
-                  uri.toString(), wfrCopy.getAbsolutePath());
+          logger.debug("Getting {} directly from working file repository root at {} for read", uri, wfrCopy);
+          return new FileInputStream(wfrCopy);
         }
+        logger.warn("The working file repository URI and paths don't match. Looking up {} at {} failed", uri, wfrCopy);
       }
     }
 
     // fall back to get() which should download the file into local workspace if necessary
-    return get(uri);
+    return new DeleteOnCloseFileInputStream(get(uri, true));
   }
 
   /** Copy or link <code>src</code> to <code>dst</code>. */
@@ -927,5 +938,26 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public String rootDirectory() {
     return wsRoot;
+  }
+
+  private class DeleteOnCloseFileInputStream extends FileInputStream {
+    private File file;
+
+    DeleteOnCloseFileInputStream(File file) throws FileNotFoundException {
+      super(file);
+      this.file = file;
+    }
+
+    public void close() throws IOException {
+      try {
+        super.close();
+      } finally {
+        if (file != null) {
+          logger.debug("Cleaning up {}", file);
+          file.delete();
+          file = null;
+        }
+      }
+    }
   }
 }

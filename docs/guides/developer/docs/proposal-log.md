@@ -16,6 +16,22 @@ A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 ho
 Passed Proposals
 ----------------
 
+### Changing Translation Sources
+Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 20, 2017
+
+```no-highlight
+Dear Opencast Developers
+
+I hereby #propose to add an additional rule to our development process as described on [1]:
+
+Adding or changing translation sources is not allowed in release branches (implying that pull requests doing so need to be directed to the branch develop).
+
+Best regards
+Sven
+
+[1] https://docs.opencast.org/develop/developer/development-process/
+```
+
 ### Crowdin Acceptance Policy
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on November 17, 2017
 

@@ -96,7 +96,8 @@ public class SeriesWorkflowOperationHandlerTest {
     capturedStream = Capture.newInstance(CaptureType.FIRST);
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(file).anyTimes();
-    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class))).andReturn(file).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore.xml")).anyTimes();
     EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
             EasyMock.capture(capturedStream))).andReturn(uri).anyTimes();
     EasyMock.replay(workspace);

@@ -674,6 +674,20 @@ public class ServiceRegistryEndpoint {
     }
   }
 
+  @GET
+  @Path("ownload")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "ownload", description = "Returns the current load on this service registry's node.",
+          returnDescription = "The current load across the cluster", restParameters = {},
+          reponses = { @RestResponse(responseCode = SC_OK, description = "Current load for the cluster.") })
+  public Response getOwnLoad() {
+    try {
+      return Response.ok(serviceRegistry.getOwnLoad()).build();
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
 
   @DELETE
   @Path("job/{id}")

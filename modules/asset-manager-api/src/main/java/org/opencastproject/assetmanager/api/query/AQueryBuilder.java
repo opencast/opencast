@@ -82,6 +82,9 @@ public interface AQueryBuilder {
   /** Get the snapshot's "organizationId" field. Use it to create a predicate. */
   Field<String> organizationId();
 
+  /** Get the snapshot's "owner" field. Use it to create a predicate. */
+  Field<String> owner();
+
   Predicate availability(Availability availability);
 
   /** Get the snapshots's "availability" field. Use it to create a predicate. */

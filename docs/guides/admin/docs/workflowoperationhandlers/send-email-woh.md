@@ -23,7 +23,9 @@ Parameter Table
 |body|Email body content.<br>Takes precedence over body-template-file.|```<Recording Title> (<Mediapackage ID>)```|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
 |body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
 |subject|Specifies the email subject.|EMPTY|Operation has been completed|
-|to|It specifies the field to of the email<br>i.e. the email account the email will be sent to.|EMPTY|email-account@email-domain.org|
+|to|It specifies the field to of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|cc|It specifies the field cc of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|bcc|It specifies the field bcc of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 

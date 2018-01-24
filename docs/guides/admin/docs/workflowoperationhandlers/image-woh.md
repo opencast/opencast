@@ -53,7 +53,7 @@ This operation therefore generates nine images in total. The target filenames wi
     <operation id="image"
                description="Extract set of thumbnails"
                fail-on-error="true"
-               exception-handler-workflow="ng-partial-error">
+               exception-handler-workflow="partial-error">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/thumbnails</configuration>

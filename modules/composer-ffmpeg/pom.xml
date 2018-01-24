@@ -55,11 +55,6 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.xmlrpc</groupId>
-      <artifactId>xmlrpc-client</artifactId>
-      <version>3.1.2</version>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
     </dependency>
@@ -88,6 +83,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
@@ -114,16 +113,17 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              !org.apache.ws.commons.*,
+              !org.codehaus.plexus.*,
               *
             </Import-Package>
-            <Private-Package> org.apache.xmlrpc.* </Private-Package>
-            <Export-Package>org.opencastproject.composer.impl.*;version=${project.version}</Export-Package>
-            <Embed-Dependency>xmlrpc-client;inline=true</Embed-Dependency>
+            <Export-Package>
+              org.opencastproject.composer.impl.*;version=${project.version}
+            </Export-Package>
+            <Private-Package>
+              org.codehaus.plexus.util.cli
+            </Private-Package>
             <Service-Component>
               OSGI-INF/composer-service.xml,
-              OSGI-INF/embedderengine.xml,
-              OSGI-INF/encoderengine.xml,
               OSGI-INF/profile-scanner.xml
             </Service-Component>
           </instructions>

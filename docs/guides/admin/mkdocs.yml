@@ -1,5 +1,5 @@
 site_name: Opencast - Administration Guide
-repo_url: https://bitbucket.org/opencast-community/opencast/src/develop/docs/guides/admin/docs
+repo_url: https://github.com/opencast/opencast/tree/develop/docs/guides/admin/docs
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -110,6 +110,7 @@ pages:
    - Include: 'workflowoperationhandlers/include-woh.md'
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
+   - Log: 'workflowoperationhandlers/log-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'

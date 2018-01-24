@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>partial-watermark</id>
+  <title>Render watermark</title>
+  <tags/>
+  <description>
+     Render watermark into presenter and presentation tracks
+  </description>
+  <configuration_panel/>
+
+  <operations>
+
+      <operation
+        id="analyze-tracks"
+        exception-handler-workflow="partial-error"
+        description="Analyze trimmed tracks">
+        <configurations>
+          <configuration key="source-flavor">*/trimmed</configuration>
+        </configurations>
+      </operation>
+
+      <operation
+        id="composite"
+        description="Render watermark into presenter track"
+        if="${presenter_trimmed_video}"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error">
+        <configurations>
+          <configuration key="source-flavor-lower">presenter/trimmed</configuration>
+          <configuration key="source-flavor-upper">not/available</configuration>
+          <configuration key="source-flavor-watermark">branding/watermark</configuration>
+          <configuration key="encoding-profile">composite.http</configuration>
+          <configuration key="target-flavor">presenter/branded</configuration>
+          <configuration key="output-resolution">lower</configuration>
+          <configuration key="output-background">0x000000FF</configuration>
+          <configuration key="layout-single">
+            {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
+            ${theme_watermark_layout_variable}
+          </configuration>
+        </configurations>
+      </operation>
+
+      <operation
+        id="composite"
+        description="Render watermark into presentation track"
+        if="${presentation_trimmed_video}"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error">
+        <configurations>
+          <configuration key="source-flavor-lower">presentation/trimmed</configuration>
+          <configuration key="source-flavor-upper">not/available</configuration>
+          <configuration key="source-flavor-watermark">branding/watermark</configuration>
+          <configuration key="encoding-profile">composite.http</configuration>
+          <configuration key="target-flavor">presentation/branded</configuration>
+          <configuration key="output-resolution">lower</configuration>
+          <configuration key="output-background">0x000000FF</configuration>
+          <configuration key="layout-single">
+            {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
+            ${theme_watermark_layout_variable}
+          </configuration>
+        </configurations>
+      </operation>
+
+  </operations>
+
+</definition>

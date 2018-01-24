@@ -25,19 +25,41 @@ angular.module('adminNg.services')
         // Load all the workflows definitions
         if (use === 'tasks') {
             queryParams = {
-                    tags: 'archive-ng'
+                    tags: 'archive'
                 };
         } else if (use === 'delete-event') {
             queryParams = {
-                    tags: 'delete-ng'
+                    tags: 'delete'
             };
         } else {
             queryParams = {
-                tags: 'upload-ng,schedule-ng'
+                tags: 'upload,schedule'
             };
+
         }
         NewEventProcessingResource.get(queryParams, function (data) {
-            me.workflows = data;
+
+            me.changingWorkflow = true;
+            
+            me.workflows = data.workflows;
+            var default_workflow_id = data.default_workflow_id;
+
+            // set default workflow as selected
+            if(angular.isDefined(default_workflow_id)){
+
+                for(var i = 0; i < me.workflows.length; i += 1){
+                    var workflow = me.workflows[i];
+
+                    if (workflow.id === default_workflow_id){
+                      me.ud.workflow = workflow;
+                      updateConfigurationPanel(me.ud.workflow.configuration_panel);
+                      me.save();
+                      break;
+                    }
+                }
+            }
+          me.changingWorkflow = false;
+
         });
 
         // Listener for the workflow selection
@@ -88,6 +110,7 @@ angular.module('adminNg.services')
 
         // Save the workflow configuration
         this.save = function () {
+
             if (isWorkflowSet()) {
                 me.ud.workflow.selection  = {
                     id: me.ud.workflow.id,

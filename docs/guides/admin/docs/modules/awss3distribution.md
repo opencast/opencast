@@ -60,7 +60,7 @@ Using S3 Distribution
 ---------------------
 
 Amazon S3 distribution is already included in the default Opencast workflows, however it must first be enabled.  The
-`ng-schedule-and-upload.xml` and `ng-publish.xml` workflow configuration files both contain lines containing the string
+`schedule-and-upload.xml` and `publish.xml` workflow configuration files both contain lines containing the string
 "Remove this line if you wish to publish to AWS S3".  Both of these lines must be removed before publishing to AWS S3
 will function correctly.
 

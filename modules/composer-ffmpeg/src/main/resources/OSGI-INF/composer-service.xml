@@ -14,10 +14,6 @@
       policy="static" bind="setWorkspace" />
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
       cardinality="1..1" policy="static" bind="setServiceRegistry" />
-    <reference name="encoderEngineFactory" policy="static" bind="setEncoderEngineFactory" cardinality="1..1"
-      interface="org.opencastproject.composer.api.EncoderEngineFactory" />
-    <reference name="embedderEngineFactory" policy="static" bind="setEmbedderEngineFactory" cardinality="1..1"
-      interface="org.opencastproject.composer.api.EmbedderEngineFactory" />
     <reference name="profileScanner" policy="static" bind="setProfileScanner" cardinality="1..1"
       interface="org.opencastproject.composer.impl.EncodingProfileScanner" />
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"

@@ -64,6 +64,7 @@ import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Booleans;
 import com.entwinemedia.fn.fns.Strings;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,11 +193,17 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   private final Fx<MediaPackageElement> addChecksum = new Fx<MediaPackageElement>() {
     @Override public void apply(MediaPackageElement mpe) {
+      File file = null;
       try {
-        logger.trace("Calculate checksum for " + mpe.getURI());
-        mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, getFileFromWorkspace(mpe.getURI())));
-      } catch (IOException e) {
+        logger.trace("Calculate checksum for {}", mpe.getURI());
+        file = getWorkspace().get(mpe.getURI(), true);
+        mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
+      } catch (IOException | NotFoundException e) {
         throw new AssetManagerException(format("Cannot calculate checksum for media package element %s", mpe.getURI()), e);
+      } finally {
+        if (file != null) {
+          FileUtils.deleteQuietly(file);
+        }
       }
     }
   };
@@ -234,22 +241,6 @@ public abstract class AbstractAssetManager implements AssetManager {
         return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
       }
     });
-  }
-
-  /**
-   * Get a file from the workspace.
-   *
-   * @throws AssetManagerException
-   *         in case of any error
-   */
-  private File getFileFromWorkspace(URI uri) {
-    try {
-      return getWorkspace().get(uri);
-    } catch (NotFoundException e) {
-      throw new AssetManagerException(format("Cannot find file at URI %s", uri), e);
-    } catch (IOException e) {
-      throw new AssetManagerException(format("Cannot access file at URI %s", uri), e);
-    }
   }
 
   private void storeManifest(final PartialMediaPackage pmp, final Version version) throws Exception {

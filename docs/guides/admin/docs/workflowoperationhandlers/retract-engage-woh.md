@@ -15,6 +15,6 @@ There are no configuration keys at this time.
     <operation
       id="retract-engage"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract recording from Engage">
     </operation>

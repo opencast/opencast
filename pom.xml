@@ -122,6 +122,7 @@
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>
@@ -490,7 +491,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.3.0</version>
+          <version>3.0.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -1136,6 +1137,16 @@
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
         <version>2.3.23</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>3.1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.opencastproject</groupId>
+        <artifactId>android-mms</artifactId>
+        <version>1.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

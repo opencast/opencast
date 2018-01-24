@@ -138,7 +138,7 @@ metadata:
 processing:
 ```
 {
-  "workflow": "ng-schedule-and-upload",
+  "workflow": "schedule-and-upload",
   "configuration": {
     "flagForCutting": "false",
     "flagForReview": "false",

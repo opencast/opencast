@@ -39,7 +39,7 @@ Operation Example
     <operation
       id="encode"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="encoding media files">
         <configurations>
         <configuration key="source-flavor">*/trimmed</configuration>

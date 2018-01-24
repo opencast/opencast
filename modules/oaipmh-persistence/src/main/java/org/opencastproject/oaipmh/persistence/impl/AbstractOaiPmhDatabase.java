@@ -53,11 +53,13 @@ import org.opencastproject.workspace.api.Workspace;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -158,7 +160,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
     String seriesId = null;
     boolean seriesXacmlFound = false;
-    DublinCoreCatalog dcEpisode = null;
     DublinCoreCatalog dcSeries = null;
     for (MediaPackageElement mpe : mediaPackage.getElements()) {
       if (mpe.getFlavor() == null) {
@@ -177,9 +178,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       if (mpe.getFlavor().matches(MediaPackageElements.EPISODE) || mpe.getFlavor().matches(MediaPackageElements.SERIES)) {
         DublinCoreCatalog dcCatalog = DublinCoreUtil.loadDublinCore(getWorkspace(), mpe);
         catalogXml = toXml(dcCatalog);
-        if (mpe.getFlavor().matches(MediaPackageElements.EPISODE)) {
-          dcEpisode = dcCatalog;
-        } else if (mpe.getFlavor().matches(MediaPackageElements.SERIES)) {
+        if (mpe.getFlavor().matches(MediaPackageElements.SERIES)) {
           dcSeries = dcCatalog;
           seriesId = dcSeries.getFirst(DublinCore.PROPERTY_IDENTIFIER);
         }
@@ -225,14 +224,19 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   @Nullable private String loadCatalogXml(MediaPackageElement element) {
     InputStream in = null;
+    File file = null;
     try {
-      in = new FileInputStream(getWorkspace().get(element.getURI()));
+      file = getWorkspace().get(element.getURI(), true);
+      in = new FileInputStream(file);
       return IOUtils.toString(in, "UTF-8");
     } catch (Exception e) {
       logger.warn("Unable to load catalog '{}'", element);
       return null;
     } finally {
       IOUtils.closeQuietly(in);
+      if (file != null) {
+        FileUtils.deleteQuietly(file);
+      }
     }
   }
 

@@ -1,0 +1,29 @@
+sudo: true
+
+language: java
+
+jdk: oraclejdk8
+
+before_install:
+  - sudo apt-get -qq update
+  - >
+     sudo apt-get install -y
+     bzip2
+     gzip
+     hunspell
+     hunspell-de-de
+     procps
+     sox
+     tar
+     tesseract-ocr
+     tesseract-ocr-deu
+     unzip
+  - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+  - tar xf ffmpeg-release-64bit-static.tar.xz
+  - sudo mv ffmpeg-*/ff* /usr/bin/
+
+install:
+  - true
+
+script:
+  - mvn --batch-mode clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pnone

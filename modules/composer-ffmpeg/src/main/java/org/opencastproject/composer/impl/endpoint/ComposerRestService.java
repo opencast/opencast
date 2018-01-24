@@ -24,7 +24,6 @@ package org.opencastproject.composer.impl.endpoint;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EmbedderException;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfileImpl;
@@ -37,7 +36,6 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
@@ -627,54 +625,6 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to convert image: " + e.getMessage());
-      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
-  }
-
-  /**
-   * Embeds captions in media file.
-   *
-   * @param sourceTrackXml
-   *          media file to which captions will be embedded
-   * @param captionsAsXml
-   *          captions that will be embedded
-   * @return A response containing the job for this encoding job in the response body.
-   * @throws Exception
-   */
-  @POST
-  @Path("captions")
-  @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "captions", description = "Starts caption embedding process, based on the specified source track and captions", restParameters = {
-          @RestParameter(description = "QuickTime file containg video stream", isRequired = true, name = "mediaTrack", type = Type.TEXT, defaultValue = "${this.mediaTrackDefault}"),
-          @RestParameter(description = "Catalog(s) containing captions in SRT format", isRequired = true, name = "captions", type = Type.TEXT, defaultValue = "${this.captionsCatalogsDefault}") }, reponses = {
-          @RestResponse(description = "Result in an xml document containing resulting media file.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "If required parameters aren't set, if mediaTrack isn't from the type Track and captions aren't from type Catalog", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response captions(@FormParam("mediaTrack") String sourceTrackXml, @FormParam("captions") String captionsAsXml)
-          throws Exception {
-    if (StringUtils.isBlank(sourceTrackXml) || StringUtils.isBlank(captionsAsXml))
-      return Response.status(Response.Status.BAD_REQUEST).entity("Source track and captions must not be null").build();
-
-    MediaPackageElement mediaTrack = MediaPackageElementParser.getFromXml(sourceTrackXml);
-    if (!Track.TYPE.equals(mediaTrack.getElementType()))
-      return Response.status(Response.Status.BAD_REQUEST).entity("Source track element must be of type track").build();
-
-    List<? extends MediaPackageElement> mpElements = MediaPackageElementParser.getArrayFromXml(captionsAsXml);
-    if (mpElements.size() == 0)
-      return Response.status(Response.Status.BAD_REQUEST).entity("At least one caption must be present").build();
-
-    // cast to catalogs
-    Catalog[] captions = new Catalog[mpElements.size()];
-    for (int i = 0; i < mpElements.size(); i++) {
-      if (!Catalog.TYPE.equals(mpElements.get(i).getElementType()))
-        return Response.status(Response.Status.BAD_REQUEST).entity("All captions must be of type catalog").build();
-      captions[i] = (Catalog) mpElements.get(i);
-    }
-
-    try {
-      Job job = composerService.captions((Track) mediaTrack, captions);
-      return Response.ok().entity(new JaxbJob(job)).build();
-    } catch (EmbedderException e) {
-      logger.warn("Unable to embed captions: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
