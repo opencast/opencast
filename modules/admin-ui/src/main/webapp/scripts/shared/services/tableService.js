@@ -186,6 +186,17 @@ angular.module('adminNg.services')
                 me.predicate = me.sorters[0].name;
                 me.reverse = me.sorters[0].order === DESC;
             }
+            // if no entry in local storage, sort by first sortable column
+            else {
+                for (var i = 0; i < me.columns.length; i++) {
+                    var column = me.columns[i];
+
+                    if (!column.dontSort) {
+                        me.sortBy(column);
+                        break;
+                    }
+                }
+            }
         };
 
         this.saveSortingCriteria = function (sorterCriteria) {
@@ -257,7 +268,6 @@ angular.module('adminNg.services')
             if (me.sorters.length > 0) {
                 sorters.push(me.sorters[0].name + ':' + me.sorters[0].order);
             }
-
 
             query.limit = me.pagination.limit;
             query.offset = me.pagination.offset * me.pagination.limit;
