@@ -58,6 +58,17 @@ public interface ListProvidersService {
   boolean isTranslatable(String listName) throws ListProviderException;
 
   /**
+   * Defines the key of a default value in the given list.
+   *
+   * @param listName the name of the list
+   * @return the key of the default value
+   *
+   * @throws ListProviderException
+   *              if no list provider found for the given list name
+   */
+  String getDefault(String listName) throws ListProviderException;
+
+  /**
    * Adds an source to the service
    *
    * @param name

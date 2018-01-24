@@ -122,4 +122,9 @@ public class EventCommentsListProvider implements ResourceListProvider {
   public boolean isTranslatable(String listName) {
     return true;
   }
+
+  @Override
+  public String getDefault() {
+    return null;
+  }
 }

@@ -278,6 +278,11 @@ public class ContributorsListProvider implements ResourceListProvider {
     return false;
   }
 
+  @Override
+  public String getDefault() {
+    return null;
+  }
+
   private class Contributor {
     public String getKey() {
       return key;

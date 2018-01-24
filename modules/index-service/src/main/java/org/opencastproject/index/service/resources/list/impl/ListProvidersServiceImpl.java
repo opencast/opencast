@@ -72,80 +72,6 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     addWorkflowStatus();
     addReviewStatus();
 
-    // TODO create a file for each resource and made it dynamic
-
-    providers.put("locationFilter", new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { "locationFilter" };
-      }
-
-      @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, String> list = new HashMap<String, String>();
-        list.put("Location 1", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION1");
-        list.put("Location 2", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION2");
-        list.put("Location 3", "EVENTS.EVENT.TABLE.FILTER.LOCATION.LOCATION3");
-        return list;
-      }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return false;
-      }
-    });
-
-    // TODO create a file for each resource and made it dynamic
-    providers.put("eventSourcesFilter", new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { "eventSourcesFilter" };
-      }
-
-      @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, String> list = new HashMap<String, String>();
-        list.put("Twitter", "EVENTS.EVENT.TABLE.FILTER.SOURCE.TWITTER");
-        list.put("Github", "EVENTS.EVENT.TABLE.FILTER.SOURCE.GITHUB");
-        list.put("Facebook", "EVENTS.EVENT.TABLE.FILTER.SOURCE.FACEBOOK");
-        return list;
-      }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return false;
-      }
-    });
-
-    // TODO create a file for each resource and made it dynamic
-    providers.put("eventStatusFilter", new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { "eventStatusFilter" };
-      }
-
-      @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
-        Map<String, String> list = new HashMap<String, String>();
-        list.put("Scheduled", "EVENTS.EVENT.TABLE.FILTER.STATUS.SCHEDULED");
-        list.put("Recording", "EVENTS.EVENT.TABLE.FILTER.STATUS.RECORDING");
-        list.put("Ingesting", "EVENTS.EVENT.TABLE.FILTER.STATUS.INGESTING");
-        list.put("Processing", "EVENTS.EVENT.TABLE.FILTER.STATUS.PROCESSING");
-        list.put("Archive", "EVENTS.EVENT.TABLE.FILTER.STATUS.ARCHIVE");
-        list.put("upload", "EVENTS.EVENT.TABLE.FILTER.STATUS.UPLOAD");
-        list.put("On hold", "EVENTS.EVENT.TABLE.FILTER.STATUS.ONHOLD");
-        return list;
-      }
-
-      @Override
-      public boolean isTranslatable(String listName) {
-        return true;
-      }
-    });
-
     logger.info("Activate the list provider");
   }
 
@@ -177,6 +103,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       @Override
       public boolean isTranslatable(String listName) {
         return true;
+      }
+
+      @Override
+      public String getDefault() {
+        return null;
       }
     });
   }
@@ -211,6 +142,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       public boolean isTranslatable(String listName) {
         return true;
       }
+
+      @Override
+      public String getDefault() {
+        return null;
+      }
     });
   }
 
@@ -244,6 +180,11 @@ public class ListProvidersServiceImpl implements ListProvidersService {
       public boolean isTranslatable(String listName) {
         return true;
       }
+
+      @Override
+      public String getDefault() {
+        return null;
+      }
     });
   }
 
@@ -267,6 +208,14 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     if (provider == null)
       throw new ListProviderException("No resources list found with the name " + listName);
     return provider.isTranslatable(listName);
+  }
+
+  @Override
+  public String getDefault(String listName) throws ListProviderException {
+    ResourceListProvider provider = providers.get(listName);
+    if (provider == null)
+      throw new ListProviderException("No resources list found with the name " + listName);
+    return provider.getDefault();
   }
 
   @Override
