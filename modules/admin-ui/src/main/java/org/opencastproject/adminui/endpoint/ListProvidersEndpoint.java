@@ -138,40 +138,6 @@ public class ListProvidersEndpoint {
   }
 
   @GET
-  @Path("components.json")
-  @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "components", description = "Provides a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
-    reponses = { @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
-    responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  public Response getComponents(@Context HttpHeaders headers) {
-    String[] sources = { "eventCommentReasons" };
-    ResourceListQuery query = new ResourceListQueryImpl();
-
-    JSONObject list = new JSONObject();
-
-    for (String source : sources) {
-      if (listProvidersService.hasProvider(source)) {
-        JSONObject subList;
-        try {
-          subList = generateJSONObject(listProvidersService.getList(source, query, securityService.getOrganization(),
-                  true));
-          list.put(source, subList);
-        } catch (JsonCreationException e) {
-          logger.error("Not able to generate resources list JSON from source {}: {}", source, e);
-          return SERVER_ERROR;
-        } catch (ListProviderException e) {
-          logger.error("Not able to get list from provider {}: {}", source, e);
-          return SERVER_ERROR;
-        }
-      } else {
-        return NOT_FOUND;
-      }
-    }
-
-    return Response.ok(list.toString()).build();
-  }
-
-  @GET
   @Path("providers.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", reponses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
