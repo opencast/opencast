@@ -140,7 +140,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
         return null;
       }
     });
-    listProvidersServiceImpl.activate(null);
     return listProvidersServiceImpl;
   }
 
