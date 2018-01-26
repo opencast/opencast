@@ -213,7 +213,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-api/${project.version}</bundle>
@@ -319,7 +319,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
@@ -436,7 +436,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-api/${project.version}</bundle>
@@ -601,7 +601,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-presets/${project.version}</bundle>
@@ -709,7 +709,7 @@
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/matterhorn-solr/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/matterhorn-migration/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-security-cas" version="0.0.0">
