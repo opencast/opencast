@@ -369,6 +369,7 @@ public class SeriesEndpoint {
     }
     MetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
+    ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     return okJson(metadataList.toJSON());
   }
@@ -382,6 +383,7 @@ public class SeriesEndpoint {
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
       MetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
+      ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
       return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
     }
 

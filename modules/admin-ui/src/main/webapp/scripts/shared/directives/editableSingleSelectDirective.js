@@ -30,6 +30,7 @@ angular.module('adminNg.directives')
         scope: {
             params:     '=',
             collection: '=',
+            ordered:    '=',
             save:       '='
         },
         link: function (scope, element) {
@@ -48,8 +49,32 @@ angular.module('adminNg.directives')
                 return array;
             }
 
+            var mapToArrayOrdered = function (map) {
+                var array = [];
+
+                angular.forEach(map, function (mapValue, mapKey) {
+                    var entry = JSON.parse(mapKey);
+                    if (entry.selectable || scope.params.value === mapValue) {
+                        array.push({
+                            label: entry,
+                            value: mapValue
+                        });
+                    }
+                });
+                array.sort(function(a, b) {
+                    return a.label.order - b.label.order;
+                });
+                return array.map(function (entry) {
+                    return {
+                        label: entry.label.label,
+                        value: entry.value
+                    };
+                });
+            }
+
+
             //transform map to array so that orderBy can be used
-            scope.collection = mapToArray(scope.collection);
+            scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection) : mapToArray(scope.collection);
 
             scope.submit = function () {
                 // Wait until the change of the value propagated to the parent's
