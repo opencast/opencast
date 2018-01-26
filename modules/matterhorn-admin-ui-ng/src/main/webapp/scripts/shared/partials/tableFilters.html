@@ -52,7 +52,7 @@
             </div>
 
             <span ng-repeat="(name, filter) in filters.map"
-                class="ng-multi-value" ng-show="filter.value">
+                class="ng-multi-value" ng-if="filter.value">
                 <span ng-switch on="filter.type">
                     <span ng-switch-when="select">
                         {{ filter.label | translate | limitTo : 70 }}: {{ filter.options[filter.value] | translate | limitTo : 70 }}
