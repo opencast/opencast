@@ -86,11 +86,13 @@ angular.module('adminNg.directives')
             }, 250);
 
             scope.getFilterName = function(){
+              if (angular.isDefined(scope.selectedFilter) && angular.isDefined(scope.selectedFilter.label)) {
                 for(var i in scope.filters.filters) {
                   if (angular.equals(scope.filters.filters[i].label, scope.selectedFilter.label)) {
                     return i;
                   }
                 }
+              }
             };
 
             scope.selectFilterSelectValue = function (filter)  {
