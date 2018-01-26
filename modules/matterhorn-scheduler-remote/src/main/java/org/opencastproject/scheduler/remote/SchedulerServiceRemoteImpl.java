@@ -53,6 +53,7 @@ import org.opencastproject.util.UrlSupport;
 
 import com.entwinemedia.fn.data.Opt;
 
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -67,6 +68,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.joda.time.DateTimeConstants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -74,10 +76,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -298,6 +302,74 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         } else if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event " + eventId);
+        } else {
+          throw new SchedulerException("Unexpected error code " + errorCode);
+        }
+      } else if (response != null && SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to create the event");
+        throw new UnauthorizedException("Unauthorized to create the event");
+      } else {
+        throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service");
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (SchedulerTransactionLockException e) {
+      throw e;
+    } catch (SchedulerConflictException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  @Override
+  public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
+          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
+          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
+          throws UnauthorizedException, SchedulerConflictException, SchedulerTransactionLockException,
+          SchedulerException {
+    HttpPost post = new HttpPost("/");
+    logger.debug("Start adding a new events through remote Schedule Service");
+
+    List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+    params.add(new BasicNameValuePair("rrule", rRule.getValue()));
+    params.add(new BasicNameValuePair("start", Long.toString(start.getTime())));
+    params.add(new BasicNameValuePair("end", Long.toString(end.getTime())));
+    params.add(new BasicNameValuePair("duration", Long.toString(duration)));
+    params.add(new BasicNameValuePair("tz", tz.toZoneId().getId()));
+    params.add(new BasicNameValuePair("agent", captureAgentId));
+    params.add(new BasicNameValuePair("users", StringUtils.join(userIds, ",")));
+    params.add(new BasicNameValuePair("templateMp", MediaPackageParser.getAsXml(templateMp)));
+    params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
+    params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
+    if (optOut.isSome())
+      params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
+    if (schedulingSource.isSome())
+      params.add(new BasicNameValuePair("source", schedulingSource.get()));
+    params.add(new BasicNameValuePair("origin", modificationOrigin));
+    post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
+
+    String eventId = templateMp.getIdentifier().compact();
+
+    HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
+    try {
+      if (response != null && SC_CREATED == response.getStatusLine().getStatusCode()) {
+        logger.info("Successfully added events to the scheduler service");
+        return null;
+      } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
+        String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
+        JSONObject json = (JSONObject) parser.parse(errorJson);
+        JSONObject error = (JSONObject) json.get("error");
+        String errorCode = (String) error.get("code");
+        if (SchedulerTransactionLockException.ERROR_CODE.equals(errorCode)) {
+          logger.info("Event is locked by a transaction, unable to add event based on {}", eventId);
+          throw new SchedulerTransactionLockException(
+                  "Event is locked by a transaction, unable to add event " + eventId);
+        } else if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
+          logger.info("Conflicting events found when adding event based on {}", eventId);
+          throw new SchedulerConflictException("Conflicting events found when adding event based on" + eventId);
         } else {
           throw new SchedulerException("Unexpected error code " + errorCode);
         }
@@ -781,6 +853,55 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get event review status from remote scheduler service");
+  }
+
+  //NOTE: Do not modify this without making the same modifications to the copy of this method in IndexServiceImplTest, and SchedulerServiceImpl
+  //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
+  @Override
+  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+    final TimeZone timeZone = TimeZone.getDefault();
+    final TimeZone utc = TimeZone.getTimeZone("UTC");
+    TimeZone.setDefault(tz);
+    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
+    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
+
+    Calendar endCalendar = Calendar.getInstance(utc);
+    endCalendar.setTime(end);
+    Calendar calendar = Calendar.getInstance(utc);
+    calendar.setTime(periodStart);
+    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
+    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
+    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
+    periodEnd.setTime(calendar.getTime().getTime() + duration);
+    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
+
+    List<Period> events = new LinkedList<>();
+
+    TimeZone.setDefault(utc);
+    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
+      Date d = (Date) date;
+      Calendar cDate = Calendar.getInstance(utc);
+
+      // Adjust for DST, if start of event
+      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
+        if (!tz.inDaylightTime(d)) { // Date not in DST?
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
+        }
+      } else { // Event doesn't start in DST
+        if (tz.inDaylightTime(d)) {
+          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
+        }
+      }
+      cDate.setTime(d);
+
+      TimeZone.setDefault(timeZone);
+      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
+              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
+      events.add(p);
+      TimeZone.setDefault(utc);
+    }
+    TimeZone.setDefault(timeZone);
+    return events;
   }
 
   @Override
