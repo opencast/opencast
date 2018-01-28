@@ -35,11 +35,13 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -53,10 +55,16 @@ import org.opencastproject.security.api.User;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+
 /**
  * Security layer.
  */
 public class AssetManagerWithSecurity extends AssetManagerDecorator {
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithSecurity.class);
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
@@ -73,12 +81,59 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
     this.secSvc = secSvc;
   }
 
-  @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
-    final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
+  private boolean isAuthorizedByAcl(AccessControlList acl, String action) {
     final User user = secSvc.getUser();
     final Organization org = secSvc.getOrganization();
-    if (AccessControlUtil.isAuthorized(acl, user, org, WRITE_ACTION)) {
+    return AccessControlUtil.isAuthorized(acl, user, org, action);
+  }
+
+  private boolean isAuthorizedByAcl(MediaPackage mp, String action) {
+    final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
+    return isAuthorizedByAcl(acl, action);
+  }
+
+  private boolean isAuthorizedByAcl(Version version, String mpId, String action) {
+    final AQueryBuilder q = q();
+    final AResult r = q.select(q.snapshot())
+            .where(q.mediaPackageId(mpId))
+            .run();
+    if (r.getSize() == 1) {
+      final Opt<Snapshot> snapShot = r.getRecords().head2().getSnapshot();
+      if (snapShot.isSome()) {
+        final MediaPackage mp = snapShot.get().getMediaPackage();
+        String xacmlId = null;
+        for (MediaPackageElement mpe : mp.getElements()) {
+          if (mpe.toString().contains("security-policy-episode")) {
+            xacmlId = mpe.getIdentifier();
+            break;
+          }
+        }
+        if (xacmlId != null) {
+          Opt<Asset> secAsset = super.getAsset(version, mpId, xacmlId);
+          if (secAsset.isSome()) {
+            InputStream in = secAsset.get().getInputStream();
+            final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
+            return isAuthorizedByAcl(acl, action);
+          }
+          return false;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return false;
+      }
+    }
+    else {
+      return false;
+    }
+  }
+
+ @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
+    if (isAuthorizedByAcl(mp, WRITE_ACTION)) {
       final Snapshot snapshot = super.takeSnapshot(owner, mp);
+      final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
       storeAclAsProperties(snapshot, acl);
       return snapshot;
     } else {
@@ -104,9 +159,12 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
   }
 
   @Override public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
-    if (isAuthorized(mkAuthPredicate(mpId, READ_ACTION))) {
+    final boolean isUserAuthorized = isAuthorized(mkAuthPredicate(mpId, READ_ACTION))
+                                     || isAuthorizedByAcl(version, mpId, READ_ACTION);
+    if (isUserAuthorized) {
       return super.getAsset(version, mpId, mpeId);
-    } else {
+    }
+    else {
       return chuck(new UnauthorizedException(format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)));
     }
   }
