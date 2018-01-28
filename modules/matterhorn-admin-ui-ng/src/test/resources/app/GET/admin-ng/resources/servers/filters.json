@@ -1,21 +1,20 @@
 {
-    "hostname": {
-        "options": {
-            "http:\/\/mh-allinone.localdomain": "http:\/\/mh-allinone.localdomain",
-            "http:\/\/mh-engage.localdomain": "http:\/\/mh-engage.localdomain",
-            "http:\/\/mh-worker1.localdomain": "http:\/\/mh-worker1.localdomain",
-            "http:\/\/mh-worker2.localdomain": "http:\/\/mh-worker2.localdomain"
-        },
-        "label": "FILTERS.SERVERS.HOSTNAME.LABEL",
-        "type": "select"
+  "hostname":{
+    "translatable":false,
+    "options":{
+      "http:\/\/localhost:8080":"http:\/\/localhost:8080"
     },
-    "status": {
-        "options": {
-            "offline": "FILTERS.SERVERS.STATUS.OFFLINE",
-            "online": "FILTERS.SERVERS.STATUS.ONLINE",
-            "maintenance": "FILTERS.SERVERS.STATUS.MAINTENANCE"
-        },
-        "label": "FILTERS.SERVERS.STATUS.LABEL",
-        "type": "select"
-    }
+    "label":"FILTERS.SERVERS.HOSTNAME.LABEL",
+    "type":"select"
+  },
+  "status":{
+    "translatable":true,
+    "options":{
+      "offline":"FILTERS.SERVERS.STATUS.OFFLINE",
+      "online":"FILTERS.SERVERS.STATUS.ONLINE",
+      "maintenance":"FILTERS.SERVERS.STATUS.MAINTENANCE"
+    },
+    "label":"FILTERS.SERVERS.STATUS.LABEL",
+    "type":"select"
+  }
 }
