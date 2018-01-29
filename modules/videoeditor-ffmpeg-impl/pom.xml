@@ -30,9 +30,6 @@
               org.opencastproject.videoeditor.ffmpeg;version=${project.version},
               org.opencastproject.videoeditor.impl;version=${project.version}
             </Export-Package>
-            <Embed-Dependency>
-              jna;inline=true
-            </Embed-Dependency>
             <Service-Component>
               OSGI-INF/videoeditor-service.xml,
             </Service-Component>
@@ -71,6 +68,15 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workspace-api</artifactId>
       <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
@@ -79,10 +85,6 @@
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -96,11 +98,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
