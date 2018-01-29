@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'NewEventMetadata', 'SchedulingHelperService',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, NewEventMetadata, SchedulingHelperService) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'SchedulingHelperService',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, SchedulingHelperService) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -26,29 +26,20 @@ angular.module('adminNg.services')
         var self = this;
 
         this.save = function () {
-          if (self.startDate.index) {
-            NewEventMetadata.ud['dublincore/episode'].fields[self.startDate.index] = self.startDate;
-          } else {
-            self.startDate.index = NewEventMetadata.ud['dublincore/episode'].fields.length;
-            NewEventMetadata.ud['dublincore/episode'].fields.push(self.startDate);
-          }
+            self.ud.UPLOAD.metadata['start'] = self.startDate;
         };
 
         this.createStartDate = function () {
-          self.startDate = {
-            "id": "startDate",
-            "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
-            "value": new Date(Date.now()).toISOString(),
-            "type": "date",
-            "readOnly": false,
-            "required": false,
-            "tabindex": 7
-          };
-          self.metadata = new Array();
-          self.metadata.push(self.startDate);
+            self.startDate = {
+                "id": "startDate",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+                "value": new Date(Date.now()).toISOString(),
+                "type": "date",
+                "readOnly": false,
+                "required": false,
+                "tabindex": 7
+            };
         };
-
-        this.createStartDate();
 
         self.isSourceState = true;
 
@@ -73,11 +64,16 @@ angular.module('adminNg.services')
         this.loadCaptureAgents();
 
         this.reset = function (opts) {
+
             self.createStartDate();
             self.weekdays = _.clone(WEEKDAYS);
             self.ud = {
-                upload: {},
-
+                UPLOAD: {
+                    tracks: {},
+                    metadata: {
+                        start: self.startDate
+                    }
+                },
                 SCHEDULE_SINGLE: {
                     device: {
                         inputMethods: {}
@@ -175,7 +171,7 @@ angular.module('adminNg.services')
             later: function() { return true; },
             UPLOAD: function() {
                 // test for any type of upload source (MH-12085)
-                return Object.keys(self.ud.upload).length > 0;
+                return Object.keys(self.ud.UPLOAD.tracks).length > 0;
             },
             SCHEDULE_SINGLE: function () {
                 return !self.hasConflicts && _.every(fields, function(field) {
@@ -234,7 +230,7 @@ angular.module('adminNg.services')
         this.updateUploadTracksForSummary =  function () {
             self.ud.trackuploadlistforsummary = [];
             var namemap = self.wizard.sharedData.uploadNameMap;
-            angular.forEach(self.ud.upload, function ( value, key) {
+            angular.forEach(self.ud.UPLOAD.tracks, function ( value, key) {
                 var item = {};
                 var fileNames = [];
                 item.id = key;
@@ -431,7 +427,7 @@ angular.module('adminNg.services')
         this.onExitStep = function () {
             // update summary of selections
             this.updateUploadTracksForSummary();
-        }
+        };
 
         this.isValid = function () {
             var validator = getValidatorByType();
