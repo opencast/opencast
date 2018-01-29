@@ -3,11 +3,11 @@
  name="org.opencastproject.engage.theodul.plugin.usertracking"
  immediate="true"
  activate="activate">
-  <implementation class="org.opencastproject.engage.theodul.plugin.custom.piwik.EngagePluginImpl" />
+  <implementation class="org.opencastproject.engage.theodul.plugin.custom.matomo.EngagePluginImpl" />
 
   <!-- Engage Plugin Properties: at least name and path must be set -->
-  <property name="opencast.engage.plugin.name" value="EngagePluginCustomPiwik" />
-  <property name="opencast.engage.plugin.description" value="Custom plugin to enable Piwik Analytics" />
+  <property name="opencast.engage.plugin.name" value="EngagePluginCustomMatomo" />
+  <property name="opencast.engage.plugin.description" value="Custom plugin to enable Matomo Analytics" />
   <property name="opencast.engage.plugin.rest" value="false" />
 
   <service>

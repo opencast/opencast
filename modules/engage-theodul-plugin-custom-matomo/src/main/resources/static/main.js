@@ -24,7 +24,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     "use strict";
 
     var insertIntoDOM = false;
-    var PLUGIN_NAME = "Engage Plugin Custom Piwik";
+    var PLUGIN_NAME = "Engage Plugin Custom Matomo";
     var PLUGIN_TYPE = "engage_custom";
     var PLUGIN_VERSION = "1.0";
     var PLUGIN_TEMPLATE_DESKTOP = "none";
@@ -107,7 +107,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     /* don't change these variables */
 
-    var server = Engage.model.get("meInfo").get("piwik.server"),
+    var server = Engage.model.get("meInfo").get("matomo.server"),
         tracker,
         initing = true,
         mediapackageError = false,
@@ -117,9 +117,9 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
     if (server && allow_tracking) {
       if (server.substr(-1) != '/') server += '/';
-      var siteId = parseInt(Engage.model.get("meInfo").get("piwik.site_id")),
-          heartbeat = parseInt(Engage.model.get("meInfo").get("piwik.heartbeat")),
-          track_events = Engage.model.get("meInfo").get("piwik.track_events"),
+      var siteId = parseInt(Engage.model.get("meInfo").get("matomo.site_id")),
+          heartbeat = parseInt(Engage.model.get("meInfo").get("matomo.heartbeat")),
+          track_events = Engage.model.get("meInfo").get("matomo.track_events"),
           translations = [];
 
           if (track_events) track_events = track_events.toLowerCase();
@@ -135,7 +135,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
 
       // load piwik lib from remote server
       require([server + "piwik.js"], function(piwik) {
-        Engage.log("Piwik: external piwik lib loaded");
+        Engage.log("Matomo: external piwik lib loaded");
 
         tracker = Piwik.getAsyncTracker( server + "piwik.php", siteId );
         initTranslate(Engage.model.get("language"), function () {
@@ -149,7 +149,9 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
             last_zoom_update = 0,
             zoom_timeout = 2000,
             volume_changing = false,
-            changed_volume = 1;
+            changed_volume = 1,
+            last_event,
+            last_value;
 
         if (tracker && mediapackage && mediapackage.get("ready")) {
           initTracker(tracker, mediapackage);
@@ -169,9 +171,11 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
           });
 
           Engage.on(plugin.events.qualitySet.getName(), function(q) {
-            if (!trackEvent("quality")) return;
+            if (!trackEvent("quality") || (last_event === "quality" && last_value === q)) return;
             if (!initing)
               tracker.trackEvent("Player.Settings","Quality", q);
+              last_event = "quality";
+              last_value = q;
            });
 
           Engage.on(plugin.events.volumeSet.getName(), function(v) {
@@ -181,59 +185,79 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
               volume_changing = true;
               setTimeout(function () {
                 tracker.trackEvent("Player.Settings","Volume", changed_volume);
+                last_event = "quality";
+                last_value = undefined;
                 volume_changing = false;
               }, 1000);
             }
           });
 
           Engage.on(plugin.events.ended.getName(), function() {
-            if (!trackEvent("ended")) return;
+            if (!trackEvent("ended") || last_event === "ended") return;
             tracker.trackEvent("Player.Status","Ended");
+            last_event = "ended";
+            last_value = undefined;
           });
 
           Engage.on(plugin.events.play.getName(), function() {
-            if (!trackEvent("play")) return;
+            if (!trackEvent("play") || last_event === "play") return;
             tracker.trackEvent("Player.Controls","Play");
+            last_event = "play";
+            last_value = undefined;
           });
 
           Engage.on(plugin.events.pause.getName(), function() {
-            if (!trackEvent("pause")) return;
+            if (!trackEvent("pause") || last_event === "pause") return;
             tracker.trackEvent("Player.Controls","Pause");
+            last_event = "pause";
+            last_value = undefined;
           });
 
           Engage.on(plugin.events.seek.getName(), function(time) {
-            if (!trackEvent("seek")) return;
+            if (!trackEvent("seek") || (last_event === "pause" && last_value === time)) return;
             tracker.trackEvent("Player.Controls","Seek", time);
+            last_event = "seek";
+            last_value = time;
           });
 
           Engage.on(plugin.events.playbackRateChanged.getName(), function(speed) {
-            if (!trackEvent("playbackrate")) return;
+            if (!trackEvent("playbackrate") || (last_event === "playbackrate" && last_value === speed)) return;
             tracker.trackEvent("Player.Controls","PlaybackRate", speed);
+            last_event = "playbackrate";
+            last_value = speed;
           });
 
           Engage.on(plugin.events.fullscreenEnable.getName(), function() {
-            if (!trackEvent("fullscreen")) return;
+            if (!trackEvent("fullscreen") || last_event === "fullscreen") return;
             tracker.trackEvent("Player.View","Fullscreen");
+            last_event = "fullscreen";
+            last_value = undefined;
           });
 
           Engage.on(plugin.events.focusVideo.getName(), function(focus) {
-            if (!trackEvent("focus")) return;
+            if (!trackEvent("focus")  || (last_event === "focus" && last_value === "focus")) return;
             if (!initing)
                 tracker.trackEvent("Player.View","Focus", focus);
+                last_event = "focus";
+                last_value = focus;
           });
 
           Engage.on(plugin.events.resetLayout.getName(), function(q) {
-            if (!trackEvent("layout_reset")) return;
+            if (!trackEvent("layout_reset") || last_event === "layout_reset") return;
             if (!initing)
               tracker.trackEvent("Player.View","DefaultLayout");
+              last_event = "layout_reset";
+              last_value = undefined;
           });
 
           Engage.on(plugin.events.zoomChange.getName(), function() {
-            if (!trackEvent("zoom")) return;
+            if (!trackEvent("zoom") || last_event === "zoom") return;
             var now = new Date().getTime();
             if (now > (last_zoom_update + zoom_timeout)) {
               tracker.trackEvent("Player.View","Zoom");
               last_zoom_update = now;
+              last_event = "zoom";
+              last_value = undefined;
             }
           });
         }
@@ -245,9 +269,9 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         }
 
       });
-      Engage.log("Piwik: Init");
+      Engage.log("Matomo: Init");
     } else {
-      Engage.log("Piwik: tracking not configured");
+      Engage.log("Matomo: tracking not configured");
     }
 
     function initTracker(tracker, mediapackage) {
@@ -269,14 +293,15 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         tracker.setCustomVariable(2, "series", seriestitle + " (" + seriesid + ")", "page");
         tracker.setCustomVariable(3, "presenter", presenter, "page");
         tracker.setCustomVariable(4, "view_mode", Engage.model.get("mode"), "page");
+        tracker.setCustomVariable(5, "client", "Theodul Player");
         tracker.setDocumentTitle(mediapackage.get("title") + " - " + presenter);
         tracker.trackPageView(mediapackage.get("title") + " - " + presenter);
         if (Piwik && Piwik.MediaAnalytics) Piwik.MediaAnalytics.scanForMedia();
         if (heartbeat > 0) tracker.enableHeartBeatTimer(heartbeat);
         Engage.trigger(plugin.events.customNotification.getName(),
-            translate('piwik_tracking',
-            'Usage data will be collected with Piwik. You can use the Do-Not-Track settings of your browser to prevent this.'));
-        Engage.log("Piwik: Tracker initialized");
+            translate('matomo_tracking',
+            'Usage data will be collected with Matomo. You can use the Do-Not-Track settings of your browser to prevent this.'));
+        Engage.log("Matomo: Tracker initialized");
         setTimeout(function () {
           initing = false;
         }, 2000);
@@ -284,7 +309,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
     }
 
     function initTranslate(language, funcSuccess, funcError) {
-      var path = Engage.getPluginPath('EngagePluginCustomPiwik').replace(/(\.\.\/)/g, '');
+      var path = Engage.getPluginPath('EngagePluginCustomMatomo').replace(/(\.\.\/)/g, '');
       /* this solution is really bad, fix it... */
       var jsonstr = window.location.origin + '/engage/theodul/' + path;
 

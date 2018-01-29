@@ -187,7 +187,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-matomo/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
@@ -358,7 +358,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
@@ -410,7 +410,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-matomo/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
@@ -477,7 +477,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
@@ -639,9 +639,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
@@ -671,7 +671,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-mhConnection/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-notifications/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-piwik/${project.version}</bundle>
+    <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-matomo/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-custom-usertracking/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-description/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-tab-description/${project.version}</bundle>
