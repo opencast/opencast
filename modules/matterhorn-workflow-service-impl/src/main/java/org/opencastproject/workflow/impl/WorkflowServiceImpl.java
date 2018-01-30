@@ -259,9 +259,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final List<Long> delayedWorkflows = new ArrayList<Long>();
 
   /** Striped locks for synchronization */
-  private final Striped<Lock> lock = Striped.lazyWeakLock(1);
-  private final Striped<Lock> updateLock = Striped.lazyWeakLock(1);
-  private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1);
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
+  private final Striped<Lock> updateLock = Striped.lazyWeakLock(1024);
+  private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
   static {
     YES = new HashSet<String>(Arrays.asList(new String[] { "yes", "true", "on" }));
@@ -613,6 +613,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.
     final Lock lock = mediaPackageLocks.get(sourceMediaPackage.getIdentifier().toString());
     lock.lock();
+
     try {
       logger.startUnitOfWork();
       if (workflowDefinition == null)
@@ -1299,6 +1300,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public void update(final WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
     final Lock lock = updateLock.get(workflowInstance.getId());
     lock.lock();
+
     try {
       WorkflowInstance originalWorkflowInstance = null;
       try {
