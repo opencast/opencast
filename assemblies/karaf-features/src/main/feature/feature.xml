@@ -173,7 +173,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
@@ -293,7 +292,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -396,7 +394,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
@@ -575,7 +572,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -660,7 +656,6 @@
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
