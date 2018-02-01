@@ -23,12 +23,7 @@ package org.opencastproject.engage.paella;
 
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
-//import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
-//import org.opencastproject.security.api.User;
-//import org.opencastproject.systems.OpencastConstants;
-//import org.opencastproject.userdirectory.UserIdRoleProvider;
-//import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -36,36 +31,17 @@ import org.opencastproject.util.doc.rest.RestService;
 
 
 import org.apache.commons.io.FileUtils;
-//import org.apache.commons.lang3.StringUtils;
-//import org.json.simple.JSONArray;
-//import org.json.simple.JSONObject;
-//import org.osgi.framework.BundleContext;
-//import org.osgi.framework.Constants;
-//import org.osgi.framework.InvalidSyntaxException;
-//import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-//import java.io.FileNotFoundException;
 
-//import java.net.MalformedURLException;
-//import java.net.URL;
-//import java.util.Arrays;
-//import java.util.Comparator;
-//import java.util.Map.Entry;
-//import java.util.SortedSet;
-//import java.util.TreeSet;
-
-//import javax.servlet.Servlet;
-//import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-//import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -102,23 +78,6 @@ public class PaellaConfigRest {
     this.securityService = securityService;
   }
 
-  /**
-  private UserIdRoleProvider userIdRoleProvider;
-  
-  private BundleContext bundleContext;
-
-  protected void setUserIdRoleProvider(UserIdRoleProvider userIdRoleProvider) {
-    this.userIdRoleProvider = userIdRoleProvider;
-  }
-
-  protected ServiceReference[] getRestServiceReferences() throws InvalidSyntaxException {
-    return bundleContext.getAllServiceReferences(null, SERVICES_FILTER);
-  }
-
-  protected ServiceReference[] getUserInterfaceServiceReferences() throws InvalidSyntaxException {
-    return bundleContext.getAllServiceReferences(Servlet.class.getName(), "(&(alias=*)(classpath=*))");
-  }
-  */
   public void activate(ComponentContext cc) {
     logger.debug("activate()");
 
@@ -134,7 +93,7 @@ public class PaellaConfigRest {
   @GET
   @Path("config.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "me", description = "Information about the curent user", reponses = { @RestResponse(description = "Returns information about the current user", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "config.json", description = "Paella configuration file", reponses = { @RestResponse(description = "Returns the paella configuration file", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   @SuppressWarnings("unchecked")
   public String getMyInfo() throws IOException {
     // Add the current user's organizational information
