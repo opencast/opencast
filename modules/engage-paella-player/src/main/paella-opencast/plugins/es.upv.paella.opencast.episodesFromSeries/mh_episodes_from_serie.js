@@ -18,8 +18,8 @@
  * the License.
  *
  */
-paella.plugins.EpisodesFromSerie = Class.create(paella.ButtonPlugin,{
-	getSubclass:function() { return 'EpisodesFromSerie'; },
+paella.plugins.EpisodesFromSeries = Class.create(paella.ButtonPlugin,{
+	getSubclass:function() { return 'EpisodesFromSeries'; },
 	getName:function() { return "es.upv.paella.opencast.episodesFromSeries"; },
 	
 	getIndex:function() { return 10; },
@@ -52,32 +52,32 @@ paella.plugins.EpisodesFromSerie = Class.create(paella.ButtonPlugin,{
 
 
 
-		var episodesFromSerieTitle = document.createElement('div');
-		episodesFromSerieTitle.id = 'episodesFromSerieTitle';
-		episodesFromSerieTitle.className = 'episodesFromSerieTitle';
+		var episodesFromSeriesTitle = document.createElement('div');
+		episodesFromSeriesTitle.id = 'episodesFromSeriesTitle';
+		episodesFromSeriesTitle.className = 'episodesFromSeriesTitle';
 		if (serieId) {
-			episodesFromSerieTitle.innerHTML = "<span class='episodesFromSerieTitle_Bold'>" +paella.dictionary.translate("Videos in this series:")+"</span> " + serieTitle;
+			episodesFromSeriesTitle.innerHTML = "<span class='episodesFromSeriesTitle_Bold'>" +paella.dictionary.translate("Videos in this series:")+"</span> " + serieTitle;
 		}
 		else {
-			episodesFromSerieTitle.innerHTML = "<span class='episodesFromSerieTitle_Bold'>" +paella.dictionary.translate("Available videos:")+"</span>";			
+			episodesFromSeriesTitle.innerHTML = "<span class='episodesFromSeriesTitle_Bold'>" +paella.dictionary.translate("Available videos:")+"</span>";			
 		}
 
-		var episodesFromSerieListing = document.createElement('div');
-		episodesFromSerieListing.id = 'episodesFromSerieListing';
-		episodesFromSerieListing.className = 'episodesFromSerieListing';
+		var episodesFromSeriesListing = document.createElement('div');
+		episodesFromSeriesListing.id = 'episodesFromSeriesListing';
+		episodesFromSeriesListing.className = 'episodesFromSeriesListing';
 
 	
-		domElement.appendChild(episodesFromSerieTitle);
-		domElement.appendChild(episodesFromSerieListing);
+		domElement.appendChild(episodesFromSeriesTitle);
+		domElement.appendChild(episodesFromSeriesListing);
 
 
 		var params = {limit:5, page:0, sid:serieId};
 		var mySearch = new SearchEpisode(paella.player.config, params);
-		mySearch.doSearch(params, document.getElementById('episodesFromSerieListing'));
+		mySearch.doSearch(params, document.getElementById('episodesFromSeriesListing'));
 	}
 });
 
-paella.plugins.episodesFromSerie = new paella.plugins.EpisodesFromSerie();
+paella.plugins.episodesFromSeries = new paella.plugins.EpisodesFromSeries();
 
 
 
