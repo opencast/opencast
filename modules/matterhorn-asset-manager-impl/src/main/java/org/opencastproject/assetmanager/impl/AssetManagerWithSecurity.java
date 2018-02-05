@@ -53,6 +53,8 @@ import org.opencastproject.security.api.User;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
 
+import java.io.InputStream;
+
 /**
  * Security layer.
  */
@@ -73,12 +75,32 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
     this.secSvc = secSvc;
   }
 
-  @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
-    final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
+  private boolean isAuthorizedByAcl(AccessControlList acl, String action) {
     final User user = secSvc.getUser();
     final Organization org = secSvc.getOrganization();
-    if (AccessControlUtil.isAuthorized(acl, user, org, WRITE_ACTION)) {
+    return AccessControlUtil.isAuthorized(acl, user, org, action);
+  }
+
+  private boolean isAuthorizedByAcl(MediaPackage mp, String action) {
+    final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
+    return isAuthorizedByAcl(acl, action);
+  }
+
+  private boolean isAuthorizedByAcl(Version version, String mpId, String action) {
+    Opt<Asset> secAsset = super.getAsset(version, mpId, "security-policy-episode");
+    if (secAsset.isSome()) {
+      InputStream in = secAsset.get().getInputStream();
+      final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
+      return isAuthorizedByAcl(acl, action);
+    }
+
+    return false;
+  }
+
+ @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
+    if (isAuthorizedByAcl(mp, WRITE_ACTION)) {
       final Snapshot snapshot = super.takeSnapshot(owner, mp);
+      final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
       storeAclAsProperties(snapshot, acl);
       return snapshot;
     } else {
@@ -103,10 +125,13 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
     }
   }
 
-  @Override public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
-    if (isAuthorized(mkAuthPredicate(mpId, READ_ACTION))) {
-      return super.getAsset(version, mpId, mpeId);
-    } else {
+  @Override public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
+    final boolean isUserAuthorized = isAuthorized(mkAuthPredicate(mpId, READ_ACTION))
+                                     || isAuthorizedByAcl(version, mpId, READ_ACTION);
+    if (isUserAuthorized) {
+      return super.getAsset(version, mpId, mpElementId);
+    }
+    else {
       return chuck(new UnauthorizedException(format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)));
     }
   }
