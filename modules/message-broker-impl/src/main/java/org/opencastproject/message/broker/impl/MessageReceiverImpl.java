@@ -27,7 +27,6 @@ import org.opencastproject.message.broker.api.MessageSender.DestinationType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InterruptedIOException;
 import java.io.Serializable;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
@@ -66,8 +65,10 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
       Session session = getSession();
       // This shouldn't happen after a connection has been successfully
       // established at least once, but better be safe than sorry.
-      if (session == null)
+      if (session == null) {
+        logger.warn("No session object, consumer could not be created.");
         return null;
+      }
       if (type.equals(DestinationType.Queue)) {
         destination = session.createQueue(destinationId);
       } else {
@@ -88,43 +89,43 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
    *          The type of the destination either queue or topic.
    * @return A message or none if there was a problem getting the message.
    */
-  private Message waitForMessage(String destinationId, DestinationType type) {
+  private Message waitForMessage(String destinationId, DestinationType type) throws JMSException {
     waitForConnection();
     MessageConsumer consumer = null;
     try {
       consumer = createConsumer(destinationId, type);
       if (consumer != null)
           return consumer.receive();
-    } catch (JMSException e) {
-      if (e.getCause() instanceof InterruptedIOException || e.getCause() instanceof InterruptedException) {
-        logger.trace("Exception due to message receiver shutdown:", e);
-      } else if (isConnected()) {
-        logger.error("Unable to receive messages", e);
-      }
+      logger.trace("Consumer could not be created.");
+      return null;
     } finally {
-      try {
-        if (consumer != null) {
+      if (consumer != null) {
+        try {
           consumer.close();
+        } catch (JMSException e) {
+          logger.error("Unable to close connections after receipt of message", e);
         }
-      } catch (JMSException e) {
-        logger.error("Unable to close connections after receipt of message", e);
       }
     }
-    return null;
   }
 
-  protected Serializable getSerializable(String destinationId, DestinationType type) {
+  /**
+   * Get serializable object from the message bus.
+   *
+   * @param destinationId The destination queue or topic to pull the message from.
+   * @param type The type of the destination either queue or topic.
+   * @return serializable object from the message bus
+   * @throws JMSException if an error occures during the communication with the message bus.
+   */
+  protected Serializable getSerializable(String destinationId, DestinationType type) throws JMSException {
     while (true) {
       // Wait for a message
       Message message = waitForMessage(destinationId, type);
       if (message != null && message instanceof ObjectMessage) {
         ObjectMessage objectMessage = (ObjectMessage) message;
-        try {
-          return objectMessage.getObject();
-        } catch (JMSException e) {
-          logger.error("Unable to get message {}", message, e);
-        }
+        return objectMessage.getObject();
       }
+
       logger.debug("Skipping invalid message: {}", message);
     }
   }
@@ -133,7 +134,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
   public FutureTask<Serializable> receiveSerializable(final String destinationId, final DestinationType type) {
     FutureTask<Serializable> futureTask = new FutureTask<Serializable>(new Callable<Serializable>() {
       @Override
-      public Serializable call() {
+      public Serializable call() throws JMSException {
         return getSerializable(destinationId, type);
       }
     });
