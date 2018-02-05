@@ -82,6 +82,14 @@ public interface AuthorizationService {
    * @return the set of permissions and explicit denials
    */
   Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp);
+
+  /**
+   * Gets the active permissions as specified by the given XACML attachment.
+   *
+   * @param in
+   *          the XACML attachment used to determine a set of permissions and explicit denials
+   * @return a set of permissions and explicit denials
+   */
   Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in);
 
   /**

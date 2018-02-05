@@ -55,16 +55,12 @@ import org.opencastproject.security.api.User;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.InputStream;
 
 /**
  * Security layer.
  */
 public class AssetManagerWithSecurity extends AssetManagerDecorator {
-  private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithSecurity.class);
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
@@ -93,12 +89,13 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
   }
 
   private boolean isAuthorizedByAcl(Version version, String mpId, String action) {
-    final AQueryBuilder q = q();
-    final AResult r = q.select(q.snapshot())
-            .where(q.mediaPackageId(mpId))
-            .run();
-    if (r.getSize() == 1) {
-      final Opt<Snapshot> snapShot = r.getRecords().head2().getSnapshot();
+    final AQueryBuilder query = q();
+    final AResult results = query.select(query.snapshot())
+                              .where(query.mediaPackageId(mpId))
+                              .run();
+
+    if (results.getSize() == 1) {
+      final Opt<Snapshot> snapShot = results.getRecords().head2().getSnapshot();
       if (snapShot.isSome()) {
         final MediaPackage mp = snapShot.get().getMediaPackage();
         String xacmlId = null;
@@ -115,19 +112,11 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
             final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
             return isAuthorizedByAcl(acl, action);
           }
-          return false;
-        }
-        else {
-          return false;
         }
       }
-      else {
-        return false;
-      }
     }
-    else {
-      return false;
-    }
+
+    return false;
   }
 
  @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
@@ -158,11 +147,11 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
     }
   }
 
-  @Override public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
+  @Override public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
     final boolean isUserAuthorized = isAuthorized(mkAuthPredicate(mpId, READ_ACTION))
                                      || isAuthorizedByAcl(version, mpId, READ_ACTION);
     if (isUserAuthorized) {
-      return super.getAsset(version, mpId, mpeId);
+      return super.getAsset(version, mpId, mpElementId);
     }
     else {
       return chuck(new UnauthorizedException(format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)));
