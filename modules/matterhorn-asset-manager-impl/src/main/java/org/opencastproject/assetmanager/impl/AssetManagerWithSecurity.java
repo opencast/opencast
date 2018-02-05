@@ -35,13 +35,11 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
@@ -89,31 +87,11 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
   }
 
   private boolean isAuthorizedByAcl(Version version, String mpId, String action) {
-    final AQueryBuilder query = q();
-    final AResult results = query.select(query.snapshot())
-                              .where(query.mediaPackageId(mpId))
-                              .run();
-
-    if (results.getSize() == 1) {
-      final Opt<Snapshot> snapShot = results.getRecords().head2().getSnapshot();
-      if (snapShot.isSome()) {
-        final MediaPackage mp = snapShot.get().getMediaPackage();
-        String xacmlId = null;
-        for (MediaPackageElement mpe : mp.getElements()) {
-          if (mpe.toString().contains("security-policy-episode")) {
-            xacmlId = mpe.getIdentifier();
-            break;
-          }
-        }
-        if (xacmlId != null) {
-          Opt<Asset> secAsset = super.getAsset(version, mpId, xacmlId);
-          if (secAsset.isSome()) {
-            InputStream in = secAsset.get().getInputStream();
-            final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
-            return isAuthorizedByAcl(acl, action);
-          }
-        }
-      }
+    Opt<Asset> secAsset = super.getAsset(version, mpId, "security-policy-episode");
+    if (secAsset.isSome()) {
+      InputStream in = secAsset.get().getInputStream();
+      final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
+      return isAuthorizedByAcl(acl, action);
     }
 
     return false;

@@ -124,6 +124,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     });
   }
 
+  /** Returns an ACL based on a given file/inputstream. */
   public Tuple<AccessControlList, AclScope> getAclFromInputStream(final InputStream in) {
     logger.debug("Get ACL from inputstream");
     return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
@@ -409,6 +410,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Option.none();
   }
 
+
+  /** Produces an ACL derived from a given security policy file. */
   private Option<AccessControlList> loadAclFromFile(final InputStream in) {
     try {
       AccessControlList acl = XACMLUtils.parseXacml(in);
@@ -416,7 +419,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         return Option.option(acl);
       }
     } catch (Exception e) {
-      logger.error("Exception occurred: {}", e);
+      logger.error("Failed to produce Acl when reading file: {}", e);
     }
     return Option.none();
   }
