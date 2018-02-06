@@ -1,28 +1,24 @@
 HTTPS
 =====
 
-This document will assist you in enabling HTTPS for a new or an
-existing Opencast installation, either via HTTPS termination proxy
-or directly in Opencast.
-Changing the domain name of an Opencast installation is a similar
-procedure.
+This document will assist you in enabling HTTPS for a new or an existing
+Opencast installation, either via HTTPS termination proxy or directly in
+Opencast.
 
-Disclaimer: The document was written for Opencast 2.2 using the
-[opencast-docker](https://github.com/opencast/opencast-docker) images:
-admin, worker and presentation
-It might work for newer versions of Opencast as well.
+Changing the domain name of an Opencast installation is a similar procedure.
 
-## Motivation: HTTPS for Opencast, why?
 
-Your site visitor's privacy. While ISPs and public HotSpot operators
-and those who sniff unencrypted WiFi traffic might be able to see
-your visitors connecting to your site, they can't see, which video
-is watched when HTTPS is enabled.
-Think of a lecture about the human rights situation in China and a
-visitor from there watching the video. Or someone wanting to gain
-access, stealing your user's session cookies or credentials.
+Motivation: HTTPS for Opencast, why?
+------------------------------------
 
-## Enable HTTPS directly in Opencast – without proxy
+Your site visitor's privacy. While ISPs and public HotSpot operators and those
+who sniff unencrypted WiFi traffic might be able to see your visitors
+connecting to your site, they can't see, which video is watched when HTTPS is
+enabled.
+
+
+Enable HTTPS directly in Opencast – without proxy
+-------------------------------------------------
 
 In `opencast/etc/`, use the `org.ops4j.pax.web.cfg` file for
 configuration:
@@ -55,39 +51,45 @@ org.ops4j.pax.web.ssl.password=<the_keystore_password>
 org.ops4j.pax.web.ssl.keypassword=<the_key_password>
 ```
 
+
 ### Port-Forwarding required
 
-Note that if you do not run Opencast as root, it most likely can't
-bind to port 443. That's why you still need to reverse-proxy or port-
-forward if you want to avoid URLs with port specified like
-https://host:8443/ which is technically perfectly okay but may
-confuse users or is perceived as "ugly".
+Note that Opencast most likely can't bind to port 443. That's why you still
+need to reverse-proxy or port-forward if you want to avoid URLs with port
+specified like `https://host:8443/` which is technically perfectly okay but may
+confuse users or may be perceived as "ugly".
+
+Here is a non-comprehensive lists of tools and methods which can be used for
+port forwarding:
+
 
 #### Port-Forwarding with iptables
 
 A rule like
 
 ```sh
-sudo iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443
+iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 8443
 # Allow also localhost traffic to use :443
-#sudo iptables -A OUTPUT -t nat -o lo -p tcp --dport 443 -j REDIRECT --to-port 8443
+# iptables -A OUTPUT -t nat -o lo -p tcp --dport 443 -j REDIRECT --to-port 8443
 ```
 
-should do the job after replacing `eth0` with the network interface
-your Opencast consumers will connect on. Note that you usually want
-to persist the rule.
+should do the job after replacing `eth0` with the network interface your
+Opencast consumers will connect on. Note that you usually want to persist the
+rule.
+
 
 #### Port-Forwarding with docker(-proxy)
 
 When starting a container from an Opencast image, either insert a
 command line argument to docker run: `-p 443:8443` or add a `ports:`
-in docker-compose.yaml
+in `docker-compose.yaml`.
+
 
 #### Port-Forwarding with sniproxy
 
-[Sniproxy](https://github.com/dlundquist/sniproxy) can be used as
-well, especially if you have multiple servers running on the same
-machine that handle HTTPS individually (no termination proxy).
+[Sniproxy](https://github.com/dlundquist/sniproxy) can be used as well,
+especially if you have multiple servers running on the same machine that handle
+HTTPS individually (no termination proxy).
 
 ```
 user, pidfile, error_log ...
@@ -108,11 +110,13 @@ table https_hosts {
 }
 ```
 
+
 ### Creating the keystore
 
 What you need, is the TLS private key and the certificate including the
 whole chain between the root certificate, all intermediates and the
 certificate itself.
+
 
 #### Obtaining the certificate chain
 
@@ -160,6 +164,7 @@ openssl pkcs12 \
         -passout "pass:<the_keystore_password>"
 ```
 
+
 #### Import the p12 keystore into a Java keystore:
 
 ```bash
@@ -178,11 +183,13 @@ keytool \
         -storepass "<the_keystore_password>"
 ```
 
-[There exists a shell script automating that task](https://gist.github.com/pawohl/dd92ff4909e3e2704e36dec747ea238e).
+[There exists a shell script automating that task
+](https://gist.github.com/pawohl/dd92ff4909e3e2704e36dec747ea238e).
+
 
 ### Default to HTTPS
 
-When finished, restarted and verified that HTTPS works as expexted,
+When finished, restarted and verified that HTTPS works as expected,
 you can change Opencast's default URL to the HTTPS one.
 
 Set `org.opencastproject.server.url` to the  HTTPS-URL in
@@ -193,7 +200,8 @@ org.opencastproject.server.url=https://opencast.example.com
 ```
 
 
-## Enable HTTPS using a termination-proxy
+Enable HTTPS using a termination-proxy
+--------------------------------------
 
 All you have to do is to set `org.opencastproject.server.url` to the
 HTTPS-URL in `etc/custom.properties`.
@@ -202,17 +210,11 @@ HTTPS-URL in `etc/custom.properties`.
 org.opencastproject.server.url=https://opencast.example.com
 ```
 
-I am not aware that Opencast would use WebSockets but if it starts
-doing so, you might need to take care forwarding the headers and
-allowing the connection to upgrage here and avoid closing it too
-soon.
 
-As a docker user, you would probably just use
-[jwilder/nginx-proxy](https://hub.docker.com/r/jwilder/nginx-proxy/).
+Upgrading to HTTPS if already-processed media packages exist
+------------------------------------------------------------
 
-## Upgrading to HTTPS if already-processed media packages exist
-
-1. Backup your database, and the solr and adminui indices.
+1. Backup your database, and the Solr and Elasticsearch indices.
 2. Tell your other Opencast systems to use HTTPS for each other,
    or at least for the system delivering the videos to the visitors
    and creating the search indices.
@@ -238,16 +240,12 @@ As a docker user, you would probably just use
            WHERE INSTR( mediapackage_xml,
                         'http://presentation.opencast.example.com:80') > 0;
 
-6. Rebuild the AdminUI (lucene?) indices.
+6. Rebuild the Elasticsearch indices.
    Visit your REST API and push the button:
    https://admin.opencast.example.com/docs.html?path=/admin-ng/index
-7. Move the old Solr **search** indices away. There might be a directory
+7. Move the search service's old Solr index away. There might be a directory
    named `solr-indexes/search` but its configuration really depends on
    `org.opencastproject.solr.dir`, or if set in `custom.properties`,
    `org.opencastproject.search.solr.dir`
-8. Rebuild the Solr indices. For this to work, make sure to have a
-   service serving mediapackages running (e.g. a presentation node).
-   Start another node, whose task is to re-index episodes (e.g. a second
-   presentation). Ensure the JVM of the indexing service has sufficient
-   virtual memory.
-
+8. Rebuild the Solr indices by re-starting your Opencast node running the
+   search service (usually presentation).
