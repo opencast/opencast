@@ -1,15 +1,15 @@
 {
-  "value_locale":"pl",
-  "error_AudioCodecNotSupported":"Błąd: Format audio nie jest obsługiwany przez przeglądarkę",
-  "error_AudioElementNotSupported":"Błąd: Twoja przeglądarka nie obsługuje elementu audio.",
-  "video":"Wideo",
-  "video_short":"Wid.",
-  "openInPlayer":"Odtwórz",
-  "givenTime":"Wskazany czas",
-  "hasToBeSmallerThanDuration":"musi być mniejszy niż czas trwania",
-  "msg_waitToSetTime":"Poczekaj z określeniem czasu odtwarzania aż film zostanie załadowany.",
-  "msg_startPlayingToSetTime":"Rozpocznij odtwarzanie wideo, zanim ustawisz czas nagrania.",
-  "msg_waitToSeek":"Przewijanie nie jest możliwe, przed załadowaniem filmu.",
-  "msg_startPlayingToSeek":"Przewijanie i wyszukiwanie nie jest możliwe przed rozpoczęciem odtwarzania.",
-  "chromeBuffer":"Kontrola buforowanie wideo została wyłączona ze względu na ograniczenia przeglądarki Google Chrome. Z tego powodu mogą wystąpić problemy podczas odtwarzania."
+    "value_locale": "pl",
+    "error_AudioCodecNotSupported": "Błąd: Format audio nie jest obsługiwany przez przeglądarkę",
+    "error_AudioElementNotSupported": "Błąd: Twoja przeglądarka nie obsługuje elementu audio.",
+    "video": "Wideo",
+    "video_short": "Wid.",
+    "openInPlayer": "Odtwórz",
+    "givenTime": "Wskazany czas",
+    "hasToBeSmallerThanDuration": "musi być mniejszy niż czas trwania",
+    "msg_waitToSetTime": "Poczekaj z określeniem czasu odtwarzania aż film zostanie załadowany.",
+    "msg_startPlayingToSetTime": "Rozpocznij odtwarzanie wideo, zanim ustawisz czas nagrania.",
+    "msg_waitToSeek": "Przewijanie nie jest możliwe, przed załadowaniem filmu.",
+    "msg_startPlayingToSeek": "Przewijanie i wyszukiwanie nie jest możliwe przed rozpoczęciem odtwarzania.",
+    "chromeBuffer": "Kontrola buforowanie wideo została wyłączona ze względu na ograniczenia przeglądarki Google Chrome. Z tego powodu mogą wystąpić problemy podczas odtwarzania."
 }

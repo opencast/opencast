@@ -1,8 +1,8 @@
 {
-  "value_locale":"en",
-  "error_mediaPackageInformationNotLoaded":"There are two possible reasons for this error:",
-  "error_mediaPackageInformationNotLoaded_reason1":"The media is not available any more",
-  "error_mediaPackageInformationNotLoaded_reason2":"The media is protected and you need to log in",
-  "error_noMediaInformationAvailable":"Er zijn geen mediagegevens beschikbaar.",
-  "error_endpointNotAvailable":"De zoekservice is momenteel niet beschikbaar."
+    "value_locale": "en",
+    "error_mediaPackageInformationNotLoaded": "Er zijn twee mogelijke redenen voor deze fout:",
+    "error_mediaPackageInformationNotLoaded_reason1": "De media is niet meer beschikbaar",
+    "error_mediaPackageInformationNotLoaded_reason2": "De media wordt beschermd en u hoeft in te loggen",
+    "error_noMediaInformationAvailable": "Er zijn geen mediagegevens beschikbaar.",
+    "error_endpointNotAvailable": "De zoekservice is momenteel niet beschikbaar."
 }

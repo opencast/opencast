@@ -1,6 +1,6 @@
 {
-  "value_locale":"sv",
-  "segment":"Segment",
-  "noSlidesAvailable":"Inga transparanger tillgängliga.",
-  "slide_text":"Bildtexten"
+    "value_locale": "sv",
+    "segment": "Segment",
+    "noSlidesAvailable": "Inga transparanger tillgängliga.",
+    "slide_text": "Bildtexten"
 }

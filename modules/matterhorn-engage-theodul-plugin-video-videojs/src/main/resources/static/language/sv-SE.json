@@ -1,15 +1,15 @@
 {
-  "value_locale":"sv",
-  "error_AudioCodecNotSupported":"Fel: Ljud-codec stöds inte av denna webbläsare",
-  "error_AudioElementNotSupported":"Fel: Din webbläsare stöder inte audio-elementet.",
-  "video":"Video",
-  "video_short":"Vid.",
-  "openInPlayer":"Öppna i spelare",
-  "givenTime":"Den angivna tiden",
-  "hasToBeSmallerThanDuration":"måste vara mindre än totala längden",
-  "msg_waitToSetTime":"Vänta med att ställa in uppspelningshastighet tills videon laddats.",
-  "msg_startPlayingToSetTime":"Starta uppspelning av videon innan val av uppspelningshastighet görs.",
-  "msg_waitToSeek":"Sökning är inte tillgänglig tills videon är laddad.",
-  "msg_startPlayingToSeek":"Sökning är inte möjligt innan minst ett klick på Play-knappen.",
-  "chromeBuffer":"Buffer-kontrollen har inaktiverats pga begränsningar i Chrome. Det är möjligt att du kommer stöta på problem med videouppspelningen."
+    "value_locale": "sv",
+    "error_AudioCodecNotSupported": "Fel: Ljud-codec stöds inte av denna webbläsare",
+    "error_AudioElementNotSupported": "Fel: Din webbläsare stöder inte audio-elementet.",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Öppna i spelare",
+    "givenTime": "Den angivna tiden",
+    "hasToBeSmallerThanDuration": "måste vara mindre än totala längden",
+    "msg_waitToSetTime": "Vänta med att ställa in uppspelningshastighet tills videon laddats.",
+    "msg_startPlayingToSetTime": "Starta uppspelning av videon innan val av uppspelningshastighet görs.",
+    "msg_waitToSeek": "Sökning är inte tillgänglig tills videon är laddad.",
+    "msg_startPlayingToSeek": "Sökning är inte möjligt innan minst ett klick på Play-knappen.",
+    "chromeBuffer": "Buffer-kontrollen har inaktiverats pga begränsningar i Chrome. Det är möjligt att du kommer stöta på problem med videouppspelningen."
 }

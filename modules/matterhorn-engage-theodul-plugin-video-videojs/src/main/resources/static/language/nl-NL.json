@@ -1,15 +1,15 @@
 {
-  "value_locale":"en",
-  "error_AudioCodecNotSupported":"Fout: De audio codec wordt niet ondersteund door deze browser",
-  "error_AudioElementNotSupported":"Fout: Uw browser biedt geen ondersteuning voor het audio element.",
-  "video":"Video",
-  "video_short":"Vid.",
-  "openInPlayer":"Open in de speler",
-  "givenTime":"De gegeven tijd",
-  "hasToBeSmallerThanDuration":"moet kleiner zijn dan de duur",
-  "msg_waitToSetTime":"Gelieve te wachten met het instellen van een afspeeltijdstip tot wanneer de video ingeladen is.",
-  "msg_startPlayingToSetTime":"Start de video alvoor een afspeeltijdstip in te stellen.",
-  "msg_waitToSeek":"Zoeken is niet mogelijk tot wanneer de video ingeladen is.",
-  "msg_startPlayingToSeek":"Zoeken is niet mogelijk voor minstens een keer op de afspeelknop te klikken.",
-  "chromeBuffer":"De buffer checker is uitgeschakeld wegens Google Chrome limitaties. Het is mogelijk dat je problemen ondervindt bij het afspelen van de video."
+    "value_locale": "en",
+    "error_AudioCodecNotSupported": "Fout: De audio codec wordt niet ondersteund door deze browser",
+    "error_AudioElementNotSupported": "Fout: Uw browser biedt geen ondersteuning voor het audio element.",
+    "video": "Video",
+    "video_short": "Vid.",
+    "openInPlayer": "Open in de speler",
+    "givenTime": "De gegeven tijd",
+    "hasToBeSmallerThanDuration": "moet kleiner zijn dan de duur",
+    "msg_waitToSetTime": "Gelieve te wachten met het instellen van een afspeeltijdstip tot wanneer de video ingeladen is.",
+    "msg_startPlayingToSetTime": "Start de video alvoor een afspeeltijdstip in te stellen.",
+    "msg_waitToSeek": "Zoeken is niet mogelijk tot wanneer de video ingeladen is.",
+    "msg_startPlayingToSeek": "Zoeken is niet mogelijk voor minstens een keer op de afspeelknop te klikken.",
+    "chromeBuffer": "De buffer checker is uitgeschakeld wegens Google Chrome limitaties. Het is mogelijk dat je problemen ondervindt bij het afspelen van de video."
 }
