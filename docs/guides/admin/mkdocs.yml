@@ -47,6 +47,7 @@ pages:
       - Access Control Lists: 'configuration/acl.md'
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
+      - HTTPS: 'configuration/security.https.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
       - Stream Security: 'configuration/stream-security.md'
