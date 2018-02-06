@@ -53,7 +53,9 @@ import org.opencastproject.util.UrlSupport;
 
 import com.entwinemedia.fn.data.Opt;
 
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -862,8 +864,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     final TimeZone timeZone = TimeZone.getDefault();
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
-    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
-    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
+    DateTime periodStart = new DateTime(start);
+    DateTime periodEnd = new DateTime();
 
     Calendar endCalendar = Calendar.getInstance(utc);
     endCalendar.setTime(end);
@@ -878,7 +880,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     List<Period> events = new LinkedList<>();
 
     TimeZone.setDefault(utc);
-    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
+    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, Value.DATE_TIME)) {
       Date d = (Date) date;
       Calendar cDate = Calendar.getInstance(utc);
 
@@ -895,8 +897,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       cDate.setTime(d);
 
       TimeZone.setDefault(timeZone);
-      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
-              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
+      Period p = new Period(new DateTime(cDate.getTime()),
+              new DateTime(cDate.getTimeInMillis() + duration));
       events.add(p);
       TimeZone.setDefault(utc);
     }
