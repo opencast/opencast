@@ -46,6 +46,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,7 +68,8 @@ public class SchedulerUtilTest {
 
     workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class))).andReturn(workspaceFile).anyTimes();
-    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class))).andReturn(workspaceFile).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
+            .andAnswer(() -> new FileInputStream(workspaceFile)).anyTimes();
     EasyMock.replay(workspace);
   }
 

@@ -1,6 +1,6 @@
 angular.module('adminNg.directives')
-.directive('adminNgTimeline', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
-function (PlayerAdapter, $document, VideoService, $timeout) {
+.directive('adminNgTimeline', ['AuthService', 'PlayerAdapter', '$document', 'VideoService', '$timeout',
+function (AuthService, PlayerAdapter, $document, VideoService, $timeout) {
 
     return {
         templateUrl: 'shared/partials/timeline.html',
@@ -32,6 +32,17 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
             scope.from = 0;
             scope.to = 0;
+
+            scope.previewMode = true; // in preview mode, deactivated segments are skipped while playing.
+
+            if (AuthService) {
+                var ADMIN_EDITOR_PREVIEWMODE_DEFAULT = 'admin.editor.previewmode.default';
+                AuthService.getUser().$promise.then(function(user) {
+                    if (angular.isDefined(user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT])) {
+                        scope.previewMode = user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT].toUpperCase() === 'TRUE';
+                    }
+                });
+            }
 
             scope.wrapperClass = ''; // list of border classes for the segment wrapper.
 
@@ -81,8 +92,8 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                     replaySegment = segment;
                 }
 
-                // Skip deleted segments while playing
-                if (segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
+                // When in preview mode, skip deleted segments while playing
+                if (scope.previewMode && segment.deleted && scope.player.adapter.getStatus() === PlayerAdapter.STATUS.PLAYING) {
                     scope.player.adapter.setCurrentTime(segment.end / 1000);
                 }
             });
@@ -986,6 +997,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
                 });
                 segment.selected = true;
                 scope.setWrapperClasses();
+            };
+
+            /**
+             * Toggles the preview mode. When preview mode is enabled, deactivated segments are skipped while playing.
+             */
+            scope.togglePreviewMode = function() {
+                scope.previewMode = !scope.previewMode;
             };
 
             /**

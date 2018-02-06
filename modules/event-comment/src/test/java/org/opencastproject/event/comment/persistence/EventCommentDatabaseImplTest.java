@@ -22,6 +22,8 @@
 package org.opencastproject.event.comment.persistence;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl.PERSISTENCE_UNIT;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
@@ -30,6 +32,7 @@ import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -39,6 +42,9 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
+import java.util.Map;
 
 public class EventCommentDatabaseImplTest {
 
@@ -94,6 +100,42 @@ public class EventCommentDatabaseImplTest {
     assertEquals(2, modifiedComment.getReplies().size());
     assertEquals("comment2", modifiedComment.getReplies().get(0).getText());
     assertEquals("comment3", modifiedComment.getReplies().get(1).getText());
+  }
+
+  @Test
+  public void testGetEventsWithComments() throws Exception {
+    Organization org1 = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(org1.getId()).andReturn("org1").anyTimes();
+    EasyMock.expect(org1.getName()).andReturn("org1").anyTimes();
+
+    Organization org2 = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(org2.getId()).andReturn("org2").anyTimes();
+    EasyMock.expect(org2.getName()).andReturn("org2").anyTimes();
+    EasyMock.replay(org1, org2);
+
+    User userOrg1 = new JaxbUser("userOrg1", "default", JaxbOrganization.fromOrganization(org1));
+    User userOrg2 = new JaxbUser("userOrg2", "default", JaxbOrganization.fromOrganization(org2));
+
+    EventComment eventComment1 = EventComment.create(none(Long.class), "event1", org1.getId(), "test", userOrg1);
+    EventComment eventComment2 = EventComment.create(none(Long.class), "event2", org1.getId(), "test", userOrg1);
+    EventComment eventComment3 = EventComment.create(none(Long.class), "event3", org2.getId(), "test", userOrg2);
+
+    persistence.updateComment(eventComment1);
+    persistence.updateComment(eventComment2);
+    persistence.updateComment(eventComment3);
+
+    Map<String, List<String>> eventsWithComments = persistence.getEventsWithComments();
+    assertEquals(2, eventsWithComments.keySet().size());
+    assertTrue(eventsWithComments.keySet().contains(org1.getId()));
+    assertTrue(eventsWithComments.keySet().contains(org2.getId()));
+
+    assertTrue(eventsWithComments.get(org1.getId()).contains(eventComment1.getEventId()));
+    assertTrue(eventsWithComments.get(org1.getId()).contains(eventComment2.getEventId()));
+    assertTrue(eventsWithComments.get(org2.getId()).contains(eventComment3.getEventId()));
+
+    assertFalse(eventsWithComments.get(org1.getId()).contains(eventComment3.getEventId()));
+    assertFalse(eventsWithComments.get(org2.getId()).contains(eventComment1.getEventId()));
+    assertFalse(eventsWithComments.get(org2.getId()).contains(eventComment2.getEventId()));
   }
 
 }

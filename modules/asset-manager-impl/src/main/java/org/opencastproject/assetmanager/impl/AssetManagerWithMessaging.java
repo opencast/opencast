@@ -22,6 +22,7 @@ package org.opencastproject.assetmanager.impl;
 
 import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
+import static org.opencastproject.util.RequireUtil.notEmpty;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -47,17 +48,14 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.P1Lazy;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -123,39 +121,61 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
       }
 
       @Override
-      public void repopulate(final String indexName) throws Exception {
-        final AQueryBuilder q = delegate.createQuery();
-        final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
-        logger.info(format("Populating index '%s' with %d snapshots | start", indexName, r.getSize()));
-        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
-        final IndexRecreationBatch batch = mkRecreationBatch(indexName, AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX,
-                (int) r.getSize());
-        for (final Map.Entry<String, List<Snapshot>> es : byOrg.entrySet()) {
-          final Organization organization = AssetManagerWithMessaging.this.orgDir.getOrganization(es.getKey());
-            for (final Snapshot e : es.getValue()) {
-              try {
-                batch.update(organization, new P1Lazy<Serializable>() {
-                  @Override
-                  public Serializable get1() {
-                    return mkTakeSnapshotMessage(e);
-                  }
-                });
-              } catch (Exception excpt) {
-                logger.error("Skipping non existing Asset. " + excpt);
+      public void repopulate(final String indexName) {
+        notEmpty(indexName, "indexName");
+        final Organization org = getSecurityService().getOrganization();
+        final User user = (org != null ? getSecurityService().getUser() : null);
+        try {
+          final Organization defaultOrg = new DefaultOrganization();
+          final User systemUser = SecurityUtil.createSystemUser(getSystemUserName(), defaultOrg);
+          getSecurityService().setOrganization(defaultOrg);
+          getSecurityService().setUser(systemUser);
+
+          final AQueryBuilder q = delegate.createQuery();
+          final RichAResult r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).run());
+          final int total = r.countSnapshots();
+          logger.info(format("Populating index '%s' with %d snapshots | start", indexName, total));
+          final int responseInterval = (total < 100) ? 1 : (total / 100);
+          int current = 0;
+
+          final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+          for (String orgId : byOrg.keySet()) {
+            final Organization snapshotOrg;
+            try {
+              snapshotOrg = AssetManagerWithMessaging.this.orgDir.getOrganization(orgId);
+              getSecurityService().setOrganization(snapshotOrg);
+              getSecurityService().setUser(SecurityUtil.createSystemUser(systemUserName, snapshotOrg));
+
+              for (Snapshot snapshot : byOrg.get(orgId)) {
+                current += 1;
+                try {
+                  TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot);
+                  getMessageSender().sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
+                          MessageSender.DestinationType.Queue, takeSnapshot);
+                } catch (Throwable t) {
+                  logger.error("Unable to recreate event {} from organization {}",
+                          snapshot.getMediaPackage().getIdentifier().compact(), orgId, t);
+                }
+                if (((current % responseInterval) == 0) || (current == total)) {
+                  getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
+                          MessageSender.DestinationType.Queue, IndexRecreateObject.update(indexName, getService(),
+                                  total, current));
+                }
               }
+            } catch (Throwable t) {
+              logger.error("Unable to recreate event index for organization {}", orgId, t);
+            } finally {
+              getSecurityService().setOrganization(defaultOrg);
+              getSecurityService().setUser(systemUser);
             }
           }
-        logger.info("Populating index | end");
-        Organization organization = new DefaultOrganization();
-        SecurityUtil.runAs(getSecurityService(), organization,
-                SecurityUtil.createSystemUser(getSystemUserName(), organization), new Effect0() {
-                  @Override
-                  protected void run() {
-                    String destinationId = AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            IndexRecreateObject.end(indexName, IndexRecreateObject.Service.AssetManager));
-                  }
-                });
+          getMessageSender().sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                  IndexRecreateObject.end(indexName, getService()));
+
+        } finally {
+          getSecurityService().setOrganization(org);
+          getSecurityService().setUser(user);
+        }
       }
     };
     this.indexProducerMsgReceiver.activate();

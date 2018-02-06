@@ -608,7 +608,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
             new Effect0() {
               @Override
               protected void run() {
-                messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                         IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
               }
             });

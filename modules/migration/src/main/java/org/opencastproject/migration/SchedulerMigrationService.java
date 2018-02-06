@@ -285,6 +285,7 @@ public class SchedulerMigrationService {
         DublinCoreCatalog dc = readDublinCoreSilent(resultSet.getString(5));
         dc.setIdentifier(UUID.randomUUID().toString());
         dc.setFlavor(MediaPackageElements.EPISODE);
+        dc.remove(DublinCore.PROPERTY_IDENTIFIER);
         Properties properties = parseProperties(resultSet.getString(4));
         AccessControlList acl = resultSet.getString(2) != null
                 ? AccessControlParser.parseAclSilent(resultSet.getString(2)) : null;

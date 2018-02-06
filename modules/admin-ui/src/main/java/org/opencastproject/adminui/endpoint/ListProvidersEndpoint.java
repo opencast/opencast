@@ -140,9 +140,11 @@ public class ListProvidersEndpoint {
   @GET
   @Path("components.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "components", description = "Provides a set of constants lists (locationFilter, eventSourcesFilter, eventCommentReasons, eventStatusFilter) widely used in the UI", reponses = { @RestResponse(description = "Returns a set of constants lists (locationFilter, eventSourcesFilter, eventCommentReasons, eventStatusFilter) widely used in the UI", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "components", description = "Provides a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
+    reponses = { @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
+    responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getComponents(@Context HttpHeaders headers) {
-    String[] sources = { "locationFilter", "eventSourcesFilter", "eventCommentReasons", "eventStatusFilter" };
+    String[] sources = { "eventCommentReasons" };
     ResourceListQuery query = new ResourceListQueryImpl();
 
     JSONObject list = new JSONObject();

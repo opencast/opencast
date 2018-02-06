@@ -13,10 +13,10 @@ admin node).
 Installation
 ------------
 
- - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
+ - If you use the Opencast package repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
- - Newer Debian based operating systems contain a sufficient new version.
+ - Newer Debian based operating systems contain a sufficient new version, however the ActiveMQ configuration file will require modification to function correctly.
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
 
 
@@ -149,3 +149,25 @@ two properties to set:
 Do not forget that ActiveMQ uses the TCP port 61616 (default configuration) for communication. You probably want to
 allow communication over this port in your firewall on a distributed setup or explicitly forbid public access on an
 all-in-one installation.
+
+## Memory settings
+
+When ActiveMQ is under heavy load it may require additional RAM. There are two places to change this:
+
+In `docs/scripts/activemq/activemq.xml`:
+
+    ...
+    <systemUsage>
+      <systemUsage>
+        <memoryUsage>
+          <!--<memoryUsage percentOfJvmHeap="70" />-->
+          <memoryUsage limit="2048 MB"/>
+    ...
+
+This controls the allowed memory of ActiveMQ inside of its JVM instance. For more information see [the ActiveMQ documentation](http://activemq.apache.org/javalangoutofmemory.html)
+
+In `/usr/share/activemq/bin/env`:
+
+    ACTIVEMQ_OPTS_MEMORY="-Xms64M -Xmx4G"
+
+These are the classic JVM minimum and maximum memory flags.

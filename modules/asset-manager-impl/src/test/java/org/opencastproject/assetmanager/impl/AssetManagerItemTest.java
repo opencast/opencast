@@ -54,7 +54,7 @@ public class AssetManagerItemTest {
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).once();
     EasyMock.expect(workspace.read(EasyMock.anyObject(URI.class)))
-            .andReturn(new File(getClass().getResource("/dublincore-a.xml").toURI())).once();
+            .andAnswer(() -> getClass().getResourceAsStream("/dublincore-a.xml")).once();
     EasyMock.replay(workspace);
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     mp.add(DublinCores.mkOpencastEpisode().getCatalog());

@@ -49,6 +49,7 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -97,6 +98,9 @@ public class EventCatalogUIAdapterTest {
     EasyMock.expect(
             listProvidersService.isTranslatable(EasyMock.anyString()))
             .andThrow(new ListProviderException("not implemented")).anyTimes();
+    EasyMock.expect(
+            listProvidersService.getDefault(EasyMock.anyString()))
+            .andThrow(new ListProviderException("not implemented")).anyTimes();
     EasyMock.replay(listProvidersService);
 
     Properties props = new Properties();
@@ -111,7 +115,8 @@ public class EventCatalogUIAdapterTest {
     URI eventDublincoreURI = getClass().getResource("/catalog-adapter/event-dublincore.xml").toURI();
 
     workspace = EasyMock.createMock(Workspace.class);
-    EasyMock.expect(workspace.read(eventDublincoreURI)).andReturn(new File(eventDublincoreURI));
+    EasyMock.expect(workspace.read(eventDublincoreURI))
+            .andAnswer(() -> new FileInputStream(new File(eventDublincoreURI)));
     EasyMock.replay(workspace);
 
     Catalog eventCatalog = EasyMock.createMock(Catalog.class);

@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * A workflow definition.
  */
 @XmlJavaTypeAdapter(WorkflowDefinitionImpl.Adapter.class)
-public interface WorkflowDefinition {
+public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
 
   /**
    * The variable in a workflow definition that is to be replaced by the reason for an operation's failure.

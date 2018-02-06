@@ -55,8 +55,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -350,6 +352,32 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     }
   }
 
+  /**
+   * Return all known event ID's with existing comments, grouped by organization ID
+   *
+   * @return a list of all event ID's grouped by organization ID
+   */
+  public Map<String, List<String>> getEventsWithComments() {
+    EntityManager em = emf.createEntityManager();
+    Query query = em.createNativeQuery(
+            "SELECT e.organization, e.event FROM mh_event_comment e ORDER BY e.organization ASC");
+    Iterator iter = query.getResultList().iterator();
+    Map<String, List<String>> orgEventsMap = new Hashtable<>();
+    while (iter.hasNext()) {
+      Object[] orgEventResult = (Object[]) iter.next();
+      String orgId = (String) orgEventResult[0];
+      String eventId = (String) orgEventResult[1];
+      if (!orgEventsMap.containsKey(orgId)) {
+        List<String> eventIds = new ArrayList<>();
+        eventIds.add(eventId);
+        orgEventsMap.put(orgId, eventIds);
+      } else if (!orgEventsMap.get(orgId).contains(eventId)) {
+        orgEventsMap.get(orgId).add(eventId);
+      }
+    }
+    return orgEventsMap;
+  }
+
   private void sendMessageUpdate(String eventId) throws EventCommentDatabaseException {
     List<EventComment> comments = getComments(eventId);
     boolean openComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
@@ -378,31 +406,43 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       final int total = countComments();
       final int[] current = new int[1];
-      current[0] = 1;
+      current[0] = 0;
       logger.info("Re-populating index '{}' with comments for events. There are {} events with comments to add",
               indexName, total);
       final int responseInterval = (total < 100) ? 1 : (total / 100);
-      for (Iterator<EventCommentDto> i = getComments(); i.hasNext();) {
-        final EventCommentDto comment = i.next();
-        Organization organization = organizationDirectoryService.getOrganization(comment.getOrganization());
+      final Map<String, List<String>> eventsWithComments = getEventsWithComments();
+      for (String orgId : eventsWithComments.keySet()) {
+        Organization organization = organizationDirectoryService.getOrganization(orgId);
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization),
                 new Effect0() {
-          @Override
-          protected void run() {
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    CommentItem.update(comment.getEventId(), true, !comment.isResolvedStatus(),
-                            (!comment.isResolvedStatus()
-                                    && EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()))));
-            if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
-            }
-            current[0] += 1;
-          }
-        });
+                  @Override
+                  protected void run() {
+                    for (String eventId : eventsWithComments.get(orgId)) {
+                      try {
+                        List<EventComment> comments = getComments(eventId);
+                        boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
+                        boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                                CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
+
+                        current[0] += comments.size();
+                        if (responseInterval == 1 || comments.size() > responseInterval || current[0] == total
+                                || current[0] % responseInterval < comments.size()) {
+                          messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
+                                  MessageSender.DestinationType.Queue, IndexRecreateObject
+                                          .update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
+                        }
+                      } catch (EventCommentDatabaseException e) {
+                        logger.error("Unable to retrieve event comments for organization {}", orgId, e);
+                      } catch (Throwable t) {
+                        logger.error("Unable to update comment on event {} for organization {}", eventId, orgId, t);
+                      }
+                    }
+                  }
+                });
       }
     } catch (Exception e) {
-      logger.warn("Unable to index event comments: {}", e);
+      logger.warn("Unable to index event comments", e);
       throw new ServiceException(e.getMessage());
     }
 
@@ -410,7 +450,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
       @Override
       protected void run() {
-        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                 IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Comments));
       }
     });

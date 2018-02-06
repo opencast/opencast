@@ -29,7 +29,6 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.storage.Source;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
@@ -42,12 +41,13 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URI;
 
 public class AbstractFileSystemAssetStoreTest {
   private static final String XML_EXTENSTION = ".xml";
@@ -72,15 +72,22 @@ public class AbstractFileSystemAssetStoreTest {
 
   private File sampleElemDir;
 
+  @Rule
+  public TemporaryFolder tmpFolder = new TemporaryFolder();
+
   @Before
   public void setUp() throws Exception {
     final File asset = IoSupport.classPathResourceAsFile("/" + FILE_NAME).get();
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.<URI>anyObject())).andReturn(asset);
+    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(asset);
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andAnswer(() -> {
+        File tmp = tmpFolder.newFile();
+        FileUtils.copyFile(asset, tmp);
+        return tmp;
+      }).anyTimes();
     EasyMock.replay(workspace);
 
-    tmpRoot = FileSupport.getTempDirectory(TEST_ROOT_DIR_NAME);
-    tmpRoot.deleteOnExit();
+    tmpRoot = tmpFolder.newFolder();
 
     repo = new AbstractFileSystemAssetStore() {
       @Override protected Workspace getWorkspace() {

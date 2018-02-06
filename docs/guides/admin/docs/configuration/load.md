@@ -59,7 +59,6 @@ is running.  The current files with relevant configuration keys are:
 |------------------------------------------------------------------------------------------|------------------------------------|
 | org.opencastproject.caption.impl.CaptionServiceImpl.cfg                                  | Caption convertion services        |
 | org.opencastproject.composer.impl.ComposerServiceImpl.cfg                                | Caption embedding services         |
-| org.opencastproject.distribution.acl.AclDistributionService.cfg                          | ACL file distribution              |
 | org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.cfg | Streaming distribution             |
 | org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
 | org.opencastproject.execute.impl.ExecuteServiceImpl.cfg                                  | Execute service                    |

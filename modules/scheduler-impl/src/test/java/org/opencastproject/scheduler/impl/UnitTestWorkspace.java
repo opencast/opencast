@@ -32,9 +32,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.UUID;
 
 /**
  * A {@link Workspace} implementation suitable for unit tests.
@@ -61,12 +63,23 @@ public class UnitTestWorkspace implements Workspace {
 
   @Override
   public File get(URI uri) throws NotFoundException, IOException {
-    return new File(uri);
+    return get(uri, false);
   }
 
   @Override
-  public File read(URI uri) throws NotFoundException, IOException {
-    return get(uri);
+  public File get(URI uri, boolean uniqueFilename) throws NotFoundException, IOException {
+    File src = new File(uri);
+    if (uniqueFilename) {
+      File target = new File(baseDir, UUID.randomUUID().toString());
+      FileUtils.copyFile(src, target);
+      return target;
+    }
+    return src;
+  }
+
+  @Override
+  public InputStream read(URI uri) throws NotFoundException, IOException {
+    return new FileInputStream(get(uri));
   }
 
   @Override
