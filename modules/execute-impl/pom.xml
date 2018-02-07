@@ -89,6 +89,10 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              *
+            </Import-Package>
             <Export-Package>
               org.opencastproject.execute.impl.*;version=${project.version}
             </Export-Package>

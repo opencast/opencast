@@ -292,6 +292,9 @@
               !org.mozilla.javascript.*,
               !org.python.*,
               !org.zeroturnaround.javarebel.*,
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              javax.ws.rs.ext;version=2.0.1,
               *
             </Import-Package>
             <Embed-Dependency>

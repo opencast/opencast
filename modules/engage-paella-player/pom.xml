@@ -196,7 +196,11 @@
             <Http-Alias>/engage/paella/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>watch.html</Http-Welcome>
-            
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
             <Export-Package>org.opencastproject.engage.paella</Export-Package>
             <Service-Component>
               OSGI-INF/paella-config-file.xml
