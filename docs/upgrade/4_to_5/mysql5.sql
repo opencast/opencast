@@ -335,10 +335,6 @@ ALTER TABLE oc_user_ref_role DROP FOREIGN KEY FK_mh_user_ref_role_user_id;
 RENAME TABLE mh_user_settings TO oc_user_settings;
 ALTER TABLE oc_user_settings ADD CONSTRAINT UNQ_oc_user_settings UNIQUE (username, organization);
 ALTER TABLE oc_user_settings DROP INDEX IF EXISTS UNQ_mh_user_settings;
-ALTER TABLE oc_user_settings ADD CONSTRAINT FK_oc_user_setting_organization FOREIGN KEY (organization) REFERENCES oc_user (organization);
-ALTER TABLE oc_user_settings DROP FOREIGN KEY FK_mh_user_setting_organization;
-ALTER TABLE oc_user_settings ADD CONSTRAINT FK_oc_user_setting_username FOREIGN KEY (username) REFERENCES oc_user (username);
-ALTER TABLE oc_user_settings DROP FOREIGN KEY FK_mh_user_setting_username;
 
 CREATE INDEX IX_oc_user_setting_organization ON oc_user_settings (organization);
 DROP INDEX IF EXISTS IX_mh_user_setting_organization ON oc_user_settings;
