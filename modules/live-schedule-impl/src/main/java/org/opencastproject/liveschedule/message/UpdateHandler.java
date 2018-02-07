@@ -22,16 +22,16 @@ package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
 import org.opencastproject.message.broker.api.MessageItem;
-import org.opencastproject.util.Log;
 
 import org.osgi.service.component.ComponentContext;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class UpdateHandler {
 
   protected static final String PUBLISH_LIVE_PROPERTY = "publishLive";
 
-  private static final Log logger = new Log(LoggerFactory.getLogger(SchedulerUpdateHandler.class));
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
 
   /** Services */
   protected LiveScheduleService liveScheduleService;

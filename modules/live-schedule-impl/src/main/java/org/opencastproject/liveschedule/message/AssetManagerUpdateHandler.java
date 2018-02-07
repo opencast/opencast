@@ -27,13 +27,13 @@ import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.DeleteEpisode;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.TakeSnapshot;
-import org.opencastproject.util.Log;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AssetManagerUpdateHandler extends UpdateHandler {
 
-  private static final Log logger = new Log(LoggerFactory.getLogger(AssetManagerUpdateHandler.class));
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerUpdateHandler.class);
 
   private static final String DESTINATION_ASSET_MANAGER = "ASSETMANAGER.Liveschedule";
 
@@ -80,7 +80,7 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
           throw new IllegalArgumentException("Unhandled type of AssetManagerItem");
       }
     } catch (Exception e) {
-      logger.warn(e, String.format("Exception occurred for mp %s, event type %s", mpId, item.getType()));
+      logger.warn(String.format("Exception occurred for mp %s, event type %s", mpId, item.getType()), e);
     } finally {
       logger.debug("Asset Manager message handler END for mp {} event type {} in thread {}", mpId, item.getType(),
               Thread.currentThread().getId());

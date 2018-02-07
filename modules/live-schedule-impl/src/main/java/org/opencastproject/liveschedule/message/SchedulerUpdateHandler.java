@@ -27,17 +27,17 @@ import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class SchedulerUpdateHandler extends UpdateHandler {
 
-  private static final Log logger = new Log(LoggerFactory.getLogger(SchedulerUpdateHandler.class));
+  private static final Logger logger = LoggerFactory.getLogger(SchedulerUpdateHandler.class);
 
   private static final String DESTINATION_SCHEDULER = "SCHEDULER.Liveschedule";
 
@@ -107,7 +107,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           throw new IllegalArgumentException("Unhandled type of SchedulerItem");
       }
     } catch (Exception e) {
-      logger.warn(e, String.format("Exception occurred for mp %s, event type %s", mpId, schedulerItem.getType()));
+      logger.warn(String.format("Exception occurred for mp %s, event type %s", mpId, schedulerItem.getType()), e);
     } finally {
       logger.debug("Scheduler message handler END for mp {} event type {} in thread {}", mpId, schedulerItem.getType(),
               Thread.currentThread().getId());
