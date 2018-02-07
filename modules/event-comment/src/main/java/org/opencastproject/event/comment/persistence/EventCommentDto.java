@@ -53,6 +53,7 @@ import javax.persistence.TemporalType;
         @NamedQuery(name = "EventComment.findReasons", query = "SELECT e.reason FROM EventComment e WHERE e.organization = :org GROUP BY e.reason"),
         @NamedQuery(name = "EventComment.findByEvent", query = "SELECT e FROM EventComment e WHERE e.eventId = :eventId AND e.organization = :org ORDER BY e.creationDate"),
         @NamedQuery(name = "EventComment.findByCommentId", query = "SELECT e FROM EventComment e WHERE e.id = :commentId"),
+        @NamedQuery(name = "EventComment.findAllWIthOrg", query = "SELECT e.organization, e.eventId FROM EventComment e ORDER BY e.organization ASC"),
         @NamedQuery(name = "EventComment.clear", query = "DELETE FROM EventComment e WHERE e.organization = :org") })
 public class EventCommentDto {
 
