@@ -34,7 +34,8 @@ angular.module('adminNg.directives')
                     scope.filters.map[key] = {
                         options: {},
                         type: scope.filters.filters[key].type,
-                        label: scope.filters.filters[key].label
+                        label: scope.filters.filters[key].label,
+                        translatable: scope.filters.filters[key].translatable
                     };
                     var options = scope.filters.filters[key].options;
                     angular.forEach(options, function(option) {

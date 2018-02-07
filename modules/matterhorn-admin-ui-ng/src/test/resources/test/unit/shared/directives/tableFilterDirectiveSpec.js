@@ -38,7 +38,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                     'brown': 'BROWN',
                     'white': 'WHITE',
                     'black': 'BLACK'
-                }
+                },
+                translatable: true
             },
             type: {
                 label: 'TYPE',
@@ -46,7 +47,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 options: {
                     'chair': 'CHAIR',
                     'table': 'TABLE'
-                }
+                },
+                translatable: true
             }
         }));
 
