@@ -539,9 +539,7 @@ CREATE TABLE oc_user_settings (
   username varchar(128) NOT NULL,
   organization varchar(128) NOT NULL,
   PRIMARY KEY (id),
-  CONSTRAINT UNQ_oc_user_settings UNIQUE (username, organization),
-  CONSTRAINT `FK_oc_user_setting_organization` FOREIGN KEY (`organization`) REFERENCES `oc_user` (`organization`),
-  CONSTRAINT `FK_oc_user_setting_username` FOREIGN KEY (`username`) REFERENCES `oc_user` (`username`)
+  CONSTRAINT UNQ_oc_user_settings UNIQUE (username, organization)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_oc_user_setting_organization ON oc_user_settings (organization);
