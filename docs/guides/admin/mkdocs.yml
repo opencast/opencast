@@ -83,6 +83,7 @@ pages:
    - Retry Strategies: 'workflowoperationhandlers/retry-strategies.md'
    - Analyze Tracks: 'workflowoperationhandlers/analyze-tracks-woh.md'
    - Analyze Audio: 'workflowoperationhandlers/analyzeaudio-woh.md'
+   - Animate: 'workflowoperationhandlers/animate-woh.md'
    - Asset Snapshot: 'workflowoperationhandlers/snapshot-woh.md'
    - Asset Delete: 'workflowoperationhandlers/asset-delete-woh.md'
    - Attach Watson Transcription: 'workflowoperationhandlers/attach-watson-transcription-woh.md'
