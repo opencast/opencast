@@ -81,6 +81,10 @@
       <artifactId>json-simple</artifactId>
     </dependency>
     <dependency>
+      <groupId>javax.ws.rs</groupId>
+      <artifactId>jsr311-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>test</scope>
@@ -151,6 +155,11 @@
               OSGI-INF/ibm-watson-transcription-rest.xml,
               OSGI-INF/ibm-watson-transcription-service.xml
             </Service-Component>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

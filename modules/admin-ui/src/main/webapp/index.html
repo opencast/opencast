@@ -109,8 +109,8 @@
         <footer id="main-footer" ng-controller="NavCtrl">
             <div class="default-footer">
                 <div ng-if="version.version" class="meta">
-                    Opencast (v.{{ version.version }}<span ng-if=version.buildNumber> -
-                        build: {{ version.buildNumber }}</span>)
+                    Opencast {{ version.version }}
+                    <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
                 </div>
                 <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
                     <a href="javascript:;">Feedback</a>
@@ -152,7 +152,6 @@
         <script src="scripts/shared/services/languageService.js"></script>
         <script src="scripts/shared/services/storageService.js"></script>
         <script src="scripts/shared/services/modalService.js"></script>
-        <script src="scripts/shared/services/constantsService.js"></script>
         <script src="scripts/shared/services/filterProfilesService.js"></script>
         <script src="scripts/shared/services/notificationsService.js"></script>
         <script src="scripts/shared/services/tableService.js"></script>
@@ -283,7 +282,6 @@
         <script src="scripts/shared/filters/arrayFilter.js"></script>
         <script src="scripts/shared/filters/presentValue.js"></script>
         <script src="scripts/shared/filters/removeQueryParams.js"></script>
-        <script src="scripts/shared/filters/sortMapByValue.js"></script>
         <script src="scripts/shared/filters/trustedResourceUrlFilter.js"></script>
         <script src="scripts/shared/directives/directives.js"></script>
         <script src="scripts/shared/directives/customIcon.js"></script>

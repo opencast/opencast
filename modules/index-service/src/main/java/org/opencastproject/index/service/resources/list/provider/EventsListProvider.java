@@ -126,4 +126,9 @@ public class EventsListProvider implements ResourceListProvider {
   public boolean isTranslatable(String listName) {
     return STATUS.equals(listName);
   }
+
+  @Override
+  public String getDefault() {
+    return null;
+  }
 }

@@ -159,4 +159,9 @@ public class ServersListProvider implements ResourceListProvider {
   public boolean isTranslatable(String listName) {
     return StringUtils.equalsIgnoreCase(LIST_STATUS, listName);
   }
+
+  @Override
+  public String getDefault() {
+    return null;
+  }
 }

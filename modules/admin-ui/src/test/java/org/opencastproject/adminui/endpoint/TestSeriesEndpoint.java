@@ -134,6 +134,11 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       public boolean isTranslatable(String listName) {
         return false;
       }
+
+      @Override
+      public String getDefault() {
+        return null;
+      }
     });
     listProvidersServiceImpl.activate(null);
     return listProvidersServiceImpl;

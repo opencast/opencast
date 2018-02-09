@@ -57,4 +57,11 @@ public interface ResourceListProvider {
    * @return if the results should be translated
    */
   boolean isTranslatable(String listName);
+
+  /**
+   * Returns the key of the default value in the list if customized, else null.
+   *
+   * @return key of default value or null
+   */
+  String getDefault();
 }

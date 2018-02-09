@@ -134,4 +134,9 @@ public class ServicesListProvider implements ResourceListProvider {
   public boolean isTranslatable(String listName) {
     return LIST_STATUS.equals(listName);
   }
+
+  @Override
+  public String getDefault() {
+    return null;
+  }
 }

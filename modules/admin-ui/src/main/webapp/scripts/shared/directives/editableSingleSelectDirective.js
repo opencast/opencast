@@ -33,6 +33,24 @@ angular.module('adminNg.directives')
             save:       '='
         },
         link: function (scope, element) {
+
+            var mapToArray = function (map) {
+                var array = [];
+
+                angular.forEach(map, function (mapValue, mapKey) {
+
+                    array.push({
+                        label: mapKey,
+                        value: mapValue
+                    });
+                });
+
+                return array;
+            }
+
+            //transform map to array so that orderBy can be used
+            scope.collection = mapToArray(scope.collection);
+
             scope.submit = function () {
                 // Wait until the change of the value propagated to the parent's
                 // metadata object.
@@ -42,12 +60,12 @@ angular.module('adminNg.directives')
                 scope.editMode = false;
             };
 
-            scope.getLabel = function (key) {
+            scope.getLabel = function (searchedValue) {
                 var label;
 
-                angular.forEach(scope.collection, function (value, index) {
-                    if (value === key) {
-                        label = index;
+                angular.forEach(scope.collection, function (obj) {
+                    if (obj.value === searchedValue) {
+                        label = obj.label;
                     }
                 });
 

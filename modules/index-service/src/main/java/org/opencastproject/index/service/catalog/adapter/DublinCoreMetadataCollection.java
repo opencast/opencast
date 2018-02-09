@@ -57,6 +57,20 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
     return Opt.none();
   }
 
+  private String getCollectionDefault(MetadataField<?> metadataField,
+          ListProvidersService listProvidersService) {
+    if (listProvidersService != null && metadataField.getListprovider().isSome()) {
+      try {
+        return listProvidersService.getDefault(metadataField.getListprovider().get());
+
+      } catch (ListProviderException ex) {
+        // failed to get default property on list-provider-service
+        // as this field is optional, it is fine to pass here
+      }
+    }
+    return null;
+  }
+
   private Opt<Map<String, String>> getCollection(MetadataField<?> metadataField,
           ListProvidersService listProvidersService) {
     try {
@@ -75,6 +89,12 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
   }
 
   public void addField(MetadataField<?> metadataField, String value, ListProvidersService listProvidersService) {
+
+    String defaultKey = getCollectionDefault(metadataField, listProvidersService);
+    if (StringUtils.isBlank(value) && StringUtils.isNotBlank(defaultKey)) {
+      value = defaultKey;
+    }
+
     switch (metadataField.getType()) {
       case BOOLEAN:
         MetadataField<Boolean> booleanField = MetadataField.createBooleanMetadata(metadataField.getInputID(),

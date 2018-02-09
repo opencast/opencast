@@ -99,4 +99,9 @@ public class BooleanListProvider implements ResourceListProvider {
   public boolean isTranslatable(String listName) {
     return true;
   }
+
+  @Override
+  public String getDefault() {
+    return null;
+  }
 }

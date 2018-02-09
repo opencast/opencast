@@ -83,7 +83,14 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> org.opencastproject.distribution.streaming;version=${opencast.version} </Export-Package>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.distribution.streaming;version=${project.version}
+            </Export-Package>
             <Service-Component>
               OSGI-INF/distribution-service-streaming.xml
             </Service-Component>
