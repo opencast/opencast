@@ -40,6 +40,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,11 +71,17 @@ public class CloneWorkflowOperationHandlerTest {
 
     // set up service
     operationHandler = new CloneWorkflowOperationHandler();
+
+    // Prepare file to returne from workflow
+    File videoFile = new File(getClass().getResource("/av.mov").toURI());
+    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(videoFile).anyTimes();
+    EasyMock.replay(workspace);
+
     operationHandler.setWorkspace(workspace);
   }
 
   @Test
-  public void testSourceFlavor() throws Exception {
+  public void testSingleSourceFlavor() throws Exception {
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "presentation/source");
@@ -87,6 +94,51 @@ public class CloneWorkflowOperationHandlerTest {
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("presentation/target");
     Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
   }
+
+  @Test
+  public void testWildcardSourceFlavor() throws Exception {
+    // operation configuration
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
+    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 2);
+  }
+
+  @Test
+  public void testTagsAsSourceFlavor() throws Exception {
+    // operation configuration
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_TAGS, "first");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
+    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 1);
+  }
+
+  @Test
+  public void testNoSourceFlavor() throws Exception {
+    // operation configuration
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
+    Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 0);
+  }
+
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
           throws WorkflowOperationException {
