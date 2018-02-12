@@ -758,6 +758,11 @@ angular.module('adminNg.controllers')
           });
         };
 
+        $scope.accessChanged = function (role) {
+          if (!role) return;
+          $scope.accessSave();
+        };
+
         $scope.accessSave = function () {
             var ace = [],
                 hasRights = false,

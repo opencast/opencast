@@ -124,6 +124,18 @@ public class XACMLAuthorizationService implements AuthorizationService {
     });
   }
 
+  /** Returns an ACL based on a given file/inputstream. */
+  public Tuple<AccessControlList, AclScope> getAclFromInputStream(final InputStream in) {
+    logger.debug("Get ACL from inputstream");
+    return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
+      @Override
+      public Tuple<AccessControlList, AclScope> apply() {
+        Option<AccessControlList> episode = loadAclFromFile(in);
+        return tuple(episode.get(), AclScope.Episode);
+      }
+    });
+  }
+
   private Tuple<AccessControlList, AclScope> getDefaultAcl(final MediaPackage mp) {
     logger.debug("Get default ACL for media package {}", mp.getIdentifier());
     if (StringUtils.isNotBlank(mp.getSeries())) {
@@ -394,6 +406,20 @@ public class XACMLAuthorizationService implements AuthorizationService {
       }
     } else {
       logger.debug("URI {} not found", uri);
+    }
+    return Option.none();
+  }
+
+
+  /** Produces an ACL derived from a given security policy file. */
+  private Option<AccessControlList> loadAclFromFile(final InputStream in) {
+    try {
+      AccessControlList acl = XACMLUtils.parseXacml(in);
+      if (acl != null) {
+        return Option.option(acl);
+      }
+    } catch (Exception e) {
+      logger.error("Failed to produce Acl when reading file: {}", e);
     }
     return Option.none();
   }

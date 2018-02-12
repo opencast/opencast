@@ -1,37 +1,81 @@
 {
-  "location": {
-    "label": "FILTERS.EVENTS.LOCATION.LABEL",
-    "type": "select",
-    "options": {
-      "location_1": "FILTERS.EVENTS.LOCATION.LOCATION1",
-      "location_2": "FILTERS.EVENTS.LOCATION.LOCATION2",
-      "location_3": "FILTERS.EVENTS.LOCATION.LOCATION3"
-    }
+  "presentersBibliographic":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.EVENTS.PRESENTERS_BIBLIOGRAPHIC.LABEL",
+    "type":"select"
   },
-  "source": {
-    "label": "FILTERS.EVENTS.SOURCE.LABEL",
-    "type": "select",
-    "options": {
-      "twitter":  "FILTERS.EVENTS.SOURCE.TWITTER",
-      "github":   "FILTERS.EVENTS.SOURCE.GITHUB",
-      "facebook": "FILTERS.EVENTS.SOURCE.FACEBOOK"
-    }
+  "presentersTechnical":{
+    "translatable":false,
+    "options":{
+      "opencast_system_account":"System User",
+      "admin":"Opencast Project Administrator"
+    },
+    "label":"FILTERS.EVENTS.PRESENTERS_TECHNICAL.LABEL",
+    "type":"select"
   },
-  "status": {
-    "label": "FILTERS.EVENTS.STATUS.LABEL",
-    "type": "select",
-    "options": {
-      "FILTERS.EVENTS.STATUS.SCHEDULED": "scheduled",
-      "FILTERS.EVENTS.STATUS.RECORDING": "recording",
-      "FILTERS.EVENTS.STATUS.INGESTING": "ingesting",
-      "FILTERS.EVENTS.STATUS.PROCESSING": "processing",
-      "FILTERS.EVENTS.STATUS.ARCHIVE": "archive",
-      "FILTERS.EVENTS.STATUS.UPLOAD": "upload",
-      "FILTERS.EVENTS.STATUS.ONHOLD": "on_hold"
-    }
+  "agent":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.AGENT_ID.LABEL",
+    "type":"select"
   },
-  "period": {
-    "label": "FILTERS.EVENTS.PERIOD.LABEL",
-    "type": "period"
+  "comments":{
+    "translatable":false,
+    "options":{
+      "RESOLVED":"RESOLVED",
+      "NONE":"NONE",
+      "OPEN":"OPEN"
+    },
+    "label":"FILTERS.EVENTS.COMMENTS.LABEL",
+    "type":"select"
+  },
+  "series":{
+    "translatable":false,
+    "options":{
+      "2c06b745-2c5b-4f9c-b856-ad0cd5b575ca":"< & >"
+    },
+    "label":"FILTERS.EVENTS.SERIES.LABEL",
+    "type":"select"
+  },
+  "location":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.LOCATION.LABEL",
+    "type":"select"
+  },
+  "contributors":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.EVENTS.CONTRIBUTORS.LABEL",
+    "type":"select"
+  },
+  "startDate":{
+    "translatable":false,
+    "label":"FILTERS.EVENTS.START_DATE.LABEL",
+    "type":"period"
+  },
+  "status":{
+    "translatable":true,
+    "options":{
+      "EVENTS.EVENTS.STATUS.RECORDING_FAILURE":"EVENTS.EVENTS.STATUS.RECORDING_FAILURE",
+      "EVENTS.EVENTS.STATUS.OPTEDOUT":"EVENTS.EVENTS.STATUS.OPTEDOUT",
+      "EVENTS.EVENTS.STATUS.PENDING":"EVENTS.EVENTS.STATUS.PENDING",
+      "EVENTS.EVENTS.STATUS.RECORDING":"EVENTS.EVENTS.STATUS.RECORDING",
+      "EVENTS.EVENTS.STATUS.PAUSED":"EVENTS.EVENTS.STATUS.PAUSED",
+      "EVENTS.EVENTS.STATUS.INGESTING":"EVENTS.EVENTS.STATUS.INGESTING",
+      "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE":"EVENTS.EVENTS.STATUS.PROCESSING_FAILURE",
+      "EVENTS.EVENTS.STATUS.SCHEDULED":"EVENTS.EVENTS.STATUS.SCHEDULED",
+      "EVENTS.EVENTS.STATUS.BLACKLISTED":"EVENTS.EVENTS.STATUS.BLACKLISTED",
+      "EVENTS.EVENTS.STATUS.PROCESSING":"EVENTS.EVENTS.STATUS.PROCESSING",
+      "EVENTS.EVENTS.STATUS.PROCESSING_CANCELED":"EVENTS.EVENTS.STATUS.PROCESSING_CANCELED",
+      "EVENTS.EVENTS.STATUS.PROCESSED":"EVENTS.EVENTS.STATUS.PROCESSED"
+    },
+    "label":"FILTERS.EVENTS.STATUS.LABEL",
+    "type":"select"
   }
 }
