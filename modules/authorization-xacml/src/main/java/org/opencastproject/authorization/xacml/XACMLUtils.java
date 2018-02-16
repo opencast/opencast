@@ -114,31 +114,36 @@ public final class XACMLUtils {
     final AccessControlList acl = new AccessControlList();
     final List<AccessControlEntry> entries = acl.getEntries();
     for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
-      if (object instanceof RuleType) {
-        RuleType rule = (RuleType) object;
-        if (rule.getTarget() == null) {
-          continue;
-        }
-        ActionType action = rule.getTarget().getActions().getAction().get(0);
-        String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
-        String role = null;
-        @SuppressWarnings("unchecked")
-        JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
-        for (JAXBElement<?> element : apply.getValue().getExpression()) {
-          if (element.getValue() instanceof AttributeValueType) {
-            role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
-            break;
+
+      try {
+        if (object instanceof RuleType) {
+          RuleType rule = (RuleType) object;
+          if (rule.getTarget() == null) {
+            continue;
           }
+          ActionType action = rule.getTarget().getActions().getAction().get(0);
+          String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
+          String role = null;
+          @SuppressWarnings("unchecked") JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
+          for (JAXBElement<?> element : apply.getValue().getExpression()) {
+            if (element.getValue() instanceof AttributeValueType) {
+              role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
+              break;
+            }
+          }
+          if (role == null) {
+            logger.warn("Unable to find a role in rule {}", rule);
+            continue;
+          }
+          AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(EffectType.PERMIT));
+          entries.add(ace);
+        } else {
+          logger.debug("XACML rule '{}' out of policy '{} could not be parsed to ACE", object, policy);
         }
-        if (role == null) {
-          logger.warn("Unable to find a role in rule {}", rule);
-          continue;
-        }
-        AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(EffectType.PERMIT));
-        entries.add(ace);
-      } else {
-        logger.debug("XACML rule '{}' out of policy '{} could not be parsed to ACE", object, policy);
+      } catch (Exception e) {
+        logger.error("XACML rule {} out of policy {} could not be parsed, an error occured", object, policy, e);
       }
+
     }
 
     return acl;
