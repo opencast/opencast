@@ -208,6 +208,7 @@
               !org.antlr.*,
               !org.apache.log4j.*,
               !org.apache.lucene.*,
+              !org.tartarus.snowball*,
               !org.apache.tomcat.*,
               !org.bouncycastle.*,
               !org.codehaus.groovy.*,
