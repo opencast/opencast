@@ -45,7 +45,6 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
-import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
@@ -88,6 +87,11 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   private static final float DEFAULT_JOB_LOAD = 2.0f;
 
   private float jobload = DEFAULT_JOB_LOAD;
+
+  /** The default base location to use when building attempting to process a
+    * smil file relative to the storage directory */
+
+  public static final String DEFAULT_EDITOR_TEMP_DIR = "tmp/editor";
 
   /**
    * The logging instance
@@ -137,6 +141,11 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
    * Bundle properties
    */
   private Properties properties = new Properties();
+
+  /**
+   * Where to store files during smil processing
+   */
+  private File tempParentDirectory = null;
 
   public VideoEditorServiceImpl() {
     super(JOB_TYPE);
@@ -211,7 +220,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
 
     // create working directory
-    File tempDirectory = FileSupport.getTempDirectory(Long.toString(job.getId()));
+    File tempDirectory = new File(tempParentDirectory, Long.toString(job.getId()));
     File outputPath = new File(tempDirectory, sourceTrackFlavor + "_" + sourceFile.getName() + outputFileExtension);
 
     if (!outputPath.getParentFile().exists()) {
@@ -446,6 +455,24 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     logger.debug("activating...");
     super.activate(context);
     FFmpegEdit.init(context.getBundleContext());
+
+    tempParentDirectory = new File(context.getBundleContext().getProperty("org.opencastproject.storage.dir"), DEFAULT_EDITOR_TEMP_DIR);
+
+    // create directory
+    try {
+      FileUtils.forceMkdir(tempParentDirectory);
+    } catch (IOException e) {
+      logger.error("Could not create temporary directory for SMIL processing: `{}`", tempParentDirectory.getAbsolutePath());
+      throw new IllegalStateException(e);
+    }
+
+    // Clean up tmp dir on start-up
+    try {
+      FileUtils.cleanDirectory(tempParentDirectory);
+    } catch (IOException e) {
+      logger.error("Could not clean temporary directory for SMIL processing: `{}`", tempParentDirectory.getAbsolutePath());
+      throw new IllegalStateException(e);
+    }
   }
 
   protected void deactivate(ComponentContext context) {
