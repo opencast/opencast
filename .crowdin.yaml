@@ -1,7 +1,6 @@
 project_identifier: opencast-community
 base_path: .
 preserve_hierarchy: true
-api_key: 247ed803f91a34444f0aa1ba0c997c92
 
 files:
   -
