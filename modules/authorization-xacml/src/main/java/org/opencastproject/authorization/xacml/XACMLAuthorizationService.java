@@ -383,7 +383,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
       try {
         workspace.delete(a.getURI());
       } catch (Exception e) {
-        logger.warn("Unable to delete XACML file: {}", e);
+        logger.warn("Unable to delete XACML file:", e);
       }
       mp.remove(a);
     }
@@ -402,7 +402,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
           return Option.option(acl);
         }
       } catch (Exception e) {
-        logger.error("Exception occured: {}", e);
+        logger.error("Exception occured:", e);
       }
     } else {
       logger.debug("URI {} not found", uri);
@@ -419,7 +419,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
         return Option.option(acl);
       }
     } catch (Exception e) {
-      logger.error("Failed to produce Acl when reading file: {}", e);
+      logger.error("Failed to produce Acl when reading file:", e);
     }
     return Option.none();
   }

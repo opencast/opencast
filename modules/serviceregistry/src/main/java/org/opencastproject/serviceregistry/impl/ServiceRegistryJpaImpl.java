@@ -302,7 +302,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
       jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
     } catch (ServiceRegistryException e) {
-      logger.error("Error registering JMX statistic beans {}", e);
+      logger.error("Error registering JMX statistic beans", e);
     }
 
     // Find the jobs URL
@@ -342,7 +342,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tracker = new RestServiceTracker(cc.getBundleContext());
         tracker.open(true);
       } catch (InvalidSyntaxException e) {
-        logger.error("Invalid filter syntax: {}", e);
+        logger.error("Invalid filter syntax:", e);
         throw new IllegalStateException(e);
       }
     }

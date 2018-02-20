@@ -246,7 +246,7 @@ public class ResourceServlet extends HttpServlet {
         logger.warn("Invalid XML in file " + aclFile.getAbsolutePath() + ", denying access by default");
       }
     } catch (XPathExpressionException e) {
-      logger.error("Wrong xPath expression: {}", e);
+      logger.error("Wrong xPath expression:", e);
     }
     return allowed;
   }

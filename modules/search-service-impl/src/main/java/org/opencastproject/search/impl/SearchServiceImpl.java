@@ -538,7 +538,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
           indexManager.add(mediaPackage.getA(), acl, deletionDate, modificationDate);
         } catch (Exception e) {
-          logger.error("Unable to index search instances: {}", e);
+          logger.error("Unable to index search instances:", e);
           if (retryToPopulateIndex(systemUserName)) {
             logger.warn("Trying to re-index search index later. Aborting for now.");
             return;
