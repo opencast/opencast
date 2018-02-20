@@ -28,6 +28,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
@@ -53,7 +54,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.UnmarshalException;
 
 public class AclScannerTest {
@@ -170,8 +170,8 @@ public class AclScannerTest {
     try {
       aclScanner.install(file);
       fail("Should not be parsed.");
-    } catch (JAXBException e) {
-      assertTrue("The file can not be parsed.", e instanceof UnmarshalException);
+    } catch (XACMLParsingException e) {
+      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
     }
   }
 
@@ -221,8 +221,8 @@ public class AclScannerTest {
     try {
       aclScanner.update(file);
       fail("Should not be parsed.");
-    } catch (JAXBException e) {
-      assertTrue("The file can not be parsed.", e instanceof UnmarshalException);
+    } catch (XACMLParsingException e) {
+      assertTrue("The file can not be parsed.", e.getCause() instanceof UnmarshalException);
     }
   }
 

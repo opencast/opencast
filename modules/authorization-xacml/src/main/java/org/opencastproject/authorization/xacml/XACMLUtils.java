@@ -105,43 +105,59 @@ public final class XACMLUtils {
    * @param xacml
    *          the XACML to parse
    * @return the ACL, never {@code null}
-   * @throws JAXBException
-   *           if unmarshalling fails
+   * @throws XACMLParsingException
+   *           if parsing fails
    */
-  public static AccessControlList parseXacml(InputStream xacml) throws JAXBException {
-    @SuppressWarnings("unchecked")
-    final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(xacml)).getValue();
-    final AccessControlList acl = new AccessControlList();
-    final List<AccessControlEntry> entries = acl.getEntries();
-    for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
-      if (object instanceof RuleType) {
+  public static AccessControlList parseXacml(InputStream xacml) throws XACMLParsingException {
+
+    try {
+      @SuppressWarnings("unchecked")
+      final AccessControlList acl = new AccessControlList();
+      final List<AccessControlEntry> entries = acl.getEntries();
+      final PolicyType policy = ((JAXBElement<PolicyType>) XACMLUtils.jBossXacmlJaxbContext.createUnmarshaller().unmarshal(xacml)).getValue();
+      for (Object object : policy.getCombinerParametersOrRuleCombinerParametersOrVariableDefinition()) {
+
+        if (!(object instanceof RuleType)) {
+          throw new XACMLParsingException("Object " + object + " of policy " + policy + " is not of type RuleType");
+        }
         RuleType rule = (RuleType) object;
         if (rule.getTarget() == null) {
-          continue;
-        }
-        ActionType action = rule.getTarget().getActions().getAction().get(0);
-        String actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
-        String role = null;
-        @SuppressWarnings("unchecked")
-        JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
-        for (JAXBElement<?> element : apply.getValue().getExpression()) {
-          if (element.getValue() instanceof AttributeValueType) {
-            role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
-            break;
+          if (rule.getRuleId().equals("DenyRule")) {
+            logger.trace("Skipping global deny rule");
+            continue;
           }
+          throw new XACMLParsingException("Empty rule " + rule + " in policy " + policy);
+        }
+
+        String role = null;
+        String actionForAce = null;
+        try {
+          ActionType action = rule.getTarget().getActions().getAction().get(0);
+          actionForAce = (String) action.getActionMatch().get(0).getAttributeValue().getContent().get(0);
+
+          @SuppressWarnings("unchecked") JAXBElement<ApplyType> apply = (JAXBElement<ApplyType>) rule.getCondition().getExpression();
+          for (JAXBElement<?> element : apply.getValue().getExpression()) {
+            if (element.getValue() instanceof AttributeValueType) {
+              role = (String) ((AttributeValueType) element.getValue()).getContent().get(0);
+              break;
+            }
+          }
+        } catch (Exception e) {
+          throw new XACMLParsingException("Rule " + rule + " of policy " + policy + " could not be parsed", e);
         }
         if (role == null) {
-          logger.warn("Unable to find a role in rule {}", rule);
-          continue;
+          throw new XACMLParsingException("Unable to find role in rule " + rule + " of policy " + policy);
         }
         AccessControlEntry ace = new AccessControlEntry(role, actionForAce, rule.getEffect().equals(EffectType.PERMIT));
         entries.add(ace);
-      } else {
-        logger.debug("XACML rule '{}' out of policy '{} could not be parsed to ACE", object, policy);
       }
+      return acl;
+    } catch (Exception e) {
+      if (e instanceof XACMLParsingException) {
+        throw (XACMLParsingException) e;
+      }
+      throw new XACMLParsingException("XACML could not be parsed", e);
     }
-
-    return acl;
   }
 
   /**

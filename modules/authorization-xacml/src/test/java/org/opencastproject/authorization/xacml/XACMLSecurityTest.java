@@ -56,10 +56,10 @@ import de.schlichtherle.io.FileOutputStream;
 /**
  * Tests XACML features of the security service
  */
-public class XacmlSecurityTest {
+public class XACMLSecurityTest {
 
   /** The logger */
-  protected static final Logger logger = LoggerFactory.getLogger(XacmlSecurityTest.class);
+  protected static final Logger logger = LoggerFactory.getLogger(XACMLSecurityTest.class);
 
   /** The username to use with the security service */
   protected final String currentUser = "me";
