@@ -548,7 +548,7 @@
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
-                                                        ng-change="accessSave(policy)"
+                                                        ng-change="accessChanged(policy.role)"
                                                         ng-options="id as id for (id, type) in roles"
                                                         ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"

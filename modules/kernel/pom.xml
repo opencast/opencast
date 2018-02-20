@@ -297,6 +297,9 @@
               org.springframework.security.ldap.search,
               org.springframework.security.ldap.userdetails,
               org.xml.sax;version=0,
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              javax.ws.rs.ext;version=2.0.1,
               *
             </Import-Package>
             <Export-Package>

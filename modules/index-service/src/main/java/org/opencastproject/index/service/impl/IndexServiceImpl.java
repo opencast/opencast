@@ -80,7 +80,6 @@ import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -103,7 +102,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesException;
-import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.DateTimeSupport;
@@ -1883,12 +1881,6 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException {
-    SeriesQuery seriesQuery = new SeriesQuery();
-    seriesQuery.setSeriesId(id);
-    DublinCoreCatalogList dublinCoreCatalogList = seriesService.getSeries(seriesQuery);
-    if (dublinCoreCatalogList.size() == 0) {
-      throw new NotFoundException();
-    }
     seriesService.deleteSeries(id);
   }
 

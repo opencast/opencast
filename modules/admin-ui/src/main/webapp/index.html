@@ -109,8 +109,8 @@
         <footer id="main-footer" ng-controller="NavCtrl">
             <div class="default-footer">
                 <div ng-if="version.version" class="meta">
-                    Opencast (v.{{ version.version }}<span ng-if=version.buildNumber> -
-                        build: {{ version.buildNumber }}</span>)
+                    Opencast {{ version.version }}
+                    <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
                 </div>
                 <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
                     <a href="javascript:;">Feedback</a>

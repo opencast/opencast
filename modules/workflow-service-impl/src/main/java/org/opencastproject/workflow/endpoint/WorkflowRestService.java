@@ -134,6 +134,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public static final String DESCENDING_SUFFIX = "_DESC";
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowRestService.class);
+
   /** The default server URL */
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
   /** The default service URL */
@@ -146,7 +147,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   private Workspace workspace;
 
   /** Resource lock */
-  private final Striped<Lock> lock = Striped.lazyWeakLock(1);
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
 
   /**
    * Callback from the OSGi declarative services to set the service registry.

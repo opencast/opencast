@@ -126,6 +126,11 @@
               OSGI-INF/annotation-service.xml,
               OSGI-INF/annotation-service-rest.xml
             </Service-Component>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

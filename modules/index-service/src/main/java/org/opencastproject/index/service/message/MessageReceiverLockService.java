@@ -32,7 +32,7 @@ public class MessageReceiverLockService {
 
   private static final Logger logger = LoggerFactory.getLogger(MessageReceiverLockService.class);
 
-  private final Striped<Lock> lock = Striped.lazyWeakLock(1);
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
 
   public <K, A> A synchronize(K resource, Fn<K, A> function) {
     final Lock lock = this.lock.get(resource);

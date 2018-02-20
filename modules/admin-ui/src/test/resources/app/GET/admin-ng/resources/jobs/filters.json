@@ -1,20 +1,21 @@
 {
-    "hostname": {
-        "options": {
-            "admin.opencast.org": "admin.opencast.org",
-            "worker01.opencast.org": "worker01.opencast.org"
-        },
-        "label": "FILTERS.JOBS.HOSTNAME.LABEL",
-        "type": "select"
+  "hostname":{
+    "translatable":false,
+    "options":{
+      "http:\/\/localhost:8080":"http:\/\/localhost:8080"
     },
-    "status": {
-        "options": {
-            "PAUSED": "FILTERS.JOBS.STATUS.PAUSED",
-            "QUEUED": "FILTERS.JOBS.STATUS.QUEUED",
-            "RUNNING": "FILTERS.JOBS.STATUS.RUNNING",
-            "WAITING": "FILTERS.JOBS.STATUS.WAITING"
-        },
-        "label": "FILTERS.JOBS.STATUS.LABEL",
-        "type": "select"
-    }
+    "label":"FILTERS.JOBS.HOSTNAME.LABEL",
+    "type":"select"
+  },
+  "status":{
+    "translatable":true,
+    "options":{
+      "PAUSED":"FILTERS.JOBS.STATUS.PAUSED",
+      "QUEUED":"FILTERS.JOBS.STATUS.QUEUED",
+      "RUNNING":"FILTERS.JOBS.STATUS.RUNNING",
+      "WAITING":"FILTERS.JOBS.STATUS.WAITING"
+    },
+    "label":"FILTERS.JOBS.STATUS.LABEL",
+    "type":"select"
+  }
 }
