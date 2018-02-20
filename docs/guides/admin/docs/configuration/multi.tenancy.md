@@ -9,8 +9,11 @@ Opencast refers to tenants as *organizations*, and an HTTP request to the Openca
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
 
- - tenant1.example.org
- - tenant2.example.org
+ - admin.example.org
+ - tenant1-admin.example.org
+ - tenant2-admin.example.org
+
+should all resolve to the same IP.
 
 A tenant configuration thus consists mainly of the DNS name that is mapped to that tenant.
 
@@ -35,7 +38,7 @@ Adding A Tenant
 
 To add a tenant to the installation, two things need to be put in place: a tenant configuration and a set of security
 rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and 
-`worker.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to `tenant1_*.myuniversity.edu`.
+`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to `tenant1-*.example.org`.
 
 ### Tenant Configuration
 
@@ -44,14 +47,14 @@ installation, on each of the nodes:
 
     id=tenant1
     name=Tenant 1
-    server=tenant1_admin.myuniversity.edu,tenant1_presentation.myuniversity.edu
+    server=tenant1-admin.example.org,tenant1-presentation.example.org
     port=8080
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
     # Admin and Presentation Server Urls
-    prop.org.opencastproject.admin.ui.url=https://tenant1_admin.myuniversity.edu
-    prop.org.opencastproject.engage.ui.url=https://tenant1_presentation.myuniversity.edu
+    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.example.org
+    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.example.org
 
     # Default properties for the user interface
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
@@ -59,7 +62,7 @@ installation, on each of the nodes:
 
 Also make sure to modify `org.opencastproject.organization-mh_default_org.org`:
 
-    server=tenant1_admin.myuniversity.edu,tenant1_presentation.myuniversity.edu
+    server=tenant1-admin.example.org,tenant1-presentation.example.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
