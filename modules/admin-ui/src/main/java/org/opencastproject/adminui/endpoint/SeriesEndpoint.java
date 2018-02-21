@@ -516,8 +516,11 @@ public class SeriesEndpoint {
 
     JSONObject themesJson = new JSONObject();
     for (SearchResultItem<Theme> item : results.getItems()) {
+      JSONObject list = new JSONObject();
       Theme theme = item.getSource();
-      themesJson.put(theme.getIdentifier(), theme.getName());
+      list.put("name", theme.getName());
+      list.put("description", theme.getDescription());
+      themesJson.put(theme.getIdentifier(), list);
     }
     return Response.ok(themesJson.toJSONString()).build();
   }

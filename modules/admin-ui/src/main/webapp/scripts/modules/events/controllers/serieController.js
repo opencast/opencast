@@ -207,7 +207,13 @@ angular.module('adminNg.controllers')
             });
         });
 
-        $scope.theme = {};
+        $scope.selectedtheme = {};
+
+        $scope.updateSelectedThemeDescripton = function () {
+            if(angular.isDefined($scope.themedescriptions)) {
+                $scope.selectedtheme.description = $scope.themedescriptions[$scope.selectedtheme.id];
+            }
+        };
 
         ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
             $scope.themes = data;
@@ -215,16 +221,22 @@ angular.module('adminNg.controllers')
             //after themes have been loaded we match the current selected
             SeriesThemeResource.get({id: id}, function (response) {
 
-                //we want to get dir of $resolved, etc. - therefore we use toJSON()
+                //we want to get rid of $resolved, etc. - therefore we use toJSON()
                 angular.forEach(data.toJSON(), function (value, key) {
 
                     if (angular.isDefined(response[key])) {
-                        $scope.theme.current = key;
+                        $scope.selectedtheme.id = key;
                         return false;
                     }
                 });
             });
+
+            ResourcesListResource.get({ resource: 'THEMES.DESCRIPTION' }, function (data) {
+                $scope.themedescriptions = data;
+                $scope.updateSelectedThemeDescripton();
+            });
         });
+
         $scope.getMoreRoles();
     };
 
@@ -366,14 +378,15 @@ angular.module('adminNg.controllers')
     });
 
     $scope.themeSave = function () {
-        var theme = $scope.theme.current;
+        var selectedthemeid = $scope.selectedtheme.id;
+        $scope.updateSelectedThemeDescripton();
 
-        if (angular.isUndefined(theme) || theme === null) {
-            SeriesThemeResource.delete({id: $scope.resourceId}, {theme: theme}, function () {
+        if (angular.isUndefined(selectedthemeid) || selectedthemeid === null) {
+            SeriesThemeResource.delete({id: $scope.resourceId}, {theme: selectedthemeid}, function () {
                 Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');
             });
         } else {
-            SeriesThemeResource.save({id: $scope.resourceId}, {theme: theme}, function () {
+            SeriesThemeResource.save({id: $scope.resourceId}, {theme: selectedthemeid}, function () {
                 Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');
             });
         }

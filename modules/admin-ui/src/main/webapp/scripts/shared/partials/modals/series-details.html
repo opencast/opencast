@@ -285,21 +285,33 @@
             <p class="tab-desc"></p>
             <div class="full-col">
                 <div class="obj quick-actions">
-                    <header>Theme</header>
+                  <header translate="CONFIGURATION.NAVIGATION.THEMES"><!-- Theme --></header>
                     <div class="obj-container padded">
-                        <select chosen pre-select-from="themes"
-                                allow-single-deselect="true"
-                                ng-disabled="(tab == 'theme') && !$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')"
-                                data-width="'200px'"
-                                data-disable-search-threshold="8"
-                                ng-change="themeSave()"
-                                ng-model="theme.current"
-                                ng-options="id as name for (id, name) in themes"
-                                data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
-                                no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
-                                >
-                            <option value=""></option>
-                        </select>
+                        <ul>
+                            <li>
+                                <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT">
+                                    <!-- Theme Dialog Explanation Text -->
+                                </p>
+                                <p>
+                                    <!-- Dropdown with availabel themes -->
+                                    <select chosen pre-select-from="themes"
+                                            allow-single-deselect="true"
+                                            ng-disabled="(tab == 'theme') && !$root.userIs('ROLE_UI_SERIES_DETAILS_THEMES_EDIT')"
+                                            data-width="'100%'"
+                                            data-disable-search-threshold="8"
+                                            ng-change="themeSave()"
+                                            ng-model="selectedtheme.id"
+                                            ng-options="id as name for (id, name) in themes"
+                                            data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                                            no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
+                                            >
+                                        <option value=""></option>
+                                    </select>
+                                </p>
+                                <!-- Selected Theme Description Text -->
+                                <p ng-if="selectedtheme.description">{{ selectedtheme.description }}</p>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

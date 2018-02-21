@@ -161,27 +161,37 @@
 </div>
 
 <div class="modal-content" data-modal-tab-content="theme" data-level="1">
-    <p class="tab-description" translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"><!-- Description --></p>
     <div class="modal-body">
         <div class="full-col">
             <div class="obj quick-actions">
-                <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.TITLE"><!-- Title --></header>
+                <header class="no-expand "translate="EVENTS.SERIES.NEW.THEME.TITLE"><!-- Theme --></header>
                 <div class="obj-container padded">
-                    <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION"><!-- Description --></p>
-                    <select chosen pre-select-from="wizard.step.themes"
-                            allow-single-deselect="true"
-                            data-width="'200px'"
-                            tabindex="1"
-                            focushere
-                            data-disable-search-threshold="8"
-                            ng-model="wizard.step.ud.theme"
-                            ng-options="id as name for (id, name) in wizard.step.themes"
-                            data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
-                            empty-
-                            no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
-                            >
-                        <option value=""></option>
-                    </select>
+                    <ul>
+                        <li>
+                            <p translate="EVENTS.SERIES.NEW.THEME.DESCRIPTION.TEXT">
+                                <!-- Theme Dialog Explanation Text -->
+                            </p>
+                            <p>
+                                <!-- Dropdown with availabel themes -->
+                                <select chosen pre-select-from="wizard.step.themes"
+                                        allow-single-deselect="true"
+                                        data-width="'100%'"
+                                        tabindex="1"
+                                        focushere
+                                        data-disable-search-threshold="8"
+                                        ng-change="wizard.step.themeSave()"
+                                        ng-model="wizard.step.ud.theme"
+                                        ng-options="id as list.name for (id, list) in wizard.step.themes"
+                                        data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                                        no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
+                                        >
+                                    <option value=""></option>
+                                </select>
+                            </p>
+                            <!-- Selected Theme Description Text -->
+                            <p ng-if="wizard.step.ud.themedescription">{{ wizard.step.ud.themedescription }}</p>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
