@@ -53,8 +53,10 @@ var OpencastToPaellaConverter = Class.create({
 
 		var tracks = episode.mediapackage.media.track;
 		var attachments = episode.mediapackage.attachments.attachment;
+		var catalogs = episode.mediapackage.metadata.catalog;
 		if (!(tracks instanceof Array)) { tracks = [tracks]; }
 		if (!(attachments instanceof Array)) { attachments = [attachments]; }		
+		if (!(catalogs instanceof Array)) { catalogs = [catalogs]; }		
 		// Read the tracks!!
 		tracks.forEach(function(currentTrack) {
 			var currentStream = opencastStreams[currentTrack.type];
@@ -108,10 +110,37 @@ var OpencastToPaellaConverter = Class.create({
 		var imageSource =   {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:320, h:180}};
 		var imageSourceHD = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
 		var blackboardSource = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
+		var captions = [];
+		
 		// Read the attachments
 		attachments.forEach(function(currentAttachment){
 			try {
-				if (currentAttachment.type == "blackboard/image") {
+				if (currentAttachment.type == "captions/timedtext") {
+					if (currentAttachment.tags && currentAttachment.tags.tag) {
+						if (!(currentAttachment.tags.tag instanceof Array)) {
+							currentAttachment.tags.tag = [currentAttachment.tags.tag];
+						}
+						currentAttachment.tags.tag.forEach((tag)=>{
+							if (tag.startsWith("lang:")){
+								let split = tag.split(":");
+								let code = split[1]
+								let label = split[2] || code;
+								
+								let re = /(?:\.([^.]+))?$/;
+								let ext = re.exec(currentAttachment.url)[1];								
+								
+								captions.push({
+									id: currentAttachment.id,								
+									lang: code,
+									text: label,
+									url: currentAttachment.url,
+									format: ext
+								});
+							}
+						});
+					}
+				}			
+				else if (currentAttachment.type == "blackboard/image") {
 					if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
 						time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
 						
@@ -154,6 +183,38 @@ var OpencastToPaellaConverter = Class.create({
 			catch (err) {}
 		});
 		
+		// Read the catalogs
+		catalogs.forEach(function(currentCatalog){
+			try {
+				if (currentCatalog.type == "captions/timedtext") {
+					if (currentCatalog.tags && currentCatalog.tags.tag) {
+						if (!(currentCatalog.tags.tag instanceof Array)) {
+							currentCatalog.tags.tag = [currentAttachment.tags.tag];
+						}
+						currentCatalog.tags.tag.forEach((tag)=>{
+							if (tag.startsWith("lang:")){
+								let split = tag.split(":");
+								let code = split[1]
+								let label = split[2] || code;
+								
+								let re = /(?:\.([^.]+))?$/;
+								let ext = re.exec(currentCatalog.url)[1];								
+								
+								captions.push({
+									id: currentCatalog.id,
+									lang: code,
+									text: label,
+									url: currentCatalog.url,
+									format: ext
+								});
+							}
+						});
+					}
+				}
+			} 
+			catch (err) {}	
+		});
+		
 		
 		// Set the image stream
 		var imagesArray = [];
@@ -179,7 +240,8 @@ var OpencastToPaellaConverter = Class.create({
 				duration: episode.mediapackage.duration/1000
 			},
 			streams: [],
-			frameList: []
+			frameList: [],
+			captions: captions
 		};
 
 		if (presenter) { data.streams.push(presenter); }
