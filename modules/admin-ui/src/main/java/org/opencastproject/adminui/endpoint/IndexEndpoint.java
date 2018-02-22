@@ -26,11 +26,12 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.data.Effect0;
+import org.opencastproject.util.data.Function0;
+import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ import java.util.concurrent.Executors;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -89,8 +91,73 @@ public class IndexEndpoint {
   }
 
   @POST
+  @Path("clearIndex")
+  @RestQuery(name = "clearIndex", description = "Clear the Admin UI index",
+    returnDescription = "OK if index is cleared", reponses = {
+    @RestResponse(description = "Index is cleared", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "Unable to clear index", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) })
+  public Response clearIndex() {
+    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
+      securityService.getUser());
+    return securityContext.runInContext(new Function0<Response>() {
+      @Override
+      public Response apply() {
+        try {
+          logger.info("Clear the Admin UI index");
+          adminUISearchIndex.clear();
+          return R.ok();
+        } catch (Throwable t) {
+          logger.error("Clearing the Admin UI index failed", t);
+          return R.serverError();
+        }
+      }
+    });
+  }
+
+  @POST
+  @Path("recreateIndex/{service}")
+  @RestQuery(name = "recreateIndexFromService",
+    description = "Repopulates the Admin UI Index from an specific service",
+    returnDescription = "OK if repopulation has started", pathParameters = {
+      @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
+        + "The available services are: Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager and Comments. "
+        + "The service order (see above) is very important! Make sure, you do not run index rebuild for more than one "
+        + "service at a time!",
+        type = RestParameter.Type.STRING) }, reponses = {
+      @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
+  public Response recreateIndexFromService(@PathParam("service") final String service) {
+    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
+      securityService.getUser());
+    executor.execute(new Runnable() {
+      @Override
+      public void run() {
+        securityContext.runInContext(new Effect0() {
+          @Override
+          protected void run() {
+            try {
+              logger.info("Starting to repopulate the index from service {}", service);
+              adminUISearchIndex.recreateIndex(service);
+            } catch (InterruptedException e) {
+              logger.error("Repopulating the index was interrupted", e);
+            } catch (CancellationException e) {
+              logger.trace("Listening for index messages has been cancelled.");
+            } catch (ExecutionException e) {
+              logger.error("Repopulating the index failed to execute", e);
+            } catch (Throwable t) {
+              logger.error("Repopulating the index failed", t);
+            }
+          }
+        });
+      }
+    });
+    return R.ok();
+  }
+
+  @POST
   @Path("recreateIndex")
-  @RestQuery(name = "recreateIndex", description = "Repopulates the Admin UI Index directly from the Services", returnDescription = "OK if repopulation has started", reponses = { @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(name = "recreateIndex", description = "Clear and repopulates the Admin UI Index directly from the Services",
+    returnDescription = "OK if repopulation has started", reponses = {
+    @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
@@ -103,15 +170,14 @@ public class IndexEndpoint {
             try {
               logger.info("Starting to repopulate the index");
               adminUISearchIndex.recreateIndex();
-              logger.info("Finished repopulating the index");
             } catch (InterruptedException e) {
-              logger.error("Repopulating the index was interrupted {}", ExceptionUtils.getStackTrace(e));
+              logger.error("Repopulating the index was interrupted", e);
             } catch (CancellationException e) {
               logger.trace("Listening for index messages has been cancelled.");
             } catch (ExecutionException e) {
-              logger.error("Repopulating the index failed to execute because {}", ExceptionUtils.getStackTrace(e));
+              logger.error("Repopulating the index failed to execute", e);
             } catch (Throwable t) {
-              logger.error("Repopulating the index failed because {}", ExceptionUtils.getStackTrace(t));
+              logger.error("Repopulating the index failed", t);
             }
           }
         });
@@ -119,5 +185,4 @@ public class IndexEndpoint {
     });
     return R.ok();
   }
-
 }
