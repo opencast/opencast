@@ -1036,7 +1036,7 @@ public class IndexServiceImplTest {
     return String.format("FREQ=WEEKLY;BYDAY=%s;BYHOUR=%d;BYMINUTE=%d", days, hour, minute);
   }
 
-  //NOTE: Do not modify this without making the same modifications to the copy of this method in SchedulerServiceImpl
+  //NOTE: Do not modify this without making the same modifications to the copy of this method in Util in the scheduler service
   //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
   public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
     final TimeZone timeZone = TimeZone.getDefault();

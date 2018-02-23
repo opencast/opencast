@@ -22,6 +22,8 @@ package org.opencastproject.scheduler.impl;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.scheduler.api.Util;
+
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;

@@ -103,6 +103,7 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -1527,7 +1528,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureAgentId));
-      final TimeZone timeZone = TimeZone.getDefault();
       final TimeZone utc = TimeZone.getTimeZone("utc");
 
       Set<MediaPackage> events = new HashSet<>();
@@ -1540,7 +1540,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         events.addAll(findConflictingEvents(startDate, endDate, alreadyScheduledEvents));
       }
 
-      TimeZone.setDefault(timeZone);
+      TimeZone.setDefault(null);
       return new ArrayList<>(events);
     } catch (Exception e) {
       logger.error("Failed to search for conflicting events: {}", getStackTrace(e));
@@ -1548,53 +1548,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  //NOTE: Do not modify this without making the same modifications to the copy of this method in IndexServiceImplTest, and SchedulerServiceRemoteImpl
-  //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
   @Override
   public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
-    final TimeZone utc = TimeZone.getTimeZone("UTC");
-    TimeZone.setDefault(tz);
-    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
-    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
-
-    Calendar endCalendar = Calendar.getInstance(utc);
-    endCalendar.setTime(end);
-    Calendar calendar = Calendar.getInstance(utc);
-    calendar.setTime(periodStart);
-    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
-    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
-    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-    periodEnd.setTime(calendar.getTime().getTime() + duration);
-    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
-
-    List<Period> events = new LinkedList<>();
-
-    TimeZone.setDefault(utc);
-    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
-      Date d = (Date) date;
-      Calendar cDate = Calendar.getInstance(utc);
-
-      // Adjust for DST, if start of event
-      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
-        if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
-        }
-      } else { // Event doesn't start in DST
-        if (tz.inDaylightTime(d)) {
-          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
-        }
-      }
-      cDate.setTime(d);
-
-      TimeZone.setDefault(timeZone);
-      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
-              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
-      events.add(p);
-      TimeZone.setDefault(utc);
-    }
-    TimeZone.setDefault(timeZone);
-    return events;
+    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 
   @Override

@@ -43,6 +43,7 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -53,9 +54,7 @@ import org.opencastproject.util.UrlSupport;
 
 import com.entwinemedia.fn.data.Opt;
 
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -70,7 +69,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.joda.time.DateTimeConstants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -78,12 +76,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -857,53 +853,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     throw new SchedulerException("Unable to get event review status from remote scheduler service");
   }
 
-  //NOTE: Do not modify this without making the same modifications to the copy of this method in IndexServiceImplTest, and SchedulerServiceImpl
-  //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
   @Override
   public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
-    final TimeZone utc = TimeZone.getTimeZone("UTC");
-    TimeZone.setDefault(tz);
-    DateTime periodStart = new DateTime(start);
-    DateTime periodEnd = new DateTime();
-
-    Calendar endCalendar = Calendar.getInstance(utc);
-    endCalendar.setTime(end);
-    Calendar calendar = Calendar.getInstance(utc);
-    calendar.setTime(periodStart);
-    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
-    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
-    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-    periodEnd.setTime(calendar.getTime().getTime() + duration);
-    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
-
-    List<Period> events = new LinkedList<>();
-
-    TimeZone.setDefault(utc);
-    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, Value.DATE_TIME)) {
-      Date d = (Date) date;
-      Calendar cDate = Calendar.getInstance(utc);
-
-      // Adjust for DST, if start of event
-      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
-        if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
-        }
-      } else { // Event doesn't start in DST
-        if (tz.inDaylightTime(d)) {
-          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
-        }
-      }
-      cDate.setTime(d);
-
-      TimeZone.setDefault(timeZone);
-      Period p = new Period(new DateTime(cDate.getTime()),
-              new DateTime(cDate.getTimeInMillis() + duration));
-      events.add(p);
-      TimeZone.setDefault(utc);
-    }
-    TimeZone.setDefault(timeZone);
-    return events;
+    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 
   @Override
