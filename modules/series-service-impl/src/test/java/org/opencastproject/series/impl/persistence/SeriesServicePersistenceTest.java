@@ -51,7 +51,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -118,11 +117,11 @@ public class SeriesServicePersistenceTest {
   public void testRetrieving() throws Exception {
     seriesDatabase.storeSeries(testCatalog);
 
-    Iterator<Tuple<DublinCoreCatalog, String>> series = seriesDatabase.getAllSeries();
-    assertTrue("Exactly one series should be returned", series.hasNext());
+    List<Tuple<DublinCoreCatalog, String>> series = seriesDatabase.getAllSeries();
+    assertTrue("Exactly one series should be returned", series.size() == 1);
     seriesDatabase.deleteSeries(testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER));
     series = seriesDatabase.getAllSeries();
-    assertFalse("Exactly zero series should be returned", series.hasNext());
+    assertTrue("Exactly zero series should be returned", series.isEmpty());
   }
 
   @Test

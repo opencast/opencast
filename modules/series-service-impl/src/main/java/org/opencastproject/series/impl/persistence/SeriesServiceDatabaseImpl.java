@@ -50,8 +50,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -239,10 +238,10 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Iterator<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException {
+  public List<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("Series.findAll");
-    List<SeriesEntity> seriesEntities = null;
+    List<SeriesEntity> seriesEntities;
     try {
       seriesEntities = query.getResultList();
     } catch (Exception e) {
@@ -251,7 +250,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } finally {
       em.close();
     }
-    List<Tuple<DublinCoreCatalog, String>> seriesList = new LinkedList<>();
+    List<Tuple<DublinCoreCatalog, String>> seriesList = new ArrayList<>(seriesEntities.size());
     try {
       for (SeriesEntity entity : seriesEntities) {
         DublinCoreCatalog dc = parseDublinCore(entity.getDublinCoreXML());
@@ -261,7 +260,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       logger.error("Could not parse series entity: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     }
-    return seriesList.iterator();
+    return seriesList;
   }
 
   /*

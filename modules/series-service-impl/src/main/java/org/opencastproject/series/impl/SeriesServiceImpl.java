@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -150,41 +149,52 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   /** If the solr index is empty, but there are series in the database, populate the solr index. */
   private void populateSolr(String systemUserName) {
-    long instancesInSolr = 0L;
+    long instancesInSolr;
     try {
       instancesInSolr = index.count();
     } catch (Exception e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Repopulating series Solr index failed", e);
     }
-    if (instancesInSolr == 0L) {
-      try {
-        Iterator<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
-        if (databaseSeries.hasNext()) {
-          logger.info("The series index is empty. Populating it now with series");
-          while (databaseSeries.hasNext()) {
-            Tuple<DublinCoreCatalog, String> series = databaseSeries.next();
+    if (instancesInSolr != 0L) {
+      return;
+    }
 
-            // Run as the superuser so we get all series, regardless of organization or role
-            Organization organization = orgDirectory.getOrganization(series.getB());
-            securityService.setOrganization(organization);
-            securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
-
-            index.updateIndex(series.getA());
-            String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
-            AccessControlList acl = persistence.getAccessControlList(id);
-            if (acl != null)
-              index.updateSecurityPolicy(id, acl);
-            index.updateOptOutStatus(id, persistence.isOptOut(id));
-          }
-          logger.info("Finished populating series search index");
-        }
-      } catch (Exception e) {
-        logger.warn("Unable to index series instances:", e);
-        throw new ServiceException(e.getMessage());
-      } finally {
-        securityService.setOrganization(null);
-        securityService.setUser(null);
+    logger.info("The series index is empty. Populating it now with series");
+    try {
+      List<Tuple<DublinCoreCatalog, String>> allSeries = persistence.getAllSeries();
+      final int total = allSeries.size();
+      if (total == 0) {
+        logger.info("No series found. Repopulating index finished.");
+        return;
       }
+
+      int current = 0;
+      for (Tuple<DublinCoreCatalog, String> series: allSeries) {
+        current++;
+        // Run as the superuser so we get all series, regardless of organization or role
+        Organization organization = orgDirectory.getOrganization(series.getB());
+        securityService.setOrganization(organization);
+        securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
+
+        index.updateIndex(series.getA());
+        String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
+        AccessControlList acl = persistence.getAccessControlList(id);
+        if (acl != null)
+          index.updateSecurityPolicy(id, acl);
+        index.updateOptOutStatus(id, persistence.isOptOut(id));
+
+        // log progress
+        if (current % 100 == 0) {
+          logger.info("Indexing series {}/{} ({} percent done)", current, total, current * 100 / total);
+        }
+      }
+      logger.info("Finished populating series search index");
+    } catch (Exception e) {
+      logger.warn("Unable to index series instances", e);
+      throw new ServiceException(e.getMessage());
+    } finally {
+      securityService.setOrganization(null);
+      securityService.setUser(null);
     }
   }
 
@@ -561,11 +571,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       final int total = persistence.countSeries();
       logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
       final int responseInterval = (total < 100) ? 1 : (total / 100);
-      Iterator<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
-      final int[] current = new int[1];
-      current[0] = 1;
-      while (databaseSeries.hasNext()) {
-        final Tuple<DublinCoreCatalog, String> series = databaseSeries.next();
+      List<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
+      int current = 1;
+      for (Tuple<DublinCoreCatalog, String> series: databaseSeries) {
         Organization organization = orgDirectory.getOrganization(series.getB());
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
                 new Function0.X<Void>() {
@@ -587,15 +595,14 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateProperty(id, property.getKey(), property.getValue()));
                     }
-                    if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
-                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                              IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Series, total,
-                                      current[0]));
-                    }
-                    current[0] += 1;
                     return null;
                   }
                 });
+        if ((current % responseInterval == 0) || (current == total)) {
+          logger.info("Updating {} series index {}/{}: {} percent complete.", indexName, current, total,
+                  current * 100 / total);
+        }
+        current++;
       }
       logger.info("Finished populating '{}' index with series.", indexName);
     } catch (Exception e) {
