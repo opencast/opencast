@@ -168,7 +168,6 @@
     <module>modules/series-service-impl</module>
     <module>modules/series-service-remote</module>
     <module>modules/serviceregistry</module>
-    <module>modules/serviceregistry-remote</module>
     <module>modules/silencedetection-api</module>
     <module>modules/silencedetection-impl</module>
     <module>modules/silencedetection-remote</module>
