@@ -158,10 +158,10 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
 SELECT
   e.mediapackage_id,
   count(*) AS v
-FROM mh_assets_snapshot e
+FROM oc_assets_snapshot e
 GROUP BY e.mediapackage_id
 HAVING v = (SELECT count(*)
-            FROM mh_assets_snapshot e2
+            FROM oc_assets_snapshot e2
             WHERE e.mediapackage_id = e2.mediapackage_id
                   AND
                   -- delete where clause
@@ -237,7 +237,7 @@ HAVING v = (SELECT count(*)
                 .list(Q_PROPERTY.mediaPackageId)
 
              [2]
-             SELECT DISTINCT t1.mediapackage_id FROM mh_assets_snapshot t2, mh_assets_properties t1 WHERE (t2.organization_id = ?)
+             SELECT DISTINCT t1.mediapackage_id FROM oc_assets_snapshot t2, oc_assets_properties t1 WHERE (t2.organization_id = ?)
            */
           where = Q_PROPERTY.mediaPackageId.in(
                   new JPASubQuery()
@@ -272,24 +272,24 @@ HAVING v = (SELECT count(*)
     logger.debug("\n---\nDELETE [orphaned properties]\n---");
     am.getDb().runSql(new Database.Sql<Unit>() {
       @Override public Unit h2(EntityManager em) {
-        Queries.sql.update(em, "DELETE FROM mh_assets_properties\n"
+        Queries.sql.update(em, "DELETE FROM oc_assets_properties\n"
                 + "WHERE id in (\n"
                 + "  SELECT p.id\n"
-                + "  FROM mh_assets_properties p LEFT JOIN mh_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
+                + "  FROM oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
                 + "  WHERE e.id IS NULL);");
         return Unit.unit;
       }
 
       @Override public Unit mysql(EntityManager em) {
         Queries.sql.update(em, "DELETE p FROM\n"
-                + "mh_assets_properties p LEFT JOIN mh_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
+                + "oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
                 + "WHERE e.id IS NULL;");
         return Unit.unit;
       }
 
       @Override public Unit postgres(EntityManager em) {
         Queries.sql.update(em, "DELETE p FROM\n"
-                + "mh_assets_properties p LEFT JOIN mh_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
+                + "oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
                 + "WHERE e.id IS NULL;");
         return Unit.unit;
       }

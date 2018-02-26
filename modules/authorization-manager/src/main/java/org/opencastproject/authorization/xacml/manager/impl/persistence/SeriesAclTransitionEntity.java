@@ -52,7 +52,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity(name = "SeriesAclTransition")
 @Access(AccessType.FIELD)
-@Table(name = "mh_acl_series_transition",
+@Table(name = "oc_acl_series_transition",
        uniqueConstraints = @UniqueConstraint(columnNames = {"series_id", "organization_id", "application_date"}))
 @NamedQueries({
       @NamedQuery(name = "SeriesAcl.findByTransitionId", query = "SELECT s FROM SeriesAclTransition s WHERE s.id = :id AND s.organizationId = :organizationId"),

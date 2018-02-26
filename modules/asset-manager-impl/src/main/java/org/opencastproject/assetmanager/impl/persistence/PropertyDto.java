@@ -40,7 +40,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 @Entity(name = "Property")
-@Table(name = "mh_assets_properties")
+@Table(name = "oc_assets_properties")
 
 public class PropertyDto {
   /** Surrogate key. */

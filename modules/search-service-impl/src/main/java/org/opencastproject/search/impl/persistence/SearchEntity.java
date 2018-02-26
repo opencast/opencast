@@ -37,7 +37,7 @@ import javax.persistence.TemporalType;
  * Entity object for storing search in persistence storage. Media package id is stored as primary key.
  */
 @Entity(name = "SearchEntity")
-@Table(name = "mh_search")
+@Table(name = "oc_search")
 @NamedQueries({
         @NamedQuery(name = "Search.findAll", query = "SELECT s FROM SearchEntity s"),
         @NamedQuery(name = "Search.getCount", query = "SELECT COUNT(s) FROM SearchEntity s"),

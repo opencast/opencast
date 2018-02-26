@@ -45,16 +45,16 @@ import javax.persistence.UniqueConstraint;
 
 /** JPA DTO. */
 @Entity(name = "Snapshot")
-@Table(name = "mh_assets_snapshot",
+@Table(name = "oc_assets_snapshot",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"mediapackage_id", "version"})})
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
-@TableGenerator(name = "seq_mh_assets_snapshot", initialValue = 0, allocationSize = 50)
+@TableGenerator(name = "seq_oc_assets_snapshot", initialValue = 0, allocationSize = 50)
 public class SnapshotDto {
   @Id
   @Column(name = "id")
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_mh_assets_snapshot")
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_oc_assets_snapshot")
   private Long id;
 
   @Column(name = "mediapackage_id", length = 128, nullable = false)

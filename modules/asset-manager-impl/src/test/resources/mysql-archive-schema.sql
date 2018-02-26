@@ -1,6 +1,6 @@
 # setup the archive tables
 
-CREATE TABLE mh_archive_asset
+CREATE TABLE oc_archive_asset
 (
     id BIGINT PRIMARY KEY NOT NULL,
     mediapackageelement VARCHAR(128) NOT NULL,
@@ -9,10 +9,10 @@ CREATE TABLE mh_archive_asset
     checksum VARCHAR(255) NOT NULL,
     uri VARCHAR(255) NOT NULL,
     version BIGINT NOT NULL,
-    CONSTRAINT mh_archive_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+    CONSTRAINT oc_archive_asset_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 );
 
-CREATE TABLE mh_archive_episode
+CREATE TABLE oc_archive_episode
 (
     id VARCHAR(128) NOT NULL,
     version BIGINT NOT NULL,
@@ -22,22 +22,22 @@ CREATE TABLE mh_archive_episode
     mediapackage_xml LONGTEXT,
     modification_date DATETIME,
     PRIMARY KEY (id, version, organization),
-    CONSTRAINT mh_archive_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+    CONSTRAINT oc_archive_episode_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 );
 
-CREATE TABLE mh_archive_version_claim
+CREATE TABLE oc_archive_version_claim
 (
     mediapackage VARCHAR(128) PRIMARY KEY NOT NULL,
     last_claimed BIGINT NOT NULL
 );
 
-CREATE UNIQUE INDEX UNQ_mh_archive_asset_0 ON mh_archive_asset (organization, mediapackage, mediapackageelement, version);
-CREATE INDEX IX_mh_archive_asset_checksum ON mh_archive_asset (checksum);
-CREATE INDEX IX_mh_archive_asset_mediapackage ON mh_archive_asset (mediapackage);
-CREATE INDEX IX_mh_archive_asset_uri ON mh_archive_asset (uri);
-CREATE INDEX FK_mh_archive_episode_organization ON mh_archive_episode (organization);
-CREATE INDEX IX_mh_archive_episode_deleted ON mh_archive_episode (deleted);
-CREATE INDEX IX_mh_archive_episode_mediapackage ON mh_archive_episode (id);
-CREATE INDEX IX_mh_archive_episode_version ON mh_archive_episode (version);
-CREATE INDEX IX_mh_archive_version_claim_last_claimed ON mh_archive_version_claim (last_claimed);
-CREATE INDEX IX_mh_archive_version_claim_mediapackage ON mh_archive_version_claim (mediapackage);
+CREATE UNIQUE INDEX UNQ_oc_archive_asset_0 ON oc_archive_asset (organization, mediapackage, mediapackageelement, version);
+CREATE INDEX IX_oc_archive_asset_checksum ON oc_archive_asset (checksum);
+CREATE INDEX IX_oc_archive_asset_mediapackage ON oc_archive_asset (mediapackage);
+CREATE INDEX IX_oc_archive_asset_uri ON oc_archive_asset (uri);
+CREATE INDEX FK_oc_archive_episode_organization ON oc_archive_episode (organization);
+CREATE INDEX IX_oc_archive_episode_deleted ON oc_archive_episode (deleted);
+CREATE INDEX IX_oc_archive_episode_mediapackage ON oc_archive_episode (id);
+CREATE INDEX IX_oc_archive_episode_version ON oc_archive_episode (version);
+CREATE INDEX IX_oc_archive_version_claim_last_claimed ON oc_archive_version_claim (last_claimed);
+CREATE INDEX IX_oc_archive_version_claim_mediapackage ON oc_archive_version_claim (mediapackage);

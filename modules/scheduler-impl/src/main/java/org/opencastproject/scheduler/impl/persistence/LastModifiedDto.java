@@ -40,7 +40,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "LastModified.findAll", query = "SELECT e FROM LastModified e "),
         @NamedQuery(name = "LastModified.findById", query = "SELECT e FROM LastModified e WHERE e.captureAgentId = :agentId"),
         @NamedQuery(name = "LastModified.countAll", query = "SELECT COUNT(e) FROM LastModified e ") })
-@Table(name = "mh_scheduled_last_modified", uniqueConstraints = { @UniqueConstraint(columnNames = { "capture_agent_id" }) })
+@Table(name = "oc_scheduled_last_modified", uniqueConstraints = { @UniqueConstraint(columnNames = { "capture_agent_id" }) })
 public class LastModifiedDto {
 
   /** Capture agent ID */
