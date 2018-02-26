@@ -169,4 +169,8 @@ public class UnitTestWorkspace implements Workspace {
     return Option.none();
   }
 
+  @Override
+  public String rootDirectory() {
+    return null;
+  }
 }
