@@ -85,7 +85,7 @@ public class CloneWorkflowOperationHandlerTest {
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "presentation/source");
-    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR_SUBTYPE, "target");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -100,7 +100,7 @@ public class CloneWorkflowOperationHandlerTest {
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_FLAVOR, "*/source");
-    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR_SUBTYPE, "target");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -111,11 +111,11 @@ public class CloneWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testTagsAsSourceFlavor() throws Exception {
+  public void testTagsAsSourceSelector() throws Exception {
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
     configurations.put(CloneWorkflowOperationHandler.OPT_SOURCE_TAGS, "first");
-    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR_SUBTYPE, "target");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
@@ -129,12 +129,12 @@ public class CloneWorkflowOperationHandlerTest {
   public void testNoSourceFlavor() throws Exception {
     // operation configuration
     Map<String, String> configurations = new HashMap<String, String>();
-    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR, "target");
+    configurations.put(CloneWorkflowOperationHandler.OPT_TARGET_FLAVOR_SUBTYPE, "target");
 
     // run the operation handler
     WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Assert.assertEquals(Action.SKIP, result.getAction());
     MediaPackageElementFlavor newFlavor = MediaPackageElementFlavor.parseFlavor("*/target");
     Assert.assertTrue(result.getMediaPackage().getElementsByFlavor(newFlavor).length == 0);
   }

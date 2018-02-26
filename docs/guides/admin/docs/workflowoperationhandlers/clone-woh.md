@@ -1,15 +1,15 @@
 # CloneWorkflowOperationHandler
 
 ## Description
-The CopyWorkflowOperationHandler can be used to clone media package elements from one flavor to another.
+The CloneWorkflowOperationHandler can be used to clone media package elements.
 
 ## Parameter Table
 
-|Configuration Key|Example           |Description                                       |
-|-----------------|------------------|--------------------------------------------------|
-|source-flavor     |presenter/source |The source flavor(s) to clone                     |
-|source-tags       |archive          |Comma-separated list of source-tags               |
-|target-flavor*    |target           |The target subflavor-name                         |
+|Configuration Key         |Example           |Description                                       |
+|--------------------------|------------------|--------------------------------------------------|
+|source-flavor             |presenter/source  |The source flavor(s) to clone                     |
+|source-tags               |archive           |Comma-separated list of source-tags               |
+|target-flavor-subtype*    |target            |The target flavor's subtype                         |
 
 \* mandatory configuration key
 
@@ -31,7 +31,7 @@ If *source-flavor* is specified as e.g. *\*/source*, all matching media package 
                 <configurations>
                         <configuration key="source-flavor">*/source</configuration>
                         <configuration key="source-tags">archive</configuration>
-                        <configuration key="target-flavor">target</configuration>
+                        <configuration key="target-flavor-subtype">target</configuration>
                 </configurations>
         </operation>
 

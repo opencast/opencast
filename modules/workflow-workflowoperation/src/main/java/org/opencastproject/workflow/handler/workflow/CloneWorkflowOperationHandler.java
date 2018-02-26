@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static java.lang.String.format;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -65,7 +63,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_SOURCE_TAGS = "source-tags";
 
   /** Configuration key for the target-flavor */
-  public static final String OPT_TARGET_FLAVOR = "target-flavor";
+  public static final String OPT_TARGET_FLAVOR_SUBTYPE = "target-flavor-subtype";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CloneWorkflowOperationHandler.class);
@@ -97,14 +95,14 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Check which tags have been configured
     String sourceTagsOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_TAGS));
     String sourceFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_FLAVOR));
-    String targetFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_FLAVOR));
+    String targetFlavorSubtypeOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_FLAVOR_SUBTYPE));
 
     AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
 
     // Make sure either one of tags or flavors are provided
     if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorOption)) {
-      logger.info("No source tags or flavors have been specified, not matching anything");
-      return createResult(mediaPackage, Action.CONTINUE);
+      logger.info("No source tags or flavors have been specified, not matching anything. Operation will be skipped.");
+      return createResult(mediaPackage, Action.SKIP);
     }
 
     // if no source-favor is specified, all flavors will be checked for given tags
@@ -116,12 +114,12 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     sb.append("Parameters passed to clone workflow operation:");
     sb.append("\n source-tags: ").append(sourceTagsOption);
     sb.append("\n source-flavor: ").append(sourceFlavorOption);
-    sb.append("\n target-flavor: ").append(targetFlavorOption);
+    sb.append("\n target-flavor-subtype: ").append(targetFlavorSubtypeOption);
     logger.debug(sb.toString());
 
     // Make sure the target flavor is provided
-    if (StringUtils.isBlank(targetFlavorOption))
-      throw new WorkflowOperationException("No target flavor has been set for the clone operation!");
+    if (StringUtils.isBlank(targetFlavorSubtypeOption))
+      throw new WorkflowOperationException("No target-flavor-subtype has been set for the clone operation!");
 
     // Select the source flavors
     MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorOption);
@@ -138,16 +136,16 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Check the the number of element returned
     if (elements.size() == 0) {
       // If no one found, we skip the operation
-      logger.debug("No matching elements found, skipping action.");
+      logger.debug("No matching elements found, skipping operation.");
       return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
     } else {
-      logger.debug("Copy multiple elements to new flavor: {}", targetFlavorOption);
-      // Store the new Flavor for the loop, so that there are noe duplicates
+      logger.debug("Copy multiple elements to new flavor-subtype: {}", targetFlavorSubtypeOption);
+      // Store the new flavor for the loop, so that there are no duplicates
       Map<String, MediaPackageElementFlavor> newFlavors = new HashMap<>();
 
       for (MediaPackageElement element : elements) {
         String flavorType;
-        // Get the element's flavor if neccessary (there should always be one I guess?)
+        // Get the element's flavor if neccessary
         if (sourceFlavor.getType().equals("*"))
           flavorType = element.getFlavor().getType();
         else
@@ -156,7 +154,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
         // Create new Flavor or get existing previously created one
         MediaPackageElementFlavor newFlavor = newFlavors.get(flavorType);
         if (newFlavor == null) {
-          newFlavor = new MediaPackageElementFlavor(flavorType, targetFlavorOption);
+          newFlavor = new MediaPackageElementFlavor(flavorType, targetFlavorSubtypeOption);
           newFlavors.put(flavorType, newFlavor);
         }
 
@@ -175,11 +173,12 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     newElement.setIdentifier(elementId);
 
     File sourceFile = null;
+    String toFileName = null;
     try {
       URI sourceURI = element.getURI();
       sourceFile = workspace.get(sourceURI);
 
-      String toFileName = elementId;
+      toFileName = elementId;
       String extension = FilenameUtils.getExtension(sourceFile.getName());
       if (!"".equals(extension))
         toFileName = "." + extension;
@@ -187,13 +186,13 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.debug("Start copying element {} to target {}.", sourceFile.getPath(), toFileName);
 
       URI newUri = workspace.copyTo(sourceURI, element.getMediaPackage().getIdentifier().toString(),
-              newElement.getIdentifier().toString(), toFileName);
+              newElement.getIdentifier(), toFileName);
       newElement.setURI(newUri);
       newElement.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(newUri)));
 
       logger.debug("Element {} copied to target {}.", sourceFile.getPath(), toFileName);
     } catch (IOException e) {
-      throw new WorkflowOperationException(format("Unable to copy %s: %s", sourceFile.getPath()));
+      throw new WorkflowOperationException("Unable to copy " + sourceFile.getPath() + " to " + toFileName + ".", e);
     } catch (NotFoundException e) {
       throw new WorkflowOperationException("Unable to find " + element.getURI() + " in the workspace", e);
     }
