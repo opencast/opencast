@@ -74,6 +74,7 @@ groups in multiple places when a change is necessary.  These changes are
  - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
  - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
  - Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
+ - Modifying the list of committers on the [Opencast website](http://www.opencast.org/community)
 
 Current Administrators
 ----------------------
