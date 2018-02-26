@@ -24,6 +24,7 @@ package org.opencastproject.series.impl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
@@ -102,7 +103,7 @@ public interface SeriesServiceDatabase {
    * @throws SeriesServiceDatabaseException
    *           if exception occurs
    */
-  List<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException;
+  List<SeriesEntity> getAllSeries() throws SeriesServiceDatabaseException;
 
   /**
    * Retrieves ACL for series with given ID.

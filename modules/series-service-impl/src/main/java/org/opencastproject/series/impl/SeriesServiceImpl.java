@@ -39,9 +39,11 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -51,12 +53,12 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -160,7 +162,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
     logger.info("The series index is empty. Populating it now with series");
     try {
-      List<Tuple<DublinCoreCatalog, String>> allSeries = persistence.getAllSeries();
+      List<SeriesEntity> allSeries = persistence.getAllSeries();
       final int total = allSeries.size();
       if (total == 0) {
         logger.info("No series found. Repopulating index finished.");
@@ -168,19 +170,20 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
 
       int current = 0;
-      for (Tuple<DublinCoreCatalog, String> series: allSeries) {
+      for (SeriesEntity series: allSeries) {
         current++;
         // Run as the superuser so we get all series, regardless of organization or role
-        Organization organization = orgDirectory.getOrganization(series.getB());
+        Organization organization = orgDirectory.getOrganization(series.getOrganization());
         securityService.setOrganization(organization);
         securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
-        index.updateIndex(series.getA());
-        String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
-        AccessControlList acl = persistence.getAccessControlList(id);
-        if (acl != null)
+        index.updateIndex(DublinCoreXmlFormat.read(series.getDublinCoreXML()));
+        String id = series.getSeriesId();
+        AccessControlList acl = AccessControlParser.parseAcl(series.getAccessControl());
+        if (acl != null) {
           index.updateSecurityPolicy(id, acl);
-        index.updateOptOutStatus(id, persistence.isOptOut(id));
+        }
+        index.updateOptOutStatus(id, series.isOptOut());
 
         // log progress
         if (current % 100 == 0) {
@@ -571,26 +574,27 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       final int total = persistence.countSeries();
       logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
       final int responseInterval = (total < 100) ? 1 : (total / 100);
-      List<Tuple<DublinCoreCatalog, String>> databaseSeries = persistence.getAllSeries();
+      List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       int current = 1;
-      for (Tuple<DublinCoreCatalog, String> series: databaseSeries) {
-        Organization organization = orgDirectory.getOrganization(series.getB());
+      for (SeriesEntity series: databaseSeries) {
+        Organization organization = orgDirectory.getOrganization(series.getOrganization());
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
                 new Function0.X<Void>() {
                   @Override
                   public Void xapply() throws Exception {
-                    String id = series.getA().getFirst(DublinCore.PROPERTY_IDENTIFIER);
-                    logger.trace("Adding series '{}' for org '{}'", id, series.getB());
+                    String id = series.getSeriesId();
+                    logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
+                    DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateCatalog(series.getA()));
+                            SeriesItem.updateCatalog(catalog));
 
-                    AccessControlList acl = persistence.getAccessControlList(id);
+                    AccessControlList acl = AccessControlParser.parseAcl(series.getAccessControl());
                     if (acl != null) {
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateAcl(id, acl));
                     }
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateOptOut(id, persistence.isOptOut(id)));
+                            SeriesItem.updateOptOut(id, series.isOptOut()));
                     for (Entry<String, String> property : persistence.getSeriesProperties(id).entrySet()) {
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateProperty(id, property.getKey(), property.getValue()));

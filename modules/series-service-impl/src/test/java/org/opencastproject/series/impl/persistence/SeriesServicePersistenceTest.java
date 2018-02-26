@@ -41,7 +41,6 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -117,7 +116,7 @@ public class SeriesServicePersistenceTest {
   public void testRetrieving() throws Exception {
     seriesDatabase.storeSeries(testCatalog);
 
-    List<Tuple<DublinCoreCatalog, String>> series = seriesDatabase.getAllSeries();
+    List series = seriesDatabase.getAllSeries();
     assertTrue("Exactly one series should be returned", series.size() == 1);
     seriesDatabase.deleteSeries(testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER));
     series = seriesDatabase.getAllSeries();
