@@ -62,7 +62,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -566,7 +565,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
   @Override
   public void repopulate(final String indexName) {
-    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + WordUtils.capitalize(indexName);
+    final String destinationId = SeriesItem.SERIES_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
+            + indexName.substring(1);
     try {
       final int total = persistence.countSeries();
       logger.info("Re-populating '{}' index with series. There are {} series to add to the index.", indexName, total);
@@ -599,12 +599,12 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                   }
                 });
         if ((current % responseInterval == 0) || (current == total)) {
-          logger.info("Updating {} series index {}/{}: {} percent complete.", indexName, current, total,
+          logger.info("Initializing {} series index rebuild {}/{}: {} percent", indexName, current, total,
                   current * 100 / total);
         }
         current++;
       }
-      logger.info("Finished populating '{}' index with series.", indexName);
+      logger.info("Finished initializing '{}' index rebuild", indexName);
     } catch (Exception e) {
       logger.warn("Unable to index series instances:", e);
       throw new ServiceException(e.getMessage());
