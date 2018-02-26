@@ -47,8 +47,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -63,7 +61,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
   public static final String OPT_SOURCE_TAGS = "source-tags";
 
   /** Configuration key for the target-flavor */
-  public static final String OPT_TARGET_FLAVOR_SUBTYPE = "target-flavor-subtype";
+  public static final String OPT_TARGET_FLAVOR = "target-flavor";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CloneWorkflowOperationHandler.class);
@@ -95,7 +93,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // Check which tags have been configured
     String sourceTagsOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_TAGS));
     String sourceFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_SOURCE_FLAVOR));
-    String targetFlavorSubtypeOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_FLAVOR_SUBTYPE));
+    String targetFlavorOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_FLAVOR));
 
     AbstractMediaPackageElementSelector<MediaPackageElement> elementSelector = new SimpleElementSelector();
 
@@ -114,12 +112,14 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     sb.append("Parameters passed to clone workflow operation:");
     sb.append("\n source-tags: ").append(sourceTagsOption);
     sb.append("\n source-flavor: ").append(sourceFlavorOption);
-    sb.append("\n target-flavor-subtype: ").append(targetFlavorSubtypeOption);
+    sb.append("\n target-flavor: ").append(targetFlavorOption);
     logger.debug(sb.toString());
 
-    // Make sure the target flavor is provided
-    if (StringUtils.isBlank(targetFlavorSubtypeOption))
-      throw new WorkflowOperationException("No target-flavor-subtype has been set for the clone operation!");
+    // Make sure the target flavor is provided and has the right format
+    if (StringUtils.isBlank(targetFlavorOption))
+      throw new WorkflowOperationException("No target-flavor has been set for the clone operation!");
+    else if (!targetFlavorOption.contains("/") || targetFlavorOption.split("/").length != 2)
+      throw new WorkflowOperationException("Target-flavor should have the format \"type/subtype\".");
 
     // Select the source flavors
     MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorOption);
@@ -139,27 +139,29 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.debug("No matching elements found, skipping operation.");
       return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
     } else {
-      logger.debug("Copy multiple elements to new flavor-subtype: {}", targetFlavorSubtypeOption);
-      // Store the new flavor for the loop, so that there are no duplicates
-      Map<String, MediaPackageElementFlavor> newFlavors = new HashMap<>();
+      logger.debug("Copy multiple elements to new flavor: {}", targetFlavorOption);
+
+      MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
 
       for (MediaPackageElement element : elements) {
-        String flavorType;
-        // Get the element's flavor if neccessary
-        if (sourceFlavor.getType().equals("*"))
-          flavorType = element.getFlavor().getType();
+        MediaPackageElementFlavor flavor;
+
+        // Take subtype either from option or from element (if option is *)
+        String subtype;
+        if ("*".equals(targetFlavor.getSubtype()))
+          subtype = element.getFlavor().getSubtype();
         else
-          flavorType = sourceFlavor.getType();
+          subtype = targetFlavor.getSubtype();
 
-        // Create new Flavor or get existing previously created one
-        MediaPackageElementFlavor newFlavor = newFlavors.get(flavorType);
-        if (newFlavor == null) {
-          newFlavor = new MediaPackageElementFlavor(flavorType, targetFlavorSubtypeOption);
-          newFlavors.put(flavorType, newFlavor);
-        }
+        // Take type either from option or from element (if option is *)
+        if ("*".equals(targetFlavor.getType()))
+          flavor = new MediaPackageElementFlavor(element.getFlavor().getType(), subtype);
+        else
+          flavor = new MediaPackageElementFlavor(targetFlavor.getType(), subtype);
 
+        // Copy element and set new flavor
         MediaPackageElement newElement = copyElement(element);
-        newElement.setFlavor(newFlavor);
+        newElement.setFlavor(flavor);
         mediaPackage.add(newElement);
       }
     }

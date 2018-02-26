@@ -9,7 +9,7 @@ The CloneWorkflowOperationHandler can be used to clone media package elements.
 |--------------------------|------------------|--------------------------------------------------|
 |source-flavor             |presenter/source  |The source flavor(s) to clone                     |
 |source-tags               |archive           |Comma-separated list of source-tags               |
-|target-flavor-subtype*    |target            |The target flavor's subtype                         |
+|target-flavor*            |presenter/target  |The target flavor                                 |
 
 \* mandatory configuration key
 
@@ -22,6 +22,10 @@ Notes:
 ## Source Flavor
 If *source-flavor* is specified as e.g. *\*/source*, all matching media package elements will be cloned and have the new flavor *<original-flavor>/target*.
 
+## Target Flavor
+If *target-flavor* is specified as e.g. *\*/target*, the target flavors will have the subtype *target* and the type from the source
+If *target-flavor* is specified as e.g. *target/\**, the target flavors will have the type *target* and the subtype from the source
+
 ## Operation Example
 
         <operation
@@ -31,7 +35,7 @@ If *source-flavor* is specified as e.g. *\*/source*, all matching media package 
                 <configurations>
                         <configuration key="source-flavor">*/source</configuration>
                         <configuration key="source-tags">archive</configuration>
-                        <configuration key="target-flavor-subtype">target</configuration>
+                        <configuration key="target-flavor">*/target</configuration>
                 </configurations>
         </operation>
 
