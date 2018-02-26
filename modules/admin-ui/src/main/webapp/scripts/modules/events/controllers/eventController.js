@@ -235,7 +235,7 @@ angular.module('adminNg.controllers')
                         publication.order = 999 + index;
                         var now = new Date();
                         if (publication.id == "engage-live" && 
-                        	(now < new Date($scope.general["start-date"]) || now > new Date($scope.general["end-date"])))
+                        	(now < new Date(general["start-date"]) || now > new Date(general["end-date"])))
                         	publication.enabled = false;
                         else publication.enabled = true;
                     });
