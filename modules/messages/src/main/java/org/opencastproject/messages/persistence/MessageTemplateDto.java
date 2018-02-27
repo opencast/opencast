@@ -45,7 +45,7 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for message templates. */
 @Entity(name = "MessageTemplate")
-@Table(name = "mh_message_template", uniqueConstraints = {
+@Table(name = "oc_message_template", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "name", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "MessageTemplate.findAll", query = "SELECT m FROM MessageTemplate m WHERE m.organization = :org"),

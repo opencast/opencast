@@ -1,5 +1,5 @@
 describe('adminNg.directives.timelineDirective', function () {
-    var $compile, $rootScope, $document, element, spy;
+    var $compile, $httpBackend, $rootScope, $document, element, spy;
 
     beforeEach(module('adminNg'));
     beforeEach(module('shared/partials/timeline.html'));
@@ -10,10 +10,14 @@ describe('adminNg.directives.timelineDirective', function () {
         });
     }));
 
-    beforeEach(inject(function (_$rootScope_, _$compile_, _$document_) {
+    beforeEach(inject(function (_$httpBackend_, _$rootScope_, _$compile_, _$document_) {
         $compile = _$compile_;
+        $httpBackend = _$httpBackend_;
         $rootScope = _$rootScope_;
         $document = _$document_;
+
+        jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
     }));
 
     beforeEach(function () {

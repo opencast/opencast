@@ -149,6 +149,15 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                 }
             }
 
+            .preview-toggle-control {
+                display: inline;
+                float: right;
+            }
+
+            .preview-toggle-control > * {
+                vertical-align: middle;
+            }
+
             $segment-height: 24px;
             $segment-background: $segment-height;
             $segment-main-height: 60px;

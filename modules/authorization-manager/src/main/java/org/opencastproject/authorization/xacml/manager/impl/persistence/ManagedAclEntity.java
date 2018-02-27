@@ -54,7 +54,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 @Entity(name = "ManagedAcl")
-@Table(name = "mh_acl_managed_acl",
+@Table(name = "oc_acl_managed_acl",
        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "organization_id"}))
 @NamedQueries({
         @NamedQuery(name = "ManagedAcl.findByIdAndOrg",

@@ -50,7 +50,7 @@ import javax.persistence.TemporalType;
  * Persists the last harvested time of a url.
  */
 @Entity
-@Table(name = "mh_oaipmh_harvesting")
+@Table(name = "oc_oaipmh_harvesting")
 @NamedQueries({
     @NamedQuery(name = "findLastHarvested",
         query = "SELECT a.lastHarvested FROM LastHarvested a WHERE a.url = :url"),

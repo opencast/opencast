@@ -33,10 +33,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ListProvidersServiceImpl implements ListProvidersService {
 
-  private Map<String, ResourceListProvider> providers = new HashMap<String, ResourceListProvider>();
+  private Map<String, ResourceListProvider> providers = new ConcurrentHashMap<String, ResourceListProvider>();
 
   /** OSGi callback for provider. */
   public void addProvider(ResourceListProvider provider) {

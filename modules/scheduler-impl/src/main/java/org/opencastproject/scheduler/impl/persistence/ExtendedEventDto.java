@@ -50,7 +50,7 @@ import javax.persistence.UniqueConstraint;
         // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewStatus =
         // org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.UNCONFIRMED")
 })
-@Table(name = "mh_scheduled_extended_event", uniqueConstraints = {
+@Table(name = "oc_scheduled_extended_event", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "mediapackage_id", "organization" }) })
 public class ExtendedEventDto {
 

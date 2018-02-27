@@ -48,7 +48,7 @@ import javax.persistence.UniqueConstraint;
 
 @Entity(name = "OaiPmhEntity")
 @IdClass(OaiPmhEntityId.class)
-@Table(name = "mh_oaipmh", uniqueConstraints = @UniqueConstraint(columnNames = { "modification_date" }))
+@Table(name = "oc_oaipmh", uniqueConstraints = @UniqueConstraint(columnNames = { "modification_date" }))
 @NamedQueries({ @NamedQuery(name = "OaiPmh.findById",
         query = "SELECT o FROM OaiPmhEntity o "
                 + "WHERE o.mediaPackageId=:mediaPackageId"
@@ -97,9 +97,9 @@ public class OaiPmhEntity {
   /** List of serialized media package element entities */
   @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumns({
-    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "mh_oaipmh_elements"),
-    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "mh_oaipmh_elements"),
-    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "mh_oaipmh_elements")
+    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements"),
+    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "oc_oaipmh_elements"),
+    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements")
   })
   private List<OaiPmhElementEntity> mediaPackageElements = new ArrayList<>();
 

@@ -104,6 +104,7 @@
             <Import-Package>
               !junit.framework,
               !org.apache.lucene.*,
+              !org.tartarus.snowball*,
               !org.mortbay.*,
               *
             </Import-Package>

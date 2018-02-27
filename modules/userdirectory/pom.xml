@@ -125,6 +125,8 @@
             <Import-Package>
               javax.servlet,
               javax.servlet.http,
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
             <Export-Package>

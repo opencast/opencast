@@ -28,7 +28,7 @@
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
     <bundle>mvn:javax.servlet.jsp/javax.servlet.jsp-api/2.3.1</bundle>
     <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
-    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.8.0</bundle>
+    <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
 
     <!-- JPA -->
     <feature>jndi</feature>
@@ -173,7 +173,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
@@ -182,6 +181,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-core/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
@@ -213,7 +213,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
@@ -293,7 +293,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -319,7 +318,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
@@ -396,7 +395,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
@@ -405,6 +403,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-core/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
@@ -436,7 +435,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
@@ -575,7 +574,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-dataloader/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-remote/${project.version}</bundle>
@@ -601,7 +599,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-messages/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-metadata/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
@@ -660,12 +658,12 @@
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-acl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-download/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-adaptive-streaming-wowza/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-core/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
@@ -709,7 +707,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
+    <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-security-cas" version="0.0.0">

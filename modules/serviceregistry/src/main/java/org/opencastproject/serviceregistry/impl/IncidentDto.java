@@ -58,7 +58,7 @@ import javax.persistence.TemporalType;
 
 @Entity(name = "Incident")
 @Access(AccessType.FIELD)
-@Table(name = "mh_incident")
+@Table(name = "oc_incident")
 @NamedQueries({@NamedQuery(name = "Incident.findByJobId",
                            query = "select a from Incident a where a.jobId = :jobId")})
 public class IncidentDto {

@@ -35,7 +35,7 @@ import javax.persistence.UniqueConstraint;
  * Entity object for email configuration data.
  */
 @Entity(name = "EmailConfiguration")
-@Table(name = "mh_email_configuration", uniqueConstraints = { @UniqueConstraint(columnNames = { "organization" }) })
+@Table(name = "oc_email_configuration", uniqueConstraints = { @UniqueConstraint(columnNames = { "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "EmailConfiguration.findAll", query = "SELECT e FROM EmailConfiguration e WHERE e.organization = :org"),
         @NamedQuery(name = "EmailConfiguration.clear", query = "DELETE FROM EmailConfiguration e WHERE e.organization = :org") })

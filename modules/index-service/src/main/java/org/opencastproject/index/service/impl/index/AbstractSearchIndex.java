@@ -63,6 +63,7 @@ import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.Fn;
 
+import org.apache.commons.lang.StringUtils;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -138,6 +139,44 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     recreateService(IndexRecreateObject.Service.Workflow);
     recreateService(IndexRecreateObject.Service.AssetManager);
     recreateService(IndexRecreateObject.Service.Comments);
+  }
+
+  /**
+   * Recreate the index from a specific service that provide data.
+   *
+   * @param service
+   *           The service name. The available services are:
+   *           Groups, Acl, Themes, Series, Scheduler, Workflow, AssetManager, Comments
+   *
+   * @throws IllegalArgumentException
+   *           Thrown if the service name is invalid
+   * @throws InterruptedException
+   *           Thrown if the process is interupted.
+   * @throws ExecutionException
+   *           Thrown if there is a problem executing the process.
+   * @throws IndexServiceException
+   *           Thrown if there was a problem adding some of the data back into the index.
+   */
+  public synchronized void recreateIndex(String service)
+          throws IllegalArgumentException, InterruptedException, ExecutionException, IndexServiceException {
+    if (StringUtils.equalsIgnoreCase("Groups", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Groups);
+    else if (StringUtils.equalsIgnoreCase("Acl", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Acl);
+    else if (StringUtils.equalsIgnoreCase("Themes", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Themes);
+    else if (StringUtils.equalsIgnoreCase("Series", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Series);
+    else if (StringUtils.equalsIgnoreCase("Scheduler", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Scheduler);
+    else if (StringUtils.equalsIgnoreCase("Workflow", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Workflow);
+    else if (StringUtils.equalsIgnoreCase("AssetManager", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.AssetManager);
+    else if (StringUtils.equalsIgnoreCase("Comments", StringUtils.trim(service)))
+      recreateService(IndexRecreateObject.Service.Comments);
+    else
+      throw new IllegalArgumentException("Unknown service " + service);
   }
 
   /**

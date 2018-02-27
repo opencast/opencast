@@ -53,7 +53,7 @@ import javax.persistence.UniqueConstraint;
 /** JPA link of {@link org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition}. */
 @Entity(name = "EpisodeAclTransition")
 @Access(AccessType.FIELD)
-@Table(name = "mh_acl_episode_transition",
+@Table(name = "oc_acl_episode_transition",
        uniqueConstraints = @UniqueConstraint(columnNames = {"episode_id", "organization_id", "application_date"}))
 @NamedQueries({
       @NamedQuery(name = "EpisodeAcl.findByTransitionId",

@@ -54,6 +54,16 @@ angular.module('adminNg.controllers')
             } else if ($scope.tab === "playback") {
               $scope.area   = "metadata";
             }
+
+            // This fixes a problem where video playback breaks after switching tabs. Changing the location seems
+            // to be destructive to the <video> element working together with opencast's external controls.
+            var lastRoute, off;
+            lastRoute = $route.current;
+            off = $scope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                off();
+            });
+
             $scope.navigateTo('/events/' + $scope.resource + '/' + $scope.id + '/tools/' + tab);
         };
 

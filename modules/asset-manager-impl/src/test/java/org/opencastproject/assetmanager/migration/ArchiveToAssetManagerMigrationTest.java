@@ -88,7 +88,7 @@ public class ArchiveToAssetManagerMigrationTest extends AbstractAssetManagerTest
     //
     // compare actual and expected DDL
     final String showCreateTables =
-            $("mh_assets_snapshot", "mh_assets_asset", "mh_assets_properties", "mh_assets_version_claim", "SEQUENCE")
+            $("oc_assets_snapshot", "oc_assets_asset", "oc_assets_properties", "oc_assets_version_claim", "SEQUENCE")
                     .map(Strings.wrap("SHOW CREATE TABLE ", ""))
                     .bind(findAll)
                     .map(take(1))
@@ -100,9 +100,9 @@ public class ArchiveToAssetManagerMigrationTest extends AbstractAssetManagerTest
                  showCreateTables);
     // check sequence table migration
     assertTrue("Sequence table should be updated",
-               penv.tx(Queries.sql.findSingle("SELECT * FROM SEQUENCE WHERE SEQ_NAME='seq_mh_assets_asset'")).isSome());
+               penv.tx(Queries.sql.findSingle("SELECT * FROM SEQUENCE WHERE SEQ_NAME='seq_oc_assets_asset'")).isSome());
     assertTrue("Sequence table should be updated",
-               penv.tx(Queries.sql.findSingle("SELECT * FROM SEQUENCE WHERE SEQ_NAME='seq_mh_assets_snapshot'")).isSome());
+               penv.tx(Queries.sql.findSingle("SELECT * FROM SEQUENCE WHERE SEQ_NAME='seq_oc_assets_snapshot'")).isSome());
 
     //
     // if the migration completed successfully the asset manager should be able to run some operations
