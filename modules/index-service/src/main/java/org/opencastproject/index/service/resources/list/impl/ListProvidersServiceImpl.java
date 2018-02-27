@@ -30,7 +30,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
