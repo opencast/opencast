@@ -10,7 +10,7 @@ text.
 |------------------|-------|-----------|-------------|
 |source-flavor|The flavor of the audio file to be sent for translation.|EMPTY|presenter/delivery|
 |source-tag|The flavor of the audio file to be sent for translation.|EMPTY|transcript-audio|
-|skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file.|false|captions/timedtext|
+|skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file.|false|captions/vtt+en|
 
 **One of source-flavor or source-tag must be specified.**
 
@@ -42,7 +42,7 @@ text.
   description="Start IBM Watson transcription job">
   <configurations>
     <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/timedtext</configuration>
+    <configuration key="skip-if-flavor-exists">captions/vtt+en</configuration>
     <!-- Audio to be translated, produced in the previous compose operation -->
     <configuration key="source-tag">transcript</configuration>
   </configurations>

@@ -48,4 +48,9 @@ public interface TranscriptionService {
    * Called when external service reported an error in transcription.
    */
   void transcriptionError(String mpId, Object results) throws TranscriptionServiceException;
+
+  /*
+   * Returns a string representing the language supported.
+   */
+  String getLanguage();
 }
