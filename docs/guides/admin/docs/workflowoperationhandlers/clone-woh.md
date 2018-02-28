@@ -16,6 +16,7 @@ The CloneWorkflowOperationHandler can be used to clone media package elements.
 Notes:
 
 * *source-flavor* and *source-tags* may be used both together to select media package elements based on both flavors and tags
+* If *source-flavor* is not specified, all media package elements matching *source-tags* will be selected
 * In case that neither *source-flavor* nor *source-tags* are specified, the operation will be skipped
 * In case no media package elements match *source-flavor* and *source-tags*, the operation will be skipped
 
