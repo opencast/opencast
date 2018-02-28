@@ -160,7 +160,7 @@ public class AssetManagerUpdatedEventHandler {
         final Organization organization = organizationDirectoryService.getOrganization(orgId);
         if (organization == null) {
           logger.warn("Skipping update of episode {} since organization {} is unknown",
-                  snapshot.getMediaPackage().getIdentifier(), orgId);
+                  snapshot.getMediaPackage().getIdentifier().compact(), orgId);
           continue;
         }
         securityService.setOrganization(organization);
@@ -200,7 +200,7 @@ public class AssetManagerUpdatedEventHandler {
           }
         }
 
-        // Remove the series catalog and isPartOf from episode catalog
+        // Remove the series catalogs and isPartOf from episode catalog
         if (SeriesItem.Type.Delete.equals(seriesItem.getType())) {
           mp.setSeries(null);
           mp.setSeriesTitle(null);
@@ -217,13 +217,21 @@ public class AssetManagerUpdatedEventHandler {
             // setting the URI to a new source so the checksum will most like be invalid
             episodeCatalog.setChecksum(null);
           }
+          authorizationService.removeAcl(mp, AclScope.Series);
+          // here we don't know the series extended metadata types,
+          // we assume that all series catalog flavors have a fixed subtype: series
+          MediaPackageElementFlavor seriesFlavor = MediaPackageElementFlavor.flavor("*", "series");
+          for (Catalog catalog : mp.getCatalogs()) {
+            if (catalog.getFlavor().matches(seriesFlavor))
+              mp.remove(catalog);
+          }
         }
 
         try {
           // Update the asset manager with the modified mediapackage
           assetManager.takeSnapshot(snapshot.getOwner(), mp);
         } catch (AssetManagerException e) {
-          logger.error("Error updating mediapackage {}: {}", mp, e.getMessage());
+          logger.error("Error updating mediapackage {}", mp.getIdentifier().compact(), e);
         }
       }
     } catch (NotFoundException e) {
