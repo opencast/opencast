@@ -115,12 +115,6 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
     sb.append("\n target-flavor: ").append(targetFlavorOption);
     logger.debug(sb.toString());
 
-    // Make sure the target flavor is provided and has the right format
-    if (StringUtils.isBlank(targetFlavorOption))
-      throw new WorkflowOperationException("No target-flavor has been set for the clone operation!");
-    else if (!targetFlavorOption.contains("/") || targetFlavorOption.split("/").length != 2)
-      throw new WorkflowOperationException("Target-flavor should have the format \"type/subtype\".");
-
     // Select the source flavors
     MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorOption);
     elementSelector.addFlavor(sourceFlavor);
