@@ -2516,7 +2516,7 @@ public class SchedulerServiceImplTest {
       }
 
       @Override
-      public AssetStore getAssetStore() {
+      public AssetStore getLocalAssetStore() {
         return mkAssetStore();
       }
 
@@ -2593,6 +2593,11 @@ public class SchedulerServiceImplTest {
       @Override
       public boolean contains(StoragePath path) throws AssetStoreException {
         return false;
+      }
+
+      @Override
+      public String getStoreType() {
+        return "test_store";
       }
     };
   }

@@ -168,7 +168,7 @@ public class TestTasksEndpoint extends TasksEndpoint {
       }
 
       @Override
-      public AssetStore getAssetStore() {
+      public AssetStore getLocalAssetStore() {
         return mkAssetStore(workspace);
       }
 
@@ -245,6 +245,11 @@ public class TestTasksEndpoint extends TasksEndpoint {
       @Override
       public boolean contains(StoragePath path) throws AssetStoreException {
         return false;
+      }
+
+      @Override
+      public String getStoreType() {
+        return "test_store";
       }
     };
   }

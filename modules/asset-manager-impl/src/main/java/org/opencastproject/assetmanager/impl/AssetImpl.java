@@ -35,18 +35,21 @@ public class AssetImpl implements Asset {
   private final Opt<MimeType> mimeType;
   private final long size;
   private final Availability availability;
+  private final String storageId;
 
   public AssetImpl(
           AssetId id,
           InputStream in,
           Opt<MimeType> mimeType,
           long size,
+          String storeId,
           Availability availability) {
     this.id = id;
     this.in = in;
     this.mimeType = mimeType;
     this.size = size;
     this.availability = availability;
+    this.storageId = storeId;
   }
 
   @Override public AssetId getId() {
@@ -68,4 +71,6 @@ public class AssetImpl implements Asset {
   @Override public Availability getAvailability() {
     return availability;
   }
+
+  @Override public String getStorageId() { return storageId; }
 }

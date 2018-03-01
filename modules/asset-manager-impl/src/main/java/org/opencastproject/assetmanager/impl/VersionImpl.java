@@ -49,6 +49,10 @@ public final class VersionImpl implements Version {
     return new VersionImpl(nr);
   }
 
+  public static VersionImpl mk(Version v) {
+    return new VersionImpl(Long.parseLong(v.toString()));
+  }
+
   /** Create the next version after the <code>latest</code>. */
   public static VersionImpl next(long latest) {
     return new VersionImpl(latest + 1);

@@ -5,6 +5,7 @@
     immediate="true">
   <implementation class="org.opencastproject.assetmanager.storage.impl.fs.OsgiFileSystemAssetStore" />
   <property name="service.description" value="File system based asset store" />
+  <property name="store.type" value="local-filesystem" />
   <service>
     <provide interface="org.opencastproject.assetmanager.impl.storage.AssetStore" />
   </service>

@@ -22,6 +22,7 @@ package org.opencastproject.assetmanager.storage.impl.fs;
 
 import static org.opencastproject.util.IoSupport.file;
 
+import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -77,6 +78,9 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
    *          the component context
    */
   public void activate(final ComponentContext cc) throws IllegalStateException, IOException {
+    storeType = (String) cc.getProperties().get(AssetStore.STORE_TYPE_PROPERTY);
+    logger.info("{} is: {}", AssetStore.STORE_TYPE_PROPERTY, storeType);
+
     rootDirectory = StringUtils.trimToNull(cc.getBundleContext().getProperty(CONFIG_STORE_ROOT_DIR));
     if (rootDirectory == null) {
       final String storageDir = StringUtils.trimToNull(cc.getBundleContext().getProperty(CFG_OPT_STORAGE_DIR));

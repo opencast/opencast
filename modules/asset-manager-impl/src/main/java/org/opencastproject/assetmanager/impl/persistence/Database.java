@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Full;
@@ -160,6 +161,41 @@ public class Database implements EntityPaths {
   }
 
   /**
+   * Save a property to the database. This is either an insert or an update operation.
+   */
+  public boolean saveAssetProperty(final Property property) {
+    return penv.tx(new Fn<EntityManager, Boolean>() {
+      @Override public Boolean apply(EntityManager em) {
+        final PropertyId pId = property.getId();
+        // check the existence of both the media package and the property in one query
+        //
+        // either the property matches or it does not exist <- left outer join
+        final BooleanExpression eitherMatchOrNull =
+                Q_PROPERTY.namespace.eq(pId.getNamespace())
+                        .and(Q_PROPERTY.propertyName.eq(pId.getName())).or(Q_PROPERTY.namespace.isNull());
+        final Tuple result = new JPAQuery(em, TEMPLATES)
+                .from(Q_SNAPSHOT)
+                .leftJoin(Q_PROPERTY).on(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(eitherMatchOrNull))
+                .where(Q_SNAPSHOT.mediaPackageId.eq(pId.getMediaPackageId()))
+                // only one result is interesting, no need to fetch all versions of the media package
+                .singleResult(Q_SNAPSHOT.id, Q_PROPERTY);
+        if (result != null) {
+          // media package exists, now check if the property exists
+          final PropertyDto exists = result.get(Q_PROPERTY);
+          Queries.persistOrUpdate(em, exists == null
+                  ? PropertyDto.mk(property)
+                  : exists.update(property.getValue()));
+          return true;
+        } else {
+          logger.debug("Mediapackage {} not found!", property.getId().getMediaPackageId());
+          // media package does not exist
+          return false;
+        }
+      }
+    });
+  }
+
+  /**
    * Claim a new version for media package <code>mpId</code>.
    */
   public VersionImpl claimVersion(final String mpId) {
@@ -188,6 +224,7 @@ public class Database implements EntityPaths {
           final Date archivalDate,
           final VersionImpl version,
           final Availability availability,
+          final String storageId,
           final String owner) {
     final SnapshotDto snapshotDto = SnapshotDto.mk(
             pmp.getMediaPackage(),
@@ -195,6 +232,7 @@ public class Database implements EntityPaths {
             orgId,
             archivalDate,
             availability,
+            storageId,
             owner);
     return penv.tx(new Fn<EntityManager, SnapshotDto>() {
       @Override public SnapshotDto apply(EntityManager em) {
@@ -207,12 +245,38 @@ public class Database implements EntityPaths {
                   snapshotDto.getId(),
                   e.getChecksum().toString(),
                   Opt.nul(e.getMimeType()),
+                  storageId,
                   e.getSize());
           em.persist(a);
         }
         return snapshotDto;
       }
     });
+  }
+
+  public void setStorageLocation(Snapshot snapshot, final String storageId) {
+    setStorageLocation(VersionImpl.mk(snapshot.getVersion()), snapshot.getMediaPackage().getIdentifier().compact(), storageId);
+  }
+
+  public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {
+    penv.tx(new Fx<EntityManager>() {
+      @Override public void apply(EntityManager em) {
+        final QSnapshotDto q = QSnapshotDto.snapshotDto;
+        final QAssetDto a = QAssetDto.assetDto;
+        //Update the snapshot
+        new JPAUpdateClause(em, q, TEMPLATES)
+                .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
+                .set(q.storageId, storageId)
+                .execute();
+        //Get the snapshot (to get its database ID)
+        Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
+        //Update the assets
+        new JPAUpdateClause(em, a, TEMPLATES)
+                .where(a.snapshotId.eq(s.get().getSnapshotDto().getId()))
+                .set(a.storageId, storageId)
+                .execute();
+      }
+    }.toFn());
   }
 
   public void setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
@@ -244,7 +308,22 @@ public class Database implements EntityPaths {
                         // if no version has been specified make sure to get the latest by ordering
                 .orderBy(snapshotDto.version.desc())
                 .uniqueResult(Medium.select);
-        return Opt.nul(result).map(Medium.fromTuple);
+        return Opt.nul(result).map(AssetDtos.Medium.fromTuple);
+      }
+    });
+  }
+
+  public Opt<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
+    return penv.tx(new Fn<EntityManager, Opt<SnapshotDtos.Medium>>() {
+      @Override public Opt<SnapshotDtos.Medium> apply(EntityManager em) {
+        final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
+        final Tuple result = SnapshotDtos.baseQuery(em)
+                .where(snapshotDto.mediaPackageId.eq(mpId)
+                  .and(snapshotDto.version.eq(version.value())))
+                // if no version has been specified make sure to get the latest by ordering
+                .orderBy(snapshotDto.version.desc())
+                .uniqueResult(SnapshotDtos.Medium.select);
+        return Opt.nul(result).map(SnapshotDtos.Medium.fromTuple);
       }
     });
   }

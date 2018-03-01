@@ -31,6 +31,8 @@ import com.entwinemedia.fn.data.Opt;
  * Its purpose is to group the various data that is associated with a media package and to support their partial loading.
  */
 public interface ARecord {
+  /** Get the snapshot ID.  This is from the underlying DTO, and thus may be null. */
+  long getSnapshotId();
   /** Get the media package ID. */
   String getMediaPackageId();
 

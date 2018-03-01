@@ -81,6 +81,14 @@ public class AQueryBuilderDecorator implements AQueryBuilder {
     return delegate.availability();
   }
 
+  @Override public Predicate storage(String storageId) {
+    return delegate.storage(storageId);
+  }
+
+  @Override public Field<String> storage() {
+    return delegate.storage();
+  }
+
   @Override public Predicate hasPropertiesOf(String namespace) {
     return delegate.hasPropertiesOf(namespace);
   }

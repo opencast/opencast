@@ -31,7 +31,7 @@ import static org.opencastproject.util.IoSupport.file;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
-import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
 import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
@@ -62,6 +62,9 @@ import java.net.URI;
 public abstract class AbstractFileSystemAssetStore implements AssetStore {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AbstractFileSystemAssetStore.class);
+
+  /** The store type e.g. filesystem (short-term), aws (long-term), other implementations */
+  protected String storeType = null;
 
   protected abstract Workspace getWorkspace();
 
@@ -161,7 +164,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    */
   private File getDeletionSelectorDir(DeletionSelector sel) {
     final String basePath = path(getRootDirectory(), sel.getOrganizationId(), sel.getMediaPackageId());
-    for (VersionImpl v : sel.getVersion())
+    for (Version v : sel.getVersion())
       return file(basePath, v.toString());
     return file(basePath);
   }
@@ -260,5 +263,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   public Option<Long> getTotalSpace() {
     return Option.some(new File(getRootDirectory()).getTotalSpace());
   }
+
+  @Override
+  public String getStoreType() { return storeType; }
 
 }

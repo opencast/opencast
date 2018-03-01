@@ -182,10 +182,26 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
     };
   }
 
+  @Override public Predicate storage(final String storage) {
+    return new SnapshotBasedPredicate() {
+      @Override protected BooleanExpression mkSnapshotFieldPredicate(QSnapshotDto e) {
+        return e.storageId.eq(storage);
+      }
+    };
+  }
+
   @Override public Field<Availability> availability() {
     return new AbstractSnapshotField<Availability, String>(Q_SNAPSHOT.availability) {
       @Override protected String extract(Availability availability) {
         return availability.name();
+      }
+    };
+  }
+
+  @Override public Field<String> storage() {
+    return new AbstractSnapshotField<String, String>(Q_SNAPSHOT.availability) {
+      @Override protected String extract(String storageId) {
+        return storageId;
       }
     };
   }

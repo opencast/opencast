@@ -23,7 +23,7 @@ package org.opencastproject.assetmanager.impl.storage;
 import static com.entwinemedia.fn.Equality.eq;
 import static java.lang.String.format;
 
-import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.assetmanager.api.Version;
 
 import com.entwinemedia.fn.Equality;
 import com.entwinemedia.fn.data.Opt;
@@ -40,20 +40,20 @@ public final class DeletionSelector implements Serializable {
 
   private final String mediaPackageId;
   private final String organizationId;
-  private final Opt<VersionImpl> version;
+  private final Opt<Version> version;
 
-  public DeletionSelector(String organizationId, String mediaPackageId, Opt<VersionImpl> version) {
+  public DeletionSelector(String organizationId, String mediaPackageId, Opt<Version> version) {
     this.mediaPackageId = mediaPackageId;
     this.organizationId = organizationId;
     this.version = version;
   }
 
-  public static DeletionSelector delete(String organizationId, String mediaPackageId, VersionImpl version) {
+  public static DeletionSelector delete(String organizationId, String mediaPackageId, Version version) {
     return new DeletionSelector(organizationId, mediaPackageId, Opt.some(version));
   }
 
   public static DeletionSelector deleteAll(String organizationId, String mediaPackageId) {
-    return new DeletionSelector(organizationId, mediaPackageId, Opt.<VersionImpl>none());
+    return new DeletionSelector(organizationId, mediaPackageId, Opt.<Version>none());
   }
 
   public String getMediaPackageId() {
@@ -64,7 +64,7 @@ public final class DeletionSelector implements Serializable {
     return organizationId;
   }
 
-  public Opt<VersionImpl> getVersion() {
+  public Opt<Version> getVersion() {
     return version;
   }
 

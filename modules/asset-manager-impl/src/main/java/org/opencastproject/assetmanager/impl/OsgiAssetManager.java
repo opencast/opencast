@@ -90,7 +90,7 @@ public class OsgiAssetManager implements AssetManager {
       }
 
       @Override
-      public AssetStore getAssetStore() {
+      public AssetStore getLocalAssetStore() {
         return assetStore;
       }
 

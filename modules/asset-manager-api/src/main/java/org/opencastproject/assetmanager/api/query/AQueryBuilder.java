@@ -87,8 +87,12 @@ public interface AQueryBuilder {
 
   Predicate availability(Availability availability);
 
+  Predicate storage(String storage);
+
   /** Get the snapshots's "availability" field. Use it to create a predicate. */
   Field<Availability> availability();
+
+  Field<String> storage();
 
   /** Create a predicate that matches all snapshots with properties of the given namespace. */
   Predicate hasPropertiesOf(String namespace);

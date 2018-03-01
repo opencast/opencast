@@ -231,6 +231,7 @@ ALTER TABLE oc_assets_snapshot ADD CONSTRAINT UNQ_oc_assets_snapshot  UNIQUE (me
 ALTER TABLE oc_assets_snapshot DROP INDEX IF EXISTS UNQ_mh_assets_snapshot;
 ALTER TABLE oc_assets_snapshot ADD CONSTRAINT FK_oc_assets_snapshot_organization FOREIGN KEY (organization_id) REFERENCES oc_organization (id);
 ALTER TABLE oc_assets_snapshot DROP FOREIGN KEY FK_mh_assets_snapshot_organization;
+ALTER TABLE oc_assets_snapshot ADD COLUMN storage_id VARCHAR(256) NOT NULL;
 CREATE INDEX IX_oc_assets_snapshot_archival_date ON oc_assets_snapshot (archival_date);
 DROP INDEX IF EXISTS IX_mh_assets_snapshot_archival_date ON oc_assets_snapshot;
 CREATE INDEX IX_oc_assets_snapshot_mediapackage_id ON oc_assets_snapshot (mediapackage_id);
