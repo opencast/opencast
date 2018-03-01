@@ -8,6 +8,7 @@
   <property name="service.description" value="Opencast Asset Manager" />
   <service>
     <provide interface="org.opencastproject.assetmanager.api.AssetManager" />
+    <provide interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManager" />
   </service>
   
   <reference name="assetStore"
@@ -15,6 +16,12 @@
     cardinality="1..1"
     policy="static"
     bind="setAssetStore" />
+  <reference name="remoteAssetStores"
+    interface="org.opencastproject.assetmanager.impl.storage.RemoteAssetStore"
+    cardinality="0..n"
+    policy="dynamic"
+    bind="addRemoteAssetStore"
+    unbind="removeRemoteAssetStore"/>
   <reference name="authSvc"
     interface="org.opencastproject.security.api.AuthorizationService"
     cardinality="1..1"

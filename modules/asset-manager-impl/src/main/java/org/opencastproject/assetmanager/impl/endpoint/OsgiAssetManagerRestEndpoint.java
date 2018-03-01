@@ -20,21 +20,21 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
-import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
 @Path("/")
-public class OsgiAssetManagerRestEndpoint extends AbstractAssetManagerRestEndpoint {
-  private AssetManager assetManager;
+public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetManagerRestEndpoint {
+  private TieredStorageAssetManager assetManager;
 
-  @Override public AssetManager getAssetManager() {
+  @Override public TieredStorageAssetManager getAssetManager() {
     return assetManager;
   }
 
   /** OSGi DI */
-  public void setAssetManager(AssetManager assetManager) {
+  public void setAssetManager(TieredStorageAssetManager assetManager) {
     this.assetManager = assetManager;
   }
 }

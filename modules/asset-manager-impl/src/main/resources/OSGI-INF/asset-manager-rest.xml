@@ -22,6 +22,7 @@
   <property name="service.description" value="AssetManager REST Endpoint"/>
   <property name="opencast.service.type" value="org.opencastproject.assetmanager"/>
   <property name="opencast.service.path" value="/assets"/>
+  <property name="opencast.service.jobproducer" value="true" />
 
   <service>
     <!-- Needed for the RestPublisher to pick up the service. -->
@@ -29,8 +30,18 @@
   </service>
 
   <reference name="asset-manager"
-          interface="org.opencastproject.assetmanager.api.AssetManager"
-          cardinality="1..1"
-          policy="static"
-          bind="setAssetManager"/>
+             interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManager"
+             cardinality="1..1"
+             policy="static"
+             bind="setAssetManager"/>
+  <reference name="job-producer"
+             interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProducer"
+             cardinality="1..1"
+             policy="static"
+             bind="setJobProducer"/>
+  <reference name="service-registry"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1"
+             policy="static"
+             bind="setServiceRegistry"/>
 </scr:component>

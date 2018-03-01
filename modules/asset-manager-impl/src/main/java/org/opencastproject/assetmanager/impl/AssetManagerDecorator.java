@@ -21,20 +21,26 @@
 package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.Asset;
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.RichAResult;
+import org.opencastproject.assetmanager.impl.storage.AssetStore;
+import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
-public class AssetManagerDecorator implements AssetManager {
-  protected final AssetManager delegate;
+import java.util.Date;
+import java.util.Set;
 
-  public AssetManagerDecorator(AssetManager delegate) {
+public class AssetManagerDecorator<A extends TieredStorageAssetManager> implements TieredStorageAssetManager {
+  protected final A delegate;
+
+  public AssetManagerDecorator(A delegate) {
     this.delegate = delegate;
   }
 
@@ -64,5 +70,95 @@ public class AssetManagerDecorator implements AssetManager {
 
   @Override public Opt<Version> toVersion(String version) {
     return delegate.toVersion(version);
+  }
+
+  @Override
+  public Set<String> getRemoteAssetStoreIds() {
+    return delegate.getRemoteAssetStoreIds();
+  }
+
+  @Override
+  public void addRemoteAssetStore(RemoteAssetStore assetStore) {
+    delegate.addRemoteAssetStore(assetStore);
+  }
+
+  @Override
+  public void removeRemoteAssetStore(RemoteAssetStore assetStore) {
+    delegate.removeRemoteAssetStore(assetStore);
+  }
+
+  @Override
+  public Opt<AssetStore> getRemoteAssetStore(String id) {
+    return delegate.getRemoteAssetStore(id);
+  }
+
+  @Override
+  public Opt<AssetStore> getAssetStore(String storeId) {
+    return delegate.getAssetStore(storeId);
+  }
+
+  @Override
+  public void moveSnapshotToStore(Version version, String mpId, String storeId) throws NotFoundException {
+    delegate.moveSnapshotToStore(version, mpId, storeId);
+  }
+
+  @Override
+  public RichAResult getSnapshotsById(String mpId) {
+    return delegate.getSnapshotsById(mpId);
+  }
+
+  @Override
+  public void moveSnapshotsById(String mpId, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsById(mpId, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndVersion(String mpId, Version version) {
+    return delegate.getSnapshotsByIdAndVersion(mpId, version);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndVersion(mpId, version, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByDate(Date start, Date end) {
+    return delegate.getSnapshotsByDate(start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByDate(Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByDate(start, end, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end) {
+    return delegate.getSnapshotsByIdAndDate(mpId, start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndDate(mpId, start, end, targetStore);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(snap);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalTime(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalTime(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalCost(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalCost(version, mpId);
   }
 }

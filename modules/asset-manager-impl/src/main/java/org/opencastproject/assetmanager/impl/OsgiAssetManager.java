@@ -27,8 +27,10 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.storage.AssetStore;
+import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -36,6 +38,7 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -45,6 +48,13 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.EntityManagerFactory;
 
 /**
@@ -53,7 +63,7 @@ import javax.persistence.EntityManagerFactory;
  * Composes the core asset manager with the {@link AssetManagerWithMessaging} and {@link AssetManagerWithSecurity}
  * implementations.
  */
-public class OsgiAssetManager implements AssetManager {
+public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAssetManager.class);
 
@@ -66,11 +76,12 @@ public class OsgiAssetManager implements AssetManager {
   private MessageSender messageSender;
   private MessageReceiver messageReceiver;
   private EntityManagerFactory emf;
+  private List<RemoteAssetStore> remotes = new LinkedList<>();
 
   // collect all objects that need to be closed on service deactivation
   private AutoCloseable toClose;
 
-  private AssetManager delegate;
+  private TieredStorageAssetManager delegate;
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
@@ -78,7 +89,9 @@ public class OsgiAssetManager implements AssetManager {
     final Database db = new Database(PersistenceEnvs.mk(emf));
     final String systemUserName = SecurityUtil.getSystemUserName(cc);
     // create the core asset manager
-    final AssetManager core = new AbstractAssetManager() {
+    final AbstractAssetManagerWithTieredStorage core = new AbstractAssetManagerWithTieredStorage() {
+      private HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
+
       @Override
       public Database getDb() {
         return db;
@@ -92,6 +105,30 @@ public class OsgiAssetManager implements AssetManager {
       @Override
       public AssetStore getLocalAssetStore() {
         return assetStore;
+      }
+
+      @Override
+      public Set<String> getRemoteAssetStoreIds() {
+        return remoteStores.keySet();
+      }
+
+      @Override
+      public Opt<AssetStore> getRemoteAssetStore(String id) {
+        if (remoteStores.containsKey(id)) {
+          return Opt.some(remoteStores.get(id));
+        } else {
+          return Opt.none();
+        }
+      }
+
+      @Override
+      public void addRemoteAssetStore(RemoteAssetStore store) {
+        remoteStores.put(store.getStoreType(), store);
+      }
+
+      @Override
+      public void removeRemoteAssetStore(RemoteAssetStore store) {
+        remoteStores.remove(store.getStoreType());
       }
 
       @Override
@@ -116,6 +153,10 @@ public class OsgiAssetManager implements AssetManager {
             systemUserName);
     // compose with security
     delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc);
+    for (RemoteAssetStore ras : remotes) {
+      delegate.addRemoteAssetStore(ras);
+    }
+    remotes.clear();
     // collect all objects that need to be closed
     toClose = new AutoCloseable() {
       @Override
@@ -197,6 +238,22 @@ public class OsgiAssetManager implements AssetManager {
     this.assetStore = assetStore;
   }
 
+  public void addRemoteAssetStore(RemoteAssetStore assetStore) {
+    if (null == delegate) {
+      remotes.add(assetStore);
+    } else {
+      delegate.addRemoteAssetStore(assetStore);
+    }
+  }
+
+  public void removeRemoteAssetStore(RemoteAssetStore assetStore) {
+    if (null != delegate) {
+      delegate.removeRemoteAssetStore(assetStore);
+    } else {
+      logger.warn("Unable to remove remote store of type {} because delegate is null!", assetStore.getStoreType());
+    }
+  }
+
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
     this.httpAssetProvider = httpAssetProvider;
   }
@@ -207,5 +264,85 @@ public class OsgiAssetManager implements AssetManager {
 
   public void setMessageReceiver(MessageReceiver messageReceiver) {
     this.messageReceiver = messageReceiver;
+  }
+
+  @Override
+  public Set<String> getRemoteAssetStoreIds() {
+    return delegate.getRemoteAssetStoreIds();
+  }
+
+  @Override
+  public Opt<AssetStore> getRemoteAssetStore(String id) {
+    return delegate.getRemoteAssetStore(id);
+  }
+
+  @Override
+  public Opt<AssetStore> getAssetStore(String storeId) {
+    return delegate.getAssetStore(storeId);
+  }
+
+  @Override
+  public void moveSnapshotToStore(Version version, String mpId, String storeId) throws NotFoundException {
+    delegate.moveSnapshotToStore(version, mpId, storeId);
+  }
+
+  @Override
+  public RichAResult getSnapshotsById(String mpId) {
+    return delegate.getSnapshotsById(mpId);
+  }
+
+  @Override
+  public void moveSnapshotsById(String mpId, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsById(mpId, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndVersion(String mpId, Version version) {
+    return delegate.getSnapshotsByIdAndVersion(mpId, version);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndVersion(mpId, version, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByDate(Date start, Date end) {
+    return delegate.getSnapshotsByDate(start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByDate(Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByDate(start, end, targetStore);
+  }
+
+  @Override
+  public RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end) {
+    return delegate.getSnapshotsByIdAndDate(mpId, start, end);
+  }
+
+  @Override
+  public void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException {
+    delegate.moveSnapshotsByIdAndDate(mpId, start, end, targetStore);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotStorageLocation(Snapshot snap) throws NotFoundException {
+    return delegate.getSnapshotStorageLocation(snap);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalTime(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalTime(version, mpId);
+  }
+
+  @Override
+  public Opt<String> getSnapshotRetrievalCost(Version version, String mpId) {
+    return delegate.getSnapshotRetrievalCost(version, mpId);
   }
 }

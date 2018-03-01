@@ -218,7 +218,9 @@
             <Service-Component>
               OSGI-INF/asset-manager.xml,
               OSGI-INF/asset-manager-rest.xml,
-              OSGI-INF/asset-manager-asset-provider.xml
+              OSGI-INF/asset-manager-asset-provider.xml,
+              OSGI-INF/tiered-storage-job-producer.xml,
+              OSGI-INF/tiered-storage-timed-media-archiver.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml
