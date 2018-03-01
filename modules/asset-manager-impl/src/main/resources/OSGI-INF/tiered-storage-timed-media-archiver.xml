@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.assetmanager.impl.TimedMediaArchiver"
+               activate="activate"
+               deactivate="deactivate"
+               immediate="true">
+
+  <implementation class="org.opencastproject.assetmanager.impl.TimedMediaArchiver" />
+  <property name="service.description" value="Timed media archiver Service" />
+
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService" />
+  </service>
+
+  <reference cardinality="1..1" interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManager" name="AssetManager" policy="static" bind="setAssetManager"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.OrganizationDirectoryService" name="OrganizationDirectoryService" policy="static" bind="bindOrganizationDirectoryService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" name="SecurityService" policy="static" bind="bindSecurityService"/>
+
+</scr:component>
