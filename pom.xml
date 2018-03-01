@@ -156,7 +156,6 @@
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
     <module>modules/search-service-remote</module>
-    <module>modules/search-workflowoperation</module>
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
