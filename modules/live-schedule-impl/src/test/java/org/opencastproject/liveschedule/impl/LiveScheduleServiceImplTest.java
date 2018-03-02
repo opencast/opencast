@@ -29,7 +29,6 @@ import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.query.VersionField;
-import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -346,10 +345,7 @@ public class LiveScheduleServiceImplTest {
 
     Snapshot s = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(s.getMediaPackage()).andReturn(mp);
-    Workflows wfs = EasyMock.createNiceMock(Workflows.class);
-    EasyMock.expect(wfs.putInWorkspace(s)).andReturn((MediaPackage) mp.clone());
-    EasyMock.replay(s, wfs);
-    service.setWfUtil(wfs);
+    EasyMock.replay(s);
     service.setDownloadDistributionService(downloadDistributionService);
 
     MediaPackage mp1 = service.addAndDistributeElements(s);
@@ -711,11 +707,6 @@ public class LiveScheduleServiceImplTest {
     replayServices();
     service.setDownloadDistributionService(downloadDistributionService);
 
-    Workflows wfs = EasyMock.createNiceMock(Workflows.class);
-    EasyMock.expect(wfs.putInWorkspace(snapshot)).andReturn((MediaPackage) mp.clone());
-    EasyMock.replay(wfs);
-    service.setWfUtil(wfs);
-
     service.createLiveEvent(MP_ID, episodeDC);
 
     // Check published live media package
@@ -798,11 +789,6 @@ public class LiveScheduleServiceImplTest {
 
     replayServices();
     service.setDownloadDistributionService(downloadDistributionService);
-
-    Workflows wfs = EasyMock.createNiceMock(Workflows.class);
-    EasyMock.expect(wfs.putInWorkspace(snapshot)).andReturn((MediaPackage) mp.clone());
-    EasyMock.replay(wfs);
-    service.setWfUtil(wfs);
 
     // Capture agent change
     episodeDC.set(DublinCore.PROPERTY_SPATIAL, DublinCoreValue.mk("another_ca"));
@@ -901,6 +887,12 @@ public class LiveScheduleServiceImplTest {
 
     @Override
     public Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope) {
+      return null;
+    }
+
+    @Override
+    public Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in) {
+      // TODO Auto-generated method stub
       return null;
     }
   };

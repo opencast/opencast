@@ -25,7 +25,6 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -156,8 +155,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private AuthorizationService authService;
   private OrganizationDirectoryService organizationService;
 
-  // Only used by unit tests!
-  private Workflows wfUtil;
   private long jobPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
   /**
@@ -561,10 +558,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
   MediaPackage addAndDistributeElements(Snapshot snapshot) throws LiveScheduleException {
     try {
-      // First, download existing catalogs to workspace/wfr
-      // wfUtil is only used by unit tests
-      Workflows workflows = wfUtil != null ? wfUtil : new Workflows(assetManager, workspace, null);
-      MediaPackage mp = workflows.putInWorkspace(snapshot);
+      MediaPackage mp = (MediaPackage) snapshot.getMediaPackage().clone();
 
       Set<String> elementIds = new HashSet<String>();
       // Then, add series catalog if needed
@@ -809,10 +803,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   // === Used by unit tests - begin
   void setJobPollingInterval(long jobPollingInterval) {
     this.jobPollingInterval = jobPollingInterval;
-  }
-
-  void setWfUtil(Workflows wfUtil) {
-    this.wfUtil = wfUtil;
   }
   // === Used by unit tests - end
 }
