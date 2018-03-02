@@ -1211,7 +1211,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * Returns a list of events which start and/or end within a given date range.  So you could search for things which start
    * on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at Epoch and
    * ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any edge cases.
-   * sUse checkScheduleConflicts instead.
+   * Use checkScheduleConflicts instead.
    */
   private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
                                             Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
