@@ -1871,6 +1871,31 @@ public class SchedulerServiceImplTest {
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
     }
+    {
+      //Event A starts before event B, and ends during event B
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23) + minutes(30)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts during event B, and ends after event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(30)), new Date(currentTime + hours(25) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A ends at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(25)));
+      assertEquals(1, conflicts.size());
+
+      //Event A is contained entirely within event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(24) + minutes(50)));
+      assertEquals(1, conflicts.size());
+
+      //Event A contains event B entirely
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(26)));
+      assertEquals(1, conflicts.size());
+    }
   }
 
   @Test
