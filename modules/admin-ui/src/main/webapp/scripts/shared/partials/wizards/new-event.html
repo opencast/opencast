@@ -166,7 +166,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.date"
-                                    ng-change="wizard.step.checkConflicts()" />
+                                    ng-change="wizard.step.onTemporalValueChange('start')" />
                             </td>
                         </tr>
                         <tr>
@@ -177,7 +177,7 @@
                                     tabindex="5"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
-                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.checkConflicts()"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.onTemporalValueChange('start')"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
@@ -188,7 +188,7 @@
                                     tabindex="6"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
-                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.checkConflicts()"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.onTemporalValueChange('start')"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
@@ -204,7 +204,7 @@
                                     tabindex="7"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
-                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.checkConflicts()"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.onTemporalValueChange('duration')"
                                     data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
@@ -215,13 +215,43 @@
                                     tabindex="8"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
-                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.checkConflicts()"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.onTemporalValueChange('duration')"
                                     data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
                                 </select>
                             </td>
+                        </tr>
+                        <tr>
+                          <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME' | translate }} <i class="required">*</i></td>
+                          <td>
+                            <select chosen
+                                    data-width="'100px'"
+                                    tabindex="7"
+                                    ng-disabled="wizard.step.checkingConflicts"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.hour" ng-change="wizard.step.onTemporalValueChange('end')"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                            >
+                              <option value=""></option>
+                            </select>
+                            <select chosen
+                                    data-width="'100px'"
+                                    tabindex="8"
+                                    ng-disabled="wizard.step.checkingConflicts"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.minute" ng-change="wizard.step.onTemporalValueChange('end')"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                            >
+                              <option value=""></option>
+                            </select>
+                            <span ng-bind="wizard.step.ud.SCHEDULE_SINGLE.end.date"
+                                  ng-show="wizard.step.ud.SCHEDULE_SINGLE.end.date !== wizard.step.ud.SCHEDULE_SINGLE.start.date"
+                            />
+                          </td>
                         </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>
@@ -264,13 +294,13 @@
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE' | translate }} <i class="required">*</i></td>
                             <td>
-                                <input type="text" tabindex="4" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.date" ng-change="wizard.step.checkConflicts()">
+                                <input type="text" tabindex="4" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.date" ng-change="wizard.step.onTemporalValueChange('start')">
                             </td>
                         </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE' | translate }} <i class="required">*</i></td>
                             <td>
-                                <input type="text" tabindex="5" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end" ng-change="wizard.step.checkConflicts()">
+                                <input type="text" tabindex="5" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}"  datepicker ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.date" ng-change="wizard.step.onTemporalValueChange('end')">
                             </td>
                         </tr>
                         <tr>
@@ -294,7 +324,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
-                                    ng-change="wizard.step.checkConflicts()"
+                                    ng-change="wizard.step.onTemporalValueChange('start')"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
@@ -306,7 +336,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
-                                    ng-change="wizard.step.checkConflicts()"
+                                    ng-change="wizard.step.onTemporalValueChange('start')"
                                     data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
@@ -323,7 +353,7 @@
                                     tabindex="17"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
-                                    ng-change="wizard.step.checkConflicts()"
+                                    ng-change="wizard.step.onTemporalValueChange('duration')"
                                     data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
@@ -335,13 +365,42 @@
                                     tabindex="18"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
-                                    ng-change="wizard.step.checkConflicts()"
+                                    ng-change="wizard.step.onTemporalValueChange('duration')"
                                     data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
                                 </select>
                             </td>
+                        </tr>
+                        <tr>
+                          <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME' | translate }} <i class="required">*</i></td>
+                          <td>
+                            <select chosen
+                                    data-width="'100px'"
+                                    tabindex="15"
+                                    ng-disabled="wizard.step.checkingConflicts"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.hour"
+                                    ng-change="wizard.step.onTemporalValueChange('end')"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    ng-options="h.index as h.value for h in wizard.step.hours"
+                            >
+                              <option value=""></option>
+                            </select>
+                            <select chosen
+                                    data-width="'100px'"
+                                    tabindex="16"
+                                    ng-disabled="wizard.step.checkingConflicts"
+                                    data-disable-search-threshold="8"
+                                    ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.minute"
+                                    ng-change="wizard.step.onTemporalValueChange('end')"
+                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    ng-options="m.index as m.value for m in wizard.step.minutes"
+                            >
+                              <option value=""></option>
+                            </select>
+                          </td>
                         </tr>
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>

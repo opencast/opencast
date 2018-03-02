@@ -11,7 +11,7 @@ angular.module('adminNg.resources')
 
         if (data.weekdays) {
             result.end = JsHelper.toZuluTimeString({
-                date: data.end,
+                date: data.end.date,
                 hour: data.start.hour,
                 minute: data.start.minute
             }, data.duration);
@@ -19,7 +19,7 @@ angular.module('adminNg.resources')
         } else {
             result.end = JsHelper.toZuluTimeString(data.start, data.duration);
         }
-        
+
         if (data.eventId) {
        	    result.id = data.eventId;
         }

@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'NewEventMetadata',
-    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, NewEventMetadata) {
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'NewEventMetadata', 'SchedulingHelperService',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, NewEventMetadata, SchedulingHelperService) {
 
     // -- constants ------------------------------------------------------------------------------------------------- --
 
@@ -101,17 +101,17 @@ angular.module('adminNg.services')
                   return;
                 }
 
-                var singleKeys = ['duration', 'start', 'device'];                        //Only apply these default fields to SCHEDULE_SINGLE
+                var singleKeys = ['duration', 'start', 'end', 'device']; //Only apply these default fields to SCHEDULE_SINGLE
 
                 for (var key in opts) {
                     if (key === 'type') {
                       continue;
                     }
 
-                    self.ud.SCHEDULE_MULTIPLE[key] = opts[key];
+                    self.ud.SCHEDULE_MULTIPLE[key] = angular.copy(opts[key]);
 
                     if (singleKeys.indexOf(key) > -1) {
-                      self.ud.SCHEDULE_SINGLE[key] = opts[key];
+                      self.ud.SCHEDULE_SINGLE[key] = angular.copy(opts[key]);
                     }
                 }
 
@@ -164,6 +164,9 @@ angular.module('adminNg.services')
              'start.minute',
              'duration.hour',
              'duration.minute',
+             'end.date',
+             'end.hour',
+             'end.minute',
              'device.name'];
 
         var getType = function() { return self.ud.type; };
@@ -214,8 +217,8 @@ angular.module('adminNg.services')
                 isDefined(data.device.id) && data.device.id.length > 0;
 
             if (self.isScheduleMultiple() && result) {
-                return angular.isDefined(data.end) &&
-                    data.end.length > 0 &&
+                return angular.isDefined(data.end.date) &&
+                    data.end.date.length > 0 &&
                     self.atLeastOneRepetitionDayMarked();
             } else {
                 return result;
@@ -306,6 +309,11 @@ angular.module('adminNg.services')
             }
         };
 
+        this.getStartDate = function() {
+            var start = self.ud[getType()].start;
+            return SchedulingHelperService.parseDate(start.date, start.hour, start.minute);
+        };
+
         this.checkValidity = function () {
             var data = self.ud[getType()];
 
@@ -317,8 +325,7 @@ angular.module('adminNg.services')
                 && angular.isDefined(data.start.minute) && angular.isDefined(data.start.date)
                 && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
                 && angular.isDefined(data.duration.minute)) {
-                var dateArray = data.start.date.split("-");
-                var startDate = new Date(dateArray[0], parseInt(dateArray[1]) - 1, dateArray[2], data.start.hour, data.start.minute);
+                var startDate = self.getStartDate();
                 var endDate = new Date(startDate.getTime());
                 endDate.setHours(endDate.getHours() + data.duration.hour, endDate.getMinutes() + data.duration.minute, 0, 0);
                 var nowDate = new Date();
@@ -334,9 +341,9 @@ angular.module('adminNg.services')
             }
             // check if end date is before start date
             if (angular.isDefined(data.start) && angular.isDefined(data.start.date)
-                && angular.isDefined(data.end)) {
+                && angular.isDefined(data.end.date)) {
                 var startDate = new Date(data.start.date);
-                var endDate = new Date(data.end);
+                var endDate = new Date(data.end.date);
                 if (endDate < startDate) {
                     self.endBeforeStartNotification = Notifications.add('error', 'CONFLICT_END_BEFORE_START',
                         NOTIFICATION_CONTEXT, -1);
@@ -451,7 +458,7 @@ angular.module('adminNg.services')
                     //Variables needed to determine an event's start time
                     var startTime = orgProperties['admin.event.new.start_time'] || '08:00';
                     var endTime = orgProperties['admin.event.new.end_time'] || '20:00';
-                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || 55);
+                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || (12 * 60));
                     var intervalMins = parseInt(orgProperties['admin.event.new.interval'] || 60);
 
                     var chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime );
@@ -464,21 +471,27 @@ angular.module('adminNg.services')
                         var multiple = Math.ceil( timeDiff/(intervalMins * 60) );
                         chosenSlot.add(multiple * intervalMins, 'minute');
                         if (chosenSlot.unix() >= endSlot.unix()) {
-                            chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime )
-                                             .add(1, 'day');
+                            endSlot = moment( chosenSlot ).add(durationMins, 'minutes');
                         }
+                        durationMins = endSlot.diff(chosenSlot, 'minutes');
                     }
 
                     defaults.start = {
                                          date: chosenSlot.format('YYYY-MM-DD'),
                                          hour: parseInt(chosenSlot.format('H')),
                                          minute: parseInt(chosenSlot.format('mm'))
-                                     }
+                                     };
 
                     defaults.duration = {
                                             hour: parseInt(durationMins / 60),
                                             minute: durationMins % 60
                                         };
+
+                    defaults.end = {
+                                         date: endSlot.format('YYYY-MM-DD'),
+                                         hour: parseInt(endSlot.format('H')),
+                                         minute: parseInt(endSlot.format('mm'))
+                                     };
 
                     defaults.presentableWeekdays = chosenSlot.format('dd');
 
@@ -495,6 +508,11 @@ angular.module('adminNg.services')
                     self.defaultsSet = true;
                 });
         };
+
+        this.onTemporalValueChange = function(type) {
+            SchedulingHelperService.applyTemporalValueChange(self.ud[getType()], type, self.isScheduleSingle() );
+            self.checkConflicts();
+        }
     };
     return new Source();
 }]);

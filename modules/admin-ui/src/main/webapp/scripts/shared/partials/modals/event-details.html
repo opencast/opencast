@@ -219,7 +219,7 @@
                                         ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"
                                         placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
                                         ng-model="source.start.date"
-                                        ng-change="saveScheduling()" />
+                                        ng-change="onTemporalValueChange('start')" />
                                 </td>
                             </tr>
                             <tr>
@@ -229,7 +229,7 @@
                                         ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
-                                        ng-model="source.start.hour" ng-change="saveScheduling()"
+                                        ng-model="source.start.hour" ng-change="onTemporalValueChange('start')"
                                         data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
                                         ng-options="h.index as h.value for h in hours"
                                     />
@@ -237,7 +237,7 @@
                                         ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
-                                        ng-model="source.start.minute" ng-change="saveScheduling()"
+                                        ng-model="source.start.minute" ng-change="onTemporalValueChange('start')"
                                         data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
                                         ng-options="m.index as m.value for m in minutes"
                                     />
@@ -253,7 +253,7 @@
                                         ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
-                                        ng-model="source.duration.hour" ng-change="saveScheduling()"
+                                        ng-model="source.duration.hour" ng-change="onTemporalValueChange('duration')"
                                         data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
                                         ng-options="h.index as h.value for h in hours"
                                     />
@@ -262,13 +262,43 @@
                                         ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
-                                        ng-model="source.duration.minute" ng-change="saveScheduling()"
+                                        ng-model="source.duration.minute" ng-change="onTemporalValueChange('duration')"
                                         data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
                                         ng-options="m.index as m.value for m in minutes"
                                     />
                                 </td>
                                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME' | translate }}</td>
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    <select chosen
+                                        ng-disabled="checkingConflicts"
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.end.hour" ng-change="onTemporalValueChange('end')"
+                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                        ng-options="h.index as h.value for h in hours"
+                                    />
+                                    <select chosen
+                                        ng-disabled="checkingConflicts"
+                                        data-width="'100px'"
+                                        data-disable-search-threshold="8"
+                                        ng-model="source.end.minute" ng-change="onTemporalValueChange('end')"
+                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                        ng-options="m.index as m.value for m in minutes"
+                                    />
+                                    <span ng-bind="source.end.date"
+                                          ng-show="source.end.date !== source.start.date"
+                                    />
+                                </td>
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                    {{ source.end.hour | addLeadingZeros : 2 }} : {{ source.end.minute | addLeadingZeros : 2}}
+                                    <span ng-bind="source.end.date"
+                                          ng-show="source.end.date !== source.start.date"
+                                    />
                                 </td>
                             </tr>
                             <tr>

@@ -55,6 +55,9 @@ describe('Source Step in New Event Wizard', function () {
                     ud.SCHEDULE_SINGLE.start.minute    = '02';
                     ud.SCHEDULE_SINGLE.duration.hour   = '01';
                     ud.SCHEDULE_SINGLE.duration.minute = '33';
+                    ud.SCHEDULE_SINGLE.end.date      = new Date();
+                    ud.SCHEDULE_SINGLE.end.hour      = '11';
+                    ud.SCHEDULE_SINGLE.end.minute    = '35';
                     ud.SCHEDULE_SINGLE.device =
                     {
                         'name': '•mock• agent4',
@@ -72,6 +75,7 @@ describe('Source Step in New Event Wizard', function () {
                 ud.SCHEDULE_SINGLE = {
                     start: {},
                     duration: {},
+                    end: {},
                     inputMethods: {},
                     device: {
                         name: 'test device',
@@ -104,6 +108,9 @@ describe('Source Step in New Event Wizard', function () {
                 ud.SCHEDULE_MULTIPLE.start.minute = '09';
                 ud.SCHEDULE_MULTIPLE.duration.hour = '10';
                 ud.SCHEDULE_MULTIPLE.duration.minute = '09';
+                ud.SCHEDULE_MULTIPLE.end.date = new Date();
+                ud.SCHEDULE_MULTIPLE.end.hour = '20';
+                ud.SCHEDULE_MULTIPLE.end.minute = '18';
                 ud.SCHEDULE_MULTIPLE.repetitionOption = 'daily';
                 ud.SCHEDULE_MULTIPLE.device = {};
                 ud.SCHEDULE_MULTIPLE.device.name  = 'test device';
@@ -121,7 +128,7 @@ describe('Source Step in New Event Wizard', function () {
                 expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.start.date = '2014-07-01';
                 expect(NewEventSource.canPollConflicts()).toBeFalsy();
-                ud.SCHEDULE_MULTIPLE.end = '2014-08-01';
+                ud.SCHEDULE_MULTIPLE.end.date = '2014-08-01';
                 expect(NewEventSource.canPollConflicts()).toBeFalsy();
                 ud.SCHEDULE_MULTIPLE.device = {
                     id: 'an id, no matter which'
@@ -170,6 +177,7 @@ describe('Source Step in New Event Wizard', function () {
             var tomorrow = new Date();
             tomorrow.setDate(new Date().getDate() + 1);
             NewEventSource.ud.SCHEDULE_SINGLE.start.date = tomorrow.toISOString().substring(0, 10);
+            NewEventSource.ud.SCHEDULE_SINGLE.end.date = tomorrow.toISOString().substring(0, 10);
             NewEventSource.checkConflicts();
             $httpBackend.flush();
             expect(NewEventSource.hasConflictingSettings()).toBeFalsy();

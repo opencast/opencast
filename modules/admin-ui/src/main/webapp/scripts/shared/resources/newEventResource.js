@@ -71,12 +71,7 @@ angular.module('adminNg.resources')
                                                     .add(parseInt(data.source.SCHEDULE_MULTIPLE.duration.minute, 10), 'm')
                                                     .as('ms') + '';
 
-                    var endMomentDate = moment(data.source.SCHEDULE_MULTIPLE.end)
-                                        .hour(data.source.SCHEDULE_MULTIPLE.start.hour)
-                                        .minute(data.source.SCHEDULE_MULTIPLE.start.minute)
-                                        .add(source.metadata.duration, 'ms');
-
-                    source.metadata.end = endMomentDate.toISOString().replace('.000', '');
+                    source.metadata.end = JsHelper.toZuluTimeString(data.source.SCHEDULE_MULTIPLE.end);
 
                     source.metadata.rrule = (function (src) {
                         return JsHelper.assembleRrule(src.SCHEDULE_MULTIPLE);
@@ -86,7 +81,7 @@ angular.module('adminNg.resources')
                 // Remove useless information for the request
                 angular.forEach(data.metadata, function (catalog) {
                     angular.forEach(catalog.fields, function (field) {
-                            delete field.collection;                        
+                            delete field.collection;
                             delete field.label;
                             delete field.presentableValue;
                             delete field.readOnly;
