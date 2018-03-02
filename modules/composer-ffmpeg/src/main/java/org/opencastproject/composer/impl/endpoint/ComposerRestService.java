@@ -41,6 +41,8 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.smil.api.SmilService;
+import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
@@ -52,6 +54,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
@@ -59,6 +62,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -102,6 +106,12 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /** The service registry */
   protected ServiceRegistry serviceRegistry = null;
 
+  /** The smil service */
+  protected SmilService smilService = null;
+
+  public void setSmilService(SmilService smilService) {
+    this.smilService = smilService;
+  }
   /**
    * Callback from the OSGi declarative services to set the service registry.
    *
@@ -501,7 +511,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at least two tracks are present",
             responseCode = HttpServletResponse.SC_BAD_REQUEST)}, returnDescription = "")
   public Response concat(@FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId,
-          @FormParam("outputDimension") String outputDimension, @FormParam("outputFrameRate") String outputFrameRate) throws Exception {
+          @FormParam("outputDimension") String outputDimension, @FormParam("outputFrameRate") String outputFrameRate,
+          @FormParam("sameCodec") String hasSameCodec) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks and profileId must not be null").build();
@@ -522,12 +533,13 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       if (StringUtils.isNotBlank(outputDimension)) {
         dimension = Serializer.dimension(JsonObj.jsonObj(outputDimension));
       }
+      boolean sameCodec = BooleanUtils.toBoolean(hasSameCodec);
 
       Job job = null;
       if (fps > 0) {
-        job = composerService.concat(profileId, dimension, fps, tracks.toArray(new Track[tracks.size()]));
+        job = composerService.concat(profileId, dimension, fps, sameCodec, tracks.toArray(new Track[tracks.size()]));
       } else {
-        job = composerService.concat(profileId, dimension, tracks.toArray(new Track[tracks.size()]));
+        job = composerService.concat(profileId, dimension, sameCodec, tracks.toArray(new Track[tracks.size()]));
       }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
@@ -625,6 +637,137 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to convert image: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * #DCE OPC-29 Demuxes a track into multiple outputs
+   *
+   * @param sourceTrackAsXml
+   *          The source track
+   * @param profileId
+   *          The profile to use in encoding this track
+   * @return A response containing the job for this encoding job in the response body.
+   * @throws Exception
+   *           - if it fails
+   */
+  @POST
+  @Path("demux")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "demux", description = "Starts an demux process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "demux.work") }, reponses = {
+                  @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response demux(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
+          throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
+
+    // Deserialize the track
+    MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
+
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.demux((Track) sourceTrack, profileId);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to encode the track: " + e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Encodes a track into multiple outputs
+   *
+   * @param sourceTrackAsXml
+   *          The source track
+   * @param profileIds
+   *          The profile to use in encoding this track
+   * @return A response containing the job for this encoding job in the response body.
+   * @throws Exception
+   *           - if any of the encodes from the profiles fail
+   */
+  @POST
+  @Path("multiencode")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "multiencode", description = "Starts an encoding process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "flash.http") }, reponses = {
+                  @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response multiEncode(@FormParam("sourceTrack") String sourceTrackAsXml,
+          @FormParam("profileIds") String profileIds) throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileIds))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileIds must not be null").build();
+
+    // Deserialize the track
+    MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
+
+    try {
+      // Asynchronously encode the specified tracks
+      String[] profiles = StringUtils.split(profileIds, ",");
+      Job job = composerService.multiEncode((Track) sourceTrack, Arrays.asList(profiles));
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to encode the track: " + e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * ProcessSmil - encode a video based on descriptions in a smil file into all format in the profileIds
+   *
+   * @param smilAsXml
+   *          - smil describing a list of videos and clips in them to make up one video
+   * @param trackId
+   *          - a paramGroup Id in the smil file describing a track
+   * @param mediaType
+   *          - audio only, video only or both
+   * @param profileIds
+   *          - list of encoding profile ids
+   * @return a job running the process
+   * @throws Exception
+   *           if it fails
+   */
+  @POST
+  @Path("processsmil")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "processsmil", description = "Starts an encoding process, based on the tracks and edit points in the smil and specified encoding profile IDs", restParameters = {
+          @RestParameter(description = "The smil containing the tracks and edit points", isRequired = true, name = "smilAsXml", type = Type.TEXT),
+          @RestParameter(description = "The id (paramgroup) of the track to encode", isRequired = false, name = "trackId", type = Type.STRING, defaultValue = ""),
+          @RestParameter(description = "MediaType - v for video only, a for audio only, audiovisual otherwise", isRequired = false, name = "mediaType", type = Type.STRING, defaultValue = "o"),
+          @RestParameter(description = "The encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING) }, reponses = {
+                  @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response processSmil(@FormParam("smilAsXml") String smilAsXml, @FormParam("trackId") String trackId,
+          @FormParam("mediaType") String mediaType, @FormParam("profileIds") String profileIds) throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(smilAsXml) || StringUtils.isBlank(profileIds))
+      return Response.status(Response.Status.BAD_REQUEST).entity("smil and profileId must not be null").build();
+
+    // Deserialize the data
+    Smil smil;
+    String[] profiles = StringUtils.split(profileIds, ",");
+    try {
+      smil = smilService.fromXml(smilAsXml).getSmil();
+    } catch (Exception e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("smil must be readable").build();
+    }
+
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.processSmil(smil, trackId, mediaType, Arrays.asList(profiles));
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to process the smil: " + e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

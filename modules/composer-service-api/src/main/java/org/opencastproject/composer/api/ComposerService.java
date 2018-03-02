@@ -26,8 +26,10 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.data.Option;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -109,8 +111,8 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
-          MediaPackageException;
+  Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks)
+          throws EncoderException, MediaPackageException;
 
   /**
    * Concat multiple tracks to a single track. Required ffmpeg version 1.1
@@ -123,7 +125,7 @@ public interface ComposerService {
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -262,5 +264,54 @@ public interface ComposerService {
    */
   Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
+  /**
+   * Reads a smil definition and create one media track in multiple delivery formats. The track in the smil is selected
+   * by "trackParamGroupId" which is the paramGroup in the smil The multiple delivery formats are determined by a list
+   * of encoding profiles by name. The resultant tracks will be tagged by profile name. The smil file can contain more
+   * than one source track but they must have the same dimension. This is used mainly on smil.xml from the editor. There
+   * is a 2s fadein/fadeout between each clip.
+   *
+   * @param smil
+   *          - Describes one media (can contain multiple source in ws) and editing instructions (in out points) for
+   *          conte
+   * @param trackParamGroupId
+   *          - track group id to process, if missing, will process first track found in smil
+   * @param mediaType
+   *          - v for VideoOnly, a for audioOnly, o or anything else is AV
+   * @param profileIds
+   *          - Encoding profiles for each output from this media
+   * @return Receipt for this processing based on the smil file and the list of profiles
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+
+  Job processSmil(Smil smil, String trackParamGroupId, String mediaType, List<String> profileIds)
+          throws EncoderException, MediaPackageException;
+
+  /**
+   * Encode the sourceTrack using a profile that produces multiple outputs, so that only one encode job is needed. Each
+   * output is tagged by profile name. The profile is responsible for naming the outputs differently, currently the
+   * profile only supports one mimetype and one suffix. TODO: profileScanner should be updated to support different
+   * output types
+   *
+   * @param sourceTrack
+   * @param profileIds
+   * @return Receipt for this processing based on the profiles
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+  Job multiEncode(Track sourceTrack, List<String> profileIds) throws EncoderException, MediaPackageException;
+
+  /**
+   * Demux a multi-track source into 2 media as defined by the encoding profile, the results are flavored and tagged
+   * positionally. eg: One ffmpeg operation to produce presenter/work and presentation/work
+   *
+   * @param sourceTrack
+   * @param profileId
+   * @return Receipt for this demux based on the profile
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+  Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
 }

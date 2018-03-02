@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2010-05-19T09:27:46"
+	id="d51f9d4e-b5e7-41e0-8640-0d1f43b2fed0" duration="65649"
+	xmlns:ns2="http://mediapackage.opencastproject.org">
+	<ns2:title>Compose workflow operation handler test</ns2:title>
+	<ns2:media>
+		<ns2:track id="compose-workflow-operation-test-trimmed-presentation-track-id">
+			<ns2:mimetype>video/flv</ns2:mimetype>
+			<ns2:tags/>
+			<ns2:url>fooVideoTrack2_v.flv</ns2:url>
+			<ns2:checksum type="md5">322293948673e98459becf5b7ad82586</ns2:checksum>
+			<ns2:duration>50000</ns2:duration>
+			<ns2:audio id="compose-workflow-operation-test-trimmed-audio-id">
+				<ns2:device />
+				<ns2:encoder type="MPEG Audio" />
+				<ns2:bitdepth>16</ns2:bitdepth>
+				<ns2:channels>2</ns2:channels>
+				<ns2:samplingrate>48000</ns2:samplingrate>
+				<ns2:bitrate>128000.0</ns2:bitrate>
+			</ns2:audio>
+			<ns2:video id="compose-workflow-operation-test-trimmed-video-id">
+				<ns2:device />
+				<ns2:encoder type="MPEG-4 Visual" />
+				<ns2:bitrate>1340065.0</ns2:bitrate>
+				<ns2:framerate>23.976</ns2:framerate>
+				<ns2:resolution>624x352</ns2:resolution>
+				<ns2:scantype type="Progressive" />
+			</ns2:video>
+		</ns2:track>
+		<ns2:track id="compose-workflow-operation-test-trimmed-presenter-track-id">
+			<ns2:mimetype>video/x264</ns2:mimetype>
+			<ns2:tags/>
+			<ns2:url>fooVideoTrack2_v.mp4</ns2:url>
+			<ns2:checksum type="md5">322293948673e98459becf5b7ad82586</ns2:checksum>
+			<ns2:duration>50000</ns2:duration>
+			<ns2:audio id="compose-workflow-operation-test-trimmed-audio-id">
+				<ns2:device />
+				<ns2:encoder type="MPEG Audio" />
+				<ns2:bitdepth>16</ns2:bitdepth>
+				<ns2:channels>2</ns2:channels>
+				<ns2:samplingrate>48000</ns2:samplingrate>
+				<ns2:bitrate>128000.0</ns2:bitrate>
+			</ns2:audio>
+			<ns2:video id="compose-workflow-operation-test-trimmed-video-id">
+				<ns2:device />
+				<ns2:encoder type="MPEG-4 Visual" />
+				<ns2:bitrate>1340065.0</ns2:bitrate>
+				<ns2:framerate>23.976</ns2:framerate>
+				<ns2:resolution>624x352</ns2:resolution>
+				<ns2:scantype type="Progressive" />
+			</ns2:video>
+		</ns2:track>
+	</ns2:media>
+	<ns2:metadata>
+		<ns2:catalog type="dublincore/episode" id="9a9eb5dd-e0e1-4321-b46b-66a1feb5bac7">
+			<ns2:mimetype>text/xml</ns2:mimetype>
+			<ns2:tags />
+			<ns2:url>fooDC.xml</ns2:url>
+		</ns2:catalog>
+		<ns2:catalog ref="track:91bec596-cc93-4315-96c5-9c790c4db875"
+			type="mpeg-7/segments" id="catalog-2">
+			<ns2:mimetype>text/xml</ns2:mimetype>
+			<ns2:tags />
+			<ns2:url>fooMPEG7.xml</ns2:url>
+		</ns2:catalog>
+        <ns2:catalog id="s-e9f24302-afb9-4bea-9e1e-0f9b0ba2a8eb" type="smil/smil">
+            <ns2:mimetype>text/xml</ns2:mimetype>
+            <ns2:tags/>
+            <ns2:url>smil.smil</ns2:url>
+        </ns2:catalog>
+	</ns2:metadata>
+	<ns2:attachments />
+</ns2:mediapackage>

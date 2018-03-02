@@ -373,7 +373,11 @@
                },
                "MULTIPLE_PARTS": {
                    "SHORT": "Multiple parts",
-                   "DETAIL": "A set of files containing different parts of the event."
+                   "DETAIL": "One file or multiple chunked files of a recording of an event."
+               },
+               "MULTIPLE_TRACKS": {
+                   "SHORT": "Multiple tracks",
+                   "DETAIL": "The file contains 2 recordings: A presenter speaking and a slide presentation."
                }
            },
            "DATE_TIME": {

@@ -139,6 +139,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
+  /** The codec on all the components are not assumed to be identical */
+  private final boolean concatSameCodec = false;
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(SOURCE_PRESENTER_FLAVOR, "The source flavor of the partial presenter tracks");
@@ -561,9 +564,11 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws MediaPackageException, EncoderException {
     final Dimension dim = determineDimension(tracks, forceDivisible);
     if (outputFramerate > 0.0) {
-      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, concatSameCodec,
+              Collections.toArray(Track.class, tracks));
     } else {
-      return composerService.concat(profile.getIdentifier(), dim, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, concatSameCodec,
+              Collections.toArray(Track.class, tracks));
     }
   }
 

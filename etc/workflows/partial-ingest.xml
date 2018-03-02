@@ -28,6 +28,7 @@
       </configurations>
     </operation>
 
+
     <!-- Inspect the media -->
 
     <operation
@@ -38,6 +39,15 @@
         <configuration key="overwrite">false</configuration>
         <configuration key="accept-no-media">false</configuration>
       </configurations>
+    </operation>
+
+    <!-- Convert multipart and multitrack media to presenter and presentation as needed -->
+    <operation
+        id="include"
+        description="Convert ingested sources to presenter/presentation if needed">
+        <configurations>
+          <configuration key="workflow-id">ng-partial-ingest-normalize</configuration>
+        </configurations>
     </operation>
 
     <!-- Apply access control lists from series to the mediapackage -->

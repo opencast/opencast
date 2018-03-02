@@ -19,6 +19,7 @@ distributed systems) to be installed.
 |skip-if-not-trimmed|`false`       |(Optional) if set to `true`, the track encoding will be skipped if no trimming points were defined (i.e. there is only one segment from the very beginning to the very end of the video). Defaults to `false`|
 |*preview_flavors*|*`*/preview`*|*(Legacy) Flavors used to preview the video in the editor.*<br/>***Currently has no effect. Preview flavors are now configured in the file `etc/org.opencastproject.adminui.cfg`***|
 |*interactive*|*`false`*|*(Legacy) If `true` make the operation interactive, i.e. pause and wait for user input.*<br/>***Do not use. Interactive operations are deprecated in the current API.***|
+|create-smil-skip-processing|`true`|Do not process the smil file after trim, just save and exit. This option is used with process-smiltrack operation, which will process the smil afterwards |
 
 ## Operation Example
 

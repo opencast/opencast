@@ -1,45 +1,64 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>fast</id>
-  <title>Fast Testing Workflow</title>
+  <id>fast-multiencode</id>
+  <title>Fast Testing Workflow Multiencode</title>
   <tags>
-    <tag>upload</tag>
-    <tag>schedule</tag>
+    <tag>upload-ng</tag>
+    <tag>schedule-ng</tag>
   </tags>
   <description>
-    A minimal workflow that transcodes the media into distribution formats, then
+    A minimal workflow that transcodes presenter and presentation media into distribution formats with different profiles, then
     sends the resulting distribution files, along with their associated metadata,
     to the distribution channels.
   </description>
 
   <configuration_panel>
-    <![CDATA[
-      <div id="workflow-configuration">
-        <fieldset>
-          <legend>Add a comment that the recording needs:</legend>
-          <ul>
-            <li>
-              <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
-              <label for="comment">Review / Cutting</label>
-            </li>
-          </ul>
-        </fieldset>
-        <fieldset>
-          <legend>Immediately distribute the recording to:</legend>
-          <ul>
-            <li>
-              <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
-              <label for="publishToMediaModule">Opencast Media Module</label>
-            </li>
-            <li>
-              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
-              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
-            </li>
-          </ul>
-        </fieldset>
-      </div>
-    ]]>
+      <![CDATA[
+        <style type="text/css">
+        <!--
+            #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
+            #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
+            #workflow-configuration input[type=checkbox] { padding: 0px 5px; }
+            #workflow-configuration label { display: inline-block; padding: 0px }
+        -->
+        </style>
+        <div id="workflow-configuration">
+          <fieldset>
+            <legend>Add a comment that the recording needs:</legend>
+            <ul>
+              <li>
+                <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
+                <label for=comment>Review / Cutting</label>
+              </li>
+            </ul>
+          </fieldset>
+          <fieldset>
+            <legend>Immediately distribute the recording to:</legend>
+            <ul>
+              <li>
+                <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
+                <label for=publishToMediaModule>Opencast Media Module</label>
+              </li>
+            </ul>
+            <ul>
+              <li>
+                <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
+                <label for=publishToOaiPmh>Default OAI-PMH Repository</label>
+              </li>
+            </ul>
+          </fieldset>
+          <fieldset>
+            <legend>Publish live stream:</legend>
+            <ul>
+              <li>
+                <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="false" />
+                <label for=publishLive>Add live event to Opencast Media Module</label>
+              </li>
+            </ul>
+          </fieldset>
+        </div>
+      ]]>
   </configuration_panel>
 
   <operations>
@@ -51,6 +70,7 @@
         <configuration key="comment">false</configuration>
         <configuration key="publishToMediaModule">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
+        <configuration key="publish-live">false</configuration>
         <configuration key="uploadedSearchPreview">false</configuration>
       </configurations>
     </operation>
@@ -60,7 +80,7 @@
     <operation
       id="series"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Applying access control entries from series">
       <configurations>
         <configuration key="apply-acl">true</configuration>
@@ -73,7 +93,7 @@
 
     <operation
       id="tag"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Tagging media package elements for archival">
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
@@ -85,7 +105,7 @@
     <operation
       id="tag"
       if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Tagging uploaded assets for distribution">
       <configurations>
         <configuration key="source-flavors">${download-source-flavors}</configuration>
@@ -98,7 +118,7 @@
     <operation
       id="inspect"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Inspecting audio and video streams">
       <configurations>
         <configuration key="overwrite">false</configuration>
@@ -106,10 +126,9 @@
       </configurations>
     </operation>
 
-    <!-- Convert the sources if needed -->
     <operation
       id="include"
-      description="Convert sources to presenter and presentation if needed">
+      description="Convert multipart and multitrack source to presenter/presentation if needed">
       <configurations>
         <configuration key="workflow-id">ng-partial-ingest-normalize</configuration>
       </configurations>
@@ -118,15 +137,57 @@
     <!-- encode video -->
 
     <operation
-      id="compose"
+      id="multiencode"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Encoding video">
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding all videos at once, with different encoding profiles for each video source">
       <configurations>
-        <configuration key="source-flavor">*/source</configuration>
-        <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
-        <configuration key="encoding-profile">fast.http</configuration>
+        <!-- Name two independent media flavors separated by semi-colon --> 
+        <configuration key="source-flavors">presenter/source;presentation/source</configuration>
+        <configuration key="target-flavors">*/preview</configuration>
+        <!-- List tags for all target flavors --> 
+        <configuration key="target-tags">archive,engage-download,engage-streaming,rss,atom</configuration>
+        <!-- List two sets of encoding profiles separated by semi-colon for each coresponding source --> 
+        <!-- Note that all the encoding profiles used have distinct suffices -->
+        <configuration key="encoding-profiles">mp4-low.http,mp4-vga-medium.http,adaptive-720p.http;mp4-low.http,mp4-medium.http,mp4-hd.http</configuration>
+        <!-- optional - tag with profile id -->
+        <configuration key="tag-with-profile">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="tag the targets for player">
+      <configurations>
+        <configuration key="source-tags">mp4-low.http</configuration>
+        <configuration key="target-tags">+288p-quality</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="tag the targets for player">
+      <configurations>
+        <configuration key="source-tags">mp4-medium.http,mp4-vga-medium.http</configuration>
+        <configuration key="target-tags">+360p-quality</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="tag the targets for player">
+      <configurations>
+        <configuration key="source-tags">mp4-hd.http,adaptive-720p.http</configuration>
+        <configuration key="target-tags">+720p-quality</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      description="tag the targets for player">
+      <configurations>
+        <configuration key="source-tags">adaptive-360p.http</configuration>
+        <configuration key="target-tags">+360p-quality</configuration>
       </configurations>
     </operation>
 
@@ -138,21 +199,21 @@
       description="Mark the recording for review / cutting">
       <configurations>
         <configuration key="description">Recording has not been reviewed / cut yet.</configuration>
-        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="reason">EVENTS.COMMENTS.REASONS.REVIEW-OR-CUTTING</configuration>
         <configuration key="action">create</configuration>
       </configurations>
     </operation>
 
     <!-- encode to engage search result thumbnails -->
-    <!-- skip this when manually uploaded */search+preview -->
+
     <operation
       id="image"
-      if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
+      if="(NOT ${uploadedSearchPreview}) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Creating Engage search result thumbnails">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
@@ -166,10 +227,10 @@
       id="image"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Creating Engage player preview image">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
@@ -183,10 +244,10 @@
       id="segment-video"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Detecting slide transitions in presentation track">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
@@ -197,10 +258,10 @@
       id="segmentpreviews"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Creating presentation segments preview image">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-flavor">presentation/segment+preview</configuration>
         <configuration key="reference-flavor">presentation/preview</configuration>
         <configuration key="reference-tags">engage-download</configuration>
@@ -209,41 +270,25 @@
       </configurations>
     </operation>
 
-	<!-- Generate timeline preview images -->
-
-    <operation
-      id="timelinepreviews"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
-      fail-on-error="false"
-      exception-handler-workflow="error"
-      description="Creating timeline preview images">
-      <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
-        <configuration key="target-flavor">*/timeline+preview</configuration>
-        <configuration key="target-tags">engage-download</configuration>
-        <configuration key="image-count">100</configuration>
-      </configurations>
-    </operation>
-
     <!-- Extract text form slide preview images -->
 
-    <operation
+    <!-- operation
       id="extract-text"
       if="${publishToMediaModule} OR ${publishToOaiPmh}"
       fail-on-error="false"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Extracting text from presentation segments">
       <configurations>
-        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="source-flavor">presentation/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
       </configurations>
-    </operation>
+    </operation -->
 
     <!-- Publish preview internal -->
 
     <operation
       id="publish-configure"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Publish to preview publication channel">
       <configurations>
         <configuration key="source-flavors">*/preview</configuration>
@@ -260,7 +305,7 @@
       if="${publishToMediaModule}"
       max-attempts="2"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Publishing to Engage">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
@@ -275,7 +320,7 @@
     <operation
       id="publish-oaipmh"
       if="${publishToOaiPmh}"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Publish to OAI-PMH Default Repository">
       <configurations>
         <configuration key="download-flavors">dublincore/*,security/*</configuration>
@@ -291,7 +336,7 @@
     <operation
       id="snapshot"
       fail-on-error="true"
-      exception-handler-workflow="partial-error"
+      exception-handler-workflow="ng-partial-error"
       description="Archiving">
       <configurations>
         <configuration key="source-tags">archive</configuration>

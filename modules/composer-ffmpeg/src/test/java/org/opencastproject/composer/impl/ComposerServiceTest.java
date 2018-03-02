@@ -393,7 +393,7 @@ public class ComposerServiceTest {
   @Test
   public void testConcat() throws Exception {
     Dimension outputDimension = new Dimension(500, 500);
-    Job concat = composerService.concat("concat.work", outputDimension, sourceVideoTrack, sourceVideoTrack);
+    Job concat = composerService.concat("concat.work", outputDimension, false, sourceVideoTrack, sourceVideoTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
     Assert.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
@@ -407,13 +407,28 @@ public class ComposerServiceTest {
   @Test
   public void testConcatWithFrameRate() throws Exception {
     Dimension outputDimension = new Dimension(500, 500);
-    Job concat = composerService.concat("concat.work", outputDimension, 20.0f, sourceVideoTrack, sourceVideoTrack);
+    Job concat = composerService.concat("concat.work", outputDimension, 20.0f, false, sourceVideoTrack,
+            sourceVideoTrack);
     Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
     Assert.assertNotNull(concatTrack);
     inspectedTrack.setIdentifier(concatTrack.getIdentifier());
     inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
     Assert.assertEquals(inspectedTrack, concatTrack);
   }
+
+  /**
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   */
+  @Test
+  public void testConcatWithSameCodec() throws Exception {
+    Job concat = composerService.concat("concat.work", null, true, sourceVideoTrack, sourceVideoTrack);
+    Track concatTrack = (Track) MediaPackageElementParser.getFromXml(concat.getPayload());
+    Assert.assertNotNull(concatTrack);
+    inspectedTrack.setIdentifier(concatTrack.getIdentifier());
+    inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
+    Assert.assertEquals(inspectedTrack, concatTrack);
+  }
+
 
   /**
    * Test method for

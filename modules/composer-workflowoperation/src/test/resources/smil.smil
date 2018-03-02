@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<smil baseProfile="Language" version="3.0" xml:id="s-30c539fb-9813-4584-b1ba-6684d1160527" xmlns="http://www.w3.org/ns/SMIL">
+	<head xml:id="h-232d7057-3a8b-4fd1-aa5a-665b62ba9f15">
+		<meta content="8163579ms" name="track-duration" xml:id="meta-93c0d28f-da73-4164-bd78-907e4351fc72"/>
+		<paramGroup xml:id="pg-e823179d-f606-4975-8972-6d06feb92f04">
+			<param name="track-id" value="b7c4f480-dd22-4f82-bb58-c4f218051059" valuetype="data" xml:id="param-966b3380-dd7d-461c-92ad-234d046b6b45"/>
+			<param name="track-src" value="fooVideo1.flv" valuetype="data" xml:id="param-e809b387-168f-45bb-92e9-236a2e6f0817"/>
+			<param name="track-flavor" value="presenter/work" valuetype="data" xml:id="param-8ad17709-35d9-4f1d-a2ac-df3443a61719"/>
+		</paramGroup>
+		<paramGroup xml:id="pg-acc84414-82b8-427f-8453-8b655101df22">
+			<param name="track-id" value="144b489b-c498-4d11-9a63-1ab96a7ec0b1" valuetype="data" xml:id="param-862ef9e7-1fdf-49c6-a0cb-fca1b3bc918c"/>
+			<param name="track-src" value="fooVideo2.flv" valuetype="data" xml:id="param-d5e85240-4258-4bc8-b2d0-112ea4545c8b"/>
+			<param name="track-flavor" value="presentation/work" valuetype="data" xml:id="param-5b4120ad-ae2f-41ce-8619-d8593874278e"/>
+		</paramGroup>
+	</head>
+	<body xml:id="b-d404405a-31f9-42b7-aeee-7662faa84355">
+		<par xml:id="par-316874c4-478b-4aa4-864c-68269a3b6b7e">
+			<video clipBegin="180ms" clipEnd="4029ms" paramGroup="pg-e823179d-f606-4975-8972-6d06feb92f04" src="av.mov" xml:id="v-43556772-871c-4041-bd38-54be3b30b7ff"/>
+			<video clipBegin="180ms" clipEnd="4029ms" paramGroup="pg-acc84414-82b8-427f-8453-8b655101df22" src="av.mov" xml:id="v-9d889384-9d00-47d3-96f6-b770fea58106"/>
+		</par>
+		<par xml:id="par-a464458a-e170-4add-a427-5f7ebe29759b">
+			<video clipBegin="4622ms" clipEnd="7273ms" paramGroup="pg-e823179d-f606-4975-8972-6d06feb92f04" src="av.mov" xml:id="v-b9a86b92-6c97-44e7-9826-624140d0902d"/>
+			<video clipBegin="4622ms" clipEnd="7273ms" paramGroup="pg-acc84414-82b8-427f-8453-8b655101df22" src="av.mov" xml:id="v-e6c79370-27b9-48a7-98d2-fbd868c1c72c"/>
+		</par>
+	</body>
+</smil>
