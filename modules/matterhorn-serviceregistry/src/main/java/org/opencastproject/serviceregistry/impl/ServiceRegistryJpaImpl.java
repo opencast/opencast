@@ -772,10 +772,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (heartbeatInterval == 0) {
         logger.info("Heartbeat disabled");
       } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} minutes too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
+        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
         heartbeatInterval = DEFAULT_HEART_BEAT;
       } else {
-        logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
       }
     }
 
