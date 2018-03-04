@@ -375,36 +375,6 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException,
-          MediaPackageException {
-    HttpPost post = new HttpPost("/watermark");
-    try {
-      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(mediaTrack)));
-      params.add(new BasicNameValuePair("watermark", watermark));
-      params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
-    } catch (Exception e) {
-      throw new EncoderException("Unable to assemble a remote composer request for track " + mediaTrack, e);
-    }
-    HttpResponse response = null;
-    try {
-      response = getResponse(post);
-      if (response != null) {
-        String content = EntityUtils.toString(response.getEntity());
-        Job r = JobParser.parseJob(content);
-        logger.info("watermarking job {} started on a remote composer", r.getId());
-        return r;
-      }
-    } catch (Exception e) {
-      throw new EncoderException("Unable to watermark track " + mediaTrack + " using a remote composer service", e);
-    } finally {
-      closeConnection(response);
-    }
-    throw new EncoderException("Unable to watermark track " + mediaTrack + " using a remote composer service");
-  }
-
-  @Override
   public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
           LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
           String background) throws EncoderException, MediaPackageException {
