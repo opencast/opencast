@@ -31,8 +31,8 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.9</karaf.version>
-    <pax.web.version>4.3.0</pax.web.version>
+    <karaf.version>4.0.10</karaf.version>
+    <pax.web.version>4.3.4</pax.web.version>
     <cxf.version>3.1.12</cxf.version>
     <jackson.version>2.7.0</jackson.version>
     <functional.version>1.4.2</functional.version>
@@ -426,7 +426,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.6.0</version>
+          <version>1.26.0</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -723,7 +723,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>3.5.8</version>
+        <version>3.6.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
