@@ -54,7 +54,6 @@
     <module>modules/caption-remote</module>
     <module>modules/capture-admin-service-api</module>
     <module>modules/capture-admin-service-impl</module>
-    <module>modules/capture-workflowoperation</module>
     <module>modules/comments-workflowoperation</module>
     <module>modules/common</module>
     <module>modules/common-jpa-impl</module>
@@ -157,7 +156,6 @@
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
     <module>modules/search-service-remote</module>
-    <module>modules/search-workflowoperation</module>
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>

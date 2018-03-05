@@ -219,24 +219,6 @@ public interface ComposerService {
   Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException;
 
   /**
-   * Insert captions in media package element identified by <code>mediaTrack</code> from catalog which contains
-   * captions.
-   *
-   * @param mediaTrack
-   *          media track to which captions will be embedded
-   * @param watermark
-   *          Watermark image to be applied to the video
-   * @param profileId
-   *          identifier of the encoding profile
-   * @return Receipt for this embedding job
-   * @throws EncoderException
-   *           if exception occurs during embedding process
-   * @throws MediaPackageException
-   *           if the track is invalid
-   */
-  Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException, MediaPackageException;
-
-  /**
    * @return All registered {@link EncodingProfile}s.
    */
   EncodingProfile[] listProfiles();

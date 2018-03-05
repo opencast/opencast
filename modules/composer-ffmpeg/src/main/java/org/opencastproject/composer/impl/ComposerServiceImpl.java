@@ -123,7 +123,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static final int IMAGE_EXTRACTION_UNKNOWN_DURATION = 16;
   private static final int IMAGE_EXTRACTION_TIME_OUTSIDE_DURATION = 17;
   private static final int IMAGE_EXTRACTION_NO_VIDEO = 18;
-  private static final int WATERMARK_NOT_FOUND = 22;
   private static final int NO_STREAMS = 23;
 
   /** The logging instance */
@@ -1202,50 +1201,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return some(attachment);
   }
 
-  @Override
-  public Job watermark(Track mediaTrack, String watermark, String profileId) throws EncoderException,
-          MediaPackageException {
-    try {
-      final EncodingProfile profile = profileScanner.getProfile(profileId);
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Watermark.toString(),
-              Arrays.asList(profileId, MediaPackageElementParser.getAsXml(mediaTrack), watermark), profile.getJobLoad());
-    } catch (ServiceRegistryException e) {
-      throw new EncoderException("Unable to create a job", e);
-    }
-  }
-
-  /**
-   * Encodes a video track with a watermark.
-   *
-   * @param mediaTrack
-   *          the video track
-   * @param watermark
-   *          the watermark image
-   * @param encodingProfile
-   *          the encoding profile
-   * @return the watermarked track or none if the operation does not return a track. This may happen for example when
-   *         doing two pass encodings where the first pass only creates metadata for the second one
-   * @throws EncoderException
-   *           if encoding fails
-   */
-  private Option<Track> watermark(Job job, Track mediaTrack, String watermark, String encodingProfile)
-          throws EncoderException, MediaPackageException {
-    logger.info("watermarking track {}.", mediaTrack.getIdentifier());
-    File watermarkFile = new File(watermark);
-    if (!watermarkFile.exists()) {
-      logger.error("Watermark image {} not found.", watermark);
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("watermark", watermarkFile.getAbsolutePath());
-      incident().recordFailure(job, WATERMARK_NOT_FOUND, params);
-      throw new EncoderException("Watermark image not found");
-    }
-
-    Map<String, String> watermarkProperties = new HashMap<>();
-    watermarkProperties.put("watermark", watermarkFile.getAbsolutePath());
-
-    return encode(job, Collections.map(tuple("video", mediaTrack)), encodingProfile, watermarkProperties);
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -1303,12 +1258,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           long start = Long.parseLong(arguments.get(2));
           long duration = Long.parseLong(arguments.get(3));
           serialized = trim(job, firstTrack, encodingProfile, start, duration).map(
-                  MediaPackageElementParser.getAsXml()).getOrElse("");
-          break;
-        case Watermark:
-          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-          String watermark = arguments.get(2);
-          serialized = watermark(job, firstTrack, watermark, encodingProfile).map(
                   MediaPackageElementParser.getAsXml()).getOrElse("");
           break;
         case Composite:
