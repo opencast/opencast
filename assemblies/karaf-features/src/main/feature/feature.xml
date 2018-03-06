@@ -3,7 +3,7 @@
 
   <feature name="query-dsl">
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
+    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-sql/3.6.5</bundle>
@@ -22,7 +22,7 @@
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
-    <bundle start-level="55">mvn:commons-codec/commons-codec/1.10</bundle>
+    <bundle start-level="55">mvn:commons-codec/commons-codec/1.11</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
@@ -42,23 +42,22 @@
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:com.google.code.gson/gson/2.8.1</bundle>
-    <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
+    <bundle>mvn:com.google.code.gson/gson/2.8.2</bundle>
+    <bundle>mvn:commons-collections/commons-collections/${commons-collection.version}</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/1.3.3</bundle>
-    <bundle>mvn:commons-io/commons-io/2.5</bundle>
+    <bundle>mvn:commons-io/commons-io/2.6</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
+    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.8.3</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
-    <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/3.6</bundle>
+    <bundle>mvn:org.apache.commons/commons-csv/1.5</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/3.7</bundle>
     <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.batik/1.7_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/3.2.4_1</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-pool/1.5.4_4</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jakarta-regexp/1.4_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-inject/1_2</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/1.8.5_1</bundle>
