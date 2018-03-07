@@ -164,6 +164,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
+  /** The minimum separation between one event ending and the next starting */
+  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
+
   /** The last modifed cache configuration key */
   private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
 
@@ -1208,10 +1211,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /*
-   * Returns a list of events which start and/or end within a given date range.  So you could search for things which start
-   * on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at Epoch and
-   * ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any edge cases.
-   * Use checkScheduleConflicts instead.
+   * Returns a list of events which start and/or end within a given date range.  So you could search for things which
+   * start on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at
+   * Epoch and ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any
+   * edge cases.  Use checkScheduleConflicts instead.
    */
   private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
                                             Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
@@ -1246,10 +1249,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     for (final ARecord r : records) {
       final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
       final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-      if (checkStart.equals(start) || checkEnd.equals(end) ||      //If the start or end times are identical (.after and .before are strict comparisons)
-          checkStart.after(start) && checkStart.before(end) ||     //If the potential event starts during event r
-          checkEnd.before(end) && checkEnd.after(start) ||         //If the potential event ends during event r
-          checkStart.before(start) && checkEnd.after(end)) {       //If the potential event begins before, and ends after event r (ie, containment)
+      /*
+      If the start or end times are identical (.after and .before are strict comparisons) OR
+      If the potential event starts during event r OR
+      If the potential event ends during event r OR
+      If the potential event begins before, and ends after event r (ie, containment)
+      */
+      if (checkStart.equals(start) || checkEnd.equals(end)
+       || checkStart.after(start) && checkStart.before(end)
+       || checkEnd.after(start) && checkEnd.before(end)
+       || checkStart.before(start) && checkEnd.after(end)
+       || eventWithinMinimumSeparation(checkStart, checkEnd, start, end)) {
         result.add(r);
       }
     }
@@ -1262,6 +1272,20 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
     });
     return Stream.mk(result).bind(recordToMp).toList();
+  }
+
+  /**
+   * Returns true of checkStart is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates, or checkEnd
+   * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
+   */
+  private boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
+    if (Math.abs(checkStart.getTime() - start.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkStart.getTime() - end.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - start.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - end.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
+      return true;
+    }
+    return false;
   }
 
   @Override

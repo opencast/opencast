@@ -1895,6 +1895,12 @@ public class SchedulerServiceImplTest {
       //Event A contains event B entirely
       conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(26)));
       assertEquals(1, conflicts.size());
+
+      //Event A ends with less than one minute before event B starts
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(24) - seconds(1)));
+
+      //Event A begins than one minute after event B ends
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(25) + seconds(1)), new Date(currentTime + hours(27)));
     }
   }
 
