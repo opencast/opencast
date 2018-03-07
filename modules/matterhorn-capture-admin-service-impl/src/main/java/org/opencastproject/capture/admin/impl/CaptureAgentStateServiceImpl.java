@@ -503,18 +503,15 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     EntityTransaction tx = null;
     try {
       //This is the cached last-heard-from time
-      Long cached = -1L;
+      Long cachedLastHeardFrom = -1L;
       // Update the last seen property from the agent cache
       if (updateFromCache) {
         try {
-          cached = getAgentFromCache(agent.getName(), agent.getOrganization()).getC();
+          cachedLastHeardFrom = getAgentFromCache(agent.getName(), agent.getOrganization()).getC();
         } catch (NotFoundException e) {
           // That's fine
         }
       }
-
-      //Make sure the last heard from value is as large as possible
-      Long larger = Math.max(cached, agent.getLastHeardFrom());
 
       em = emf.createEntityManager();
       tx = em.getTransaction();
@@ -523,7 +520,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
         existing.setConfiguration(agent.getConfiguration());
         if (!AgentState.UNKNOWN.equals(agent.getState())) {
-          existing.setLastHeardFrom(larger);
+          existing.setLastHeardFrom(Math.max(cachedLastHeardFrom, agent.getLastHeardFrom()));
         }
         existing.setState(agent.getState());
         existing.setSchedulerRoles(agent.getSchedulerRoles());
