@@ -95,6 +95,7 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -157,8 +158,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
   public static final String JOB_TYPE = "org.opencastproject.ingest";
 
-  /** Managed Property key to overwrite existing series */
-  public static final String PROPKEY_OVERWRITE_SERIES = "org.opencastproject.series.overwrite";
+  /** Managed Property key to overwrite existing elements of same flavor (e.g. series and episode catalogs) */
+  public static final String PROPKEY_OVERWRITE = "org.opencastproject.ingest.overwrite";
 
   /** Methods that ingest zips create jobs with this operation type */
   public static final String INGEST_ZIP = "zip";
@@ -248,11 +249,11 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Cache<String, Long> partialTrackStartTimes = CacheBuilder.newBuilder().expireAfterWrite(1, TimeUnit.DAYS)
           .build();
 
-  /** The default is to overwrite series catalog on ingest */
-  protected boolean defaultIsOverWriteSeries = true;
+  /** The OC default is to overwrite existing flavors on ingest. The default is used if the configuration param is not found */
+  protected boolean defaultOverWriteValue = true;
 
-  /** Option to overwrite series on ingest */
-  protected boolean isOverwriteSeries = defaultIsOverWriteSeries;
+  /** Option to overwrite matching flavors (e.g. series and episode metadata) on ingest, tracks are always taken on ingest */
+  protected boolean isOverwrite = defaultOverWriteValue;
 
   /**
    * Creates a new ingest service instance.
@@ -303,14 +304,22 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     ingestZipJobLoad = LoadUtil.getConfiguredLoadValue(properties, ZIP_JOB_LOAD_KEY, DEFAULT_INGEST_ZIP_JOB_LOAD,
             serviceRegistry);
     // try to get overwrite series option from config, use default if not configured
+    isOverwrite = defaultOverWriteValue;
     try {
-      isOverwriteSeries = Boolean.parseBoolean(((String) properties.get(PROPKEY_OVERWRITE_SERIES)).trim());
+      String overwriteParam = (String) properties.get(PROPKEY_OVERWRITE);
+      if (overwriteParam != null) {
+        isOverwrite = BooleanUtils.toBoolean(overwriteParam.trim().toLowerCase(), "true", "false");
+      } else {
+        logger.info("Did not find '{}' in configuration, using default value '{}'", PROPKEY_OVERWRITE, isOverwrite);
+      }
     } catch (Exception e) {
-      isOverwriteSeries = defaultIsOverWriteSeries;
-      logger.warn("Unable to update configuration. {}", e.getMessage());
+      isOverwrite = defaultOverWriteValue;
+      logger.warn("Unable to use '{}' from Ingest configuration file, expected 'true' or 'false'. {}",
+              PROPKEY_OVERWRITE,
+              e.getMessage());
     }
-    logger.info("Configuration updated. It is {} that existing series will be overwritten during ingest.",
-            isOverwriteSeries);
+    logger.info("Ingest Service configuration updated, Overwrite matching flavored elements on ingest is '{}'",
+            isOverwrite);
   }
 
   /**
@@ -868,7 +877,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         try {
           try {
             seriesService.getSeries(id);
-            if (isOverwriteSeries) {
+            if (isOverwrite) {
               // Update existing series
               seriesService.updateSeries(dc);
               isUpdated = true;
@@ -1328,44 +1337,99 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
   }
 
+  /**
+   * Merge different elements from capture agent ingesting mp and Asset manager. Overwrite or replace same flavored
+   * elements depending on the Ingest Service overwrite configuration. Ignore publications (i.e. live publication
+   * channel from Asset Manager) Always keep tracks from the capture agent.
+   *
+   * @param mp
+   *          the medipackage being ingested from the Capture Agent
+   * @param scheduledMp
+   *          the mediapckage that was schedule and managed by the Asset Manager
+   */
   private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
+
     for (MediaPackageElement element : scheduledMp.getElements()) {
-      // Asset manager media package may have a publication element (for live) if retract live has not run yet
-      if (element.getFlavor() != null
-              && !MediaPackageElement.Type.Publication.equals(element.getElementType())
-              && mp.getElementsByFlavor(element.getFlavor()).length > 0) {
-        logger.info("Ignore scheduled element '{}', there is already an ingested element with flavor '{}'", element,
-                element.getFlavor());
+      if (MediaPackageElement.Type.Publication.equals(element.getElementType())) {
+        // The sset managed media package may have a publication element for a live event, if retract live has not run yet.
+        // Publications do not have flavors and are never part of the mediapackage from the capture agent.
+        // Therefore, ignore publication element because it is removed when the recorded media is published and causes complications (on short media) if added.
+        logger.debug("Ignoring {}, not adding to ingested mediapackage {}", MediaPackageElement.Type.Publication, mp);
         continue;
+      } else if (mp.getElementsByFlavor(element.getFlavor()).length > 0) {
+        // The default is to overwrite matching flavored elements in the Asset managed mediapackage (e.g. catalogs)
+        // If isOverwrite is true, changes made from the CA overwrite (update/revert) changes made from the Admin UI.
+        // If isOverwrite is false, changes made from the CA do not overwrite (update/revert) changes made from the Admin UI.
+        // regardless of overwrite, always keep new ingested tracks.
+        if (isOverwrite || MediaPackageElement.Type.Track.equals(element.getElementType())) {
+          // Allow updates made from the Capture Agent to overwrite existing metadata in Opencast
+          logger.debug(
+                  "Omitting existing (Asset Managed) element '{}', replacing with ingested element of same flavor '{}'",
+                  element,
+                  element.getFlavor());
+          continue;
+        }
+        // Remove flavored element from ingested mp and replaced it with maching element from Asset Managed mediapackage.
+        // This protects updates made from the admin UI during an event capture from being reverted by artifacts from the ingested CA.
+        for (MediaPackageElement el : mp.getElementsByFlavor(element.getFlavor())) {
+          logger.info("Omitting ingested element '{}' {}, keeping existing (Asset Managed) element of same flavor '{}'", el, el.getURI(),
+                  element.getFlavor());
+          mp.remove(el);
+        }
       }
-      logger.info("Adding new scheduled element '{}' to ingested mediapackage", element);
+      logger.info("Adding element {} from scheduled (Asset Managed) event '{}' into ingested mediapackage", element, mp);
       mp.add(element);
     }
   }
 
+  /**
+   *
+   * The previous OC behaviour is for metadata in the ingested mediapackage to be updated by the
+   * Asset Managed metadata *only* when the field is blank on the ingested mediapackage.
+   * However, that field may have been intentionally emptied by
+   * removing its value from the Capture Agent UI (e.g. Galicaster)
+   *
+   * If isOverwrite is true, metadata values in the ingest mediapackage take precedence and are *not* replaced Asset Managed metadata fields.
+   * If isOverwrite is false, the ingest mediapackage metadata is updated with Asset Managed mediapackage metadata (i.e. Asset Manged mp data prevails, and can empty out values)
+   *
+   * @param mp,
+   *          the inbound ingested mp
+   * @param scheduledMp,
+   *          the existing scheduled mp
+   */
   private void mergeMediaPackageMetadata(MediaPackage mp, MediaPackage scheduledMp) {
     // Merge media package fields
-    if (mp.getDate() == null)
+    if ((mp.getDate() == null) || !isOverwrite)
       mp.setDate(scheduledMp.getDate());
-    if (isBlank(mp.getLicense()))
+    if (isBlank(mp.getLicense()) || !isOverwrite)
       mp.setLicense(scheduledMp.getLicense());
-    if (isBlank(mp.getSeries()))
+    if (isBlank(mp.getSeries()) || !isOverwrite)
       mp.setSeries(scheduledMp.getSeries());
-    if (isBlank(mp.getSeriesTitle()))
+    if (isBlank(mp.getSeriesTitle()) || !isOverwrite)
       mp.setSeriesTitle(scheduledMp.getSeriesTitle());
-    if (isBlank(mp.getTitle()))
+    if (isBlank(mp.getTitle()) || !isOverwrite)
       mp.setTitle(scheduledMp.getTitle());
-    if (mp.getSubjects().length == 0) {
+
+    if (mp.getSubjects().length <= 0 || !isOverwrite) {
+      for (String subject : mp.getSubjects()) {
+        mp.removeSubject(subject);
+      }
       for (String subject : scheduledMp.getSubjects()) {
         mp.addSubject(subject);
       }
     }
-    if (mp.getContributors().length == 0) {
+    if (mp.getContributors().length <= 0 || !isOverwrite) {
+      for (String contributor : mp.getContributors()) {
+        mp.removeContributor(contributor);
+      }
       for (String contributor : scheduledMp.getContributors()) {
         mp.addContributor(contributor);
       }
     }
-    if (mp.getCreators().length == 0) {
+    if (mp.getCreators().length <= 0 || !isOverwrite) {
+      for (String creator : mp.getCreators()) {
+        mp.removeCreator(creator);
+      }
       for (String creator : scheduledMp.getCreators()) {
         mp.addCreator(creator);
       }
