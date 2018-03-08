@@ -22,7 +22,6 @@
 package org.opencastproject.helloworld.impl.endpoint;
 
 import org.opencastproject.helloworld.api.HelloWorldService;
-
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;

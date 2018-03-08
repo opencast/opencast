@@ -11,9 +11,6 @@
     <property name="severity" value="error" />
   </module>
 
-  <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
-  <module name="SuppressionCommentFilter"/>
-
   <!-- Checks whether spaces are used as opposed to tabs                    -->
   <!-- See http://checkstyle.sf.net/config_whitespace.html#FileTabCharacter -->
   <module name="FileTabCharacter"/>
@@ -32,8 +29,8 @@
   <module name="TreeWalker">
     <property name="cacheFile" value="${checkstyle.cache.file}" />
 
-    <!-- Required to enable the SuppressionCommentFilter -->
-    <module name="FileContentsHolder"/>
+    <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
+    <module name="SuppressionCommentFilter"/>
 
     <!-- Checks for Naming Conventions.                  -->
     <!-- See http://checkstyle.sf.net/config_naming.html -->

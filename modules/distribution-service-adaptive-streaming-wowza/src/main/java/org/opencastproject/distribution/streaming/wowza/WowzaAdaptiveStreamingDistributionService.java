@@ -21,7 +21,6 @@
 package org.opencastproject.distribution.streaming.wowza;
 
 import static java.lang.String.format;
-
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
