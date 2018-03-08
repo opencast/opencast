@@ -80,9 +80,9 @@
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- AWS Bits -->
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.0</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.6</bundle>
-    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.6.6</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aws-java-sdk/${aws.version}</bundle>
 
     <!-- Spring Framework / Security -->
