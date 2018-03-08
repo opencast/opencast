@@ -24,8 +24,8 @@
     <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collection.version>3.2.2</commons-collection.version>
     <commons-compress.version>1.16.1</commons-compress.version>
-    <httpcomponents-httpcore.version>4.4.1</httpcomponents-httpcore.version>
-    <httpcomponents-httpclient.version>4.5</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.9</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5.5</httpcomponents-httpclient.version>
     <aws.version>1.11.49_1</aws.version>
     <jmeter.version>2.4</jmeter.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
