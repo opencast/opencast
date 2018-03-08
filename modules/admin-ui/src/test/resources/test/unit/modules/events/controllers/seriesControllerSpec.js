@@ -34,7 +34,7 @@ describe('Series controller', function () {
         it('reloads series after deletion', function () {
             $httpBackend.expectGET('/admin-ng/resources/series/filters.json').respond('[]');
             $httpBackend.expectDELETE('/admin-ng/series/12').respond('12');
-            $httpBackend.expectGET('/admin-ng/series/series.json?limit=10&offset=0').respond(JSON.stringify(getJSONFixture('admin-ng/series/series.json')));
+            $httpBackend.expectGET('/admin-ng/series/series.json?limit=10&offset=0&sort=title:ASC').respond(JSON.stringify(getJSONFixture('admin-ng/series/series.json')));
 
             $scope.table.delete({'id': 12});
 
