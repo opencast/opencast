@@ -17,7 +17,7 @@ definitions consist of a list of workflow operations, which basically map a piec
        ...
     </definition>
 
-##Default Workflow Operations
+## Default Workflow Operations
 
 The following table contains the workflow operations that are available in an out-of-the-box Opencast installation:
 
