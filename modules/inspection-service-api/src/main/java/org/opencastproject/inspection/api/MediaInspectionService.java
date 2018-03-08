@@ -65,7 +65,7 @@ public interface MediaInspectionService {
    * @throws MediaInspectionException
    *           if there is a failure during media package update
    */
-  Job inspect(URI uri, final Map<String, String> options) throws MediaInspectionException;
+  Job inspect(URI uri, Map<String, String> options) throws MediaInspectionException;
 
   /**
    * Equip an existing media package element with automatically generated metadata
@@ -105,6 +105,6 @@ public interface MediaInspectionService {
    * @throws MediaPackageException
    *           if the element is invalid
    */
-  Job enrich(MediaPackageElement original, boolean override, final Map<String, String> options)
+  Job enrich(MediaPackageElement original, boolean override, Map<String, String> options)
           throws MediaInspectionException, MediaPackageException;
 }

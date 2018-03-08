@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-
 import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
