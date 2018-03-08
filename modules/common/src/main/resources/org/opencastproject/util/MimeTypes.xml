@@ -20,6 +20,11 @@
     <Extensions>json</Extensions>
   </MimeType>
   <MimeType>
+    <Type>application/octet</Type>
+    <Description>MH 1.3 CaptureAgent MPEG media</Description>
+    <Extensions>mpeg,mpg,m1s,m75,m15,mpm,mpv</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/ogg</Type>
     <Description>Ogg file</Description>
     <Extensions>ogg,oga,ogv,ogx</Extensions>
