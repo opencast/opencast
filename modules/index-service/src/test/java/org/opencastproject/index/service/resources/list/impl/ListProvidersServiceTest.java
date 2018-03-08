@@ -96,7 +96,6 @@ public class ListProvidersServiceTest {
   @Before
   public void setUp() {
     listProviderService = new ListProvidersServiceImpl();
-    listProviderService.activate(null);
   }
 
   @Test
