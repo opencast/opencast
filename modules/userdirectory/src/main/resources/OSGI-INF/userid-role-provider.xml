@@ -6,6 +6,7 @@
   <service>
     <provide interface="org.opencastproject.security.api.RoleProvider" />
     <provide interface="org.opencastproject.userdirectory.UserIdRoleProvider" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
