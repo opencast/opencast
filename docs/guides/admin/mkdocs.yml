@@ -93,6 +93,7 @@ pages:
    - Concat: 'workflowoperationhandlers/concat-woh.md'
    - Configure-By-DCTerm: 'workflowoperationhandlers/configure-by-dcterm-woh.md'
    - Copy: 'workflowoperationhandlers/copy-woh.md'
+   - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
    - Editor: 'workflowoperationhandlers/editor-woh.md'
