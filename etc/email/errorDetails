@@ -8,16 +8,16 @@ Title: ${catalogs['episode']['title']!'title missing'}
 Event Date: ${mediaPackage.date?datetime?iso_local}
 
 <#if failedOperation?has_content>
-	Workflow failed in operation: ${failedOperation.position}-${failedOperation.template}
-	Started: ${failedOperation.dateStarted?datetime?iso_local}
-	Ended: ${failedOperation.dateCompleted?datetime?iso_local}
-	Execution Host: ${failedOperation.executionHost}
+  Workflow failed in operation: ${failedOperation.position}-${failedOperation.template}
+  Started: ${failedOperation.dateStarted?datetime?iso_local}
+  Ended: ${failedOperation.dateCompleted?datetime?iso_local}
+  Execution Host: ${failedOperation.executionHost}
 </#if>
 
 Logged incident of the error looks like this:
 
 <#if incident?has_content>
-        <#list incident as inc>
-                <#list inc.details as dets>${dets.b} </#list>
-        </#list>
+  <#list incident as inc>
+    <#list inc.details as dets>${dets.b} </#list>
+  </#list>
 </#if>
