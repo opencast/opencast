@@ -21,8 +21,11 @@ before_install:
   - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
   - tar xf ffmpeg-release-64bit-static.tar.xz
   - sudo mv ffmpeg-*/ff* /usr/bin/
-  - wget https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
-  - sudo dpkg -i synfigstudio_1.0.2_amd64.deb
+  - >
+     wget https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     wget https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
+  - sudo dpkg -i synfigstudio-1.0.2.deb
 
 install:
   - true
