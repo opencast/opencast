@@ -2270,8 +2270,8 @@ public class SchedulerServiceImplTest {
     long offset = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
       MediaPackage mp = generateEvent(Opt.<String> none());
-      Date startDateTime = new Date(offset + 10 * 1000);
-      Date endDateTime = new Date(offset + 3610000);
+      Date startDateTime = new Date(offset + 10 * 1000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
+      Date endDateTime = new Date(offset + 3610000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
       offset = endDateTime.getTime();
       final DublinCoreCatalog event = generateEvent(agent, Opt.<String> none(), Opt.some(titlePrefix + "-" + i),
               startDateTime, endDateTime);
