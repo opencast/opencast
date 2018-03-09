@@ -28,8 +28,8 @@
 
     <!-- Merge caption/transcript to existing publication and republish -->
 
-    <operation id="publish-engage" 
-      fail-on-error="true" 
+    <operation id="publish-engage"
+      fail-on-error="true"
       exception-handler-workflow="partial-error"
       description="Distribute and publish to engage server">
       <configurations>

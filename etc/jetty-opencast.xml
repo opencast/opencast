@@ -27,7 +27,7 @@
   <!-- One of each type! -->
   <!-- =========================================================== -->
 
-  <!-- Use this connector for many frequently idle connections and for 
+  <!-- Use this connector for many frequently idle connections and for
       threadless continuations. -->
   <New id="httpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
     <Set name="secureScheme">https</Set>
