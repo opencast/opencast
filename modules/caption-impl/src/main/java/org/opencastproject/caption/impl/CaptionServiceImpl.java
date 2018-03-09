@@ -245,7 +245,7 @@ public class CaptionServiceImpl extends AbstractJobProducer implements CaptionSe
       MediaPackageElementBuilder elementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       MediaPackageElement mpe = elementBuilder.elementFromURI(exported, converter.getElementType(),
               new MediaPackageElementFlavor(
-              "captions", outputFormat));
+                      "captions", outputFormat + (language == null ? "" : "+" + language)));
       if (mpe.getMimeType() == null) {
         String[] mimetype = FileTypeMap.getDefaultFileTypeMap().getContentType(exported.getPath()).split("/");
         mpe.setMimeType(mimeType(mimetype[0], mimetype[1]));

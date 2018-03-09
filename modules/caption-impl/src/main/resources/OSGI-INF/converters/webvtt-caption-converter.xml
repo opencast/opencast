@@ -3,7 +3,7 @@
  name="org.opencastproject.caption.converters.WebVttCaptionConverter" immediate="true">
   <implementation class="org.opencastproject.caption.converters.WebVttCaptionConverter" />
   <property name="service.description" value="WebVTT caption converter" />
-  <property name="caption.format" value="webvtt" />
+  <property name="caption.format" value="vtt" />
   <service>
     <provide interface="org.opencastproject.caption.api.CaptionConverter" />
   </service>
