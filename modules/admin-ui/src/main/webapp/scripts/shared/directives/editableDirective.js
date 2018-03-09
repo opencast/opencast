@@ -13,6 +13,7 @@ angular.module('adminNg.directives')
         },
         link: function (scope, element) {
             scope.mixed = false;
+            scope.ordered = false;
 
             if (scope.params === undefined || scope.params.type === undefined) {
               console.warn("Illegal parameters for editable field");
@@ -50,6 +51,9 @@ angular.module('adminNg.directives')
                             }
                         } else {
                             if (scope.collection) {
+                                if (scope.params.type === 'ordered_text') {
+                                    scope.ordered = true;
+                                }
                                 scope.mode = 'singleSelect';
                             } else {
                                 scope.mode = 'singleValue';

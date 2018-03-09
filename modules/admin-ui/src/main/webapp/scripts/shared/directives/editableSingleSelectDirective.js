@@ -22,7 +22,7 @@
    </doc:example>
  */
 angular.module('adminNg.directives')
-.directive('adminNgEditableSingleSelect', ['$timeout', function ($timeout) {
+.directive('adminNgEditableSingleSelect', ['$timeout', '$filter', function ($timeout, $filter) {
     return {
         restrict: 'A',
         templateUrl: 'shared/partials/editableSingleSelect.html',
@@ -30,26 +30,52 @@ angular.module('adminNg.directives')
         scope: {
             params:     '=',
             collection: '=',
+            ordered:    '=',
             save:       '='
         },
         link: function (scope, element) {
 
-            var mapToArray = function (map) {
+            var mapToArray = function (map, translate) {
                 var array = [];
 
                 angular.forEach(map, function (mapValue, mapKey) {
 
                     array.push({
-                        label: mapKey,
+                        label: translate ? $filter('translate')(mapKey) : mapKey,
                         value: mapValue
                     });
                 });
 
-                return array;
+                return $filter('orderBy')(array, 'label');
             }
 
+            var mapToArrayOrdered = function (map, translate) {
+                var array = [];
+
+                angular.forEach(map, function (mapValue, mapKey) {
+                    var entry = JSON.parse(mapKey);
+                    if (entry.selectable || scope.params.value === mapValue) {
+                        array.push({
+                            label: entry,
+                            value: mapValue
+                        });
+                    }
+                });
+                array.sort(function(a, b) {
+                    return a.label.order - b.label.order;
+                });
+                return array.map(function (entry) {
+                    return {
+                        label: translate ? $filter('translate')(entry.label.label) : entry.label.label,
+                        value: entry.value
+                    };
+                });
+            }
+
+
             //transform map to array so that orderBy can be used
-            scope.collection = mapToArray(scope.collection);
+            scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
+                mapToArray(scope.collection, scope.params.translatable);
 
             scope.submit = function () {
                 // Wait until the change of the value propagated to the parent's
