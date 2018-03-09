@@ -36,7 +36,7 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/series/4581/participation.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/participation.json')));
         $httpBackend.whenPUT('/admin-ng/series/4581/theme').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
-        $httpBackend.whenGET('/admin-ng/resources/THEMES.DESCRIPTION.json').respond({901:"theme1 description",902:"theme2 desc\nsecond line"});
+        $httpBackend.whenGET('/admin-ng/resources/THEMES.DESCRIPTION.json').respond({901: 'theme1 description', 902: 'theme2 desc\nsecond line'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
@@ -184,7 +184,7 @@ describe('Serie controller', function () {
 
         it('displays notification on success', function () {
 
-            $scope.selectedtheme.id = 17;
+            $scope.selectedTheme.id = 17;
             spyOn(Notifications, 'add');
 
             $scope.themeSave();
@@ -195,7 +195,7 @@ describe('Serie controller', function () {
 
         it('saves the theme record', function () {
 
-            $scope.selectedtheme.id = 17;
+            $scope.selectedTheme.id = 17;
             spyOn(SeriesThemeResource, 'save');
 
             $scope.themeSave();

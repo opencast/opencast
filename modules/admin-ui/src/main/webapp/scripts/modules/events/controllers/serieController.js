@@ -57,7 +57,7 @@ angular.module('adminNg.controllers')
                 }
                 if (acl.action === 'read' || acl.action === 'write') {
                     newPolicies[acl.role][acl.action] = acl.allow;
-                } else if (acl.allow === true || acl.allow === 'true'){
+                } else if (acl.allow === true || acl.allow === 'true') {
                     newPolicies[acl.role].actions.value.push(acl.action);
                 }
             });
@@ -174,7 +174,7 @@ angular.module('adminNg.controllers')
 
         $scope.roles = {};
 
-        $scope.access = SeriesAccessResource.get({id: id}, function (data) {
+        $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
             if (angular.isDefined(data.series_access)) {
                 var json = angular.fromJson(data.series_access.acl);
                 changePolicies(json.acl.ace, true);
@@ -198,7 +198,7 @@ angular.module('adminNg.controllers')
         $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
         $scope.actions = {};
         $scope.hasActions = false;
-        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, function(data) {
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS' }, function(data) {
             angular.forEach(data, function (value, key) {
                 if (key.charAt(0) !== '$') {
                     $scope.actions[key] = value;
@@ -207,11 +207,11 @@ angular.module('adminNg.controllers')
             });
         });
 
-        $scope.selectedtheme = {};
+        $scope.selectedTheme = {};
 
         $scope.updateSelectedThemeDescripton = function () {
-            if(angular.isDefined($scope.themedescriptions)) {
-                $scope.selectedtheme.description = $scope.themedescriptions[$scope.selectedtheme.id];
+            if(angular.isDefined($scope.themeDescriptions)) {
+                $scope.selectedTheme.description = $scope.themeDescriptions[$scope.selectedTheme.id];
             }
         };
 
@@ -219,19 +219,19 @@ angular.module('adminNg.controllers')
             $scope.themes = data;
 
             //after themes have been loaded we match the current selected
-            SeriesThemeResource.get({id: id}, function (response) {
+            SeriesThemeResource.get({ id: id }, function (response) {
 
                 //we want to get rid of $resolved, etc. - therefore we use toJSON()
                 angular.forEach(data.toJSON(), function (value, key) {
 
                     if (angular.isDefined(response[key])) {
-                        $scope.selectedtheme.id = key;
+                        $scope.selectedTheme.id = key;
                         return false;
                     }
                 });
 
                 ResourcesListResource.get({ resource: 'THEMES.DESCRIPTION' }, function (data) {
-                    $scope.themedescriptions = data;
+                    $scope.themeDescriptions = data;
                     $scope.updateSelectedThemeDescripton();
                 });
             });
@@ -322,7 +322,7 @@ angular.module('adminNg.controllers')
                         });
                     }
 
-                    angular.forEach(policy.actions.value, function(customAction){
+                    angular.forEach(policy.actions.value, function(customAction) {
                            ace.push({
                                 'action' : customAction,
                                 'allow'  : true,
@@ -356,7 +356,7 @@ angular.module('adminNg.controllers')
             }
 
             if (hasRights && rulesValid) {
-                SeriesAccessResource.save({id: $scope.resourceId}, {
+                SeriesAccessResource.save({ id: $scope.resourceId }, {
                     acl: {
                         ace: ace
                     },
@@ -378,15 +378,15 @@ angular.module('adminNg.controllers')
     });
 
     $scope.themeSave = function () {
-        var selectedthemeid = $scope.selectedtheme.id;
+        var selectedThemeID = $scope.selectedTheme.id;
         $scope.updateSelectedThemeDescripton();
 
-        if (angular.isUndefined(selectedthemeid) || selectedthemeid === null) {
-            SeriesThemeResource.delete({id: $scope.resourceId}, {theme: selectedthemeid}, function () {
+        if (angular.isUndefined(selectedThemeID) || selectedThemeID === null) {
+            SeriesThemeResource.delete({ id: $scope.resourceId }, { theme: selectedThemeID }, function () {
                 Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');
             });
         } else {
-            SeriesThemeResource.save({id: $scope.resourceId}, {theme: selectedthemeid}, function () {
+            SeriesThemeResource.save({ id: $scope.resourceId }, { theme: selectedThemeID }, function () {
                 Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');
             });
         }
