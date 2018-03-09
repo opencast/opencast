@@ -82,11 +82,11 @@ angular.module('adminNg.controllers')
                 $scope.submitButton = false;
                 if ($scope.video.workflow) {
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
+                    $location.url('/events/' + $scope.resource);
                 } else {
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
                 $scope.unsavedChanges = false;
-                $location.url('/events/' + $scope.resource);
             }, function () {
                 $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
