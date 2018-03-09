@@ -272,7 +272,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />    
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />
@@ -535,20 +535,20 @@
             <!-- Dn patterns to search for valid users. Multiple "<value>" tags are allowed -->
             <value>uid={0},ou=Group,dc=my-institution,dc=country</value>
           </list>
-	</property>
-	<!-- If your user IDs are not part of the user Dn's, you can use a search filter to find them -->
-	<!-- This property can be used together with the "userDnPatterns" above -->
-	<!--
-	<property name="userSearch">
-	  <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
-	    < ! - - Base Dn from where the users will be searched for - - >
-	    <constructor-arg index="0" value="ou=GroupName,dc=my-institution,dc=country" />
-	    < ! - - Filter to located valid users. Use {0} as a placeholder for the login name - - >
-	    <constructor-arg index="1" value="(uid={0})" />
-	    <constructor-arg ref="contextSource" />
-	  </bean>
         </property>
-	-->
+        <!-- If your user IDs are not part of the user Dn's, you can use a search filter to find them -->
+        <!-- This property can be used together with the "userDnPatterns" above -->
+        <!--
+        <property name="userSearch">
+          <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+            < ! - - Base Dn from where the users will be searched for - - >
+            <constructor-arg index="0" value="ou=GroupName,dc=my-institution,dc=country" />
+            < ! - - Filter to located valid users. Use {0} as a placeholder for the login name - - >
+            <constructor-arg index="1" value="(uid={0})" />
+            <constructor-arg ref="contextSource" />
+          </bean>
+        </property>
+        -->
       </bean>
     </constructor-arg>
     <!-- Defines how the user attributes are converted to authorities (roles) -->
