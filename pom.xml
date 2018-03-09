@@ -41,6 +41,10 @@
   </properties>
   <modules>
     <module>modules/admin-ui</module>
+    <module>modules/animate-api</module>
+    <module>modules/animate-impl</module>
+    <module>modules/animate-remote</module>
+    <module>modules/animate-workflowoperation</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
     <module>modules/asset-manager-api</module>
@@ -1011,6 +1015,11 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
         <version>3.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
