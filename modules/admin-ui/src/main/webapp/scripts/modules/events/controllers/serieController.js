@@ -229,11 +229,11 @@ angular.module('adminNg.controllers')
                         return false;
                     }
                 });
-            });
 
-            ResourcesListResource.get({ resource: 'THEMES.DESCRIPTION' }, function (data) {
-                $scope.themedescriptions = data;
-                $scope.updateSelectedThemeDescripton();
+                ResourcesListResource.get({ resource: 'THEMES.DESCRIPTION' }, function (data) {
+                    $scope.themedescriptions = data;
+                    $scope.updateSelectedThemeDescripton();
+                });
             });
         });
 
