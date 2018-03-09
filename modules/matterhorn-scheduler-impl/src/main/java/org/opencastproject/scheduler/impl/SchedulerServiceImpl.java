@@ -1250,13 +1250,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
       final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
       /*
-      If the start or end times are identical (.after and .before are strict comparisons) OR
       If the potential event starts during event r OR
       If the potential event ends during event r OR
-      If the potential event begins before, and ends after event r (ie, containment)
+      If the potential event begins before, and ends after event r (ie, containment) OR
+      If the potential event begins or ends within the minimum separation distance of event r
       */
-      if (checkStart.equals(start) || checkEnd.equals(end)
-       || checkStart.after(start) && checkStart.before(end)
+      if (checkStart.after(start) && checkStart.before(end)
        || checkEnd.after(start) && checkEnd.before(end)
        || checkStart.before(start) && checkEnd.after(end)
        || eventWithinMinimumSeparation(checkStart, checkEnd, start, end)) {
