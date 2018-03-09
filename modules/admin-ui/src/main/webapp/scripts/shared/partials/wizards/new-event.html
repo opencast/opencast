@@ -115,7 +115,7 @@
                   <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
                     <div class="file-upload">
                       <input id="{{asset.id}}" class="blue-btn file-select-btn" admin-ng-file-upload data-ng-file-select data-ng-multiple="asset.multiple"
-                        type="file" file="$parent.wizard.step.ud.upload.{{asset.id}}" tabindex="" />
+                        type="file" file="$parent.wizard.step.ud.UPLOAD.tracks.{{asset.id}}" tabindex="" />
                     </div>
                     <span  translate="{{asset.title + '.SHORT'}}">
                     </span>
@@ -133,7 +133,7 @@
                 <div class="obj-container">
                     <form novalidate name="outerForm">
                         <table class="main-tbl">
-                            <tr ng-repeat="row in wizard.step.metadata">
+                            <tr ng-repeat="row in wizard.step.ud.UPLOAD.metadata">
                                 <td>
                                     <span translate="{{ row.label }}"></span>
                                     <i ng-show="row.required" class="required">*</i>

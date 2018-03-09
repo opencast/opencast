@@ -28,7 +28,6 @@ angular.module('adminNg.directives')
                 dateValue = new Date(scope.$parent.params.value);
             }
 
-
             if (ngModel) {
 
                 var updateModel = function (date) {
@@ -44,7 +43,6 @@ angular.module('adminNg.directives')
                 optionsObj.timeInput = true;
                 optionsObj.showButtonPanel = true;
                 optionsObj.onClose = function () {
-                    console.log('onClose');
                     var newDate = element.datetimepicker('getDate');
                     setTimeout(function(){
                         updateModel(newDate);
@@ -62,6 +60,7 @@ angular.module('adminNg.directives')
 
                 element.datetimepicker(optionsObj);
                 element.datetimepicker('setDate', dateValue);
+                ngModel.$setViewValue(dateValue.toISOString());
             }
 
             scope.$on('$destroy', function () {
