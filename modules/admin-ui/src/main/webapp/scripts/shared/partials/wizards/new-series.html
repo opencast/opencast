@@ -264,7 +264,8 @@
                     <table class="main-tbl">
                         <tr>
                             <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></td>
-                            <td ng-if="wizard.getStateControllerByName('theme').ud.theme">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]}}</td>
+                            <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}</td>
+
                         </tr>
                     </table>
                 </div>
