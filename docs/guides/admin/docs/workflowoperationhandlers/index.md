@@ -17,7 +17,7 @@ definitions consist of a list of workflow operations, which basically map a piec
        ...
     </definition>
 
-##Default Workflow Operations
+## Default Workflow Operations
 
 The following table contains the workflow operations that are available in an out-of-the-box Opencast installation:
 
@@ -26,7 +26,7 @@ The following table contains the workflow operations that are available in an ou
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
-|attach-watson-transcription|Attaches automated transcripts to mediapackage|[Documentation](attach-watson-transcription-woh.md)|
+|attach-watson-transcription|Attaches automated transcripts to mediapackage          |[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
 |clone               |Clone media package elements to another flavor                 |[Documentation](clone-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
@@ -60,13 +60,13 @@ The following table contains the workflow operations that are available in an ou
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
-|publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publishaws-woh.md)|
-|publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publishconfigure-woh.md)|
-|publish-engage      |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
+|publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publish-aws-woh.md)|
+|publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publish-configure-woh.md)|
+|publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
 |retract-aws         |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-aws-woh.md)|
-|retract-configure   |Retracts media from configured publication                     |[Documentation](retractconfigure-woh.md)|
+|retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|

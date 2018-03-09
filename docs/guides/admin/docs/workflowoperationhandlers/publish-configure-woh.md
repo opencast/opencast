@@ -1,16 +1,11 @@
-ConfigurablePublishWorkflowOperationHandler
-===========================================
+# ConfigurablePublishWorkflowOperationHandler
 
+## Description
 
-Description
------------
-
-The ConfigurablePublishWorkflowOperationHandler will distribute the given elements and create a publication element for
+The `ConfigurablePublishWorkflowOperationHandler` will distribute the given elements and create a publication element for
 it. By default it will retract all publications before publishing anew.
 
-
-Parameter Table
----------------
+## Parameter Table
 
 These are the keys that are configured through the workflow definition. At least one media package element must match
 the supplied `source-flavors` or `source-tags` or else the operation will not know what to publish. The `channel-id` and
@@ -28,9 +23,7 @@ the supplied `source-flavors` or `source-tags` or else the operation will not kn
 |strategy               |Strategy for when there is already published material|`fail`     |`retract`|
 |mode                   |How elements are distributed                         |`mixed`    |`bulk`   |
 
-
-Mode
-----
+## Mode
 
 The configuration key `mode` can be used to control how media package elements are being distributed:
 
@@ -43,9 +36,7 @@ The configuration key `mode` can be used to control how media package elements a
 This allows you to choose a lot of jobs and parallelism (`single`), just one job and no parallelism (`bulk`)
 or something in between (`mixed`). The best choice depends on your setup.
 
-
-URL Pattern Variables
----------------------
+## URL Pattern Variables
 
 These are the variables available in the `url-pattern` configuration. They will be replaced with the value during the
 execution of the workflow operation.
@@ -58,18 +49,14 @@ execution of the workflow operation.
 |`${publication_id}`|The id of this publication.               |`54f6c12d-8e68-4ec8-badf-cd045b33d01e`|
 |`${series_id}`     |The id of the series if available         |`36f3c5d8-ad4d-4dab-beb1-1400ffab4a69`|
 
-
-Publication Channel Labels and Icons
-------------------------------------
+## Publication Channel Labels and Icons
 
 Using this workflow operation, you can create arbitrary custom publication channels. Without further action, the
 administrative user interface will label these channels "Custom". You can specify both a label and an icon for each
 custom publication channels in the configuration files `etc/listproviders/publication.channel.labels.properties` and
 `etc/listproviders/publication.channel.icons.properties`.
 
-
-Operation Examples
-------------------
+## Operation Examples
 
 ### Internal Channel
 
