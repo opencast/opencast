@@ -14,7 +14,7 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -34,7 +34,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>            
+    </dependency>
   </dependencies>
 
   <profiles>
@@ -93,8 +93,8 @@
         </plugins>
       </build>
     </profile>
-  
-  
+
+
     <profile>
       <id>frontend</id>
       <activation>
@@ -156,7 +156,7 @@
       </build>
     </profile>
   </profiles>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -204,7 +204,7 @@
             <Export-Package>org.opencastproject.engage.paella</Export-Package>
             <Service-Component>
               OSGI-INF/paella-config-file.xml
-            </Service-Component>            
+            </Service-Component>
           </instructions>
         </configuration>
         <executions>

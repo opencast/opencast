@@ -40,7 +40,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> 
+            <Export-Package>
               org.opencastproject.search.api;version=${project.version},
               org.opencastproject.feed.api;version=${project.version}
             </Export-Package>
