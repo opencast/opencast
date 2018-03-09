@@ -2571,7 +2571,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                     current++;
                   }
                 } catch (Exception e) {
-                  logger.warn("Unable to index scheduled instances: {}", e);
+                  logger.warn("Unable to index scheduled instances:", e);
                   throw new ServiceException(e.getMessage());
                 }
               }

@@ -170,7 +170,7 @@ public class MessageBaseFacility {
         }
       } catch (JMSException e) {
         if (verbose) {
-          logger.error("Error while trying to close producer: {}", e);
+          logger.error("Error while trying to close producer:", e);
         }
       }
       producer = null;
@@ -181,7 +181,7 @@ public class MessageBaseFacility {
         }
       } catch (JMSException e) {
         if (verbose) {
-          logger.error("Error while trying to close session: {}", e);
+          logger.error("Error while trying to close session:", e);
         }
       }
       session = null;
@@ -192,7 +192,7 @@ public class MessageBaseFacility {
         }
       } catch (JMSException e) {
         if (verbose) {
-          logger.error("Error while trying to close session: {}", e);
+          logger.error("Error while trying to close session:", e);
         }
       }
       connection = null;

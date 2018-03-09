@@ -78,7 +78,7 @@ public class WorkflowsListProvider implements ResourceListProvider {
     try {
       workflowInstances = workflowService.getWorkflowInstances(q).getItems();
     } catch (WorkflowDatabaseException e) {
-      logger.error("Error by querying the workflow instances from the DB:  {}", e);
+      logger.error("Error by querying the workflow instances from the DB: ", e);
       throw new ListProviderException(e.getMessage(), e.getCause());
     }
 

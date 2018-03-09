@@ -97,7 +97,7 @@ public class MessageReceiverImpl extends MessageBaseFacility implements MessageR
           return consumer.receive();
     } catch (JMSException e) {
       if (e.getCause() instanceof InterruptedIOException || e.getCause() instanceof InterruptedException) {
-        logger.trace("Exception due to message receiver shutdown: {}", e);
+        logger.trace("Exception due to message receiver shutdown:", e);
       } else if (isConnected()) {
         logger.error("Unable to receive messages", e);
       }

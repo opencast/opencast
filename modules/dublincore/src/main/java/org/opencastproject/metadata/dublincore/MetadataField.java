@@ -602,7 +602,7 @@ public class MetadataField<A> {
           try {
             array = (JSONArray) parser.parse((String) arrayIn);
           } catch (ParseException e) {
-            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray: {}", e);
+            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray:", e);
           }
         } else {
           array = (JSONArray) arrayIn;
