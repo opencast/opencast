@@ -631,6 +631,46 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     }
   }
 
+  /**
+   * #DCE OPC-29 Demuxes a track into multiple outputs
+   *
+   * @param sourceTrackAsXml
+   *          The source track
+   * @param profileId
+   *          The profile to use in encoding this track
+   * @return A response containing the job for this encoding job in the response body.
+   * @throws Exception
+   *           - if it fails
+   */
+  @POST
+  @Path("demux")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "demux", description = "Starts an demux process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "demux.work") }, reponses = {
+                  @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response demux(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
+          throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceTrackAsXml) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack and profileId must not be null").build();
+
+    // Deserialize the track
+    MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackAsXml);
+    if (!Track.TYPE.equals(sourceTrack.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
+
+    try {
+      // Asynchronously encode the specified tracks
+      Job job = composerService.demux((Track) sourceTrack, profileId);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to encode the track: " + e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
   @GET
   @Path("profiles.xml")
   @Produces(MediaType.TEXT_XML)

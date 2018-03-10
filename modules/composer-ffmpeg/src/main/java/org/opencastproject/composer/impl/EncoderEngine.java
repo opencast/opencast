@@ -23,6 +23,7 @@
 package org.opencastproject.composer.impl;
 
 import static org.apache.commons.lang3.StringUtils.startsWithAny;
+import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -237,6 +238,178 @@ public class EncoderEngine implements AutoCloseable {
         }
       }
       throw new EncoderException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+      IoSupport.closeQuietly(encoderProcess);
+    }
+  }
+
+
+  /**
+   * #DCE OPC-29 : Encode the videoSource with an encoding profile that produces multiple outputs Care is taken that the
+   * files are returned in the order listed in the profile
+   *
+   * @param videoSource
+   *          - source recording file
+   * @param profile
+   *          - encoding profile
+   * @param properties
+   *          - for the ffmpeg command
+   * @return demuxed files
+   * @throws EncoderException
+   *           - Fails to encode
+   */
+  public List<File> demux(File videoSource, EncodingProfile profile, Map<String, String> properties)
+          throws EncoderException {
+    List<File> inputs = new ArrayList<File>();
+    Map<String, String> params = new HashMap<String, String>();
+    if (properties != null)
+      params.putAll(properties);
+    // build command
+    if (videoSource == null) {
+      throw new IllegalArgumentException("sourcetrack must be specified.");
+    }
+    // Set encoding parameters
+
+    if (videoSource != null) {
+      final String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
+      params.put("in.video.path", videoInput);
+      params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
+      params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
+      params.put("in.video.filename", FilenameUtils.getName(videoInput));
+      params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
+      inputs.add(videoSource.getAbsoluteFile());
+    }
+    File parentFile = videoSource;
+    final String outDir = parentFile.getAbsoluteFile().getParent();
+    String outFileName = FilenameUtils.getBaseName(parentFile.getName());
+    final String outSuffix = processParameters(profile.getSuffix(), params);
+
+    if (params.containsKey("time")) {
+      outFileName += "_" + properties.get("time");
+    }
+
+    // generate random name if multiple jobs are producing file with identical name (MH-7673)
+    outFileName += "_" + UUID.randomUUID().toString();
+
+    params.put("out.dir", outDir);
+    params.put("out.name", outFileName);
+    params.put("out.suffix", outSuffix);
+
+    // create encoder process.
+    final List<String> command = buildCommand(profile, params);
+    final String commandStr = mlist(command).mkString(" ");
+    logger.info("Executing encoding command: {}", commandStr);
+    List<String> outputfiles = new ArrayList<String>();
+    // Look for output name in command - input follows -i , outputs follow -c<odec> -map etc
+    boolean skip = false;
+    for (String word : command) {
+      if (skip) { // input file may use the same outDir
+        skip = false;
+        continue;
+      }
+      if ("-i".equals(word)) {
+        skip = true;
+      }
+      // Use 'or' in case one of the two wildcards is not used, outname is more precise
+      if (word.contains(outFileName) || word.contains(outDir)) { // is probably output name
+        outputfiles.add(word); // in the order listed in the command
+      }
+    }
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profile);
+    command.remove(0); // buildCommand prepends ffmpeg, but process() also prepends ffmpeg, so remove it
+    return (this.process(command, inputs, outputfiles, profiles));
+  }
+
+  /*
+   * #DCE OPC-29- Runs the raw command string thru the encoder. The string commandopts is ffmpeg specific, it just needs
+   * the binary. The calling function is responsible in doing all the appropriate substitutions using the encoding
+   * profiles, creating the directory for storage, etc Encoding profiles and output names are included here for output
+   * listeners and returns
+   *
+   * @param commandopts - tokenized ffmpeg command
+   *
+   * @param inputs - input files in the command, used for reporting
+   *
+   * @param outputs - output file name for reporting
+   *
+   * @param profiles - encoding profiles
+   *
+   * @return encoded - media as a result of running the command
+   *
+   * @throws EncoderException if it fails
+   */
+  protected List<File> process(List<String> commandopts, List<File> inputs, List<String> outputs,
+          List<EncodingProfile> profiles) throws EncoderException {
+    logger.trace("Process raw command -  {}", commandopts);
+    // create encoder process. using working dir of the
+    // current java process
+    Process encoderProcess = null;
+    BufferedReader in = null;
+    EncodingProfile profile = profiles.get(0);
+    File videoSource = null;
+    try { // May not be empty
+      videoSource = inputs.get(0);
+    } catch (Exception e) {
+      logger.info("No inputs, ouputs {}", profiles);
+    }
+
+    if (videoSource == null) {
+      throw new IllegalArgumentException("At least one track must be specified.");
+    }
+    try {
+      List<String> command = new ArrayList<String>();
+      command.add(binary);
+      command.addAll(commandopts);
+      logger.info("Executing encoding command: {}", StringUtils.join(command, " "));
+
+      ProcessBuilder pbuilder = new ProcessBuilder(command);
+      pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
+      encoderProcess = pbuilder.start();
+      // tell encoder listeners about output
+      in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
+      String line;
+      while ((line = in.readLine()) != null) {
+        handleEncoderOutput(line);
+      }
+      // wait until the task is finished
+      encoderProcess.waitFor();
+      int exitCode = encoderProcess.exitValue();
+      if (exitCode != 0) {
+        throw new EncoderException("Encoder exited abnormally with status " + exitCode);
+      }
+      StringBuffer sb = new StringBuffer(); // report on input
+      for (File videoInput : inputs) {
+        sb.append(videoInput.getName());
+        sb.append(",");
+      }
+      StringBuffer sbp = new StringBuffer(); // profile
+      for (EncodingProfile p : profiles) {
+        sbp.append(p.getIdentifier());
+        sbp.append(",");
+      }
+      logger.info("Video track successfully encoded '{}'",
+              new Object[] { sb.toString(), sbp.toString(), StringUtils.join(outputs, ",") });
+      List<File> al = new ArrayList<File>();
+      for (String outFiles : outputs) {
+        al.add(new File(outFiles));
+      }
+      return al; // return output as a list of files
+    } catch (EncoderException e) {
+      StringBuffer sb = new StringBuffer();
+      for (File videoInput : inputs) {
+        sb.append(videoInput.getName());
+        sb.append(",");
+      }
+      logger.warn("Error while encoding video track {} using '{}': {}",
+              new Object[] { sb.toString(), profile.getIdentifier(), e.getMessage() });
+
+      throw e;
+    } catch (Exception e) {
+      logger.warn("Error while encoding track {} to {}, {}",
+              new Object[] { videoSource.getName(), profile.getName(), e.getMessage() });
+      throw new EncoderException(e.getMessage(), e);
     } finally {
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
