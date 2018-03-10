@@ -22,9 +22,6 @@
 
 package org.opencastproject.composer.impl;
 
-import static org.apache.commons.lang3.StringUtils.startsWithAny;
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.util.IoSupport;
@@ -53,6 +50,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -259,38 +257,25 @@ public class EncoderEngine implements AutoCloseable {
    * @throws EncoderException
    *           - Fails to encode
    */
-  public List<File> demux(File videoSource, EncodingProfile profile, Map<String, String> properties)
-          throws EncoderException {
-    List<File> inputs = new ArrayList<File>();
-    Map<String, String> params = new HashMap<String, String>();
-    if (properties != null)
-      params.putAll(properties);
+  public List<File> demux(File videoSource, EncodingProfile profile) throws EncoderException {
+    List<File> inputs = new ArrayList<>();
+    Map<String, String> params = new HashMap<>();
     // build command
     if (videoSource == null) {
       throw new IllegalArgumentException("sourcetrack must be specified.");
     }
+
     // Set encoding parameters
-
-    if (videoSource != null) {
-      final String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
-      params.put("in.video.path", videoInput);
-      params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
-      params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
-      params.put("in.video.filename", FilenameUtils.getName(videoInput));
-      params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
-      inputs.add(videoSource.getAbsoluteFile());
-    }
-    File parentFile = videoSource;
-    final String outDir = parentFile.getAbsoluteFile().getParent();
-    String outFileName = FilenameUtils.getBaseName(parentFile.getName());
+    final String videoInput = FilenameUtils.normalize(videoSource.getAbsolutePath());
+    params.put("in.video.path", videoInput);
+    params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
+    params.put("in.video.suffix", FilenameUtils.getExtension(videoInput));
+    params.put("in.video.filename", FilenameUtils.getName(videoInput));
+    params.put("in.video.mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(videoInput));
+    inputs.add(videoSource.getAbsoluteFile());
+    final String outDir = videoSource.getAbsoluteFile().getParent();
+    String outFileName = FilenameUtils.getBaseName(videoSource.getName()) + "_" + UUID.randomUUID().toString();
     final String outSuffix = processParameters(profile.getSuffix(), params);
-
-    if (params.containsKey("time")) {
-      outFileName += "_" + properties.get("time");
-    }
-
-    // generate random name if multiple jobs are producing file with identical name (MH-7673)
-    outFileName += "_" + UUID.randomUUID().toString();
 
     params.put("out.dir", outDir);
     params.put("out.name", outFileName);
@@ -298,51 +283,44 @@ public class EncoderEngine implements AutoCloseable {
 
     // create encoder process.
     final List<String> command = buildCommand(profile, params);
-    final String commandStr = mlist(command).mkString(" ");
-    logger.info("Executing encoding command: {}", commandStr);
-    List<String> outputfiles = new ArrayList<String>();
-    // Look for output name in command - input follows -i , outputs follow -c<odec> -map etc
+    List<String> outputFiles = new ArrayList<>();
+    // Look for output name in command
     boolean skip = false;
-    for (String word : command) {
+    for (String argument : command) {
       if (skip) { // input file may use the same outDir
         skip = false;
         continue;
       }
-      if ("-i".equals(word)) {
-        skip = true;
-      }
+      skip = "-i".equals(argument);
       // Use 'or' in case one of the two wildcards is not used, outname is more precise
-      if (word.contains(outFileName) || word.contains(outDir)) { // is probably output name
-        outputfiles.add(word); // in the order listed in the command
+      if (argument.contains(outFileName) || argument.contains(outDir)) { // is probably output name
+        outputFiles.add(argument); // in the order listed in the command
       }
     }
-    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
-    profiles.add(profile);
-    command.remove(0); // buildCommand prepends ffmpeg, but process() also prepends ffmpeg, so remove it
-    return (this.process(command, inputs, outputfiles, profiles));
+    List<EncodingProfile> profiles = java.util.Collections.singletonList(profile);
+    return process(command, inputs, outputFiles, profiles);
   }
 
-  /*
-   * #DCE OPC-29- Runs the raw command string thru the encoder. The string commandopts is ffmpeg specific, it just needs
-   * the binary. The calling function is responsible in doing all the appropriate substitutions using the encoding
+  /**
+   * #DCE OPC-29- Runs the raw command string through the encoder. The string commandopts is ffmpeg specific, it just
+   * needs the binary. The calling function is responsible in doing all the appropriate substitutions using the encoding
    * profiles, creating the directory for storage, etc Encoding profiles and output names are included here for output
    * listeners and returns
    *
-   * @param commandopts - tokenized ffmpeg command
+   * @param command ffmpeg command to run
    *
-   * @param inputs - input files in the command, used for reporting
+   * @param inputs input files in the command, used for reporting
    *
-   * @param outputs - output file name for reporting
+   * @param outputs output file name for reporting
    *
-   * @param profiles - encoding profiles
+   * @param profiles encoding profiles
    *
-   * @return encoded - media as a result of running the command
+   * @return encoded media as a result of running the command
    *
    * @throws EncoderException if it fails
    */
-  protected List<File> process(List<String> commandopts, List<File> inputs, List<String> outputs,
+  private List<File> process(List<String> command, List<File> inputs, List<String> outputs,
           List<EncodingProfile> profiles) throws EncoderException {
-    logger.trace("Process raw command -  {}", commandopts);
     // create encoder process. using working dir of the
     // current java process
     Process encoderProcess = null;
@@ -359,14 +337,11 @@ public class EncoderEngine implements AutoCloseable {
       throw new IllegalArgumentException("At least one track must be specified.");
     }
     try {
-      List<String> command = new ArrayList<String>();
-      command.add(binary);
-      command.addAll(commandopts);
-      logger.info("Executing encoding command: {}", StringUtils.join(command, " "));
+      logger.info("Executing encoding command: {}", command);
 
-      ProcessBuilder pbuilder = new ProcessBuilder(command);
-      pbuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
-      encoderProcess = pbuilder.start();
+      ProcessBuilder processBuilder = new ProcessBuilder(command);
+      processBuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
+      encoderProcess = processBuilder.start();
       // tell encoder listeners about output
       in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
       String line;
@@ -379,36 +354,31 @@ public class EncoderEngine implements AutoCloseable {
       if (exitCode != 0) {
         throw new EncoderException("Encoder exited abnormally with status " + exitCode);
       }
-      StringBuffer sb = new StringBuffer(); // report on input
+      StringBuilder sb = new StringBuilder(); // report on input
       for (File videoInput : inputs) {
         sb.append(videoInput.getName());
         sb.append(",");
       }
-      StringBuffer sbp = new StringBuffer(); // profile
+      StringBuilder sbp = new StringBuilder(); // profile
       for (EncodingProfile p : profiles) {
         sbp.append(p.getIdentifier());
         sbp.append(",");
       }
-      logger.info("Video track successfully encoded '{}'",
-              new Object[] { sb.toString(), sbp.toString(), StringUtils.join(outputs, ",") });
-      List<File> al = new ArrayList<File>();
-      for (String outFiles : outputs) {
-        al.add(new File(outFiles));
-      }
-      return al; // return output as a list of files
+      logger.info("Video track successfully encoded '{}'", sb.toString(), sbp.toString(),
+              StringUtils.join(outputs, ","));
+      // return output as a list of files
+      return outputs.stream().map(File::new).collect(Collectors.toList());
     } catch (EncoderException e) {
-      StringBuffer sb = new StringBuffer();
+      StringBuilder sb = new StringBuilder();
       for (File videoInput : inputs) {
         sb.append(videoInput.getName());
         sb.append(",");
       }
-      logger.warn("Error while encoding video track {} using '{}': {}",
-              new Object[] { sb.toString(), profile.getIdentifier(), e.getMessage() });
+      logger.warn("Error while encoding video track {} using '{}'", sb, profile.getIdentifier(), e);
 
       throw e;
     } catch (Exception e) {
-      logger.warn("Error while encoding track {} to {}, {}",
-              new Object[] { videoSource.getName(), profile.getName(), e.getMessage() });
+      logger.warn("Error while encoding track {} to {}", videoSource.getName(), profile.getName(), e);
       throw new EncoderException(e.getMessage(), e);
     } finally {
       IoSupport.closeQuietly(in);
@@ -535,8 +505,8 @@ public class EncoderEngine implements AutoCloseable {
       return;
 
     // Others go to trace logging
-    if (startsWithAny(message.toLowerCase(),
-          new String[] {"ffmpeg version", "configuration", "lib", "size=", "frame=", "built with"})) {
+    if (StringUtils.startsWithAny(message.toLowerCase(),
+          "ffmpeg version", "configuration", "lib", "size=", "frame=", "built with")) {
       logger.trace(message);
 
     // Handle output files
@@ -550,10 +520,10 @@ public class EncoderEngine implements AutoCloseable {
       }
 
     // Some to debug
-    } else if (startsWithAny(message.toLowerCase(),
-          new String[] { "artist", "compatible_brands", "copyright", "creation_time", "description", "duration",
+    } else if (StringUtils.startsWithAny(message.toLowerCase(),
+          "artist", "compatible_brands", "copyright", "creation_time", "description", "duration",
             "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
-            "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ "})) {
+            "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ ")) {
       logger.debug(message);
 
     // And the rest is likely to deserve at least info

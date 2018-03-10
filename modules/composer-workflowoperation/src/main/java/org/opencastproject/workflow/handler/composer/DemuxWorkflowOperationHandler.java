@@ -51,32 +51,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
- * The workflow definition for handling "Demux from epiphan CA" operations This allows to demux and tagging to be done
- * in one operation and save 5-60 mins from each wf
+ * The workflow definition for handling demux operations.
  */
 public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DemuxWorkflowOperationHandler.class);
-
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags", "The \"tag\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("encoding-profile",
-            "The encoding profile to use, this is one profile with multiple outputs listed");
-    CONFIG_OPTIONS.put("target-flavors",
-            "The flavors to apply to the encoded file in the same order as in the encoding profile,sections separated by \";\"");
-    CONFIG_OPTIONS.put("target-tags",
-            "The tags to apply to the encoded files, sections ordered as in the encoding profile and separated by \";\", each tag separated by \",\"");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -108,23 +90,13 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    logger.debug("Running DCE DEmux workflow operation on workflow {}", workflowInstance.getId());
+    logger.debug("Running demux workflow operation on workflow {}", workflowInstance.getId());
 
     try {
       return demux(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());
@@ -154,7 +126,6 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws EncoderException, IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     MediaPackage mediaPackage = (MediaPackage) src.clone();
     final String sectionSeparator = ";";
-    final String separator = ",";
     // Check which tags have been configured
     String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
     String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
@@ -165,25 +136,23 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
       targetFlavorsOption = StringUtils.trimToEmpty(operation.getConfiguration("target-flavor"));
     String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
     String encodingProfile = StringUtils.trimToEmpty(operation.getConfiguration("encoding-profile"));
-    if (encodingProfile == null)
-      encodingProfile = StringUtils.trimToEmpty(operation.getConfiguration("encoding-profiles"));
-    String[] targetFlavors = (targetFlavorsOption != null) ? targetFlavorsOption.split(separator) : null;
-    String[] targetTags = (targetTagsOption != null) ? targetTagsOption.split(sectionSeparator) : null;
-    AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Make sure either one of tags or flavors are provided
-    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorsOption)
-            && StringUtils.isBlank(sourceFlavorsOption)) {
+    if (StringUtils.isBlank(sourceTagsOption) && StringUtils.isBlank(sourceFlavorsOption)) {
       logger.info("No source tags or flavors have been specified, not matching anything");
       return createResult(mediaPackage, Action.CONTINUE);
     }
+
+    List<String> targetFlavors = asList(targetFlavorsOption);
+    String[] targetTags = StringUtils.split(targetTagsOption, sectionSeparator);
+    AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
 
     // Select the source flavors
     for (String flavor : asList(sourceFlavorsOption)) {
       try {
         elementSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(flavor));
       } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Source flavor '" + flavor + "' is malformed");
+        throw new WorkflowOperationException(String.format("Source flavor '%s' is malformed", flavor));
       }
     }
 
@@ -194,22 +163,22 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     // Find the encoding profile - should only be one
     EncodingProfile profile = composerService.getProfile(encodingProfile);
-    if (profile == null)
-      throw new WorkflowOperationException("Encoding profile '" + encodingProfile + "' was not found");
-    // Look for elements matching the tag
-    Collection<Track> elements = elementSelector.select(mediaPackage, false);
-
-    long totalTimeInQueue = 0;
-    Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
-    for (Track track : elements) { // For each source
-      logger.info("Encoding track {} using encoding profile '{}'", track, profile);
-      // Start encoding and wait for the result
-      encodingJobs.put(composerService.demux(track, profile.getIdentifier()), new JobInformation(track, profile));
+    if (profile == null) {
+      throw new WorkflowOperationException(String.format("Encoding profile '%s' was not found", encodingProfile));
     }
-
-    if (encodingJobs.isEmpty()) {
+    // Look for elements matching the tag
+    Collection<Track> sourceTracks = elementSelector.select(mediaPackage, false);
+    if (sourceTracks.isEmpty()) {
       logger.info("No matching tracks found");
       return createResult(mediaPackage, Action.CONTINUE);
+    }
+
+    long totalTimeInQueue = 0;
+    Map<Job, Track> encodingJobs = new HashMap<>();
+    for (Track track : sourceTracks) {
+      logger.info("Encoding track {} using encoding profile '{}'", track, profile);
+      // Start encoding and wait for the result
+      encodingJobs.put(composerService.demux(track, profile.getIdentifier()), track);
     }
 
     // Wait for the jobs to return
@@ -218,53 +187,50 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     // Process the result
-    for (Map.Entry<Job, JobInformation> entry : encodingJobs.entrySet()) {
+    for (Map.Entry<Job, Track> entry : encodingJobs.entrySet()) {
       Job job = entry.getKey();
-      Track track = entry.getValue().getTrack(); // source
+      Track sourceTrack = entry.getValue();
 
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
 
       // it is allowed for compose jobs to return an empty payload. See the EncodeEngine interface
-      if (job.getPayload().length() > 0) {
-        List<Track> composedTracks = null;
-        composedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
-        if (targetFlavors != null && composedTracks.size() != targetFlavors.length && targetFlavors.length != 1) {
-          logger.info("Encoded {} tracks, with {} flavors", composedTracks.size(), targetFlavors.length);
-          throw new WorkflowOperationException("Number of Flavors does not match encoding profile outputs");
-        }
-        if (targetTags != null && composedTracks.size() != targetTags.length && targetTags.length != 1) {
-          logger.info("Encoded {} tracks, with {} tags", composedTracks.size(), targetTags.length);
-          throw new WorkflowOperationException("Number of Tag Sections does not match encoding profile outputs");
-        }
-
-        // Flavor each track in the order read
-        int i = 0;
-        int j = 0;
-        for (Track composedTrack : composedTracks) {
-          if (targetFlavors != null && targetFlavors.length > 0) { // Has Flavors
-            // set it to the matching flavor in the order listed
-            composedTrack.setFlavor(newFlavor(track, targetFlavors[i]));
-            if (targetFlavors.length > 1)
-              i++;
-          }
-          if (targetTags != null && targetTags.length > 0) { // Has tags
-            for (String tag : asList(targetTags[j])) {
-              composedTrack.addTag(tag);
-            }
-            logger.trace("Tagging composed track with '{}'", targetTags[j].toString());
-            if (targetTags.length > 1) {
-              j++;
-            }
-          }
-          // store new tracks to mediaPackage
-          String fileName = getFileNameFromElements(track, composedTrack);
-          composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
-                  composedTrack.getIdentifier(), fileName));
-          mediaPackage.addDerived(composedTrack, track);
-        }
-      } else {
+      if (job.getPayload().length() <= 0) {
         logger.warn("No output from Demux operation");
+        continue;
+      }
+
+      List<Track> composedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+      if (composedTracks.size() != targetFlavors.size() && targetFlavors.size() != 1) {
+        throw new WorkflowOperationException(String.format("Number of target flavors (%d) and output tracks (%d) do "
+                + "not match", targetFlavors.size(), composedTracks.size()));
+      }
+      if (composedTracks.size() != targetTags.length && targetTags.length != 1 && targetTags.length != 0) {
+        throw new WorkflowOperationException(String.format("Number of target tag groups (%d) and output tracks (%d) "
+                + "do not match", targetTags.length, composedTracks.size()));
+      }
+
+      // Flavor each track in the order read
+      int i = 0;
+      int j = 0;
+      for (Track composedTrack : composedTracks) {
+        // set flavor to the matching flavor in the order listed
+        composedTrack.setFlavor(newFlavor(sourceTrack, targetFlavors.get(i)));
+        if (targetFlavors.size() > 1) {
+          i++;
+        }
+        if (targetTags.length > 0) {
+          asList(targetTags[j]).forEach(composedTrack::addTag);
+          logger.trace("Tagging composed track with '{}'", targetTags[j]);
+          if (targetTags.length > 1) {
+            j++;
+          }
+        }
+        // store new tracks to mediaPackage
+        String fileName = getFileNameFromElements(sourceTrack, composedTrack);
+        composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
+                composedTrack.getIdentifier(), fileName));
+        mediaPackage.addDerived(composedTrack, sourceTrack);
       }
     }
 
@@ -274,46 +240,21 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private MediaPackageElementFlavor newFlavor(Track track, String flavor) throws WorkflowOperationException {
-    MediaPackageElementFlavor targetFlavor = null;
+    MediaPackageElementFlavor targetFlavor;
 
-    if (StringUtils.isNotBlank(flavor)) {
-      try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
-        String flavorType = targetFlavor.getType();
-        String flavorSubtype = targetFlavor.getSubtype();
-        // Adjust the target flavor. Make sure to account for partial updates
-        if ("*".equals(flavorType))
-          flavorType = track.getFlavor().getType();
-        if ("*".equals(flavorSubtype))
-          flavorSubtype = track.getFlavor().getSubtype();
-        return (new MediaPackageElementFlavor(flavorType, flavorSubtype));
-      } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor '" + flavor + "' is malformed");
-      }
+    try {
+      targetFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
+      String flavorType = targetFlavor.getType();
+      String flavorSubtype = targetFlavor.getSubtype();
+      // Adjust the target flavor. Make sure to account for partial updates
+      if ("*".equals(flavorType))
+        flavorType = track.getFlavor().getType();
+      if ("*".equals(flavorSubtype))
+        flavorSubtype = track.getFlavor().getSubtype();
+      return (new MediaPackageElementFlavor(flavorType, flavorSubtype));
+    } catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Target flavor '" + flavor + "' is malformed");
     }
-    return null;
-  }
-
-  /**
-   * This class is used to store context information for the jobs.
-   */
-  private static final class JobInformation {
-
-    private Track track = null;
-
-    JobInformation(Track track, EncodingProfile profile) {
-      this.track = track;
-    }
-
-    /**
-     * Returns the track.
-     *
-     * @return the track
-     */
-    public Track getTrack() {
-      return track;
-    }
-
   }
 
 }

@@ -632,7 +632,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
-   * #DCE OPC-29 Demuxes a track into multiple outputs
+   * Demuxes a track into multiple outputs
    *
    * @param sourceTrackAsXml
    *          The source track

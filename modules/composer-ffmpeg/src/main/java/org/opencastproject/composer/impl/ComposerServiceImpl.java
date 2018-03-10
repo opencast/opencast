@@ -323,9 +323,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     URI workspaceURI = putToCollection(job, output.get(0), "encoded file");
 
     // Have the encoded track inspected and return the result
-    Job inspectionJob = inspect(job, workspaceURI);
-
-    Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+    Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
     if (profile.getMimeType() != null)
@@ -388,8 +386,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // Have the encoded track inspected and return the result
-      Job inspectionJob = inspect(job, returnURL);
-      Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+      Track inspectedTrack = inspect(job, returnURL);
       inspectedTrack.setIdentifier(targetTrackId);
 
       List<String> tags = profile.getTags();
@@ -497,15 +494,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     URI workspaceURI = putToCollection(job, output, "trimmed file");
 
     // Have the encoded track inspected and return the result
-    Job inspectionJob = inspect(job, workspaceURI);
-
-    try {
-      Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
-      inspectedTrack.setIdentifier(targetTrackId);
-      return some(inspectedTrack);
-    } catch (MediaPackageException e) {
-      throw new EncoderException(e);
-    }
+    Track inspectedTrack = inspect(job, workspaceURI);
+    inspectedTrack.setIdentifier(targetTrackId);
+    return some(inspectedTrack);
   }
 
   /**
@@ -685,9 +676,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       URI workspaceURI = putToCollection(job, output.get(0), "compound file");
 
       // Have the compound track inspected and return the result
-      Job inspectionJob = inspect(job, workspaceURI);
 
-      Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+      Track inspectedTrack = inspect(job, workspaceURI);
       inspectedTrack.setIdentifier(targetTrackId);
 
       if (profile.getMimeType() != null)
@@ -844,9 +834,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     URI workspaceURI = putToCollection(job, output, "concatenated file");
 
     // Have the concat track inspected and return the result
-    Job inspectionJob = inspect(job, workspaceURI);
-
-    Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+    Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
     if (profile.getMimeType() != null)
@@ -925,9 +913,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     URI workspaceURI = putToCollection(job, output, "converted image file");
 
     // Have the compound track inspected and return the result
-    Job inspectionJob = inspect(job, workspaceURI);
-
-    Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
+    Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
     if (profile.getMimeType() != null)
@@ -1339,9 +1325,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
                   .map(MediaPackageElementParser.getAsXml()).getOrElse("");
           break;
         case Demux:
-          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
-          encodingProfile = arguments.get(1);
-          List<Track> outTracks = demux(job, firstTrack, encodingProfile, null);
+          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
+          List<Track> outTracks = demux(job, firstTrack, encodingProfile);
           serialized = StringUtils.trimToEmpty(MediaPackageElementParser.getArrayAsXml(outTracks));
           break;
         default:
@@ -1379,20 +1364,43 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return profileScanner.getProfiles().get(profileId);
   }
 
-  protected Job inspect(Job job, URI workspaceURI) throws EncoderException {
-    Job inspectionJob;
-    try {
-      inspectionJob = inspectionService.inspect(workspaceURI);
-    } catch (MediaInspectionException e) {
-      incident().recordJobCreationIncident(job, e);
-      throw new EncoderException("Media inspection of " + workspaceURI + " failed", e);
+  private List<Track> inspect(Job job, List<URI> uris) throws EncoderException {
+    // Start inspection jobs
+    Job[] inspectionJobs = new Job[uris.size()];
+    for (int i = 0; i < uris.size(); i++) {
+      try {
+        inspectionJobs[i] = inspectionService.inspect(uris.get(i));
+      } catch (MediaInspectionException e) {
+        incident().recordJobCreationIncident(job, e);
+        throw new EncoderException(String.format("Media inspection of %s failed", uris.get(i)), e);
+      }
     }
 
-    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
+    // Wait for inspection jobs
+    JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJobs);
     if (!barrier.waitForJobs().isSuccess()) {
-      throw new EncoderException("Media inspection of " + workspaceURI + " failed");
+      for (Map.Entry<Job, Job.Status> result : barrier.getStatus().getStatus().entrySet()) {
+        if (result.getValue() != Job.Status.FINISHED) {
+          logger.error("Media inspection failed in job {}: {}", result.getKey(), result.getValue());
+        }
+      }
+      throw new EncoderException("Inspection of encoded file failed");
     }
-    return inspectionJob;
+
+    // De-serialize tracks
+    List<Track> results = new ArrayList<>(uris.size());
+    for (Job inspectionJob: inspectionJobs) {
+      try {
+        results.add((Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload()));
+      } catch (MediaPackageException e) {
+        throw new EncoderException(e);
+      }
+    }
+    return results;
+  }
+
+  protected Track inspect(Job job, URI workspaceURI) throws EncoderException {
+    return inspect(job, java.util.Collections.singletonList(workspaceURI)).get(0);
   }
 
   /**
@@ -1621,24 +1629,28 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return sb.toString();
   }
 
-  private URI putToCollection(Job job, File output, String description) throws EncoderException {
-    URI returnURL = null;
-    InputStream in = null;
-    try {
-      in = new FileInputStream(output);
-      returnURL = workspace.putInCollection(COLLECTION,
-              job.getId() + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
-      logger.info("Copied the {} to the workspace at {}", description, returnURL);
-      return returnURL;
-    } catch (Exception e) {
-      incident().recordFailure(job, WORKSPACE_PUT_COLLECTION_IO_EXCEPTION, e,
-              getWorkspaceCollectionParams(description, COLLECTION, output.toURI()), NO_DETAILS);
-      cleanupWorkspace(returnURL);
-      throw new EncoderException("Unable to put the " + description + " into the workspace", e);
-    } finally {
-      cleanup(output);
-      IOUtils.closeQuietly(in);
+  private List<URI> putToCollection(Job job, List<File> files, String description) throws EncoderException {
+    List<URI> returnURLs = new ArrayList<>(files.size());
+    for (File file: files) {
+      try (InputStream in = new FileInputStream(file)) {
+        String newFileName = format("%s.%s", job.getId(), FilenameUtils.getName(file.getAbsolutePath()));
+        URI newFileURI = workspace.putInCollection(COLLECTION, newFileName, in);
+        logger.info("Copied the {} to the workspace at {}", description, newFileURI);
+        returnURLs.add(newFileURI);
+      } catch (Exception e) {
+        incident().recordFailure(job, WORKSPACE_PUT_COLLECTION_IO_EXCEPTION, e,
+                getWorkspaceCollectionParams(description, COLLECTION, file.toURI()), NO_DETAILS);
+        returnURLs.forEach(this::cleanupWorkspace);
+        throw new EncoderException("Unable to put the " + description + " into the workspace", e);
+      } finally {
+        cleanup(file);
+      }
     }
+    return returnURLs;
+  }
+
+  private URI putToCollection(Job job, File output, String description) throws EncoderException {
+    return putToCollection(job, java.util.Collections.singletonList(output), description).get(0);
   }
 
   private static List<Tuple<String, String>> detailsFor(EncoderException ex, EncoderEngine engine) {
@@ -1787,31 +1799,17 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     return organizationDirectoryService;
   }
 
-  // A mockable convenience function to test inspection Jobs
-  protected boolean inspectionSuccessful(JobBarrier barrier, String message) throws MediaInspectionException {
-    if (!barrier.waitForJobs().isSuccess()) {
-      Map<Job, Job.Status> results = barrier.getStatus().getStatus();
-      for (Job j : results.keySet()) {
-        if (results.get(j) != Job.Status.FINISHED)
-          logger.info("Media inspection failed in job " + j + " " + results.get(j));
-      }
-      throw new MediaInspectionException(message);
-    }
-    return true;
-  }
-
   @Override
   public Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Demux.toString(),
-              Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack), profileId));
+              Arrays.asList(profileId, MediaPackageElementParser.getAsXml(sourceTrack)));
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
   }
 
-  protected List<Track> demux(final Job job, Track videoTrack, String encodingProfile, Map<String, String> properties)
-          throws EncoderException, MediaPackageException {
+  private List<Track> demux(final Job job, Track videoTrack, String encodingProfile) throws EncoderException {
     if (job == null)
       throw new IllegalArgumentException("The Job parameter must not be null");
 
@@ -1828,12 +1826,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // Do the work
       List<File> outputs;
       try {
-        outputs = encoderEngine.demux(videoFile, profile, properties);
+        outputs = encoderEngine.demux(videoFile, profile);
       } catch (EncoderException e) {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
         params.put("video", (videoFile != null) ? videoTrack.getURI().toString() : "EMPTY");
         params.put("profile", profile.getIdentifier());
-        params.put("properties", (properties != null) ? properties.toString() : "EMPTY");
+        params.put("properties", "EMPTY");
         incident().recordFailure(job, ENCODING_FAILED, e, params, detailsFor(e, encoderEngine));
         throw e;
       } finally {
@@ -1843,8 +1841,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // demux did not return a file
       if (outputs.isEmpty() || !outputs.get(0).exists() || outputs.get(0).length() == 0)
         return null;
-      return getInspectedTracks(job, profile, outputs);
-    } catch (Exception e) { // clean up all the stored files
+
+      List<URI> workspaceURIs = putToCollection(job, outputs, "demuxed file");
+      List<Track> tracks = inspect(job, workspaceURIs);
+      tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
+      return tracks;
+    } catch (Exception e) {
       logger.warn("Demux/MultiOutputEncode operation failed to encode " + videoTrack, e);
       if (e instanceof EncoderException) {
         throw (EncoderException) e;
@@ -1852,50 +1854,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         throw new EncoderException(e);
       }
     }
-  }
-
-  private List<Track> getInspectedTracks(Job job, EncodingProfile profile, List<File> outputs)
-          throws MediaInspectionException, FileNotFoundException, EncoderException, MediaPackageException {
-    List<URI> outputURLs = new ArrayList<URI>();
-    List<Job> inspectionJobs = new ArrayList<Job>();
-    InputStream in = null;
-    // Set up inspection of all the outputs
-    JobBarrier barrier = new JobBarrier(job, serviceRegistry);
-    for (File output : outputs) { // inspect each output media in order
-      URI returnURL = null;
-      in = new FileInputStream(output);
-      try {
-        // Use name instead of just extension because there are now multiples files from the same source
-        // Downstream has to tag them correctly
-        String newname = format("%s.%s", job.getId(), FilenameUtils.getName(output.getAbsolutePath()));
-        returnURL = workspace.putInCollection(COLLECTION, newname, in); // File copied OK
-        logger.info("Copied the encoded file {} to the workspace at {}", output, returnURL);
-        outputURLs.add(returnURL);
-      } catch (Exception e) {
-        logger.error("Unable to copy the encoded file {} to the workspace", output);
-        cleanup(outputs.toArray(new File[outputs.size()]));
-        cleanupWorkspace(outputURLs.toArray(new URI[outputURLs.size()]));
-        throw new EncoderException("Unable to put the encoded files into the workspace", e);
-      } finally {
-        IOUtils.closeQuietly(in);
-      }
-      Job inspectionJob = inspectionService.inspect(returnURL);
-      inspectionJobs.add(inspectionJob);
-      barrier.addJob(inspectionJob);
-    }
-    cleanup(outputs.toArray(new File[outputs.size()])); // cleanup
-    inspectionSuccessful(barrier, "Inspection failed for some output media from MultiOutputEncode"); // So that I can
-
-    List<Track> outputTracks = new ArrayList<Track>();
-    for (Job j : inspectionJobs) {
-      Track inspectedTrack = (Track) MediaPackageElementParser.getFromXml(j.getPayload());
-      String targetTrackId = idBuilder.createNew().toString();
-      inspectedTrack.setIdentifier(targetTrackId);
-      if (profile.getMimeType() != null)
-        inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-      outputTracks.add(inspectedTrack);
-    }
-    return outputTracks; // return 1 or more inspected tracks
   }
 
 }
