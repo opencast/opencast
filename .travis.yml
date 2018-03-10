@@ -26,6 +26,7 @@ before_install:
      wget https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
      wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
   - sudo dpkg -i synfigstudio-1.0.2.deb
+  - sudo pip install mkdocs
 
 install:
   - true
@@ -35,4 +36,7 @@ script:
   - (! grep -rq ' $' modules assemblies pom.xml --include=pom.xml)
   - (! grep -rq '	' etc)
   - (! grep -rq ' $' etc)
+  - cd docs/guides/admin && mkdocs build && cd -
+  - cd docs/guides/developer && mkdocs build && cd -
+  - cd docs/guides/user && mkdocs build && cd -
   - mvn --batch-mode clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pnone
