@@ -168,6 +168,18 @@ Opencast 4.0
 Opencast 3.x
 ============
 
+Opencast 3.5
+------------
+*Released on February 6, 2018*
+
+- [[MH-12620]](https://opencast.jira.com/browse/MH-12620) - Document ActiveMQ memory requirements
+- [[MH-12606]](https://opencast.jira.com/browse/MH-12606) - Using "Start Task" with a workflow containing an embedded script in the configuration which somehow modifies the input parameters does not update those values properly
+- [[MH-12582]](https://opencast.jira.com/browse/MH-12582) - Editor WOH should not encode videos unless it is strictly necessary (to save time and resources)
+- [[MH-12495]](https://opencast.jira.com/browse/MH-12495) - Job dispatching with loads needs optimization
+- [[MH-12487]](https://opencast.jira.com/browse/MH-12487) - Add job load settings to the default encoding profles
+- [[MH-12399]](https://opencast.jira.com/browse/MH-12399) - Oaipmh Retract very slow
+
+
 Opencast 3.4
 ------------
 *Released on December 4, 2017*

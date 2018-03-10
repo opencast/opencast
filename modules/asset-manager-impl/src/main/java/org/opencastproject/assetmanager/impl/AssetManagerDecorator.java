@@ -42,6 +42,10 @@ public class AssetManagerDecorator implements AssetManager {
     return delegate.takeSnapshot(owner, mp);
   }
 
+  @Override public Snapshot takeSnapshot(MediaPackage mp) {
+    return delegate.takeSnapshot(mp);
+  }
+
   @Override public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
     return delegate.getAsset(version, mpId, mpeId);
   }

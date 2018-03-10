@@ -41,6 +41,7 @@ import net.fortuna.ical4j.model.parameter.XParameter;
 import net.fortuna.ical4j.model.property.Attach;
 import net.fortuna.ical4j.model.property.CalScale;
 import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.LastModified;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.Organizer;
 import net.fortuna.ical4j.model.property.ProdId;
@@ -125,7 +126,7 @@ public class CalendarGenerator {
    * @return true if the event could be added.
    */
   public boolean addEvent(MediaPackage mp, DublinCoreCatalog catalog, String agentId, Date start, Date end,
-          String captureAgentMetadata) {
+          Date lastModified, String captureAgentMetadata) {
     String eventId = mp.getIdentifier().compact();
 
     logger.debug("Creating iCaleandar VEvent from scheduled event '{}'", eventId);
@@ -148,6 +149,10 @@ public class CalendarGenerator {
         pl.add(new Cn(catalog.getFirst(DublinCore.PROPERTY_CREATOR)));
       }
       event.getProperties().add(new Uid(eventId));
+
+      DateTime lastModifiedDate = new DateTime(lastModified);
+      lastModifiedDate.setUtc(true);
+      event.getProperties().add(new LastModified(lastModifiedDate));
 
       // TODO Organizer should be URI (email-address?) created fake address
       if (StringUtils.isNotEmpty(catalog.getFirst(DublinCore.PROPERTY_CREATOR))) {
