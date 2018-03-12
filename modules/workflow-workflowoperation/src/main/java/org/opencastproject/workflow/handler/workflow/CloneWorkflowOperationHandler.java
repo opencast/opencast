@@ -133,7 +133,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       logger.debug("No matching elements found, skipping operation.");
       return createResult(workflowInstance.getMediaPackage(), Action.SKIP);
     } else {
-      logger.debug("Copy multiple elements to new flavor: {}", targetFlavorOption);
+      logger.debug("Copy " + elements.size() + " elements to new flavor: {}", targetFlavorOption);
 
       MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
 
@@ -177,12 +177,12 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       toFileName = elementId;
       String extension = FilenameUtils.getExtension(sourceFile.getName());
       if (!"".equals(extension))
-        toFileName = "." + extension;
+        toFileName += "." + extension;
 
       logger.debug("Start copying element {} to target {}.", sourceFile.getPath(), toFileName);
 
-      URI newUri = workspace.copyTo(sourceURI, element.getMediaPackage().getIdentifier().toString(),
-              newElement.getIdentifier(), toFileName);
+      URI newUri = workspace.put(element.getMediaPackage().getIdentifier().toString(), newElement.getIdentifier(),
+              toFileName, workspace.read(sourceURI));
       newElement.setURI(newUri);
       newElement.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(newUri)));
 
