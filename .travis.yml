@@ -35,6 +35,7 @@ before_install:
      wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
   - _nt docs sudo dpkg -i synfigstudio-1.0.2.deb
   - _t docs sudo pip install mkdocs
+  - _t docs pushd docs/guides && npm install && popd
 
 install:
   - true
@@ -47,6 +48,7 @@ script:
   - _t docs sh -c "cd docs/guides/admin && mkdocs build"
   - _t docs sh -c "cd docs/guides/developer && mkdocs build"
   - _t docs sh -c "cd docs/guides/user && mkdocs build"
+  - _t docs sh -c "cd docs/guides && grunt"
   - _t build mvn --batch-mode clean install -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   - _t site  mvn --batch-mode install -DskipTests=true -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
   - _t site  mvn --batch-mode site -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn

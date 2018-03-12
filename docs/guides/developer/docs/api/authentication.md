@@ -1,5 +1,5 @@
 
-[figure_2]: media/img/figure_2.png "Figure 2: Authentication and  authorization based on Basic  Authentication"
+[figure_2]: media/img/figure_2.png "Figure 2: Authentication and authorization based on Basic Authentication"
 
 # Introduction
 
@@ -14,7 +14,7 @@ NOTE: Basic authentication is not activated by default, please activate it in th
 <center>
 ![][figure_2]
 </center>
-<a name="figure_2"></a>Figure 2: Authentication and  authorization based on Basic  Authentication
+<a name="figure_2"></a>Figure 2: Authentication and authorization based on Basic Authentication
 
 ## Protection of authentication data
 Since Base64 is by no means regarded as encryption in the sense of security, it is strongly recommended to only offer access to the Application API over HTTPS rather than over HTTP in order to avoid unprotected transmission of the username and password via the Authorization header.
