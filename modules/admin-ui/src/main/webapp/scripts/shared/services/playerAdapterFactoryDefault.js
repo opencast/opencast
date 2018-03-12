@@ -18,7 +18,6 @@
  * the License.
  *
  */
-'use strict';
 
 angular.module('adminNg.services')
 .factory('PlayerAdapterFactoryDefault', ['PlayerAdapter', function (PlayerAdapter) {

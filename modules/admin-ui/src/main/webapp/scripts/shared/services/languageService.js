@@ -18,7 +18,6 @@
  * the License.
  *
  */
-'use strict';
 
 /**
  * @ngdoc overview
