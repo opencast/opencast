@@ -22,6 +22,7 @@ package org.opencastproject.liveschedule.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
@@ -66,6 +67,8 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
@@ -87,6 +90,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -102,8 +106,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   static final String DEFAULT_PLAYER_PATH = "/engage/ui/watch.html";
   /** The configuration property value for the player location. */
   static final String PLAYER_PROPERTY = "player";
-  /** The snapshot owner **/
-  public static final String SNAPSHOT_OWNER = "org.opencastproject.liveschedule";
 
   /** Default values for configuration options */
   private static final String DEFAULT_STREAM_MIME_TYPE = "video/mp4";
@@ -142,6 +144,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private MediaPackageElementFlavor[] liveFlavors;
   private String distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
   private String serverUrl;
+  private Cache<String, Version> snapshotVersionCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
 
   /** Services */
   private DownloadDistributionService downloadDistributionService; // to distribute episode and series catalogs
@@ -285,8 +288,9 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       }
       MediaPackage archivedMp = snapshot.getMediaPackage();
       addLivePublicationChannel(currentOrg, archivedMp);
-      // Take a snapshot with the publication added
-      assetManager.takeSnapshot(SNAPSHOT_OWNER, archivedMp);
+      // Take a snapshot with the publication added and put its version in our local cache
+      // so that we ignore notifications for this snapshot version.
+      snapshotVersionCache.put(mpId, assetManager.takeSnapshot(archivedMp).getVersion());
       return true;
     } catch (Exception e) {
       throw new LiveScheduleException(e);
@@ -296,6 +300,13 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   boolean updateLiveEvent(MediaPackage previousMp, DublinCoreCatalog episodeDC) throws LiveScheduleException {
     // Get latest mp from the asset manager
     Snapshot snapshot = getSnapshot(previousMp.getIdentifier().toString());
+    // If the snapshot version is in our local cache, it means that this snapshot was created by us so
+    // nothing to do. Note that this is just to save time; if the entry has already been deleted, the mp
+    // will be compared below.
+    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier()))) {
+      logger.debug("Snapshot version {} was created by us so this change is ignored.", snapshot.getVersion());
+      return false;
+    }
     // Temporary mp
     MediaPackage tempMp = (MediaPackage) snapshot.getMediaPackage().clone();
     // Set duration (used by live tracks)
@@ -332,12 +343,14 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
 
     // Get latest mp from the asset manager if there to remove the publication
     try {
-      Snapshot snapshot = getSnapshot(mp.getIdentifier().toString());
+      String mpId = mp.getIdentifier().toString();
+      Snapshot snapshot = getSnapshot(mpId);
       MediaPackage archivedMp = snapshot.getMediaPackage();
       removeLivePublicationChannel(archivedMp);
       logger.debug("Removed live pub channel from archived media package {}", mp);
-      // Take a snapshot with the publication added
-      assetManager.takeSnapshot(SNAPSHOT_OWNER, archivedMp);
+      // Take a snapshot with the publication removed and put its version in our local cache
+      // so that we ignore notifications for this snapshot version.
+      snapshotVersionCache.put(mpId, assetManager.takeSnapshot(archivedMp).getVersion());
     } catch (LiveScheduleException e) {
       // It was not found in asset manager. This is ok.
     }
@@ -803,6 +816,10 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   // === Used by unit tests - begin
   void setJobPollingInterval(long jobPollingInterval) {
     this.jobPollingInterval = jobPollingInterval;
+  }
+
+  Cache<String, Version> getSnapshotVersionCache() {
+    return this.snapshotVersionCache;
   }
   // === Used by unit tests - end
 }

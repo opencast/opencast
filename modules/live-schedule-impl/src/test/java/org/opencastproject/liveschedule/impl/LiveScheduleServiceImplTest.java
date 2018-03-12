@@ -22,6 +22,7 @@ package org.opencastproject.liveschedule.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
@@ -104,7 +105,6 @@ public class LiveScheduleServiceImplTest {
   private static final String STREAMING_SERVER_URL = "rtmp://cp999999.live.edgefcs.net/live";
   private static final String STREAM_NAME = "#{id}-#{caName}-#{flavor}-stream-#{resolution}_suffix";
   private static final long DURATION = 60000L;
-  private static final String OWNER = "owner";
   private static final String ORG_ID = "org";
   private static final String ENGAGE_URL = "htttp://engage.server";
   private static final String PATH_TO_PLAYER = "/path-to-playengageer/view.html";
@@ -115,6 +115,7 @@ public class LiveScheduleServiceImplTest {
   private MimeType mimeType;
   private Organization org;
   private Snapshot snapshot;
+  private Version version;
 
   private ComponentContext cc;
   private SearchService searchService;
@@ -403,10 +404,11 @@ public class LiveScheduleServiceImplTest {
   }
 
   private void setUpAssetManager(MediaPackage mp) {
+    version = EasyMock.createNiceMock(Version.class);
     snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getMediaPackage()).andReturn(mp).anyTimes();
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId()).anyTimes();
-    EasyMock.expect(snapshot.getOwner()).andReturn(OWNER);
+    EasyMock.expect(snapshot.getVersion()).andReturn(version);
     ARecord aRec = EasyMock.createNiceMock(ARecord.class);
     EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot)).anyTimes();
     Stream<ARecord> recStream = Stream.mk(aRec);
@@ -699,10 +701,12 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job).anyTimes();
 
     Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
-    Capture<String> capturedSnapshotOwner = Capture.newInstance();
+    Version v = EasyMock.createNiceMock(Version.class);
+    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
+    EasyMock.expect(s.getVersion()).andReturn(v);
+    EasyMock.replay(s, v);
     EasyMock.expect(
-            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotOwner), EasyMock.capture(capturedSnapshotMp)))
-            .andReturn(null);
+            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
 
     replayServices();
     service.setDownloadDistributionService(downloadDistributionService);
@@ -721,7 +725,7 @@ public class LiveScheduleServiceImplTest {
     Assert.assertEquals(MP_ID, archivedMp.getIdentifier().compact());
     Assert.assertEquals(1, archivedMp.getPublications().length);
     Assert.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
-    Assert.assertEquals(LiveScheduleServiceImpl.SNAPSHOT_OWNER, capturedSnapshotOwner.getValue());
+    Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID)); // Check that version got into local cache
   }
 
   @Test
@@ -739,6 +743,8 @@ public class LiveScheduleServiceImplTest {
     DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
 
     replayServices();
+
+    service.getSnapshotVersionCache().put(MP_ID, version);
 
     Assert.assertFalse(service.updateLiveEvent(previousMp, episodeDC));
   }
@@ -827,10 +833,11 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job2).anyTimes();
 
     Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
-    Capture<String> capturedSnapshotOwner = Capture.newInstance();
-    EasyMock.expect(
-            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotOwner), EasyMock.capture(capturedSnapshotMp)))
-            .andReturn(null);
+    Version v = EasyMock.createNiceMock(Version.class);
+    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
+    EasyMock.expect(s.getVersion()).andReturn(v);
+    EasyMock.replay(s, v);
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
 
     replayServices();
     service.setDownloadDistributionService(downloadDistributionService);
@@ -841,7 +848,6 @@ public class LiveScheduleServiceImplTest {
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
     Assert.assertEquals(MP_ID, archivedMp.getIdentifier().compact());
     Assert.assertEquals(0, archivedMp.getPublications().length);
-    Assert.assertEquals(LiveScheduleServiceImpl.SNAPSHOT_OWNER, capturedSnapshotOwner.getValue());
 
     EasyMock.verify(searchService, downloadDistributionService);
   }

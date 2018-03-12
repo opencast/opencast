@@ -21,7 +21,6 @@
 package org.opencastproject.liveschedule.message;
 
 import org.opencastproject.liveschedule.api.LiveScheduleService;
-import org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
@@ -54,10 +53,8 @@ public class AssetManagerUpdateHandler extends UpdateHandler {
         case Update:
           if (item instanceof TakeSnapshot) { // Check class just in case
             TakeSnapshot snapshotItem = (TakeSnapshot) item;
-            // If notification was originated by the live schedule service, there's nothing to do.
-            // Same for no episode dc.
-            if (LiveScheduleServiceImpl.SNAPSHOT_OWNER.equals(snapshotItem.getOwner())
-                    || snapshotItem.getEpisodeDublincore().isNone())
+            // If no episopde dc, there's nothing to do.
+            if (snapshotItem.getEpisodeDublincore().isNone())
               break;
             // Does media package have a live publication channel? This is to ignore non-live
             // and past events.

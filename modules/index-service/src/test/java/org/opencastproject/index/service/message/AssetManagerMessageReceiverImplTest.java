@@ -26,7 +26,6 @@ import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -81,8 +80,7 @@ public class AssetManagerMessageReceiverImplTest {
   public void testUpdateCreator() throws Exception {
     MediaPackage mediaPackage = new MediaPackageBuilderImpl()
             .loadFromXml(getClass().getResourceAsStream("/jobs_mediapackage1.xml"));
-    TakeSnapshot takeSnapshot = AssetManagerItem.add(workspace, mediaPackage, new AccessControlList(), 0, new Date(),
-            AssetManager.DEFAULT_OWNER);
+    TakeSnapshot takeSnapshot = AssetManagerItem.add(workspace, mediaPackage, new AccessControlList(), 0, new Date());
 
     // Test initial set of creator
     assetManager.execute(takeSnapshot);

@@ -29,7 +29,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTI
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.util.Workflows;
@@ -1603,18 +1602,9 @@ public class IndexServiceImpl implements IndexService {
     try {
       final AQueryBuilder q = assetManager.createQuery();
       final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      final AResult r = q.select(q.snapshot()).where(p).run();
-      if (r.getSize() > 0) {
-        Set<String> owners = new HashSet<String>();
-        for (ARecord rec : r.getRecords()) {
-          if (rec.getSnapshot().isSome())
-            owners.add(rec.getSnapshot().get().getOwner());
-        }
-        for (String owner : owners)
-          q.delete(owner, q.snapshot()).where(p).run();
-      } else {
-        notFoundArchive = true;
-      }
+      final AResult r = q.select(q.nothing()).where(p).run();
+      if (r.getSize() > 0)
+        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;

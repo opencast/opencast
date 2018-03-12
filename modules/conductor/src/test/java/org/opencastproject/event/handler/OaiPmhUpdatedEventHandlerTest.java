@@ -31,7 +31,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getAsXml;
 import static org.opencastproject.publication.api.OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -180,8 +179,7 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
 
     Workspace workspaceMock = mock(MockType.NICE, Workspace.class);
     AccessControlList acl = new AccessControlList();
-    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspaceMock, mediaPackage, acl, 0L, new Date(),
-            AssetManager.DEFAULT_OWNER);
+    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspaceMock, mediaPackage, acl, 0L, new Date());
     return result;
   }
 
