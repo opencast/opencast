@@ -164,6 +164,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
+  /** The minimum separation between one event ending and the next starting */
+  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
+
   /** The last modifed cache configuration key */
   private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
 
@@ -1207,6 +1210,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return searchInternal(startsFrom, startsTo, endFrom, endTo, alreadyScheduledEvents);
   }
 
+  /*
+   * Returns a list of events which start and/or end within a given date range.  So you could search for things which
+   * start on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at
+   * Epoch and ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any
+   * edge cases.  Use checkScheduleConflicts instead.
+   */
   private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
                                             Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
     final List<ARecord> result = new ArrayList<>();
@@ -1232,6 +1241,52 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return Stream.mk(result).bind(recordToMp).toList();
   }
 
+  /*
+   * Returns a list of conflicting mediapackages.  This method checks for containment, starts-during, and ends-during.
+   */
+  private List<MediaPackage> checkScheduleConflicts(Date checkStart, Date checkEnd, ARecord[] records) {
+    final List<ARecord> result = new ArrayList<>();
+    for (final ARecord r : records) {
+      final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+      final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+      /*
+      If the potential event starts during event r OR
+      If the potential event ends during event r OR
+      If the potential event begins before, and ends after event r (ie, containment) OR
+      If the potential event begins or ends within the minimum separation distance of event r
+      */
+      if (checkStart.after(start) && checkStart.before(end)
+       || checkEnd.after(start) && checkEnd.before(end)
+       || checkStart.before(start) && checkEnd.after(end)
+       || eventWithinMinimumSeparation(checkStart, checkEnd, start, end)) {
+        result.add(r);
+      }
+    }
+    result.sort(new Comparator<ARecord>() {
+      @Override
+      public int compare(ARecord o1, ARecord o2) {
+        Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        return start1.compareTo(start2);
+      }
+    });
+    return Stream.mk(result).bind(recordToMp).toList();
+  }
+
+  /**
+   * Returns true of checkStart is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates, or checkEnd
+   * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
+   */
+  private boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
+    if (Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
           throws SchedulerException {
@@ -1241,17 +1296,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private List<MediaPackage> findConflictingEvents(Date startDate, Date endDate, ARecord[] alreadyScheduledEvents)
           throws SchedulerException {
-    final List<MediaPackage> events = new ArrayList<>();
-    // overlap
-    events.addAll(searchInternal(Opt.<Date> none(), Opt.some(startDate), Opt.some(endDate),
-            Opt.<Date> none(), alreadyScheduledEvents));
-    // start between
-    events.addAll(searchInternal(Opt.some(startDate), Opt.some(endDate), Opt.<Date> none(),
-            Opt.<Date> none(), alreadyScheduledEvents));
-    // end between
-    events.addAll(searchInternal(Opt.<Date> none(), Opt.<Date> none(), Opt.some(startDate),
-            Opt.some(endDate), alreadyScheduledEvents));
-    return events;
+    return checkScheduleConflicts(startDate, endDate, alreadyScheduledEvents);
   }
 
   private List<String> preCollisionEventCheck(String trxId, String schedulingSource) throws SchedulerException {
