@@ -181,8 +181,8 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
       logger.debug("Start copying element {} to target {}.", sourceFile.getPath(), toFileName);
 
-      URI newUri = workspace.copyTo(sourceURI, element.getMediaPackage().getIdentifier().toString(),
-              newElement.getIdentifier(), toFileName);
+      URI newUri = workspace.put(element.getMediaPackage().getIdentifier().toString(), newElement.getIdentifier(),
+              toFileName, workspace.read(sourceURI));
       newElement.setURI(newUri);
       newElement.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(newUri)));
 
