@@ -1278,10 +1278,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
    */
   private boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
-    if (Math.abs(checkStart.getTime() - start.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkStart.getTime() - end.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkEnd.getTime() - start.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkEnd.getTime() - end.getTime()) <= EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
+    if (Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
       return true;
     }
     return false;
