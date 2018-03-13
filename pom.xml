@@ -23,23 +23,28 @@
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
     <commons-collection.version>3.2.2</commons-collection.version>
-    <commons-compress.version>1.12</commons-compress.version>
-    <httpcomponents-httpcore.version>4.4.1</httpcomponents-httpcore.version>
-    <httpcomponents-httpclient.version>4.5</httpcomponents-httpclient.version>
+    <commons-compress.version>1.16.1</commons-compress.version>
+    <httpcomponents-httpcore.version>4.4.9</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5.5</httpcomponents-httpclient.version>
     <aws.version>1.11.49_1</aws.version>
     <jmeter.version>2.4</jmeter.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.9</karaf.version>
-    <pax.web.version>4.3.0</pax.web.version>
+    <karaf.version>4.0.10</karaf.version>
+    <pax.web.version>4.3.4</pax.web.version>
     <cxf.version>3.1.12</cxf.version>
-    <jackson.version>2.7.0</jackson.version>
+    <jackson.version>2.9.4</jackson.version>
     <functional.version>1.4.2</functional.version>
     <jdk.version>1.8</jdk.version>
+    <mina.version>2.0.16</mina.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
+    <module>modules/animate-api</module>
+    <module>modules/animate-impl</module>
+    <module>modules/animate-remote</module>
+    <module>modules/animate-workflowoperation</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
     <module>modules/asset-manager-api</module>
@@ -54,7 +59,6 @@
     <module>modules/caption-remote</module>
     <module>modules/capture-admin-service-api</module>
     <module>modules/capture-admin-service-impl</module>
-    <module>modules/capture-workflowoperation</module>
     <module>modules/comments-workflowoperation</module>
     <module>modules/common</module>
     <module>modules/common-jpa-impl</module>
@@ -157,7 +161,6 @@
     <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
     <module>modules/search-service-remote</module>
-    <module>modules/search-workflowoperation</module>
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
@@ -168,7 +171,6 @@
     <module>modules/series-service-impl</module>
     <module>modules/series-service-remote</module>
     <module>modules/serviceregistry</module>
-    <module>modules/serviceregistry-remote</module>
     <module>modules/silencedetection-api</module>
     <module>modules/silencedetection-impl</module>
     <module>modules/silencedetection-remote</module>
@@ -303,12 +305,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.17</version>
+        <version>3.0.0</version>
         <dependencies>
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>6.18</version>
+            <version>8.8</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -318,8 +320,10 @@
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
-          <sourceDirectory>src</sourceDirectory>
-          <excludes>**/package-info.java,**/generated-sources/**/*</excludes>
+          <sourceDirectories>
+            <sourceDirectory>src</sourceDirectory>
+          </sourceDirectories>
+          <excludes>**/package-info.java,**/generated-sources/**/*,**/org/apache/commons/**</excludes>
           <failOnViolation>true</failOnViolation>
           <failsOnError>true</failsOnError>
         </configuration>
@@ -428,7 +432,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-scr-plugin</artifactId>
-          <version>1.6.0</version>
+          <version>1.26.0</version>
           <executions>
             <execution>
               <id>generate-scr-scrdescriptor</id>
@@ -475,12 +479,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.20.1</version>
+          <version>2.20</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
-          <version>2.17</version>
+          <version>3.0.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -646,22 +650,22 @@
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-core</artifactId>
-        <version>2.0.9</version>
+        <version>${mina.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-beans</artifactId>
-        <version>2.0.9</version>
+        <version>${mina.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-jmx</artifactId>
-        <version>2.0.9</version>
+        <version>${mina.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.mina</groupId>
         <artifactId>mina-integration-ognl</artifactId>
-        <version>2.0.9</version>
+        <version>${mina.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
@@ -725,7 +729,7 @@
       <dependency>
         <groupId>org.apache.felix</groupId>
         <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>3.5.8</version>
+        <version>3.6.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.felix</groupId>
@@ -941,7 +945,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>3.4</version>
+        <version>3.5.1</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -990,7 +994,7 @@
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.10</version>
+        <version>1.11</version>
       </dependency>
       <dependency>
         <groupId>commons-collections</groupId>
@@ -1005,27 +1009,22 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.6</version>
+        <version>3.7</version>
       </dependency>
       <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-pool</groupId>
-        <artifactId>commons-pool</artifactId>
-        <version>1.5.3</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-text</artifactId>
+        <version>1.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-csv</artifactId>
-        <version>1.0</version>
+        <version>1.5</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
@@ -1047,7 +1046,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.9.4</version>
+        <version>2.9.9</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
@@ -1095,7 +1094,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.8.1</version>
+        <version>2.8.2</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
@@ -1110,22 +1109,22 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>2.6.0</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.6.6</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.6.6</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-cbor</artifactId>
-        <version>2.6.6</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -1527,7 +1526,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.19.1</version>
+        <version>2.20</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>

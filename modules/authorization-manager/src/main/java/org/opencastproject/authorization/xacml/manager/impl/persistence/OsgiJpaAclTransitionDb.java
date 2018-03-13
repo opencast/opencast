@@ -272,7 +272,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
       em = emf.createEntityManager();
       return Misc.<EpisodeACLTransition> widen(getEpisodeEntities(episodeId, org.getId(), em));
     } catch (Exception e) {
-      logger.warn("Error parsing episode ACL: {}", e);
+      logger.warn("Error parsing episode ACL:", e);
       throw new AclTransitionDbException(e);
     } finally {
       if (em != null)
@@ -288,7 +288,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
       em = emf.createEntityManager();
       return Misc.<SeriesACLTransition> widen(getSeriesEntities(seriesId, org.getId(), em));
     } catch (Exception e) {
-      logger.warn("Error parsing episode ACL: {}", e);
+      logger.warn("Error parsing episode ACL:", e);
       throw new AclTransitionDbException(e);
     } finally {
       if (em != null)
@@ -388,7 +388,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
         return new TransitionResultImpl(Misc.<EpisodeACLTransition> widen(option(
                 getEpisodeEntity(transitionId, orgId, em)).list()), Collections.<SeriesACLTransition> nil());
       } catch (Exception e) {
-        logger.warn("Error parsing episode ACL: {}", e);
+        logger.warn("Error parsing episode ACL:", e);
         throw new AclTransitionDbException(e);
       } finally {
         if (em != null)
@@ -450,7 +450,7 @@ public final class OsgiJpaAclTransitionDb implements AclTransitionDb {
         return new TransitionResultImpl(Collections.<EpisodeACLTransition> nil(),
                 Misc.<SeriesACLTransition> widen(option(getSeriesEntity(transitionId, orgId, em)).list()));
       } catch (Exception e) {
-        logger.warn("Error parsing episode ACL: {}", e);
+        logger.warn("Error parsing episode ACL:", e);
         throw new AclTransitionDbException(e);
       } finally {
         if (em != null)

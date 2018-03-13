@@ -30,7 +30,11 @@
         "hour": 17,
         "minute": 0
     },
-    "end": "2014-07-23",
+    "end": {
+        "date": "2014-07-23",
+        "hour": 18,
+        "minute": 0
+    },
     "duration": {
         "hour": 1,
         "minute": 0

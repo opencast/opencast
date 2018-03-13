@@ -165,7 +165,7 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       try {
         getWorkflowService().cleanupWorkflowInstances(bufferForFailedJobs, WorkflowInstance.WorkflowState.FAILED);
       } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup failed jobs: {}", e);
+        logger.error("Unable to cleanup failed jobs:", e);
       } catch (UnauthorizedException e) {
         logger.error("Workflow cleanup job doesn't have right to delete jobs!");
         throw new IllegalStateException(e);
@@ -176,7 +176,7 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       try {
         getWorkflowService().cleanupWorkflowInstances(bufferForSuccessfulJobs, WorkflowInstance.WorkflowState.SUCCEEDED);
       } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup successful jobs: {}", e);
+        logger.error("Unable to cleanup successful jobs:", e);
       } catch (UnauthorizedException e) {
         logger.error("Workflow cleanup job doesn't have right to delete jobs!");
         throw new IllegalStateException(e);
@@ -187,7 +187,7 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       try {
         getWorkflowService().cleanupWorkflowInstances(bufferForStoppedJobs, WorkflowInstance.WorkflowState.STOPPED);
       } catch (WorkflowDatabaseException e) {
-        logger.error("Unable to cleanup stopped jobs: {}", e);
+        logger.error("Unable to cleanup stopped jobs:", e);
       } catch (UnauthorizedException e) {
         logger.error("Workflow cleanup job doesn't have right to delete jobs!");
         throw new IllegalStateException(e);

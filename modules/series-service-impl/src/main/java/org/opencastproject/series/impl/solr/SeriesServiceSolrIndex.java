@@ -978,7 +978,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
       try {
         dc = parseDublinCore(dcXML);
       } catch (IOException e) {
-        logger.error("Could not parse Dublin core: {}", e);
+        logger.error("Could not parse Dublin core:", e);
         throw new SeriesServiceDatabaseException(e);
       }
       return dc;
@@ -1046,7 +1046,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         return response.getResults().get(0);
       }
     } catch (SolrServerException e) {
-      logger.error("Could not perform series retrieval: {}", e);
+      logger.error("Could not perform series retrieval:", e);
       throw new SeriesServiceDatabaseException(e);
     }
   }

@@ -206,7 +206,7 @@ public interface AclService {
    * @throws AclServiceException
    *           in case of any error
    */
-  void applyEpisodeAclTransition(final EpisodeACLTransition t) throws AclServiceException;
+  void applyEpisodeAclTransition(EpisodeACLTransition t) throws AclServiceException;
 
   /**
    * Immediate ACL application to an episode.
@@ -248,7 +248,7 @@ public interface AclService {
    * @throws AclServiceException
    *           in case of any error
    */
-  void applySeriesAclTransition(final SeriesACLTransition t) throws AclServiceException;
+  void applySeriesAclTransition(SeriesACLTransition t) throws AclServiceException;
 
   /**
    * Immediate ACL application to a series.

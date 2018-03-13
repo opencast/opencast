@@ -85,11 +85,11 @@
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
-            <Export-Package> 
+            <Export-Package>
               org.opencastproject.fileupload.api;version=${project.version},
               org.opencastproject.fileupload.api.exception;version=${project.version},
               org.opencastproject.fileupload.api.job;version=${project.version},
-              org.opencastproject.fileupload.service;version=${project.version} 
+              org.opencastproject.fileupload.service;version=${project.version}
             </Export-Package>
             <Service-Component>
               OSGI-INF/fileupload-service.xml,

@@ -50,7 +50,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "Annotation")
 @Access(AccessType.FIELD)
-@Table(name = "mh_annotation")
+@Table(name = "oc_annotation")
 @NamedQueries({
 
         @NamedQuery(name = "findAnnotations", query = "SELECT a FROM Annotation a WHERE (a.privateAnnotation = FALSE OR (a.userId = :userId AND a.privateAnnotation = TRUE))"),

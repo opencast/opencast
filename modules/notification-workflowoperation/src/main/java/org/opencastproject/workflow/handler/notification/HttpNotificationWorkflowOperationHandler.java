@@ -189,7 +189,7 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
       request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new WorkflowOperationException(
-              "Error happened during the encoding of the event parameter as form parameter: {}", e);
+              "Error happened during the encoding of the event parameter as form parameter:", e);
     }
 
     // Execute the request

@@ -200,7 +200,7 @@
       </configurations>
     </operation>
 
-	<!-- Generate timeline preview images -->
+    <!-- Generate timeline preview images -->
 
     <operation
       id="timelinepreviews"

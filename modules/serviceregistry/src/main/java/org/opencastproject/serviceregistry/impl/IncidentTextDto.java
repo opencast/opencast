@@ -38,7 +38,7 @@ import javax.persistence.Table;
 
 @Entity(name = "IncidentText")
 @Access(AccessType.FIELD)
-@Table(name = "mh_incident_text")
+@Table(name = "oc_incident_text")
 @NamedQueries({@NamedQuery(name = "IncidentText.findAll", query = "select a from IncidentText a")})
 public class IncidentTextDto {
   @Id

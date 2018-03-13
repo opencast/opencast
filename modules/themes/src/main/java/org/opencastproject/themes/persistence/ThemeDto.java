@@ -43,7 +43,7 @@ import javax.persistence.TemporalType;
 /** Entity object for themes. */
 @Entity(name = "Themes")
 @Access(AccessType.FIELD)
-@Table(name = "mh_themes")
+@Table(name = "oc_themes")
 @NamedQueries({
         @NamedQuery(name = "Themes.count", query = "SELECT COUNT(t) FROM Themes t WHERE t.organization = :org"),
         @NamedQuery(name = "Themes.findById", query = "SELECT t FROM Themes t WHERE t.id = :id AND t.organization = :org"),

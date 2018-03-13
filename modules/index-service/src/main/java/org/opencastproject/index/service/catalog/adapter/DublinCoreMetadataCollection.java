@@ -224,6 +224,17 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
         }
         addField(startDate);
         break;
+      case ORDERED_TEXT:
+        MetadataField<String> orderedTextField = MetadataField.createOrderedTextMetadataField(metadataField.getInputID(),
+            Opt.some(metadataField.getOutputID()), metadataField.getLabel(), metadataField.isReadOnly(),
+            metadataField.isRequired(), getCollectionIsTranslatable(metadataField, listProvidersService),
+            getCollection(metadataField, listProvidersService),
+            metadataField.getCollectionID(), metadataField.getOrder(), metadataField.getNamespace());
+        if (StringUtils.isNotBlank(value)) {
+          orderedTextField.setValue(value);
+        }
+        addField(orderedTextField);
+        break;
       default:
         throw new IllegalArgumentException("Unknown metadata type! " + metadataField.getType());
     }

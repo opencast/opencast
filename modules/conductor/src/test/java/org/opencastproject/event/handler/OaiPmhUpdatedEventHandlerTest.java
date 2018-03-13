@@ -64,7 +64,6 @@ import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

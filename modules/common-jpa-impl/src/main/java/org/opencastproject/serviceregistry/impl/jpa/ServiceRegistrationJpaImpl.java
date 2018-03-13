@@ -52,7 +52,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "ServiceRegistration")
 @Access(AccessType.FIELD)
-@Table(name = "mh_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
+@Table(name = "oc_service_registration", uniqueConstraints = @UniqueConstraint(columnNames = { "host_registration",
         "service_type" }))
 @NamedQueries({
         @NamedQuery(name = "ServiceRegistration.statistics", query = "SELECT job.processorServiceRegistration.id as serviceRegistration, job.status, "

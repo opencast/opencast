@@ -65,7 +65,7 @@ Amazon S3 distribution is already included in the default Opencast workflows, ho
 will function correctly.
 
 If you wish to use AWS S3 publishing with your own custom workflow, you must add the `publish-aws` workflow operation to
-your workflow.  The operation documentation can be found [here](../workflowoperationhandlers/publishaws-woh.md).
+your workflow.  The operation documentation can be found [here](../workflowoperationhandlers/publish-aws-woh.md).
 
 Publishing to multiple distribution services
 --------------------------------------------

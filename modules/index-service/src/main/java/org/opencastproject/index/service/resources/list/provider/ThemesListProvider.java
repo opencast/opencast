@@ -46,8 +46,9 @@ public class ThemesListProvider implements ResourceListProvider {
 
   private static final String PROVIDER_PREFIX = "THEMES";
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
+  public static final String DESCRIPTION = PROVIDER_PREFIX + ".DESCRIPTION";
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, NAME };
+  private static final String[] NAMES = { PROVIDER_PREFIX, NAME, DESCRIPTION };
 
   private static final Logger logger = LoggerFactory.getLogger(ThemesListProvider.class);
 
@@ -97,6 +98,32 @@ public class ThemesListProvider implements ResourceListProvider {
       for (SearchResultItem<Theme> item : results.getItems()) {
         Theme theme = item.getSource();
         list.put(Long.toString(theme.getIdentifier()), theme.getName());
+      }
+    }
+    else if (DESCRIPTION.equals(listName)) {
+      ThemeSearchQuery themeQuery = new ThemeSearchQuery(securityService.getOrganization().getId(),
+              securityService.getUser());
+      themeQuery.withOffset(query.getOffset().getOrElse(0));
+      int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
+      themeQuery.withLimit(limit);
+      themeQuery.sortByName(SearchQuery.Order.Ascending);
+      SearchResult<Theme> results = null;
+      try {
+        results = searchIndex.getByQuery(themeQuery);
+      } catch (SearchIndexException e) {
+        logger.error("The admin UI Search Index was not able to get the themes: {}", ExceptionUtils.getStackTrace(e));
+        throw new ListProviderException("No themes list for list name " + listName + " found!");
+      }
+
+      for (SearchResultItem<Theme> item : results.getItems()) {
+        Theme theme = item.getSource();
+        if (theme.getDescription() == null) {
+          theme.setDescription("");
+        }
+        else {
+          theme.getDescription();
+        }
+        list.put(Long.toString(theme.getIdentifier()), theme.getDescription());
       }
     }
 

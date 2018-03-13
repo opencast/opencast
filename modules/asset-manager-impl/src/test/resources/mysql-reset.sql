@@ -7,25 +7,25 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS SEQUENCE;
 
-DROP TABLE IF EXISTS mh_organization;
+DROP TABLE IF EXISTS oc_organization;
 
 # archive tables
 
-DROP TABLE IF EXISTS mh_archive_episode;
+DROP TABLE IF EXISTS oc_archive_episode;
 
-DROP TABLE IF EXISTS mh_archive_asset;
+DROP TABLE IF EXISTS oc_archive_asset;
 
-DROP TABLE IF EXISTS mh_archive_version_claim;
+DROP TABLE IF EXISTS oc_archive_version_claim;
 
 # assets tables
 
-DROP TABLE IF EXISTS mh_assets_snapshot;
+DROP TABLE IF EXISTS oc_assets_snapshot;
 
-DROP TABLE IF EXISTS mh_assets_asset;
+DROP TABLE IF EXISTS oc_assets_asset;
 
-DROP TABLE IF EXISTS mh_assets_properties;
+DROP TABLE IF EXISTS oc_assets_properties;
 
-DROP TABLE IF EXISTS mh_assets_version_claim;
+DROP TABLE IF EXISTS oc_assets_version_claim;
 
 ####
 # base setup
@@ -33,7 +33,7 @@ DROP TABLE IF EXISTS mh_assets_version_claim;
 
 # organization
 
-CREATE TABLE mh_organization (
+CREATE TABLE oc_organization (
   id             VARCHAR(128) NOT NULL,
   anonymous_role VARCHAR(255),
   name           VARCHAR(255),
@@ -43,7 +43,7 @@ CREATE TABLE mh_organization (
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-INSERT INTO mh_organization (id, anonymous_role, name, admin_role)
+INSERT INTO oc_organization (id, anonymous_role, name, admin_role)
 VALUES ('mh_default_org', 'ROLE_ANONYMOUS', 'Default', 'ROLE_ADMIN');
 
 # sequence

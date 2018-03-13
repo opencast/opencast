@@ -38,7 +38,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.BufferedOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -46,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -63,12 +61,9 @@ public final class EndpointUtil {
    * {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
    */
   public static StreamingOutput stream(final Fx<OutputStream> out) {
-    return new StreamingOutput() {
-      @Override
-      public void write(OutputStream s) throws IOException, WebApplicationException {
-        try (final OutputStream bs = new BufferedOutputStream(s)) {
-          out.apply(bs);
-        }
+    return s -> {
+      try (OutputStream bs = new BufferedOutputStream(s)) {
+        out.apply(bs);
       }
     };
   }

@@ -117,7 +117,7 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
    */
   @POST
   @Path("results")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(name = "results", description = "Called by the speech-to-text service to report status.", returnDescription = "", reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Got notification!") })
   public Response reportStatus(String body) {

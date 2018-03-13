@@ -53,7 +53,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @Entity(name = "UserAction")
 @Access(AccessType.FIELD)
-@Table(name = "mh_user_action")
+@Table(name = "oc_user_action")
 @NamedQueries({
         @NamedQuery(name = "findUserActions", query = "SELECT a FROM UserAction a"),
         @NamedQuery(name = "countSessionsGroupByMediapackage", query = "SELECT a.mediapackageId, COUNT(distinct a.session), SUM(a.length) FROM UserAction a GROUP BY a.mediapackageId"),

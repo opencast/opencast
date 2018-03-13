@@ -3,7 +3,7 @@
 
   <feature name="query-dsl">
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
+    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-sql/3.6.5</bundle>
@@ -22,7 +22,7 @@
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
     <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
-    <bundle start-level="55">mvn:commons-codec/commons-codec/1.10</bundle>
+    <bundle start-level="55">mvn:commons-codec/commons-codec/1.11</bundle>
 
     <!-- General specifications -->
     <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
@@ -42,23 +42,23 @@
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:com.google.code.gson/gson/2.8.1</bundle>
-    <bundle>mvn:commons-collections/commons-collections/3.2.2</bundle>
+    <bundle>mvn:com.google.code.gson/gson/2.8.2</bundle>
+    <bundle>mvn:commons-collections/commons-collections/${commons-collection.version}</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/1.3.3</bundle>
-    <bundle>mvn:commons-io/commons-io/2.5</bundle>
+    <bundle>mvn:commons-io/commons-io/2.6</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
+    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.8.3</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
-    <bundle>mvn:org.apache.commons/commons-csv/1.0</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/3.6</bundle>
+    <bundle>mvn:org.apache.commons/commons-csv/1.5</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/3.7</bundle>
+    <bundle>mvn:org.apache.commons/commons-text/1.2</bundle>
     <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.batik/1.7_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/3.2.4_1</bundle>
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-pool/1.5.4_4</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jakarta-regexp/1.4_1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-inject/1_2</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.quartz/1.8.5_1</bundle>
@@ -81,9 +81,9 @@
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
 
     <!-- AWS Bits -->
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.0</bundle>
-    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.6</bundle>
-    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/2.6.6</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-cbor/${jackson.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aws-java-sdk/${aws.version}</bundle>
 
     <!-- Spring Framework / Security -->
@@ -151,6 +151,9 @@
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
@@ -161,7 +164,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
@@ -234,7 +236,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-feeds/${project.version}</bundle>
     <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-impl/${project.version}</bundle>
@@ -275,6 +276,9 @@
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
@@ -283,7 +287,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-remote/${project.version}</bundle>
@@ -335,7 +338,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-remote/${project.version}</bundle>
@@ -357,7 +359,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>
@@ -375,6 +377,9 @@
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-remote/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
@@ -385,7 +390,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-remote/${project.version}</bundle>
@@ -455,7 +459,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-feeds/${project.version}</bundle>
     <!-- load search impl later than its optional index rebuilding resources to have maximium support during search index rebuild -->
     <bundle start-level="84">mvn:org.opencastproject/opencast-search-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
@@ -476,7 +479,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
@@ -512,6 +515,8 @@
   <feature name="opencast-worker">
     <feature start-level="80">opencast-core</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
@@ -553,6 +558,9 @@
   <feature name="opencast-adminworker">
     <feature start-level="80">opencast-core</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-animate-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-storage-fs/${project.version}</bundle>
@@ -562,7 +570,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-capture-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-composer-service-api/${project.version}</bundle>
@@ -615,7 +622,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search-service-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-search-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-search/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-silencedetection-api/${project.version}</bundle>
@@ -637,9 +643,9 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-timelinepreviews-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>    
+    <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-ffmpeg-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-workflowoperation/${project.version}</bundle>

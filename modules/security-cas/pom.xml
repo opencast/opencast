@@ -48,7 +48,7 @@
               org.springframework.security.cas.web.authentication,
               *
             </Import-Package>
-            <Fragment-Host>opencast-kernel</Fragment-Host> 
+            <Fragment-Host>opencast-kernel</Fragment-Host>
           </instructions>
         </configuration>
       </plugin>

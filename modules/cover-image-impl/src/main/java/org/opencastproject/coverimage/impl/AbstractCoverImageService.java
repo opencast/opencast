@@ -263,7 +263,7 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
       tempFile = File.createTempFile(COVERIMAGE_WORKSPACE_COLLECTION, Long.toString(job.getId()) + "_" + suffix);
       log.debug("Created temporary file {}", tempFile);
     } catch (IOException e) {
-      log.warn("Error creating temporary file: {}", e);
+      log.warn("Error creating temporary file:", e);
       throw new CoverImageException("Error creating temporary file", e);
     }
     return tempFile;

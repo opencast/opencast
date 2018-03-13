@@ -1,3 +1,25 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+
 angular.module('adminNg.resources')
 .factory('NewEventResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
     return $resource('/admin-ng/event/new', {}, {
@@ -16,6 +38,9 @@ angular.module('adminNg.resources')
             transformResponse: [],
 
             transformRequest: function (data) {
+
+                console.log(JSON.stringify(data));
+
                 if (angular.isUndefined(data)) {
                     return data = [];
                 }
@@ -71,37 +96,25 @@ angular.module('adminNg.resources')
                                                     .add(parseInt(data.source.SCHEDULE_MULTIPLE.duration.minute, 10), 'm')
                                                     .as('ms') + '';
 
-                    var endMomentDate = moment(data.source.SCHEDULE_MULTIPLE.end)
-                                        .hour(data.source.SCHEDULE_MULTIPLE.start.hour)
-                                        .minute(data.source.SCHEDULE_MULTIPLE.start.minute)
-                                        .add(source.metadata.duration, 'ms');
-
-                    source.metadata.end = endMomentDate.toISOString().replace('.000', '');
+                    source.metadata.end = JsHelper.toZuluTimeString(data.source.SCHEDULE_MULTIPLE.end);
 
                     source.metadata.rrule = (function (src) {
                         return JsHelper.assembleRrule(src.SCHEDULE_MULTIPLE);
                     })(data.source);
                 }
 
-                // Remove useless information for the request
-                angular.forEach(data.metadata, function (catalog) {
-                    angular.forEach(catalog.fields, function (field) {
-                            delete field.collection;                        
-                            delete field.label;
-                            delete field.presentableValue;
-                            delete field.readOnly;
-                            delete field.required;
-                    });
-                });
-
                 // Dynamic source config and multiple source per type allowed
                 if (sourceType === 'UPLOAD') {
-                    if (data.source.upload) {
-                       angular.forEach(data.source.upload, function(files, name) {
+                    if (data.source.UPLOAD.tracks) {
+                       angular.forEach(data.source.UPLOAD.tracks, function(files, name) {
                           angular.forEach(files, function (file, index) {
                              fd.append(name + "." + index, file);
                           });
                        });
+                    }
+
+                    if (data.source.UPLOAD.metadata.start) {
+                        data.metadata[0].fields.push(data.source.UPLOAD.metadata.start);
                     }
                 }
 
@@ -128,6 +141,17 @@ angular.module('adminNg.resources')
                     data.processing.workflow.selection.configuration["downloadSourceflavorsExist"] = "true";
                     data.processing.workflow.selection.configuration["download-source-flavors"] = flavorList.join(", ");
                 }
+
+                // Remove useless information for the request
+                angular.forEach(data.metadata, function (catalog) {
+                    angular.forEach(catalog.fields, function (field) {
+                        delete field.collection;
+                        delete field.label;
+                        delete field.presentableValue;
+                        delete field.readOnly;
+                        delete field.required;
+                    });
+                });
 
                // Add metadata form field
                 fd.append('metadata', JSON.stringify({

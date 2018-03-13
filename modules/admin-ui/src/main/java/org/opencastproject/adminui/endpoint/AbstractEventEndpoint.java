@@ -2058,7 +2058,7 @@ public abstract class AbstractEventEndpoint {
     try {
       results = getIndex().getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the events list: {}", e);
+      logger.error("The admin UI Search Index was not able to get the events list:", e);
       return RestUtil.R.serverError();
     }
 

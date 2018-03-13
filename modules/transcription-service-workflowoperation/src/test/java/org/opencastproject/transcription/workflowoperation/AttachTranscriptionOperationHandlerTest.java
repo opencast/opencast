@@ -23,7 +23,6 @@ package org.opencastproject.transcription.workflowoperation;
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -78,17 +77,17 @@ public class AttachTranscriptionOperationHandlerTest {
     // Media package set up
     URI mediaPackageURI = StartTranscriptionOperationHandlerTest.class.getResource("/mp.xml").toURI();
     mediaPackage = builder.loadFromXml(mediaPackageURI.toURL().openStream());
-    URI catalogURI = StartTranscriptionOperationHandlerTest.class.getResource("/catalog_mpe.xml").toURI();
-    String catalogXml = FileUtils.readFileToString(new File(catalogURI));
-    Catalog catalog = (Catalog) MediaPackageElementParser.getFromXml(catalogXml);
-    URI attachmentURI = StartTranscriptionOperationHandlerTest.class.getResource("/attachment_mpe.xml").toURI();
-    String attachmentXml = FileUtils.readFileToString(new File(attachmentURI));
-    Attachment attachment = (Attachment) MediaPackageElementParser.getFromXml(attachmentXml);
+    URI dfxpURI = StartTranscriptionOperationHandlerTest.class.getResource("/attachment_dfxp.xml").toURI();
+    String dfxpXml = FileUtils.readFileToString(new File(dfxpURI));
+    Attachment captionDfxp = (Attachment) MediaPackageElementParser.getFromXml(dfxpXml);
+    URI vttURI = StartTranscriptionOperationHandlerTest.class.getResource("/attachment_vtt.xml").toURI();
+    String vttXml = FileUtils.readFileToString(new File(vttURI));
+    Attachment captionVtt = (Attachment) MediaPackageElementParser.getFromXml(vttXml);
 
     // Service registry set up
     job1 = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(job1.getId()).andReturn(1L);
-    EasyMock.expect(job1.getPayload()).andReturn(catalogXml).anyTimes();
+    EasyMock.expect(job1.getPayload()).andReturn(dfxpXml).anyTimes();
     EasyMock.expect(job1.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job1.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job1.getDateStarted()).andReturn(new Date());
@@ -97,7 +96,7 @@ public class AttachTranscriptionOperationHandlerTest {
 
     job2 = EasyMock.createNiceMock(Job.class);
     EasyMock.expect(job2.getId()).andReturn(2L);
-    EasyMock.expect(job2.getPayload()).andReturn(attachmentXml).anyTimes();
+    EasyMock.expect(job2.getPayload()).andReturn(vttXml).anyTimes();
     EasyMock.expect(job2.getStatus()).andReturn(Job.Status.FINISHED);
     EasyMock.expect(job2.getDateCreated()).andReturn(new Date());
     EasyMock.expect(job2.getDateStarted()).andReturn(new Date());
@@ -112,8 +111,10 @@ public class AttachTranscriptionOperationHandlerTest {
     // Transcription service set up
     service = EasyMock.createStrictMock(TranscriptionService.class);
 
-    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(catalog);
-    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob")).andReturn(attachment);
+    EasyMock.expect(service.getGeneratedTranscription("mpId1", "transcriptionJob")).andReturn(captionDfxp);
+    EasyMock.expect(service.getLanguage()).andReturn("en").once();
+    EasyMock.expect(service.getGeneratedTranscription("mpId2", "transcriptionJob")).andReturn(captionVtt);
+    EasyMock.expect(service.getLanguage()).andReturn("en").once();
     EasyMock.replay(service);
 
     // Caption service set up
@@ -153,7 +154,7 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
 
@@ -161,14 +162,15 @@ public class AttachTranscriptionOperationHandlerTest {
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Catalog[] catalogs = updatedMp.getCatalogs(MediaPackageElementFlavor.parseFlavor("captions/timedtext"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/dfxp+en"));
 
-    Assert.assertNotNull(catalogs);
-    Assert.assertEquals(1, catalogs.length);
-    Assert.assertNotNull(catalogs[0].getTags());
-    Assert.assertEquals(2, catalogs[0].getTags().length);
-    Assert.assertEquals("tag1", catalogs[0].getTags()[0]);
-    Assert.assertEquals("tag2", catalogs[0].getTags()[1]);
+    Assert.assertNotNull(attachments);
+    Assert.assertEquals(1, attachments.length);
+    Assert.assertNotNull(attachments[0].getTags());
+    Assert.assertEquals(3, attachments[0].getTags().length);
+    Assert.assertEquals("lang:en", attachments[0].getTags()[0]);
+    Assert.assertEquals("tag1", attachments[0].getTags()[1]);
+    Assert.assertEquals("tag2", attachments[0].getTags()[2]);
   }
 
   @Test
@@ -178,22 +180,23 @@ public class AttachTranscriptionOperationHandlerTest {
     EasyMock.replay(captionService);
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
+    // operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/timedtext");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAG, "tag1,tag2");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "webvtt");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
 
     WorkflowOperationResult result = operationHandler.start(workflowInstance, null);
     Assert.assertEquals(Action.CONTINUE, result.getAction());
 
     MediaPackage updatedMp = result.getMediaPackage();
-    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/timedtext"));
+    Attachment[] attachments = updatedMp.getAttachments(MediaPackageElementFlavor.parseFlavor("captions/vtt+en"));
 
     Assert.assertNotNull(attachments);
     Assert.assertEquals(1, attachments.length);
     Assert.assertNotNull(attachments[0].getTags());
-    Assert.assertEquals(2, attachments[0].getTags().length);
-    Assert.assertEquals("tag1", attachments[0].getTags()[0]);
-    Assert.assertEquals("tag2", attachments[0].getTags()[1]);
+    Assert.assertEquals(3, attachments[0].getTags().length);
+    Assert.assertEquals("lang:en", attachments[0].getTags()[0]);
+    Assert.assertEquals("tag1", attachments[0].getTags()[1]);
+    Assert.assertEquals("tag2", attachments[0].getTags()[2]);
   }
 
   @Test(expected = WorkflowOperationException.class)

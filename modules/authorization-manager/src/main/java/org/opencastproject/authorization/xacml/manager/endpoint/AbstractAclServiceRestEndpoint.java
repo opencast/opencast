@@ -165,7 +165,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("Managed acl with id '{}' could not be found", managedAclId);
       throw new WebApplicationException(Status.BAD_REQUEST);
     } catch (AclServiceException e) {
-      logger.warn("Error updating series transition: {}", e);
+      logger.warn("Error updating series transition:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     } catch (NotFoundException e) {
       throw e;
@@ -196,7 +196,7 @@ public abstract class AbstractAclServiceRestEndpoint {
               workflow);
       return JsonConv.full(t).toJson();
     } catch (AclServiceException e) {
-      logger.warn("Error updating episode transition: {}", e);
+      logger.warn("Error updating episode transition:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     } catch (NotFoundException e) {
       throw e;
@@ -236,7 +236,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("Error adding series transition: transition with date {} already exists", applicationDate);
       throw new WebApplicationException(Status.CONFLICT);
     } catch (AclServiceException e) {
-      logger.warn("Error adding series transition: {}", e);
+      logger.warn("Error adding series transition:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
       logger.warn("Unable to parse the application date");
@@ -269,7 +269,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       logger.info("Error adding episode transition: transition with date {} already exists", applicationDate);
       throw new WebApplicationException(Status.CONFLICT);
     } catch (AclServiceException e) {
-      logger.warn("Error adding episode transition: {}", e);
+      logger.warn("Error adding episode transition:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     } catch (Exception e) {
       logger.warn("Unable to parse the application date");

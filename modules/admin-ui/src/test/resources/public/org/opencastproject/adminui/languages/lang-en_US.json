@@ -351,6 +351,7 @@
                "START_TIME": "Start time",
                "TIMEZONE": "Time zone",
                "END_DATE": "End date",
+               "END_TIME": "End time",
                "DURATION": "Duration"
            },
            "SCHEDULE_SINGLE": {
@@ -694,7 +695,7 @@
           "SCHEDULING": {
             "CAPTION": "Participation status",
             "REVIEW_STATUS": {
-              "CAPTION": "Review status" 
+              "CAPTION": "Review status"
             },
             "OPTEDOUT": {
               "CAPTION": "Opted-out Status",
@@ -892,7 +893,7 @@
             "CAPTION": "Participation status template",
             "WARNING_TEMPLATE": "Series paticipation status will be used as default value for new events that are part of the series.",
             "REVIEW_STATUS": {
-              "CAPTION": "Review status" 
+              "CAPTION": "Review status"
             },
             "OPTEDOUT": {
               "CAPTION": "Opted-out Status",

@@ -41,7 +41,6 @@ import com.entwinemedia.fn.Products;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Booleans;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -280,13 +279,13 @@ public abstract class AbstractIndexProducer implements IndexProducer {
           repopulate(indexObject.getIndexName());
           logger.info("Index '{}' has finished repopulating service '{}'.", indexObject.getIndexName(), getService());
         } catch (InterruptedException e) {
-          logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", getClassName(), e);
         } catch (ExecutionException e) {
-          logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(e));
+          logger.error("Problem while getting {} message events", getClassName(), e);
         } catch (CancellationException e) {
           logger.trace("Listening for messages {} has been cancelled.", getClassName());
         } catch (Throwable t) {
-          logger.error("Problem while getting {} message events {}", getClassName(), ExceptionUtils.getStackTrace(t));
+          logger.error("Problem while getting {} message events", getClassName(), t);
         }
       }
       logger.info("Stopping listening for {} Messages", getClassName());

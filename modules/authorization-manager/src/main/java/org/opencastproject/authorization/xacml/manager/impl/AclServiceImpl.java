@@ -22,7 +22,6 @@
 package org.opencastproject.authorization.xacml.manager.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.authorization.xacml.manager.impl.Util.toAcl;
 import static org.opencastproject.util.data.Collections.list;
@@ -181,7 +180,7 @@ public final class AclServiceImpl implements AclService {
             // update in episode service
             MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
             if (assetManager != null)
-              assetManager.takeSnapshot(DEFAULT_OWNER, mp);
+              assetManager.takeSnapshot(mp);
           }
 
           // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
@@ -190,7 +189,7 @@ public final class AclServiceImpl implements AclService {
             // update in episode service
             MediaPackage mp = authorizationService.removeAcl(episodeSvcMp, AclScope.Episode);
             if (assetManager != null)
-              assetManager.takeSnapshot(DEFAULT_OWNER, mp);
+              assetManager.takeSnapshot(mp);
           }
 
         });
@@ -245,7 +244,7 @@ public final class AclServiceImpl implements AclService {
         for (MediaPackage mp : mediaPackages) {
           // remove episode xacml and update in archive service
           if (assetManager != null)
-            assetManager.takeSnapshot(DEFAULT_OWNER, authorizationService.removeAcl(mp, AclScope.Episode));
+            assetManager.takeSnapshot(authorizationService.removeAcl(mp, AclScope.Episode));
         }
       }
       // update in series service
