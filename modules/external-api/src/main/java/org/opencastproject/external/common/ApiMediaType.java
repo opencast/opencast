@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 public final class ApiMediaType {
 
-  private static final String VERSION_REG_EX_PATTERN = "[v][0-9]+\\.[0-9]+\\.[0-9]+";
+  public static final String VERSION_REG_EX_PATTERN = "[v]([0-9]+)\\.([0-9]+)\\.([0-9]+)";
 
   private final ApiVersion version;
   private final ApiFormat format;
@@ -54,6 +54,8 @@ public final class ApiMediaType {
     final String format;
     if (subtype.contains("+")) {
       format = subtype.substring(subtype.indexOf("+") + 1);
+    } else if ("*".equals(subtype)) {
+      return ApiFormat.UNSPECIFIED;
     } else {
       format = subtype;
     }
@@ -76,6 +78,13 @@ public final class ApiMediaType {
   }
 
   public ApiVersion getVersion() {
+    return version;
+  }
+
+  public ApiVersion getResponseVersion() {
+    if (version.equals(ApiVersion.VERSION_UNDEFINED)) {
+      return ApiVersion.CURRENT_VERSION;
+    }
     return version;
   }
 

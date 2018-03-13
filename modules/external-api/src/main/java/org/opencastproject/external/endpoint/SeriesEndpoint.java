@@ -30,11 +30,10 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_0_0;
-import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.impl.index.ExternalIndex;
@@ -119,6 +118,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
+@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = "", abstractText = "Provides resources and operations related to the series")
 public class SeriesEndpoint {
 
@@ -178,7 +178,6 @@ public class SeriesEndpoint {
 
   @GET
   @Path("")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getseries", description = "Returns a list of series.", returnDescription = "", restParameters = {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
@@ -188,6 +187,7 @@ public class SeriesEndpoint {
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
           @QueryParam("limit") int limit) throws UnauthorizedException {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
@@ -274,7 +274,7 @@ public class SeriesEndpoint {
 
       SearchResult<Series> result = externalIndex.getByQuery(query);
 
-      return ApiResponses.Json.ok(VERSION_1_0_0, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
+      return ApiResponses.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
         @Override
         public JValue apply(SearchResultItem<Series> a) {
           final Series s = a.getSource();
@@ -300,13 +300,13 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getseries", description = "Returns a single series.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
                   @RestResponse(description = "The series is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     for (final Series s : indexService.getSeries(id, externalIndex)) {
       JValue subjects;
       if (s.getSubject() == null) {
@@ -315,7 +315,7 @@ public class SeriesEndpoint {
         subjects = arr(splitSubjectIntoArray(s.getSubject()));
       }
       Date createdDate = s.getCreatedDateTime();
-      return ApiResponses.Json.ok(VERSION_1_0_0, obj(
+      return ApiResponses.Json.ok(requestedVersion, obj(
           f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())),
           f("description", v(s.getDescription(), BLANK)), f("creator", v(s.getCreator(), BLANK)), f("subjects", subjects),
           f("organization", v(s.getOrganization())), f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
@@ -338,7 +338,6 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}/metadata")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getseriesmetadata", description = "Returns a series' metadata of all types or returns a series' metadata collection of the given type when the query string parameter type is specified. For each metadata catalog there is a unique property called the flavor such as dublincore/series so the type in this example would be 'dublincore/series'", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "type", isRequired = false, description = "The type of metadata to return", type = STRING) }, reponses = {
@@ -346,14 +345,15 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type) throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.trimToNull(type) == null) {
-      return getAllMetadata(id);
+      return getAllMetadata(id, requestedVersion);
     } else {
-      return getMetadataByType(id, type);
+      return getMetadataByType(id, type, requestedVersion);
     }
   }
 
-  private Response getAllMetadata(String id) throws SearchIndexException {
+  private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
     Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
@@ -371,10 +371,10 @@ public class SeriesEndpoint {
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return okJson(metadataList.toJSON());
+    return ApiResponses.Json.ok(requestedVersion, metadataList.toJSON());
   }
 
-  private Response getMetadataByType(String id, String type) throws SearchIndexException {
+  private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
     Opt<Series> optSeries = indexService.getSeries(id, externalIndex);
     if (optSeries.isNone())
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
@@ -384,7 +384,7 @@ public class SeriesEndpoint {
       MetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
       ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
+      return ApiResponses.Json.ok(requestedVersion, collection.toJSON());
     }
 
     // Try the other catalogs
@@ -395,7 +395,7 @@ public class SeriesEndpoint {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
         final Opt<MetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isSome()) {
-          return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, optSeriesMetadata.get().toJSON());
+          return ApiResponses.Json.ok(requestedVersion, optSeriesMetadata.get().toJSON());
         }
       }
     }
@@ -518,7 +518,6 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/metadata")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "updateseriesmetadata", description = "Update a series' metadata of the given type. For a metadata catalog there is the flavor such as 'dublincore/series' and this is the unique type.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update", type = STRING),
@@ -528,6 +527,7 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.trimToNull(metadataJSON) == null) {
       return RestUtil.R.badRequest("Unable to update metadata for series as the metadata provided is empty.");
     }
@@ -606,12 +606,11 @@ public class SeriesEndpoint {
 
     metadataList.add(adapter, collection);
     indexService.updateAllSeriesMetadata(id, metadataList, externalIndex);
-    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "");
+    return ApiResponses.Json.ok(requestedVersion, "");
   }
 
   @DELETE
   @Path("{seriesId}/metadata")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "deleteseriesmetadata", description = "Deletes a series' metadata catalog of the given type. All fields and values of that catalog will be deleted.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, reponses = {
@@ -620,6 +619,7 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteSeriesMetadataByType(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String id, @QueryParam("type") String type) throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.trimToNull(type) == null) {
       return RestUtil.R
               .badRequest(String.format("A type of catalog needs to be specified for series '%s' to delete it.", id));
@@ -648,22 +648,22 @@ public class SeriesEndpoint {
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     }
-    return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
+    return ApiResponses.Json.noContent(requestedVersion);
   }
 
   @GET
   @Path("{seriesId}/acl")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getseriesacl", description = "Returns a series' access policy.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
                   @RestResponse(description = "The series' access policy is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getSeriesAcl(@PathParam("seriesId") String id) throws Exception {
+  public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     JSONParser parser = new JSONParser();
     for (final Series series : indexService.getSeries(id, externalIndex)) {
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
-      return ApiResponses.Json.ok(VERSION_1_0_0, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
+      return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
     }
 
     return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
@@ -671,16 +671,16 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}/properties")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getseriesproperties", description = "Returns a series' properties", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, reponses = {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getSeriesProperties(@PathParam("seriesId") String id) throws Exception {
+  public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (indexService.getSeries(id, externalIndex).isSome()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
-      return ApiResponses.Json.ok(VERSION_1_0_0, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
+      return ApiResponses.Json.ok(requestedVersion, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
                 @Override
                 public Field apply(Entry<String, String> a) {
                   return f(a.getKey(), v(a.getValue(), BLANK));
@@ -718,12 +718,13 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response updateSeriesMetadata(@PathParam("seriesId") String seriesID,
+  public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
           @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
+      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
-      return okJson(metadataList.toJSON());
+      return ApiResponses.Json.ok(requestedVersion, metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}' because: {}",
               seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
@@ -737,7 +738,6 @@ public class SeriesEndpoint {
 
   @POST
   @Path("")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "createseries", description = "Creates a series.", returnDescription = "", restParameters = {
           @RestParameter(name = "metadata", isRequired = true, description = "Series metadata", type = STRING),
           @RestParameter(name = "acl", description = "A collection of roles with their possible action", isRequired = true, type = STRING),
@@ -748,6 +748,7 @@ public class SeriesEndpoint {
   public Response createNewSeries(@HeaderParam("Accept") String acceptHeader,
           @FormParam("metadata") String metadataParam, @FormParam("acl") String aclParam,
           @FormParam("theme") String themeIdParam) throws UnauthorizedException, NotFoundException {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (isBlank(metadataParam))
       return R.badRequest("Required parameter 'metadata' is missing or invalid");
 
@@ -792,7 +793,7 @@ public class SeriesEndpoint {
 
     try {
       String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
-      return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getSeriesUrl(seriesId)),
+      return ApiResponses.Json.created(requestedVersion, URI.create(getSeriesUrl(seriesId)),
                                        obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}' because: ",
@@ -879,7 +880,6 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/acl")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "updateseriesacl", description = "Updates a series' access policy.", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING) }, reponses = {
@@ -887,6 +887,7 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
           @FormParam("acl") String aclJson) throws NotFoundException, SeriesException, UnauthorizedException {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (isBlank(aclJson))
       return R.badRequest("Missing form parameter 'acl'");
 
@@ -908,12 +909,11 @@ public class SeriesEndpoint {
     }).toList();
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries));
-    return ApiResponses.Json.ok(VERSION_1_0_0, aclJson);
+    return ApiResponses.Json.ok(requestedVersion, aclJson);
   }
 
   @SuppressWarnings("unchecked")
   @PUT
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @Path("{seriesId}/properties")
   @RestQuery(name = "updateseriesproperties", description = "Updates a series' properties", returnDescription = "", pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
@@ -923,6 +923,7 @@ public class SeriesEndpoint {
   public Response updateSeriesProperties(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String seriesID, @FormParam("properties") String propertiesJson)
           throws NotFoundException, SeriesException, UnauthorizedException {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.isBlank(propertiesJson))
       return R.badRequest("Missing form parameter 'acl'");
 
@@ -940,7 +941,7 @@ public class SeriesEndpoint {
       seriesService.updateSeriesProperty(seriesID, field.getKey(), field.getValue().toString());
     }
 
-    return ApiResponses.Json.ok(VERSION_1_0_0, propertiesJson);
+    return ApiResponses.Json.ok(requestedVersion, propertiesJson);
   }
 
   /**

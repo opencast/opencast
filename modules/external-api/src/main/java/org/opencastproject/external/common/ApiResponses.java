@@ -138,6 +138,19 @@ public final class ApiResponses {
               .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
 
+    /**
+     * Create a conflict json response for the external api
+     *
+     * @param version
+     *          The version that was requested for the api
+     * @param json
+     *          The json body of the response.
+     * @return The new {@link Response}
+     */
+    public static Response conflict(ApiVersion version, JValue json) {
+      return Response.status(Status.CONFLICT).entity(serializer.toJson(json))
+          .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
+    }
   }
 
   /**

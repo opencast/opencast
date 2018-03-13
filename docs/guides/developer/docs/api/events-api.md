@@ -47,11 +47,11 @@ Query String Parameter     |Type                         | Description
 `withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response
 `withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response
 `withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response
+`withscheduling`           | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
 
 By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
 on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching
 this response.
-
 
 __Sample request__
 
@@ -159,6 +159,7 @@ Multipart Form Parameters  |Type                             | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
 
 __Sample__
 
@@ -221,11 +222,37 @@ acl:
 ]
 ```
 
+scheduling (`rrule` is optional and can be used to schedule multiple events):
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"],
+  "rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
+}
+```
+
 __Response__
 
+`200 (OK)`: Multiple new events were created (scheduling with `rrule`).<br/>
 `201 (CREATED)`: A new event is created and its identifier is returned in the `Location` header.<br/>
-`400 (BAD REQUEST)`: The request is invalid or inconsistent.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
+`409 (CONFLICT)`: The event could not be created due to a scheduling conflict. A list of conflicting events is returned.
 
+In case of success, when scheduling multiple events (200):
+```
+[
+  {
+    "identifier": "e6aeb8df-a852-46cd-8128-b89de696f20e"
+  },
+  {
+    "identifier": "90e93bf6-ed95-483b-8e57-3e2de77a786f"
+  }
+]
+```
+
+In case of success (201):
 ```xml
 Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20e
 ```
@@ -235,6 +262,18 @@ Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20
 }
 ```
 
+In case of a conflict (409):
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
+```
+
+
 ### GET /api/events/{event_id}
 
 Returns a single event.
@@ -243,12 +282,12 @@ By setting the optional `sign` parameter to `true`, the method will pre-sign dis
 in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
 response.
 
-Query String Parameter |Type                         | Description
-:----------------------|:----------------------------|:-----------
-`sign`                 | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
-`withacl`              | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
-`withmetadata`         | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
-`withpublications`     | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
+Query String Parameter     |Type            | Description
+:--------------------------|:---------------|:----------------------------
+`sign`                     | boolean        | Whether public distribution urls should be signed.
+`withacl`                  | boolean        | Whether the acl metadata should be included in the response.
+`withmetadata`             | boolean        | Whether the metadata catalogs should be included in the response.
+`withpublications`         | boolean        | Whether the publication ids and urls should be included in the response.
 
 __Response__
 
@@ -321,6 +360,7 @@ Multipart Form Parameters  |Type                             | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
 
 __Sample__
 
@@ -353,6 +393,18 @@ __Response__
 
 `204 (NO CONTENT)`: The event has been updated.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.<br/>
+`409 (CONFLICT)`: The event could not be updated due to a scheduling conflict. A list of conflicting events is returned.
+
+In case of a conflict (when updating `scheduling`):
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
+```
 
 ### DELETE /api/events/{event_id}
 
@@ -741,4 +793,65 @@ __Response__
     }
   ]
 }
+```
+
+# Scheduling Information
+
+<!--- ##################################################################### -->
+### GET /api/events/{event_id}/scheduling
+
+Returns an event's scheduling information.
+
+__Response__
+
+`200 (OK)`: The scheduling information is returned.<br/>
+`204 (NO CONTENT)`: The event is not scheduled.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.
+
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"]
+}
+```
+
+<!--- ##################################################################### -->
+### PUT /api/events/{event_id}/scheduling
+
+Update the scheduling information of the event with id `{event_id}`.
+
+Form Parameters             |Type            | Description
+:---------------------------|:---------------|:----------------------------
+`scheduling`                | `string`       | The scheduling information.
+
+__Sample__
+
+scheduling:
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"]
+}
+```
+
+__Response__
+
+`204 (NO CONTENT)`: The scheduling information of the event has been updated.<br/>
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.<br/>
+`409 (CONFLICT)`: The scheduling information could not be updated due to a conflict. A list of conflicting events is returned.
+
+In case of a conflict:
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
 ```

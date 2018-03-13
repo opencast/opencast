@@ -29,6 +29,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.impl.index.ExternalIndex;
@@ -70,6 +71,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
+@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = "", abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 
@@ -97,7 +99,6 @@ public class GroupsEndpoint {
 
   @GET
   @Path("")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getgroups", description = "Returns a list of groups.", returnDescription = "", restParameters = {
           @RestParameter(name = "filter", isRequired = false, description = "A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon \":\" and then the value to filter with so it is the form <Filter Name>:<Value to Filter With>.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
@@ -106,6 +107,7 @@ public class GroupsEndpoint {
                   @RestResponse(description = "A (potentially empty) list of groups.", responseCode = HttpServletResponse.SC_OK) })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     Opt<Integer> optLimit = Opt.nul(limit);
     if (optLimit.isSome() && limit <= 0)
       optLimit = Opt.none();
@@ -127,27 +129,26 @@ public class GroupsEndpoint {
     for (SearchResultItem<Group> item : results.getItems()) {
       groupsList.add(groupToJSON(item.getSource()));
     }
-    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(groupsList));
+    return ApiResponses.Json.ok(requestedVersion, arr(groupsList));
   }
 
   @GET
   @Path("{groupId}")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "getgroup", description = "Returns a single group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, reponses = {
                   @RestResponse(description = "The group is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws Exception {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     for (final Group group : indexService.getGroup(id, externalIndex)) {
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, groupToJSON(group));
+      return ApiResponses.Json.ok(requestedVersion, groupToJSON(group));
     }
     return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
   }
 
   @DELETE
   @Path("{groupId}")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "deletegroup", description = "Deletes a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, reponses = {
                   @RestResponse(description = "The group has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
@@ -159,7 +160,6 @@ public class GroupsEndpoint {
 
   @PUT
   @Path("{groupId}")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "updategroup", description = "Updates a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "name", isRequired = false, description = "Group Name", type = STRING),
@@ -176,7 +176,6 @@ public class GroupsEndpoint {
 
   @POST
   @Path("")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "creategroup", description = "Creates a group.", returnDescription = "", restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "Group Name", type = STRING),
           @RestParameter(name = "description", description = "Group Description", isRequired = false, type = STRING),
@@ -192,7 +191,6 @@ public class GroupsEndpoint {
 
   @POST
   @Path("{groupId}/members")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "addgroupmember", description = "Adds a member to a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, reponses = {
@@ -201,6 +199,7 @@ public class GroupsEndpoint {
                           @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
       Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
       if (groupOpt.isSome()) {
@@ -211,7 +210,7 @@ public class GroupsEndpoint {
           return indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                   StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
         } else {
-          return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "Member is already member of group");
+          return ApiResponses.Json.ok(requestedVersion, "Member is already member of group");
         }
       } else {
         return ApiResponses.notFound("Cannot find group with id '%s'.", id);
@@ -228,7 +227,6 @@ public class GroupsEndpoint {
 
   @DELETE
   @Path("{groupId}/members/{memberId}")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "removegroupmember", description = "Removes a member from a group", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING),
           @RestParameter(name = "memberId", description = "The member id", isRequired = true, type = STRING) }, reponses = {
