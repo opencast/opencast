@@ -79,7 +79,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (series != null && series.isUpdated()) {
+    if (series.getValue().isSome() && series.isUpdated()) {
       if (isNotBlank(series.getValue().get().toString())) {
         mediaPackage.setSeries(series.getValue().get().toString());
         final Opt<String> seriesTitle = getSeriesTitle(series);

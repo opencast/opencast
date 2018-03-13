@@ -1741,13 +1741,10 @@ public class IndexServiceImpl implements IndexService {
 
   private void updateMediaPackageMetadata(MediaPackage mp, MetadataList metadataList) {
     String oldSeriesId = mp.getSeries();
-    List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    if (catalogUIAdapters != null) {
-      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-        Opt<MetadataCollection> metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
-        if (metadata.isSome() && metadata.get().isUpdated()) {
-          catalogUIAdapter.storeFields(mp, metadata.get());
-        }
+    for (EventCatalogUIAdapter catalogUIAdapter : getEventCatalogUIAdapters()) {
+      Opt<MetadataCollection> metadata = metadataList.getMetadataByAdapter(catalogUIAdapter);
+      if (metadata.isSome() && metadata.get().isUpdated()) {
+        catalogUIAdapter.storeFields(mp, metadata.get());
       }
     }
 
@@ -1781,14 +1778,13 @@ public class IndexServiceImpl implements IndexService {
                 mp.remove(mpe);
                 String elementType = mpe.getFlavor().getType();
                 if (StringUtils.isNotBlank(elementType)) {
+                  // remember the tags for this type of element
+                  if (!seriesExtDcTags.containsKey(elementType)) {
+                    // initialize the tags list on the first occurrence of this element type
+                    seriesExtDcTags.put(elementType, new ArrayList<>());
+                  }
                   for (String tag : mpe.getTags()) {
-                    if (!seriesExtDcTags.containsKey(elementType)) {
-                      List<String> tags = new ArrayList<>();
-                      tags.add(tag);
-                      seriesExtDcTags.put(elementType, tags);
-                    } else {
-                      seriesExtDcTags.get(elementType).add(tag);
-                    }
+                    seriesExtDcTags.get(elementType).add(tag);
                   }
                 }
               }
