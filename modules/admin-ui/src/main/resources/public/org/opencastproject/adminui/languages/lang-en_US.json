@@ -893,9 +893,11 @@
          },
          "THEME": {
            "CAPTION": "Theme",
-           "DESCRIPTION": "",
+           "DESCRIPTION": {
+             "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+           },
            "TITLE": "Theme",
-           "LABEL": "No theme",
+           "LABEL": "Please select a theme",
            "EMPTY": "No theme found"
          },
          "SUMMARY": {

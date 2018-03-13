@@ -36,6 +36,10 @@ angular.module('adminNg.services')
 
         this.reset();
 
+        this.themeSave = function () {
+            me.ud.themeDescription = me.themes[me.ud.theme].description;
+        };
+
         me.themes = NewSeriesThemeResource.get();
     };
 
