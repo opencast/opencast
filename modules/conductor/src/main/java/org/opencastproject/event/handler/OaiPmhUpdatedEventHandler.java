@@ -28,22 +28,17 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -62,9 +57,9 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
   protected static final Logger logger = LoggerFactory.getLogger(OaiPmhUpdatedEventHandler.class);
 
   // config keys
-  private static final String CFG_PROPAGATE_EPISODE = "propagate.episode";
-  private static final String CFG_FLAVORS = "flavors";
-  private static final String CFG_TAGS = "tags";
+  protected static final String CFG_PROPAGATE_EPISODE = "propagate.episode";
+  protected static final String CFG_FLAVORS = "flavors";
+  protected static final String CFG_TAGS = "tags";
 
   /** Whether to propagate episode meta data changes to OAI-PMH or not */
   private boolean propagateEpisode = false;
@@ -75,22 +70,14 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
   /** List of tags to redistribute */
   private Set<String> tags = new HashSet<>();
 
-
-  private AuthorizationService authorizationService = null;
-
-  private DublinCoreCatalogService dublinCoreService = null;
-
+  /** The security service */
   private SecurityService securityService = null;
 
-  private ServiceRegistry serviceRegistry = null;
-
+  /** The OAI-PMH database */
   private OaiPmhDatabase oaiPmhPersistence = null;
 
+  /** The OAI-PMH publication service */
   private OaiPmhPublicationService oaiPmhPublicationService = null;
-
-  private OrganizationDirectoryService organizationDirectoryService = null;
-
-  private Workspace workspace = null;
 
   /** The system account to use for running asynchronous events */
   protected String systemAccount = null;
@@ -135,14 +122,9 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       return;
     }
 
-    if (AssetManagerItem.Type.Update != snapshotItem.getType()) {
-      logger.trace("Handling the event type {} is not implemented yet", snapshotItem.getType().toString());
-      return;
-    }
-
     //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
-    logger.info("Handling {} event for media package {}",
-            snapshotItem.getType().toString(), snapshotItem.getMediapackage().getIdentifier().compact());
+    logger.info("Handling update event for media package {}",
+            snapshotItem.getMediapackage().getIdentifier().compact());
 
     // We must be an administrative user to make a query to the OaiPmhPublicationService
     final User prevUser = securityService.getUser();
@@ -185,14 +167,6 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     }
   }
 
-  public void setAuthorizationService(AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-  }
-
-  public void setDublinCoreCatalogService(DublinCoreCatalogService dublinCoreService) {
-    this.dublinCoreService = dublinCoreService;
-  }
-
   public void setOaiPmhPersistence(OaiPmhDatabase oaiPmhPersistence) {
     this.oaiPmhPersistence = oaiPmhPersistence;
   }
@@ -201,19 +175,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     this.oaiPmhPublicationService = oaiPmhPublicationService;
   }
 
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  public void setWorkspace(Workspace workspace) {
-    this.workspace = workspace;
   }
 }

@@ -120,7 +120,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
         streaming = set(streamingElements);
       job = service.publish(mediaPackage, channel, download, streaming, checkAvailability);
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to create an publication job", e);
+      logger.warn("Unable to create an publication job", e);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Error publishing element", e);
