@@ -1,9 +1,8 @@
 # YouTube Publication Configuration
 
-This page documents the configuration for Opencast module **matterhorn-publication-service-youtube-v3**.
+This page documents the configuration for Opencast module **opencast-publication-service-youtube-v3**.
 
 ## Before you start
-
 
 You need to meet these requirements to make a YouTube Publication:
 
@@ -13,13 +12,20 @@ You need to meet these requirements to make a YouTube Publication:
 
 ## Google Developers Configuration
 
+Below is a summarized version of Google's quickstart page, which currently lives [here][googledoc].  If these
+instructions do not work for you, or are unclear please let us know - Google has a habit of changing its configuration
+pages and we don't always notice!
+
 ### Create new Google Project
 
 - Login to Google account
 - Navigate to the [**Google Developers Console**][googledevconsole]
 - Click **Create Project** and follow the instructions
-- On your new projects page, choose **APIs & auth** then **Consent screen** in the navigation pane
-- Set the **PRODUCT NAME** and the **EMAIL ADDRESS**
+- Navigate to the [**Google Credentials Console**][googleapiconsole]
+- Select **Credentials**
+- Create Credentials, specifically OAuth Client ID
+- Configure the API Consent Screen, you will need to set the Product name
+- Select **Other** product type
 
 ### Enable API
 
@@ -39,6 +45,10 @@ You need to meet these requirements to make a YouTube Publication:
 - Save the JSON file to `${karaf.etc}/youtube-v3/client-secrets-youtube-v3.json` (Usually this is
   `etc/youtube-v3/client-secrets-youtube-v3.json`)
 
+### Enable the publication service
+
+- In `etc/org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg` set `org.opencastproject.publication.youtube.enabled=true`
+- Update the category, keywords, default privacy, and default playlist variables as required
 
 ## YouTube configuration in Opencast
 
@@ -63,7 +73,7 @@ With the JSON file created and saved previously, you have to proceed as describe
         Received verification code. Closing…
 
 - Now verify that Opencast has received the access key and that it has been saved in
-  `work/opencast/youtube-v3/data-store/store.`
+  `data/opencast/youtube-v3/data-store/store.`
 
 - Restart Opencast
 
@@ -73,23 +83,28 @@ With the JSON file created and saved previously, you have to proceed as describe
 Opencast can now publish to YouTube. The last step is to activate this feature. For this you have to create a new
 workflow or modify an existing one.
 
-- Make a copy of the default workflow `etc/opencast/workflows/ng-schedule-and-upload.xml` and create a copy named
-  `etc/opencast/workflows/ng-schedule-and-upload-youtube.xml`
+- Open the workflows `etc/opencast/workflows/ng-schedule-and-upload.xml` and `etc/opencast/workflows/ng-publish.xml`
 
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
-        <input id="publishToYouTube" name="publishToYouTube" type="checkbox"
-          checked="checked" class="configField" value="true" />
-        <label for="publishToYouTube">YouTube</label>
+        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+becomes
 
-- In `<operation id="defaults"`, set `publishToYouTube` to `true`.
+        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true"/>
 
-- Additionally, in the workflow `ng-partial-publish.xml` you also configure the `<operation id="publish-youtube"`. For
-  example, you could specify to publish the presentation stream only by setting the configuration to:
+- Open the workflows `etc/opencast/workflows/ng-retract.xml`
 
-        <configuration key="source-flavors">presentation/trimmed</configuration>
+- In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
+
+        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+
+becomes
+
+        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
 
 Opencast will detect the new workflow without restart, with that you can select the new workflow with the YouTube option
 enabled.
 
 [googledevconsole]: https://console.developers.google.com/project
+[googledoc]: https://developers.google.com/youtube/registering_an_application
+[googleapiconsole]: https://console.developers.google.com/apis/credentials
