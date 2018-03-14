@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.HashSet;
@@ -101,6 +102,8 @@ public class XACMLSecurityTest {
         return file.toURI();
       }).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.capture(uri))).andAnswer(() -> new File(uri.getValue())).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.capture(uri))).andAnswer(
+            () -> new FileInputStream(uri.getValue().getPath())).anyTimes();
     workspace.delete(EasyMock.anyObject(URI.class));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.replay(securityService, workspace);
