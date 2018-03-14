@@ -304,10 +304,10 @@
    "source":{
       "type":"SCHEDULE_MULTIPLE",
       "metadata": {
-        "start":"2008-03-16T14:00:00Z",
-        "end":"2008-04-16T00:00:00Z",
+        "start":"2018-02-04T14:00:00Z",
+        "end":"2018-02-24T00:00:00Z",
         "duration":"60000",
-        "rrule":"FREQ=DAILY;BYDAY=MO,TU,WE,TH,FR;COUNT=15",
+        "rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=14;BYMINUTE=0",
         "device":"agent1",
         "inputs":"a,b"
       }

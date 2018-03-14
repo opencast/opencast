@@ -1680,6 +1680,16 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  public void testRecurringRecording() throws Exception {
+    RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA");
+
+    //GDLGDL Needs test
+    /*List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
+            , start, new Date(start.getTime() + hours(48)),
+            new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));*/
+  }
+
+  @Test
   public void testGetArchivedOnly() throws Exception {
     MediaPackage mediaPackage = generateEvent(Opt.some("1"));
     Version version = assetManager.takeSnapshot("test", mediaPackage).getVersion();

@@ -108,6 +108,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -706,7 +707,7 @@ public class SchedulerRestService {
    */
   @POST
   @Path("/")
-  @RestQuery(name = "newrecordings", description = "Creates new event with specified parameters",
+  @RestQuery(name = "newrecording", description = "Creates new event with specified parameters",
           returnDescription = "If an event was successfully created",
           restParameters = {
           @RestParameter(name = "start", isRequired = true, type = Type.INTEGER, description = "The start date of the event in milliseconds from 1970-01-01T00:00:00Z"),
@@ -801,6 +802,117 @@ public class SchedulerRestService {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
     } catch (Exception e) {
       logger.error("Unable to create new event with id '{}'", eventId, e);
+      return Response.serverError().build();
+    }
+  }
+
+  /**
+   * Creates new event based on parameters. All times and dates are in milliseconds.
+   */
+  @POST
+  @Path("/multiple")
+  @RestQuery(name = "newrecordings", description = "Creates new event with specified parameters",
+          returnDescription = "If an event was successfully created",
+          restParameters = {
+                  @RestParameter(name = "rrule", isRequired = true, type = Type.STRING, description = "The recurrence rule for the events"),
+                  @RestParameter(name = "start", isRequired = true, type = Type.INTEGER, description = "The start date of the event in milliseconds from 1970-01-01T00:00:00Z"),
+                  @RestParameter(name = "end", isRequired = true, type = Type.INTEGER, description = "The end date of the event in milliseconds from 1970-01-01T00:00:00Z"),
+                  @RestParameter(name = "duration", isRequired = true, type = Type.INTEGER, description = "The duration of the events in milliseconds"),
+                  @RestParameter(name = "tz", isRequired = true, type = Type.INTEGER, description = "The timezone of the events"),
+                  @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent of the event"),
+                  @RestParameter(name = "users", isRequired = false, type = Type.STRING, description = "Comma separated list of user ids (speakers/lecturers) for the event"),
+                  @RestParameter(name = "templateMp", isRequired = true, type = Type.TEXT, description = "The template mediapackage for the events"),
+                  @RestParameter(name = "wfproperties", isRequired = false, type = Type.TEXT, description = "Workflow "
+                          + "configuration keys for the event. Each key will be prefixed by 'org.opencastproject.workflow"
+                          + ".config.' and added to the capture agent parameters."),
+                  @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
+                  @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event"),
+                  @RestParameter(name = "source", isRequired = false, type = Type.STRING, description = "The scheduling source of the event"),
+                  @RestParameter(name = "origin", isRequired = false, type = Type.STRING, description = "The origin")
+          }, reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
+          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, conflicting events found (ConflicsFound)"),
+          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, event locked by a transaction  (TransactionLock)"),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "You do not have permission to create the event. Maybe you need to authenticate."),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid information for this request") })
+  public Response addMultipleEvents(@FormParam("rrule") String rruleString, @FormParam("start") long startTime,
+          @FormParam("end") long endTime, @FormParam("duration") long duration, @FormParam("tz") String tzString,
+          @FormParam("agent") String agentId, @FormParam("users") String users,
+          @FormParam("templateMp") MediaPackage templateMp, @FormParam("wfproperties") String workflowProperties,
+          @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut,
+          @FormParam("source") String schedulingSource, @FormParam("origin") String origin)
+          throws UnauthorizedException {
+    if (StringUtils.isBlank(origin))
+      origin = SchedulerService.ORIGIN;
+
+    if (endTime <= startTime || startTime < 0) {
+      logger.debug("Cannot add event without proper start and end time");
+      return RestUtil.R.badRequest("Cannot add event without proper start and end time");
+    }
+
+    RRule rrule;
+    try {
+      rrule = new RRule(rruleString);
+    } catch (ParseException e) {
+      logger.debug("Could not parse recurrence rule");
+      return RestUtil.R.badRequest("Could not parse recurrence rule");
+    }
+
+    if (duration < 1) {
+      logger.debug("Cannot schedule events with durations less than 1");
+      return RestUtil.R.badRequest("Cannot schedule events with durations less than 1");
+    }
+
+    if (StringUtils.isBlank(tzString)) {
+      logger.debug("Cannot schedule events with blank timezone");
+      return RestUtil.R.badRequest("Cannot schedule events with blank timezone");
+    }
+    TimeZone tz = TimeZone.getTimeZone(tzString);
+
+    if (StringUtils.isBlank(agentId)) {
+      logger.debug("Cannot add event without agent identifier");
+      return RestUtil.R.badRequest("Cannot add event without agent identifier");
+    }
+
+    Map<String, String> caProperties = new HashMap<>();
+    if (StringUtils.isNotBlank(agentParameters)) {
+      try {
+        Properties prop = parseProperties(agentParameters);
+        caProperties.putAll((Map) prop);
+      } catch (Exception e) {
+        logger.info("Could not parse capture agent properties: {}", agentParameters);
+        return RestUtil.R.badRequest("Could not parse capture agent properties");
+      }
+    }
+
+    Map<String, String> wfProperties = new HashMap<>();
+    if (StringUtils.isNotBlank(workflowProperties)) {
+      try {
+        Properties prop = parseProperties(workflowProperties);
+        wfProperties.putAll((Map) prop);
+      } catch (IOException e) {
+        logger.info("Could not parse workflow configuration properties: {}", workflowProperties);
+        return RestUtil.R.badRequest("Could not parse workflow configuration properties");
+      }
+    }
+    Set<String> userIds = new HashSet<>();
+    String[] ids = StringUtils.split(users, ",");
+    if (ids != null)
+      userIds.addAll(Arrays.asList(ids));
+
+    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.UTC);
+    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC);
+
+    try {
+      service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
+              Opt.nul(optOut), Opt.nul(schedulingSource), origin);
+      return Response.status(Status.CREATED).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (SchedulerTransactionLockException | SchedulerConflictException e) {
+      return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
+    } catch (Exception e) {
+      logger.error("Unable to create new events", e);
       return Response.serverError().build();
     }
   }

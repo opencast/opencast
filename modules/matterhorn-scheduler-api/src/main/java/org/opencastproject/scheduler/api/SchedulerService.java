@@ -29,6 +29,7 @@ import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
 
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import java.util.Date;
@@ -244,6 +245,59 @@ public interface SchedulerService {
                   SchedulerConflictException, SchedulerTransactionLockException, SchedulerException;
 
   /**
+   * Creates a group of new event using specified mediapackage, workflow configuration and capture agent configuration.
+   * The mediapackage id is used as the event's identifier.
+   *
+   * Default capture agent properties are created from agentId and DublinCore. Following values are generated:
+   * <ul>
+   * <li>event.title (mapped from dc:title)</li>
+   * <li>event.series (mapped from mediaPackage#getSeries())</li>
+   * <li>event.location (mapped from captureAgentId)</li>
+   * </ul>
+   *
+   * @param rRule
+   *          the {@link RRule} for the events to schedule
+   * @param start
+   *          the start date for the recurrence
+   * @param end
+   *          the end date for the recurrence
+   * @param duration
+   *          the duration of the events
+   * @param tz
+   *          the {@link TimeZone} for the events
+   * @param captureAgentId
+   *          the capture agent id
+   * @param userIds
+   *          the list of user identifiers of speakers/lecturers
+   * @param templateMp
+   *          the mediapackage to base the events on
+   * @param wfProperties
+   *          the workflow configuration
+   * @param caMetadata
+   *          the capture agent configuration
+   * @param optOut
+   *          the optional opt out status
+   * @param schedulingSource
+   *          the optional scheduling source from which the event comes from
+   * @param modificationOrigin
+   *          the origin of the modifier which adds the event
+   * @return A {@link Map>} of mediapackage ID and {@link Period} where the event occurs
+   * @throws UnauthorizedException
+   *           if the caller is not authorized to take this action
+   * @throws SchedulerConflictException
+   *           if there are conflicting events
+   * @throws SchedulerTransactionLockException
+   *           if there is a conflict with an open transaction
+   * @throws SchedulerException
+   *           if creating new events failed
+   */
+  Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
+          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String,
+          String> wfProperties, Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource,
+          String modificationOrigin) throws UnauthorizedException,
+          SchedulerConflictException, SchedulerTransactionLockException, SchedulerException;
+
+  /**
    * Updates event with specified ID.
    *
    * Default capture agent properties are created from DublinCore. Following values are generated:
@@ -432,6 +486,24 @@ public interface SchedulerService {
    */
   ReviewStatus getReviewStatus(String mediaPackageId)
           throws NotFoundException, UnauthorizedException, SchedulerException;
+
+  /**
+   * Returns a list of {@link Period}s which would be scheduled between a start and end date with a given recurrence
+   * rule. Note that this method does not actually schedule anything, merely calculates where things *would* be scheduled.
+   *
+   * @param rrule
+   *          The {@link RRule} defining the recurrence rules
+   * @param start
+   *          The start date and time
+   * @param end
+   *          The end date and time
+   * @param duration
+   *          The duration for each event
+   * @param tz
+   *          The timezone to schedule in
+   * @return The list of Periods which would be scheduled
+   */
+  List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz);
 
   /**
    * Query
