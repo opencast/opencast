@@ -183,7 +183,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       liveStreamingUrl = StringUtils.trimToEmpty((String) properties.get(LIVE_STREAMING_URL));
       logger.info("Live streaming server url is {}", liveStreamingUrl);
     } else {
-      logger.warn("Live streaming url was not set in '{}'. This is a problem when not using MHPearl capture agents!",
+      logger.info("Live streaming url not set in '{}'. Streaming urls must be provided by capture agent properties.",
               LIVE_STREAMING_URL);
     }
 
@@ -432,7 +432,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   void addLiveTracks(MediaPackage mp, String caName) throws LiveScheduleException {
     String mpId = mp.getIdentifier().compact();
     try {
-      // MHPearl specific: if capture agent registered the properties:
+      // If capture agent registered the properties:
       // capture.device.live.resolution.WIDTHxHEIGHT=COMPLETE_STREAMING_URL, use them!
       try {
         Properties caProps = captureAgentService.getAgentCapabilities(caName);

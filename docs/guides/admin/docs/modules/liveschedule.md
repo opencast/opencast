@@ -120,7 +120,7 @@ If the capture agent registers itself with:
 |-------------|-----|
 |capture.device.names|presentation,presenter,live|
 |capture.device.presentation.flavor|presentation/source|
-|capture.device.presentater.flavor|presenter/source|
+|capture.device.presenter.flavor|presenter/source|
 |capture.device.live.resolution.1920x540|rtmp://xyz.live.edgefcs.net/live/presenter.stream-1920x540@12345|
 |capture.device.live.resolution.960x270|rtmp://xyz.live.edgefcs.net/live/presenter.stream-960x270@12345|
 
