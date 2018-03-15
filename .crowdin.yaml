@@ -20,5 +20,5 @@ files:
     translation: '/modules/engage-ui/src/main/resources/ui/language/%locale%.json'
 
   -
-    source: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/en.json'
-    translation: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/%two_letters_code%.json'
+    source: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/en-US.json'
+    translation: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/%locale%.json'
