@@ -85,43 +85,39 @@ module.exports = function (grunt) {
         }
       },
       proxy: {
-          options: {
-              keepalive: true,
-              livereload: true,
-              debug: false,
-              proxyPort: '<%= proxyPort %>',
-              middleware: proxyMiddleware(grunt, appConfig.app)
-          },
-          proxies: [ {
-              context: '/admin-ng',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-           },
-           {
-              context: '/acl-manager',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/i18n',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/broker',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/services',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          }]
+        options: {
+          keepalive: true,
+          livereload: true,
+          debug: false,
+          proxyPort: '<%= proxyPort %>',
+          middleware: proxyMiddleware(grunt, appConfig.app)
+        },
+        proxies: [{
+          context: '/admin-ng',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/acl-manager',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/i18n',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/broker',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/services',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }]
       },
       test: {
         options: {
@@ -229,17 +225,17 @@ module.exports = function (grunt) {
         devDependencies: true,
         src: '<%= karma.options.configFile %>',
         ignorePath:  /\.\.\//,
-        fileTypes:{
+        fileTypes: {
           js: {
             block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-              detect: {
-                js: /'(.*\.js)'/gi
-              },
-              replace: {
-                js: '\'../{{filePath}}\','
-              }
+            detect: {
+              js: /'(.*\.js)'/gi
+            },
+            replace: {
+              js: '\'../{{filePath}}\','
             }
           }
+        }
       },
       sass: {
         src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
@@ -249,29 +245,29 @@ module.exports = function (grunt) {
 
     // Compiles Sass to CSS and generates necessary files if requested
     sass: {
-        options: {
-            includePaths: [
-                'bower_components'
-            ]
-        },
-        dist: {
-            files: [{
-                expand: true,
-                cwd: '<%= yeoman.app %>/styles',
-                src: ['*.scss'],
-                dest: '.tmp/styles',
-                ext: '.css'
-            }]
-        },
-        server: {
-            files: [{
-                expand: true,
-                cwd: '<%= yeoman.app %>/styles',
-                src: ['*.scss'],
-                dest: '.tmp/styles',
-                ext: '.css'
-            }]
-        }
+      options: {
+        includePaths: [
+          'bower_components'
+        ]
+      },
+      dist: {
+        files: [{
+          expand: true,
+          cwd: '<%= yeoman.app %>/styles',
+          src: ['*.scss'],
+          dest: '.tmp/styles',
+          ext: '.css'
+        }]
+      },
+      server: {
+        files: [{
+          expand: true,
+          cwd: '<%= yeoman.app %>/styles',
+          src: ['*.scss'],
+          dest: '.tmp/styles',
+          ext: '.css'
+        }]
+      }
     },
 
     // Renames files for browser caching purposes
@@ -436,7 +432,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
+      grunt.task.run(['build', 'connect:dist:keepalive']);
+      return;
     }
 
     grunt.task.run([
