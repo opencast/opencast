@@ -126,6 +126,7 @@
     <sec:intercept-url pattern="/admin-ng/event/new/conflicts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/optouts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_STATUS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/assets" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
