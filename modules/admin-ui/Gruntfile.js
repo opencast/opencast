@@ -16,8 +16,7 @@ module.exports = function (grunt) {
 
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
-    useminPrepare: 'grunt-usemin',
-    ngtemplates: 'grunt-angular-templates'
+    useminPrepare: 'grunt-usemin'
   });
 
   // Configurable paths for the application
