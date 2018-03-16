@@ -16,7 +16,8 @@ module.exports = function (grunt) {
 
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
-    useminPrepare: 'grunt-usemin'
+    useminPrepare: 'grunt-usemin',
+    setupProxies: 'grunt-middleware-proxy'
   });
 
   // Configurable paths for the application
@@ -486,12 +487,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'serve'
   ]);
-
-  grunt.loadNpmTasks('grunt-middleware-proxy');
-  grunt.loadNpmTasks('grunt-sass');
-  grunt.loadNpmTasks('grunt-postcss');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-reload');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
