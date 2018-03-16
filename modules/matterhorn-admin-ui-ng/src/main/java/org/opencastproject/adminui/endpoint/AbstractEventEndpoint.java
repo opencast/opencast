@@ -111,6 +111,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -2033,6 +2034,10 @@ public abstract class AbstractEventEndpoint {
       query.withLimit(optLimit.get());
     if (optOffset.isSome())
       query.withOffset(offset);
+
+    //We search for write actions
+    query.withoutActions();
+    query.withAction(Permissions.Action.WRITE);
     // TODO: Add other filters to the query
 
     SearchResult<Event> results = null;
