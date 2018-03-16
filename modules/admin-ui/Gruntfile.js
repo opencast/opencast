@@ -335,9 +335,19 @@ module.exports = function (grunt) {
       }
     },
 
+    concat: {
+      options: {
+        sourceMap: true,
+        sourceMapStyle: 'inline'
+      }
+    },
+
     // ng-annotate tries to make the code safe for minification automatically
     // by using the Angular long form for dependency injection.
     ngAnnotate: {
+      options: {
+        sourceMap: true
+      },
       dist: {
         files: [{
           expand: true,
@@ -345,6 +355,40 @@ module.exports = function (grunt) {
           src: '*.js',
           dest: '.tmp/concat/scripts'
         }]
+      }
+    },
+
+    // The sourcemaps embedded by ngAnnotate are sometimes missing
+    // a trailing newline, which is expected by extract_sourcemap
+    endline: {
+      ngAnnotate: {
+        files: [{
+          src: '.tmp/concat/scripts/*.js',
+          dest: '.'
+        }]
+      }
+    },
+
+    // Uglify generate bogus sourcemaps when trying to take into account
+    // a preexisting inline sourcemap, so we extract the inline sourcemaps
+    // that ngAnnotate generates into their own files.
+    // Note that ngAnnotate **can** actually output external source maps, too,
+    // but in that mode, it does not in turn take into account any preexisting sourcemap.
+    extract_sourcemap: {
+      ngAnnotate: {
+        files: [{
+            src: '.tmp/concat/scripts/*.js',
+            dest: '.tmp/concat/scripts'
+        }]
+      }
+    },
+
+    uglify: {
+      options: {
+        sourceMap: true,
+        sourceMapIn: function (file) {
+          return file + '.map';
+        }
       }
     },
 
@@ -475,6 +519,8 @@ module.exports = function (grunt) {
       'postcss',
       'concat',
       'ngAnnotate',
+      'endline',
+      'extract_sourcemap',
       'copy:dist',
       'cssmin',
       'uglify',
