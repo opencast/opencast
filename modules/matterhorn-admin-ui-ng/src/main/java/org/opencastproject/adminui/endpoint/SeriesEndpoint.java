@@ -85,6 +85,7 @@ import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
@@ -684,6 +685,10 @@ public class SeriesEndpoint {
           }
         }
       }
+
+      //We search for write actions
+      query.withoutActions();
+      query.withAction(Permissions.Action.WRITE);
 
       logger.trace("Using Query: " + query.toString());
 
