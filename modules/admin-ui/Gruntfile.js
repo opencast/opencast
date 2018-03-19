@@ -374,7 +374,10 @@ module.exports = function (grunt) {
     // that ngAnnotate generates into their own files.
     // Note that ngAnnotate **can** actually output external source maps, too,
     // but in that mode, it does not in turn take into account any preexisting sourcemap.
+
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
     extract_sourcemap: {
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
       ngAnnotate: {
         files: [{
             src: '.tmp/concat/scripts/*.js',
