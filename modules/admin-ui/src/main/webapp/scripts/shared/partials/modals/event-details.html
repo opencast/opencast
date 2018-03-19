@@ -397,10 +397,18 @@
                                             <td>{{ item.status }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                                             <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
+                                                <a ng-show="item.status == 'RUNNING' || item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'STOP')" class="stop fa-fw"><!-- STOP -->
+                                                </a>
                                                 <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')" class="fa fa-hand-stop-o fa-fw" style="color:red"><!-- Abort -->
                                                 </a>
                                                 <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')" class="fa fa-refresh fa-fw"><!-- Retry -->
                                                 </a>
+                                                <a ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"
+                                                   ng-show="(item.status == 'SUCCEEDED' || item.status == 'FAILED' || item.status == 'STOPPED') && !isCurrentWorkflow(item.id)"
+                                                   ng-click="deleteWorkflow(item.id)"
+                                                   class="remove fa-fw"><!-- DELETE -->
+                                                </a>
+
                                             </td>
                                             <td>
                                                 <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">

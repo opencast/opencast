@@ -294,7 +294,6 @@ describe('Event controller', function () {
     describe('#workflowAction', function () {
         beforeEach(function () {
             spyOn(Notifications, 'add');
-            $scope.modal_close = jasmine.createSpy();
         });
 
         describe('on success', function () {
@@ -302,20 +301,18 @@ describe('Event controller', function () {
             	$httpBackend.expectPUT(/\/admin-ng\/event\/.+\/workflows\/.+\/action\/.+/g).respond(200, '{}');
             });
 
-            it('resumes workflow, shows notification, closes', function () {
+            it('resumes workflow, shows notification', function () {
                 $scope.workflowAction(1234, 'RETRY'); // wfId
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
-                expect($scope.modal_close).toHaveBeenCalled();
+                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String), 'events-access');
             });
 
-            it('aborts workflow, shows notification, closes', function () {
+            it('aborts workflow, shows notification', function () {
                 $scope.workflowAction(1234, 'NONE'); // wfId
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String));
-                expect($scope.modal_close).toHaveBeenCalled();
+                expect(Notifications.add).toHaveBeenCalledWith('success', jasmine.any(String), 'events-access');
             });
         });
 
@@ -324,20 +321,18 @@ describe('Event controller', function () {
             	$httpBackend.expectPUT(/\/admin-ng\/event\/.+\/workflows\/.+\/action\/.+/g).respond(500, '{}');
             });
 
-        	it('shows notification, closes', function () {
+            it('shows notification', function () {
                 $scope.workflowAction(1234, 'RETRY'); // wfId
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));
-                expect($scope.modal_close).toHaveBeenCalled();
+                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String), 'events-access');
             });
 
-            it('shows notification, closes', function () {
+            it('shows notification', function () {
                 $scope.workflowAction(1234, 'NONE'); // wfId
                 $httpBackend.flush();
 
-                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String));
-                expect($scope.modal_close).toHaveBeenCalled();
+                expect(Notifications.add).toHaveBeenCalledWith('error', jasmine.any(String), 'events-access');
             });
         });
     });
