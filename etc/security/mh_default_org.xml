@@ -317,7 +317,7 @@
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
-    <!-- Shibooleth log out
+    <!-- Shibboleth log out
          Please specifiy the URL to return to after logging out
     <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
     -->
