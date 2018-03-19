@@ -38,31 +38,31 @@ Adding A Tenant
 
 To add a tenant to the installation, two things need to be put in place: a tenant configuration and a set of security
 rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and 
-`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to `tenant1-*.example.org`.
+`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to `tenant1-*.opencast.org`.
 
 ### Tenant Configuration
 
 Create a file called org.opencastproject.organization-tenant1.cfg in the `etc/` directory of your Opencast
-installation, on each of the nodes:
+installation, on each of the nodes.  As an example, this is what the admin node looks like:
 
     id=tenant1
     name=Tenant 1
-    server=tenant1-admin.example.org,tenant1-presentation.example.org
+    server=tenant1-admin.opencast.org
     port=8080
     admin_role=ROLE_ADMIN
     anonymous_role=ROLE_ANONYMOUS
 
     # Admin and Presentation Server Urls
-    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.example.org
-    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.example.org
+    prop.org.opencastproject.admin.ui.url=https://tenant1-admin.opencast.org
+    prop.org.opencastproject.engage.ui.url=https://tenant1-presentation.opencast.org
 
     # Default properties for the user interface
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-Also make sure to modify `org.opencastproject.organization-mh_default_org.org`:
+Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual server names:
 
-    server=tenant1-admin.example.org,tenant1-presentation.example.org
+    server=admin.opencast.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
@@ -83,4 +83,4 @@ The easiest way of creating that file is probably to create a copy of the alread
 
 Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg-tenant1`, and `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg` should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common-tenant1.cfg`.
 
-In each of the new configuration files, change `organization` key to match the tenant id.  Create a copy of the files for each tenant.
+In each of the new configuration files, change `organization` key to match the tenant id, and change the `common-metadata` key to false.  Create a copy of the files for each tenant.  Note: The original `...-common.cfg` files *must* have their `common-metadata` keys set to true, otherwise metadata will only be available in one tenant and you will experience a number of odd errors.
