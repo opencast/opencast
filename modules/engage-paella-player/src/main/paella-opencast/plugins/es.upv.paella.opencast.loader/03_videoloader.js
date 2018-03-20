@@ -53,8 +53,10 @@ var OpencastToPaellaConverter = Class.create({
 
 		var tracks = episode.mediapackage.media.track;
 		var attachments = episode.mediapackage.attachments.attachment;
+		var catalogs = episode.mediapackage.metadata.catalog;
 		if (!(tracks instanceof Array)) { tracks = [tracks]; }
 		if (!(attachments instanceof Array)) { attachments = [attachments]; }		
+		if (!(catalogs instanceof Array)) { catalogs = [catalogs]; }		
 		// Read the tracks!!
 		tracks.forEach(function(currentTrack) {
 			var currentStream = opencastStreams[currentTrack.type];
@@ -108,10 +110,44 @@ var OpencastToPaellaConverter = Class.create({
 		var imageSource =   {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:320, h:180}};
 		var imageSourceHD = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
 		var blackboardSource = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
+		var captions = [];
+		
 		// Read the attachments
 		attachments.forEach(function(currentAttachment){
 			try {
-				if (currentAttachment.type == "blackboard/image") {
+			    let captions_regex = /^captions\/([^\+]+)(\+(.+))?/g;
+			    let captions_match = captions_regex.exec(currentAttachment.type);
+			    
+				if (captions_match) {
+					let captions_format = captions_match[1];
+					let captions_lang = captions_match[3];
+					
+					// TODO: read the lang from the dfxp file
+					//if (captions_format == "dfxp") {}
+
+					if (!captions_lang && currentAttachment.tags && currentAttachment.tags.tag) {
+						if (!(currentAttachment.tags.tag instanceof Array)) {
+							currentAttachment.tags.tag = [currentAttachment.tags.tag];
+						}
+						currentAttachment.tags.tag.forEach((tag)=>{
+							if (tag.startsWith("lang:")){
+								let split = tag.split(":");
+								captions_lang = split[1];
+							}
+						});
+					}
+
+					let captions_label = captions_lang || "unknown language"; //base.dictionary.translate("CAPTIONS_" + captions_lang);
+					
+					captions.push({
+						id: currentAttachment.id,								
+						lang: captions_lang,
+						text: captions_label,
+						url: currentAttachment.url,
+						format: captions_format
+					});
+				}			
+				else if (currentAttachment.type == "blackboard/image") {
 					if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
 						time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
 						
@@ -154,6 +190,40 @@ var OpencastToPaellaConverter = Class.create({
 			catch (err) {}
 		});
 		
+		// Read the catalogs
+		catalogs.forEach(function(currentCatalog){
+			try {
+				// backwards compatibility:
+				// Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
+				if (currentCatalog.type == "captions/timedtext") {
+					let captions_lang;
+					
+					if (currentCatalog.tags && currentCatalog.tags.tag) {
+						if (!(currentCatalog.tags.tag instanceof Array)) {
+							currentCatalog.tags.tag = [currentCatalog.tags.tag];
+						}
+						currentCatalog.tags.tag.forEach((tag)=>{
+							if (tag.startsWith("lang:")){
+								let split = tag.split(":");
+								captions_lang = split[1];
+							}
+						});
+					}
+					
+					let captions_label = captions_lang || "unknown language";
+										
+					captions.push({
+						id: currentCatalog.id,								
+						lang: captions_lang,
+						text: captions_label,
+						url: currentCatalog.url,
+						format: "dfxp"
+					});										
+				}
+			} 
+			catch (err) {}	
+		});
+		
 		
 		// Set the image stream
 		var imagesArray = [];
@@ -179,7 +249,8 @@ var OpencastToPaellaConverter = Class.create({
 				duration: episode.mediapackage.duration/1000
 			},
 			streams: [],
-			frameList: []
+			frameList: [],
+			captions: captions
 		};
 
 		if (presenter) { data.streams.push(presenter); }
