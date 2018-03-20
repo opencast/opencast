@@ -1,45 +1,51 @@
 # Types
 
-This page defines data types that are used with the Application API. The page is divided in several sections that
-start with some general information about how the defined types are supposed to work.
+This page defines data types that are commonly used by many Application API requests. The page is divided in several
+sections that start with general information about how the types are supposed to work.
 
 [TOC]
 
 ## Basic
 
-This section defines some basic data types used in the Application API specification.
+This section defines basic data types used in the Application API specification.
 
-Type      | Description
-:---------|:-----------
-`string`  | An UTF-8 encoded string
-`boolean` | `true` or `false`
-`integer` | An integer number, i.e. [-][0-9]+[0-9]*
+Type                | Description
+:-------------------|:-----------
+[`string`](#basic)  | An UTF-8 encoded string
+[`boolean`](#basic) | `true` or `false`
+[`integer`](#basic) | An integer number, i.e. [-][0-9]+[0-9]*
 
 ## Extended
 
-This section describes some extended data types often used in the Application API.
+This section describes extended data types used in the Application API specification.
 
 ### array
 
 The Application API makes use of JSON arrays often. We indicate the element type in the brackets, e.g.
-`array[string]`.
+[`array[string]`](#array).
 
 The empty array [] is allowed.
 
-__Example__
+__Examples__
 
+```
 ["String1", "String2"]
+```
+
+```
+[]
+```
 
 ### file
 
-TBD
+This data type indicates that a file is needed as parameter.
 
 ### flavor
 
-Opencast uses flavors to locate tracks, attachments and catalogs associated to an events. Flavors have a type and a
-subtype and are written in the for `type` + "/" + `subtype`.
+Opencast uses flavors to locate tracks, attachments and catalogs associated to events. Flavors have a type and a
+subtype and are written in the form `type` + "/" + `subtype`.
 
-`flavor` ::= `type` + "/" + `subtype` whereas both `type` and `subtype` consist of ([a-z][A-Z][1-9])+([a-z][A-Z][1-9])[+-])*
+[`flavor`](#flavor) ::= `type` + "/" + `subtype` whereas both `type` and `subtype` consist of ([a-z][A-Z][1-9])+([a-z][A-Z][1-9][+-])*
 
 __Example__
 
@@ -75,7 +81,7 @@ Opencast distinguishes between bibliographic metadata and technical metadata:
 For events and series, Opencast manages bibliographic metadata in metadata catalogs. There are two kind of metadata
 catalogs:
 
- - The default metadata catalogs are for events (`dublincore/episode`) and series (`dublincore/series`)
+ - The default metadata catalogs for events (`dublincore/episode`) and series (`dublincore/series`)
  - An arbitrary number of configurable extended metadata catalogs can be configured for both events and series
 
 While the extended metadata can be fully configured, the default metadata catalogs are supposed to hold a minimum
@@ -85,9 +91,11 @@ As the metadata catalogs are configurable, the Application API provides means of
 configuration.
 
 This is done by ["/api/events/{event_id}/metadata"](events-api.md#metadata) and
-["/api/series/{series_id}/metdata"](series-api.md#metadata). Those requests return a self-describing metadata catalog
-that does not just contain the current values of all metadata fields but also a list of available metadata feilds and
-their configuration.
+["/api/series/{series_id}/metdata"](series-api.md#metadata). Those requests return self-describing metadata catalogs
+that do not just contain the values of all metadata fields but also a list of available metadata fields and their
+configuration.
+
+Note that the Opencast configuration defines which metadata catalogs are available for events and series.
 
 The following sections define data types that are used to manage metadata catalogs.
 
@@ -95,16 +103,16 @@ The following sections define data types that are used to manage metadata catalo
 
 Each metadata catalogs has a list of metadata fields that is described as JSON objects with the following fields:
 
-Field          | Optional | Type      | Description
-:--------------|:---------|:----------|:-----------
-`id`           | no       | `string`  | Technical identifier of the metadata field
-`value`        | no       | `string`  | Current value of the metadata field
-`label`        | no       | `string`  | Displayable name of the metadata field (i18n)
-`type`         | no       | `string`  | Type of the metadata field
-`readOnly`     | no       | `boolean` | Whether this metadata field is read-only
-`required`     | no       | `booelan` | Whether this metadata field is mandatory
-`collection`   | yes      | `string`  | Pre-defined list of values as JSON object
-`translatable` | yes      | `booelan` | Whether the field `value` supports i18n
+Field          | Optional | Type                | Description
+:--------------|:---------|:--------------------|:-----------
+`id`           | no       | [`string`](#basic)  | Technical identifier of the metadata field
+`value`        | no       | [`string`](#basic)  | Current value of the metadata field
+`label`        | no       | [`string`](#basic)  | Displayable name of the metadata field (i18n)
+`type`         | no       | [`string`](#basic)  | Type of the metadata field
+`readOnly`     | no       | [`boolean`](#basic) | Whether this metadata field is read-only
+`required`     | no       | [`boolean`](#basic) | Whether this metadata field is mandatory
+`collection`   | yes      | [`string`](#basic)  | Pre-defined list of values as JSON object
+`translatable` | yes      | [`boolean`](#basic) | Whether the field `value` supports i18n
 
 __Example__
 
@@ -142,7 +150,7 @@ __Example__
 
 ### values
 
-To modifiy existing metadata catalogs, a JSON array with JSON objects contained the following fields is used:
+To modifiy values of metadata catalogs, a JSON array with JSON objects contained the following fields is used:
 
 Field   | Required | Description
 :-------|:---------|:-----------
@@ -177,11 +185,11 @@ Notes:
 Besides the metadata configuration, the full metadata catalog configuration includes some additional fields
 describing the catalog itself:
 
-Field  | Type     | Description
-:------|:---------|:-----------
-label  | `string` | Displayable name of the metadata catalog
-flavor | `string` | The flavor of the metadata catalog
-fields | `string` | An array of JSON objects describing the metadata field configurations of the metadata catalogs
+Field  | Type               | Description
+:------|:-------------------|:-----------
+label  | [`string`](#basic) | Displayable name of the metadata catalog
+flavor | [`string`](#basic) | The flavor of the metadata catalog
+fields | [`string`](#basic) | An array of JSON objects describing the metadata field configurations of the metadata catalogs
 
 __Example__
 
@@ -271,11 +279,11 @@ Depending on the configuration of Opencast, there can be additional ACL actions.
 
 The access control entries are represented as JSON object with the following fields:
 
-ACE field  | Required  | Type      | Description
-:----------|:----------|:----------|:-----------
-`role`     | yes       | `string`  | The role this ACE affects
-`action`   | yes       | `string`  | The actions this ACE affects
-`allow`    | yes       | `boolean` | Whether role is allowed to perform the action
+ACE field  | Required | Type                | Description
+:----------|:---------|:--------------------|:-----------
+`role`     | yes      | [`string`](#basic)  | The role this ACE affects
+`action`   | yes      | [`string`](#basic)  | The actions this ACE affects
+`allow`    | yes      | [`boolean`](#basic) | Whether role is allowed to perform the action
 
 __Example__
 
