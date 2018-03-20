@@ -169,16 +169,6 @@
       </configurations>
     </operation>
 
-    <operation
-      id="export-wf-properties"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Export workflow settings to Java properties file">
-      <configurations>
-        <configuration key="target-flavor">processing/defaults</configuration>
-      </configurations>
-    </operation>
-
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Prepare asset                                                     -->

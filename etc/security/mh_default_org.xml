@@ -48,6 +48,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*/asset/publication/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/catalogAdapters" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/events.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/workflowProperties" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE, ROLE_UI_TASKS_CREATE, ROLE_UI_EVENTS_EDITOR_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/new/processing" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE, ROLE_UI_TASKS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/attachments.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW" />
