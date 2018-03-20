@@ -1,4 +1,4 @@
-# Types
+# Data Types
 
 This page defines data types that are commonly used by many Application API requests. The page is divided in several
 sections that start with general information about how the types are supposed to work.
