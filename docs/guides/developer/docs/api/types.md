@@ -67,6 +67,28 @@ __Example__
 }
 ```
 
+## Date and Time
+
+Type                         |Encoding      | Description
+:----------------------------|:-------------|:-----------
+[`date`](#date-and-time)     |[ISO 8601][4] | Date
+[`datetime`](#date-and-time) |[ISO 8601][4] | Date and Time
+
+__Examples__
+
+[`date`](#date-and-time):
+
+```
+2018-03-11
+```
+
+[`datetime`](#date-and-time):
+
+```
+2018-03-11T13:23:51Z
+```
+
+[4]: http://en.wikipedia.org/wiki/ISO_8601
 
 ## Metadata Catalogs
 

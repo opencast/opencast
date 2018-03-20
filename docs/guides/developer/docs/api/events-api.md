@@ -50,23 +50,23 @@ __Response__
 `200 (OK)`: A (potentially empty) list of events is returned. The list is represented as JSON array where each element
 is a JSON objects with the following fields:
 
-Field                | Type                              | Description
-:--------------------|:----------------------------------|:-----------
-`identifier`         | [`string`](types.md#basic)        | The unique identifier of the event
-`creator`            | [`string`](types.md#basic)        | The technical creator of this event
-`presenter`\*        | [`array[string]`](types.md#array) | The presenters of this event
-`created`            | [`string`](types.md#string)       | The date and time this event was created
-`subjects`\*         | [`array[string]`](types.md#array) | The subjects of this event
-`start`              | [`string`](types.md#basic)        | The technical start date and time of this event
-`description`\*      | [`string`](types.md#basic)        | The description of this event
-`title`\*            | [`string`](types.md#basic)        | The title of this event
-`processing_state`   | [`string`](types.md#basic)        | The current processing state of this event
-`duration`           | [`string`](types.md#basic)        | The bibliographic duration of this event
-`archive_version`    | [`string`](types.md#basic)        | The current version of this event
-`contributor`\*      | [`array[string]`](types.md#array) | The contributors of this event
-`has_previews`       | [`boolean`](types.md#basic)       | Whether this event can be opened with the video editor
-`location`\*         | [`string`](types.md#basic)        | The bibliographic location of this event
-`publication_status` | [`array[string]`](types.md#array) | The publications available for this event
+Field                | Type                                 | Description
+:--------------------|:-------------------------------------|:-----------
+`identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
+`creator`            | [`string`](types.md#basic)           | The technical creator of this event
+`presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
+`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`description`\*      | [`string`](types.md#basic)           | The description of this event
+`title`\*            | [`string`](types.md#basic)           | The title of this event
+`processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
+`duration`           | [`string`](types.md#basic)           | The bibliographic duration of this event
+`archive_version`    | [`string`](types.md#basic)           | The current version of this event
+`contributor`\*      | [`array[string]`](types.md#array)    | The contributors of this event
+`has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
+`location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
+`publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
 
 \* Metadata fields of metadata catalog `dublincore/episode`
 
@@ -225,7 +225,9 @@ Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20
 
 Returns a single event.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
+in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
+response.
 
 Query String Parameter |Type                         | Description
 :----------------------|:----------------------------|:-----------
@@ -238,23 +240,23 @@ __Response__
 
 `200 (OK)`: The event is returned as JSON object with the following fields:
 
-Field                | Type                              | Description
-:--------------------|:----------------------------------|:-----------
-`identifier`         | [`string`](types.md#basic)        | The unique identifier of the event
-`creator`            | [`string`](types.md#basic)        | The technical creator of this event
-`presenter`\*        | [`array[string]`](types.md#array) | The presenters of this event
-`created`            | [`string`](types.md#string)       | The date and time this event was created
-`subjects`\*         | [`array[string]`](types.md#array) | The subjects of this event
-`start`              | [`string`](types.md#basic)        | The technical start date and time of this event
-`description`\*      | [`string`](types.md#basic)        | The description of this event
-`title`\*            | [`string`](types.md#basic)        | The title of this event
-`processing_state`   | [`string`](types.md#basic)        | The current processing state of this event
-`duration`           | [`string`](types.md#basic)        | The bibliographic duration of this event
-`archive_version`    | [`string`](types.md#basic)        | The current version of this event
-`contributor`\*      | [`array[string]`](types.md#array) | The contributors of this event
-`has_previews`       | [`boolean`](types.md#basic)       | Whether this event can be opened with the video editor
-`location`\*         | [`string`](types.md#basic)        | The bibliographic location of this event
-`publication_status` | [`array[string]`](types.md#array) | The publications available for this event
+Field                | Type                                 | Description
+:--------------------|:-------------------------------------|:-----------
+`identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
+`creator`            | [`string`](types.md#basic)           | The technical creator of this event
+`presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
+`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`description`\*      | [`string`](types.md#basic)           | The description of this event
+`title`\*            | [`string`](types.md#basic)           | The title of this event
+`processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
+`duration`           | [`string`](types.md#basic)           | The bibliographic duration of this event
+`archive_version`    | [`string`](types.md#basic)           | The current version of this event
+`contributor`\*      | [`array[string]`](types.md#array)    | The contributors of this event
+`has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
+`location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
+`publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
 
 \* Metadata fields of metadata catalog `dublincore/episode`
 

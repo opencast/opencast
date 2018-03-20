@@ -63,14 +63,6 @@ If that header is not specified, the `Content-Type` will be `application/<versio
 
 > Note that the same header should be used to specify the version of the api that is expected to return the response. In this case, the header looks like this: `application/v1+json`. See the [versioning chapter of the general section](index.md#versioning) for more details.
 
-## Data types
-
-Type              |Encoding      | Comment                                                                   
-:-----------------|:-------------|:--------------------------------------------------------------------------
-Date              |[ISO 8601][4] | E. g. 2015-03-11
-Date Time         |[ISO 8601][4] | E. g. 2015-03-11T13:23:51Z
-Date (Time) range |[ISO 8601][4] | date &#124; date “/” &#124; ”/” date &#124; date “/” date &#124; date
-
 ## Encoding of single objects
 
 ### JSON notation
