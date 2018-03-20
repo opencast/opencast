@@ -1,18 +1,18 @@
 [1]: http://en.wikipedia.org/wiki/Basic_access_authentication
 [2]: http://en.wikipedia.org/wiki/XML
 [3]: http://en.wikipedia.org/wiki/JSON
-[4]: http://en.wikipedia.org/wiki/ISO_8601
 
 # Version
 
 Since the API is versioned, it supports specification of a version identifier as part of the standard `Accept` HTTP request header:
 
 
-Header            |Type       | Comment                                                                   
-:-----------------|:----------|:--------------------------------------------------------------------------
-`Accept`          |`String`   | The format is specified to use `application/<version>`, or `application/<version>+<format>` to also specify the required format.
+Header   | Type                       | Description
+:--------|:---------------------------|:-----------
+`Accept` | [`string`](types.md#basic) | The format is specified to use `application/<version>`, or `application/<version>+<format>` to also specify the required format.
 
-__Sample__
+__Example__
+
 ```
 Accept: application/v1.0.0+json
 ```
@@ -28,9 +28,9 @@ Versions should be specified as obtained from the [Base API](base-api.md#version
 
 The API is using basic authentication. In order to make calls to the API, the following standard request headers need to be sent with every request:
 
-Header            |Type       | Comment                                                                   
-:-----------------|:----------|:--------------------------------------------------------------------------
-`Authorization`   |`String`   | Sends username and password as defined in [Basic Authentication][1]       
+Header          | Type                       | Description
+:---------------|:---------------------------|:-----------
+`Authorization` | [`string`](types.md#basic) | Sends username and password as defined in [Basic Authentication][1]
 
 
 # Authorization
@@ -39,10 +39,10 @@ There are multiple ways to authorize a request - see the [authorization section]
 
 If no user is specified, Opencast’s `anonymous` user is used to execute the request, potentially enriched by the roles provided using the `X-ROLES` request.
 
-Header            |Type       | Comment                                                                   
-:-----------------|:----------|:--------------------------------------------------------------------------
-`X-API-AS-USER`   |`String`   | Id of the user in whose name the request should be executed               
-`X-API-WITH-ROLES`|`String`   | Set of roles, separated by whitespace, that the execution user should be assigned in addition to existing roles.                                                                               
+Header            | Type                       | Description
+:-----------------|:---------------------------|:-----------
+`X-API-AS-USER`   | [`string`](types.md#basic) | Id of the user in whose name the request should be executed
+`X-API-WITH-ROLES`| [`string`](types.md#basic) | Set of roles, separated by whitespace, that the execution user should be assigned in addition to existing roles.
 
 
 # Formats and Encoding
@@ -51,9 +51,9 @@ Header            |Type       | Comment
 
 The Application API currently supports [JSON][3] format only.
 
-Header            |Type       | Comment                                                                   
-:-----------------|:----------|:--------------------------------------------------------------------------
-`Accept`          |`String`   | The expected response format is `application/json`
+Header   | Type                       | Description
+:--------|:---------------------------|:-----------
+`Accept` | [`string`](types.md#basic) | The expected response format is `application/json`
 
 If that header is not specified, the `Content-Type` will be `application/<version>+json`.
 
@@ -65,7 +65,7 @@ If that header is not specified, the `Content-Type` will be `application/<versio
 
 Single objects are enclosed in curly braces "{}" and are not explicitly named.
 
-__Sample__
+__Example__
 
 ```
 {
@@ -80,7 +80,7 @@ __Sample__
 
 Collections of objects are enclosed in braces "[ ... ]" and are not explicitly named.
 
-__Sample__
+__Example__
 
 ```
 [
@@ -99,11 +99,11 @@ __Sample__
 
 Instead of dropping fields that do not contain a value for a specific data object from the JSON response structure, the respective identity element should be used:
 
-Type              |Encoding    | Comment                                                                   
-:-----------------|:-----------|:--------------------------------------------------------------------------
-Literals          |""          | Strings and numbers                                                       
-Objects           |{}          | Non-existing objects                                                      
-Arrays            |[]          | Non-existing list of literals or objects                                  
+Type     | Encoding | Description
+:--------|:---------|:-----------
+Literals | ""       | Strings and numbers
+Objects  | {}       | Non-existing objects
+Arrays   | []       | Non-existing list of literals or objects
 
 # Sorting
 
@@ -111,9 +111,9 @@ Sorting of result sets is supported by a set of well-defined fields per request,
 
 ## Sort field
 
-Parameter         | Comment                                                                               
-:-----------------|:--------------------------------------------------------------------------------------
-`sort`            | Takes the name of the field that defines the sort criteria.
+Parameter | Description
+:---------|:-----------
+`sort`    | Takes the name of the field that defines the sort criteria.
 
 __Example__
 
@@ -125,9 +125,9 @@ GET /api/events?sort=title
 
 ## Sort order
 
-Parameter         |Encoding          | Comment
-:-----------------|:-----------------|:--------------------------------------------------------------------
-`order`           | `asc`, `desc`    | Default value is `asc`.
+Parameter | Encoding      | Description
+:---------|:--------------|:-----------
+`order`   | `asc`, `desc` | The sort order. Default value is `asc`.
                   
 __Example__
 
@@ -143,9 +143,9 @@ Filtering of result sets is supported by a set of well-defined fields per reques
 
 Each api request explicitly defines the fields that support filtering.
 
-Paramter          |Comment
-:-----------------|:--------------------------------------------------------------------------------------
-`filter`          | Filter conditions must be URL encoded
+Parameter | Description
+:---------|:-----------
+`filter`  | The filter. Filter conditions must be URL encoded
 
 __Example__
 
@@ -159,10 +159,10 @@ GET /api/events?filter=status%3dpublished&filter=series%3dmath
 
 When loading large result sets, being able to address and access the data in well-defined chunks using a limit and offset is essential. Paging is enabled for all requests that return lists of items.
 
-Paramter          |Comment
-:-----------------|:--------------------------------------------------------------------------------------
-`limit`           | The number of records to return per request
-`offset`          | The index of the first record to return
+Paramter | Description
+:--------|:-----------
+`limit`  | The maximum number of records to return per request
+`offset` | The index of the first record to return
 
 __Example__
 
