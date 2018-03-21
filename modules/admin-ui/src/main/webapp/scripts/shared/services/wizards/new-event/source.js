@@ -245,7 +245,7 @@ angular.module('adminNg.services')
 
         // Sort source select options by short title
         this.translatedSourceShortTitle = function(asset) {
-            return $filter('translate')(asset.title + '.SHORT');
+            return $filter('translateOverrideFallback')(asset, 'SHORT');
         }
 
         // Create the data array for use in the summary view
