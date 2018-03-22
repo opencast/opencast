@@ -192,7 +192,7 @@ public class EventsEndpointTest {
 
     EventsEndpoint endpoint = new EventsEndpoint();
     Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0,
-            endpoint.eventToJSON(event, false, false, false,false, false));
+            endpoint.eventToJSON(event, false, false, false,false, false, ApiVersion.VERSION_1_0_0));
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/v1.0.0+json", result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(eventJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());

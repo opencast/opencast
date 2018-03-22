@@ -81,6 +81,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
@@ -285,11 +286,34 @@ public class SeriesEndpoint {
             subjects = arr(splitSubjectIntoArray(s.getSubject()));
           }
           Date createdDate = s.getCreatedDateTime();
-          return obj(f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())), f("creator", v(s.getCreator(), BLANK)),
-                  f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)), f("subjects", subjects),
-                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+          JObject result;
+          if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            result = obj(
+                    f("identifier", v(s.getIdentifier())),
+                    f("title", v(s.getTitle())),
+                    f("creator", v(s.getCreator(), BLANK)),
+                    f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                    f("subjects", subjects),
+                    f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                    f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                    f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+          }
+          else {
+            result = obj(
+                    f("identifier", v(s.getIdentifier())),
+                    f("title", v(s.getTitle())),
+                    f("creator", v(s.getCreator(), BLANK)),
+                    f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                    f("subjects", subjects),
+                    f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                    f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                    f("language", v(s.getLanguage(), BLANK)),
+                    f("license", v(s.getLicense(), BLANK)),
+                    f("rightsholder", v(s.getRightsHolder(), BLANK)),
+                    f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+          }
+          return result;
+
         }
       }).toList()));
     } catch (Exception e) {
@@ -315,14 +339,39 @@ public class SeriesEndpoint {
         subjects = arr(splitSubjectIntoArray(s.getSubject()));
       }
       Date createdDate = s.getCreatedDateTime();
-      return ApiResponses.Json.ok(requestedVersion, obj(
-          f("identifier", v(s.getIdentifier())), f("title", v(s.getTitle())),
-          f("description", v(s.getDescription(), BLANK)), f("creator", v(s.getCreator(), BLANK)), f("subjects", subjects),
-          f("organization", v(s.getOrganization())), f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-          f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-          f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-          f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
-          f("opt_out", v(s.isOptedOut()))));
+      JValue responseContent;
+      if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+        responseContent = obj(
+                f("identifier", v(s.getIdentifier())),
+                f("title", v(s.getTitle())),
+                f("description", v(s.getDescription(), BLANK)),
+                f("creator", v(s.getCreator(), BLANK)),
+                f("subjects", subjects),
+                f("organization", v(s.getOrganization())),
+                f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
+                f("opt_out", v(s.isOptedOut())));
+      }
+      else {
+        responseContent = obj(
+                f("identifier", v(s.getIdentifier())),
+                f("title", v(s.getTitle())),
+                f("description", v(s.getDescription(), BLANK)),
+                f("creator", v(s.getCreator(), BLANK)),
+                f("subjects", subjects),
+                f("organization", v(s.getOrganization())),
+                f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
+                f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
+                f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
+                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
+                f("language", v(s.getLanguage(), BLANK)),
+                f("license", v(s.getLicense(), BLANK)),
+                f("rightsholder", v(s.getRightsHolder(), BLANK)),
+                f("opt_out", v(s.isOptedOut())));
+      }
+      return ApiResponses.Json.ok(requestedVersion, responseContent);
     }
     return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
   }

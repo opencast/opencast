@@ -353,7 +353,7 @@ public class EventsEndpoint implements ManagedService {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       event.updatePreview(previewSubtype);
       return ApiResponses.Json.ok(
-          requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, sign));
+          requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -751,7 +751,8 @@ public class EventsEndpoint implements ManagedService {
       throws IndexServiceException, UnauthorizedException, SchedulerException {
     List<JValue> eventsList = new ArrayList<>();
     for (IndexObject item : events) {
-      eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, withSignedUrls));
+      eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, withSignedUrls,
+              requestedVersion));
     }
     return ApiResponses.Json.ok(requestedVersion, arr(eventsList));
   }
@@ -780,7 +781,7 @@ public class EventsEndpoint implements ManagedService {
    *           Thrown if unable to find all of the metadata
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withScheduling,
-          Boolean withPublications, Boolean withSignedUrls) throws IndexServiceException, SchedulerException, UnauthorizedException {
+          Boolean withPublications, Boolean withSignedUrls, ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
     List<Field> fields = new ArrayList<>();
     if (event.getArchiveVersion() != null)
       fields.add(f("archive_version", v(event.getArchiveVersion())));
@@ -792,6 +793,14 @@ public class EventsEndpoint implements ManagedService {
     fields.add(f("identifier", v(event.getIdentifier(), BLANK)));
     fields.add(f("location", v(event.getLocation(), BLANK)));
     fields.add(f("presenter", arr($(event.getPresenters()).map(Functions.stringToJValue))));
+    if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+      fields.add(f("language", v(event.getLanguage(), BLANK)));
+      fields.add(f("rightsholder", v(event.getRights(), BLANK)));
+      fields.add(f("license", v(event.getLicense(), BLANK)));
+      fields.add(f("is_part_of", v(event.getSeriesId(), BLANK)));
+      fields.add(f("duration", v(event.getDuration(), BLANK)));
+      fields.add(f("source", v(event.getSource(), BLANK)));
+    }
     List<JValue> publicationIds = new ArrayList<>();
     if (event.getPublications() != null) {
       for (Publication publication : event.getPublications()) {
