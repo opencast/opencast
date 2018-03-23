@@ -1017,8 +1017,8 @@ public abstract class AbstractEventEndpoint {
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(),
             EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter()));
 
-    final String wfSate = optEvent.get().getWorkflowState();
-    if (wfSate != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfSate)))
+    final String wfState = optEvent.get().getWorkflowState();
+    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     return okJson(metadataList.toJSON());
