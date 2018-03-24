@@ -22,8 +22,8 @@
 
 // A controller for global page navigation
 angular.module('adminNg.controllers')
-.controller('NavCtrl', ['$scope', '$rootScope', '$location', '$window', '$resource', '$routeParams', 'Language',
-    function ($scope, $rootScope, $location, $window, $resource, $routeParams, Language) {
+.controller('NavCtrl', ['$scope', '$rootScope', '$location', '$window', 'ToolsResource', '$resource', '$routeParams', 'Language',
+    function ($scope, $rootScope, $location, $window, ToolsResource, $resource, $routeParams, Language) {
         // FIXME Move this information to the Language service so it can be
         // fetched via Language.getAvailableLanguages().
 
@@ -40,6 +40,10 @@ angular.module('adminNg.controllers')
             $scope.currentLanguageName = Language.getLanguage().displayLanguage;
             $scope.availableLanguages = Language.getAvailableLanguages();
         });
+
+        $scope.release = function() {
+          ToolsResource.release({id: $scope.id, tool: 'lock'});
+        };
 
         $scope.logout = function () {
             $window.location.href = $window.location.origin + '/j_spring_security_logout';

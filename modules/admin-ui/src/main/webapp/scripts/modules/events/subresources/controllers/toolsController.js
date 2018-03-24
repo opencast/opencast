@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('ToolsCtrl', ['$scope', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
-    function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
+.controller('ToolsCtrl', ['$scope', '$interval', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
+    function ($scope, $interval, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
             $location.path(path).replace();
@@ -73,17 +73,41 @@ angular.module('adminNg.controllers')
 
         // TODO Move the following to a VideoCtrl
         $scope.player = {};
-        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
+        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' }, function () {
+          if ($scope.video.status === 'locked' ) {
+            var mins = $scope.video.locked;
+            Notifications.addWithParams('error', 'VIDEO_EDIT_LOCKED_MINS', {minutes : mins});
+            $location.url('/events/' + $scope.resource);
+          }
+          if ($scope.video.status === 'edited before' ) {
+            Notifications.add('error', 'VIDEO_EDITED_BEFORE', 'video-tools');
+            $location.url('/events/' + $scope.resource);
+          }
+        });
+
+        $scope.autosave = function () {
+            $scope.video.autosave = true;
+            $scope.video.$save({id: $scope.id, tool: $scope.tab}, function () {
+                Notifications.add('success', 'VIDEO_CUT_SAVED_AUTO');
+            });
+        };
+        $scope.stopTime = $interval($scope.autosave, 1740000);
 
         $scope.submitButton = false;
+        $scope.release = function() {
+          ToolsResource.release({id: $scope.id, tool: 'lock'});
+        };
         $scope.submit = function () {
+            $scope.video.autosave = false;
             $scope.submitButton = true;
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
                 $scope.submitButton = false;
                 if ($scope.video.workflow) {
+                    $scope.video.autosave = false;
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
                     $location.url('/events/' + $scope.resource);
                 } else {
+                    $scope.video.autosave = true;
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
                 $scope.unsavedChanges = false;
@@ -91,6 +115,9 @@ angular.module('adminNg.controllers')
                 $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
             });
+        };
+        $window.onbeforeunload = function () {
+            ToolsResource.release({id: $scope.id, tool: 'lock'});
         };
     }
 ]);
