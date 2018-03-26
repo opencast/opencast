@@ -108,24 +108,27 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     if (!StringUtils.equalsIgnoreCase(JOB_TYPE, job.getJobType()))
       throw new IllegalArgumentException("Can not handle job type " + job.getJobType());
 
-    MediaPackage mediaPackage = MediaPackageParser.getFromXml(job.getArguments().get(0));
     Publication publication = null;
+    MediaPackage mediaPackage = MediaPackageParser.getFromXml(job.getArguments().get(0));
+    String repository = job.getArguments().get(1);
     boolean checkAvailability = false;
     switch (Operation.valueOf(job.getOperation())) {
       case Publish:
-        publication = publish(job, mediaPackage, job.getArguments().get(1),
-                Collections.set(StringUtils.split(job.getArguments().get(2), SEPARATOR)),
-                Collections.set(StringUtils.split(job.getArguments().get(3), SEPARATOR)),
-                BooleanUtils.toBoolean(job.getArguments().get(4)));
+        String[] downloadElementIds = StringUtils.split(job.getArguments().get(2), SEPARATOR);
+        String[] streamingElementIds = StringUtils.split(job.getArguments().get(3), SEPARATOR);
+        checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(4));
+        publication = publish(job, mediaPackage, repository,
+                Collections.set(downloadElementIds), Collections.set(streamingElementIds), checkAvailability);
         break;
       case Retract:
-        publication = retract(job, mediaPackage, job.getArguments().get(1));
+        publication = retract(job, mediaPackage, repository);
         break;
       case UpdateMetadata:
         checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(4));
-        Set<String> flavors = Collections.set(StringUtils.split(job.getArguments().get(2), SEPARATOR));
-        Set<String> tags = Collections.set(StringUtils.split(job.getArguments().get(3), SEPARATOR));
-        publication = updateMetadata(job, mediaPackage, job.getArguments().get(1), flavors, tags, checkAvailability);
+        String[] flavors = StringUtils.split(job.getArguments().get(2), SEPARATOR);
+        String[] tags = StringUtils.split(job.getArguments().get(3), SEPARATOR);
+        publication = updateMetadata(job, mediaPackage, repository,
+                Collections.set(flavors), Collections.set(tags), checkAvailability);
         break;
       default:
         throw new IllegalArgumentException("Can not handle this type of operation: " + job.getOperation());
@@ -137,12 +140,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   public Job publish(MediaPackage mediaPackage, String repository, Set<String> downloadElementIds,
           Set<String> streamingElementIds, boolean checkAvailability)
           throws PublicationException, MediaPackageException {
-    if (mediaPackage == null)
-      throw new IllegalArgumentException("Media package must be specified");
-    if (StringUtils.isEmpty(repository))
-      throw new IllegalArgumentException("Repository must be specified");
-    if (!oaiPmhServerInfo.hasRepo(repository))
-      throw new IllegalArgumentException("OAI-PMH repository '" + repository + "' does not exist");
+    checkInputArguments(mediaPackage, repository);
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(),
@@ -158,11 +156,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
   @Override
   public Job retract(MediaPackage mediaPackage, String repository) throws PublicationException, NotFoundException {
-    if (mediaPackage == null)
-      throw new IllegalArgumentException("Media package must be specified");
-
-    if (StringUtils.isNotBlank(repository) && !oaiPmhServerInfo.hasRepo(repository))
-      throw new IllegalArgumentException("Not existant OAI-PMH repository " + repository);
+    checkInputArguments(mediaPackage, repository);
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.Retract.toString(),
@@ -175,12 +169,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   @Override
   public Job updateMetadata(MediaPackage mediaPackage, String repository, Set<String> flavors, Set<String> tags,
           boolean checkAvailability) throws PublicationException, MediaPackageException {
-    if (mediaPackage == null)
-      throw new IllegalArgumentException("Media package must be specified");
-    if (StringUtils.isEmpty(repository))
-      throw new IllegalArgumentException("Repository must be specified");
-    if (!oaiPmhServerInfo.hasRepo(repository))
-      throw new IllegalArgumentException("OAI-PMH repository '" + repository + "' does not exist");
+    checkInputArguments(mediaPackage, repository);
     if ((flavors == null || flavors.isEmpty()) && (tags == null || tags.isEmpty()))
       throw new IllegalArgumentException("Flavors or tags must be set");
 
@@ -513,6 +502,15 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         return p;
     }
     return null;
+  }
+
+  protected void checkInputArguments(MediaPackage mediaPackage, String repository) {
+    if (mediaPackage == null)
+      throw new IllegalArgumentException("Media package must be specified");
+    if (StringUtils.isEmpty(repository))
+      throw new IllegalArgumentException("Repository must be specified");
+    if (!oaiPmhServerInfo.hasRepo(repository))
+      throw new IllegalArgumentException("OAI-PMH repository '" + repository + "' does not exist");
   }
 
   protected String getPublicationChannelName(String repository) {

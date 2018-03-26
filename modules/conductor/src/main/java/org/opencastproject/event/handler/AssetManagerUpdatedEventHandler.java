@@ -207,6 +207,7 @@ public class AssetManagerUpdatedEventHandler {
           for (Catalog seriesCatalog : mp.getCatalogs(MediaPackageElements.SERIES)) {
             mp.remove(seriesCatalog);
           }
+          authorizationService.removeAcl(mp, AclScope.Series);
           for (Catalog episodeCatalog : mp.getCatalogs(MediaPackageElements.EPISODE)) {
             DublinCoreCatalog episodeDublinCore = DublinCoreUtil.loadDublinCore(workspace, episodeCatalog);
             episodeDublinCore.remove(DublinCore.PROPERTY_IS_PART_OF);
@@ -217,7 +218,6 @@ public class AssetManagerUpdatedEventHandler {
             // setting the URI to a new source so the checksum will most like be invalid
             episodeCatalog.setChecksum(null);
           }
-          authorizationService.removeAcl(mp, AclScope.Series);
           // here we don't know the series extended metadata types,
           // we assume that all series catalog flavors have a fixed subtype: series
           MediaPackageElementFlavor seriesFlavor = MediaPackageElementFlavor.flavor("*", "series");

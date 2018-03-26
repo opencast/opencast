@@ -123,7 +123,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     }
 
     //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
-    logger.info("Handling update event for media package {}",
+    logger.debug("Handling update event for media package {}",
             snapshotItem.getMediapackage().getIdentifier().compact());
 
     // We must be an administrative user to make a query to the OaiPmhPublicationService

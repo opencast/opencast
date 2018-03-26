@@ -223,7 +223,7 @@ public class OaiPmhPersistenceTest {
   }
 
   @Test
-  public void tesRemovalOfOrphanedElements() throws Exception {
+  public void testRemovalOfOrphanedElements() throws Exception {
     oaiPmhDatabase.store(mp1, REPOSITORY_ID_1);
     int count = 0;
     for (SearchResultItem searchResultItem : oaiPmhDatabase

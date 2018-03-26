@@ -99,7 +99,7 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
 
       if (!waitForJobs(serviceRegistry, updateMetadataJob).isSuccess()) {
         throw new WorkflowOperationException(format(
-                "OAI-PMH update metadata job for the media package %s does not end successfully",
+                "OAI-PMH update metadata job for the media package %s did not end successfully",
                 mp.getIdentifier().compact()));
       }
     } catch (MediaPackageException | PublicationException | IllegalArgumentException | IllegalStateException e) {
