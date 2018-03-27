@@ -63,6 +63,7 @@ angular.module('adminNg.resources')
                 row.workflow_state = r.workflow_state;
                 row.date = Language.formatDate('short', r.start_date);
                 row.technical_date = Language.formatDate('short', r.technical_start);
+                row.technical_date_raw = r.technical_start
                 row.publications = r.publications;
                 row.start_date = Language.formatTime('short', r.start_date);
                 row.technical_start = Language.formatTime('short', r.technical_start);
