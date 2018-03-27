@@ -1826,7 +1826,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       // Do the work
       List<File> outputs;
       try {
-        outputs = encoderEngine.demux(videoFile, profile);
+        Map<String, File> source = new HashMap<>();
+        source.put("video", videoFile);
+        outputs = encoderEngine.process(source, profile, null);
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<>();
         params.put("video", (videoFile != null) ? videoTrack.getURI().toString() : "EMPTY");
