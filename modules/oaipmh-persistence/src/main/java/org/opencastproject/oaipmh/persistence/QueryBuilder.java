@@ -33,6 +33,7 @@ public class QueryBuilder {
   private Option<String> mediaPackageId = none();
   private Option<String> repositoryId = none();
   private Option<String> seriesId = none();
+  private Option<Boolean> deleted = none();
   private Option<Date> modifiedAfter = none();
   private Option<Date> modifiedBefore = none();
   private Option<Integer> limit = none();
@@ -59,7 +60,7 @@ public class QueryBuilder {
   }
 
   public QueryBuilder mediaPackageId(MediaPackage mediaPackage) {
-    this.mediaPackageId = some(mediaPackage.getIdentifier().toString());
+    this.mediaPackageId = some(mediaPackage.getIdentifier().compact().toString());
     return this;
   }
 
@@ -107,6 +108,11 @@ public class QueryBuilder {
     return this;
   }
 
+  public QueryBuilder isDeleted(boolean deleted) {
+    this.deleted = some(deleted);
+    return this;
+  }
+
   public QueryBuilder limit(Option<Integer> limit) {
     this.limit = limit;
     return this;
@@ -133,6 +139,7 @@ public class QueryBuilder {
     final Option<String> mediaPackageId = this.mediaPackageId;
     final Option<String> repositoryId = this.repositoryId;
     final Option<String> seriesId = this.seriesId;
+    final Option<Boolean> deleted = this.deleted;
     final Option<Date> modifiedAfter = this.modifiedAfter;
     final Option<Date> modifiedBefore = this.modifiedBefore;
     final Option<Integer> limit = this.limit;
@@ -150,6 +157,10 @@ public class QueryBuilder {
 
       @Override public Option<String> getSeriesId() {
         return seriesId;
+      }
+
+      @Override public Option<Boolean> isDeleted() {
+        return deleted;
       }
 
       @Override public Option<Date> getModifiedAfter() {

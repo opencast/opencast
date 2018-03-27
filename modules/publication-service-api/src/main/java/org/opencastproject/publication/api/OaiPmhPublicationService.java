@@ -80,4 +80,19 @@ public interface OaiPmhPublicationService {
    */
   Job retract(MediaPackage mediaPackage, String repository) throws PublicationException, NotFoundException;
 
+  /**
+   * Update all media package elements that match the flavors and tags. Also update the media package in the given
+   * OAI-PMH repository.
+   *
+   * @param mediaPackage media package with updated elements
+   * @param repository OAI-PMH repository where to update the media package
+   * @param flavors updated media package element flavors
+   * @param tags updated media package element tags
+   * @param checkAvailability whether to check the distributed download artifacts are available at its URL
+   * @return The job to update the media package
+   * @throws PublicationException if there was a problem publishing the media
+   * @throws MediaPackageException if there was a problem with the media package element
+   */
+  Job updateMetadata(MediaPackage mediaPackage, String repository, Set<String> flavors, Set<String> tags,
+          boolean checkAvailability) throws PublicationException, MediaPackageException;
 }

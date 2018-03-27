@@ -67,10 +67,18 @@ public class TestOaiPmhPublicationRestService extends OaiPmhPublicationRestServi
       return job;
     }
 
-    // no used
+    // not used
     @Override
     public Job retract(MediaPackage mediaPackage, String repository) throws PublicationException, NotFoundException {
       return null;
     }
+
+    // not used
+    @Override
+    public Job updateMetadata(MediaPackage mediaPackage, String repository, Set<String> flavors, Set<String> tags,
+            boolean checkAvailability) throws PublicationException, MediaPackageException {
+      return null;
+    }
+
   }
 }

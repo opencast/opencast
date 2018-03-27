@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -96,7 +97,7 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
   @Path("/")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "publish", description = "Publish a media package element to this publication channel", returnDescription = "The job that can be used to track the publication", restParameters = {
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The media package", type = Type.TEXT),
           @RestParameter(name = "channel", isRequired = true, description = "The channel name", type = Type.STRING),
           @RestParameter(name = "downloadElementIds", isRequired = true, description = "The elements to publish to download seperated by ';;'", type = Type.STRING),
           @RestParameter(name = "streamingElementIds", isRequired = true, description = "The elements to publish to streaming seperated by ';;'", type = Type.STRING),
@@ -107,8 +108,8 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
           @FormParam("checkAvailability") @DefaultValue("true") boolean checkAvailability) throws Exception {
     final Job job;
     try {
-      Set<String> download = new HashSet<String>();
-      Set<String> streaming = new HashSet<String>();
+      Set<String> download = new HashSet<>();
+      Set<String> streaming = new HashSet<>();
 
       final MediaPackage mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
       final String[] downloadElements = StringUtils.split(downloadElementIds, ";;");
@@ -118,9 +119,12 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
       if (streamingElements != null)
         streaming = set(streamingElements);
       job = service.publish(mediaPackage, channel, download, streaming, checkAvailability);
+    } catch (IllegalArgumentException e) {
+      logger.warn("Unable to create an publication job", e);
+      return Response.status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
       logger.warn("Error publishing element", e);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+      return Response.serverError().build();
     }
     return Response.ok(new JaxbJob(job)).build();
   }
@@ -129,18 +133,56 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
   @Path("/retract")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract a media package element from this publication channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
-          @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
-  public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("elementId") String elementId)
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The media package", type = Type.TEXT),
+          @RestParameter(name = "channel", isRequired = true, description = "The OAI-PMH channel to retract from", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction job") })
+  public Response retract(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channel") String channel)
           throws Exception {
     Job job = null;
+    MediaPackage mediaPackage = null;
     try {
-      MediaPackage mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
-      job = service.retract(mediaPackage, elementId);
+      mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      job = service.retract(mediaPackage, channel);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create an retract job", e);
+      return Response.status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from the OAI-PMH channel: {}",
-              mediaPackageXml, e);
-      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+      logger.warn("Unable to retract media package '{}' from the OAI-PMH channel {}",
+              mediaPackage != null ? mediaPackage.getIdentifier().compact() : "<parsing error>", channel, e);
+      return Response.serverError().build();
+    }
+    return Response.ok(new JaxbJob(job)).build();
+  }
+
+  @POST
+  @Path("/updateMetadata")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "update", description = "Update metadata of an published media package. "
+          + "This endpoint does not update any media files. If you want to update the whole media package, use the "
+          + "publish endpoint.",
+          returnDescription = "The job that can be used to update the metadata of an media package", restParameters = {
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The updated media package", type = Type.TEXT),
+          @RestParameter(name = "channel", isRequired = true, description = "The channel name", type = Type.STRING),
+          @RestParameter(name = "flavors", isRequired = true, description = "The element flavors to be updated, separated by ';;'", type = Type.STRING),
+          @RestParameter(name = "tags", isRequired = true, description = "The element tags to be updated, separated by ';;'", type = Type.STRING),
+          @RestParameter(name = "checkAvailability", isRequired = false, description = "Whether to check for availability", type = Type.BOOLEAN, defaultValue = "true") },
+          reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the publication job") })
+  public Response updateMetadata(@FormParam("mediapackage") String mediaPackageXml,
+          @FormParam("channel") String channel,
+          @FormParam("flavors") String flavors,
+          @FormParam("tags") String tags,
+          @FormParam("checkAvailability") @DefaultValue("true") boolean checkAvailability) throws Exception {
+    final Job job;
+    try {
+      final MediaPackage mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      final Set<String> flavorsSet = Collections.set(StringUtils.split(flavors, ";;"));
+      final Set<String> tagsSet = Collections.set(StringUtils.split(tags, ";;"));
+      job = service.updateMetadata(mediaPackage, channel, flavorsSet, tagsSet, checkAvailability);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to create an update metadata job", e);
+      return Response.status(Status.BAD_REQUEST).build();
+    } catch (Exception e) {
+      logger.warn("Error publishing element", e);
+      return Response.serverError().build();
     }
     return Response.ok(new JaxbJob(job)).build();
   }

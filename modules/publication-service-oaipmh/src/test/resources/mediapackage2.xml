@@ -1,6 +1,6 @@
 <mediapackage xmlns="http://mediapackage.opencastproject.org" id="10.0000/1" start="2007-12-05T13:40:00" duration="1004400000">
   <media>
-    <track id="track-1" type="presentation/source">
+    <track id="track-1-new-id" type="presentation/source">
       <mimetype>video/quicktime</mimetype>
       <url>media.mov</url>
       <checksum type="md5">43b7d843b02c4a429b2f547a4f230d31</checksum>
@@ -16,12 +16,12 @@
     </track>
   </media>
   <metadata>
-    <catalog id="catalog-1" type="dublincore/episode">
+    <catalog id="catalog-1-new-id" type="dublincore/episode">
       <mimetype>text/xml</mimetype>
       <url>dublincore.xml</url>
       <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
     </catalog>
-    <catalog id="catalog-2" type="metadata/mpeg-7" ref="track:track-1">
+    <catalog id="catalog-2-new-id" type="metadata/mpeg-7" ref="track:track-1">
       <mimetype>text/xml</mimetype>
       <url>mpeg7.xml</url>
       <checksum type="md5">2b8a52878c536e64e20e309b5d7c1070</checksum>
