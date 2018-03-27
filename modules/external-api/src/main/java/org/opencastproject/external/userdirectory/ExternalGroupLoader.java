@@ -118,6 +118,7 @@ public class ExternalGroupLoader {
           try {
             Organization testOrg = organizationDirectoryService.getOrganization(organization.getId());
             if (!(testOrg instanceof JpaOrganization)) {
+              logger.info("Note: Ignoring organization with id " + testOrg.getId() + " because it is not a JpaOrganization");
               return;
             }
             JpaOrganization org = (JpaOrganization) testOrg;
