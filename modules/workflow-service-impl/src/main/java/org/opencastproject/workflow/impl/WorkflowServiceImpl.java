@@ -2394,7 +2394,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
             + indexName.substring(1);
-    logger.warn("index name: {}", destinationId);
     if (workflows.size() > 0) {
       final int total = workflows.size();
       logger.info("Populating index '{}' with {} workflows", indexName, total);
