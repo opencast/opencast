@@ -1,6 +1,17 @@
 Opencast 4.x
 ============
 
+Opencast 4.3
+------------
+
+*Released on March 28, 2018*
+
+- [[MH-12774]](https://opencast.jira.com/browse/MH-12744) - Fix differences in provided security configurations
+- [[MH-12773]](https://opencast.jira.com/browse/MH-12773) - Fix that non-admins cannot add new assets
+- [[MH-12772]](https://opencast.jira.com/browse/MH-12772) - Fix acces to assets for non-admins
+- [[MH-12789]](https://opencast.jira.com/browse/MH-12789) - Remove tabs and trailing spaces in LTI tools
+- [[MH-12790]](https://opencast.jira.com/browse/MH-12790) - Make LTI respect player configuration
+
 Opencast 4.2
 ------------
 
