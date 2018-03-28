@@ -36,7 +36,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -50,8 +49,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -239,29 +236,17 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
    */
   @SuppressWarnings("unchecked")
   @Override
-  public Iterator<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException {
+  public List<SeriesEntity> getAllSeries() throws SeriesServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("Series.findAll");
-    List<SeriesEntity> seriesEntities = null;
     try {
-      seriesEntities = query.getResultList();
+      return query.getResultList();
     } catch (Exception e) {
       logger.error("Could not retrieve all series: {}", e.getMessage());
       throw new SeriesServiceDatabaseException(e);
     } finally {
       em.close();
     }
-    List<Tuple<DublinCoreCatalog, String>> seriesList = new LinkedList<>();
-    try {
-      for (SeriesEntity entity : seriesEntities) {
-        DublinCoreCatalog dc = parseDublinCore(entity.getDublinCoreXML());
-        seriesList.add(Tuple.tuple(dc, entity.getOrganization()));
-      }
-    } catch (Exception e) {
-      logger.error("Could not parse series entity: {}", e.getMessage());
-      throw new SeriesServiceDatabaseException(e);
-    }
-    return seriesList.iterator();
   }
 
   /*
