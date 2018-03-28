@@ -68,6 +68,9 @@ public class LtiLaunchAuthenticationHandler
   /** The LTI field containing the context_id */
   public static final String CONTEXT_ID = "context_id";
 
+  /** The LTI field containing the name of a custom context id */
+  public static final String CUSTOM_CONTEXT_ID_PARAM = "custom_context_id_param";
+
   /** The prefix for LTI user ids */
   public static final String LTI_USER_ID_PREFIX = "lti";
 
@@ -164,6 +167,16 @@ public class LtiLaunchAuthenticationHandler
 
     UserDetails userDetails = null;
     Collection<GrantedAuthority> userAuthorities = null;
+    String roles = request.getParameter(ROLES);
+    String context = request.getParameter(CONTEXT_ID);
+    // Override the context_id if custom_context_id_param is set, allowing a more friendly value to be used
+    String customContextParam = request.getParameter(CUSTOM_CONTEXT_ID_PARAM);
+    String customContext = request.getParameter(customContextParam);
+    if (StringUtils.isNotBlank(customContext)) {
+      logger.debug("Setting context_id to value of parameter specified as custom_context_id_param: {}", customContextParam);
+      context = request.getParameter(customContextParam);
+    }
+    logger.debug("Context id: {}", context);
     try {
       userDetails = userDetailsService.loadUserByUsername(userIdFromConsumer);
 
@@ -175,15 +188,11 @@ public class LtiLaunchAuthenticationHandler
       userAuthorities = new HashSet<GrantedAuthority>(userDetails.getAuthorities());
 
       // we still need to enrich this user with the LTI Roles
-      String roles = request.getParameter(ROLES);
-      String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
       // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
       userAuthorities = new HashSet<GrantedAuthority>();
       // We should add the authorities passed in from the tool consumer?
-      String roles = request.getParameter(ROLES);
-      String context = request.getParameter(CONTEXT_ID);
       enrichRoleGrants(roles, context, userAuthorities);
 
       logger.info("Returning user with {} authorities", userAuthorities.size());
