@@ -32,10 +32,10 @@ install:
   - true
 
 script:
-  - (! grep -r '	' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -r ' $' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -r '	' etc)
-  - (! grep -r ' $' etc)
+  - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
+  - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
+  - (! grep -rn '	' etc)
+  - (! grep -rn ' $' etc)
   - (cd docs/guides/admin && mkdocs build)
   - (cd docs/guides/developer && mkdocs build)
   - (cd docs/guides/user && mkdocs build)
