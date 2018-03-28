@@ -119,6 +119,7 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
       if (server.substr(-1) != '/') server += '/';
       var siteId = parseInt(Engage.model.get("meInfo").get("matomo.site_id")),
           heartbeat = parseInt(Engage.model.get("meInfo").get("matomo.heartbeat")),
+          notification = $.parseJSON(Engage.model.get("meInfo").get("matomo.notification")),
           track_events = Engage.model.get("meInfo").get("matomo.track_events"),
           translations = [];
 
@@ -298,9 +299,11 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
         tracker.trackPageView(mediapackage.get("title") + " - " + presenter);
         if (Piwik && Piwik.MediaAnalytics) Piwik.MediaAnalytics.scanForMedia();
         if (heartbeat > 0) tracker.enableHeartBeatTimer(heartbeat);
-        Engage.trigger(plugin.events.customNotification.getName(),
+	if (notification) {      
+	  Engage.trigger(plugin.events.customNotification.getName(),
             translate('matomo_tracking',
-            'Usage data will be collected with Matomo. You can use the Do-Not-Track settings of your browser to prevent this.'));
+              'Usage data will be collected with Matomo. You can use the Do-Not-Track settings of your browser to prevent this.'));
+        }
         Engage.log("Matomo: Tracker initialized");
         setTimeout(function () {
           initing = false;
