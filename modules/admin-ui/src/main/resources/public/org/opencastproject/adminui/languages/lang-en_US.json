@@ -462,7 +462,19 @@
          "REVIEW_STATUS": "Review status",
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
-         "PUBLISHED": "Published"
+         "PUBLISHED": "Published",
+         "HOVER": {
+           "START": "Filter for this start date",
+           "SERIES": "Filter for this series",
+           "STATUS": "Filter for this event status",
+           "LOCATION": "Filter for this location",
+           "DETAILS": "Event details",
+           "DELETE": "Delete",
+           "PREVIEW": "Open preview player",
+           "EDITOR": "Open video Editor",
+           "COMMENTS": "View comments",
+           "PAUSED_WORKFLOW": "View paused workflow"
+         }
        },
        "SCHEDULING_STATUS": {
          "READY_FOR_RECORDING": "Ready for recording",
