@@ -151,6 +151,9 @@ public class LtiServlet extends HttpServlet {
   /** See the LTI specification */
   public static final String COURSE_SECTION = "lis_course_section_sourcedid";
 
+  /** Used to override the default context id with a value of another LTI parameter */
+  public static final String CUSTOM_CONTEXT_ID_PARAM = "custom_context_id_param";
+
   public static final SortedSet<String> LTI_CONSTANTS;
 
   static {
@@ -183,6 +186,7 @@ public class LtiServlet extends HttpServlet {
     LTI_CONSTANTS.add(CONSUMER_CONTACT);
     LTI_CONSTANTS.add(COURSE_OFFERING);
     LTI_CONSTANTS.add(COURSE_SECTION);
+    LTI_CONSTANTS.add(CUSTOM_CONTEXT_ID_PARAM);
   }
 
   /**
@@ -226,7 +230,7 @@ public class LtiServlet extends HttpServlet {
     // We need to add the custom params to the outgoing request
     for (String key : req.getParameterMap().keySet()) {
       logger.debug("Found query parameter '{}'", key);
-      if (key.startsWith(LTI_CUSTOM_PREFIX) && (!LTI_CUSTOM_TOOL.equals(key))) {
+      if (key.startsWith(LTI_CUSTOM_PREFIX) && !LTI_CUSTOM_TOOL.equals(key) && !CUSTOM_CONTEXT_ID_PARAM.equals(key)) {
         String paramValue = req.getParameter(key);
         // we need to remove the prefix custom_
         String paramName = key.substring(LTI_CUSTOM_PREFIX.length());
@@ -268,6 +272,12 @@ public class LtiServlet extends HttpServlet {
       if (value != null) {
         ltiValues.put(key, value);
       }
+    }
+    // Override the context_id if custom_context_id_param is set
+    String customContextParam = req.getParameter(CUSTOM_CONTEXT_ID_PARAM);
+    String customContext = req.getParameter(customContextParam);
+    if (StringUtils.isNotBlank(customContext)) {
+      ltiValues.replace(CONTEXT_ID, customContext);
     }
     return ltiValues;
   }
