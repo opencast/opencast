@@ -1750,6 +1750,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   }
 
+  @Override
+  public List<String> getJobPayloads(String operation) throws ServiceRegistryException {
+    EntityManager em = emf.createEntityManager();
+    try {
+      TypedQuery<String> query = em.createNamedQuery("Job.payload", String.class);
+      query.setParameter("operation", operation);
+      logger.debug("Requesting job payloads using query: {}", query);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
   /**
    * {@inheritDoc}
    *

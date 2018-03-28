@@ -707,6 +707,22 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return result;
   }
 
+  @Override
+  public List<String> getJobPayloads(String operation) throws ServiceRegistryException {
+    List<String> result = new ArrayList<>();
+    for (String serializedJob : jobs.values()) {
+      try {
+        Job job = JobParser.parseJob(serializedJob);
+        if (operation.equals(job.getOperation())) {
+          result.add(job.getPayload());
+        }
+      } catch (IOException e) {
+        throw new IllegalStateException("Error unmarshaling job", e);
+      }
+    }
+    return result;
+  }
+
   /**
    * {@inheritDoc}
    *
