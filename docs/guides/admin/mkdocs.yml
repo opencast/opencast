@@ -65,7 +65,7 @@ pages:
    - Player:
       - Configuration: 'modules/player.configuration.md'
       - URL Parameters: 'modules/player.url.parameter.md'
-      - Piwik Tracking: 'modules/player.piwik.tracking.md'
+      - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player: 'modules/paella.player.md'
    - Search Index: 'modules/searchindex.md'
    - Stream Security: 'modules/stream-security.md'

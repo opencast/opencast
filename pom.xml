@@ -99,7 +99,7 @@
     <module>modules/engage-theodul-plugin-custom-mhConnection</module>
     <module>modules/engage-theodul-plugin-custom-notifications</module>
     <module>modules/engage-theodul-plugin-custom-usertracking</module>
-    <module>modules/engage-theodul-plugin-custom-piwik</module>
+    <module>modules/engage-theodul-plugin-custom-matomo</module>
     <module>modules/engage-theodul-plugin-description</module>
     <module>modules/engage-theodul-plugin-tab-description</module>
     <module>modules/engage-theodul-plugin-tab-shortcuts</module>
