@@ -50,6 +50,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,7 +74,7 @@ public class WorkflowServiceSolrIndexTest {
     EasyMock.replay(orgDirectroy);
 
     // Create a job with a workflow as its payload
-    List<Job> jobs = new ArrayList<Job>();
+    List<Job> jobs = new ArrayList<>();
     Job job = new JobImpl();
     WorkflowInstanceImpl workflow = new WorkflowInstanceImpl();
     workflow.setId(123);
@@ -81,15 +82,18 @@ public class WorkflowServiceSolrIndexTest {
     workflow.setOrganization(securityService.getOrganization());
     workflow.setState(WorkflowState.INSTANTIATED);
     workflow.setMediaPackage(MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew());
-    job.setPayload(WorkflowParser.toXml(workflow));
+    String jobPayload = WorkflowParser.toXml(workflow);
+    job.setPayload(jobPayload);
     job.setOrganization(securityService.getOrganization().getId());
     jobs.add(job);
 
     // Mock up the service registry to return the job
-    ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    EasyMock.expect(serviceRegistry.count(WorkflowService.JOB_TYPE, null)).andReturn(new Long(1));
+    ServiceRegistry serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
+    EasyMock.expect(serviceRegistry.count(WorkflowService.JOB_TYPE, null)).andReturn(1L);
     EasyMock.expect(serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)).andReturn(jobs);
     EasyMock.expect(serviceRegistry.getJob(123)).andReturn(job);
+    EasyMock.expect(serviceRegistry.getJobPayloads("START_WORKFLOW"))
+            .andReturn(Collections.singletonList(jobPayload));
     EasyMock.replay(serviceRegistry);
 
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);

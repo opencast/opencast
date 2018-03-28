@@ -68,11 +68,9 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
-import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -109,10 +107,8 @@ import com.google.common.util.concurrent.Striped;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.lang3.text.WordUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -2394,71 +2390,43 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   @Override
   public void repopulate(final String indexName) throws Exception {
-    List<Job> jobs = new ArrayList<>();
-    try {
-      for (Job job : serviceRegistry.getJobs(WorkflowService.JOB_TYPE, null)) {
-        if (WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
-          jobs.add(job);
-        }
-      }
-    } catch (ServiceRegistryException e) {
-      logger.error("Unable to load the workflows jobs: {}", e.getMessage());
-      throw new ServiceException(e.getMessage());
-    }
+    List<String> workflows =  serviceRegistry.getJobPayloads(Operation.START_WORKFLOW.toString());
 
-    final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-    if (jobs.size() > 0) {
-      logger.info("Populating index '{}' with {} workflows", indexName, jobs.size());
-      final int total = jobs.size();
+    final String destinationId = WorkflowItem.WORKFLOW_QUEUE_PREFIX + indexName.substring(0, 1).toUpperCase()
+            + indexName.substring(1);
+    if (workflows.size() > 0) {
+      final int total = workflows.size();
+      logger.info("Populating index '{}' with {} workflows", indexName, total);
       final int responseInterval = (total < 100) ? 1 : (total / 100);
-      final int[] errors = new int[1];
-      errors[0] = 0;
-      final int[] current = new int[1];
-      current[0] = 1;
-      for (final Job job : jobs) {
-        if (job.getPayload() == null) {
-          logger.warn("Skipping restoring of workflow {}: Payload is empty", job.getId());
+      int current = 0;
+      for (final String workflow : workflows) {
+        current += 1;
+        if (StringUtils.isEmpty(workflow)) {
+          logger.warn("Skipping restoring of workflow no {}: Payload is empty", current);
           continue;
         }
-        Organization organization = organizationDirectoryService.getOrganization(job.getOrganization());
-        boolean erroneousWorkflowJob = SecurityUtil.runAs(securityService, organization,
-                SecurityUtil.createSystemUser(componentContext, organization), new Function0<Boolean>() {
+        WorkflowInstance instance;
+        try {
+          instance = WorkflowParser.parseWorkflowInstance(workflow);
+        } catch (WorkflowParsingException e) {
+          logger.warn("Skipping restoring of workflow. Error parsing: {}", workflow, e);
+          continue;
+        }
+        Organization organization = instance.getOrganization();
+        SecurityUtil.runAs(securityService, organization,
+                SecurityUtil.createSystemUser(componentContext, organization), new Effect0() {
                   @Override
-                  public Boolean apply() {
-                    WorkflowInstance instance;
-                    try {
-                      instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
-                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                              WorkflowItem.updateInstance(instance));
-                      if (((current[0] % responseInterval) == 0) || (current[0] == total)) {
-                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
-                              MessageSender.DestinationType.Queue, IndexRecreateObject.update(indexName,
-                                      IndexRecreateObject.Service.Workflow, total, current[0]));
-                      }
-                      current[0] += 1;
-                      return false;
-                    } catch (WorkflowParsingException e) {
-                      logger.warn("Skipping restoring of workflow job {}: {}", job.getId(),
-                              ExceptionUtils.getMessage(e));
-                      errors[0] += 1;
-                    }
-                    return true;
+                  public void run() {
+                    // Send message to update index item
+                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                            WorkflowItem.updateInstance(instance));
                   }
                 });
-
-        // Make sure this job is not being dispatched anymore
-        if (erroneousWorkflowJob && JobUtil.isReadyToDispatch(job)) {
-          job.setStatus(Job.Status.CANCELED);
-          try {
-            serviceRegistry.updateJob(job);
-            logger.info("Canceled job {} because unable to restore", job);
-          } catch (Exception e) {
-            logger.error("Error updating erroneous job {}: {}", job.getId(), e.getMessage());
-          }
+        if ((current % responseInterval == 0) || (current == total)) {
+          logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
+                  current * 100 / total);
         }
       }
-      if (errors[0] > 0)
-        logger.warn("Skipped {} erroneous workflows while populating the index", errors[0]);
     }
     logger.info("Finished populating {} index with workflows", indexName);
     Organization organization = new DefaultOrganization();

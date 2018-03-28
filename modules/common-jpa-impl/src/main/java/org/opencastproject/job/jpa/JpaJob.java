@@ -89,6 +89,8 @@ import javax.persistence.Version;
                 + "WHERE j.dispatchable = true AND j.status IN :statuses AND j.id IN :jobids ORDER BY j.dateCreated"),
         @NamedQuery(name = "Job.undispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = false and "
                 + "j.status in :statuses order by j.dateCreated"),
+        @NamedQuery(name = "Job.payload", query = "SELECT j.payload FROM Job j where j.operation = :operation "
+                + "order by j.dateCreated"),
         @NamedQuery(name = "Job.processinghost.status", query = "SELECT j FROM Job j "
                 + "where j.status in :statuses and j.processorServiceRegistration is not null and "
                 + "j.processorServiceRegistration.serviceType = :serviceType and "
