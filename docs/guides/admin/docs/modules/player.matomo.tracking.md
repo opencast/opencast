@@ -1,43 +1,43 @@
-Opencast Player - Piwik Tracking Plugin
+Opencast Player - Matomo Tracking Plugin
 =======================================
 
-This plugin allows to user Piwik (https://piwik.org/) to track usage data. To setup Piwik please follow the instructions
-on the piwik website: https://piwik.org/docs/installation/#the-5-minut-piwik-installation
+This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo please follow the instructions
+on the Matomo website: https://matomo.org/docs/installation/#the-5-minute-matomo-installation
 
 The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
-need to consider the legal requirements of your country when you setup Piwik.
+need to consider the legal requirements of your country when you setup Matomo.
 
-This plugin uses a Piwik javascript library that is loaded from the remote Piwik server!
+This plugin uses a Matomo javascript library that is loaded from the remote Matomo server!
 
-Tested Piwik version: 3.0.2
+Tested Matomo version: 3.0.2+
 
-The configurations for the piwik player plugin are done for each tenant. So the configuration keys are located in
+The configurations for the Matomo player plugin are done for each tenant. So the configuration keys are located in
 `.../etc/org.opencastproject.organization-mh_default_org.cfg`.
 
 To activate the plugin set:
 
-    prop.player.piwik.server=http://localhost/piwik
+    prop.player.matomo.server=http://localhost/matomo
 
 Where localhost should be replaced with your Piwik server URL.
 
 Configuration
 -------------
 
-### prop.player.piwik.server
+### prop.player.matomo.server
 
-The Piwik server from which the Piwik JS library will be loaded and where the dat awill be reported.
+The Matomo server from which the Piwik JS library will be loaded and where the data will be reported.
 
-### prop.player.piwik.site_id=1
+### prop.player.matomo.site_id=1
 
-The Piwik site ID has to be numeric value. If not set this will be 1. It is recommended to use different site IDs for
+The Matomo site ID has to be numeric value. If not set this will be 1. It is recommended to use different site IDs for
 each tenant that is configured in Opencast.
 
-### prop.player.piwik.heartbeat=30
+### prop.player.matomo.heartbeat=30
 
 The heartbeat setting to track how long a user stayed on the player page. Set to 0 or comment this line to
 disable the heartbeat.
 
-### prop.player.piwik.track_events
+### prop.player.matomo.track_events
 
 This setting lets you track several player events. Add the events that you want to track to the list. Comment this
 property to prevent event tracking.
@@ -63,7 +63,7 @@ Additional to the event data that can be turned on for each event (see above), t
 if tracking is allowed:
 
 - Page name as "<title of the event> - <lecturer name>"
-- Custom Piwik variables:
+- Custom Matomo variables:
   - "event" as "<title of the event> (<event id>)"
   - "series" as "<title of the series> (<series id>)"
   - "presenter"
