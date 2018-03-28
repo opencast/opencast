@@ -119,11 +119,15 @@ define(["jquery", "backbone", "engage/core"], function($, Backbone, Engage) {
       if (server.substr(-1) != '/') server += '/';
       var siteId = parseInt(Engage.model.get("meInfo").get("matomo.site_id")),
           heartbeat = parseInt(Engage.model.get("meInfo").get("matomo.heartbeat")),
-          notification = $.parseJSON(Engage.model.get("meInfo").get("matomo.notification")),
+          notification,
           track_events = Engage.model.get("meInfo").get("matomo.track_events"),
           translations = [];
 
-          if (track_events) track_events = track_events.toLowerCase();
+      if (track_events) track_events = track_events.toLowerCase();
+
+      if (Engage.model.get("meInfo").get("matomo.notification"))
+        notification = JSON.parse(Engage.model.get("meInfo").get("matomo.notification"));
+      else notification = true;
 
       if (isNaN(siteId)) {
         siteId = 1;
