@@ -72,6 +72,8 @@ directly in the Opencast administrative user interface.
 |ROLE_API_EVENTS_METADATA_EDIT     |PUT         |/api/events/\*/metadata<br>/api/events/\*/metadata/\*         |
 |ROLE_API_EVENTS_METADATA_DELETE   |DELETE      |/api/events/\*/metadata<br>/api/events/\*/metadata/\*         |
 |ROLE_API_EVENTS_PUBLICATIONS_VIEW |GET         |/api/events/\*/publications<br>/api/events/\*/publications/\* |
+|ROLE_API_EVENTS_SCHEDULING_EDIT   |PUT         |/api/events/\*/scheduling                                     |
+|ROLE_API_EVENTS_SCHEDULING_VIEW   |GET         |/api/events/\*/scheduling                                     |
 
 **Series API**
 
@@ -104,6 +106,12 @@ directly in the Opencast administrative user interface.
 |ROLE                   |METHOD | URL               |
 |-----------------------|-------|-------------------|
 |ROLE_API_SECURITY_EDIT |POST   |/api/security/sign |
+
+**Agents API**
+
+|ROLE                         |METHOD | URL                           |
+|-----------------------------|-------|-------------------------------|
+|ROLE_API_CAPTURE_AGENTS_VIEW |GET    |/api/agents</br>/api/agents/\* |
 
 **Administrative API**
 

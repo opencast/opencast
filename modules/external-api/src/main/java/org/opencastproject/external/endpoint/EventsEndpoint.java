@@ -362,7 +362,6 @@ public class EventsEndpoint implements ManagedService {
   @Path("{eventId}/media")
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     ArrayList<TrackImpl> tracks = new ArrayList<>();
 
     for (final Event event : indexService.getEvent(id, externalIndex)) {
@@ -409,7 +408,7 @@ public class EventsEndpoint implements ManagedService {
           fields.add(f("uri", v(track.getURI().toString())));
         tracksJson.add(obj(fields));
       }
-      return ApiResponses.Json.ok(requestedVersion, arr(tracksJson));
+      return ApiResponses.Json.ok(acceptHeader, arr(tracksJson));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -422,11 +421,10 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws NotFoundException, UnauthorizedException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (!indexService.removeEvent(id))
       return Response.serverError().build();
 
-    return ApiResponses.Json.noContent(requestedVersion);
+    return Response.noContent().build();
   }
 
   @POST
@@ -471,7 +469,7 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        return ApiResponses.Json.noContent(requestedVersion);
+        return Response.noContent().build();
       }
       return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
     } catch (NotFoundException e) {
@@ -864,10 +862,9 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList acl = getAclFromEvent(event);
-      return ApiResponses.Json.ok(requestedVersion, arr(AclUtils.serializeAclToJson(acl)));
+      return ApiResponses.Json.ok(acceptHeader, arr(AclUtils.serializeAclToJson(acl)));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -881,7 +878,6 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (indexService.getEvent(id, externalIndex).isSome()) {
       AccessControlList accessControlList;
       try {
@@ -900,7 +896,7 @@ public class EventsEndpoint implements ManagedService {
                 id, acl, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     } else {
       return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
     }
@@ -916,7 +912,6 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     List<AccessControlEntry> entries = new ArrayList<>();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
@@ -949,7 +944,7 @@ public class EventsEndpoint implements ManagedService {
                 id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -964,7 +959,6 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     List<AccessControlEntry> entries = new ArrayList<>();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList accessControlList = getAclFromEvent(event);
@@ -990,7 +984,7 @@ public class EventsEndpoint implements ManagedService {
                 id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -1153,7 +1147,6 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     Map<String, String> updatedFields;
     JSONParser parser = new JSONParser();
     try {
@@ -1276,7 +1269,7 @@ public class EventsEndpoint implements ManagedService {
 
       metadataList.add(adapter, collection);
       indexService.updateEventMetadata(id, metadataList, externalIndex);
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -1304,7 +1297,6 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
       if (flavor.isNone()) {
@@ -1332,7 +1324,7 @@ public class EventsEndpoint implements ManagedService {
       } catch (UnauthorizedException e) {
         return Response.status(Status.UNAUTHORIZED).build();
       }
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -1345,11 +1337,10 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
       final Opt<Event> event = indexService.getEvent(id, externalIndex);
       if (event.isSome()) {
-        return ApiResponses.Json.ok(requestedVersion, arr(getPublications(event.get(), sign)));
+        return ApiResponses.Json.ok(acceptHeader, arr(getPublications(event.get(), sign)));
       } else {
         return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
       }
@@ -1472,9 +1463,8 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
           @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
-      return ApiResponses.Json.ok(requestedVersion, getPublication(eventId, publicationId, sign));
+      return ApiResponses.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign));
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     } catch (SearchIndexException e) {
@@ -1656,7 +1646,6 @@ public class EventsEndpoint implements ManagedService {
       @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
       throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
       final Opt<Event> event = indexService.getEvent(id, externalIndex);
 
@@ -1666,9 +1655,9 @@ public class EventsEndpoint implements ManagedService {
 
       final JObject scheduling = SchedulingInfo.of(event.get().getIdentifier(), schedulerService).toJson();
       if (!scheduling.isEmpty()) {
-        return ApiResponses.Json.ok(requestedVersion, scheduling);
+        return ApiResponses.Json.ok(acceptHeader, scheduling);
       }
-      return ApiResponses.Json.noContent(requestedVersion);
+      return Response.noContent().build();
     } catch (SearchIndexException e) {
       logger.error("Unable to get list of publications from event with id '{}' because {}", id,
           ExceptionUtils.getStackTrace(e));
@@ -1703,7 +1692,7 @@ public class EventsEndpoint implements ManagedService {
       return RestUtil.R.badRequest("Unparsable scheduling information");
     }
     Optional<Response> clientError = updateSchedulingInformation(parsedJson, id, requestedVersion);
-    return clientError.orElse(ApiResponses.Json.noContent(requestedVersion));
+    return clientError.orElse(Response.noContent().build());
   }
 
   private Optional<Response> updateSchedulingInformation(

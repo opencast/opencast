@@ -29,9 +29,7 @@ import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
-import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.util.Log;
@@ -121,7 +119,6 @@ public class SecurityEndpoint implements ManagedService {
                   @RestResponse(description = "The caller is not authorized to have the link signed.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
   public Response signUrl(@HeaderParam("Accept") String acceptHeader, @FormParam("url") String url,
           @FormParam("valid-until") String validUntilUtc, @FormParam("valid-source") String validSource) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (isBlank(url))
       return R.badRequest("Query parameter 'url' is mandatory");
 
@@ -142,11 +139,11 @@ public class SecurityEndpoint implements ManagedService {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
         log.warn("Error while trying to sign url '{}': {}", url, getStackTrace(e));
-        return ApiResponses.Json.ok(requestedVersion, obj(f("error", "Error while signing url")));
+        return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
       }
-      return ApiResponses.Json.ok(requestedVersion, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
+      return ApiResponses.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
     } else {
-      return ApiResponses.Json.ok(requestedVersion, obj(f("error", "Given URL cannot be signed")));
+      return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Given URL cannot be signed")));
     }
   }
 }

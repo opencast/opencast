@@ -39,14 +39,14 @@ public enum ApiVersion {
   private String versionString;
   private int major;
   private int minor;
-  private int micro;
+  private int patch;
 
   ApiVersion(String versionString) {
     this.versionString = versionString;
     if ("v*.*.*".equals(versionString)) {
       major = Integer.MAX_VALUE;
       minor = Integer.MAX_VALUE;
-      micro = Integer.MAX_VALUE;
+      patch = Integer.MAX_VALUE;
     } else {
       Matcher matcher = Pattern.compile(VERSION_REG_EX_PATTERN).matcher(versionString);
       if (!matcher.matches() || matcher.groupCount() != 3) {
@@ -54,7 +54,7 @@ public enum ApiVersion {
       }
       major = Integer.parseInt(matcher.group(1));
       minor = Integer.parseInt(matcher.group(2));
-      micro = Integer.parseInt(matcher.group(3));
+      patch = Integer.parseInt(matcher.group(3));
     }
   }
 
@@ -74,7 +74,7 @@ public enum ApiVersion {
     if (this.major > other.major) return false;
     if (this.minor < other.minor) return true;
     if (this.minor > other.minor) return false;
-    return this.micro < other.micro;
+    return this.patch < other.patch;
   }
 
   public String toExternalForm() {

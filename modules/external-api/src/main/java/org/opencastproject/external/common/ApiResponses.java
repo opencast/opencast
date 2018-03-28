@@ -82,7 +82,24 @@ public final class ApiResponses {
      * @return The new {@link Response}
      */
     public static Response ok(ApiVersion version, String body) {
+      // FIXME: This does not make sense. Sending content type 'application/json' for a plain string?
+      // Maybe, when a new major release happens, wrap the string with a JSON object.
+      // See MH-12798: The External API should consistently return JSON strings
       return Response.ok(body, APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
+    }
+
+    /**
+     * Create an ok json response for the external api
+     *
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
+     * @param body
+     *          The body of the response.
+     * @return The new {@link Response}
+     */
+    public static Response ok(String acceptHeader, String body) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      return ok(version, body);
     }
 
     /**
@@ -99,14 +116,17 @@ public final class ApiResponses {
     }
 
     /**
-     * Create a no content response for the external api
+     * Create an ok json response for the external api
      *
-     * @param version
-     *          The version that was requested for the api
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
+     * @param json
+     *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response noContent(ApiVersion version) {
-      return Response.noContent().build();
+    public static Response ok(String acceptHeader, JValue json) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      return ok(version, json);
     }
 
     /**
@@ -120,6 +140,22 @@ public final class ApiResponses {
      */
     public static Response created(ApiVersion version, URI location) {
       return Response.created(location).build();
+    }
+
+    /**
+     * Create a created json response for the external api
+     *
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
+     * @param location
+     *          The location
+     * @param json
+     *          The json body of the response.
+     * @return The new {@link Response}
+     */
+    public static Response created(String acceptHeader, URI location, JValue json) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      return created(version, location, json);
     }
 
     /**

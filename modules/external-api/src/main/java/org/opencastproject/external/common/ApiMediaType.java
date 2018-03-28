@@ -55,7 +55,7 @@ public final class ApiMediaType {
     if (subtype.contains("+")) {
       format = subtype.substring(subtype.indexOf("+") + 1);
     } else if ("*".equals(subtype)) {
-      return ApiFormat.UNSPECIFIED;
+      return ApiFormat.DEFAULT_API_FORMAT;
     } else {
       format = subtype;
     }

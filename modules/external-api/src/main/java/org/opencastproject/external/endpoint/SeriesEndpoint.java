@@ -576,7 +576,6 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.trimToNull(metadataJSON) == null) {
       return RestUtil.R.badRequest("Unable to update metadata for series as the metadata provided is empty.");
     }
@@ -655,7 +654,7 @@ public class SeriesEndpoint {
 
     metadataList.add(adapter, collection);
     indexService.updateAllSeriesMetadata(id, metadataList, externalIndex);
-    return ApiResponses.Json.ok(requestedVersion, "");
+    return ApiResponses.Json.ok(acceptHeader, "");
   }
 
   @DELETE
@@ -668,7 +667,6 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteSeriesMetadataByType(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String id, @QueryParam("type") String type) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.trimToNull(type) == null) {
       return RestUtil.R
               .badRequest(String.format("A type of catalog needs to be specified for series '%s' to delete it.", id));
@@ -697,7 +695,7 @@ public class SeriesEndpoint {
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     }
-    return ApiResponses.Json.noContent(requestedVersion);
+    return Response.noContent().build();
   }
 
   @GET
@@ -725,11 +723,10 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (indexService.getSeries(id, externalIndex).isSome()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
-      return ApiResponses.Json.ok(requestedVersion, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
+      return ApiResponses.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
                 @Override
                 public Field apply(Entry<String, String> a) {
                   return f(a.getKey(), v(a.getValue(), BLANK));
@@ -771,9 +768,8 @@ public class SeriesEndpoint {
           @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
-      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
-      return ApiResponses.Json.ok(requestedVersion, metadataList.toJSON());
+      return ApiResponses.Json.ok(acceptHeader, metadataList.toJSON());
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}' because: {}",
               seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
@@ -797,7 +793,6 @@ public class SeriesEndpoint {
   public Response createNewSeries(@HeaderParam("Accept") String acceptHeader,
           @FormParam("metadata") String metadataParam, @FormParam("acl") String aclParam,
           @FormParam("theme") String themeIdParam) throws UnauthorizedException, NotFoundException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (isBlank(metadataParam))
       return R.badRequest("Required parameter 'metadata' is missing or invalid");
 
@@ -842,7 +837,7 @@ public class SeriesEndpoint {
 
     try {
       String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
-      return ApiResponses.Json.created(requestedVersion, URI.create(getSeriesUrl(seriesId)),
+      return ApiResponses.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)),
                                        obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}' because: ",
@@ -936,7 +931,6 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
           @FormParam("acl") String aclJson) throws NotFoundException, SeriesException, UnauthorizedException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (isBlank(aclJson))
       return R.badRequest("Missing form parameter 'acl'");
 
@@ -958,7 +952,7 @@ public class SeriesEndpoint {
     }).toList();
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries));
-    return ApiResponses.Json.ok(requestedVersion, aclJson);
+    return ApiResponses.Json.ok(acceptHeader, aclJson);
   }
 
   @SuppressWarnings("unchecked")
@@ -972,7 +966,6 @@ public class SeriesEndpoint {
   public Response updateSeriesProperties(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String seriesID, @FormParam("properties") String propertiesJson)
           throws NotFoundException, SeriesException, UnauthorizedException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     if (StringUtils.isBlank(propertiesJson))
       return R.badRequest("Missing form parameter 'acl'");
 
@@ -990,7 +983,7 @@ public class SeriesEndpoint {
       seriesService.updateSeriesProperty(seriesID, field.getKey(), field.getValue().toString());
     }
 
-    return ApiResponses.Json.ok(requestedVersion, propertiesJson);
+    return ApiResponses.Json.ok(acceptHeader, propertiesJson);
   }
 
   /**

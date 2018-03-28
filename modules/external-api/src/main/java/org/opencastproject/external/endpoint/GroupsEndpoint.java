@@ -29,9 +29,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
-import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.group.Group;
@@ -107,7 +105,6 @@ public class GroupsEndpoint {
                   @RestResponse(description = "A (potentially empty) list of groups.", responseCode = HttpServletResponse.SC_OK) })
   public Response getGroups(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     Opt<Integer> optLimit = Opt.nul(limit);
     if (optLimit.isSome() && limit <= 0)
       optLimit = Opt.none();
@@ -129,7 +126,7 @@ public class GroupsEndpoint {
     for (SearchResultItem<Group> item : results.getItems()) {
       groupsList.add(groupToJSON(item.getSource()));
     }
-    return ApiResponses.Json.ok(requestedVersion, arr(groupsList));
+    return ApiResponses.Json.ok(acceptHeader, arr(groupsList));
   }
 
   @GET
@@ -140,9 +137,8 @@ public class GroupsEndpoint {
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     for (final Group group : indexService.getGroup(id, externalIndex)) {
-      return ApiResponses.Json.ok(requestedVersion, groupToJSON(group));
+      return ApiResponses.Json.ok(acceptHeader, groupToJSON(group));
     }
     return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
   }
@@ -199,7 +195,6 @@ public class GroupsEndpoint {
                           @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
     try {
       Opt<Group> groupOpt = indexService.getGroup(id, externalIndex);
       if (groupOpt.isSome()) {
@@ -210,7 +205,7 @@ public class GroupsEndpoint {
           return indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
                   StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
         } else {
-          return ApiResponses.Json.ok(requestedVersion, "Member is already member of group");
+          return ApiResponses.Json.ok(acceptHeader, "Member is already member of group");
         }
       } else {
         return ApiResponses.notFound("Cannot find group with id '%s'.", id);
