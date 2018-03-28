@@ -20,7 +20,7 @@ A tenant configuration thus consists mainly of the DNS name that is mapped to th
 
 ### Default Setup
 
-Out of the box, Opencast has one tenant configured, called mh_default_org that is mapped to the server name
+Out of the box, Opencast has one tenant configured, called `mh_default_org` that is mapped to the server name
 `localhost:8080`. As long as there is one tenant configuration only, Opencast will map every request to that tenant
 regardless of the server name. As soon as a second tenant configuration is available, requests will be mapped to
 organizations using the server name, and an HTTP status code 404 will be returned for requests that hit the Opencast
@@ -37,8 +37,9 @@ Adding A Tenant
 ---------------
 
 To add a tenant to the installation, two things need to be put in place: a tenant configuration and a set of security
-rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and 
-`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to `tenant1-*.opencast.org`.
+rules. For this example we have a three node install of `admin.opencast.org`, `worker.opencast.org`, and
+`presentation.opencast.org`.  Assume that the new tenant is called `tenant1` and should be mapped to
+`tenant1-*.opencast.org`.
 
 ### Tenant Configuration
 
@@ -60,14 +61,15 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual server names:
+Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
+server names:
 
     server=admin.opencast.org
 
 This file sets the default organization that is selected.  This is currently required because some Opencast components
 do not support multitenancy.
 
-Note that if you are running Apache httpd with mod_proxy in front of the Opencast installation, the port number will be
+Note that if you are running Apache httpd with mod\_proxy in front of the Opencast installation, the port number will be
 -1 in both files.
 
 ### Security Configuration
@@ -81,6 +83,12 @@ The easiest way of creating that file is probably to create a copy of the alread
 
 ### Other Configuration
 
-Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg-tenant1`, and `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg` should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common-tenant1.cfg`.
+Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`
+should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg-tenant1`, and
+`org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg` should be copied to
+`org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common-tenant1.cfg`.
 
-In each of the new configuration files, change `organization` key to match the tenant id, and change the `common-metadata` key to false.  Create a copy of the files for each tenant.  Note: The original `...-common.cfg` files *must* have their `common-metadata` keys set to true, otherwise metadata will only be available in one tenant and you will experience a number of odd errors.
+In each of the new configuration files, change `organization` key to match the tenant id, and change the
+`common-metadata` key to false.  Create a copy of the files for each tenant.  Note: The original `...-common.cfg` files
+*must* have their `common-metadata` keys set to true, otherwise metadata will only be available in one tenant and you
+will experience a number of odd errors.
