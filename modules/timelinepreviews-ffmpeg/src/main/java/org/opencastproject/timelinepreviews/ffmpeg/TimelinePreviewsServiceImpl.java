@@ -64,6 +64,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Media analysis plugin that takes a video stream and generates preview images that can be shown on the timeline.
@@ -378,7 +379,7 @@ TimelinePreviewsService, ManagedService {
           "Error reading the media file in the workspace", e);
     }
 
-    String imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath())
+    String imageFilePath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()) + '_' + UUID.randomUUID()
                            + "_timelinepreviews" + outputFormat;
     int exitCode = 1;
     String[] command = new String[] {

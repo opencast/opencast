@@ -96,6 +96,7 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
           properties.put(varName + "_resolution_y", video.getFrameHeight().toString());
           Fraction trackAspect = Fraction.getReducedFraction(video.getFrameWidth(), video.getFrameHeight());
           properties.put(varName + "_aspect", trackAspect.toString());
+          properties.put(varName + "_framerate", video.getFrameRate().toString());
 
           // Check if we should fall back to nearest defined aspect ratio
           if (!aspectRatios.isEmpty()) {

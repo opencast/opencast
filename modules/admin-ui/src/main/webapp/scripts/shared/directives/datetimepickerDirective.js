@@ -1,3 +1,25 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+
 angular.module('adminNg.directives')
 .directive('datetimepicker', ['Language', function (Language) {
 
@@ -28,7 +50,6 @@ angular.module('adminNg.directives')
                 dateValue = new Date(scope.$parent.params.value);
             }
 
-
             if (ngModel) {
 
                 var updateModel = function (date) {
@@ -44,7 +65,6 @@ angular.module('adminNg.directives')
                 optionsObj.timeInput = true;
                 optionsObj.showButtonPanel = true;
                 optionsObj.onClose = function () {
-                    console.log('onClose');
                     var newDate = element.datetimepicker('getDate');
                     setTimeout(function(){
                         updateModel(newDate);
@@ -62,6 +82,7 @@ angular.module('adminNg.directives')
 
                 element.datetimepicker(optionsObj);
                 element.datetimepicker('setDate', dateValue);
+                ngModel.$setViewValue(dateValue.toISOString());
             }
 
             scope.$on('$destroy', function () {

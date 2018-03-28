@@ -65,6 +65,10 @@ Required for audio normalization (optional):
 
     sox >= 14.4
 
+Required for animate service (optional):
+
+    synfig
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project

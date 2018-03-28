@@ -284,7 +284,7 @@ public class IncidentServiceEndpoint {
       json.put("description", localization.getDescription());
       return Response.ok(json.toJSONString()).build();
     } catch (IncidentServiceException e) {
-      logger.warn("Unable to get job localization of jo incident: {}", e);
+      logger.warn("Unable to get job localization of jo incident:", e);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
     }
   }

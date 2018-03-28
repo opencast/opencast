@@ -176,7 +176,7 @@ from the repository, all necessary dependencies will be installed automatically.
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-        apt-get install ffmpeg-dist tesseract-ocr sox hunspell
+    apt-get install ffmpeg-dist tesseract-ocr sox hunspell synfig
 
 
 Upgrading Major Versions

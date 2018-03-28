@@ -87,6 +87,7 @@ describe('Tools Edit controller', function () {
             });
 
             it('redirects to the events list', function () {
+                $scope.video.workflow = 'some-workflow';
                 $scope.submit();
                 $httpBackend.flush();
 

@@ -924,7 +924,10 @@ public class EventsEndpoint implements ManagedService {
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
         Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
-        if (collection.isSome()) convertStartDateTimeToApiV1(collection.get());
+        if (collection.isSome()) {
+          convertStartDateTimeToApiV1(collection.get());
+          ExternalMetadataUtils.changeTypeOrderedTextToText(collection.get());
+        }
 
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, actualList.toJSON());
       }
@@ -1028,6 +1031,7 @@ public class EventsEndpoint implements ManagedService {
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
+        ExternalMetadataUtils.changeTypeOrderedTextToText(collection);
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
       }
       // Try the other catalogs
@@ -1040,6 +1044,7 @@ public class EventsEndpoint implements ManagedService {
             MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
+            ExternalMetadataUtils.changeTypeOrderedTextToText(fields);
             return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, fields.toJSON());
           }
         }

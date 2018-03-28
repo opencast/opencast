@@ -310,24 +310,6 @@ public class ComposerServiceTest {
   }
 
   @Test
-  public void testWatermark() throws Exception {
-    assertTrue(sourceVideoOnly.isFile());
-    assertTrue(sourceImage.isFile());
-
-    // Need different media files
-    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).once();
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceAudioOnly).once();
-    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
-            .andReturn(sourceVideoOnly.toURI()).anyTimes();
-    composerService.setWorkspace(workspace);
-    EasyMock.replay(workspace);
-
-    Job job = composerService.watermark(sourceVideoTrack, sourceImage.getAbsolutePath(), "watermark.branding");
-    MediaPackageElementParser.getFromXml(job.getPayload());
-  }
-
-  @Test
   public void testConvertImage() throws Exception {
     assertTrue(sourceImage.isFile());
 

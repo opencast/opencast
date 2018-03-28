@@ -66,7 +66,7 @@ angular.module('adminNg.controllers')
                         'action' : 'write',
                         'allow'  : policy.write,
                         'role'   : policy.role
-                    });   
+                    });
                 }
 
                 angular.forEach(policy.actions.value, function(customAction){
@@ -97,7 +97,6 @@ angular.module('adminNg.controllers')
         else if($scope.states[3].name === 'theme'){
             theme = $scope.states[3].stateController.ud.theme;
         }
-
         if (angular.isDefined(theme) && theme !== null && !angular.isObject(theme)) {
             userdata.theme = Number(theme);
         }
@@ -129,7 +128,7 @@ angular.module('adminNg.controllers')
     $scope.$parent.$watch('tab', function (value) {
         angular.forEach($scope.states, function (state) {
             if (value === state.name && !angular.isUndefined(state.stateController.reload)) {
-                state.stateController.reload();            
+                state.stateController.reload();
             }
         });
     });

@@ -52,7 +52,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "mh_group", uniqueConstraints = { @UniqueConstraint(columnNames = { "group_id", "organization" }) })
+@Table(name = "oc_group", uniqueConstraints = { @UniqueConstraint(columnNames = { "group_id", "organization" }) })
 @NamedQueries({
         @NamedQuery(name = "Group.findAll", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization"),
         @NamedQuery(name = "Group.findByUser", query = "Select g FROM JpaGroup g WHERE g.organization.id = :organization AND :username MEMBER OF g.members"),
@@ -81,12 +81,12 @@ public final class JpaGroup implements Group {
   private String role;
 
   @ElementCollection
-  @CollectionTable(name = "mh_group_member", joinColumns = { @JoinColumn(name = "group_id") })
+  @CollectionTable(name = "oc_group_member", joinColumns = { @JoinColumn(name = "group_id") })
   @Column(name = "member")
   private Set<String> members;
 
   @ManyToMany(cascade = { CascadeType.MERGE }, fetch = FetchType.LAZY)
-  @JoinTable(name = "mh_group_role", joinColumns = { @JoinColumn(name = "group_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
+  @JoinTable(name = "oc_group_role", joinColumns = { @JoinColumn(name = "group_id") }, inverseJoinColumns = { @JoinColumn(name = "role_id") }, uniqueConstraints = { @UniqueConstraint(columnNames = {
           "group_id", "role_id" }) })
   private Set<JpaRole> roles;
 

@@ -331,7 +331,7 @@ public class DFXPCaptionConverter implements CaptionConverter {
 
   @Override
   public Type getElementType() {
-    return MediaPackageElement.Type.Catalog;
+    return MediaPackageElement.Type.Attachment;
   }
 
 }

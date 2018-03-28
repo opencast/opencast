@@ -97,7 +97,7 @@ custom parameters to be defined globally.
 
 * To show the Opencast Media Module, use `tool=engage/ui/`
 * To show all videos for a single series, use `tool=ltitools/series/index.html;series=SERIESID`
-* To show a single video, use `tool=engage/theodul/ui/core/index.html;id=MEDIAPACKAGEID`
+* To show a single video, use `tool=engage/theodul/ui/core.html;id=MEDIAPACKAGEID`
 * To show a short debugging page before proceeding to the tool page, add the parameter `test=true`
 
 For more information about how to set custom LTI parameters, please check the documentation of your LMS.

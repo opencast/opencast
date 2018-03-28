@@ -1,0 +1,114 @@
+.searchTabBarSearchBar {
+	display: block;
+	height: 42px;
+}
+.searchTabBarSearchBar .searchBar {
+	float: left;
+}
+.searchTabBarSearchBar .relevanceInfo {
+	float: right;
+	margin: 5px 10;
+	text-align: center; 
+	margin-left: 1px; 
+	margin-right: 1px; 
+	border: 0 solid black;
+	display: none;
+}
+
+.searchTabBarSearchBar .relevanceInfo .text {
+	display: inline;
+}
+
+.searchTabBarSearchBar .relevanceInfo .lt30 {
+	display: inline;
+	background-color: #C0C0C0;
+}
+
+.searchTabBarSearchBar .relevanceInfo .lt70 {
+	display: inline;
+	background-color: #ADD8E6;
+}
+
+.searchTabBarSearchBar .relevanceInfo .gt70 {
+	display: inline;
+	background-color: #90EE90;
+}
+
+
+.searchTabBarLoading {
+    background-image: url("../images/pluginloading.gif");
+    background-repeat: no-repeat;
+    background-position: center;
+    margin-top: 10;
+    width: 100%;
+    height: 11px;
+    display:block;
+}
+
+.searchTabBarResultEntry {
+	padding: 2px 5px 2px 5px;
+	border: 1px solid lightsalmon;
+	margin: 0px 0px 1px 0px;
+}
+.searchTabBarResultEntry:hover {
+    background-color: rgb(243, 222, 168);
+    cursor: pointer;
+}
+
+.searchTabBarResultEntry:focus {
+    background-color: rgb(243, 222, 168);
+    cursor: pointer;
+}
+
+.searchTabBarResultEntryPreview {
+	display: inline-block;
+	width: 15%;
+}
+
+.searchTabBarResultEntryPreview img {
+	width: 100%;
+}
+
+.searchTabBarResultEntryText {
+	display: inline-block;
+	width: 80%;
+	vertical-align: top;
+	padding: 10 0 0 5px;
+}
+
+.searchTabBarResultEntryText .time {
+    color: rgb(9, 172, 194);
+}
+
+.searchTabBarResultEntryText a {
+    color: lightgrey;
+}
+
+.searchTabBarResultEntryText a:hover {
+    color: lightgrey;
+    text-decoration: none;
+}
+
+
+.searchTabBarResultEntry:hover > .searchTabBarResultEntryText a {
+    color: lightslategrey;
+}
+
+
+
+
+.none_relevance {
+    display: none;
+}
+
+/*
+.low_relevance {
+    background-color: rgb(192, 192, 192);
+}
+.medium_relevance {
+    background-color: rgb(173, 216, 230);
+}
+.high_relevance {
+    background-color: rgb(144, 238, 144);
+}
+*/

@@ -30,6 +30,7 @@ describe('Table', function () {
     });
 
     describe('#configure', function () {
+
         var params = {
             columns: [{
                 name: 'name',
@@ -40,14 +41,15 @@ describe('Table', function () {
             category: 'furniture',
             apiService: {
                 query: function () {
-                    var rows = [];
-                    rows.push({test: ''});
-
+                    var data = {
+                        rows: []
+                    };
+                    data.rows.push({test: 'chair'});
 
                     return {
                         $promise: {
                             then: function (fn) {
-                                fn(rows);
+                                fn(data);
                             }
                         }
                     };
@@ -63,7 +65,7 @@ describe('Table', function () {
 
         it('sets default sort parameters', function () {
             Table.configure(params);
-            expect(Table.predicate).toEqual('');
+            expect(Table.predicate).toEqual('name');
             expect(Table.reverse).toBe(false);
         });
 

@@ -131,7 +131,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/groups" method="POST" access="ROLE_ADMIN, ROLE_UI_GROUPS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/index/recreateIndex" method="POST" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/index/*" method="POST" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/admin-ng/series/deleteSeries" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/series/new" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_CREATE" />
     <sec:intercept-url pattern="/admin-ng/series/optOutSeries/*" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_STATUS_EDIT" />
@@ -201,7 +201,9 @@
     <sec:intercept-url pattern="/api/events/*/comments" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <!-- External API DELETE Endpoints -->
@@ -231,6 +233,10 @@
     <sec:intercept-url pattern="/info/me.json" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
+
+    <!-- Paella player -->
+    <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -274,7 +280,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />    
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />

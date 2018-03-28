@@ -237,7 +237,7 @@ public class ThemesEndpoint {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the themes list: {}", e);
+      logger.error("The admin UI Search Index was not able to get the themes list:", e);
       return RestUtil.R.serverError();
     }
 

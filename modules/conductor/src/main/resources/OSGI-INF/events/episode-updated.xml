@@ -15,4 +15,20 @@
             interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
             cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
   </scr:component>
+  <scr:component name="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
+    immediate="true" activate="activate">
+    <implementation class="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
+    <property name="service.description" value="OAI-PMH Updated Event Handler" />
+    <property name="service.pid" value="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"/>
+    <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+      <provide interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
+    </service>
+    <reference name="oaiPmhPersistence" interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
+               cardinality="1..1" policy="static" bind="setOaiPmhPersistence" />
+    <reference name="oaiPmhPublicationService" interface="org.opencastproject.publication.api.OaiPmhPublicationService"
+               cardinality="1..1" policy="static" bind="setOaiPmhPublicationService" />
+    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
+               cardinality="1..1" policy="static" bind="setSecurityService" />
+  </scr:component>
 </scr:components>

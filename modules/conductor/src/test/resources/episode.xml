@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dcterms:contributor>Werner</dcterms:contributor>
+  <dcterms:created xsi:type="dcterms:W3CDTF">2018-03-13T19:48Z</dcterms:created>
+  <dcterms:creator>Heinz</dcterms:creator>
+  <dcterms:extent xsi:type="dcterms:ISO8601">PT3M55.010S</dcterms:extent>
+  <dcterms:isPartOf>123</dcterms:isPartOf>
+  <dcterms:language>eng</dcterms:language>
+  <dcterms:license>CC0</dcterms:license>
+  <dcterms:subject>Subject</dcterms:subject>
+  <dcterms:title>Title</dcterms:title>
+</dublincore>

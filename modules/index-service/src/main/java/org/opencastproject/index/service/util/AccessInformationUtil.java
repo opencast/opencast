@@ -82,7 +82,7 @@ public final class AccessInformationUtil {
       systemAclJson.put("name", managedAcl.getName());
     } catch (JSONException e) {
       // This should never happen, because the key is never null
-      logger.error("An unexpected error occured: {}", e);
+      logger.error("An unexpected error occured:", e);
     }
 
     return systemAclJson;
@@ -119,7 +119,7 @@ public final class AccessInformationUtil {
       transJson.put("done", trans.isDone());
     } catch (JSONException e) {
       // This should never happen, because the key is never null
-      logger.error("An unexpected error occured: {}", e);
+      logger.error("An unexpected error occured:", e);
       throw new IllegalStateException(e);
     }
 
@@ -154,7 +154,7 @@ public final class AccessInformationUtil {
       transJson.put("override_episodes", trans.isOverride());
     } catch (JSONException e) {
       // This should never happen, because the key is never null
-      logger.error("An unexpected error occured: {}", e);
+      logger.error("An unexpected error occured:", e);
       throw new IllegalStateException(e);
     }
 
@@ -189,7 +189,7 @@ public final class AccessInformationUtil {
       transJson.put("is_deleted", trans.isDelete());
     } catch (JSONException e) {
       // This should never happen, because the key is never null
-      logger.error("An unexpected error occured: {}", e);
+      logger.error("An unexpected error occured:", e);
       throw new IllegalStateException(e);
     }
 
@@ -235,7 +235,7 @@ public final class AccessInformationUtil {
         rolePrivileges.put(entry.getAction(), entry.isAllow());
       } catch (JSONException e) {
         // This should never happen, because the key is never null
-        logger.error("An unexpected error occured: {}", e);
+        logger.error("An unexpected error occured:", e);
       }
     }
 
@@ -245,7 +245,7 @@ public final class AccessInformationUtil {
         privilegesJson.put(privilege.getKey(), privilege.getValue());
       } catch (JSONException e) {
         // This should never happen, because the key is never null
-        logger.error("An unexpected error occured: {}", e);
+        logger.error("An unexpected error occured:", e);
       }
     }
     return privilegesJson;

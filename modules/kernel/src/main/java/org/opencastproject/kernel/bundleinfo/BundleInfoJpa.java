@@ -49,7 +49,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 @Entity(name = "BundleInfo")
-@Table(name = "mh_bundleinfo", uniqueConstraints = { @UniqueConstraint(columnNames = { "host", "bundle_name",
+@Table(name = "oc_bundleinfo", uniqueConstraints = { @UniqueConstraint(columnNames = { "host", "bundle_name",
         "bundle_version" }) })
 @NamedQueries({
         @NamedQuery(name = "BundleInfo.findAll", query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),

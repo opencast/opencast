@@ -21,6 +21,7 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
+import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
@@ -120,7 +121,7 @@ public class AclScanner implements ArtifactInstaller {
    * @throws IOException
    * @throws JAXBException
    */
-  private void addAcl(File artifact) throws IOException, JAXBException {
+  private void addAcl(File artifact) throws IOException, XACMLParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Adding Acl {}", artifact.getAbsolutePath());
@@ -163,7 +164,7 @@ public class AclScanner implements ArtifactInstaller {
    * @throws IOException
    * @throws JAXBException
    */
-  private void updateAcl(File artifact) throws IOException, JAXBException {
+  private void updateAcl(File artifact) throws IOException, XACMLParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Updating Acl {}", artifact.getAbsolutePath());
@@ -243,7 +244,7 @@ public class AclScanner implements ArtifactInstaller {
    * @throws FileNotFoundException
    * @throws JAXBException
    */
-  private AccessControlList parseToAcl(File artifact) throws FileNotFoundException, JAXBException {
+  private AccessControlList parseToAcl(File artifact) throws FileNotFoundException, XACMLParsingException {
     FileInputStream in = null;
     AccessControlList acl = null;
 

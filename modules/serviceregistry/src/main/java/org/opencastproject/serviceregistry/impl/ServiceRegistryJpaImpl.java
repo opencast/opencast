@@ -302,7 +302,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
       jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
     } catch (ServiceRegistryException e) {
-      logger.error("Error registering JMX statistic beans {}", e);
+      logger.error("Error registering JMX statistic beans", e);
     }
 
     // Find the jobs URL
@@ -342,7 +342,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         tracker = new RestServiceTracker(cc.getBundleContext());
         tracker.open(true);
       } catch (InvalidSyntaxException e) {
-        logger.error("Invalid filter syntax: {}", e);
+        logger.error("Invalid filter syntax:", e);
         throw new IllegalStateException(e);
       }
     }
@@ -761,10 +761,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (heartbeatInterval == 0) {
         logger.info("Heartbeat disabled");
       } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} minutes too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
+        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
         heartbeatInterval = DEFAULT_HEART_BEAT;
       } else {
-        logger.info("Dispatch interval set to {} minutes", heartbeatInterval);
+        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
       }
     }
 
@@ -966,9 +966,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   protected JpaJob updateInternal(EntityManager em, JpaJob job) throws PersistenceException {
     EntityTransaction tx = em.getTransaction();
+    JpaJob originalJob = null;
+    JpaJob fromDb = null;
     try {
       tx.begin();
-      JpaJob fromDb = em.find(JpaJob.class, job.getId());
+      fromDb = em.find(JpaJob.class, job.getId());
+      originalJob = JpaJob.from(fromDb.toJob());
       if (fromDb == null) {
         throw new NoResultException();
       }
@@ -980,10 +983,46 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       setJobUri(job);
       return job;
     } catch (PersistenceException e) {
+      dumpJobs(originalJob, fromDb);
       if (tx.isActive()) {
         tx.rollback();
       }
       throw e;
+    }
+  }
+
+  private void dumpJobs(JpaJob originalJob, JpaJob fromDb) {
+    try {
+      if (originalJob == null) {
+        logger.error("originalJob is null");
+        return;
+      }
+      if (originalJob.getStatus() == null) {
+        logger.error("originalJob.getStatus() is null");
+        return;
+      }
+      if (!originalJob.getStatus().equals(fromDb.getStatus()))
+        logger.error("JPA status mismatch: " + originalJob.getStatus() + " vs " + fromDb.getStatus());
+      if (originalJob.getProcessorServiceRegistration() == null) {
+        logger.error("originalJob.getProcessorServiceRegistration() is null");
+        return;
+      }
+      if (fromDb.getProcessorServiceRegistration() == null) {
+        logger.error("fromDb.getProcessorServiceRegistration() is null");
+        return;
+      }
+      if (!originalJob.getProcessorServiceRegistration().getId().equals(fromDb.getProcessorServiceRegistration().getId()))
+        logger.error("JPA processor service mismatch: " + originalJob.getProcessorServiceRegistration().getId() + " vs " + fromDb.getProcessorServiceRegistration().getId());
+      if (!originalJob.getDateStarted().equals(fromDb.getDateStarted()))
+        logger.error("JPA date started mismatch: " + originalJob.getDateStarted() + " vs " + fromDb.getDateStarted());
+      if (!originalJob.getBlockedJobIds().equals(fromDb.getBlockedJobIds()))
+        logger.error("JPA blocked job ids mismatch: " + originalJob.getBlockedJobIds() + " vs " + fromDb.getBlockedJobIds());
+      if (!originalJob.getBlockingJobId().equals(fromDb.getBlockingJobId()))
+        logger.error("JPA blocking job id mismatch: " + originalJob.getBlockingJobId() + " vs " + fromDb.getBlockingJobId());
+      if (!originalJob.getChildJobsString().equals(fromDb.getChildJobsString()))
+        logger.error("JPA child job id mismatch: " + originalJob.getChildJobsString() + " vs " + fromDb.getChildJobsString());
+    } catch (Exception e) {
+      logger.error("Error logging job state information in dumpJobs()", e);
     }
   }
 

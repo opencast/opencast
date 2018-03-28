@@ -23,6 +23,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-dublincore</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-publication-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -108,7 +113,14 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Export-Package> org.opencastproject.publication.oaipmh;version=${project.version} </Export-Package>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.publication.oaipmh;version=${project.version}
+            </Export-Package>
             <Service-Component>
               OSGI-INF/publication-service-oaipmh.xml
             </Service-Component>

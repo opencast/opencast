@@ -36,16 +36,16 @@ import javax.persistence.TableGenerator;
 
 /** JPA DTO modeling the asset database table. */
 @Entity(name = "Asset")
-@Table(name = "mh_assets_asset")
+@Table(name = "oc_assets_asset")
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
-@TableGenerator(name = "seq_mh_assets_asset", initialValue = 0, allocationSize = 50)
+@TableGenerator(name = "seq_oc_assets_asset", initialValue = 0, allocationSize = 50)
 public class AssetDto {
   private static final ProductBuilder p = Products.E;
 
   @Id
-  @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_mh_assets_asset")
+  @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_oc_assets_asset")
   @Column(name = "id")
   private Long id;
 

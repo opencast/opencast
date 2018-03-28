@@ -23,7 +23,6 @@ package org.opencastproject.index.service.resources.list.query;
 
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter;
 import org.opencastproject.index.service.resources.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.AgentsListProvider;
 import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider;
@@ -474,6 +473,6 @@ public class EventListQuery extends ResourceListQueryImpl {
    */
   public static ResourceListFilter<String> createReviewStatusFilter(Option<String> reviewStatus) {
     return FiltersUtils.generateFilter(reviewStatus, FILTER_REVIEW_STATUS_NAME, FILTER_REVIEW_STATUS_LABEL,
-            SourceType.SELECT, Option.some(ListProvidersServiceImpl.REVIEW_STATUS));
+            SourceType.SELECT, Option.some(EventsListProvider.REVIEW_STATUS));
   }
 }

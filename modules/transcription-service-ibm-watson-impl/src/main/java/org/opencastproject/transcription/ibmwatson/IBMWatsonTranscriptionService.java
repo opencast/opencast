@@ -111,6 +111,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private static final long DEFAULT_COMPLETION_BUFFER = 600; // in seconds, default is 10 minutes
   private static final long DEFAULT_DISPATCH_INTERVAL = 60; // in seconds, default is 1 minute
   private static final long DEFAULT_MAX_PROCESSING_TIME = 2 * 60 * 60; // in seconds, default is 2 hours
+  private static final String DEFAULT_LANGUAGE = "en";
   // Cleans up results files that are older than 7 days (which is how long the IBM watson
   // speech-to-text-service keeps the jobs by default)
   private static final int DEFAULT_CLEANUP_RESULTS_DAYS = 7;
@@ -177,6 +178,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   private long maxProcessingSeconds = DEFAULT_MAX_PROCESSING_TIME;
   private String toEmailAddress;
   private int cleanupResultDays = DEFAULT_CLEANUP_RESULTS_DAYS;
+  private String language = DEFAULT_LANGUAGE;
 
   private String systemAccount;
   private String serverUrl;
@@ -204,6 +206,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         Option<String> modelOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_MODEL);
         if (modelOpt.isSome()) {
           model = modelOpt.get();
+          language = StringUtils.substringBefore(model, "-");
           logger.info("Model is {}", model);
         } else {
           logger.info("Default model will be used");
@@ -360,6 +363,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       logger.warn("Transcription error. State in db could not be updated to error for mpId {}, jobId {}", mpId, jobId);
       throw new TranscriptionServiceException("Could not update transcription job control db", e);
     }
+  }
+
+  @Override
+  public String getLanguage() {
+    return language;
   }
 
   @Override

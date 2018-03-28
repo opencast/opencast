@@ -1034,8 +1034,12 @@ public abstract class AbstractEventEndpoint {
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
 
-    MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
-    return okJson(metadataList.toJSON());
+    try {
+      MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
+      return okJson(metadataList.toJSON());
+    } catch (IllegalArgumentException e) {
+      return badRequest(String.format("Event %s metadata can't be updated.: %s", id, e.getMessage()));
+    }
   }
 
   @GET
@@ -2054,7 +2058,7 @@ public abstract class AbstractEventEndpoint {
     try {
       results = getIndex().getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the events list: {}", e);
+      logger.error("The admin UI Search Index was not able to get the events list:", e);
       return RestUtil.R.serverError();
     }
 

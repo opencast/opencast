@@ -28,12 +28,12 @@ angular.module('adminNg.controllers')
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
-    'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
+    'UploadAssetOptions', 'EventUploadAssetResource', 'Table', 'SchedulingHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
         EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
-        EventUploadAssetResource, Table) {
+        EventUploadAssetResource, Table, SchedulingHelperService) {
 
         var roleSlice = 100;
         var roleOffset = 0;
@@ -452,7 +452,7 @@ angular.module('adminNg.controllers')
         $scope.minutes = JsHelper.initArray(60);
 
         $scope.conflicts = [];
-  
+
         this.readyToPollConflicts = function () {
             var data = $scope.source;
             return angular.isDefined(data) &&
@@ -532,6 +532,11 @@ angular.module('adminNg.controllers')
                 }, me.conflictsDetected);
             }
         };
+
+        $scope.onTemporalValueChange = function(type) {
+            SchedulingHelperService.applyTemporalValueChange($scope.source, type, true);
+            $scope.saveScheduling();
+        }
 
         /**
          * End Scheduling related resources
@@ -756,6 +761,11 @@ angular.module('adminNg.controllers')
                   changePolicies(json.acl.ace, true);
               }
           });
+        };
+
+        $scope.accessChanged = function (role) {
+          if (!role) return;
+          $scope.accessSave();
         };
 
         $scope.accessSave = function () {

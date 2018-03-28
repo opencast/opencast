@@ -259,9 +259,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   private final List<Long> delayedWorkflows = new ArrayList<Long>();
 
   /** Striped locks for synchronization */
-  private final Striped<Lock> lock = Striped.lazyWeakLock(1);
-  private final Striped<Lock> updateLock = Striped.lazyWeakLock(1);
-  private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1);
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
+  private final Striped<Lock> updateLock = Striped.lazyWeakLock(1024);
+  private final Striped<Lock> mediaPackageLocks = Striped.lazyWeakLock(1024);
 
   static {
     YES = new HashSet<String>(Arrays.asList(new String[] { "yes", "true", "on" }));
@@ -608,6 +608,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.
     final Lock lock = mediaPackageLocks.get(sourceMediaPackage.getIdentifier().toString());
     lock.lock();
+
     try {
       logger.startUnitOfWork();
       if (workflowDefinition == null)
@@ -1296,6 +1297,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public void update(final WorkflowInstance workflowInstance) throws WorkflowException, UnauthorizedException {
     final Lock lock = updateLock.get(workflowInstance.getId());
     lock.lock();
+
     try {
       WorkflowInstance originalWorkflowInstance = null;
       try {
@@ -1312,26 +1314,30 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
       }
 
-      // Before we persist this, extract the metadata
-      final MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
-      populateMediaPackageMetadata(updatedMediaPackage);
-      String seriesId = updatedMediaPackage.getSeries();
-      if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
-        // If the mediapackage contains a series, find the series ACLs and add the security information to the
-        // mediapackage
-        try {
+      MediaPackage updatedMediaPackage = null;
+      try {
+
+        // Before we persist this, extract the metadata
+        updatedMediaPackage = workflowInstance.getMediaPackage();
+
+        populateMediaPackageMetadata(updatedMediaPackage);
+
+        String seriesId = updatedMediaPackage.getSeries();
+        if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
+          // If the mediapackage contains a series, find the series ACLs and add the security information to the
+          // mediapackage
+
           AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
-                 AclScope.Series);
+          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage, AclScope.Series);
           if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
             authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
-        } catch (SeriesException e) {
-          throw new WorkflowDatabaseException(e);
-        } catch (NotFoundException e) {
-          logger.warn("Series %s not found, unable to set ACLs", seriesId);
-        } catch (Exception e) {
-          logger.error("Error reading ACL from series {}: {}", seriesId, e);
         }
+      } catch (SeriesException e) {
+        throw new WorkflowDatabaseException(e);
+      } catch (NotFoundException e) {
+        logger.warn("Metadata for mediapackage {} could not be updated because it wasn't found", updatedMediaPackage, e);
+      } catch (Exception e) {
+        logger.error("Metadata for mediapackage {} could not be updated", updatedMediaPackage, e);
       }
 
       // Synchronize the job status with the workflow
