@@ -359,8 +359,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    */
   public Map<String, List<String>> getEventsWithComments() {
     EntityManager em = emf.createEntityManager();
-    Query query = em.createNativeQuery(
-            "SELECT e.organization, e.event FROM mh_event_comment e ORDER BY e.organization ASC");
+    Query query = em.createNamedQuery("EventComment.findAllWIthOrg");
     Iterator iter = query.getResultList().iterator();
     Map<String, List<String>> orgEventsMap = new Hashtable<>();
     while (iter.hasNext()) {

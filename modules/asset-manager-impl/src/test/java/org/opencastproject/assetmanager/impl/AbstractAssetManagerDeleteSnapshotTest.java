@@ -133,11 +133,11 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     assertStoreSize(3 * 2);
     if (RUN_RAW_QUERIES) {
       /*
-        DELETE FROM mh_assets_asset
-        WHERE mh_assets_asset.snapshot_id IN (
+        DELETE FROM oc_assets_asset
+        WHERE oc_assets_asset.snapshot_id IN (
           SELECT e.id
-          FROM mh_assets_snapshot e
-            LEFT JOIN mh_assets_properties p ON p.mediapackage_id = e.mediapackage_id
+          FROM oc_assets_snapshot e
+            LEFT JOIN oc_assets_properties p ON p.mediapackage_id = e.mediapackage_id
           WHERE p.namespace = 'org.opencastproject.service' AND p.property_name = 'agent' AND p.val_string = 'agent-2'
         );
 

@@ -1,0 +1,25 @@
+{
+  "CreationDate":{
+    "translatable":false,
+    "label":"FILTERS.SERIES.CREATION_DATE.LABEL",
+    "type":"period"
+  },
+  "organizers":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.SERIES.ORGANIZERS.LABEL",
+    "type":"select"
+  },
+  "contributors":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.SERIES.CONTRIBUTORS.LABEL",
+    "type":"select"
+  }
+}

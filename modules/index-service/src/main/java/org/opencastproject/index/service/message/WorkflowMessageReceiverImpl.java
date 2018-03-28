@@ -91,8 +91,13 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
           event.setWorkflowId(wf.getId());
           event.setWorkflowDefinitionId(wf.getTemplate());
           event.setWorkflowState(wf.getState());
-          Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getActiveAcl(mp);
-          if (activeAcl != null && activeAcl.getA() != null) {
+          WorkflowInstance.WorkflowState state = wf.getState();
+
+          if (!(WorkflowInstance.WorkflowState.SUCCEEDED.equals(state)
+                  || WorkflowInstance.WorkflowState.FAILED.equals(state)
+                  || WorkflowInstance.WorkflowState.STOPPED.equals(state))) {
+
+            Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getActiveAcl(mp);
             List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
             Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, activeAcl.getA());
 
@@ -100,16 +105,16 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
               event.setManagedAcl(managedAcl.get().getName());
             }
             event.setAccessPolicy(AccessControlParser.toJsonSilent(activeAcl.getA()));
-          }
 
-          try {
-            Opt<DublinCoreCatalog> loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
-            if (loadedDC.isSome())
-              updateEvent(event, loadedDC.get());
-          } catch (Throwable t) {
-            logger.warn("Unable to load dublincore catalog for the workflow {}", wf.getId(), t);
-          }
+            try {
+              Opt<DublinCoreCatalog> loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
+              if (loadedDC.isSome())
+                updateEvent(event, loadedDC.get());
+            } catch (Throwable t) {
+              logger.warn("Unable to load dublincore catalog for the workflow {}", wf.getId(), t);
+            }
 
+          }
           updateEvent(event, mp);
         } catch (SearchIndexException e) {
           logger.error("Error retrieving the recording event from the search index: {}", e.getMessage());

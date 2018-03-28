@@ -34,28 +34,28 @@
     })();
 
 
-    
+
       $(document).ready(function(){
-            
+
         var page = Opencast.pager.getCurrentPageID();
         var searchQuery = urlParams["series"];
         var restEndpoint = "../../search/episode.xml?";
-                
+
         var keywordString = "";
-                
+
         if (searchQuery != null && searchQuery != "") {
           restEndpoint = restEndpoint + "q=" + searchQuery + "&";
-                    
+
           // replace all occurences of + by a space
           searchQuery = searchQuery.replace(/\+/g, " ");
-                    
+
           keywordString = " for “" + unescape(searchQuery) + "”";
-          
+
           $('#searchField').attr("value", unescape(searchQuery));
-                    
+
         }
-        
-        //check whether a user is logged in and show logout link 
+
+        //check whether a user is logged in and show logout link
         $.ajax({
           url: '/info/me.json',
           type: 'GET',
@@ -68,11 +68,11 @@
             }
           }
         });
-                
+
         restEndpoint = restEndpoint + "limit=10";
-                
+
         restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
-                
+
         restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
         $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function(){
           Opencast.pager.renderPager();
@@ -80,10 +80,10 @@
           var total = $('#oc-episodes-total').html();
           var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
           var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
-                    
+
           if (total > 0) {
             $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
-                        
+
             $('.timeDate').each(function(){
               var timeDate = $(this).text();
               if (timeDate) {
@@ -122,12 +122,12 @@
             }
             else {
               $('.title').text("No recordings published yet.");
-                            
+
             }
           }
-                    
+
         });
-                
+
         if (searchQuery != null && searchQuery != "") {
           $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
           $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);

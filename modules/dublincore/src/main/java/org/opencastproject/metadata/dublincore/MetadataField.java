@@ -108,11 +108,11 @@ public class MetadataField<A> {
    * fields should be formatted (if needed).
    */
   public enum Type {
-    BOOLEAN, DATE, DURATION, ITERABLE_TEXT, MIXED_TEXT, LONG, START_DATE, START_TIME, TEXT, TEXT_LONG
+    BOOLEAN, DATE, DURATION, ITERABLE_TEXT, MIXED_TEXT, ORDERED_TEXT, LONG, START_DATE, START_TIME, TEXT, TEXT_LONG
   }
 
   public enum JsonType {
-    BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, TEXT_LONG, TIME
+    BOOLEAN, DATE, NUMBER, TEXT, MIXED_TEXT, ORDERED_TEXT, TEXT_LONG, TIME
   }
 
   /** The id of a collection to validate values against. */
@@ -419,6 +419,13 @@ public class MetadataField<A> {
                 oldField.getNamespace());
         textLongField.fromJSON(value);
         return textLongField;
+      case ORDERED_TEXT:
+        MetadataField<String> orderedTextField = MetadataField.createOrderedTextMetadataField(oldField.getInputID(),
+            Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
+            oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
+            oldField.getNamespace());
+        orderedTextField.fromJSON(value);
+        return orderedTextField;
       default:
         return newField;
     }
@@ -595,7 +602,7 @@ public class MetadataField<A> {
           try {
             array = (JSONArray) parser.parse((String) arrayIn);
           } catch (ParseException e) {
-            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray: {}", e);
+            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray:", e);
           }
         } else {
           array = (JSONArray) arrayIn;
@@ -892,6 +899,42 @@ public class MetadataField<A> {
     return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection, collectionId, order,
             JsonType.TEXT, namespace);
   }
+
+  /**
+   * Create a metadata field of type String with a single line in the front end which can be ordered and filtered.
+   *
+   * @param inputID
+   *          The identifier of the new metadata field
+   * @param label
+   *          The label of the new metadata field
+   * @param readOnly
+   *          Define if the new metadata field can be or not edited
+   * @param required
+   *          Define if the new metadata field is or not required
+   * @param isTranslatable
+   *          If the field value is not human readable and should be translated before
+   * @param collection
+   *          If the field has a limited list of possible value, the option should contain this one. Otherwise it should
+   *          be none.
+   * @param order
+   *          The ui order for the new field, 0 at the top and progressively down from there.
+   * @return the new metadata field
+   */
+  public static MetadataField<String> createOrderedTextMetadataField(
+      String inputID,
+      Opt<String> outputID,
+      String label,
+      boolean readOnly,
+      boolean required,
+      Opt<Boolean> isTranslatable,
+      Opt<Map<String, String>> collection,
+      Opt<String> collectionId,
+      Opt<Integer> order,
+      Opt<String> namespace) {
+    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection, collectionId, order,
+        JsonType.ORDERED_TEXT, namespace);
+  }
+
 
   /**
    * Create a metadata field of type String with many lines in the front end.

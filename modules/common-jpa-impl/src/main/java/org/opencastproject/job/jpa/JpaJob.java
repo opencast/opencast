@@ -71,7 +71,7 @@ import javax.persistence.Version;
  */
 @Entity(name = "Job")
 @Access(AccessType.FIELD)
-@Table(name = "mh_job")
+@Table(name = "oc_job")
 @NamedQueries({
         @NamedQuery(name = "Job", query = "SELECT j FROM Job j "
                 + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType "
@@ -159,7 +159,7 @@ public class JpaJob {
   @Column(name = "argument", length = 2147483647)
   @OrderColumn(name = "argument_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "mh_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @CollectionTable(name = "oc_job_argument", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   private List<String> arguments;
 
   @Column(name = "date_completed")
@@ -169,6 +169,10 @@ public class JpaJob {
   @Column(name = "date_created")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated;
+
+  public Date getDateStarted() {
+    return dateStarted;
+  }
 
   @Column(name = "date_started")
   @Temporal(TemporalType.TIMESTAMP)
@@ -191,11 +195,24 @@ public class JpaJob {
   @Column(name = "job_load")
   private Float jobLoad;
 
+  public String getBlockedJobIds() {
+    StringBuffer sb = new StringBuffer();
+    for (Long id : blockedJobIds) {
+      sb.append(id);
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
+
   /** The list of job IDs that are blocking this job from continuing. */
   @Column(name = "blocking_job_list")
   @OrderColumn(name = "job_index")
   @ElementCollection(fetch = FetchType.EAGER)
-  @CollectionTable(name = "mh_blocking_job", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
+  @CollectionTable(name = "oc_blocking_job", joinColumns = @JoinColumn(name = "id", referencedColumnName = "id"))
   private List<Long> blockedJobIds = new LinkedList<Long>();
 
   /** The job that this job is blocking from continuing. */
@@ -440,6 +457,15 @@ public class JpaJob {
 
   public List<JpaJob> getChildJobs() {
     return childJobs;
+  }
+
+  public String getChildJobsString() {
+    StringBuilder sb = new StringBuilder();
+    for (JpaJob job : getChildJobs()) {
+      sb.append(job.getId());
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 
   public FailureReason getFailureReason() {

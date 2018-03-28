@@ -20,7 +20,7 @@
  */
 package org.opencastproject.userdirectory;
 
-import static org.opencastproject.kernel.userdirectory.InMemoryUserAndRoleProvider.PROVIDER_NAME;
+import static org.opencastproject.userdirectory.InMemoryUserAndRoleProvider.PROVIDER_NAME;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;

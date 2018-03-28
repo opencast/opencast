@@ -54,7 +54,6 @@ public class ConductingSeriesUpdatedEventHandler {
   private AssetManagerUpdatedEventHandler assetManagerUpdatedEventHandler;
   private SeriesUpdatedEventHandler seriesUpdatedEventHandler;
   private WorkflowPermissionsUpdatedEventHandler workflowPermissionsUpdatedEventHandler;
-  private OaiPmhUpdatedEventHandler oaiPmhUpdatedEventHandler;
 
   // Use a single thread executor to ensure that only one update is handled at a time.
   // This is because Opencast lacks a distributed synchronization model on media packages and/or series.
@@ -104,19 +103,12 @@ public class ConductingSeriesUpdatedEventHandler {
 
           if (SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
             assetManagerUpdatedEventHandler.handleEvent(seriesItem);
-            // the OAI-PMH handler is a dynamic dependency
-            if (oaiPmhUpdatedEventHandler != null) {
-              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
-            }
           } else if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
                   || SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())
                   || SeriesItem.Type.Delete.equals(seriesItem.getType())) {
             seriesUpdatedEventHandler.handleEvent(seriesItem);
             assetManagerUpdatedEventHandler.handleEvent(seriesItem);
             workflowPermissionsUpdatedEventHandler.handleEvent(seriesItem);
-            if (oaiPmhUpdatedEventHandler != null) {
-              oaiPmhUpdatedEventHandler.handleEvent(seriesItem);
-            }
           }
         } catch (InterruptedException | ExecutionException e) {
           logger.error("Problem while getting series update message events {}", ExceptionUtils.getStackTrace(e));
@@ -147,11 +139,6 @@ public class ConductingSeriesUpdatedEventHandler {
   /** OSGi DI callback. */
   public void setWorkflowPermissionsUpdatedEventHandler(WorkflowPermissionsUpdatedEventHandler h) {
     this.workflowPermissionsUpdatedEventHandler = h;
-  }
-
-  /** OSGi DI callback. */
-  public void setOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
-    this.oaiPmhUpdatedEventHandler = h;
   }
 
   /** OSGi DI callback. */

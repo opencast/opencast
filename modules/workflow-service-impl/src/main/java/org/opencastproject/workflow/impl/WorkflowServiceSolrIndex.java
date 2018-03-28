@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-
 import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
@@ -508,14 +507,20 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
     doc.addField(ORG_KEY, instance.getOrganization().getId());
 
-    AccessControlList acl;
-    try {
-      acl = authorizationService.getActiveAcl(mp).getA();
-    } catch (Error e) {
-      logger.error("No security xacml found on media package {}", mp);
-      throw new WorkflowException(e);
+    WorkflowInstance.WorkflowState state = instance.getState();
+    if (!(WorkflowInstance.WorkflowState.SUCCEEDED.equals(state)
+            || WorkflowInstance.WorkflowState.FAILED.equals(state)
+            || WorkflowInstance.WorkflowState.STOPPED.equals(state))) {
+
+      AccessControlList acl;
+      try {
+        acl = authorizationService.getActiveAcl(mp).getA();
+      } catch (Error e) {
+        logger.error("No security xacml found on media package {}", mp);
+        throw new WorkflowException(e);
+      }
+      addAuthorization(doc, acl);
     }
-    addAuthorization(doc, acl);
 
     return doc;
   }
@@ -563,7 +568,6 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
       String fieldName = ACL_KEY_PREFIX + entry.getKey();
       doc.setField(fieldName, entry.getValue());
     }
-
   }
 
   /**

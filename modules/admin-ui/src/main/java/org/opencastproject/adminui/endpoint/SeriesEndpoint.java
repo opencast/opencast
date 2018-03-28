@@ -100,7 +100,6 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
@@ -516,8 +515,11 @@ public class SeriesEndpoint {
 
     JSONObject themesJson = new JSONObject();
     for (SearchResultItem<Theme> item : results.getItems()) {
+      JSONObject themeInfoJson = new JSONObject();
       Theme theme = item.getSource();
-      themesJson.put(theme.getIdentifier(), theme.getName());
+      themeInfoJson.put("name", theme.getName());
+      themeInfoJson.put("description", theme.getDescription());
+      themesJson.put(theme.getIdentifier(), themeInfoJson);
     }
     return Response.ok(themesJson.toJSONString()).build();
   }
@@ -980,8 +982,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      if (getAclService()
-              .applyAclToSeries(seriesId, accessControlList, override, Option.<ConfiguredWorkflowRef> none()))
+      if (getAclService().applyAclToSeries(seriesId, accessControlList, override, Option.none()))
         return ok();
       else {
         logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);

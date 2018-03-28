@@ -54,6 +54,16 @@ angular.module('adminNg.controllers')
             } else if ($scope.tab === "playback") {
               $scope.area   = "metadata";
             }
+
+            // This fixes a problem where video playback breaks after switching tabs. Changing the location seems
+            // to be destructive to the <video> element working together with opencast's external controls.
+            var lastRoute, off;
+            lastRoute = $route.current;
+            off = $scope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                off();
+            });
+
             $scope.navigateTo('/events/' + $scope.resource + '/' + $scope.id + '/tools/' + tab);
         };
 
@@ -72,11 +82,11 @@ angular.module('adminNg.controllers')
                 $scope.submitButton = false;
                 if ($scope.video.workflow) {
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
+                    $location.url('/events/' + $scope.resource);
                 } else {
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
                 $scope.unsavedChanges = false;
-                $location.url('/events/' + $scope.resource);
             }, function () {
                 $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');

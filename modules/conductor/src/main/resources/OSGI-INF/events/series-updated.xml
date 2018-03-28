@@ -17,9 +17,6 @@
             cardinality="1..1" policy="static" bind="setWorkflowPermissionsUpdatedEventHandler"/>
     <reference name="assetManagerPermissionsUpdatedEventHandler" interface="org.opencastproject.event.handler.AssetManagerUpdatedEventHandler"
             cardinality="1..1" policy="static" bind="setAssetManagerUpdatedEventHandler"/>
-    <reference name="oaiPmhUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
-            cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
   </scr:component>
 
   <scr:component
@@ -90,31 +87,5 @@
             cardinality="1..1" policy="static" bind="setDublinCoreCatalogService"/>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
             cardinality="1..1" policy="static" bind="setWorkspace"/>
-  </scr:component>
-  <scr:component name="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
-    immediate="true" activate="activate">
-    <implementation class="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
-    <property name="service.description" value="OAI-PMH Updated Event Handler" />
-    <property name="service.pid" value="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"/>
-    <service>
-      <provide interface="org.osgi.service.cm.ManagedService"/>
-      <provide interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
-    </service>
-    <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
-    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-      cardinality="1..1" policy="static" bind="setWorkspace" />
-    <reference name="catalogService" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-      cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />
-    <reference name="distributionService" interface="org.opencastproject.distribution.api.DistributionService"
-      cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setDistributionService" />
-    <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
-    <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
-      cardinality="1..1" policy="static" bind="setAuthorizationService" />
-    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
-    <reference name="oaiPmhPersistence" interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
-      cardinality="1..1" policy="static" bind="setOaiPmhPersistence" />
   </scr:component>
 </scr:components>

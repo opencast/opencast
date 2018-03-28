@@ -21,7 +21,6 @@
 package org.opencastproject.oaipmh.persistence.impl;
 
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.ComponentContext;
@@ -43,8 +42,6 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
 
   private SecurityService securityService;
 
-  private SeriesService seriesService;
-
   /** The workspace */
   private Workspace workspace;
 
@@ -56,11 +53,6 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
   @Override
   public SecurityService getSecurityService() {
     return securityService;
-  }
-
-  @Override
-  public SeriesService getSeriesService() {
-    return seriesService;
   }
 
   @Override
@@ -90,13 +82,6 @@ public class OaiPmhDatabaseImpl extends AbstractOaiPmhDatabase {
    */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /**
-   * OSGi callback to set the series service.
-   */
-  public void setSeriesService(SeriesService seriesService) {
-    this.seriesService = seriesService;
   }
 
   /**

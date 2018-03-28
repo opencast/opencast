@@ -36,7 +36,7 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for user settings. */
 @Entity(name = "UserSettings")
-@Table(name = "mh_user_settings", uniqueConstraints = { @UniqueConstraint(columnNames = { "id"}) })
+@Table(name = "oc_user_settings", uniqueConstraints = { @UniqueConstraint(columnNames = { "id"}) })
 @NamedQueries({
         @NamedQuery(name = "UserSettings.countByUserName", query = "SELECT COUNT(us) FROM UserSettings us WHERE us.username = :username AND us.organization = :org"),
         @NamedQuery(name = "UserSettings.findByIdAndUsernameAndOrg", query = "SELECT us FROM UserSettings us WHERE us.id = :id AND us.username = :username AND us.organization = :org"),

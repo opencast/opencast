@@ -156,12 +156,9 @@ public final class RestUtils {
    * {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
    */
   public static StreamingOutput stream(final Fx<OutputStream> out) {
-    return new StreamingOutput() {
-      @Override
-      public void write(OutputStream s) throws IOException, WebApplicationException {
-        try (final BufferedOutputStream bs = new BufferedOutputStream(s)) {
-          out.apply(bs);
-        }
+    return s -> {
+      try (BufferedOutputStream bs = new BufferedOutputStream(s)) {
+        out.apply(bs);
       }
     };
   }

@@ -1292,7 +1292,7 @@ public class SchedulerRestService {
     try {
       mediaPackage = MediaPackageParser.getFromXml(mediaPackageXml);
     } catch (Exception e) {
-      logger.info("Could not parse media package: {}", e);
+      logger.info("Could not parse media package:", e);
       return Response.status(Status.BAD_REQUEST).build();
     }
 

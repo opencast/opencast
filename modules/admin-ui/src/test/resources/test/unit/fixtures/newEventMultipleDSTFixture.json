@@ -103,12 +103,12 @@
   },
   "source": {
     "upload": {
-      
+
     },
     "SCHEDULE_SINGLE": {
       "device": {
         "inputMethods": {
-          
+
         }
       }
     },
@@ -140,7 +140,11 @@
         "hour"   : "8",
         "minute" : "0"
       },
-      "end": "2016-03-28T06:10:00Z",
+      "end": {
+        "date"   : "2016-03-28T00:00:00Z",
+        "hour"   : "8",
+        "minute" : "10"
+      },
       "duration": {
         "hour"   : "0",
         "minute" : "10"
@@ -772,6 +776,6 @@
     }
   },
   "summary": {
-    
+
   }
 }

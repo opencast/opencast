@@ -1453,10 +1453,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
         Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
         Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+        Date lastModified = record.getSnapshot().get().getArchivalDate();
 
         // Add the entry to the calendar, skip it with a warning if adding fails
         try {
-          cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, toPropertyString(caMetadata));
+          cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
         } catch (Exception e) {
           logger.warn("Error adding event '{}' to calendar, event is not recorded: {}", record.getMediaPackageId(),
                   getStackTrace(e));
@@ -2571,7 +2572,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                     current++;
                   }
                 } catch (Exception e) {
-                  logger.warn("Unable to index scheduled instances: {}", e);
+                  logger.warn("Unable to index scheduled instances:", e);
                   throw new ServiceException(e.getMessage());
                 }
               }

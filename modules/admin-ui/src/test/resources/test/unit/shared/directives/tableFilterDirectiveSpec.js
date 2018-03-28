@@ -38,7 +38,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                     'brown': 'BROWN',
                     'white': 'WHITE',
                     'black': 'BLACK'
-                }
+                },
+                translatable: true
             },
             type: {
                 label: 'TYPE',
@@ -46,7 +47,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 options: {
                     'chair': 'CHAIR',
                     'table': 'TABLE'
-                }
+                },
+                translatable: true
             }
         }));
 
@@ -72,8 +74,6 @@ describe('adminNg.directives.adminNgTableFilter', function () {
     it('restores filters after fetching them', function () {
         expect(element.scope().filters.filters.type.label).toEqual('TYPE');
         expect(element.scope().filters.filters.color.label).toEqual('COLOR');
-        expect(element.find('span.ng-multi-value')).toHaveText(/TYPE/);
-        expect(element.find('span.ng-multi-value')).toHaveText(/COLOR/);
     });
 
     it('restores filter profiles', function () {

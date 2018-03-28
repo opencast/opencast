@@ -289,7 +289,7 @@ public class SeriesEndpointTest {
   public void testGetNewTheme() throws ParseException {
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("/new/themes")).asString();
     JSONObject themes = ((JSONObject) parser.parse(result));
-    assertEquals("{\"1\":\"theme-1-name\"}", themes.toJSONString());
+    assertEquals("{\"1\":{\"name\":\"theme-1-name\",\"description\":\"theme-1-description\"}}", themes.toJSONString());
   }
 
   @Test

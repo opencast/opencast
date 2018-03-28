@@ -32,7 +32,6 @@ import org.opencastproject.rest.RestServiceTestEnv;
 import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.httpclient.HttpStatus;
-
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

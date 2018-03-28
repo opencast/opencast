@@ -85,7 +85,14 @@
             <Private-Package>
               org.opencastproject.runtimeinfo.rest
             </Private-Package>
-            <Export-Package>org.opencastproject.runtimeinfo</Export-Package>
+            <Import-Package>
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.runtimeinfo
+            </Export-Package>
             <Service-Component>
               OSGI-INF/info.xml
             </Service-Component>

@@ -273,10 +273,10 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
     // empty database
     penv.tx(new Fn<EntityManager, Object>() {
       @Override public Object apply(EntityManager entityManager) {
-        Queries.sql.update(entityManager, "delete from mh_assets_asset");
-        Queries.sql.update(entityManager, "delete from mh_assets_properties");
-        Queries.sql.update(entityManager, "delete from mh_assets_snapshot");
-        Queries.sql.update(entityManager, "delete from mh_assets_version_claim");
+        Queries.sql.update(entityManager, "delete from oc_assets_asset");
+        Queries.sql.update(entityManager, "delete from oc_assets_properties");
+        Queries.sql.update(entityManager, "delete from oc_assets_snapshot");
+        Queries.sql.update(entityManager, "delete from oc_assets_version_claim");
         return null;
       }
     });

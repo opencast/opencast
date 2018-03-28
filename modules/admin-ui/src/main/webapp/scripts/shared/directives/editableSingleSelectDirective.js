@@ -1,4 +1,26 @@
 /**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+
+/**
  * @ngdoc directive
  * @name ng.directive:adminNgEditableSingleSelect
  *
@@ -22,7 +44,7 @@
    </doc:example>
  */
 angular.module('adminNg.directives')
-.directive('adminNgEditableSingleSelect', ['$timeout', function ($timeout) {
+.directive('adminNgEditableSingleSelect', ['$timeout', '$filter', function ($timeout, $filter) {
     return {
         restrict: 'A',
         templateUrl: 'shared/partials/editableSingleSelect.html',
@@ -30,26 +52,52 @@ angular.module('adminNg.directives')
         scope: {
             params:     '=',
             collection: '=',
+            ordered:    '=',
             save:       '='
         },
         link: function (scope, element) {
 
-            var mapToArray = function (map) {
+            var mapToArray = function (map, translate) {
                 var array = [];
 
                 angular.forEach(map, function (mapValue, mapKey) {
 
                     array.push({
-                        label: mapKey,
+                        label: translate ? $filter('translate')(mapKey) : mapKey,
                         value: mapValue
                     });
                 });
 
-                return array;
+                return $filter('orderBy')(array, 'label');
             }
 
+            var mapToArrayOrdered = function (map, translate) {
+                var array = [];
+
+                angular.forEach(map, function (mapValue, mapKey) {
+                    var entry = JSON.parse(mapKey);
+                    if (entry.selectable || scope.params.value === mapValue) {
+                        array.push({
+                            label: entry,
+                            value: mapValue
+                        });
+                    }
+                });
+                array.sort(function(a, b) {
+                    return a.label.order - b.label.order;
+                });
+                return array.map(function (entry) {
+                    return {
+                        label: translate ? $filter('translate')(entry.label.label) : entry.label.label,
+                        value: entry.value
+                    };
+                });
+            }
+
+
             //transform map to array so that orderBy can be used
-            scope.collection = mapToArray(scope.collection);
+            scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
+                mapToArray(scope.collection, scope.params.translatable);
 
             scope.submit = function () {
                 // Wait until the change of the value propagated to the parent's

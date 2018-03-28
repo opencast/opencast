@@ -65,6 +65,10 @@ Required for audio normalization:
 
     sox >= 14.4 (with MP3, FLAC and OGG support)
 
+Required for animate service:
+
+    synfig
+
 ### Dependency Download
 
 You can download Xcode in the Mac App Store. JDK 8 for OS X is available from

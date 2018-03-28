@@ -179,7 +179,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
           logger.info("Finished populating series search index");
         }
       } catch (Exception e) {
-        logger.warn("Unable to index series instances: {}", e);
+        logger.warn("Unable to index series instances:", e);
         throw new ServiceException(e.getMessage());
       } finally {
         securityService.setOrganization(null);
@@ -599,7 +599,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       logger.info("Finished populating '{}' index with series.", indexName);
     } catch (Exception e) {
-      logger.warn("Unable to index series instances: {}", e);
+      logger.warn("Unable to index series instances:", e);
       throw new ServiceException(e.getMessage());
     }
 

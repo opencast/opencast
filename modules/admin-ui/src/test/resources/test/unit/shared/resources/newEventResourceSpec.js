@@ -31,19 +31,19 @@ describe('New Event API Resource', function () {
             date: '2014-07-17',
             hour:  '10',
             minute: '0'
-        });           
+        });
 
         startDateDST = JsHelper.toZuluTimeString({
             date   : '2016-03-25',
             hour   : '8',
             minute : '0'
-        });         
+        });
 
         endDateDST = JsHelper.toZuluTimeString({
             date   : '2016-03-28',
             hour   : '8',
             minute : '10'
-        });   
+        });
 
         endDate = JsHelper.toZuluTimeString({
             date: '2014-07-24',
@@ -52,7 +52,7 @@ describe('New Event API Resource', function () {
         }, {
             hour: '1',
             minute: '45'
-        });        
+        });
 
         expectedSourceMultiple = {
             'type': 'SCHEDULE_MULTIPLE',
@@ -64,7 +64,7 @@ describe('New Event API Resource', function () {
                 'device'  : '•mock• agent3',
                 'inputs'  : 'TRANSLATION.PATH.VIDEO'
             }
-        };        
+        };
 
         dateDST = moment(startDateDST);
         dateDST.utc();
@@ -86,7 +86,7 @@ describe('New Event API Resource', function () {
             date: '2014-07-16',
             hour:  '02',
             minute: '06'
-        });   
+        });
 
         endDate = JsHelper.toZuluTimeString({
             date: '2014-07-16',
@@ -233,8 +233,8 @@ describe('New Event API Resource', function () {
         });
 
         it('assembles the metadata for segmentable video', function () {
-            delete uploadTestData.source.upload.audioOnly;
-            uploadTestData.source.upload.segmentable = {};
+            delete uploadTestData.source.UPLOAD.tracks.audioOnly;
+            uploadTestData.source.UPLOAD.tracks.segmentable = {};
 
             NewEventResource.save(uploadTestData);
             $httpBackend.flush();
@@ -244,8 +244,8 @@ describe('New Event API Resource', function () {
         });
 
         it('assembles the metadata for non-segmentable video', function () {
-            delete uploadTestData.source.upload.segmentable;
-            uploadTestData.source.upload.nonSegmentable = {};
+            delete uploadTestData.source.UPLOAD.tracks.segmentable;
+            uploadTestData.source.UPLOAD.tracks.nonSegmentable = {};
 
             NewEventResource.save(uploadTestData);
             $httpBackend.flush();
@@ -255,7 +255,7 @@ describe('New Event API Resource', function () {
         });
 
         it('handles empty video format gracefully', function () {
-            delete uploadTestData.source.upload.nonSegmentable;
+            delete uploadTestData.source.UPLOAD.tracks.nonSegmentable;
 
             NewEventResource.save(uploadTestData);
             $httpBackend.flush();

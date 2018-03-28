@@ -125,6 +125,8 @@
             <Import-Package>
               javax.servlet,
               javax.servlet.http,
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
             <Export-Package>
@@ -137,10 +139,13 @@
             </Private-Package>
             <Service-Component>
               OSGI-INF/admin-user-and-group-loader.xml,
-              OSGI-INF/userdirectory-service.xml,
+              OSGI-INF/custom-role-provider.xml,
               OSGI-INF/group-role-provider.xml,
+              OSGI-INF/organization-role-provider.xml,
+              OSGI-INF/user-and-role-directory-service.xml,
               OSGI-INF/user-reference-provider.xml,
-              OSGI-INF/user_endpoint.xml,
+              OSGI-INF/user-endpoint.xml,
+              OSGI-INF/userdirectory-service.xml,
               OSGI-INF/userid-role-provider.xml
             </Service-Component>
           </instructions>

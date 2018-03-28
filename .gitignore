@@ -19,6 +19,9 @@ node/
 */nbproject/*
 */nb-configuration.xml
 
+# ignore VSCode project data
+.vscode/
+
 # ingore OS artifacts
 .DS_Store
 

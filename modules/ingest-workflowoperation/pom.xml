@@ -84,8 +84,7 @@
               org.opencastproject.workflow.handler.ingest;version=${project.version}
             </Export-Package>
             <Service-Component>
-              OSGI-INF/operations/ingest-download.xml,
-              OSGI-INF/operations/ingest.xml
+              OSGI-INF/operations/ingest-download.xml
             </Service-Component>
           </instructions>
         </configuration>

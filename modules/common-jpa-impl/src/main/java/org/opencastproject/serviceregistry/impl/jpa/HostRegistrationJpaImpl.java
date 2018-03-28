@@ -39,7 +39,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "HostRegistration")
 @Access(AccessType.FIELD)
-@Table(name = "mh_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
+@Table(name = "oc_host_registration", uniqueConstraints = @UniqueConstraint(columnNames = "host"))
 @NamedQueries({
         @NamedQuery(name = "HostRegistration.getMaxLoad", query = "SELECT sum(hr.maxLoad) FROM HostRegistration hr where hr.active = true"),
         @NamedQuery(name = "HostRegistration.getMaxLoadByHostName", query = "SELECT hr.maxLoad FROM HostRegistration hr where hr.baseUrl = :host and hr.active = true"),

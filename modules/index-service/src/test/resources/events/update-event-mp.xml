@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage xmlns="http://mediapackage.opencastproject.org" duration="734167" id="event-1" start="2018-01-22T01:05:00Z">
+  <title>Test Event 1</title>
+  <metadata>
+    <catalog id="episode-dc" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <url>/dublincore.xml</url>
+    </catalog>
+  </metadata>
+</mediapackage>

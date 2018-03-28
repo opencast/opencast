@@ -287,11 +287,6 @@ public class OaiPmhRepositoryPersistenceTest {
         }
 
         @Override
-        public SeriesService getSeriesService() {
-          return seriesService;
-        }
-
-        @Override
         public Workspace getWorkspace() {
           return workspace;
         }
