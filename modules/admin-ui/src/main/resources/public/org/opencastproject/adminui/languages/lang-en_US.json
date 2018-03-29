@@ -465,7 +465,7 @@
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
          "PUBLISHED": "Published",
-         "HOVER": {
+         "TOOLTIP": {
            "START": "Filter for this start date",
            "SERIES": "Filter for this series",
            "STATUS": "Filter for this event status",
@@ -927,7 +927,7 @@
          "MANAGED_ACL":  "Access policy",
          "EVENTS":       "Events",
          "ACTION":       "Actions",
-         "HOVER": {
+         "TOOLTIP": {
            "SERIES": "Filter events for this series",
            "DETAILS": "Series details",
            "DELETE": "Delete"
@@ -1036,7 +1036,7 @@
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":    "Actions",
-         "HOVER": {
+         "TOOLTIP": {
            "NAME": "Filter events for this location",
            "DETAILS": "Location details",
            "DELETE": "Delete location (unregister capture agent)"

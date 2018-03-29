@@ -1,26 +1,26 @@
 <a data-open-modal="event-details"
   data-resource-id="{{ row.id }}"
   class="more"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.DETAILS' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS' | translate }}"
   with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
 </a>
 
 <!-- Remove button for published events. -->
 <a class="remove"
   ng-click="row.checkedDelete()"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.DELETE' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DELETE' | translate }}"
   with-role="ROLE_UI_EVENTS_DELETE">
 </a>
 
 <a ng-if="row.has_preview && row.needs_cutting" href="#/events/events/{{row.id}}/tools/editor"
   class="fa fa-scissors"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.EDITOR' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
   with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
 </a>
 
 <a ng-if="row.has_preview && !row.needs_cutting" href="#/events/events/{{row.id}}/tools/playback"
   class="preview"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.PREVIEW' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PREVIEW' | translate }}"
   with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
 </a>
 
@@ -28,7 +28,7 @@
   data-open-modal="event-details"
   data-resource-id="{{ row.id }}"
   data-tab="comments"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.COMMENTS' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
   class="fa fa-comment-o">
 </a>
 
@@ -36,7 +36,7 @@
   data-open-modal="event-details"
   data-resource-id="{{ row.id }}"
   data-tab="comments"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.COMMENTS' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
   class="fa fa-comment">
 </a>
 
@@ -45,6 +45,6 @@
   data-resource-id="{{ row.id }}"
   data-tab="workflows"
   with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
-  title="{{ 'EVENTS.EVENTS.TABLE.HOVER.PAUSED_WORKFLOW' | translate }}"
+  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW' | translate }}"
   class="fa fa-warning">
 </a>
