@@ -71,6 +71,7 @@
               org.opencastproject.message.broker.api.acl;version=${project.version},
               org.opencastproject.message.broker.api.assetmanager;version=${project.version},
               org.opencastproject.message.broker.api.comments;version=${project.version},
+              org.opencastproject.message.broker.api.eventstatuschange;version=${project.version},
               org.opencastproject.message.broker.api.group;version=${project.version},
               org.opencastproject.message.broker.api.index;version=${project.version},
               org.opencastproject.message.broker.api.scheduler;version=${project.version},

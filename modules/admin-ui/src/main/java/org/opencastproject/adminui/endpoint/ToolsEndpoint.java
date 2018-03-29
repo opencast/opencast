@@ -57,7 +57,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.message.broker.api.eventstatuschange.EventStatusChangeItem;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -95,6 +95,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -136,7 +137,7 @@ import javax.xml.bind.JAXBException;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class ToolsEndpoint implements ManagedService {
+public class ToolsEndpoint extends AsynchronousEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);
 
@@ -170,7 +171,6 @@ public class ToolsEndpoint implements ManagedService {
   private AdminUISearchIndex searchIndex;
   private AssetManager assetManager;
   private IndexService index;
-  private SecurityService securityService;
   private SmilService smilService;
   private UrlSigningService urlSigningService;
   private WorkflowService workflowService;
@@ -197,11 +197,6 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
-  void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
-  }
-
-  /** OSGi DI */
   void setSmilService(SmilService smilService) {
     this.smilService = smilService;
   }
@@ -219,6 +214,18 @@ public class ToolsEndpoint implements ManagedService {
   /** OSGi DI */
   void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Override
+  protected void activate(BundleContext bundleContext) {
+    logger.info("Activate tools endpoint");
+    super.activate(bundleContext);
+  }
+
+  @Override
+  protected void deactivate(BundleContext bundleContext) {
+    logger.info("Deactivate tools endpoint");
+    super.deactivate(bundleContext);
   }
 
   /** OSGi callback if properties file is present */
@@ -396,41 +403,7 @@ public class ToolsEndpoint implements ManagedService {
     if (optEvent.isNone()) {
       return R.notFound();
     } else {
-      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get());
-      Smil smil;
-      try {
-        smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
-      } catch (Exception e) {
-        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, getStackTrace(e));
-        return R.badRequest("Unable to create SMIL cutting catalog");
-      }
-
-      try {
-        addSmilToArchive(mediaPackage, smil);
-      } catch (IOException e) {
-        logger.warn("Unable to add SMIL cutting catalog to archive: {}", getStackTrace(e));
-        return R.serverError();
-      }
-
-      if (editingInfo.getPostProcessingWorkflow().isSome()) {
-        final String workflowId = editingInfo.getPostProcessingWorkflow().get();
-        try {
-          final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
-          workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
-                  ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId))).run();
-        } catch (AssetManagerException e) {
-          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-                  workflowId, mediaPackage, getStackTrace(e));
-          return R.serverError();
-        } catch (WorkflowDatabaseException e) {
-          logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
-          return R.serverError();
-        } catch (NotFoundException e) {
-          logger.warn("Workflow '{}' not found", workflowId);
-          return R.badRequest("Workflow not found");
-        }
-      }
-
+      submit(new VideoEditingRunnable(optEvent.get(), editingInfo, details));
     }
 
     return R.ok();
@@ -767,6 +740,89 @@ public class ToolsEndpoint implements ManagedService {
     }
     return segments;
   }
+
+  private final class VideoEditingRunnable extends WorkStartingRunnable {
+
+    private Event event;
+    private EditingInfo editingInfo;
+    private String details;
+
+    private VideoEditingRunnable(Event event, EditingInfo editingInfo, String details) {
+      super(Collections.singletonList(event.getIdentifier()));
+      this.event = event;
+      this.editingInfo = editingInfo;
+      this.details = details;
+    }
+
+    @Override
+    public void doWork() {
+
+      MediaPackage mediaPackage = null;
+      try {
+        mediaPackage = index.getEventMediapackage(event);
+      } catch (IndexServiceException e) {
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+          "Unable to retrieve mediapackage with id: " + event.getIdentifier() + " from IndexService",
+          eventIds);
+        return;
+      }
+      if (mediaPackage == null) {
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+          "Could not find mediapackage with id: " + event.getIdentifier(),
+          eventIds);
+        return;
+      }
+      Smil smil;
+      try {
+        smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
+      } catch (Exception e) {
+        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, getStackTrace(e));
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+          "Unable to create SMIL cutting catalog",
+          eventIds);
+        return;
+      }
+
+      try {
+        addSmilToArchive(mediaPackage, smil);
+      } catch (IOException e) {
+        logger.warn("Unable to add SMIL cutting catalog to archive: {}", getStackTrace(e));
+        reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+          "Unable to add SMIL cutting catalog to archive",
+          eventIds);
+        return;
+      }
+
+      if (editingInfo.getPostProcessingWorkflow().isSome()) {
+        final String workflowId = editingInfo.getPostProcessingWorkflow().get();
+        try {
+          final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+          workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+            ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId))).run();
+        } catch (AssetManagerException e) {
+          logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
+                  workflowId, mediaPackage, getStackTrace(e));
+          reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+            "Unable to start workflow '" + workflowId + "' on archived media package: "
+              + event.getIdentifier(), eventIds);
+          return;
+        } catch (WorkflowDatabaseException e) {
+          logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
+          reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+            "Unable to load workflow '" + workflowId + "'", eventIds);
+          return;
+        } catch (NotFoundException e) {
+          logger.warn("Workflow '{}' not found", workflowId);
+          reportEventStatusChange(EventStatusChangeItem.Type.Failed,
+            "Unable to find workflow '" + workflowId + "'", eventIds);
+          return;
+        }
+      }
+
+    }
+  }
+
+
 
   /** Provides access to the parsed editing information */
   static final class EditingInfo {

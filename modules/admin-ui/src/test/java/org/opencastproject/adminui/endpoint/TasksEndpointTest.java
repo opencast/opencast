@@ -73,13 +73,9 @@ public class TasksEndpointTest {
     given().formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{}}").expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
 
-    given().formParam("metadata", "{\"workflow\":\"exception\", \"configuration\":{}, \"eventIds\":[\"id1\",\"id2\"]}")
-            .expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when().post(rt.host("/new"));
-
     String result = given()
             .formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{}, \"eventIds\":[\"id1\",\"id2\"]}")
-            .expect().statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
-    assertEquals("[5,10]", result);
+            .expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("/new")).asString();
   }
 
   @Before

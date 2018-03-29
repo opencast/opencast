@@ -131,6 +131,7 @@
               org.opencastproject.message.broker.api.acl,
               org.opencastproject.message.broker.api.assetmanager,
               org.opencastproject.message.broker.api.comments,
+              org.opencastproject.message.broker.api.eventstatuschange,
               org.opencastproject.message.broker.api.group,
               org.opencastproject.message.broker.api.index,
               org.opencastproject.message.broker.api.scheduler,

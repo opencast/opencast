@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.adminui.endpoint.ToolsEndpoint"
-               immediate="true">
-	
+               immediate="true"
+               activate="activate"
+               deactivate="deactivate">
+
   <implementation class="org.opencastproject.adminui.endpoint.ToolsEndpoint" />
-  
+
   <property name="service.description" value="Admin UI - Tools Facade Endpoint" />
   <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.tools" />
   <property name="opencast.service.path" value="/admin-ng/tools" />
-  
+
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.ToolsEndpoint" />
@@ -60,4 +62,9 @@
              interface="org.opencastproject.workflow.api.WorkflowService"
              name="WorkflowService"
              policy="static" />
+  <reference bind="setMessageSender"
+             cardinality="1..1"
+             interface="org.opencastproject.message.broker.api.MessageSender"
+             name="messageSender"
+             policy="static"/>
 </scr:component>

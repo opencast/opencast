@@ -31,6 +31,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
+import static java.util.Collections.singletonList;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -98,6 +99,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.VideoStreamImpl;
+import org.opencastproject.message.broker.api.eventstatuschange.EventStatusChangeItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
@@ -206,7 +208,7 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public abstract class AbstractEventEndpoint {
+public abstract class AbstractEventEndpoint extends AsynchronousEndpoint {
 
   /**
    * Scheduling JSON keys
@@ -369,21 +371,8 @@ public abstract class AbstractEventEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
-    BulkOperationResult result = new BulkOperationResult();
-
-    for (Object eventIdObject : eventIdsJsonArray) {
-      String eventId = eventIdObject.toString();
-      try {
-        if (!getIndexService().removeEvent(eventId)) {
-          result.addServerError(eventId);
-        } else {
-          result.addOk(eventId);
-        }
-      } catch (NotFoundException e) {
-        result.addNotFound(eventId);
-      }
-    }
-    return Response.ok(result.toJson()).build();
+    submit(new BulkDeleteRunnable(new ArrayList<String>(eventIdsJsonArray)));
+    return Response.ok(new JSONObject().toJSONString()).build();
   }
 
   @GET
@@ -2365,6 +2354,32 @@ public abstract class AbstractEventEndpoint {
       return forbidden();
     } catch (Exception e) {
       return serverError();
+    }
+  }
+
+  private class BulkDeleteRunnable extends WorkStartingRunnable {
+
+    protected BulkDeleteRunnable(List<String> eventIds) {
+      super(eventIds);
+    }
+
+    @Override
+    protected void doWork() {
+      for (String eventId : eventIds) {
+        try {
+          if (!getIndexService().removeEvent(eventId)) {
+            reportEventStatusChange(
+              EventStatusChangeItem.Type.Failed, "Could not delete event", singletonList(eventId));
+          }
+        } catch (NotFoundException e) {
+          reportEventStatusChange(EventStatusChangeItem.Type.Failed, "Could not delete event: Not found",
+            singletonList(eventId));
+        } catch (UnauthorizedException e) {
+          reportEventStatusChange(
+            EventStatusChangeItem.Type.Failed, "Could not delete event: Unauthorized",
+              singletonList(eventId));
+        }
+      }
     }
   }
 
