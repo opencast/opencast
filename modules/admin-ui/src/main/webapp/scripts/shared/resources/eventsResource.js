@@ -44,7 +44,6 @@ angular.module('adminNg.resources')
                 row.publications = r.publications;
                 if (typeof(r.publications) != 'undefined' && r.publications != null) {
                 	var now = new Date();
-                	console.log("now: " + now + ", start: " + new Date(r.start_date) + ", end: " + new Date(r.end_date));
                 	for (var i = 0; i < row.publications.length; i++)
                 		if (row.publications[i].id == "engage-live" && 
                 				(now < new Date(r.start_date) || now > new Date(r.end_date)))

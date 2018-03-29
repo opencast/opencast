@@ -98,7 +98,10 @@ import java.util.regex.Pattern;
  * Implement {@link SmilService} interface.
  */
 public class LiveScheduleServiceImpl implements LiveScheduleService {
-  /** The eserver url property **/
+
+  // TODO Implement updated() so that change in configuration can be dynamically loaded.
+
+  /** The server url property **/
   static final String SERVER_URL_PROPERTY = "org.opencastproject.server.url";
   /** The engage base url property **/
   static final String ENGAGE_URL_PROPERTY = "org.opencastproject.engage.ui.url";
@@ -114,7 +117,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private static final String DEFAULT_LIVE_TARGET_FLAVORS = "presenter/delivery";
   static final String DEFAULT_LIVE_DISTRIBUTION_SERVICE = "download";
 
-  /** For MHPearl capture agent only */
   // If the capture agent registered this property, we expect to get a resolution and
   // a url in the following format:
   // capture.device.live.resolution.WIDTHxHEIGHT=COMPLETE_STREAMING_URL e.g.
@@ -253,7 +255,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       MediaPackage newMp = replaceAndDistributeAcl(previousMp, acl);
       // Publish mp to engage search index
       publish(newMp);
-      // Don't live garbage there!
+      // Don't leave garbage there!
       retractPreviousElements(previousMp, newMp);
       logger.info("Updated live acl for media package {}", newMp);
       return true;
@@ -329,7 +331,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // Publish mp to engage search index
     publish(mp);
     // Publication channel already there so no need to add
-    // Don't live garbage there!
+    // Don't leave garbage there!
     retractPreviousElements(previousMp, mp);
     return true;
   }

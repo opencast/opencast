@@ -43,14 +43,13 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.locks.Lock;
 
 /**
- * Very simple approach to serialize the work of all three dependend update handlers. Todo: Merge all handlers into one
- * to avoid unnecessary distribution updates etc.
+ * Very simple approach to serialize the work of all three dependent update handlers.
  */
 public class LiveScheduleMessageReceiver {
 
   private static final Logger logger = LoggerFactory.getLogger(LiveScheduleMessageReceiver.class);
   // Striped lock for synchronizing on media package
-  private static final Striped<Lock> lock = Striped.lazyWeakLock(1);
+  private static final Striped<Lock> lock = Striped.lazyWeakLock(1024);
 
   private SecurityService securityService;
   private MessageReceiver messageReceiver;

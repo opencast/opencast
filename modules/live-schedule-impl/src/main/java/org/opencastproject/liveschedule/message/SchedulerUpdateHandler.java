@@ -119,7 +119,7 @@ public class SchedulerUpdateHandler extends UpdateHandler {
       Map<String, String> config = schedulerService.getWorkflowConfig(mpId);
       return BooleanUtils.toBoolean((String) config.get(PUBLISH_LIVE_PROPERTY));
     } catch (UnauthorizedException | NotFoundException | SchedulerException e) {
-      logger.info("Could not get workflow configuration for mp {}. This is probably ok.", mpId);
+      logger.debug("Could not get workflow configuration for mp {}. This is probably ok.", mpId);
       return false; // Assume non-live
     }
   }

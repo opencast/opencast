@@ -10,7 +10,7 @@ When an event is scheduled and the publishLive configuration is set, a live medi
 
 The live media package is retracted from the Search index when the capture finishes or if it fails.
 
-If event metadata are updated, such as title, duration, the live media package in the Search index is updated accordingly.
+If event metadata, such as title or duration, are updated, the live media package in the Search index is updated accordingly.
 
 Pre-requisites
 --------------
@@ -28,7 +28,7 @@ Configuration
 
 Edit  _etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg_.
 
-If you capture agent does not register a _capture.device.live.resolution.WIDTHxHEIGHT_ property, it's mandatory to configure the _live.streamingUrl_. 
+If your capture agent does not register a _capture.device.live.resolution.WIDTHxHEIGHT_ property, it's mandatory to configure the _live.streamingUrl_. 
 
 The _live.streamingUrl_ should be set to your streaming server url (or the subscriber url specified by your CDN).
 
@@ -47,7 +47,7 @@ For instance, if using rtmp, set it to something like: rtmp://STREAMING_SERVER_H
 # The streaming base url e.g. rtmp://streaming.server/live/
 #live.streamingUrl=rtmp://streaming.server/live
 
-# If a comma-separated list is informed, several resolutions will be generated for each flavor
+# If a comma-separated list is provided, several resolutions will be generated for each flavor
 live.resolution=1920x540,960x270
 
 # Possible variable substitutions:
@@ -63,7 +63,7 @@ live.streamName=#{caName}-#{flavor}.stream-#{resolution}
 # The same mime-type applies to all flavors and resolutions
 live.mimeType=video/x-flv
 
-# If a comma-separated list is informed, several streams links will be generated, one for each
+# If a comma-separated list is provided, several streams links will be generated, one for each
 # resolution-targetFlavor combination.
 # Default is presenter/delivery
 #live.targetFlavors=presenter/delivery
@@ -80,7 +80,7 @@ Configure the capture agent to stream to your streaming server (or the publisher
 
 #### Capture agent registers the _capture.device.live.resolution.WIDTHxHEIGHT_ property 
 
-If you develop the code that runs on your capture agent, instead of configuring the live.streamingUrl,
+If your capture agent supports configuring custom capture agent properties, instead of configuring the live.streamingUrl,
 live.resolution, live.streamName, 
 you can update the capture agent firmware to pass the following when registering to Opencast:
 
@@ -116,18 +116,13 @@ For instance, with Akamai, the url used by the player will be something like liv
 
 If the capture agent registers itself with:
 
-```
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-    <comment>Capture Agent properties</comment>
-    <entry key="capture.device.names">presentation,presenter,live</entry>
-    <entry key="capture.device.presentation.flavor">presentation/source</entry>
-    <entry key="capture.device.presenter.flavor">presenter/source</entry>
-    <entry key="capture.device.live.resolution.1920x540">rtmp://xyz.live.edgefcs.net/live/presenter.stream-1920x540@12345</entry>
-    <entry key="capture.device.live.resolution.960x270">rtmp://xyz.live.edgefcs.net/live/presenter.stream-960x270@12345</entry>
-</properties>
-```
+|property  key|value|
+|-------------|-----|
+|capture.device.names|presentation,presenter,live|
+|capture.device.presentation.flavor|presentation/source|
+|capture.device.presentater.flavor|presenter/source|
+|capture.device.live.resolution.1920x540|rtmp://xyz.live.edgefcs.net/live/presenter.stream-1920x540@12345|
+|capture.device.live.resolution.960x270|rtmp://xyz.live.edgefcs.net/live/presenter.stream-960x270@12345|
 
 The LiveScheduleService will generate a media package with two live tracks having the following urls:
 
@@ -138,7 +133,7 @@ The LiveScheduleService will generate a media package with two live tracks havin
 ### Step 3: Configure the Workflow
 
 When scheduling a live event via the admin UI, the workflow needs to have the _publishLive_ configuration set to true (this is already included in the sample workflows).
-If not using the sample opencast workflows, add to the `<configuration_panel>`:
+If not using the sample Opencast workflows, add to the `<configuration_panel>`:
 
 ```
         <fieldset>
