@@ -51,16 +51,16 @@ public final class ApiMediaType {
 
   private static ApiFormat extractFormat(String mediaType) {
     final String subtype = extractSubtype(mediaType);
-    final String format;
     if (subtype.contains("+")) {
-      format = subtype.substring(subtype.indexOf("+") + 1);
-    } else if ("*".equals(subtype)) {
-      return ApiFormat.DEFAULT_API_FORMAT;
+      final String format = subtype.substring(subtype.indexOf("+") + 1);
+      try {
+        return ApiFormat.valueOf(format.toUpperCase());
+      } catch (Exception e) {
+        throw ApiMediaTypeException.invalidFormat(mediaType);
+      }
     } else {
-      format = subtype;
+      return ApiFormat.DEFAULT_API_FORMAT;
     }
-
-    return ApiFormat.valueOf(format.toUpperCase());
   }
 
   private static String extractSubtype(String mediaType) {
