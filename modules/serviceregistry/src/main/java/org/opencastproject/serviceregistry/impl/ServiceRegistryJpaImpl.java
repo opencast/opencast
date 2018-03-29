@@ -1750,6 +1750,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   }
 
+  @Override
+  public List<String> getJobPayloads(String operation) throws ServiceRegistryException {
+    EntityManager em = emf.createEntityManager();
+    try {
+      TypedQuery<String> query = em.createNamedQuery("Job.payload", String.class);
+      query.setParameter("operation", operation);
+      logger.debug("Requesting job payloads using query: {}", query);
+      return query.getResultList();
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    }
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -3259,69 +3272,75 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     @Override
     public void run() {
       logger.debug("Checking for unresponsive services");
-      List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
-      for (ServiceRegistration service : serviceRegistrations) {
-        hostsStatistics.updateHost(((ServiceRegistrationJpaImpl) service).getHostRegistration());
-        servicesStatistics.updateService(service);
-        if (!service.isJobProducer())
-          continue;
-        if (service.isInMaintenanceMode())
-          continue;
+      try {
+        List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
-        // We think this service is online and available. Prove it.
-        String serviceUrl = UrlSupport.concat(service.getHost(), service.getPath(), "dispatch");
-        HttpHead options = new HttpHead(serviceUrl);
-        HttpResponse response = null;
-        try {
+        for (ServiceRegistration service : serviceRegistrations) {
+          hostsStatistics.updateHost(((ServiceRegistrationJpaImpl) service).getHostRegistration());
+          servicesStatistics.updateService(service);
+          if (!service.isJobProducer())
+            continue;
+          if (service.isInMaintenanceMode())
+            continue;
+
+          // We think this service is online and available. Prove it.
+          String serviceUrl = UrlSupport.concat(service.getHost(), service.getPath(), "dispatch");
+
+          HttpHead options = new HttpHead(serviceUrl);
+          HttpResponse response = null;
           try {
-            response = client.execute(options);
-            if (response != null) {
-              switch (response.getStatusLine().getStatusCode()) {
-                case HttpStatus.SC_OK:
-                  // this service is reachable, continue checking other services
-                  logger.trace("Service " + service.toString() + " is responsive: " + response.getStatusLine());
-                  if (unresponsive.remove(service)) {
-                    logger.info("Service {} is still online", service);
-                  } else if (!service.isOnline()) {
-                    try {
-                      setOnlineStatus(service.getServiceType(), service.getHost(), service.getPath(), true, true);
-                      logger.info("Service {} is back online", service);
-                    } catch (ServiceRegistryException e) {
-                      logger.warn("Error setting online status for {}", service);
+            try {
+              response = client.execute(options);
+              if (response != null) {
+                switch (response.getStatusLine().getStatusCode()) {
+                  case HttpStatus.SC_OK:
+                    // this service is reachable, continue checking other services
+                    logger.trace("Service " + service.toString() + " is responsive: " + response.getStatusLine());
+                    if (unresponsive.remove(service)) {
+                      logger.info("Service {} is still online", service);
+                    } else if (!service.isOnline()) {
+                      try {
+                        setOnlineStatus(service.getServiceType(), service.getHost(), service.getPath(), true, true);
+                        logger.info("Service {} is back online", service);
+                      } catch (ServiceRegistryException e) {
+                        logger.warn("Error setting online status for {}", service);
+                      }
                     }
-                  }
-                  continue;
-                default:
-                  if (!service.isOnline())
                     continue;
-                  logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
+                  default:
+                    if (!service.isOnline())
+                      continue;
+                    logger.warn("Service {} is not working as expected: {}", service, response.getStatusLine());
+                }
+              } else {
+                logger.warn("Service {} does not respond: {}", service.toString());
               }
-            } else {
-              logger.warn("Service {} does not respond: {}", service.toString());
+            } catch (TrustedHttpClientException e) {
+              if (!service.isOnline())
+                continue;
+              logger.warn("Unable to reach {} : {}", service, e);
             }
-          } catch (TrustedHttpClientException e) {
-            if (!service.isOnline())
-              continue;
-            logger.warn("Unable to reach {} : {}", service, e);
-          }
 
-          // If we get here, the service did not respond as expected
-          try {
-            if (unresponsive.contains(service)) {
-              unRegisterService(service.getServiceType(), service.getHost());
-              unresponsive.remove(service);
-              logger.warn("Marking {} as offline", service);
-            } else {
-              unresponsive.add(service);
-              logger.warn("Added {} to the watch list", service);
+            // If we get here, the service did not respond as expected
+            try {
+              if (unresponsive.contains(service)) {
+                unRegisterService(service.getServiceType(), service.getHost());
+                unresponsive.remove(service);
+                logger.warn("Marking {} as offline", service);
+              } else {
+                unresponsive.add(service);
+                logger.warn("Added {} to the watch list", service);
+              }
+            } catch (ServiceRegistryException e) {
+              logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
             }
-          } catch (ServiceRegistryException e) {
-            logger.warn("Unable to unregister unreachable service: {} : {}", service, e);
+          } finally {
+            client.close(response);
           }
-        } finally {
-          client.close(response);
         }
+      } catch (Throwable t) {
+        logger.warn("Error while checking for unresponsive services", t);
       }
 
       logger.debug("Finished checking for unresponsive services");

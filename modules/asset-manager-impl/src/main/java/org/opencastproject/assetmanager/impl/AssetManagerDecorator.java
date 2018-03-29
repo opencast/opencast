@@ -39,11 +39,11 @@ public class AssetManagerDecorator implements AssetManager {
   }
 
   @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
-    return delegate.takeSnapshot(owner, mp);
+    return owner == null ? delegate.takeSnapshot(mp) : delegate.takeSnapshot(owner, mp);
   }
 
   @Override public Snapshot takeSnapshot(MediaPackage mp) {
-    return delegate.takeSnapshot(mp);
+    return takeSnapshot(null, mp);
   }
 
   @Override public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
