@@ -44,7 +44,7 @@ angular.module('adminNg.services.modal')
          * @param {string} modalId Identifier for the modal.
          * @returns {HttpPromise} a promise object for the template HTTP request
          */
-        this.show = function (modalId) {
+        this.show = function (modalId, params) {
             var $scope, http, params;
 
             // When opening a modal from another modal, remove the latter from the DOM
@@ -60,6 +60,10 @@ angular.module('adminNg.services.modal')
             }
             $scope = $rootScope.$new();
             this.$scope = $scope;
+
+            if (params) {
+                $scope.params = params;
+            }
 
             /**
              * @ngdoc function

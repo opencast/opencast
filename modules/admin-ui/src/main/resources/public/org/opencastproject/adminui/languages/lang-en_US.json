@@ -74,6 +74,11 @@
      "DOCUMENTATION": "Documentation",
      "REST_DOC": "REST API Docs"
    },
+   "ERRORS": {
+     "WORKFLOW_NOT_PERSISTED": "Unable to make workflow persistent.",
+     "WORKFLOW_NOT_PARSED": "Workflow could not be parsed.",
+     "ANOTHER_WORKFLOW_ACTIVE": "Another workflow is currently active."
+   },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
      "ACL_NOT_SAVED":       "The access policy could not be saved",
@@ -184,6 +189,22 @@
           "READY_FOR_RECORDING": "Ready for recording",
           "OPTED_OUT": "Opted-out"
       },
+     "START_STATE": {
+       "CAPTION": "Start state",
+       "INSTRUCTION": "This window displays which tasks were successfully started and which failed to start. It can be safely closed at any time, successfully started tasks will continue in the background.",
+       "TABLE": {
+         "EVENTS": "Events",
+         "SERIES": "Series",
+         "STATE": "State",
+         "ERROR":  "Error"
+       },
+       "STATE": {
+         "START_SUCCESS": "Started successfully",
+         "START_FAIL": "Failed to start",
+         "START_PENDING": "Pending"
+       },
+       "SOME_FAILED": "Some tasks failed to start"
+     },
       "DELETE": {
           "SERIES": {
             "CAPTION": "Delete",

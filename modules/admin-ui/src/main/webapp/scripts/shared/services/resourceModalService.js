@@ -323,6 +323,8 @@ angular.module('adminNg.services.modal')
             $scope.resourceId = resourceId;
             $scope.action = action;
 
+            //Is this all maybe not even necessary?
+
             http.then(function () {
                 params = $location.search();
 

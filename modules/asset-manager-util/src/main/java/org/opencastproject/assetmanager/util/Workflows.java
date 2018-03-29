@@ -107,4 +107,18 @@ public class Workflows {
       return enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots();
     }
   };
+
+  /**
+   * Returns the last snapshot of a media package or null if none exist
+   * @param mpId
+   * @return last snapshot of media package or null
+   */
+  public Snapshot getLatestVersion(String mpId) {
+    Iterable<Snapshot> snapshots = findLatest.apply(mpId);
+    if(snapshots.iterator().hasNext()){
+      return snapshots.iterator().next();
+    }
+    return null;
+  }
+
 }
