@@ -39,7 +39,7 @@
             </div>
             <nav class="header-nav nav-dd-container" id="nav-dd-container">
                 <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
-                    <div class="lang" ng-class="currentLanguageCode">
+                    <div class="lang" ng-class="currentLanguageCode" title="{{ 'LANGUAGE' | translate}}">
                         <img ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
                             ng-attr-alt="{{ currentLanguageCode }}" />
                     </div>
@@ -59,7 +59,7 @@
                     </a>
                 </div>
 
-                <div class="nav-dd info-dd" id="info-dd" old-admin-ng-dropdown="" with-role="ROLE_ADMIN">
+                <div class="nav-dd info-dd" id="info-dd" title="{{ 'SYSTEM_NOTIFICATIONS' | translate}}" old-admin-ng-dropdown="" with-role="ROLE_ADMIN">
                   <i class="fa fa-bell" aria-hidden="true"></i>
                     <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
                     <ul class="dropdown-ul">
