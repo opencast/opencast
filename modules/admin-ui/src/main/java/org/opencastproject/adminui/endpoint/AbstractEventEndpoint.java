@@ -2378,7 +2378,8 @@ public abstract class AbstractEventEndpoint {
   @Path("{eventId}/workflows/{workflowId}")
   @RestQuery(name = "deleteWorkflow", description = "Deletes a workflow", returnDescription = "The method doesn't return any content", pathParameters = {
     @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING),
-    @RestParameter(name = "transitionId", isRequired = true, description = "The workflow identifier", type = RestParameter.Type.INTEGER) }, reponses = {
+    @RestParameter(name = "workflowId", isRequired = true, description = "The workflow identifier", type = RestParameter.Type.INTEGER) }, reponses = {
+    @RestResponse(responseCode = SC_BAD_REQUEST, description = "When trying to delete the latest workflow of the event."),
     @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or the workflow has not been found."),
     @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content") })
   public Response deleteWorkflow(@PathParam("eventId") String id, @PathParam("workflowId") long wfId)

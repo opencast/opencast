@@ -885,24 +885,8 @@ angular.module('adminNg.controllers')
             if ($scope.workflowActionInProgress) return;
             $scope.workflowActionInProgress = true;
             EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
-                Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action, NOTIFICATION_CONTEXT);
-
-                // We update our client-side model in case of success, so we don't have to send a new request
-                if ($scope.workflows.entries) {
-                    var wf = $scope.workflows.entries.find(function (wf) {
-                        return wf.id === wfId;
-                    });
-                    var actionUpper = action.toUpperCase();
-                    switch (actionUpper) {
-                        case 'NONE':
-                        case 'RETRY':
-                            wf.status = 'RUNNING';
-                            break;
-                        case 'STOP':
-                            wf.status = 'STOPPED';
-                            break;
-                    }
-                }
+                Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.close();
                 $scope.workflowActionInProgress = false;
             }, function () {
                 Notifications.add('error', 'EVENTS_PROCESSING_ACTION_NOT_' + action, NOTIFICATION_CONTEXT);
