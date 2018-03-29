@@ -5,7 +5,7 @@
   <implementation class="org.opencastproject.adminui.impl.MediaPackageLockService" />
   <property name="service.description" value="MediaPackage Lock Service" />
   <service>
-	<provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
     <provide interface="org.opencastproject.adminui.impl.MediaPackageLockService" />
   </service>
 </scr:component>
