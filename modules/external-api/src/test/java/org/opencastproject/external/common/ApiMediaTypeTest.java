@@ -48,23 +48,4 @@ public class ApiMediaTypeTest {
   public void testParseJsonWithInvalidVersion() throws Exception {
     final ApiMediaType type = ApiMediaType.parse("application/v0.0.0+json");
   }
-
-  @Test
-  public void testParseVersionAgnosticXml() throws Exception {
-    final ApiMediaType type = ApiMediaType.parse("application/xml");
-
-    assertEquals(ApiFormat.XML, type.getFormat());
-    assertEquals(ApiVersion.VERSION_UNDEFINED, type.getVersion());
-    assertEquals("application/xml", type.toExternalForm());
-  }
-
-  @Test
-  public void testParseXmlWithVersion() throws Exception {
-    final ApiMediaType type = ApiMediaType.parse("application/v1.0.0+xml");
-
-    assertEquals(ApiFormat.XML, type.getFormat());
-    assertEquals(ApiVersion.VERSION_1_0_0, type.getVersion());
-    assertEquals("application/v1.0.0+xml", type.toExternalForm());
-  }
-
 }

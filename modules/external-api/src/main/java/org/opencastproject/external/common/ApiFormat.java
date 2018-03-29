@@ -21,7 +21,7 @@
 package org.opencastproject.external.common;
 
 public enum ApiFormat {
-  JSON, XML;
+  JSON;
 
   public static final ApiFormat DEFAULT_API_FORMAT = JSON;
 }
