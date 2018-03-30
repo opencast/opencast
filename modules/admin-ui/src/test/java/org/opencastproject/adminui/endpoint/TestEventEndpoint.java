@@ -123,6 +123,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
+import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
@@ -591,6 +592,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(event.getRecordingEndDate()).andReturn("2013-03-20T05:00:00Z").anyTimes();
     EasyMock.expect(event.getTechnicalStartTime()).andReturn("2013-03-20T04:00:00Z").anyTimes();
     EasyMock.expect(event.getTechnicalEndTime()).andReturn("2013-03-20T05:00:00Z").anyTimes();
+    EasyMock.expect(event.getWorkflowState()).andReturn(WorkflowInstance.WorkflowState.SUCCEEDED.name()).anyTimes();
     List<Publication> publist = new ArrayList<>();
     publist.add(new PublicationImpl("engage", "rest", new URI("engage.html?e=p-1"), MimeType.mimeType("text", "xml")));
     EasyMock.expect(event.getPublications()).andReturn(publist).anyTimes();

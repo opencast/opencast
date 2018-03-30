@@ -20,6 +20,9 @@
 <!-- Hand Stop Icon -->
 [icon_hand_stop]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABS0lEQVQ4T5XTQSjecRzH8ZfDJLWrk5TT7LKDSCl3tlpy2WETJxeJKEUOO+ygtVrK5iRlPbk6SZFSSkpElCI5KDeJJTXa+q7fUzz9n+fJ//j9/77v3+f7/Xx+FYp/ExjDJXqwlnW0oqD4Al/xFnV4h9YEOsEkFh73FAL6MYxRdKIbrzGAfUzhFc7ykELANB4wmFQsoSHVjnGKPfzESkCyAPcYQjuWEyBqMcImDvAR77H6XECMtYhZXGEkD3iJmjT/nxIK8qpi1P9KA9CFX6hOxR/PBVzgc7InlradACUi4omCW3RgHbXoxZdS3TwFfEuBacZvVOGuDGAe5xiPHVRiA0cpsn/LNMfvXcTFubwL9dhJLsyVAcSFN2jE4eMchMc5tKSwFOO8wRbC+vvCIH1PCYzXd51BiPN9aEJbVpRD3gw+pd1kqYj38CHZ7R8c9VgR4YnamQAAAABJRU5ErkJggg== "Hand Stop icon"
 
+<!-- Stop Icon -->
+[icon_stop]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH4gMUCwU6uK1oJwAAALNJREFUOMut07sNwkAQBNBnUwkNuAQnkEBkGqEgmkAigC4IHFuiB8eWjmRBfGzAwEgb3O3M3v4u048VFpjG+YQDtt5gjhYJHY5hXdy1wenFOkgNyh5/Gb4U3KeXE3beYxfcu0zaiA7ZC/HF14Tm2rD0kHYasNtyEirYRJOMCCA0mzxGVRuPGtPcj8hjSYovtAVOeWzYZGD2QyhDs//LGGH2xSLN/rrKt5mM+kxD9VZYfvKdz+bRR1rEELI+AAAAAElFTkSuQmCC "Stop icon"
+
 # Overview
 
 An Event in Opencast refers to a single lecture, training, or meeting that is automatically recorded or uploaded. Events can either stand alone or they can belong to [a Series](series.md) can be scheduled or created ad-hoc if an institution allows it. You can access the Events page from the **Main Menu > Recordings > Events**.
@@ -81,9 +84,16 @@ Use the delete icon ( ![icon_delete][] ) in the actions column of each row to de
 > When events are deleted from the asset management layer of Opencast, their link to various publication channels will be lost, i. e. there will no longer be an easy way to un-publish them. It is therefore recommended to first un-publish the events in question. See the [Processing section](processing.md) on how to start a task on an Event.
 
 
-## How to retry/abort Event processing if an error occurs
+## How to resume Event processing if an error occurs
 
-If processing is **Paused**, use the warning icon ( ![icon_warning][] ) to open the Event's details workflow tab, where you can *Retry* ( ![icon_refresh][] ) or *Abort* ( ![icon_hand_stop][] ) processing.
+If processing is **Paused**, use the warning icon ( ![icon_warning][] ) to open the Event's details workflow tab, where you can *Retry* ( ![icon_refresh][] ) or *Resume (without retrying)* ( ![icon_hand_stop][] ) processing.
+
+## How to stop Event processing
+
+If processing is **Running**, you can use the stop button ( ![icon_stop][] ) in the event details' *Workflows* tab to stop the processing.
+
+## How to delete old workflows
+You can delete old workflows in the event detail's *Workflows* tab by pressing the delete button ( ![icon_delete][] ) of the corresponding table entry. The latest workflow cannot be deleted. Also, you can only delete workflows if you have the necessary access role to do so.
 
 
 ## Working with comments on Events

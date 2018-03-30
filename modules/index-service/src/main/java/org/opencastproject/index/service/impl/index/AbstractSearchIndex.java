@@ -457,21 +457,26 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    *          The user that is requesting to delete the event.
    * @param uid
    *          The identifier of the event.
+   * @param workflowId
+   *          The identifier of the workflow.
    * @throws SearchIndexException
    *           Thrown if there is an issue with deleting the event.
    * @throws NotFoundException
    *           Thrown if the event cannot be found.
    */
-  public void deleteWorkflow(String organization, User user, String uid)
+  public void deleteWorkflow(String organization, User user, String uid, Long workflowId)
           throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
 
-    event.setWorkflowId(null);
-    event.setWorkflowDefinitionId(null);
-    event.setWorkflowState(null);
-    event.setWorkflowScheduledDate(null);
+    if (event.getWorkflowId() == workflowId) {
+      logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
+      event.setWorkflowId(null);
+      event.setWorkflowDefinitionId(null);
+      event.setWorkflowState(null);
+      event.setWorkflowScheduledDate(null);
+    }
 
     if (toDelete(event)) {
       delete(Event.DOCUMENT_TYPE, uid.concat(organization));
