@@ -494,14 +494,16 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @RestQuery(name = "concat", description = "Starts a video concating process from multiple videos, based on the specified encoding profile ID and the source tracks", restParameters = {
           @RestParameter(description = "The source tracks to concat as XML", isRequired = true, name = "sourceTracks", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
-    @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING),
-    @RestParameter(description = "The  frame rate of the concat video (should be positive, e.g. 25.0). Negative values and zero will deactivate frame rate operation.",
-            isRequired = false, name = "outputFrameRate", type = Type.STRING)}, reponses = {
+          @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING),
+          @RestParameter(description = "The  frame rate of the concat video (should be positive, e.g. 25.0). Negative values and zero will deactivate frame rate operation.",
+      isRequired = false, name = "outputFrameRate", type = Type.STRING),
+          @RestParameter(description = "The source files have the same codecs and should not be re-encoded", isRequired = false, name = "sameCodec",type = Type.TEXT, defaultValue = "false")}, reponses = {
     @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at least two tracks are present",
             responseCode = HttpServletResponse.SC_BAD_REQUEST)}, returnDescription = "")
   public Response concat(@FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId,
-          @FormParam("outputDimension") String outputDimension, @FormParam("outputFrameRate") String outputFrameRate) throws Exception {
+          @FormParam("outputDimension") String outputDimension, @FormParam("outputFrameRate") String outputFrameRate,
+          @FormParam("sameCodec") String sameCodec) throws Exception {
     // Ensure that the POST parameters are present
     if (StringUtils.isBlank(sourceTracksXml) || StringUtils.isBlank(profileId))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks and profileId must not be null").build();
@@ -522,12 +524,12 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       if (StringUtils.isNotBlank(outputDimension)) {
         dimension = Serializer.dimension(JsonObj.jsonObj(outputDimension));
       }
-
+      boolean hasSameCodec = Boolean.parseBoolean(sameCodec);
       Job job = null;
       if (fps > 0) {
-        job = composerService.concat(profileId, dimension, fps, tracks.toArray(new Track[tracks.size()]));
+        job = composerService.concat(profileId, dimension, fps, hasSameCodec, tracks.toArray(new Track[tracks.size()]));
       } else {
-        job = composerService.concat(profileId, dimension, tracks.toArray(new Track[tracks.size()]));
+        job = composerService.concat(profileId, dimension, hasSameCodec, tracks.toArray(new Track[tracks.size()]));
       }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {

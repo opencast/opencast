@@ -101,6 +101,7 @@ public interface ComposerService {
    *          The encoding profile to use
    * @param outputDimension
    *          The output dimensions
+   * @param source files all have the same codecs and timebase - no re-encode
    * @param tracks
    *          an array of track to concat in order of the array
    * @return The receipt for this concat job
@@ -109,7 +110,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -118,12 +119,13 @@ public interface ComposerService {
    * @param profileId The encoding profile to use
    * @param outputDimension The output dimensions
    * @param outputFrameRate The output frame rate
+   * @param source files all have the same codecs and timebase - no re-encode
    * @param tracks an array of track to concat in order of the array
    * @return The receipt for this concat job
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
