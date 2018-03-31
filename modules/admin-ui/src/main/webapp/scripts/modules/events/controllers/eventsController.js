@@ -25,11 +25,11 @@ angular.module('adminNg.controllers')
 .controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource',
     function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications, ResourceModal, ConfirmationModal, EventHasSnapshotsResource) {
         // Configure the table service
-        $scope.todayFilterValue = function() {
-            var now = new Date();
-            var from = new Date(now.setHours(0, 0, 0, 0)).toISOString();
-            var to = new Date(now.setHours(23, 59, 59, 999)).toISOString();
-            return from + "/" + to;
+        $scope.dateToFilterValue = function(dateString) {
+          var date = new Date(dateString);
+          var from = new Date(date.setHours(0, 0, 0, 0));
+          var to = new Date(date.setHours(23, 59, 59, 999));
+          return from.toISOString() + "/" + to.toISOString();
         };
         $scope.stats = Stats;
         $scope.stats.configure({
@@ -40,7 +40,7 @@ angular.module('adminNg.controllers')
              description: 'DASHBOARD.SCHEDULED'},
             {filters: [{name: 'startDate',
                         filter:'FILTERS.EVENTS.START_DATE',
-                        value: $scope.todayFilterValue()}],
+                        value: $scope.dateToFilterValue(new Date().toISOString())}],
              description: 'DATES.TODAY'},
             {filters: [{name: 'status',
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
@@ -86,6 +86,7 @@ angular.module('adminNg.controllers')
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
+                template: 'modules/events/partials/eventsTechnicalDateCell.html',
                 name:  'technical_date',
                 label: 'EVENTS.EVENTS.TABLE.DATE'
             }, {
@@ -146,6 +147,8 @@ angular.module('adminNg.controllers')
 
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
         $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' });
+
+        $scope.table.dateToFilterValue = $scope.dateToFilterValue;
 
         $scope.table.delete = function (row) {
             EventsResource.delete({id: row.id}, function () {

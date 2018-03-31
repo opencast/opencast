@@ -103,10 +103,14 @@
      "EVENTS_NOT_UPDATED":  "The event could not be saved",
      "EVENTS_NOT_UPDATED_ID":  "The event {{ id }} could not be saved",
      "EVENTS_NOT_UPDATED_ALL":  "None of the events could be saved",
-     "EVENTS_PROCESSING_ACTION_RETRY": "Processing being resumed...",
+     "EVENTS_PROCESSING_ACTION_RETRY": "Processing resumed.",
      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
-     "EVENTS_PROCESSING_ACTION_NONE": "Processing being aborted...",
+     "EVENTS_PROCESSING_ACTION_NONE": "Processing aborted.",
      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
+     "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+     "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+     "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+     "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
      "SERIES_UPDATED_NB":   "{{ number }} series have been successfully updated",
      "SERIES_UPDATED_ALL":   "All series have been successfully updated",
      "SERIES_NOT_UPDATED":  "The series could not be saved",
@@ -895,9 +899,11 @@
          },
          "THEME": {
            "CAPTION": "Theme",
-           "DESCRIPTION": "",
+           "DESCRIPTION": {
+             "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+           },
            "TITLE": "Theme",
-           "LABEL": "No theme",
+           "LABEL": "Please select a theme",
            "EMPTY": "No theme found"
          },
          "SUMMARY": {

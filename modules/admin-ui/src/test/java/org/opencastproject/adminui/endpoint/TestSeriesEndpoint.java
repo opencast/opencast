@@ -319,6 +319,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     org.opencastproject.index.service.impl.index.theme.Theme theme1 = new org.opencastproject.index.service.impl.index.theme.Theme(
             1L, new DefaultOrganization().getId());
     theme1.setName("theme-1-name");
+    theme1.setDescription("theme-1-description");
 
     SearchResultItem<Series> item1 = EasyMock.createMock(SearchResultItem.class);
     EasyMock.expect(item1.getSource()).andReturn(series1).anyTimes();

@@ -42,10 +42,16 @@ public class HttpsFilter implements Filter {
   private static final Logger logger = LoggerFactory.getLogger(HttpsFilter.class);
 
   /** Request header that is set when behind an SSL proxy */
-  public static final String X_FORWARDED_SSL = "X-Forwarded-SSL";
+  private static final String X_FORWARDED_SSL = "X-Forwarded-SSL";
+
+  /** Alternative request header set by proxy */
+  private static final String X_FORWARDED_PROTO = "X-Forwarded-Proto";
 
   /** Value of the X-Forwarded-SSL header that activates request wrapping */
-  public static final String X_FORWARDED_SSL_VALUE = "on";
+  private static final String X_FORWARDED_SSL_VALUE = "on";
+
+  /** Value of the X-Forwarded-Proto header that activates request wrapping */
+  private static final String X_FORWARDED_PROTO_VALUE = "https";
 
   /**
    * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse,
@@ -59,6 +65,9 @@ public class HttpsFilter implements Filter {
     // Check if the forwarded SSL header is set
     if (X_FORWARDED_SSL_VALUE.equalsIgnoreCase(httpReqquest.getHeader(X_FORWARDED_SSL))) {
       logger.debug("Found forwarded SSL header");
+      httpReqquest = new HttpsRequestWrapper(httpReqquest);
+    } else if (X_FORWARDED_PROTO_VALUE.equalsIgnoreCase(httpReqquest.getHeader(X_FORWARDED_PROTO))) {
+      logger.debug("Found forwarded proto HTTPS header");
       httpReqquest = new HttpsRequestWrapper(httpReqquest);
     }
     chain.doFilter(httpReqquest, response);

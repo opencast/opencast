@@ -29,7 +29,7 @@
         }
       ],
       "source": "SCHEDULE",
-      "workflow_state": "",
+      "workflow_state": "SUCCEEDED",
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
@@ -62,7 +62,7 @@
         }
       ],
       "source": "ARCHIVE",
-      "workflow_state": "",
+      "workflow_state": "SUCCEEDED",
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,
@@ -95,7 +95,7 @@
         }
       ],
       "source": "WORKFLOW",
-      "workflow_state": "",
+      "workflow_state": "SUCCEEDED",
       "has_comments": false,
       "technical_start": "2013-03-20T04:00:00Z",
       "has_preview": false,

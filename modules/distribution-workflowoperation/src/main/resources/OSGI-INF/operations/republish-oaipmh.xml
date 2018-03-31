@@ -9,17 +9,11 @@
   <service>
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
   </service>
-  <reference name="oaiPmhDatabase"
-             interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
+  <reference name="oaiPmhPublicationService"
+             interface="org.opencastproject.publication.api.OaiPmhPublicationService"
              cardinality="1..1"
              policy="static"
-             bind="setOaiPmhDatabase" />
-  <reference name="distributionService"
-             interface="org.opencastproject.distribution.api.DownloadDistributionService"
-             cardinality="1..1"
-             policy="static"
-             target="(distribution.channel=download)"
-             bind="setDistributionService" />
+             bind="setOaiPmhPublicationService" />
   <reference name="serviceRegistry"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              cardinality="1..1"

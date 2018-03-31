@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.engage.theodul.plugin.custom.piwik;
+package org.opencastproject.engage.theodul.plugin.custom.matomo;
 
 import org.opencastproject.engage.theodul.api.AbstractEngagePlugin;
 
@@ -32,6 +32,6 @@ public class EngagePluginImpl extends AbstractEngagePlugin {
     private static final Logger log = LoggerFactory.getLogger(EngagePluginImpl.class);
 
     protected void activate(ComponentContext cc) {
-        log.info("Activated engage plugin: Piwik.");
+        log.info("Activated engage plugin: Matomo.");
     }
 }

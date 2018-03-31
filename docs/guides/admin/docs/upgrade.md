@@ -1,3 +1,19 @@
+Upgrading Opencast from 4.0 to 5.0
+==================================
+
+Configuration Changes
+---------------------
+
+As Piwik has been renamed to Matomo Opencast changed the name for the plugin and configuration keys too.
+So if you already configured an Piwik Server please adapt in `etc/org.opencastproject.organization-mh_default_org.cfg`
+the following keys:
+
+- `prop.player.piwik.server` -> `prop.player.matomo.server`
+- `prop.player.piwik.site_id` -> `prop.player.matomo.site_id`
+- `prop.player.piwik.heartbeat` -> `prop.player.matomo.heartbeat`
+- `prop.player.piwik.track_events` -> `prop.player.matomo.track_events`
+
+
 Upgrading Opencast 3.0 To 4.0
 =============================
 

@@ -2,7 +2,7 @@
 
 ## Description
 
-The `PublishOaiPmhWorkflowOperation` exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
+The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
 
 ## Parameter Table
 

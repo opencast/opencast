@@ -32,6 +32,8 @@ public interface Query {
 
   Option<String> getSeriesId();
 
+  Option<Boolean> isDeleted();
+
   /** The date is inclusive. */
   Option<Date> getModifiedAfter();
 

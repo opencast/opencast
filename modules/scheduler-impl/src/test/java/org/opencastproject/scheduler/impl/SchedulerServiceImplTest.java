@@ -1680,6 +1680,16 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  public void testRecurringRecording() throws Exception {
+    RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA");
+
+    //GDLGDL Needs test
+    /*List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
+            , start, new Date(start.getTime() + hours(48)),
+            new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));*/
+  }
+
+  @Test
   public void testGetArchivedOnly() throws Exception {
     MediaPackage mediaPackage = generateEvent(Opt.some("1"));
     Version version = assetManager.takeSnapshot("test", mediaPackage).getVersion();
@@ -1870,6 +1880,39 @@ public class SchedulerServiceImplTest {
               new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA"), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
+    }
+    {
+      //Event A starts before event B, and ends during event B
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23) + minutes(30)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts during event B, and ends after event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(30)), new Date(currentTime + hours(25) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A ends at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(25)));
+      assertEquals(1, conflicts.size());
+
+      //Event A is contained entirely within event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(24) + minutes(50)));
+      assertEquals(1, conflicts.size());
+
+      //Event A contains event B entirely
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(26)));
+      assertEquals(1, conflicts.size());
+
+      //Event A ends with less than one minute before event B starts
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(24) - seconds(1)));
+      assertEquals(1, conflicts.size());
+
+      //Event A begins than one minute after event B ends
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(25) + seconds(1)), new Date(currentTime + hours(27)));
+      assertEquals(1, conflicts.size());
     }
   }
 
@@ -2237,8 +2280,8 @@ public class SchedulerServiceImplTest {
     long offset = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
       MediaPackage mp = generateEvent(Opt.<String> none());
-      Date startDateTime = new Date(offset + 10 * 1000);
-      Date endDateTime = new Date(offset + 3610000);
+      Date startDateTime = new Date(offset + 10 * 1000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
+      Date endDateTime = new Date(offset + 3610000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
       offset = endDateTime.getTime();
       final DublinCoreCatalog event = generateEvent(agent, Opt.<String> none(), Opt.some(titlePrefix + "-" + i),
               startDateTime, endDateTime);

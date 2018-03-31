@@ -25,6 +25,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
+import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
@@ -44,12 +46,15 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.HandleException;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -64,6 +69,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
@@ -86,6 +92,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.easymock.IAnswer;
+import org.joda.time.DateTimeConstants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -102,12 +110,14 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.UUID;
 
 public class IndexServiceImplTest {
 
@@ -336,8 +346,6 @@ public class IndexServiceImplTest {
     MediaPackage mediapackage = EasyMock.createMock(MediaPackage.class);
     mediapackage.add(EasyMock.capture(result));
     EasyMock.expectLastCall();
-    EasyMock.expect(mediapackage.getCatalogs(EasyMock.anyObject(MediaPackageElementFlavor.class)))
-            .andReturn(new Catalog[] {});
     EasyMock.expect(mediapackage.getIdentifier()).andReturn(mpId).anyTimes();
     EasyMock.expect(mediapackage.getCreators()).andReturn(creators);
     mediapackage.addCreator("");
@@ -347,7 +355,10 @@ public class IndexServiceImplTest {
     EasyMock.expect(mediapackage.getElements()).andReturn(new MediaPackageElement[] {}).anyTimes();
     EasyMock.expect(mediapackage.getCatalogs(EasyMock.anyObject(MediaPackageElementFlavor.class)))
             .andReturn(new Catalog[] {}).anyTimes();
+    EasyMock.expect(mediapackage.getSeries()).andReturn(null).anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
+    EasyMock.expectLastCall();
+    mediapackage.setSeriesTitle(EasyMock.anyString());
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
@@ -424,7 +435,9 @@ public class IndexServiceImplTest {
     EasyMock.expect(mediapackage.getElements()).andReturn(new MediaPackageElement[] {}).anyTimes();
     EasyMock.expect(mediapackage.getCatalogs(EasyMock.anyObject(MediaPackageElementFlavor.class)))
             .andReturn(new Catalog[] {}).anyTimes();
+    EasyMock.expect(mediapackage.getSeries()).andReturn(null).anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
+    mediapackage.setSeriesTitle(EasyMock.anyString());
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
@@ -624,6 +637,7 @@ public class IndexServiceImplTest {
 
     // Setup mediapackage.
     MediaPackage mediapackage = EasyMock.createMock(MediaPackage.class);
+    EasyMock.expect(mediapackage.clone()).andReturn(mediapackage).anyTimes();
     EasyMock.expect(mediapackage.getSeries()).andReturn(null).anyTimes();
     EasyMock.expect(mediapackage.getCatalogs(EasyMock.anyObject(MediaPackageElementFlavor.class)))
             .andReturn(new Catalog[] { CatalogImpl.fromURI(getClass().getResource("/dublincore.xml").toURI()) });
@@ -641,20 +655,57 @@ public class IndexServiceImplTest {
     mediapackage.setIdentifier(EasyMock.anyObject(Id.class));
     EasyMock.expectLastCall().anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
+    mediapackage.setSeriesTitle(EasyMock.anyString());
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
     CaptureAgentStateService captureAgentStateService = setupCaptureAgentStateService();
 
     // Setup scheduler service
-    Capture<Date> captureStart = EasyMock.newCapture();
-    Capture<Date> captureEnd = EasyMock.newCapture();
+    Capture<Date> recurrenceStart = EasyMock.newCapture();
+    Capture<Date> recurrenceEnd = EasyMock.newCapture();
+    Capture<RRule> rrule = EasyMock.newCapture();
+    Capture duration = EasyMock.newCapture();
+    Capture<TimeZone> tz = EasyMock.newCapture();
+
+    Capture<Date> schedStart = EasyMock.newCapture();
+    Capture<Date> schedEnd = EasyMock.newCapture();
+    Capture<RRule> schedRRule = EasyMock.newCapture();
+    Capture schedDuration = EasyMock.newCapture();
+    Capture<TimeZone> schedTz = EasyMock.newCapture();
+
+    Capture<MediaPackage> mp = EasyMock.newCapture();
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    schedulerService.addEvent(EasyMock.capture(captureStart), EasyMock.capture(captureEnd), EasyMock.anyString(),
-            EasyMock.<Set<String>> anyObject(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.<Map<String, String>> anyObject(), EasyMock.<Map<String, String>> anyObject(),
-            EasyMock.<Opt<Boolean>> anyObject(), EasyMock.<Opt<String>> anyObject(), EasyMock.anyString());
-    EasyMock.expectLastCall().atLeastOnce();
+    //Look up the expected periods
+    EasyMock.expect(
+            schedulerService.calculatePeriods(EasyMock.capture(rrule), EasyMock.capture(recurrenceStart),
+                    EasyMock.capture(recurrenceEnd), EasyMock.captureLong(duration), EasyMock.capture(tz))).
+            andAnswer(new IAnswer<List<Period>>() {
+              @Override
+              public List<Period> answer() throws Throwable {
+                return calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue());
+              }
+            }).anyTimes();
+    //The actual scheduling
+    EasyMock.expect(
+    schedulerService.addMultipleEvents(
+            EasyMock.capture(schedRRule), EasyMock.capture(schedStart), EasyMock.capture(schedEnd),
+            EasyMock.captureLong(schedDuration), EasyMock.capture(schedTz), EasyMock.anyString(),
+            EasyMock.<Set<String>>anyObject(), EasyMock.capture(mp), EasyMock.<Map<String, String>>anyObject(),
+            EasyMock.<Map<String, String>>anyObject(), EasyMock.<Opt<Boolean>>anyObject(),
+            EasyMock.<Opt<String>>anyObject(), EasyMock.anyString())).
+            andAnswer(new IAnswer<Map<String, Period>>() {
+              @Override
+              public Map<String, Period> answer() throws Throwable {
+                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
+                Map<String, Period> mapping = new LinkedHashMap<>();
+                int counter = 0;
+                for (Period p : periods) {
+                  mapping.put(new IdImpl(UUID.randomUUID().toString()).compact(), p);
+                }
+                return mapping;
+              }
+            }).anyTimes();
     EasyMock.replay(schedulerService);
 
     // Run Test
@@ -670,7 +721,8 @@ public class IndexServiceImplTest {
     indexServiceImpl.setSchedulerService(schedulerService);
     String scheduledEvents = indexServiceImpl.createEvent(metadataJson, mediapackage);
     String[] ids = StringUtils.split(scheduledEvents, ",");
-    Assert.assertTrue(ids.length > 1);
+    //We should have as many scheduled events as we do periods
+    Assert.assertTrue(ids.length == calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue()).size());
 
     assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
             mediapackageIdResult.getValue());
@@ -680,13 +732,25 @@ public class IndexServiceImplTest {
     assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
     assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
     assertTrue("The catalog should have been created", catalogResult.hasCaptured());
-    assertTrue(captureStart.hasCaptured());
-    assertTrue(captureEnd.hasCaptured());
-    List<Date> endDates = captureEnd.getValues();
-    int i = 0;
-    for (Date start : captureStart.getValues()) {
-      Assert.assertEquals(new Date(start.getTime() + 60000), endDates.get(i++));
-    }
+    //Assert that the start and end recurrence dates captured, along with the duration and recurrence rule
+    //This is all used by the scheduling calculation, but not the actual scheduling call
+    assertTrue(recurrenceStart.hasCaptured());
+    assertTrue(recurrenceEnd.hasCaptured());
+    assertTrue(duration.hasCaptured());
+    assertTrue(rrule.hasCaptured());
+    //Assert that the scheduling call has its necessary data
+    assertTrue(schedStart.hasCaptured());
+    assertTrue(schedEnd.hasCaptured());
+    assertTrue(schedDuration.hasCaptured());
+    assertTrue(schedRRule.hasCaptured());
+    assertTrue(schedTz.hasCaptured());
+    List<Period> pCheck = calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
+    List<Period> pExpected = calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue());
+
+    //Assert that the first capture time is the same as the recurrence start
+    assertEquals(pExpected.get(0).getStart(), pCheck.get(0).getStart());
+    //Assert that the end of the last capture time is the same as the recurrence end
+    assertEquals(pExpected.get(pExpected.size() - 1).getEnd(), pCheck.get(pCheck.size() - 1).getEnd());
   }
 
   /**
@@ -724,40 +788,78 @@ public class IndexServiceImplTest {
     indexService.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
   }
 
-  public void testUpdateEvent() throws IOException, IllegalArgumentException, IndexServiceException, NotFoundException,
-          UnauthorizedException, SearchIndexException, WorkflowDatabaseException {
-    String username = "username1";
-    String org = "org1";
+  @Test
+  public void testUpdateMediaPackageMetadata() throws Exception {
+    // mock/initialize dependencies
+    String username = "user1";
+    String org = "mh_default_org";
     String testResourceLocation = "/events/update-event.json";
+    String metadataJson = IOUtils.toString(getClass().getResourceAsStream(testResourceLocation));
+    MetadataCollection metadataCollection = new DublinCoreMetadataCollection();
+    metadataCollection.addField(MetadataField.createTextMetadataField(
+            "title", Opt.some("title"), "EVENTS.EVENTS.DETAILS.METADATA.TITLE", false, true, Opt.none(), Opt.none(),
+            Opt.none(), Opt.none(), Opt.none()));
+    metadataCollection.addField(MetadataField.createTextLongMetadataField(
+            "creator", Opt.some("creator"), "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS", false, false, Opt.none(),
+            Opt.none(), Opt.none(), Opt.none(), Opt.none()));
+    metadataCollection.addField(MetadataField.createTextMetadataField(
+            "isPartOf", Opt.some("isPartOf"), "EVENTS.EVENTS.DETAILS.METADATA.SERIES", false, false, Opt.none(),
+            Opt.none(), Opt.none(), Opt.none(), Opt.none()));
+    MetadataList metadataList = new MetadataList(metadataCollection, metadataJson);
     String eventId = "event-1";
-    String metadataJson = IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation));
-    String expectedTitle = "Updated Title";
-    String expectedDescription = "Unset Description";
-    // Setup search results
+    Event event = new Event(eventId, org);
+    event.setTitle("Test Event 1");
     SearchQuery query = EasyMock.createMock(SearchQuery.class);
     EasyMock.expect(query.getLimit()).andReturn(100);
     EasyMock.expect(query.getOffset()).andReturn(0);
     EasyMock.replay(query);
-
-    Event event = new Event();
-    event.setTitle("Other Title");
-    event.setDescription(expectedDescription);
     SearchResultItemImpl<Event> searchResultItem = new SearchResultItemImpl<>(1.0, event);
-    SearchResultImpl<Event> result = new SearchResultImpl<>(query, 0, 0);
-    result.addResultItem(searchResultItem);
-
-    AbstractSearchIndex abstractIndex = EasyMock.createMock(AbstractSearchIndex.class);
-    EasyMock.expect(abstractIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result);
-    EasyMock.replay(abstractIndex);
-
+    SearchResultImpl<Event> searchResult = new SearchResultImpl<>(query, 0, 0);
+    searchResult.addResultItem(searchResultItem);
     SecurityService securityService = setupSecurityService(username, org);
+    AbstractSearchIndex index = EasyMock.createMock(AbstractSearchIndex.class);
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+            .loadFromXml(getClass().getResourceAsStream("/events/update-event-mp.xml"));
+    EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(searchResult);
+    EasyMock.replay(index);
+    Workspace workspace = EasyMock.createMock(Workspace.class);
+    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject())).andReturn(getClass().getResource("/dublincore.xml").toURI()).anyTimes();
+    EasyMock.expect(workspace.read(EasyMock.anyObject())).andAnswer(
+            () -> getClass().getResourceAsStream("/dublincore.xml")).anyTimes();
+    EasyMock.replay(workspace);
+    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = setupCommonCatalogUIAdapter(workspace).getA();
+    // Using scheduler as the source of the media package here.
+    SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
+    EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andReturn(mp);
+    Capture<Opt<MediaPackage>> mpCapture = new Capture<>();
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.capture(mpCapture),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyString());
+    EasyMock.expectLastCall();
+    EasyMock.replay(schedulerService);
+    SeriesService seriesService = EasyMock.createMock(SeriesService.class);
+    DublinCoreCatalog seriesDC = DublinCores.read(getClass().getResourceAsStream("/events/update-event-series.xml"));
+    EasyMock.expect(seriesService.getSeries(EasyMock.anyString())).andReturn(seriesDC);
+    EasyMock.expect(seriesService.getSeriesAccessControl(EasyMock.anyString())).andReturn(null);
+    EasyMock.expect(seriesService.getSeriesElements(EasyMock.anyString())).andReturn(Opt.none());
+    EasyMock.replay(seriesService);
 
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setSecurityService(securityService);
-    indexServiceImpl.updateAllEventMetadata(eventId, metadataJson, abstractIndex);
-    Assert.assertEquals("The title should have been updated.", expectedTitle, event.getTitle());
-    Assert.assertEquals("The description should be the same.", expectedDescription, event.getDescription());
-    Assert.assertNull("The subject should still be null.", event.getSubject());
+    // create service
+    IndexServiceImpl indexService = new IndexServiceImpl();
+    indexService.setSecurityService(securityService);
+    indexService.setSchedulerService(schedulerService);
+    indexService.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
+    indexService.addCatalogUIAdapter(commonEventCatalogUIAdapter);
+    indexService.setSeriesService(seriesService);
+    indexService.setWorkspace(workspace);
+    MetadataList updateEventMetadata = indexService.updateEventMetadata(org, metadataList, index);
+
+    Assert.assertTrue(mpCapture.hasCaptured());
+    Assert.assertEquals("series-1", mp.getSeries());
+    Assert.assertEquals(1, mp.getCatalogs(MediaPackageElements.SERIES).length);
   }
 
   @Test
@@ -974,11 +1076,58 @@ public class IndexServiceImplTest {
     utcDate.setTime(start.getTime());
     RRule rRule = new RRule(generateRule(days, utcDate.get(Calendar.HOUR_OF_DAY), utcDate.get(Calendar.MINUTE)));
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    return indexServiceImpl.calculatePeriods(start.getTime(), end.getTime(), duration, rRule, tz);
+    return calculatePeriods(rRule, start.getTime(), end.getTime(), duration, tz);
   }
 
   private String generateRule(String days, int hour, int minute) {
     return String.format("FREQ=WEEKLY;BYDAY=%s;BYHOUR=%d;BYMINUTE=%d", days, hour, minute);
   }
 
+  //NOTE: Do not modify this without making the same modifications to the copy of this method in Util in the scheduler service
+  //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
+  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+    final TimeZone timeZone = TimeZone.getDefault();
+    final TimeZone utc = TimeZone.getTimeZone("UTC");
+    TimeZone.setDefault(tz);
+    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
+    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
+
+    Calendar endCalendar = Calendar.getInstance(utc);
+    endCalendar.setTime(end);
+    Calendar calendar = Calendar.getInstance(utc);
+    calendar.setTime(periodStart);
+    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
+    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
+    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
+    periodEnd.setTime(calendar.getTime().getTime() + duration);
+    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
+
+    List<Period> events = new LinkedList<>();
+
+    TimeZone.setDefault(utc);
+    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
+      Date d = (Date) date;
+      Calendar cDate = Calendar.getInstance(utc);
+
+      // Adjust for DST, if start of event
+      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
+        if (!tz.inDaylightTime(d)) { // Date not in DST?
+          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
+        }
+      } else { // Event doesn't start in DST
+        if (tz.inDaylightTime(d)) {
+          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
+        }
+      }
+      cDate.setTime(d);
+
+      TimeZone.setDefault(timeZone);
+      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
+              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
+      events.add(p);
+      TimeZone.setDefault(utc);
+    }
+    TimeZone.setDefault(timeZone);
+    return events;
+  }
 }
