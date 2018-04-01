@@ -21,6 +21,10 @@
 
 package org.opencastproject.userdirectory.moodle;
 
+/**
+ * This exception will be thrown, if Moodle web service requests fail or respond
+ * unexpectedly.
+ */
 public class MoodleWebServiceException extends Exception {
   private static final long serialVersionUID = -93348361425075859L;
 

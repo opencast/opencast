@@ -75,7 +75,7 @@ log4j.logger.org.opencastproject.userdirectory.moodle=DEBUG
 ### Step 3
 
 You can grant additional roles to all Moodle users in Opencast by creating a
-group with the title 'Moodle'. You can then add additional roles to this group,
+group with the name 'Moodle'. You can then add additional roles to this group,
 which will be inherited by all Moodle users.
 
 You can also use the group role name `ROLE_GROUP_MOODLE` in Event or Series
