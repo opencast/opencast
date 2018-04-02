@@ -83,3 +83,12 @@
     background-repeat: no-repeat;
     display: block;
 }
+
+.popover__list-item-disabled {
+    @include retina-image("#{$img-path}play-icon", 20px 20px);
+    margin: 6px 0;
+    padding-left: 30px;
+    line-height: 22px;
+    background-repeat: no-repeat;
+    display: block;
+}

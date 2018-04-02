@@ -49,6 +49,8 @@ function($, bootbox, _, alertify) {
         var msg_loginSuccessful = "Successfully logged in. Please reload the page if the page does not reload automatically.";
         var msg_not_logged_in = "Not logged in";
         var msg_loginFailed = "Failed to log in.";
+        var msg_live_in_progress = "Live (in progress)";
+        var msg_live_not_in_progress = "Live (not in progress)";
         var infoMeURL = "/info/me.json";
         var defaultPlayerURL = "/engage/ui/watch.html";
         var springSecurityLoginURL = "/j_spring_security_check";
@@ -226,7 +228,8 @@ function($, bootbox, _, alertify) {
             msg_loginSuccessful = tData.login_success;
             msg_loginFailed = tData.login_failed;
             msg_not_logged_in = tData.not_logged_in;
-
+            msg_live_in_progress = tData.live_in_progress;
+            msg_live_not_in_progress = tData.live_not_in_progress;
         }
 
         function initialize() {
@@ -633,6 +636,8 @@ function($, bootbox, _, alertify) {
                 var creator = "<br>";
                 var seriestitle = "<br>";
                 var date = "<br>";
+                var live = "<br>";
+                var canLaunch = true;
 
                 if (data.mediapackage) {
                     if (data.mediapackage.attachments && data.mediapackage.attachments.attachment) {
@@ -652,7 +657,6 @@ function($, bootbox, _, alertify) {
                         }
                         tile = tile + '<div><img class="thumbnail img-responsive img-rounded" src="' + thumb + '"></div>';
                     }
-
                     tile = tile + "<div class=\"infos\">";
 
                     if (data.dcCreator) {
@@ -689,17 +693,38 @@ function($, bootbox, _, alertify) {
                         tile = tile + "<div class=\"duration\">" + hours + ":" + minutes + ":" + seconds + "</div>";
                     };
 
+                    if (data.mediapackage.media && data.mediapackage.media.track) {
+                    	// Check if there's a 'live' track
+                        for (var i = 0; i < data.mediapackage.media.track.length; i++) {
+                            var track = data.mediapackage.media.track[i];
+                            if (track.live) {
+                            	// Is event in progress?
+                            	var start = new Date(data.mediapackage.start);
+                            	var end = new Date(start.getTime() + parseInt (data.mediapackage.duration));
+                            	var now = new Date(); 
+                                if (now < start || now > end) {
+                                	live = msg_live_not_in_progress;
+                                	canLaunch = false;
+                                } else live = msg_live_in_progress;
+                                break;
+                            }
+                        }
+                    }
+                    tile = tile + "<div class=\"live\">" + live + "</div>";
+
                     tile = tile + "</div></div></div></a>";
 
                     $($main_container).append(tile);
 
-                    $("#" + _.escape(data["id"])).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
+                    if (canLaunch) {
+                        $("#" + _.escape(data["id"])).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
 
-                    $("#" + _.escape(data["id"])).on("keypress", function(ev) {
-                        if (ev.which == 13 || ev.which == 32) {
-                            $(location).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
-                        }
-                    });
+                        $("#" + _.escape(data["id"])).on("keypress", function(ev) {
+                            if (ev.which == 13 || ev.which == 32) {
+                                $(location).attr("href", playerEndpoint + "?id=" + _.escape(data["id"]));
+                            }
+                        });
+                    }
 
                     if (data.mediapackage.seriestitle) {
                         var color = generateSeriesColor(data.mediapackage.series);

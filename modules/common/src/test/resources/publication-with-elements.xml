@@ -7,6 +7,7 @@
     <track id="t-1">
       <tags/>
       <url>http://publications.com/video.mp4</url>
+      <live>false</live>
     </track>
   </media>
   <attachments>

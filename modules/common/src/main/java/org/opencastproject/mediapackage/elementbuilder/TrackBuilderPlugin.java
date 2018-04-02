@@ -221,6 +221,13 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
         throw new UnsupportedElementException("Duration of track " + url + " is malformatted");
       }
 
+      // is live
+      String strLive = (String) xpath.evaluate("live/text()", elementNode, XPathConstants.STRING);
+      if (StringUtils.isNotEmpty(strLive)) {
+        boolean live = Boolean.parseBoolean(strLive.trim());
+        track.setLive(live);
+      }
+
       // audio settings
       Node audioSettingsNode = (Node) xpath.evaluate("audio", elementNode, XPathConstants.NODE);
       if (audioSettingsNode != null && audioSettingsNode.hasChildNodes()) {
