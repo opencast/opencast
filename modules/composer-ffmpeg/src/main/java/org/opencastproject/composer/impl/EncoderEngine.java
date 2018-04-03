@@ -56,7 +56,7 @@ import javax.activation.MimetypesFileTypeMap;
 /**
  * Abstract base class for encoder engines.
  */
-public class encoderEngine implements AutoCloseable {
+public class EncoderEngine implements AutoCloseable {
 
   /** The ffmpeg commandline suffix */
   static final String CMD_SUFFIX = "ffmpeg.command";
