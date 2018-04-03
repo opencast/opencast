@@ -25,6 +25,11 @@ Configuration
 
 ### prop.player.matomo.server
 
+The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
+Before you disable the notification, make sure that you do not violate any local regulations. 
+
+### prop.player.matomo.server
+
 The Matomo server from which the Piwik JS library will be loaded and where the data will be reported.
 
 ### prop.player.matomo.site_id=1
