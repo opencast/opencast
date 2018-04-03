@@ -2,6 +2,7 @@
     data-action="edit"
     data-resource-id="{{ row.id }}"
     class="more"
+    title="{{ 'CONFIGURATION.THEMES.TABLE.TOOLTIP.DETAILS' | translate }}"
     with-role="ROLE_UI_THEMES_EDIT">
 </a>
 
@@ -9,5 +10,6 @@
     data-callback="table.delete" 
     data-object="row"
     class="remove ng-scope ng-isolate-scope"
+    title="{{ 'CONFIGURATION.THEMES.TABLE.TOOLTIP.DELETE' | translate }}"
     with-role="ROLE_UI_THEMES_DELETE">
 </a>

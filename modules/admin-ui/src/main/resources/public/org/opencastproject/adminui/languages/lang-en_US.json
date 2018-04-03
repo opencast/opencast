@@ -474,8 +474,8 @@
            "SERIES": "Filter for this series",
            "STATUS": "Filter for this event status",
            "LOCATION": "Filter for this location",
-           "DETAILS": "Event details",
-           "DELETE": "Delete",
+           "DETAILS": "Open event details",
+           "DELETE": "Delete event",
            "PREVIEW": "Open preview player",
            "EDITOR": "Open video Editor",
            "COMMENTS": "View comments",
@@ -818,7 +818,13 @@
             "URL": "URL",
             "CONFIGURATION": "Configuration",
             "NO_CONFIGURATION": "No existing configuration parameters for the selected workflow definition.",
-            "WORKFLOW": "Workflow"
+            "WORKFLOW": "Workflow",
+            "TOOLTIP": {
+              "STOP": "Stop execution workflow instance",
+              "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+              "RETRY": "Retry execution of workflow instance",
+              "DELETE": "Delete workflow instance"
+            }
           },
          "WORKFLOW_DETAILS": {
            "TITLE": "Workflow details",
@@ -935,8 +941,8 @@
          "ACTION":       "Actions",
          "TOOLTIP": {
            "SERIES": "Filter events for this series",
-           "DETAILS": "Series details",
-           "DELETE": "Delete"
+           "DETAILS": "Open series details",
+           "DELETE": "Delete series"
          }
        },
        "DETAILS": {
@@ -1044,7 +1050,7 @@
          "ACTION":    "Actions",
          "TOOLTIP": {
            "NAME": "Filter events for this location",
-           "DETAILS": "Location details",
+           "DETAILS": "Open location details",
            "DELETE": "Delete location (unregister capture agent)"
          }
        },
@@ -1137,7 +1143,11 @@
          "PROVIDER":  "Provider",
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
-         "ACTION":   "Actions"
+         "ACTION":   "Actions",
+         "TOOLTIP": {
+           "DELETE": "Delete user",
+           "DETAILS": "Open user details"
+         }
        },
        "DETAILS": {
          "NEWCAPTION": "Create user",
@@ -1177,7 +1187,11 @@
          "NAME"        :        "Name",
          "DESCRIPTION" : "Description",
          "ROLE"        :        "Role",
-         "ACTION"      :      "Actions"
+         "ACTION"      :      "Actions",
+         "TOOLTIP": {
+           "DETAILS": "Open group details",
+           "DELETE": "Delete group"
+         }
        },
        "DETAILS": {
          "NEWCAPTION":  "Create group",
@@ -1217,7 +1231,11 @@
          "CREATED": "Created",
          "CREATOR": "Creator",
          "IN_USE":  "In use",
-         "ACTION":  "Actions"
+         "ACTION":  "Actions",
+         "TOOLTIP": {
+           "DELETE": "Delete access policy",
+           "DETAILS": "Open access policy details"
+         }
        },
        "NEW": {
           "CAPTION": "New Access Policy",
@@ -1433,7 +1451,11 @@
          "CREATED": "Created",
          "DEFAULT": "Default",
          "USAGE": "Usage",
-         "ACTION": "Actions"
+         "ACTION": "Actions",
+         "TOOLTIP": {
+           "DELETE": "Delete theme",
+           "DETAILS": "Open theme details"
+         }
        },
        "DETAILS": {
          "NEWCAPTION":  "Create theme",
@@ -1562,7 +1584,10 @@
          "MEAN_RUN_TIME":   "Mean run time",
          "MEAN_QUEUE_TIME": "Mean queue time",
          "SANITIZE":        "Clear failed service",
-         "ACTION":          "Actions"
+         "ACTION":          "Actions",
+         "TOOLTIP": {
+           "SANITIZE": "Sanitize service (set service back to state normal)"
+         }
        }
      }
    },
