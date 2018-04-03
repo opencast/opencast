@@ -68,6 +68,8 @@
      }
    },
    "MEDIAMODULE": "Media Module",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP":{
      "HELP": "Help",
      "USERS_GUIDE": "User's Guide",
@@ -466,7 +468,19 @@
          "REVIEW_STATUS": "Review status",
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
-         "PUBLISHED": "Published"
+         "PUBLISHED": "Published",
+         "TOOLTIP": {
+           "START": "Filter for this start date",
+           "SERIES": "Filter for this series",
+           "STATUS": "Filter for this event status",
+           "LOCATION": "Filter for this location",
+           "DETAILS": "Event details",
+           "DELETE": "Delete",
+           "PREVIEW": "Open preview player",
+           "EDITOR": "Open video Editor",
+           "COMMENTS": "View comments",
+           "PAUSED_WORKFLOW": "View paused workflow"
+         }
        },
        "SCHEDULING_STATUS": {
          "READY_FOR_RECORDING": "Ready for recording",
@@ -918,7 +932,12 @@
          "CREATED":      "Created",
          "MANAGED_ACL":  "Access policy",
          "EVENTS":       "Events",
-         "ACTION":       "Actions"
+         "ACTION":       "Actions",
+         "TOOLTIP": {
+           "SERIES": "Filter events for this series",
+           "DETAILS": "Series details",
+           "DELETE": "Delete"
+         }
        },
        "DETAILS": {
           "HEADER": "Series details - {{resourceId}}",
@@ -1022,7 +1041,12 @@
          "VERSION":   "Version",
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
-         "ACTION":    "Actions"
+         "ACTION":    "Actions",
+         "TOOLTIP": {
+           "NAME": "Filter events for this location",
+           "DETAILS": "Location details",
+           "DELETE": "Delete location (unregister capture agent)"
+         }
        },
        "DETAILS": {
           "HEADER": "Location details - {{resourceId}}",
@@ -1615,6 +1639,8 @@
      "PLACEHOLDER": "Search…",
      "PROFILES": {
        "FILTERS_HEADER":          "Saved filter sets",
+       "EDIT":                    "Edit filter set",
+       "REMOVE":                  "Remove saved filter",
        "EMPTY":                   "No saved filters yet",
        "SAVE_FILTERS":            "Save",
        "FILTER_HEADER":           "Save filter set",
