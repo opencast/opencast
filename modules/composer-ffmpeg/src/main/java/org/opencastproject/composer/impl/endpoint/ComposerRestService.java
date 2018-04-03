@@ -495,7 +495,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The source tracks to concat as XML", isRequired = true, name = "sourceTracks", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
           @RestParameter(description = "The resolution dimension of the concat video as JSON", isRequired = false, name = "outputDimension", type = Type.STRING),
-          @RestParameter(description = "The  frame rate of the concat video (should be positive, e.g. 25.0). Negative values and zero will deactivate frame rate operation.",
+          @RestParameter(description = "The  frame rate of the concat video (should be positive, e.g. 25.0). Negative values and zero will cause no FFmpeg fps filter to be used in the filter chain.",
       isRequired = false, name = "outputFrameRate", type = Type.STRING),
           @RestParameter(description = "The source files have the same codecs and should not be re-encoded", isRequired = false, name = "sameCodec",type = Type.TEXT, defaultValue = "false")}, reponses = {
     @RestResponse(description = "Results in an xml document containing the video track", responseCode = HttpServletResponse.SC_OK),

@@ -95,13 +95,13 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
-   * Concat multiple tracks to a single track. Required ffmpeg version 1.1
+   * Concat multiple tracks to a single track.
    *
    * @param profileId
    *          The encoding profile to use
    * @param outputDimension
    *          The output dimensions
-   * @param source files all have the same codecs and timebase - no re-encode
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks
    *          an array of track to concat in order of the array
    * @return The receipt for this concat job
@@ -119,7 +119,7 @@ public interface ComposerService {
    * @param profileId The encoding profile to use
    * @param outputDimension The output dimensions
    * @param outputFrameRate The output frame rate
-   * @param source files all have the same codecs and timebase - no re-encode
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks an array of track to concat in order of the array
    * @return The receipt for this concat job
    * @throws EncoderException if encoding fails
