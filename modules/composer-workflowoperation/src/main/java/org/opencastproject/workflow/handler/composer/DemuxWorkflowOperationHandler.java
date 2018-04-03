@@ -53,8 +53,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The workflow definition for handling "Demux from epiphan CA" operations This allows to demux and tagging to be done
- * in one operation and save 5-60 mins from each wf
+ * The workflow definition for handling demux operations.
  */
 public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -97,7 +96,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    logger.debug("Running DCE DEmux workflow operation on workflow {}", workflowInstance.getId());
+    logger.debug("Running demux workflow operation on workflow {}", workflowInstance.getId());
 
     try {
       return demux(workflowInstance.getMediaPackage(), workflowInstance.getCurrentOperation());

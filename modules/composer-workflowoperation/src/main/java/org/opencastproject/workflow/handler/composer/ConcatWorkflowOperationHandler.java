@@ -217,8 +217,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     if (!sameCodec) { // Ignore resolution if same Codec - no scaling
       if (outputResolution.startsWith(OUTPUT_PART_PREFIX)) {
         if (!trackSelectors.keySet().contains(
-            Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))))
+            Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length())))) {
           throw new WorkflowOperationException("Output resolution part not set!");
+        }
       } else {
         try {
           String[] outputResolutionArray = StringUtils.split(outputResolution, "x");
