@@ -32,11 +32,11 @@ install:
   - true
 
 script:
-  - (! grep -rq '	' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -rq ' $' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -rq '	' etc)
-  - (! grep -rq ' $' etc)
-  - cd docs/guides/admin && mkdocs build && cd -
-  - cd docs/guides/developer && mkdocs build && cd -
-  - cd docs/guides/user && mkdocs build && cd -
+  - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
+  - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
+  - (! grep -rn '	' etc)
+  - (! grep -rn ' $' etc)
+  - (cd docs/guides/admin && mkdocs build)
+  - (cd docs/guides/developer && mkdocs build)
+  - (cd docs/guides/user && mkdocs build)
   - mvn --batch-mode clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pnone
