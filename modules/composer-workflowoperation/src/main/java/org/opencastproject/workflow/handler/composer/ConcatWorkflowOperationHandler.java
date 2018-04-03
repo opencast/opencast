@@ -56,7 +56,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -239,17 +238,17 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     float fps = -1.0f;
     // Ignore fps if same Codec - no scaling
     if (!sameCodec && StringUtils.isNotEmpty(outputFrameRate)) {
-        if (StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)) {
-          if (!NumberUtils.isNumber(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
-                  || !trackSelectors.keySet().contains(Integer.parseInt(
-                          outputFrameRate.substring(OUTPUT_PART_PREFIX.length())))) {
-            throw new WorkflowOperationException("Output frame rate part not set or invalid!");
-          }
-        } else if (NumberUtils.isNumber(outputFrameRate)) {
-          fps = NumberUtils.toFloat(outputFrameRate);
-        } else {
-          throw new WorkflowOperationException("Unable to parse output frame rate!");
+      if (StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)) {
+        if (!NumberUtils.isCreatable(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
+                || !trackSelectors.keySet().contains(Integer.parseInt(
+                        outputFrameRate.substring(OUTPUT_PART_PREFIX.length())))) {
+          throw new WorkflowOperationException("Output frame rate part not set or invalid!");
         }
+      } else if (NumberUtils.isCreatable(outputFrameRate)) {
+        fps = NumberUtils.toFloat(outputFrameRate);
+      } else {
+        throw new WorkflowOperationException("Unable to parse output frame rate!");
+      }
     }
 
     MediaPackageElementFlavor targetFlavor = null;
@@ -270,28 +269,21 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       // Cannot mix prefix-number tracks with numbered files
       // PREFIXED_FILES must have multiple files, but numbered file can skip the operation if there is only one
       if (trackSelectors.size() == 1) {
-      // NUMBERED FILES will have one trackSelector only and multiple sorted files in it
-          Comparator<Track> comparator = new Comparator<Track>() {
-          @Override
-          public int compare(Track left, Track right) {
-            String l = (new File(left.getURI().getPath())).getName(); // Get and compare basename only, getPath() for
-                                                                      // mock
+        // NUMBERED FILES will have one trackSelector only and multiple sorted files in it
+        List<Track> list = new ArrayList<>(tracksForSelector);
+        list.sort((left, right) -> {
+            String l = (new File(left.getURI().getPath())).getName(); // Get and compare basename only, getPath() for mock
             String r = (new File(right.getURI().getPath())).getName();
             return (l.compareTo(r));
-          }
-        };
-        List<Track> list = new ArrayList<Track>(tracksForSelector);
-        java.util.Collections.sort(list, comparator);
+          });
         tracksForSelector = list;
       } else if (tracksForSelector.size() > 1) {
-        logger.warn(
-                "More than one track has been found with flavor '{}' and/or tag '{}' for concat operation, skipping concatenation!",
-                currentFlavor, currentTag);
+        logger.warn("More than one track has been found with flavor '{}' and/or tag '{}' for concat operation, "
+                        + "skipping concatenation!", currentFlavor, currentTag);
         return createResult(mediaPackage, Action.SKIP);
       } else if (tracksForSelector.size() == 0 && trackSelector.getValue().getB()) {
-        logger.warn(
-                "No track has been found with flavor '{}' and/or tag '{}' for concat operation, skipping concatenation!",
-                currentFlavor, currentTag);
+        logger.warn("No track has been found with flavor '{}' and/or tag '{}' for concat operation, "
+                        + "skipping concatenation!", currentFlavor, currentTag);
         return createResult(mediaPackage, Action.SKIP);
       } else if (tracksForSelector.size() == 0 && !trackSelector.getValue().getB()) {
         logger.info("No track has been found with flavor '{}' and/or tag '{}' for concat operation, skipping track!",
@@ -307,7 +299,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
           return createResult(mediaPackage, Action.SKIP);
         }
         if (StringUtils.startsWith(outputResolution, OUTPUT_PART_PREFIX)
-                && NumberUtils.isNumber(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
+                && NumberUtils.isCreatable(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
                 && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))) {
           outputDimension = new Dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
           if (!trackSelector.getValue().getB()) {
@@ -316,7 +308,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
           }
         }
         if (fps <= 0 && StringUtils.startsWith(outputFrameRate, OUTPUT_PART_PREFIX)
-                && NumberUtils.isNumber(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
+                && NumberUtils.isCreatable(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))
                 && trackSelector.getKey() == Integer.parseInt(outputFrameRate.substring(OUTPUT_PART_PREFIX.length()))) {
           fps = videoStreams[0].getFrameRate();
         }
@@ -388,36 +380,36 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     // Search config for SOURCE_FLAVOR_NUMBERED_FILES and SOURCE_FLAVOR_PREFIX
     for (String key : operation.getConfigurationKeys()) {
-        if (key.startsWith(SOURCE_FLAVOR_PREFIX) || key.startsWith(SOURCE_TAGS_PREFIX)) {
-            if (flavorType == SourceType.None) {
-              flavorType = SourceType.PrefixedFile;
-            } else if (flavorType != SourceType.PrefixedFile) {
-              throw new WorkflowOperationException(
-                      "Cannot mix source prefix flavor/tags with source numbered files - use one type of selector only");
-            }
+      if (key.startsWith(SOURCE_FLAVOR_PREFIX) || key.startsWith(SOURCE_TAGS_PREFIX)) {
+        if (flavorType == SourceType.None) {
+          flavorType = SourceType.PrefixedFile;
+        } else if (flavorType != SourceType.PrefixedFile) {
+          throw new WorkflowOperationException(
+                  "Cannot mix source prefix flavor/tags with source numbered files - use one type of selector only");
         }
+      }
 
-    if (key.equals(SOURCE_FLAVOR_NUMBERED_FILES)) { // Search config for SOURCE_FLAVORS_NUMBERED_FILES
-            srcFlavor = operation.getConfiguration(key);
-            if (flavorType == SourceType.None) {
-              flavorType = SourceType.NumberedFile;
-              srcFlavor = operation.getConfiguration(key);
-            } else if (flavorType != SourceType.NumberedFile) {
-              throw new WorkflowOperationException(
-                      "Cannot mix source prefix flavor/tags with source numbered files - use one type of selector only");
-            }
+      if (key.equals(SOURCE_FLAVOR_NUMBERED_FILES)) { // Search config for SOURCE_FLAVORS_NUMBERED_FILES
+        srcFlavor = operation.getConfiguration(key);
+        if (flavorType == SourceType.None) {
+          flavorType = SourceType.NumberedFile;
+          srcFlavor = operation.getConfiguration(key);
+        } else if (flavorType != SourceType.NumberedFile) {
+          throw new WorkflowOperationException(
+                  "Cannot mix source prefix flavor/tags with source numbered files - use one type of selector only");
         }
+      }
     }
 
     // if is SOURCE_FLAVOR_NUMBERED_FILES, do not use prefixed (tags or flavor)
     if (srcFlavor != null) { // Numbered files has only one selector
-          int number = 0;
-          Tuple<TrackSelector, Boolean> selectorTuple = trackSelectors.get(number);
-          selectorTuple = Tuple.tuple(new TrackSelector(), true);
-          TrackSelector trackSelector = selectorTuple.getA();
-          trackSelector.addFlavor(srcFlavor);
-          trackSelectors.put(number, selectorTuple);
-          return trackSelectors;
+      int number = 0;
+      Tuple<TrackSelector, Boolean> selectorTuple = trackSelectors.get(number);
+      selectorTuple = Tuple.tuple(new TrackSelector(), true);
+      TrackSelector trackSelector = selectorTuple.getA();
+      trackSelector.addFlavor(srcFlavor);
+      trackSelectors.put(number, selectorTuple);
+      return trackSelectors;
     }
 
     // Prefix only

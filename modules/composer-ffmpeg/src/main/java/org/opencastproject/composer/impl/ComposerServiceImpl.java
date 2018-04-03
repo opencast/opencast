@@ -789,25 +789,21 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Creating video filter command for concat
     if (sameCodec) {
       // create file list to use Concat demuxer - lossless - pack contents into a single container
-      File tempDirectory = FileSupport.getTempDirectory(Long.toString(job.getId()));
-      fileList = new File(tempDirectory, "tracklist_" + job.getId() + ".txt");
+      fileList = new File(workspace.rootDirectory(), "concat_tracklist_" + job.getId() + ".txt");
       fileList.deleteOnExit();
-      PrintWriter printer = null;
-      try {
-        printer = new PrintWriter(new FileWriter(fileList, true));
+      try (PrintWriter printer = new PrintWriter(new FileWriter(fileList, true))) {
         for (Track track : tracks) {
-          printer.append("file '" + workspace.get(track.getURI()).getAbsolutePath() + "'\n");
+          printer.append("file '").append(workspace.get(track.getURI()).getAbsolutePath()).append("'\n");
         }
       } catch (IOException e) {
-        throw new EncoderException("Cannot create file list for concat: " + e.getMessage());
+        throw new EncoderException("Cannot create file list for concat", e);
       } catch (NotFoundException e) {
-        throw new EncoderException("Cannot find track filename in workspace for concat: " + e.getMessage());
-      } finally {
-        printer.close();
+        throw new EncoderException("Cannot find track filename in workspace for concat", e);
       }
       concatCommand = "-f concat -safe 0 -i " + fileList.getAbsolutePath();
-    } else
+    } else {
       concatCommand = buildConcatCommand(onlyAudio, outputDimension, outputFrameRate, trackFiles, tracks);
+    }
 
     Map<String, String> properties = new HashMap<>();
     properties.put(EncoderEngine.CMD_SUFFIX + ".concatCommand", concatCommand);
