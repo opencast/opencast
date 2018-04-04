@@ -25,6 +25,8 @@ import org.opencastproject.email.template.api.EmailTemplateService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.kernel.mail.SmtpService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -32,11 +34,14 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.mail.MessagingException;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 
 /**
  * Please describe what this handler does.
@@ -50,6 +55,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** The email template service */
   private EmailTemplateService emailTemplateService = null;
+
+  /** The user directory service */
+  private UserDirectoryService userDirectoryService;
 
   // Configuration properties used in the workflow definition
   static final String TO_PROPERTY = "to";
@@ -90,9 +98,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
     // "To", "CC", "BCC", subject, body can be Freemarker templates
-    String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
-    String cc = applyTemplateIfNecessary(workflowInstance, operation, CC_PROPERTY);
-    String bcc = applyTemplateIfNecessary(workflowInstance, operation, BCC_PROPERTY);
+    String to = processDestination(workflowInstance, operation, TO_PROPERTY);
+    String cc = processDestination(workflowInstance, operation, CC_PROPERTY);
+    String bcc = processDestination(workflowInstance, operation, BCC_PROPERTY);
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText = null;
     String body = operation.getConfiguration(BODY_PROPERTY);
@@ -121,6 +129,36 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
     // Return the source mediapackage and tell processing to continue
     return createResult(srcPackage, Action.CONTINUE);
+  }
+
+  private String processDestination(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
+          String configName) {
+    // First apply the template if there's one
+    String templateApplied = applyTemplateIfNecessary(workflowInstance, operation, configName);
+    if (templateApplied == null)
+      return null;
+
+    // Are these valid email addresses?
+    StringBuffer result = new StringBuffer();
+    for (String part : templateApplied.split(",|\\s")) {
+      result.append(result.length() > 0 ? "," : "");
+      try {
+        InternetAddress emailAddr = new InternetAddress(part);
+        emailAddr.validate();
+        // If email address valid, put it in value to be returned
+        result.append(part);
+      } catch (AddressException ex) {
+        // Otherwise, assume this is a user name and look for the user
+        User user = userDirectoryService.loadUser(part);
+        if (user != null && StringUtils.isNotEmpty(user.getEmail()))
+          result.append(user.getEmail());
+        else {
+          logger.info("Didn't find user or user email for {}", part);
+          result.append(part);
+        }
+      }
+    }
+    return result.toString();
   }
 
   private String applyTemplateIfNecessary(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
@@ -171,4 +209,13 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     this.emailTemplateService = service;
   }
 
+  /**
+   * Callback for OSGi to set the {@link UserDirectoryService}.
+   *
+   * @param service
+   *          the user directory service
+   */
+  void setUserDirectoryService(UserDirectoryService service) {
+    this.userDirectoryService = service;
+  }
 }

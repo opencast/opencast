@@ -11,4 +11,6 @@
   <reference name="EmailTemplateService" interface="org.opencastproject.email.template.api.EmailTemplateService" policy="static" cardinality="1..1" bind="setEmailTemplateService" />
   <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
     policy="static" bind="setServiceRegistry" />
+  <reference name="userDIrectoryService" cardinality="1..1" interface="org.opencastproject.security.api.UserDirectoryService"
+    policy="static" bind="setUserDirectoryService" />
 </scr:component>
