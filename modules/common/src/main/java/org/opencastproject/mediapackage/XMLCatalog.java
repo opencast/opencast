@@ -74,4 +74,12 @@ public interface XMLCatalog {
    */
   void toXml(OutputStream out, boolean format) throws IOException;
 
+  /**
+   * Marshal elements with empty values to support
+   * remove existing values during catalog merge.
+   *
+   * @param includeEmpty
+   */
+  void includeEmpty(boolean includeEmpty);
+
 }

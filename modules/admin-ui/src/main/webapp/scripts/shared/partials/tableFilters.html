@@ -8,7 +8,7 @@
         <div class="filters">
             <i title="{{ 'TABLE_FILTERS.ADD' | translate }}"
                 ng-click="displayFilterSelector()" class="fa fa-filter"></i>
-            
+
             <div ng-show="showFilterSelector">
                 <select
                     chosen
@@ -90,7 +90,9 @@
             title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
             class="clear fa fa-times"></i>
 
-        <i ng-click="toggleFilterSettings()" class="settings fa fa-cog fa-times"></i>
+        <i ng-click="toggleFilterSettings()"
+            title="{{ 'TABLE_FILTERS.PROFILES.FILTERS_HEADER' | translate }}"
+            class="settings fa fa-cog fa-times"></i>
 
         <div class="btn-dd filter-settings-dd df-profile-filters">
             <div ng-show="mode == 1" class="filters-list">
@@ -105,8 +107,12 @@
                             ng-class="{ active: $index === activeProfile }">
                             {{ profile.name | limitTo : 70 }}
                         </a>
-                        <a ng-click="editFilterProfile($index)" class="icon edit"></a>
-                        <a ng-click="removeFilterProfile($index)" class="icon remove"></a>
+                        <a ng-click="editFilterProfile($index)"
+                            title="{{ 'TABLE_FILTERS.PROFILES.EDIT' | translate }}"
+                            class="icon edit"></a>
+                        <a ng-click="removeFilterProfile($index)"
+                            title="{{ 'TABLE_FILTERS.PROFILES.REMOVE' | translate }}"
+                            class="icon remove"></a>
                     </li>
                     <li ng-show="profiles.length == 0"
                     translate="TABLE_FILTERS.PROFILES.EMPTY"><!-- No saved filters yet --></li>

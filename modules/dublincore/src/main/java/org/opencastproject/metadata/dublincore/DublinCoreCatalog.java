@@ -371,7 +371,8 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   }
 
   void add(EName property, String value, String language, @Nullable EName encodingScheme) {
-    if (LANGUAGE_UNDEFINED.equals(language)) {
+    // Ignore empty rootTag element
+    if (LANGUAGE_UNDEFINED.equals(language) && !property.equals(rootTag)) {
       if (encodingScheme == null) {
         addElement(property, value);
       } else {
@@ -462,7 +463,10 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   // make public
   @Override public void addElement(EName element, String value, Attributes attributes) {
-    super.addElement(element, value, attributes);
+    // Ignore empty root element
+    if (! rootTag.equals(element)) {
+      super.addElement(element, value, attributes);
+    }
   }
 
   // make public

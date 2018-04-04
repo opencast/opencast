@@ -24,13 +24,13 @@
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
-    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
+    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource', 'EventWorkflowDetailsResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
     'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
     'UploadAssetOptions', 'EventUploadAssetResource', 'Table', 'SchedulingHelperService',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
-        EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
+        EventWorkflowsResource, EventWorkflowActionResource, EventWorkflowDetailsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
         OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
         OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
         EventUploadAssetResource, Table, SchedulingHelperService) {
@@ -233,6 +233,11 @@ angular.module('adminNg.controllers')
                     angular.forEach(general.publications, function (publication, index) {
                         publication.label = publication.name;
                         publication.order = 999 + index;
+                        var now = new Date();
+                        if (publication.id == "engage-live" && 
+                        	(now < new Date(general["start-date"]) || now > new Date(general["end-date"])))
+                        	publication.enabled = false;
+                        else publication.enabled = true;
                     });
                     $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' }, function() {
                         angular.forEach(general.publications, function (publication) {
@@ -882,14 +887,43 @@ angular.module('adminNg.controllers')
         checkForActiveTransactions();
 
         $scope.workflowAction = function (wfId, action) {
-        	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
+            if ($scope.workflowActionInProgress) return;
+            $scope.workflowActionInProgress = true;
+            EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
                 Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
-                $scope.modal_close();
+                $scope.close();
+                $scope.workflowActionInProgress = false;
             }, function () {
-                Notifications.add('error', 'EVENTS_PROCESSING_ACTION_' + action);
-                $scope.modal_close();
+                Notifications.add('error', 'EVENTS_PROCESSING_ACTION_NOT_' + action, NOTIFICATION_CONTEXT);
+                $scope.workflowActionInProgress = false;
             });
         };
+
+        $scope.deleteWorkflow = function (workflowId) {
+            if ($scope.deleteWorkflowInProgress) return;
+            $scope.deleteWorkflowInProgress = true;
+            EventWorkflowDetailsResource.delete({ id0: $scope.resourceId, id1: workflowId },
+                function () {
+                    Notifications.add('success', 'EVENTS_PROCESSING_DELETE_WORKFLOW', NOTIFICATION_CONTEXT);
+
+                    // We update our client-side model in case of success, so we don't have to send a new request
+                    if ($scope.workflows.entries) {
+                        $scope.workflows.entries = $scope.workflows.entries.filter(function (wf) {
+                            return wf.id !== workflowId;
+                        });
+                    }
+
+                    $scope.deleteWorkflowInProgress = false;
+                }, function () {
+                    Notifications.add('error', 'EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED', NOTIFICATION_CONTEXT);
+                    $scope.deleteWorkflowInProgress = false;
+             });
+        };
+
+        $scope.isCurrentWorkflow = function (workflowId) {
+            var currentWorkflow = $scope.workflows.entries[$scope.workflows.entries.length -1];
+            return currentWorkflow.id === workflowId;
+        }
 
         $scope.$on('$destroy', function () {
             cleanupScopeResources();

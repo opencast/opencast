@@ -1,15 +1,20 @@
 [1]: http://en.wikipedia.org/wiki/Basic_access_authentication
 [2]: http://en.wikipedia.org/wiki/XML
 [3]: http://en.wikipedia.org/wiki/JSON
+[4]: http://en.wikipedia.org/wiki/ISO_8601
 
 # Version
 
 Since the API is versioned, it supports specification of a version identifier as part of the standard `Accept` HTTP request header:
 
 
-Header   | Type                       | Description
+Header   | Type                       | Description                                                                   
 :--------|:---------------------------|:-----------
-`Accept` | [`string`](types.md#basic) | The format is specified to use `application/<version>`, or `application/<version>+<format>` to also specify the required format.
+`Accept` | [`string`](types.md#basic) | `application/<version>+<format>` is used to specify the API version and format
+
+Notes:
+
+- The API currently only supports the format [JSON][3]
 
 __Example__
 
@@ -17,9 +22,9 @@ __Example__
 Accept: application/v1.0.0+json
 ```
 
-If that header is not specified, or no version information can be extracted from the header, the assumption is that the request should be executed against the most recent version. If the version specified is not available, `400 (BAD REQUEST)` is returned as the HTTP response code.
+If that header is not specified, or no version information can be extracted from the header, the assumption is that the request should be executed against the most recent version. If the version specified is not available, `406 (NOT ACCEPTABLE)` is returned as the HTTP response code.
 
-With every response, the api version is specified as part of the standard HTTP `Content-Type` header, as in `application/v1.0.0+xml`.
+With every response, the API version is specified as part of the standard HTTP `Content-Type` header, as in `application/v1.0.0+json`.
 
 Versions should be specified as obtained from the [Base API](base-api.md#versions) call to `/versions`.
 

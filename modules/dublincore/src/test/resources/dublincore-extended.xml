@@ -15,6 +15,8 @@
   <dcterms:contributor>Harald Juhnke</dcterms:contributor>
   <dcterms:title>A title</dcterms:title>
   <dcterms:title xml:lang="de">Ein Titel</dcterms:title>
+  <dcterms:title xml:lang="ga"></dcterms:title>
+  <dcterms:spatial>lab2</dcterms:spatial>
   <oc:promoted>true</oc:promoted>
   <foo:id>197011</foo:id>
 </dublincore>

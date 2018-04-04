@@ -107,8 +107,6 @@ public class ExternalGroupLoader {
   /**
    * Creates initial groups for external applications per organization
    *
-   * @throws IOException
-   *           if loading of the role and user lists fails
    * @throws IllegalStateException
    *           if a specified role or user list is unavailable
    */
@@ -118,7 +116,12 @@ public class ExternalGroupLoader {
         @Override
         protected void run() {
           try {
-            JpaOrganization org = (JpaOrganization) organizationDirectoryService.getOrganization(organization.getId());
+            Organization testOrg = organizationDirectoryService.getOrganization(organization.getId());
+            if (!(testOrg instanceof JpaOrganization)) {
+              logger.info("Note: Ignoring organization with id " + testOrg.getId() + " because it is not a JpaOrganization");
+              return;
+            }
+            JpaOrganization org = (JpaOrganization) testOrg;
 
             // External Applications
             String externalApplicationsGroupId = org.getId().toUpperCase().concat(EXTERNAL_GROUP_SUFFIX);
@@ -136,13 +139,7 @@ public class ExternalGroupLoader {
                       externalApplicationsGroupDescription, roles, new HashSet<String>());
               groupRoleProvider.addGroup(externalApplicationGroup);
             }
-          } catch (NotFoundException e) {
-            logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
-          } catch (IllegalStateException e) {
-            logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
-          } catch (IOException e) {
-            logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
-          } catch (UnauthorizedException e) {
+          } catch (NotFoundException | IllegalStateException | IOException | UnauthorizedException e) {
             logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
           }
         }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl"
+  immediate="true" activate="activate">
+  <implementation
+    class="org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl" />
+  <property name="service.description" value="Live Schedule Service" />
+  <service>
+    <provide interface="org.opencastproject.liveschedule.api.LiveScheduleService" />
+  </service>
+  <reference name="assetManager" cardinality="1..1"
+    interface="org.opencastproject.assetmanager.api.AssetManager" policy="static"
+    bind="setAssetManager" />
+  <reference name="authorizationService" cardinality="1..1"
+    interface="org.opencastproject.security.api.AuthorizationService" policy="static"
+    bind="setAuthorizationService" />
+  <reference name="distributionService" cardinality="1..n"
+    interface="org.opencastproject.distribution.api.DownloadDistributionService"
+    policy="dynamic" bind="setDownloadDistributionService" />
+  <reference name="dublinCoreService" cardinality="1..1"
+    interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
+    policy="static" bind="setDublinCoreService" />
+  <reference name="organizationService" cardinality="1..1"
+    interface="org.opencastproject.security.api.OrganizationDirectoryService" policy="static"
+    bind="setOrganizationService" />
+  <reference name="searchService" cardinality="1..1"
+    interface="org.opencastproject.search.api.SearchService" policy="static"
+    bind="setSearchService" />
+  <reference name="seriesService" cardinality="1..1"
+    interface="org.opencastproject.series.api.SeriesService" policy="static"
+    bind="setSeriesService" />
+  <reference name="captureAgentService"
+    interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+    cardinality="1..1" policy="static" bind="setCaptureAgentService" />
+  <reference name="serviceRegistry" cardinality="1..1"
+    interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+  <reference name="workspace" cardinality="1..1"
+    interface="org.opencastproject.workspace.api.Workspace" policy="static"
+    bind="setWorkspace" />
+</scr:component>

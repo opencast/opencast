@@ -77,6 +77,9 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   @XmlAttribute(name = "transport")
   protected StreamingProtocol transport = null;
 
+  @XmlElement(name = "live")
+  protected boolean live;
+
   /** Needed by JAXB */
   public TrackImpl() {
     this.elementType = Track.TYPE;
@@ -198,6 +201,18 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
     this.video = video;
   }
 
+  public void setLive(boolean isLive) {
+    this.live = isLive;
+  }
+
+  /**
+   * @see org.opencastproject.mediapackage.Track#isLive()
+   */
+  @Override
+  public boolean isLive() {
+    return this.live;
+  }
+
   /**
    * @see org.opencastproject.mediapackage.AbstractMediaPackageElement#toManifest(org.w3c.dom.Document,
    *      MediaPackageSerializer)
@@ -212,6 +227,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
       durationNode.appendChild(document.createTextNode(Long.toString(duration)));
       node.appendChild(durationNode);
     }
+
+    Node liveNode = document.createElement("live");
+    liveNode.appendChild(document.createTextNode(Boolean.toString(live)));
+    node.appendChild(liveNode);
 
     for (Stream s : audio)
       node.appendChild(s.toManifest(document, serializer));

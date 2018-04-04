@@ -20,42 +20,32 @@
  */
 package org.opencastproject.event.handler;
 
-import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.capture;
-import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.opencastproject.mediapackage.MediaPackageElementParser.getAsXml;
-import static org.opencastproject.publication.api.OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX;
+import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.CatalogImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.PublicationImpl;
-import org.opencastproject.mediapackage.attachment.AttachmentImpl;
-import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.metadata.api.MediaPackageMetadata;
-import org.opencastproject.metadata.api.MediapackageMetadataImpl;
-import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.Query;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
+import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
@@ -64,13 +54,16 @@ import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
 import org.easymock.MockType;
 import org.easymock.TestSubject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Set;
 
 /**
  * This class contains some tests for the {@link OaiPmhUpdatedEventHandler}.
@@ -93,13 +86,11 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   @Mock
   private SecurityService securityServiceMock;
   @Mock
+  private Workspace workspace;
+  @Mock
   private OaiPmhDatabase oaiPmhDatabaseMock;
   @Mock
-  private DistributionService distributionServiceMock;
-  @Mock
-  private ServiceRegistry serviceRegistryMock;
-  @Mock
-  private DublinCoreCatalogService dublinCoreCatalogServiceMock;
+  private OaiPmhPublicationService oaiPmhPublicationService;
 
   private Capture<User> adminUserCapture;
   private Capture<Query> queryCapture;
@@ -108,47 +99,49 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   public void setup() throws Exception {
     cut.systemAccount = SYSTEM_ACCOUNT;
     Hashtable<String, String> props = new Hashtable<>();
-    props.put("propagate.episode", "true");
+    props.put(OaiPmhUpdatedEventHandler.CFG_PROPAGATE_EPISODE, "true");
+    props.put(OaiPmhUpdatedEventHandler.CFG_FLAVORS, "dublincore/*,security/*");
+    props.put(OaiPmhUpdatedEventHandler.CFG_TAGS, "archive");
     cut.updated(props);
+
+    expect(workspace.read(anyObject())).andAnswer(() -> getClass().getResourceAsStream("/episode.xml")).anyTimes();
   }
 
   /**
-   * Tests "normal" behavior, i.e. if an episode is published correctly to OAI-PMH.
+   * Tests "normal" behavior, where the media package contains at least one element with the given flavor and tags
    */
   @Test
-  public void testEpisodeMetadataUpdate() throws Exception {
+  public void testHandleEvent() throws Exception {
+    Catalog episodeCatalog = CatalogImpl.newInstance();
+    episodeCatalog.setURI(URI.create("/episode.xml"));
+    episodeCatalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
+    episodeCatalog.addTag("archive");
+    MediaPackage updatedMp = createMediaPackage(episodeCatalog);
 
-    MediaPackageMetadata metadata = createMetaData();
-    MediaPackage newMp = createMediaPackage(new PublicationImpl(), new TrackImpl(), new AttachmentImpl());
-    MediaPackage oldMp = createMediaPackage(new PublicationImpl(), new PublicationImpl(), newMp.getTracks()[0],
-        newMp.getAttachments()[0]);
-    MediaPackage expectedMediaPackage = (MediaPackage) oldMp.clone();
-    MediaPackageMetadataSupport.populateMediaPackageMetadata(expectedMediaPackage, metadata);
-    AssetManagerItem.TakeSnapshot snapshot = createSnapshot(newMp);
-
-    //These are the interactions we expect with the security service
+    // these are the interactions we expect with the security service
     mockSecurityService();
 
-    //These are the interactions we expect fo the Oai-Pmh database
-    mockOaiPmhDatabase(oldMp);
-    oaiPmhDatabaseMock.store(expectedMediaPackage, OAIPMH_REPOSITORY);
+    // these are the interactions we expect for the OAI-PMH database
+    mockOaiPmhDatabase();
 
-    //These are the interactions we expect fo the distribution service
-    Job jobMock = mockDistributionService(snapshot);
-
-    //These are the interactions we expect fo the service registry
-    expect(serviceRegistryMock.getJob(anyLong())).andReturn(jobMock).atLeastOnce();
-
-    //These are the interactions we expect fo the dublin core service
-    expect(dublinCoreCatalogServiceMock.getMetadata(snapshot.getMediapackage())).andReturn(metadata);
+    Capture<MediaPackage> mpCapture = Capture.newInstance();
+    Capture<String> repositoryCapture = Capture.newInstance();
+    Capture<Set<String>> flavorsCapture = Capture.newInstance();
+    Capture<Set> tagsCapture = Capture.newInstance();
+    expect(oaiPmhPublicationService.updateMetadata(capture(mpCapture), capture(repositoryCapture),
+            capture(flavorsCapture), capture(tagsCapture), anyBoolean()))
+            .andAnswer(() -> mock(Job.class)).times(1);
 
     replayAll();
 
-    cut.handleEvent(snapshot);
+    cut.handleEvent(createSnapshot(updatedMp));
 
-    verifyAll();
-    assertThat(queryCapture.getValue().getMediaPackageId().get(), is(newMp.getIdentifier().toString()));
-    assertThat(adminUserCapture.getValue().getUsername(), is(SYSTEM_ACCOUNT));
+    assertEquals(updatedMp.getIdentifier().compact(), mpCapture.getValue().getIdentifier().compact());
+    assertEquals(OAIPMH_REPOSITORY, repositoryCapture.getValue());
+    Assert.assertNotNull(flavorsCapture.getValue());
+    Assert.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
+    Assert.assertTrue(flavorsCapture.getValue().contains("security/*"));
+    Assert.assertTrue(tagsCapture.getValue().contains("archive"));
   }
 
   /**
@@ -156,30 +149,72 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
    */
   @Test
   public void testEpisodeNotKnownByOaiPmh() throws Exception {
+    Catalog episodeCatalog = CatalogImpl.newInstance();
+    episodeCatalog.setURI(URI.create("/episode.xml"));
+    episodeCatalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
+    episodeCatalog.addTag("archive");
+    MediaPackage updatedMp = createMediaPackage(episodeCatalog);
 
-    MediaPackage newMp = createMediaPackage(new PublicationImpl(), new TrackImpl(), new AttachmentImpl());
-    AssetManagerItem.TakeSnapshot snapshot = createSnapshot(newMp);
-
-    //These are the interactions we expect with the security service
+    // these are the interactions we expect with the security service
     mockSecurityService();
 
-    //These are the interactions we expect fo the Oai-Pmh database
+    // mock the OAI-PMH database
     SearchResult searchResultMock = mock(MockType.NICE, SearchResult.class);
-    expect(searchResultMock.getItems()).andReturn(Collections.emptyList()).anyTimes();
-    expect(oaiPmhDatabaseMock.search(anyObject(Query.class))).andReturn(searchResultMock);
+    expect(searchResultMock.getItems()).andReturn(Collections.EMPTY_LIST).anyTimes();
+    queryCapture = Capture.newInstance();
+    expect(oaiPmhDatabaseMock.search(capture(queryCapture))).andReturn(searchResultMock);
 
     replayAll();
 
-    cut.handleEvent(snapshot);
+    cut.handleEvent(createSnapshot(updatedMp));
 
+    // the OAI-PMH publication service should not be called as the media package isn't mocked in the OAI-PMH database
     verifyAll();
   }
 
-  private AssetManagerItem.TakeSnapshot createSnapshot(MediaPackage mediaPackage) throws MediaPackageException {
+  /**
+   * The media package does not contains elements with the configured tag, the publication should be skipped
+   */
+  @Test
+  public void testNoElementsWithGivenFlavorAndTags() throws Exception {
+    Catalog episodeCatalog = CatalogImpl.newInstance();
+    episodeCatalog.setURI(URI.create("/episode.xml"));
+    episodeCatalog.setFlavor(MediaPackageElementFlavor.parseFlavor("dublincore/episode"));
+    // the episode catalog isn't tagged with archive
+    MediaPackage updatedMp = createMediaPackage();
 
-    Workspace workspaceMock = mock(MockType.NICE, Workspace.class);
+    // these are the interactions we expect with the security service
+    mockSecurityService();
+
+    replayAll();
+
+    cut.handleEvent(createSnapshot(updatedMp));
+
+    // the OAI-PMH publication service should not be called as the media package isn't mocked in the OAI-PMH database
+    verifyAll();
+  }
+
+  /**
+   * The media package does not contains any elements, the publication should be skipped
+   */
+  @Test
+  public void testNoElementsForPublishing() throws Exception {
+    MediaPackage updatedMp = createMediaPackage();
+
+    // these are the interactions we expect with the security service
+    mockSecurityService();
+
+    replayAll();
+
+    cut.handleEvent(createSnapshot(updatedMp));
+
+    // the OAI-PMH publication service should not be called as the media package isn't mocked in the OAI-PMH database
+    verifyAll();
+  }
+
+  private AssetManagerItem.TakeSnapshot createSnapshot(MediaPackage mediaPackage) throws Exception {
     AccessControlList acl = new AccessControlList();
-    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspaceMock, mediaPackage, acl, 0L, new Date());
+    AssetManagerItem.TakeSnapshot result = AssetManagerItem.add(workspace, mediaPackage, acl, 0L, new Date());
     return result;
   }
 
@@ -189,20 +224,6 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     for (MediaPackageElement mpe : elements) {
       result.add(mpe);
     }
-    return result;
-  }
-
-  private MediaPackageMetadata createMetaData() {
-    MediapackageMetadataImpl result = new MediapackageMetadataImpl();
-    result.setContributors(new String[]{"Werner"});
-    result.setCreators(new String[]{"Heinz"});
-    result.setDate(new Date());
-    result.setLanguage("en");
-    result.setLicense("CC0");
-    result.setSeriesIdentifier("123");
-    result.setSeriesTitle("Title123");
-    result.setSubjects(new String[]{"Subject"});
-    result.setTitle("Title");
     return result;
   }
 
@@ -218,24 +239,12 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     securityServiceMock.setOrganization(organization);
   }
 
-  private void mockOaiPmhDatabase(MediaPackage mp) {
+  private void mockOaiPmhDatabase() {
     SearchResult searchResultMock = mock(MockType.NICE, SearchResult.class);
     SearchResultItem searchResultItemMock = mock(MockType.NICE, SearchResultItem.class);
     expect(searchResultMock.getItems()).andReturn(Collections.singletonList(searchResultItemMock)).anyTimes();
     expect(searchResultItemMock.getRepository()).andReturn(OAIPMH_REPOSITORY).anyTimes();
-    expect(searchResultItemMock.getMediaPackage()).andReturn(mp);
     queryCapture = Capture.newInstance();
     expect(oaiPmhDatabaseMock.search(capture(queryCapture))).andReturn(searchResultMock);
   }
-
-  private Job mockDistributionService(AssetManagerItem.TakeSnapshot snapshot) throws Exception {
-    String expectedChannel = PUBLICATION_CHANNEL_PREFIX.concat(OAIPMH_REPOSITORY);
-    Job jobMock = mock(MockType.NICE, Job.class);
-    expect(jobMock.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
-    expect(jobMock.getPayload()).andReturn(getAsXml(snapshot.getMediapackage().getElements()[0])).anyTimes();
-    expect(distributionServiceMock.distribute(eq(expectedChannel), eq(snapshot.getMediapackage()), anyString()))
-        .andReturn(jobMock).atLeastOnce();
-    return jobMock;
-  }
-
 }

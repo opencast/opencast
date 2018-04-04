@@ -24,12 +24,13 @@ package org.opencastproject.series.impl;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
 import com.entwinemedia.fn.data.Opt;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -102,7 +103,7 @@ public interface SeriesServiceDatabase {
    * @throws SeriesServiceDatabaseException
    *           if exception occurs
    */
-  Iterator<Tuple<DublinCoreCatalog, String>> getAllSeries() throws SeriesServiceDatabaseException;
+  List<SeriesEntity> getAllSeries() throws SeriesServiceDatabaseException;
 
   /**
    * Retrieves ACL for series with given ID.

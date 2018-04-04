@@ -3,7 +3,7 @@
 
 ## Description
 
-The RetractOaiPmhWorkflowOperationHandler retracts the published elements from a OAI-PMH repository.
+The Retract OAI-PMH workflow operation retracts the published elements from a OAI-PMH repository.
 
 ## Parameter Table
 

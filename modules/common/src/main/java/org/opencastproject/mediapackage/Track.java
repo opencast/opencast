@@ -69,4 +69,11 @@ public interface Track extends MediaPackageElement {
    * @return the track description.
    */
   String getDescription();
+
+  /**
+   * Returns <code>true</code> if the track is a live track.
+   *
+   * @return true if live track; false otherwise
+   */
+  boolean isLive();
 }
