@@ -79,6 +79,7 @@ pages:
    - Usage: 'api/usage.md'
    - Authentication: 'api/authentication.md'
    - Authorization: 'api/authorization.md'
+   - Data Types: 'api/types.md'
    - Glossary: 'api/glossary.md'
    - Base API: 'api/base-api.md'
    - Events API: 'api/events-api.md'
