@@ -320,6 +320,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     WorkflowOperationDefinitionImpl wfDOp2 = new WorkflowOperationDefinitionImpl("archive", "Archive", "error", true);
     wfD.add(wfDOp1);
     wfD.add(wfDOp2);
+    wfD.setDisplayOrder(99);
 
     WorkflowDefinitionImpl wfD2 = new WorkflowDefinitionImpl();
     wfD2.setTitle("Full HTML5");
@@ -327,6 +328,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.addTag("quick_actions");
     wfD2.addTag("test");
     wfD2.setDescription("Test description");
+    wfD2.setDisplayOrder(100);
     wfD2.setConfigurationPanel("<h2>Test</h2>");
 
     MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");

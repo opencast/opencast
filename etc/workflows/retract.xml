@@ -8,6 +8,7 @@
     <tag>delete</tag>
   </tags>
   <description>Retract a recording</description>
+  <displayOrder>100</displayOrder>
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">

@@ -7,6 +7,7 @@
     <tag>upload</tag>
     <tag>schedule</tag>
   </tags>
+  <displayOrder>100</displayOrder>
   <description>
     A minimal workflow that transcodes the media into distribution formats, then
     sends the resulting distribution files, along with their associated metadata,

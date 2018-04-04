@@ -82,6 +82,21 @@ public interface WorkflowDefinition extends Comparable<WorkflowDefinition> {
   String getConfigurationPanel();
 
   /**
+   * An integer describing the display order for this workflow definition. The display order is supposed to define the
+   * order workflow lists as displayed to users.
+   * Default is 0.
+   */
+  int getDisplayOrder();
+
+  /**
+   * Set the display order
+   *
+   * @param displayOrder
+   *          the workflow definition display order
+   */
+  void setDisplayOrder(int displayOrder);
+
+  /**
    * The operations, listed in order, that this workflow definition includes.
    */
   List<WorkflowOperationDefinition> getOperations();

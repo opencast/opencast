@@ -6,12 +6,14 @@
         "id": "full",
         "title": "Full",
         "description": "",
+        "displayOrder": 99,
         "configuration_panel": ""
       },
       {
         "id": "full-html5",
         "title": "Full HTML5",
         "description": "Test description",
+        "displayOrder": 100,
         "configuration_panel": "<h2>Test</h2>"
       }
     ]
