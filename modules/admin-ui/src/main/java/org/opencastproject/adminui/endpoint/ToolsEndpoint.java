@@ -38,6 +38,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.MediaPackageLockService;
+import org.opencastproject.adminui.impl.MediaPackageLockService.LockInfo;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
@@ -59,6 +60,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -299,10 +301,22 @@ public class ToolsEndpoint implements ManagedService {
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
-    long lTime = mediaPackageLockService.getMediaPackageLock(event, request.getRequestedSessionId());
-    long lockedTime = Math.round(lTime / 60000);
+    LockInfo lInfo = mediaPackageLockService.getMediaPackageLock(event, request.getRequestedSessionId(), adminUIConfiguration.getLockTimeout(), securityService.getUser());
+    long lockedTime = Math.round(lInfo.getDuration() / 60000);
     if (lockedTime > 0) {
-      return RestUtils.okJson(obj(f("locked", v(lockedTime)),f("status", v("locked"))));
+      User user = lInfo.getUser();
+      if (!adminUIConfiguration.isCompetitiveEdits()) {
+        return RestUtils.okJson(obj(
+            f("status", v("locked")),
+            f("lockedTime", v(lockedTime)),
+            f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+            f("lockingUser", obj(
+              f("name", v(user.getName(), Jsons.BLANK)),
+              f("username", v(user.getUsername(), Jsons.BLANK)),
+              f("email", v(user.getEmail(), Jsons.BLANK))
+            ))
+        ));
+      }
     }
     final MediaPackage mp = index.getEventMediapackage(event);
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
@@ -361,7 +375,7 @@ public class ToolsEndpoint implements ManagedService {
     }
 
     if (jPreviews.isEmpty()) {
-      return RestUtils.okJson(obj(f("status", v("edited before"))));
+      return RestUtils.okJson(obj(f("status", v("no preview"))));
     }
     // Get existing segments
     List<JValue> jSegments = new ArrayList<>();
@@ -374,15 +388,35 @@ public class ToolsEndpoint implements ManagedService {
     for (WorkflowDefinition workflow : getEditingWorkflows()) {
       jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK))));
     }
-
-    return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
-            f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
-            f("locked", v(lockedTime)),
-            f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
-            f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
-            f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
-            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))));
-  }
+    if (lockedTime > 0) {
+      User user = lInfo.getUser();
+      return RestUtils.okJson(obj(
+              f("title", v(mp.getTitle(), Jsons.BLANK)),
+              f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+              f("status", v("locked")),
+              f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+              f("lockedTime", v(lockedTime)),
+              f("lockingUser", obj(
+                f("name", v(user.getName(), Jsons.BLANK)),
+                f("username", v(user.getUsername(), Jsons.BLANK)),
+                f("email", v(user.getEmail(), Jsons.BLANK))
+              )),
+              f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+              f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
+              f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+              f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))
+      ));
+    }
+    return RestUtils.okJson(obj(
+           f("title", v(mp.getTitle(), Jsons.BLANK)),
+           f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+           f("status", v("editable")),
+           f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+           f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
+           f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+           f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))
+   ));
+ }
 
   @POST
   @Path("{mediapackageid}/lock.json")
@@ -398,8 +432,17 @@ public class ToolsEndpoint implements ManagedService {
     if (optEvent.isNone()) {
       return R.notFound();
     }
-    long time = mediaPackageLockService.getMediaPackageLock(optEvent.get(),request.getRequestedSessionId());
-    return RestUtils.okJson(obj(f("time", v(time))));
+    LockInfo lockInfo = mediaPackageLockService.getMediaPackageLock(optEvent.get(),request.getRequestedSessionId(), adminUIConfiguration.getLockTimeout(), securityService.getUser());
+    User user = lockInfo.getUser();
+    return RestUtils.okJson(obj(
+            f("lockedTime", v(lockInfo.getDuration())),
+            f("status", v("locked")),
+            f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+            f("lockingUser", obj(
+              f("name", v(user.getName(), Jsons.BLANK)),
+              f("username", v(user.getUsername(), Jsons.BLANK)),
+              f("email", v(user.getEmail(), Jsons.BLANK))
+            ))));
   }
 
   @DELETE
@@ -840,9 +883,9 @@ public class ToolsEndpoint implements ManagedService {
     private final List<Tuple<Long, Long>> segments;
     private final List<String> tracks;
     private final Opt<String> workflow;
-    private final Opt<String> autosave;
+    private final Opt<Boolean> autosave;
 
-    private EditingInfo(List<Tuple<Long, Long>> segments, List<String> tracks, Opt<String> workflow, Opt<String> autosave) {
+    private EditingInfo(List<Tuple<Long, Long>> segments, List<String> tracks, Opt<String> workflow, Opt<Boolean> autosave) {
       this.segments = segments;
       this.tracks = tracks;
       this.workflow = workflow;
@@ -876,7 +919,7 @@ public class ToolsEndpoint implements ManagedService {
       for (Object track : jsonTracks) {
         tracks.add((String) track);
       }
-      return new EditingInfo(segments, tracks, Opt.nul((String) obj.get("workflow")), Opt.nul((String) obj.get(AUTOSAVE_KEY)));
+      return new EditingInfo(segments, tracks, Opt.nul((String) obj.get("workflow")), Opt.nul((Boolean) obj.get(AUTOSAVE_KEY)));
     }
 
     /**
@@ -899,7 +942,7 @@ public class ToolsEndpoint implements ManagedService {
 
     /** Returns the state of the autosave flag */
     Boolean isAutosave() {
-      return Boolean.parseBoolean(autosave.getOr("false"));
+      return autosave.getOr(false);
     }
   }
 

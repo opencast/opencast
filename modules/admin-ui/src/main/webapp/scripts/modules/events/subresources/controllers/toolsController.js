@@ -75,12 +75,16 @@ angular.module('adminNg.controllers')
         $scope.player = {};
         $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' }, function () {
           if ($scope.video.status === 'locked' ) {
-            var mins = $scope.video.locked;
-            Notifications.addWithParams('error', 'VIDEO_EDIT_LOCKED_MINS', {minutes : mins});
-            $location.url('/events/' + $scope.resource);
+            $scope.video.user = $scope.video.lockingUser.name + " (" + $scope.video.lockingUser.email + ")";
+            if ($scope.video.editWhenLocked) {
+              Notifications.addWithParams('warning', 'VIDEO_CURRENTLY_EDITED_BY', {user: $scope.video.user}, 'global', -1);
+            } else {
+              Notifications.addWithParams('error', 'VIDEO_EDIT_LOCKED_MINS', {user: $scope.video.user, minutes: $scope.video.lockedTime}, 'global', 10000);
+              $location.url('/events/' + $scope.resource);
+            }
           }
-          if ($scope.video.status === 'edited before' ) {
-            Notifications.add('error', 'VIDEO_EDITED_BEFORE', 'video-tools');
+          if ($scope.video.status === 'no preview' ) {
+            Notifications.add('error', 'VIDEO_LOCKED_NO_PREVIEW', 'global', 10000);
             $location.url('/events/' + $scope.resource);
           }
         });
@@ -103,7 +107,6 @@ angular.module('adminNg.controllers')
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
                 $scope.submitButton = false;
                 if ($scope.video.workflow) {
-                    $scope.video.autosave = false;
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
                     $location.url('/events/' + $scope.resource);
                 } else {

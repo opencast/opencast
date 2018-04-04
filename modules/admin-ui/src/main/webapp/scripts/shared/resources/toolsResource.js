@@ -28,7 +28,7 @@ angular.module('adminNg.resources')
             transformResponse: function (json) {
                 var data = JSON.parse(json);
 
-                if (data.status === "edited before" || data.status === "locked") {
+                if ((data.status === "no preview") || (data.status === "locked" && !data.editWhenLocked )) {
                     return data;
                 }
                 // Create a default segment spanning the entire track

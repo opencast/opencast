@@ -25,8 +25,8 @@ import static java.lang.Math.max;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.security.api.User;
 
-import org.json.simple.JSONObject;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -50,6 +50,9 @@ public class MediaPackageLockService implements ManagedService {
    */
   private static final long MIN_LOCK_DURATION = 1800000;
 
+  /** 
+   * map to store the mediaPackageLocks
+   */
   private static final HashMap<String, EditorLock> mpLock = new HashMap<String, EditorLock>();
 
   /**
@@ -67,30 +70,57 @@ public class MediaPackageLockService implements ManagedService {
     logger.info("starting MP Lock service");
   }
 
-  public long getMediaPackageLock(Event event, String sessionId) {
-    EditorLock releaseLock = null;
-    EditorLock lock = new EditorLock(event.getIdentifier(), sessionId);
-    logger.debug("lock mp {} for session {}",event.getIdentifier(), sessionId);
+  /** method to acquire a lock for a specific mediaPackage
+   * 
+   * @param event
+   *        event that contains the mediapackage we want to acquire a lock for
+   * @param sessionId
+   *        sessionId of the browser to lock
+   * @param minLockDuration
+   *        minimum duration for the lock, the lock will expire after the duration of the video 
+   *        or this whichever is the longer
+   * @param user
+   *        user information of the user that aquires the lock so we can provide this information to others 
+   * @return
+   *        the LockInfo of the Lock that is currently held for this mediapackage. 
+   *        This LockInfo contains a duration (the time until the lock is released) 
+   *        and the userinfo who holds the lock
+   *        if the Duration is negative the time of the lock is newly created or just replaced an expired lock 
+   */
+  public LockInfo getMediaPackageLock(Event event, String sessionId, int minLockDuration, User user) {
+    EditorLock releaseLock;
+    EditorLock lock = new EditorLock(event.getIdentifier(), sessionId, user);
+    logger.debug("lock mp {} for session {}", event.getIdentifier(), sessionId);
     synchronized (mpLock) {
       releaseLock = mpLock.get(lock.getMediaPackageId());
-      if (releaseLock == null) {
-        Long lockDur = event.getDuration();
-        if (lockDur == null) {
-          lockDur = 0L;
-          for (Publication pub : event.getPublications()) {
-            for (Track track : pub.getTracks()) {
-              lockDur = max(lockDur, (long) track.getDuration());
-            }
+      if (releaseLock != null) {
+        LockInfo out = releaseLock.checkLock(lock);
+        if (out.getDuration() > 0) {
+          return out;
+        }
+      }
+      Long lockDur = event.getDuration();
+      if (lockDur == null) {
+        lockDur = 0L;
+        for (Publication pub : event.getPublications()) {
+          for (Track track : pub.getTracks()) {
+            lockDur = max(lockDur, (long) track.getDuration());
           }
         }
-        lock.setDuration(lockDur);
-        mpLock.put(lock.getMediaPackageId(), lock);
-        return -1;
       }
-      return releaseLock.checkLock(lock);
+      lock.setDuration(max((long)minLockDuration * 60000, lockDur));
+      mpLock.put(lock.getMediaPackageId(), lock);
+      return new LockInfo(-1, user);
     }
   }
 
+  /** method to release a lock for a specific mediaPackage
+   * 
+   * @param event
+   *        event that contains the mediapackage we want to release a lock for
+   * @param sessionId
+   *        sessionId of the browser to release
+   */
   public void releaseMediaPackageLock(final Event event, String sessionId) {
     logger.debug("unlock mp {}",event.getIdentifier());
     synchronized (mpLock) {
@@ -111,9 +141,12 @@ public class MediaPackageLockService implements ManagedService {
 
   @Override
   public void updated(Dictionary<String, ?> dctnr) throws ConfigurationException {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // do nothing
   }
 
+  /**
+   * method to clean up expired media package locks
+   */
   public void cleanUp() {
     synchronized (mpLock) {
       for (EditorLock el : mpLock.values()) {
@@ -124,37 +157,71 @@ public class MediaPackageLockService implements ManagedService {
     }
   }
 
+  /**
+   * Info class for the Media Package Lock
+   */
+  public final class LockInfo {
+
+    /**
+     * time remaining until the lock is released
+     */
+    private final long duration;
+
+    /**
+     * user that holds the lock
+     */
+    private final User user;
+
+    private LockInfo(long duration, User user) {
+      this.duration = duration;
+      this.user = user;
+    }
+
+    /**
+     * get time remaining
+     * @return time remaining until the lock is released
+     */
+    public long getDuration() {
+      return duration;
+    }
+
+    /**
+     * get user info
+     * @return user info who holds the lock
+     */
+    public User getUser() {
+      return user;
+    }
+  }
+
   final class EditorLock {
 
     private final String mediaPackageId;
     private final String sessionId;
     private long duration;
     private final Date date;
+    private final User user;
 
-    private EditorLock(String mediaPackageId, String sessionId) {
+    private EditorLock(String mediaPackageId, String sessionId, User user) {
       this.mediaPackageId = mediaPackageId;
       this.sessionId = sessionId;
       this.duration = MIN_LOCK_DURATION;
       this.date = new Date();
-    }
-
-    EditorLock(JSONObject obj) {
-      this((String) obj.get(MEDIAPACKAGEID_KEY), (String) obj.get(SESSION_KEY));
+      this.user = user;
     }
 
     void setDuration(long duration) {
-      this.duration = max(MIN_LOCK_DURATION, duration);
+      this.duration = duration;
     }
 
-    long checkLock(EditorLock other) {
+    LockInfo checkLock(EditorLock other) {
       if (other == null) {
-        return -1;
+        return new LockInfo(-1, user);
       }
       if (this.sessionId.equals(other.sessionId)) {
-        return -1;
+        return new LockInfo(-1, user);
       }
-      long ret = duration - other.date.getTime() + date.getTime();
-      return duration - other.date.getTime() + date.getTime();
+      return new LockInfo(duration - other.date.getTime() + date.getTime(), user);
     }
 
     boolean removable(String sessionId) {
