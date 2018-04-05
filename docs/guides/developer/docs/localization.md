@@ -108,7 +108,7 @@ The Crowdin CLI configuration can be found in `/.crowdin.yaml`
 
 Please perform the following steps to get the tool running on your local host:
 
-1. Download the [Crowdin CLI tool](https://crowdin.com/page/cli-tool)
+1. Install [Crowdin CLI tool](https://support.crowdin.com/cli-tool)
 2. [Get the API key for the project Opencast 
   ](https://crowdin.com/project/opencast-community/settings#integration)
 3. Add the following line to your local Crowdin configuration file (`~/.crowdin.yaml`):
@@ -120,17 +120,17 @@ Now you can use the Crowdin CLI command line tool to upload source language file
 
 To upload the sources from the Opencast code repository to Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml upload sources -b <branch>
+    crowdin --config .crowdin.yaml upload sources -b <branch>
 
 In case you need to upload the translations from the Opencast code repository branch `<branch>`, use the command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml upload translations -b <branch>
+    crowdin --config .crowdin.yaml upload translations -b <branch>
 
 Note that the branch `<branch>` will be automatically created if it is not yet existing.
 
 To download the translations from Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml download -b <branch>
+    crowdin --config .crowdin.yaml download -b <branch>
 
 
 Further Information
