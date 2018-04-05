@@ -1,6 +1,6 @@
 # YouTube Publication Configuration
 
-This page documents the configuration for Opencast module **opencast-publication-service-youtube-v3**.
+This page documents the configuration for Opencast module **matterhorn-publication-service-youtube-v3**.
 
 ## Before you start
 
@@ -22,28 +22,25 @@ pages and we don't always notice!
 - Navigate to the [**Google Developers Console**][googledevconsole]
 - Click **Create Project** and follow the instructions
 - Navigate to the [**Google Credentials Console**][googleapiconsole]
-- Select **Credentials**
-- Create Credentials, specifically OAuth Client ID
+- Select **OAuth constent screen**
 - Configure the API Consent Screen, you will need to set the Product name
-- Select **Other** product type
-
-### Enable API
-
-- Choose **APIs** in the navigation pane
-- Use the filter to find and enable **YouTube Data API v3**
-
-### Register an Application
-
-- Choose **Credentials** in the navigation panel
-- Click **Create new Client ID** for OAuth
-- Choose **Installed application** for the application type and **Other** for the installed application type
-- Accept with **Create Client ID**
+- Select **Credentials**
+- Select **Create Credentials**, specifically OAuth Client ID
+- Select **Other** application type
 
 ### Save Client ID in JSON Format
 
 - Download the client information in JSON format by clicking **Download JSON**
+    - This currently looks like an arrow pointing downwards on the rightmost portion of the client id row
 - Save the JSON file to `${karaf.etc}/youtube-v3/client-secrets-youtube-v3.json` (Usually this is
   `etc/youtube-v3/client-secrets-youtube-v3.json`)
+
+### Enable API
+
+- Naviate to the [**Google API Dashboard**][googledashboard]
+- Click **Enable APIs and Services** in the navigation pane
+- Use the filter to find and enable **YouTube Data API v3**
+
 
 ### Enable the publication service
 
@@ -56,7 +53,7 @@ With the JSON file created and saved previously, you have to proceed as describe
 
 - Start Opencast server (Restart Opencast in case was running)
 
-    *ATTENTION:* Until this operation is fully configured, Opencast will not read and write the database. In case you
+    **Note:** Until this service is fully configured, Opencast will not start completely. In case you
     want to abort the configuration, you only need to delete the JSON file and restart Opencast.
 
 - In the command line, enter the command to view the extended status of the Opencast service:
@@ -96,11 +93,10 @@ becomes
 
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
-        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-
+        <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" disabled="disabled" />
 becomes
 
-        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" />
+        <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" />
 
 Opencast will detect the new workflow without restart, with that you can select the new workflow with the YouTube option
 enabled.
@@ -108,3 +104,4 @@ enabled.
 [googledevconsole]: https://console.developers.google.com/project
 [googledoc]: https://developers.google.com/youtube/registering_an_application
 [googleapiconsole]: https://console.developers.google.com/apis/credentials
+[googledashboard]: https://console.developers.google.com/apis/dashboard
