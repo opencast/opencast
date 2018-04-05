@@ -62,6 +62,7 @@ pages:
    - Execute Service: 'modules/execute.md'
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
+   - Mattermost Notification Module: 'modules/notification.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
       - Configuration: 'modules/player.configuration.md'

@@ -33,6 +33,9 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -53,8 +56,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Workflow operation for notifying mattermost about status of current workflow.
@@ -90,19 +91,6 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   public static final String HTTP_PARAM_PAYLOAD = "payload";
 
-  /**
-   * The configuration options for this handler
-   */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(OPT_URL_PATH, "Notification request target");
-    CONFIG_OPTIONS.put(OPT_NOTIFICATION_MESSAGE, "Notification");
-    CONFIG_OPTIONS.put(OPT_METHOD, "HTTP Method");
-    CONFIG_OPTIONS.put(OPT_MAX_RETRY, "Maximum attempts for the notification request");
-    CONFIG_OPTIONS.put(OPT_TIMEOUT, "Request timeout");
-  }
 
   /**
    * The logging facility
@@ -202,7 +190,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    * The resulting String is transformed to a Json-String
    *
    * @param s                The notification message to transform to Json-String
-   * @param workflowInstance The worklowInstance which getting metadata from
+   * @param workflowInstance The workflowInstance which getting metadata from
    * @return
    */
   private String makeJson(String s, WorkflowInstance workflowInstance) {
@@ -212,14 +200,16 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     s = s.replace("%o", String.valueOf(workflowInstance.getCurrentOperation().getId()));
     s = s.replace("%I", checkIfNull(workflowInstance.getMediaPackage().getIdentifier(), "Mediapackage-ID"));
     s = s.replace("%T", checkIfNull(workflowInstance.getMediaPackage().getTitle(), "Mediapackage-Title"));
-    s = s.replace("%c", checkIfNull(workflowInstance.getMediaPackage().getContributors(), "Contributurs"));
+    s = s.replace("%c", checkIfNull(workflowInstance.getMediaPackage().getContributors(), "Contributors"));
     s = s.replace("%C", checkIfNull(workflowInstance.getMediaPackage().getCreators(), "Creators"));
     s = s.replace("%D", checkIfNull(workflowInstance.getMediaPackage().getDate(), "Date"));
     s = s.replace("%d", checkIfNull(workflowInstance.getMediaPackage().getDuration(), "Duration"));
     s = s.replace("%l", checkIfNull(workflowInstance.getMediaPackage().getLanguage(), "Language"));
     s = s.replace("%L", checkIfNull(workflowInstance.getMediaPackage().getLicense(), "License"));
     s = s.replace("%S", checkIfNull(workflowInstance.getMediaPackage().getSeriesTitle(), "Series-Title"));
-    String json = "{\"text\": \"" + s + "\"}";
+    GsonBuilder builder = new GsonBuilder();
+    Gson gson = builder.create();
+    String json = gson.toJson(s);
     return json;
   }
 
@@ -233,16 +223,15 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   private String checkIfNull(Object o, String s) {
 
-    if (o != null) {
-      if (o instanceof String[]) {
-
-        String tmp = join((String[]) o, ',');
-        return tmp;
-      }
-      return o.toString();
-    } else {
-      return s + " not defined ";
+    if(o != null) {
+      return s + "not defined";
     }
+    if (o instanceof String[]) {
+      String tmp = join((String[]) o, ',');
+      return tmp;
+    }
+    return o.toString();
+
   }
 
   /**
@@ -256,7 +245,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   private boolean executeRequest(HttpUriRequest request, int maxAttempts, int timeout, int sleepTime) {
 
-    logger.debug(format("Executing notification request on target %s, %d attemps left", request.getURI(), maxAttempts));
+    logger.debug("Executing notification request on target {}, {} attempts left", request.getURI(), maxAttempts);
 
     RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout).setConnectionRequestTimeout(timeout)
             .setSocketTimeout(timeout).build();
@@ -266,29 +255,29 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     try {
       response = httpClient.execute(request);
     } catch (ClientProtocolException e) {
-      logger.error("Protocol error during execution of query on target {}: {}", request.getURI(), e.getMessage());
+      logger.error("Protocol error during execution of query on target {}: {} ", request.getURI(), e);
       return false;
     } catch (IOException e) {
-      logger.error("I/O error during execution of query on target {}: {}", request.getURI(), e.getMessage());
+      logger.error("I/O error during execution of query on target {}: {}", request.getURI(), e);
       return false;
     }
 
     Integer statusCode = response.getStatusLine().getStatusCode();
     if (statusCode == SC_OK || statusCode == SC_NO_CONTENT || statusCode == SC_ACCEPTED) {
-      logger.debug(format("Request successfully executed on target %s, status code: %d", request.getURI(), statusCode));
+      logger.debug("Request successfully executed on target {}, status code: {}", request.getURI(), statusCode);
       return true;
     } else if (maxAttempts > 1) {
-      logger.debug(format("Request failed on target %s, status code: %d, will retry in %d seconds", request.getURI(),
-              statusCode, sleepTime / 1000));
+      logger.debug("Request failed on target {}, status code: {}, will retry in {} seconds", request.getURI(),
+              statusCode, sleepTime / 1000);
       try {
         Thread.sleep(sleepTime);
         return executeRequest(request, --maxAttempts, timeout, sleepTime * SLEEP_SCALE_FACTOR);
       } catch (InterruptedException e) {
-        logger.error("Error during sleep time before new notification request try: {}", e.getMessage());
+        logger.error("Error during sleep time before new notification request try: {}", e);
         return false;
       }
     } else {
-      logger.warn("Request failed on target {}, status code: {}, no more attempt.", request.getURI(), statusCode);
+      logger.error("Request failed on target {}, status code: {}, no more attempt.", request.getURI(), statusCode);
       return false;
     }
   }

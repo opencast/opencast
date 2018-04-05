@@ -1,7 +1,23 @@
 # Mattermost Notification
-#### Example for mattermost-notify operation:
+## Description
+The MattermostNotificationOperationHander sends an notification to a channel of Mattermost or similar applications, like Slack, with the chosen parameters provided. It is useful to send such notifications when some operation(s) have been completed or some error has occurred in a workflow.
 
-~~~~
+The notification message can be freely chosen. You can use different parameters which will be replaced with the corresponding meta-data of the current workflow instance (see List of parameters).
+
+## List of configuration options
+
+configuration keys | description |default
+--- | :---: | :---: | :---:
+url | URL of the mattermost webhook | EMPTY
+message | Message that will be send | EMPTY
+method | HTTP method that will be used | post
+max-retry | Value for the number of attempts for a request | 5
+timeout | Maximum time to wait for client to excecute a request | 10 * 1000
+
+
+## Example for mattermost-notify operation
+
+```XML
   <operation
       id="mattermost-notify"
       fail-on-error="false"
@@ -15,9 +31,9 @@
         <configuration key="timeout">5</configuration>
       </configurations>
     </operation>
-~~~~
+```
 
-#### List of parameters
+## List of parameters
 All parameters (%<letter>) will be substituted with corresponding meta-data of current workflow instance.
 
 Parameter | Meta-Data  
