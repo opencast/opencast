@@ -796,8 +796,10 @@ public class EventsEndpoint implements ManagedService {
       fields.add(f("rightsholder", v(event.getRights(), BLANK)));
       fields.add(f("license", v(event.getLicense(), BLANK)));
       fields.add(f("is_part_of", v(event.getSeriesId(), BLANK)));
+      fields.add(f("series", v(event.getSeriesName(),BLANK)));
       fields.add(f("duration", v(event.getDuration(), BLANK)));
       fields.add(f("source", v(event.getSource(), BLANK)));
+      fields.add(f("status", v(event.getEventStatus(), BLANK)));
     }
     List<JValue> publicationIds = new ArrayList<>();
     if (event.getPublications() != null) {
