@@ -302,6 +302,7 @@ public class SeriesEndpoint {
             result = obj(
                     f("identifier", v(s.getIdentifier())),
                     f("title", v(s.getTitle())),
+                    f("description", v(s.getDescription(), BLANK)),
                     f("creator", v(s.getCreator(), BLANK)),
                     f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
                     f("subjects", subjects),
