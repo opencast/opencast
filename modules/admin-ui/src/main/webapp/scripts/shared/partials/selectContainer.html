@@ -42,7 +42,7 @@
                     ng-model="markedForRemoval"
                     ng-init="markedForRemoval = []"
                     ng-class="{ disabled: disabled }"
-                    ng-options="item.name|translate group by item[groupBy] for item in resource.selected | filter: customSelectedFilter() | orderBy: 'name' : false"
+                    ng-options="item.name group by item[groupBy] for item in resource.selected | filter: customSelectedFilter() | orderBy: 'name' : false"
                     style="min-height: 11em;"
                     ng-style="getHeight()"
                     ng-dblclick="remove()">

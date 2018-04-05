@@ -6,6 +6,7 @@ Documentation for modules included in Opencast.
 - Amazon Services
     - [Amazon S3 Distribution](awss3distribution.md)
 - [Execute Service](execute.md)
+- [Live  Schedule](liveschedule.md)
 - [LTI Module](ltimodule.md)
 - [Media Module](mediamodule.configuration.md)
 - Player

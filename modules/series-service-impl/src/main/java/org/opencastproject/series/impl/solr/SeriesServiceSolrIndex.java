@@ -182,11 +182,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
       }
 
       Object syncIndexingConfig = cc.getProperties().get("synchronousIndexing");
-      if ((syncIndexingConfig != null) && ((syncIndexingConfig instanceof Boolean))) {
-        synchronousIndexing = ((Boolean) syncIndexingConfig).booleanValue();
-      } else {
-        synchronousIndexing = true;
-      }
+      synchronousIndexing = (syncIndexingConfig == null) || !(syncIndexingConfig instanceof Boolean)
+              || (Boolean) syncIndexingConfig;
     }
 
     activate();
@@ -210,9 +207,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     } else {
       try {
         setupSolr(new File(solrRoot));
-      } catch (IOException e) {
-        throw new IllegalStateException("Unable to connect to solr at " + solrRoot, e);
-      } catch (SolrServerException e) {
+      } catch (IOException | SolrServerException e) {
         throw new IllegalStateException("Unable to connect to solr at " + solrRoot, e);
       }
     }

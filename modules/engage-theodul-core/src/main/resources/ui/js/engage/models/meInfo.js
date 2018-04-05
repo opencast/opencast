@@ -35,10 +35,11 @@ define(['jquery', 'backbone'], function($, Backbone) {
         prop_logo_mediamodule = "logo_mediamodule",
         prop_link_mediamodule = "link_mediamodule",
         prop_show_embed_link = "show_embed_links",
-        prop_piwik_server = "player.piwik.server",
-        prop_piwik_site_id = "player.piwik.site_id",
-        prop_piwik_heartbeat = "player.piwik.heartbeat",
-        prop_piwik_track_events = "player.piwik.track_events",
+        prop_matomo_server = "player.matomo.server",
+        prop_matomo_site_id = "player.matomo.site_id",
+        prop_matomo_heartbeat = "player.matomo.heartbeat",
+        prop_matomo_notification = "player.matomo.notification",
+        prop_matomo_track_events = "player.matomo.track_events",
         prop_hide_video_context_menu = "player.hide_video_context_menu",
         ready = false,
         positioncontrols = "";
@@ -63,10 +64,11 @@ define(['jquery', 'backbone'], function($, Backbone) {
                         hide_video_context_menu = false,
                         layout = "off",
                         focusedflavor = "presentation",
-                        piwik_server,
-                        piwik_site_id,
-                        piwik_heartbeat,
-                        piwik_track_events;
+                        matomo_server,
+                        matomo_site_id,
+                        matomo_heartbeat,
+                        matomo_notification,
+                        matomo_track_events;
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
                         $.each(me.attributes.org.properties, function(key, value) {
@@ -127,17 +129,22 @@ define(['jquery', 'backbone'], function($, Backbone) {
                               if (value.trim() == "true") hide_video_context_menu = true;
                             }
                             // Piwik-Settings
-                            else if ((key == prop_piwik_server) && value) {
-                              piwik_server = value;
+                            else if ((key == prop_matomo_server) && value) {
+                              matomo_server = value;
                             }
-                            else if ((key == prop_piwik_site_id) && value) {
-                              piwik_site_id = value;
+                            else if ((key == prop_matomo_site_id) && value) {
+                              matomo_site_id = value;
                             }
-                            else if ((key == prop_piwik_heartbeat) && value) {
-                              piwik_heartbeat = value;
+                            else if ((key == prop_matomo_heartbeat) && value) {
+                              matomo_heartbeat = value;
+			    }
+                            else if ((key == prop_matomo_notification)) {
+                              if (value) {
+                              matomo_notification = value;
+                              } else matomo_notification = true; 
                             }
-                            else if ((key == prop_piwik_track_events) && value) {
-                              piwik_track_events = value;
+                            else if ((key == prop_matomo_track_events) && value) {
+                              matomo_track_events = value;
                             }
                         });
                     }
@@ -153,10 +160,11 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     me.set("shortcut-sequence", shortcut_sequence);
                     me.set("layout", layout);
                     me.set("focusedflavor", focusedflavor);
-                    me.set("piwik.server", piwik_server);
-                    me.set("piwik.site_id", piwik_site_id);
-                    me.set("piwik.heartbeat", piwik_heartbeat);
-                    me.set("piwik.track_events", piwik_track_events);
+                    me.set("matomo.server", matomo_server);
+                    me.set("matomo.site_id", matomo_site_id);
+                    me.set("matomo.heartbeat", matomo_heartbeat);
+                    me.set("matomo.notification", matomo_notification);
+                    me.set("matomo.track_events", matomo_track_events);
                     ready = true;
                 }
             });

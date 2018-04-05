@@ -133,9 +133,9 @@ import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowUtil;
 
 import com.entwinemedia.fn.Fn;
@@ -165,6 +165,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -216,6 +217,8 @@ public abstract class AbstractEventEndpoint {
   private static final String SCHEDULING_END_KEY = "end";
   private static final String SCHEDULING_AGENT_CONFIGURATION_KEY = "agentConfiguration";
   private static final String SCHEDULING_OPT_OUT_KEY = "optOut";
+
+  private static final String WORKFLOW_ACTION_STOP = "STOP";
 
   /** The logging facility */
   static final Logger logger = LoggerFactory.getLogger(AbstractEventEndpoint.class);
@@ -426,7 +429,9 @@ public abstract class AbstractEventEndpoint {
 
     return okJson(obj(f("publications", arr(pubJSON)), f("optout", v(event.getOptedOut(), Jsons.BLANK)),
             f("blacklisted", v(event.getBlacklisted(), Jsons.BLANK)),
-            f("review-status", v(event.getReviewStatus(), Jsons.BLANK))));
+            f("review-status", v(event.getReviewStatus(), Jsons.BLANK)),
+            f("start-date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+            f("end-date", v(event.getRecordingEndDate(), Jsons.BLANK))));
   }
 
   private List<JValue> eventPublicationsToJson(Event event) {
@@ -1014,7 +1019,8 @@ public abstract class AbstractEventEndpoint {
     metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(),
             EventUtils.getEventMetadata(optEvent.get(), getIndexService().getCommonEventCatalogUIAdapter()));
 
-    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState()))
+    final String wfState = optEvent.get().getWorkflowState();
+    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     return okJson(metadataList.toJSON());
@@ -2321,51 +2327,94 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/workflows/{workflowId}/action/{action}")
-  @RestQuery(name = "workflowAction", description = "Resumes current workflow instance if paused due to error.", returnDescription = "", pathParameters = {
+  @RestQuery(name = "workflowAction", description = "Performs the given action for the given workflow.", returnDescription = "", pathParameters = {
           @RestParameter(name = "eventId", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING),
           @RestParameter(name = "workflowId", description = "The id of the workflow", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "action", description = "The action to take: RETRY or NONE (abort processing)", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+          @RestParameter(name = "action", description = "The action to take: STOP, RETRY or NONE (abort processing)", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "Workflow resumed."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance found."),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Event or workflow instance not found."),
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid action entered."),
-                  @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate."),
+                  @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to perform the action. Maybe you need to authenticate."),
                   @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An exception occurred.") })
-  public Response workflowAction(@PathParam("eventId") String id, @PathParam("workflowId") String wfId,
-          @PathParam("action") String action)
-          throws NotFoundException, UnauthorizedException {
-    if (StringUtils.isEmpty(id) || StringUtils.isEmpty(wfId) || StringUtils.isEmpty(action)
-            || (!RetryStrategy.RETRY.toString().equalsIgnoreCase(action)
-                    && !RetryStrategy.NONE.toString().equalsIgnoreCase(action)))
+  public Response workflowAction(@PathParam("eventId") String id, @PathParam("workflowId") long wfId,
+          @PathParam("action") String action) {
+    if (StringUtils.isEmpty(id) || StringUtils.isEmpty(action)) {
       return badRequest();
-
-    Map<String, String> props = new HashMap<String, String>();
-    props.put("retryStrategy", action);
+    }
 
     try {
-      Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-      if (optEvent.isNone())
+      final Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+      if (optEvent.isNone()) {
         return notFound("Cannot find an event with id '%s'.", id);
+      }
 
-      long workflowInstanceId = Long.parseLong(wfId);
-
-      WorkflowService workflowService = getWorkflowService();
-      WorkflowInstance wfInstance = workflowService.getWorkflowById(workflowInstanceId);
-      if (!WorkflowState.PAUSED.equals(wfInstance.getState()))
-        return notFound("Workflow %s is NOT paused.", wfId);
-      if (!wfInstance.getMediaPackage().getIdentifier().toString().equals(id))
+      final WorkflowInstance wfInstance = getWorkflowService().getWorkflowById(wfId);
+      if (!wfInstance.getMediaPackage().getIdentifier().toString().equals(id)) {
         return badRequest(String.format("Workflow %s is not associated to event %s", wfId, id));
+      }
 
-      workflowService.resume(workflowInstanceId, props);
-      return ok();
+      if (RetryStrategy.NONE.toString().equalsIgnoreCase(action)
+        || RetryStrategy.RETRY.toString().equalsIgnoreCase(action)) {
+        getWorkflowService().resume(wfId, Collections.singletonMap("retryStrategy", action));
+        return ok();
+      }
+
+      if (WORKFLOW_ACTION_STOP.equalsIgnoreCase(action)) {
+        getWorkflowService().stop(wfId);
+        return ok();
+      }
+
+      return badRequest("Action not supported: " + action);
     } catch (NotFoundException e) {
       return notFound("Workflow not found: '%d'.", wfId);
     } catch (IllegalStateException e) {
-      return notFound("There's no paused workflow associated with event: %s.", id);
+      return badRequest(String.format("Action %s not allowed for current workflow state. EventId: %s", action, id));
     } catch (UnauthorizedException e) {
       return forbidden();
     } catch (Exception e) {
       return serverError();
     }
   }
+
+  @DELETE
+  @Path("{eventId}/workflows/{workflowId}")
+  @RestQuery(name = "deleteWorkflow", description = "Deletes a workflow", returnDescription = "The method doesn't return any content", pathParameters = {
+    @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING),
+    @RestParameter(name = "workflowId", isRequired = true, description = "The workflow identifier", type = RestParameter.Type.INTEGER) }, reponses = {
+    @RestResponse(responseCode = SC_BAD_REQUEST, description = "When trying to delete the latest workflow of the event."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or the workflow has not been found."),
+    @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content") })
+  public Response deleteWorkflow(@PathParam("eventId") String id, @PathParam("workflowId") long wfId)
+    throws SearchIndexException {
+    final Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    try {
+      if (optEvent.isNone()) {
+        return notFound("Cannot find an event with id '%s'.", id);
+      }
+
+      final WorkflowInstance wfInstance = getWorkflowService().getWorkflowById(wfId);
+      if (!wfInstance.getMediaPackage().getIdentifier().toString().equals(id)) {
+        return badRequest(String.format("Workflow %s is not associated to event %s", wfId, id));
+      }
+
+      if (wfId == optEvent.get().getWorkflowId()) {
+        return badRequest(String.format("Cannot delete current workflow %s from event %s."
+          + " Only older workflows can be deleted.", wfId, id));
+      }
+
+      getWorkflowService().remove(wfId);
+
+      return Response.noContent().build();
+    } catch (WorkflowStateException e) {
+      return badRequest("Deleting is not allowed for current workflow state. EventId: " + id);
+    } catch (NotFoundException e) {
+      return notFound("Workflow not found: '%d'.", wfId);
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (Exception e) {
+      return serverError();
+    }
+  }
+
 
 }

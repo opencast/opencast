@@ -52,6 +52,7 @@ public final class EventUtils {
   static {
     PUBLICATION_CHANNELS.put(EngagePublicationChannel.CHANNEL_ID, "EVENTS.EVENTS.DETAILS.GENERAL.ENGAGE");
     PUBLICATION_CHANNELS.put("youtube", "EVENTS.EVENTS.DETAILS.GENERAL.YOUTUBE");
+    PUBLICATION_CHANNELS.put("engage-live", "EVENTS.EVENTS.DETAILS.GENERAL.ENGAGE_LIVE");
   }
 
   private EventUtils() {

@@ -144,7 +144,7 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
 
         // Remove the Workflow instance entry from the search index
         try {
-          getSearchIndex().deleteWorkflow(organization, user, eventId);
+          getSearchIndex().deleteWorkflow(organization, user, eventId, workflowItem.getWorkflowInstanceId());
           logger.debug("Workflow instance mediapackage {} removed from search index", eventId);
         } catch (NotFoundException e) {
           logger.warn("Workflow instance mediapackage {} not found for deletion", eventId);

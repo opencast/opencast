@@ -8,8 +8,8 @@
         <xsl:for-each select="ns2:search-results/ns2:result">
             <tr class="search-item">
                     <td style="vertical-align: middle; text-align: center; width: 180px; height: 140px;">
-                        <a class="itemtitle">
-                            <xsl:attribute name="href">/engage/theodul/ui/core.html?id=<xsl:value-of
+                        <a class="itemtitle player">
+                            <xsl:attribute name="href">?id=<xsl:value-of
                                 select="mp:mediapackage/@id" /></xsl:attribute>
                                 <img class="thumb" alt="">
                                     <xsl:for-each select="mp:mediapackage/mp:attachments/mp:attachment">
@@ -30,8 +30,8 @@
                             <xsl:choose>
                                  <xsl:when test="mp:mediapackage/mp:media/mp:track/mp:mimetype[.='video/x-flv'] or mp:mediapackage/mp:media/mp:track/mp:mimetype[.='video/mp4'] or mp:mediapackage/mp:media/mp:track/mp:mimetype[.='audio/x-adpcm']">
                                     <b>
-                                        <a class="itemtitle">
-                                            <xsl:attribute name="href">/engage/theodul/ui/core.html?id=<xsl:value-of
+                                        <a class="itemtitle player">
+                                            <xsl:attribute name="href">?id=<xsl:value-of
                                                 select="mp:mediapackage/@id" /></xsl:attribute>
                                             <xsl:value-of select='substring(ns2:dcTitle, 0, 80)' />
                                             <xsl:if test='string-length(ns2:dcTitle)>80'>
