@@ -6,7 +6,7 @@
   <property name="service.description" value="Admin UI - Event facade Endpoint" />
   <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.event" />
   <property name="opencast.service.path" value="/admin-ng/event" />
-  
+
   <service>
     <!-- expose interface for MH REST publisher! -->
     <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
@@ -27,6 +27,11 @@
              cardinality="1..1"
              policy="static"
              bind="setJobService" />
+  <reference name="seriesService"
+             interface="org.opencastproject.adminui.endpoint.SeriesEndpoint"
+             cardinality="1..1"
+             policy="static"
+             bind="setSeriesService" />
   <reference name="AclServiceFactory"
              interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
              cardinality="1..1"
@@ -62,14 +67,14 @@
              cardinality="1..1"
              policy="static"
              bind="setIndexService" />
- <reference name="AdminUISearchIndex" 
+ <reference name="AdminUISearchIndex"
              interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
-             cardinality="1..1" 
-             policy="static" 
+             cardinality="1..1"
+             policy="static"
              bind="setIndex" />
- <reference name="UrlSigningService" 
+ <reference name="UrlSigningService"
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-             cardinality="1..1" 
-             policy="static" 
+             cardinality="1..1"
+             policy="static"
              bind="setUrlSigningService" />
 </scr:component>

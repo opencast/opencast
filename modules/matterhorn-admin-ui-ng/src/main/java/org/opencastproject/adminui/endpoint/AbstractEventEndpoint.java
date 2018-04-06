@@ -232,6 +232,8 @@ public abstract class AbstractEventEndpoint {
 
   public abstract JobEndpoint getJobService();
 
+  public abstract SeriesEndpoint getSeriesService();
+
   public abstract AclService getAclService();
 
   public abstract EventCommentService getEventCommentService();
@@ -1730,6 +1732,11 @@ public abstract class AbstractEventEndpoint {
         collection.removeField(collection.getOutputFields().get("startTime"));
       if (collection.getOutputFields().containsKey("location"))
         collection.removeField(collection.getOutputFields().get("location"));
+
+      Map swaMap = getSeriesService().getSeriesWriteAccess();
+      Opt<Map<String, String>> map = Opt.some(swaMap);
+      collection.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName()).setCollection(map);
+
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());

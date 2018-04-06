@@ -121,6 +121,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -734,6 +735,28 @@ public class SeriesEndpoint {
       logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  public HashMap<String, String> getSeriesWriteAccess() {
+      try {
+          SeriesSearchQuery query = new SeriesSearchQuery(
+                  securityService.getOrganization().getId(), securityService.getUser());
+          query.withLimit(DEFAULT_LIMIT);
+          query.withoutActions();
+          query.withAction(Permissions.Action.WRITE);
+
+          SearchResult<Series> result = searchIndex.getByQuery(query);
+          HashMap<String, String> m = new HashMap<String, String>();
+          for (SearchResultItem<Series> item : result.getItems()) {
+            Series s = item.getSource();
+            m.put(s.getTitle(), s.getIdentifier());
+          }
+
+          return m;
+      } catch (SearchIndexException e) {
+          logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+          throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      }
   }
 
   @SuppressWarnings("unchecked")

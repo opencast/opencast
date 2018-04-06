@@ -801,6 +801,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
+  public SeriesEndpoint getSeriesService() {
+    return env.getSeriesService();
+  }
+
+  @Override
   public AclService getAclService() {
     return env.getAclService();
   }
