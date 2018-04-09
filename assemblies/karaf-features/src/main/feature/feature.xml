@@ -515,8 +515,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
-    <!-- Fixes MH-11263 - add LTI dependency to the kernel bundle for shared opencast.httpcontext -->
-    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-worker">
@@ -558,8 +556,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
-    <!-- Fixes MH-11263 - add LTI dependency to the kernel bundle for shared opencast.httpcontext -->
-    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-adminworker">
