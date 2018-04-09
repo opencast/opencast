@@ -2,11 +2,11 @@
 <modelVersion>4.0.0</modelVersion>
 <artifactId>crop-workflowoperation</artifactId>
 <packaging>bundle</packaging>
-<name>matterhorn-crop-workflowoperation</name>
+<name>crop-workflowoperation</name>
 <parent>
     <groupId>org.opencastproject</groupId>
-    <artifactId>crop-service</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <artifactId>base</artifactId>
+    <version>${project.version}</version>
     <relativePath>../../pom.xml</relativePath>
 </parent>
 <properties>
