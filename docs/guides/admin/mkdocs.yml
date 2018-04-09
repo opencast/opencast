@@ -40,7 +40,8 @@ pages:
    - Manual Asset Upload: 'configuration/asset-upload-ui/index.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
-   - Logging and Privacy: 'configuration/user-statistics.and.privacy.md'
+   - Log: 'configuration/log.md'
+   - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
    - Multi Tenancy: 'configuration/multi.tenancy.md'
    - Security:
       - General Security: 'configuration/security.md'
