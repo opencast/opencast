@@ -1,6 +1,8 @@
 User Statistics and Privacy
 ===========================
 
+*There exists a newer and more complete tracking service using Matomo included [as a module](../modules/player.matomo.tracking.md).*
+
 The Opencast User-Tracking service stores user actions of the Opencast players in the database. This data is used for
 the footprint feature of the player and for the optional analytics component.
 
