@@ -281,7 +281,7 @@ public interface SchedulerService {
    *          the optional scheduling source from which the event comes from
    * @param modificationOrigin
    *          the origin of the modifier which adds the event
-   * @return A {@link Map>} of mediapackage ID and {@link Period} where the event occurs
+   * @return A {@link Map} of mediapackage ID and {@link Period} where the event occurs
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    * @throws SchedulerConflictException

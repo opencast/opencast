@@ -94,9 +94,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Implement {@link SmilService} interface.
- */
 public class LiveScheduleServiceImpl implements LiveScheduleService {
 
   // TODO Implement updated() so that change in configuration can be dynamically loaded.
