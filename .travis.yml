@@ -89,3 +89,15 @@ jobs:
         - mvn install -DskipTests=true -Dcheckstyle.skip=true -Pnone
       script:
         - mvn site -Pnone -Dcheckstyle.skip=true
+
+    # Deploy translation keys to Crowdin if we are on develop or one of the release branches
+    - stage: deployment
+      env: name=crowdin
+      install: skip
+      script: skip
+      deploy:
+        provider: script
+        script: bash .upload-crowdin.sh
+        on:
+          all_branches: true
+          condition: $TRAVIS_BRANCH =~ ^develop|r/
