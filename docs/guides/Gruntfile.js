@@ -24,6 +24,8 @@ module.exports = function(grunt) {
             },
             MD018: true, // require space after hash on atx style header
             MD019: true, // prohibit multiple spaces after hash on atx style header
+            MD025: true, // prevent multiple top level headers in the same document
+            MD042: true, // no empty links
             MD045: true, // accessibility
           }
         },
