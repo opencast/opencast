@@ -30,9 +30,12 @@ Added object functions and properties:
 
 ## Engage Model
 
-Inherited object functions of the BackboneJS model, see http://backbonejs.org/#Model, how to use BackboneJS models. This model is a global singleton object and can be used by each plugin to add new models which can be used by another plugin again.
+Inherited object functions of the BackboneJS model, see http://backbonejs.org/#Model, how to use BackboneJS models. This
+model is a global singleton object and can be used by each plugin to add new models which can be used by another plugin
+again.
 
-No special functions are added, but the model is filled with some default data. This default data can be used by each plugin, which has a reference to the EngageModel.
+No special functions are added, but the model is filled with some default data. This default data can be used by each
+plugin, which has a reference to the EngageModel.
 
 
 |Property Name|Type|Description|
@@ -43,7 +46,8 @@ No special functions are added, but the model is filled with some default data. 
  
 ## Plugin Object
 
-Each plugin **must** create and return a object with some properties which are set by the plugin itself. It is recommend to keep a reference to the object because some properties are set by the core after the plugin is processed.
+Each plugin **must** create and return a object with some properties which are set by the plugin itself. It is recommend
+to keep a reference to the object because some properties are set by the core after the plugin is processed.
 
 |Property Name|Type|Description|
 |-------------|----|-----------|

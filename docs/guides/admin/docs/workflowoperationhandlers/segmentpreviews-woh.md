@@ -1,7 +1,8 @@
 # SegmentpreviewsWorkflowOperation
 
 ## Description
-The SegmentpreviewsWorkflowOperation will extract still images from a video using FFmpeg, a given encoding profile and previous discovered segments.
+The SegmentpreviewsWorkflowOperation will extract still images from a video using FFmpeg, a given encoding profile and
+previous discovered segments.
 
 ## Parameter Table
 

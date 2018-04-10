@@ -7,8 +7,9 @@ Overview
 The IBMWatsonTranscriptionService invokes the IBM Watson Speech-to-Text service via REST API to translate audio to
  text.
 
-During the execution of an Opencast workflow, an audio file is extracted from one of the presenter videos and
-sent to the IBM Watson Speech-to-Text service. When the results are received, they are converted to the desired caption format and attached to the media package.
+During the execution of an Opencast workflow, an audio file is extracted from one of the presenter videos and sent to
+the IBM Watson Speech-to-Text service. When the results are received, they are converted to the desired caption format
+and attached to the media package.
 
 Workflow 1 runs:
 

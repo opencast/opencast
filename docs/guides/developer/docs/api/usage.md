@@ -5,7 +5,8 @@
 
 # Version
 
-Since the API is versioned, it supports specification of a version identifier as part of the standard `Accept` HTTP request header:
+Since the API is versioned, it supports specification of a version identifier as part of the standard `Accept` HTTP
+request header:
 
 
 Header   | Type                       | Description
@@ -22,16 +23,20 @@ __Example__
 Accept: application/v1.0.0+json
 ```
 
-If that header is not specified, or no version information can be extracted from the header, the assumption is that the request should be executed against the most recent version. If the version specified is not available, `406 (NOT ACCEPTABLE)` is returned as the HTTP response code.
+If that header is not specified, or no version information can be extracted from the header, the assumption is that the
+request should be executed against the most recent version. If the version specified is not available, `406 (NOT
+ACCEPTABLE)` is returned as the HTTP response code.
 
-With every response, the API version is specified as part of the standard HTTP `Content-Type` header, as in `application/v1.0.0+json`.
+With every response, the API version is specified as part of the standard HTTP `Content-Type` header, as in
+`application/v1.0.0+json`.
 
 Versions should be specified as obtained from the [Base API](base-api.md#versions) call to `/versions`.
 
 
 ## Authentication
 
-The API is using basic authentication. In order to make calls to the API, the following standard request headers need to be sent with every request:
+The API is using basic authentication. In order to make calls to the API, the following standard request headers need to
+be sent with every request:
 
 Header          | Type                       | Description
 :---------------|:---------------------------|:-----------
@@ -40,9 +45,12 @@ Header          | Type                       | Description
 
 # Authorization
 
-There are multiple ways to authorize a request - see the [authorization section](authorization.md) for more details. In short, the Application API either supports specifying the execution user, the execution user’s roles or a combination of the two in which case the execution roles will be added to the execution user’s existing roles.
+There are multiple ways to authorize a request - see the [authorization section](authorization.md) for more details. In
+short, the Application API either supports specifying the execution user, the execution user’s roles or a combination of
+the two in which case the execution roles will be added to the execution user’s existing roles.
 
-If no user is specified, Opencast’s `anonymous` user is used to execute the request, potentially enriched by the roles provided using the `X-ROLES` request.
+If no user is specified, Opencast’s `anonymous` user is used to execute the request, potentially enriched by the roles
+provided using the `X-ROLES` request.
 
 Header            | Type                       | Description
 :-----------------|:---------------------------|:-----------
@@ -62,7 +70,9 @@ Header   | Type                       | Description
 
 If that header is not specified, the `Content-Type` will be `application/<version>+json`.
 
-> Note that the same header should be used to specify the version of the api that is expected to return the response. In this case, the header looks like this: `application/v1+json`. See the [versioning chapter of the general section](index.md#versioning) for more details.
+> Note that the same header should be used to specify the version of the api that is expected to return the response. In
+> this case, the header looks like this: `application/v1+json`. See the [versioning chapter of the general
+> section](index.md#versioning) for more details.
 
 ## Encoding of single objects
 
@@ -102,7 +112,8 @@ __Example__
 
 ## Encoding of empty fields
 
-Instead of dropping fields that do not contain a value for a specific data object from the JSON response structure, the respective identity element should be used:
+Instead of dropping fields that do not contain a value for a specific data object from the JSON response structure, the
+respective identity element should be used:
 
 Type     | Encoding | Description
 :--------|:---------|:-----------
@@ -112,7 +123,8 @@ Arrays   | []       | Non-existing list of literals or objects
 
 # Sorting
 
-Sorting of result sets is supported by a set of well-defined fields per request, one at a time. Each api request explicitly defines the fields that support sorting.
+Sorting of result sets is supported by a set of well-defined fields per request, one at a time. Each api request
+explicitly defines the fields that support sorting.
 
 ## Sort field
 
@@ -144,7 +156,8 @@ GET /api/events?sort=title&order=asc
 
 # Filtering
 
-Filtering of result sets is supported by a set of well-defined fields per request. Multiple filter criteria can be defined by specifying the `filter` parameter more than once. In this case, the criteria are applied using logical `and`.
+Filtering of result sets is supported by a set of well-defined fields per request. Multiple filter criteria can be
+defined by specifying the `filter` parameter more than once. In this case, the criteria are applied using logical `and`.
 
 Each api request explicitly defines the fields that support filtering.
 
@@ -162,7 +175,8 @@ GET /api/events?filter=status%3dpublished&filter=series%3dmath
 
 # Paging
 
-When loading large result sets, being able to address and access the data in well-defined chunks using a limit and offset is essential. Paging is enabled for all requests that return lists of items.
+When loading large result sets, being able to address and access the data in well-defined chunks using a limit and
+offset is essential. Paging is enabled for all requests that return lists of items.
 
 Paramter | Description
 :--------|:-----------

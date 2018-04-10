@@ -56,7 +56,8 @@ installation:
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-There are more options available than in this example. The easiest way of creating that file is probably to create a copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
+There are more options available than in this example. The easiest way of creating that file is probably to create a
+copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
 
 Note that if you are running Apache httpd with mod_proxy in front of the Opencast installation, the port number will be
 -1.

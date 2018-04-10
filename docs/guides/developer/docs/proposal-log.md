@@ -11,7 +11,8 @@ signals agreement. Apart from that committers may vote with:
  - `-1` veto, disagree - opposes the action going forward and must propose an alternate action to address the issue or a
    justification for not addressing the issue
 
-A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being sent to list.
+A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being
+sent to list.
 
 Passed Proposals
 ----------------

@@ -220,9 +220,12 @@ ${trimHold} variable like in the current workflow definitions with trimming.
           </configurations>
         </operation>
 
-4. The waveform operation should be included. See above for the XML-code for this operation. The audio-only file should already be available.
-5. The silence detection should be done. See above for the XML-code for this operation. The audio-only file should already be available.
-6. After all previous operations have been done the editor can be included. See above for the XML-code for this operation.
+4. The waveform operation should be included. See above for the XML-code for this operation. The audio-only file should
+   already be available.
+5. The silence detection should be done. See above for the XML-code for this operation. The audio-only file should
+   already be available.
+6. After all previous operations have been done the editor can be included. See above for the XML-code for this
+   operation.
 7. You may consider to tag the trimmed files for archiving. Then you should include this operation after the editor:
 
    **Tagging trimmed files for the archive**
@@ -236,7 +239,8 @@ ${trimHold} variable like in the current workflow definitions with trimming.
           </configurations>
         </operation>
 
-    You could check, if you want to archive the source media too, or remove the source-flavors from the previous tagging operations.
+    You could check, if you want to archive the source media too, or remove the source-flavors from the previous tagging
+    operations.
 
 8. The rest of the workflow definition can be kept as it is, the input flavor subtype for the trimmed files in other
    operations is "/trimmed" if you follow the naming in this example.

@@ -11,11 +11,13 @@ The source documentation is hosted on this Git repository: https://github.com/op
 The documentation is written in standard markdown. The tool that is used to build the documentation is
 [mkdocs.org](http://www.mkdocs.org/)
 
-In order to build the documentation locally, you will need to [install MkDocs](http://www.mkdocs.org/#installation). Check out the documentation or use the following command
+In order to build the documentation locally, you will need to [install MkDocs](http://www.mkdocs.org/#installation).
+Check out the documentation or use the following command
 
     pip install mkdocs
 
-From there, download the source of the documentation, go to the repo and use the following command to start a simple http server and build the doc:
+From there, download the source of the documentation, go to the repo and use the following command to start a simple
+http server and build the doc:
 
     mkdocs serve
 

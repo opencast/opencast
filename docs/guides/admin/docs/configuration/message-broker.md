@@ -16,7 +16,8 @@ Installation
  - If you use the Opencast package repository, simply install the `activemq-dist` package.
  - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
    ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
- - Newer Debian based operating systems contain a sufficient new version, however the ActiveMQ configuration file will require modification to function correctly.
+ - Newer Debian based operating systems contain a sufficient new version, however the ActiveMQ configuration file will
+   require modification to function correctly.
  - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
 
 
@@ -164,7 +165,8 @@ In `docs/scripts/activemq/activemq.xml`:
           <memoryUsage limit="2048 MB"/>
     ...
 
-This controls the allowed memory of ActiveMQ inside of its JVM instance. For more information see [the ActiveMQ documentation](http://activemq.apache.org/javalangoutofmemory.html)
+This controls the allowed memory of ActiveMQ inside of its JVM instance. For more information see [the ActiveMQ
+documentation](http://activemq.apache.org/javalangoutofmemory.html)
 
 In `/usr/share/activemq/bin/env`:
 

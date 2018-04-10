@@ -1,9 +1,10 @@
 Install from Repository (Debian, Ubuntu)
 ===========================================================================
 
-There is a Debian software repository (DEB) available for Debian-based Linux distributions provided by Greg Logan, and hosted
-at University of Osnabrück. This repository provides prebuilt Opencast installations, including all 3rd-Party-Tools.
-Using this method, you do not have to compile the software by yourself, but you still need to configure it.
+There is a Debian software repository (DEB) available for Debian-based Linux distributions provided by Greg Logan, and
+hosted at University of Osnabrück. This repository provides prebuilt Opencast installations, including all
+3rd-Party-Tools. Using this method, you do not have to compile the software by yourself, but you still need to configure
+it.
 
 It may also be interesting for developers as all dependencies for Opencast usage, testing and development are provided
 by the Debian repository.
@@ -117,12 +118,13 @@ For a basic installation (All-In-One) just run:
 
     apt-get install opencast-3-allinone
 
-This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note that
-while the repository provides a packaged version of ffmpeg, your distribution may have a version which is pre-installed or
-otherwise takes precedence.  This version may work, however Opencast only formally supports the version(s) in the repository.
+This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
+that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
+pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
+version(s) in the repository.
 
-At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the [Basic Configuration
-guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
+At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the
+[Basic Configuration guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
 
  - On a SysV-init based system
 

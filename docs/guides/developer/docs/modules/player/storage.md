@@ -19,7 +19,8 @@ After that basil needs to be set up:
     };
     Basil = new window.Basil(basilOptions);
 
-The default plugins have "mhStorage" as their namespace, feel free to set your own. The default storage is the localstorage; if the localstorage is not available, a cookie is being used and so on.
+The default plugins have "mhStorage" as their namespace, feel free to set your own. The default storage is the
+localstorage; if the localstorage is not available, a cookie is being used and so on.
 
 After setting up basil, the usage is straightforward:
 

@@ -1,9 +1,11 @@
 # AnalyzeAudioWorkflowOperationHandler
 
 ## Description
-The AnalyzeAudioiWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX (http://sox.sourceforge.net/) and writes the result back to the given track.
+The AnalyzeAudioiWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX
+(http://sox.sourceforge.net/) and writes the result back to the given track.
 
-This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available otherwise nothing happens. Here are the internal steps done by the different inputs:
+This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available
+otherwise nothing happens. Here are the internal steps done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):
  - Analyze the given audio file with SoX

@@ -1,8 +1,9 @@
 Opencast Player - Matomo Tracking Plugin
 =======================================
 
-This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo please follow the instructions
-on the Matomo website: https://matomo.org/docs/installation/#the-5-minute-matomo-installation
+This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo
+please follow the instructions on the Matomo website:
+https://matomo.org/docs/installation/#the-5-minute-matomo-installation
 
 The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
 need to consider the legal requirements of your country when you setup Matomo.

@@ -1,6 +1,5 @@
 ## Dropdowns
-Dropdowns are used when update actions are
-required or to trigger bulk actions.
+Dropdowns are used when update actions are required or to trigger bulk actions.
 
 <div class="row-flex">
   <img src="../../../../img/dropdown-1.png" alt="Dropdown Action" />

@@ -47,8 +47,11 @@ Extract one image at position 1 second using the encoding profile *search-cover.
 
 ### Advanced
 
-In this example, we extract images at three relative positions (*1%, 50%, 100%*) from the presenter/trimmed track. For each position, we extract three images using three different encoding profiles (*example.encoding.profile.\**). 
-This operation therefore generates nine images in total. The target filenames will be formed based on the *target-base-name-format-\** configuration keys (prefix) and the configuration of the encoding profiles (file extension and possibly suffix).
+In this example, we extract images at three relative positions (*1%, 50%, 100%*) from the presenter/trimmed track. For
+each position, we extract three images using three different encoding profiles (*example.encoding.profile.\**). This
+operation therefore generates nine images in total. The target filenames will be formed based on the
+*target-base-name-format-\** configuration keys (prefix) and the configuration of the encoding profiles (file extension
+and possibly suffix).
 
     <operation id="image"
                description="Extract set of thumbnails"

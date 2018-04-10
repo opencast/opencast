@@ -3,7 +3,8 @@ Main Action Buttons
 
 <div class="row-flex">
   <img src="../../../../img/buttons-4.png" alt="Main Button - Spacing" />
-  <p>Main Action buttons appear in the action bar. These buttons are generally to start an action like exporting or importing a list, creating a new event or series.</p>
+  <p>Main Action buttons appear in the action bar. These buttons are generally to start an action like exporting or
+  importing a list, creating a new event or series.</p>
 </div>
 <br/>
 <div class="row-flex">
@@ -71,9 +72,7 @@ placed in a specific hierarchical order for consistency.
 
 <!--
 ## Radio Buttons
-Radio buttons are toggles which allow the user to select only
-one defined option to either on or off, yes or no. These buttons
-are generally placed to allow user to trigger a pending action.
-An example of radio button use would be to activate a server
-maintenance routine.
+Radio buttons are toggles which allow the user to select only one defined option to either on or off, yes or no. These
+buttons are generally placed to allow user to trigger a pending action. An example of radio button use would be to
+activate a server maintenance routine.
 -->
