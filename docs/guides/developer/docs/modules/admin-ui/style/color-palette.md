@@ -65,7 +65,8 @@ professional environment for users. Percentage tints can be used of any of these
 
 #### Secondary Color Palette
 
-The Secondary Palette should be used as a guide for the tone of a color. It is intended to be ever evolving, offering an endless palette to choose from.
+The Secondary Palette should be used as a guide for the tone of a color. It is intended to be ever evolving, offering an
+endless palette to choose from.
 
 <div class="palette">
   <ul class="table">

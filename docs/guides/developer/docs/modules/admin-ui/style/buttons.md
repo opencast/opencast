@@ -9,13 +9,45 @@ Main Action Buttons
 <br/>
 <div class="row-flex">
   <img src="../../../../img/buttons-1.png" alt="Main Button - Navigation" />
-<pre style="margin-bottom: 0px;"><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Main Button ] */</span>
-<span class="hljs-class">.action-nav-bar .btn-group .add</span> {<span class="hljs-rules">
-  <span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #FFFFFF</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #39c985</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-image</span><span class="hljs-rule">:</span><span class="hljs-value"> linear-gradient(<span class="hljs-hexcolor">#39c985</span>, <span class="hljs-hexcolor">#2d9b67</span>)</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border</span><span class="hljs-rule">:</span><span class="hljs-value"> 1px solid <span class="hljs-hexcolor">#193043</span></span></span></span>;
-</span>}</code></pre>
+  <pre style="margin-bottom: 0px;">
+    <code class="hljs css">
+      <span class="hljs-comment">/* [ Main Button ] */</span>
+      <span class="hljs-class">.action-nav-bar .btn-group .add</span> {
+      <span class="hljs-rules">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #FFFFFF</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">background-color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #39c985</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">background-image</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> linear-gradient(
+            <span class="hljs-hexcolor">#39c985</span>,
+            <span class="hljs-hexcolor">#2d9b67</span>)
+          </span>
+          </span>
+        </span>;
+          <span class="hljs-rule">
+            <span class="hljs-attribute">border</span>
+            <span class="hljs-rule">:</span>
+            <span class="hljs-value"> 1px solid
+              <span class="hljs-hexcolor">#193043</span>
+            </span>
+          </span>
+        </span>;
+      </span>}
+    </code>
+  </pre>
 </div>
 <br/>
 
@@ -24,23 +56,62 @@ Modal Buttons
 
 <div class="row-flex">
   <img src="../../../../img/buttons-2.png" alt="Main Button - Modal" />
-<pre style="margin-bottom: 0px;"><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Modal Button - Accept ] */</span>
-<span class="hljs-class">.modal</span><span class="hljs-tag"> a</span> {<span class="hljs-rules">
-  <span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #FFFFFF</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #39c985</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-image</span><span class="hljs-rule">:</span><span class="hljs-value"> linear-gradient(<span class="hljs-hexcolor">#39c985</span>, <span class="hljs-hexcolor">#2d9b67</span>)</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border</span><span class="hljs-rule">:</span><span class="hljs-value"> 1px solid <span class="hljs-hexcolor">#20724b</span></span></span></span>;
-</span>}</code></pre>
+  <pre style="margin-bottom: 0px;">
+    <code class="hljs css">
+      <span class="hljs-comment">/* [ Modal Button - Accept ] */</span>
+      <span class="hljs-class">.modal</span>
+      <span class="hljs-tag"> a</span> {
+      <span class="hljs-rules">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #FFFFFF</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">background-color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #39c985</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">background-image</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> linear-gradient(
+            <span class="hljs-hexcolor">#39c985</span>, 
+            <span class="hljs-hexcolor">#2d9b67</span>)
+          </span>
+        </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">border</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> 1px solid
+            <span class="hljs-hexcolor">#20724b</span>
+          </span>
+        </span></span>;
+      </span>}
+    </code>
+  </pre>
 </div>
 <br/>
 <div class="row-flex">
   <img src="../../../../img/buttons-3.png" alt="Cancel Button - Modal" />
-<pre style="margin-bottom: 0px;"><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Modal Button - Cancel / Return ] */</span>
-<span class="hljs-class">.modal</span><span class="hljs-tag"> a<span class="hljs-class">.cancel</span></span> {<span class="hljs-rules">
-  <span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #666666</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #FFFFFF</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">background-image</span><span class="hljs-rule">:</span><span class="hljs-value"> linear-gradient(<span class="hljs-hexcolor">#FFFFFF</span>, <span class="hljs-hexcolor">#f7f7f7</span>)</span></span></span>;
-  <span class="hljs-rule"><span class="hljs-attribute">border</span><span class="hljs-rule">:</span><span class="hljs-value"> 1px solid <span class="hljs-hexcolor">#c9d0d3</span></span></span></span>;
+<pre style="margin-bottom: 0px;"><code class="hljs css">
+<span class="hljs-comment">/* [ Modal Button - Cancel / Return ] */</span>
+<span class="hljs-class">.modal</span><span class="hljs-tag"> a<span class="hljs-class">.cancel</span>
+</span> {<span class="hljs-rules">
+  <span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span>
+  <span class="hljs-value"><span class="hljs-hexcolor"> #666666</span></span></span>;
+  <span class="hljs-rule"><span class="hljs-attribute">background-color</span><span class="hljs-rule">:</span>
+  <span class="hljs-value"><span class="hljs-hexcolor"> #FFFFFF</span></span></span>;
+  <span class="hljs-rule"><span class="hljs-attribute">background-image</span><span class="hljs-rule">:</span>
+  <span class="hljs-value"> linear-gradient(<span class="hljs-hexcolor">#FFFFFF</span>,
+  <span class="hljs-hexcolor">#f7f7f7</span>)</span></span></span>;
+  <span class="hljs-rule"><span class="hljs-attribute">border</span><span class="hljs-rule">:</span>
+  <span class="hljs-value"> 1px solid <span class="hljs-hexcolor">#c9d0d3</span></span></span></span>;
 </span>}</code></pre>
 </div>
 <br/>

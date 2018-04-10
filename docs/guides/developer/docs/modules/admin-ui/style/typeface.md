@@ -1,97 +1,221 @@
 ## Typeface
 
-Open Sans is an extremely versatile Humanist Sans-Serif
-typeface designed by Steve Matteson. Delivering a crystal clear
-look and feel, Open Sans enables users to quickly navigate the
-software without any clutter. The strengths of this typeface
-surpass both web and print applications offering excellent
-legibility for both forms of media. Open Sans is a widely available
-free font offered through Google Fonts and is widely seen as a
-web standard face.
+Open Sans is an extremely versatile Humanist Sans-Serif typeface designed by Steve Matteson. Delivering a crystal clear
+look and feel, Open Sans enables users to quickly navigate the software without any clutter. The strengths of this
+typeface surpass both web and print applications offering excellent legibility for both forms of media. Open Sans is a
+widely available free font offered through Google Fonts and is widely seen as a web standard face.
 
 Please see [References - Open Sans](/modules/admin-ui/style/references/#open-sans) for license information.
 
 <div class="row typeface">
-
   <div class="light">
     <div class="header">Light</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 300</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> normal</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 300</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> normal</span>
+        </span>;
+      </code>
+    </pre>
   </div>
 
   <div class="light italic">
     <div class="header">Light Italic</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 300</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> italic</span></span>;
-</code></pre>    
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 300</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> italic</span>
+        </span>;
+      </code>
+    </pre>    
   </div>
 
   <div>
     <div class="header">Regular</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 400</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> normal</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 400</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> normal</span>
+        </span>;
+      </code>
+    </pre>
   </div>
 
   <div class="italic">
     <div class="header">Regular Italic</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 400</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> italic</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 400</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> italic</span>
+        </span>;
+      </code>
+    </pre>
   </div>
 
   <div class="semibold">
     <div class="header">Semibold</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 600</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> normal</span></span>;
-</code></pre>
-    </code>    
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 600</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> normal</span>
+        </span>;
+      </code>
+    </pre>
   </div>
 
   <div class="semibold italic">
     <div class="header">Semibold Italic</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 600</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> italic</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 600</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> italic</span>
+        </span>;
+      </code>
+    </pre>
   </div>     
 
   <div class="bold">
     <div class="header">Bold</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 700</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> normal</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 700</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> normal</span>
+        </span>;
+      </code>
+    </pre>
   </div>
 
   <div class="bold italic">
     <div class="header">Bold Italic</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 700</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> italic</span></span>;
-</code></pre>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-weight</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-number"> 700</span>
+          </span>
+        </span>;
+        <span class="hljs-rule">
+          <span class="hljs-attribute">font-style</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value"> italic</span>
+        </span>;
+      </code>
+    </pre>
   </div>     
 
   <div class="extrabold"><!-- style="height: 150px;" -->
     <div class="header">Extrabold</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy<!--Zz--></p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 800</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> normal</span></span>;
-</code></pre>
+    <pre>
+    <code class="hljs css">
+      <span class="hljs-rule">
+        <span class="hljs-attribute">font-weight</span>
+        <span class="hljs-rule">:</span>
+        <span class="hljs-value">
+          <span class="hljs-number"> 800</span>
+        </span>
+      </span>;
+      <span class="hljs-rule">
+        <span class="hljs-attribute">font-style</span>
+        <span class="hljs-rule">:</span>
+        <span class="hljs-value"> normal</span>
+      </span>;
+    </code>
+    </pre>
   </div>
 
   <div class="extrabold italic"><!-- style="height: 150px;" -->
     <div class="header">Extrabold Italic</div>
     <p>Aa Bb Cc Dd Ee Ff Gg Hh Ii Jj Kk Ll Mm Nn Oo Pp Qq Rr Ss Tt Uu Vv Ww Xx Yy Zz</p>
-<pre><code class="hljs css" clas="css hljs">   <span class="hljs-rule"><span class="hljs-attribute">font-weight</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-number"> 800</span></span></span>;
-   <span class="hljs-rule"><span class="hljs-attribute">font-style</span><span class="hljs-rule">:</span><span class="hljs-value"> italic</span></span>;
-</code></pre>
+    <pre>
+    <code class="hljs css">
+      <span class="hljs-rule">
+        <span class="hljs-attribute">font-weight</span>
+        <span class="hljs-rule">:</span>
+        <span class="hljs-value">
+          <span class="hljs-number"> 800</span>
+        </span>
+      </span>;
+      <span class="hljs-rule">
+        <span class="hljs-attribute">font-style</span>
+        <span class="hljs-rule">:</span>
+        <span class="hljs-value"> italic</span>
+      </span>;
+    </code>
+    </pre>
   </div>  
 </div>
 <br/>

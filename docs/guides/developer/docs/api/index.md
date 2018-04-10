@@ -5,7 +5,7 @@
 [4]: http://semver.org
 [5]: http://en.wikipedia.org/wiki/Representational_state_transfer
 
-[figure_1]: media/img/figure_1.png "Figure 1: Architectural overview"
+[figure_1]:media/img/figure_1.png "Figure 1: Architectural overview"
 
 
 # Opencast API
@@ -50,7 +50,7 @@ The corresponding requests along with the data structures and potential response
 the [API](usage.md) chapter.
 
 
-![][figure_1]
+![Architectural overview][figure_1]
 
 <a name="figure_1"></a>Figure 1: Architectural overview
 
