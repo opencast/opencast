@@ -94,11 +94,11 @@ As the previous snippet shows, there are two alternative ways to find users in y
 DN. The patterns will be tried in order until a match is found. The placeholder `{0}` can be used to represent the
 username in such patterns.
 * **Using a userSearch filter:** With the previous approach, it is not possible to find users whose login name is not
-part of their DN. In such cases, you can use the userSearch property, that allows you to search the users based on a
-filter. The filter requires three parameters:
+    part of their DN. In such cases, you can use the userSearch property, that allows you to search the users based on a
+    filter. The filter requires three parameters:
     * The first parameter specifies the "root node" where the searches will start from.
     * The second one specifies the filter, where, again, the placeholder `{0}` will be substituted by the username
-    during the searches.
+      during the searches.
     * The third parameter should be the contextSource defined above.
 
 Both methods are not mutually exclusive --i.e. both can be activated at the same time, even though only the first one
@@ -140,8 +140,8 @@ The parameters that are exclusive to this `.cfg` file control the user authoriza
 the LDAP are handled and assigned to the users. Please refer to the documentation in the file itself to know the meaning
 of these parameters and how to use them.
 
-**IMPORTANT**: The `org.opencastproject.userdirectory.ldap.id` parameter in the file must be configured to the same value
-as the ID of the OSGI reference in the `security.xml` file above (at the end of the step #2).
+**IMPORTANT**: The `org.opencastproject.userdirectory.ldap.id` parameter in the file must be configured to the same
+value as the ID of the OSGI reference in the `security.xml` file above (at the end of the step #2).
 
 
 Combination with Existing authorization Mechanisms

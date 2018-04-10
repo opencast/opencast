@@ -140,7 +140,7 @@ Note: Do not upload translations to Crowdin. Our current subscription plan will 
 Further Information
 -------------------
 
- - [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
- - [Crowdin CLI Documentation](https://support.crowdin.com/cli-tool/#usage)
- - [Crowdin Versions Management Documentation](https://support.crowdin.com/versions-management/)
- - [Crowdin Language Codes](https://support.crowdin.com/api/language-codes/)
+ * [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
+ * [Crowdin CLI Documentation](https://support.crowdin.com/cli-tool/#usage)
+ * [Crowdin Versions Management Documentation](https://support.crowdin.com/versions-management/)
+ * [Crowdin Language Codes](https://support.crowdin.com/api/language-codes/)

@@ -8,14 +8,14 @@ This workflow operation handler can be used with audio and/or video files. At le
 otherwise nothing happens. Here are the internal steps done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):
- - Analyze the given audio file with SoX
- - Write analyzed audio metadata back to the given track's mediapackage.
+* Analyze the given audio file with SoX
+* Write analyzed audio metadata back to the given track's mediapackage.
 
 ### Used with Video file or with Audio only file with forceTranscode activated:
- - Extract audio file encoded as FLAC audio and save it temporary in a collection
- - Analyze the previous encoded audio file with SoX
- - Write analyzed audio metadata back to the given track's mediapackage.
- - Delete the temporary encoded FLAC audio file
+* Extract audio file encoded as FLAC audio and save it temporary in a collection
+* Analyze the previous encoded audio file with SoX
+* Write analyzed audio metadata back to the given track's mediapackage.
+* Delete the temporary encoded FLAC audio file
 
 Example result track:
 

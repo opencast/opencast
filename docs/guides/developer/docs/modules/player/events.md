@@ -23,16 +23,16 @@ for version 1.0 of Feb 12, 2015.
 
 Currently official plugins are
 
- - Controls
- - MHConnection
- - Notifications
- - Usertracking
- - Description
- - Description (Tab)
- - Slide text (Tab)
- - Shortcuts (Tab)
- - Timeline statistics
- - Videodisplay
+* Controls
+* MHConnection
+* Notifications
+* Usertracking
+* Description
+* Description (Tab)
+* Slide text (Tab)
+* Shortcuts (Tab)
+* Timeline statistics
+* Videodisplay
  
 |Name | Event name | Additional parameters|Description|Triggered in|Handled in|
 |-----|------------|----------------------|-----------|------------|----------|

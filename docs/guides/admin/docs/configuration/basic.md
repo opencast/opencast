@@ -47,16 +47,15 @@ Step 2: Setting the Login Details
 There are two authentication methods for Opencast. HTTP Digest authentication and form-based authentication. Both
 methods need a username and a password. Change the password for both! The important keys for this are:
 
- - `org.opencastproject.security.admin.user`
-    - The user for the administrative account. This is set to `admin` by default.
- - `org.opencastproject.security.admin.pass`
-    - The password for the administrative account. This is set to `opencast` by default.
- - `org.opencastproject.security.digest.user`
-    - The user for the communication between Opencast nodes, as well as for capture agents. This is set to
-      `opencast_system_account` by default.
- - `org.opencastproject.security.digest.pass`
-    - The password for the communication between Opencast nodes and capture agents. This is set to `CHANGE_ME` by
-      default.
+* `org.opencastproject.security.admin.user`
+    * The user for the administrative account. This is set to `admin` by default.
+* `org.opencastproject.security.admin.pass`
+    * The password for the administrative account. This is set to `opencast` by default.
+* `org.opencastproject.security.digest.user`
+    * The user for the communication between Opencast nodes, as well as for capture agents. This is set to
+    `opencast_system_account` by default.
+* `org.opencastproject.security.digest.pass`
+    * The password for the communication between Opencast nodes and capture agents. This is set to `CHANGE_ME` by default.
 
 *Note:* The digest credentials are also used for internal communication of Opencast servers. So these keys have to be
 set to the same value on each of you Opencast nodes (Core, Worker, Capture Agent, …)
@@ -85,9 +84,9 @@ Step 5: Database Configuration
 Opencast uses an integrated HSQL database by default. While you will find it perfectly functional, it has certain
 drawbacks:
 
- - It is rather slow
- - It cannot be used for distributed set-ups
- - Upgrading Opencast with this database is not possible
+* It is rather slow
+* It cannot be used for distributed set-ups
+* Upgrading Opencast with this database is not possible
 
 For testing, it is totally fine to keep the internal database, but you are highly encouraged to switch to a stand-alone
 database for productional use. For more information about database configuration, have a look at the [Database

@@ -90,9 +90,9 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
 Pre-built versions of most dependencies can be downloaded from the respective project website:
 
- - [Get Apache Maven](https://maven.apache.org/download.cgi)
- - [Get FFmpeg](http://ffmpeg.org/download.html)
- - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
+* [Get Apache Maven](https://maven.apache.org/download.cgi)
+* [Get FFmpeg](http://ffmpeg.org/download.html)
+* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast

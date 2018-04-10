@@ -12,31 +12,31 @@ done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):
 
- - Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
- - Run audio normalization with original audio file.
- - Replace the normalized audio file with the original.
- - Write analyzed audio metadata to the track's mediapackage.
- - Delete all used temporary files.
+* Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
+* Run audio normalization with original audio file.
+* Replace the normalized audio file with the original.
+* Write analyzed audio metadata to the track's mediapackage.
+* Delete all used temporary files.
 
 
 ### Used with Audio only file and forceTranscode activated:
 
- - Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
- - (forceTranscode step) Encode audio to FLAC. (Must be used when given audio file format is not supported by SoX)
- - Run audio normalization with original audio file or encoded FLAC audio file.
- - (forceTranscode step) Mux normalized audio file back to the original audio container by replacing it with the
+* Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
+* (forceTranscode step) Encode audio to FLAC. (Must be used when given audio file format is not supported by SoX)
+* Run audio normalization with original audio file or encoded FLAC audio file.
+* (forceTranscode step) Mux normalized audio file back to the original audio container by replacing it with the
    original audio stream.
- - Write analyzed audio metadata to the track's mediapackage.
- - Delete all used temporary files
+* Write analyzed audio metadata to the track's mediapackage.
+* Delete all used temporary files
 
 ### Used with Video file:
 
- - Extract audio file encoded as FLAC audio and save it temporary in a collection
- - Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
- - Run audio normalization with extracted audio file.
- - Mux normalized audio file back to the original video container by replacing it with original audio stream.
- - Write analyzed audio metadata to the track's mediapackage.
- - Delete all used temporary files
+* Extract audio file encoded as FLAC audio and save it temporary in a collection
+* Check if necessary RMS Lev dB value is already in the track's metadata. If not run audio analyzation.
+* Run audio normalization with extracted audio file.
+* Mux normalized audio file back to the original video container by replacing it with original audio stream.
+* Write analyzed audio metadata to the track's mediapackage.
+* Delete all used temporary files
 
 Example result track:
 

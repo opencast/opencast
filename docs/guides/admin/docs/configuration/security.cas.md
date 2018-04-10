@@ -66,8 +66,8 @@ information, to tell which services the user is allowed to use and which resourc
 
 You will need to configure a UserProvider to look up users as identified by CAS.
 
-  - [Sakai User Provider](security.user.sakai.md)
-  - [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
+* [Sakai User Provider](security.user.sakai.md)
+* [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
 
 
 Original documentation from University of Saskatchewan

@@ -9,10 +9,10 @@ or her release.
 
 The release manager has the following duties:
 
- - To ensure that the release measures up to the quality expected by the community.
- - To ensure that the development process is followed and amended if required.
- - To ensure that the release is timely and does not languish in process.
- - To encourage committers to be involved in testing and fixing of bugs.
+* To ensure that the release measures up to the quality expected by the community.
+* To ensure that the development process is followed and amended if required.
+* To ensure that the release is timely and does not languish in process.
+* To encourage committers to be involved in testing and fixing of bugs.
 
 It is in the release manager's responsibility to force decisions around the release, help negotiate the acceptance or
 rejection of contributions and to provide regular updates about the release on list and during the weekly technical and

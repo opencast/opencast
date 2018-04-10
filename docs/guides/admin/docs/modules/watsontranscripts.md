@@ -13,16 +13,16 @@ and attached to the media package.
 
 Workflow 1 runs:
 
-  - Audio file created
-  - Watson Speech-to-Text job started
-  - Workflow finishes
+* Audio file created
+* Watson Speech-to-Text job started
+* Workflow finishes
 
 Translation finishes, callback with results is received, and workflow 2 is started.
 
 Workflow 2 runs:
 
-  - File with results is converted and attached to media package
-  - Media package is republished with captions/transcripts
+* File with results is converted and attached to media package
+* Media package is republished with captions/transcripts
 
 IBM Watson Speech-to-Text service documentation, including which languages are currently supported, can be found
  [here](https://www.ibm.com/watson/developercloud/doc/speech-to-text/index.html).
@@ -39,12 +39,12 @@ Configuration
 
 Edit  _etc/org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg_:
 
-- Set _enabled_=true
-- Use service credentials obtained above to set _ibm.watson.user_ and _ibm.watson.psw_
-- Enter the appropriate language model in _ibm.watson.model_, if not using the default (_en-US_BroadbandModel_)
-- In _workflow_, enter the workflow definition id of the workflow to be used to attach the generated 
+* Set _enabled_=true
+* Use service credentials obtained above to set _ibm.watson.user_ and _ibm.watson.psw_
+* Enter the appropriate language model in _ibm.watson.model_, if not using the default (_en-US_BroadbandModel_)
+* In _workflow_, enter the workflow definition id of the workflow to be used to attach the generated 
 transcripts/captions
-- Enter a _notification.email_ to get job failure notifications. If not entered, the email in 
+* Enter a _notification.email_ to get job failure notifications. If not entered, the email in 
 etc/custom.properties (org.opencastproject.admin.email) will be used. Configure the SmtpService.
 If no email address specified in either _notification.email_ or _org.opencastproject.admin.email_,
 email notifications will be disabled. 
@@ -145,5 +145,5 @@ A sample one can be found in etc/workflows/attach-watson-transcripts.xml
 Workflow Operations
 -------------------
 
-- [start-watson-transcription](../workflowoperationhandlers/start-watson-transcription-woh.md)
-- [attach-watson-transcription](../workflowoperationhandlers/attach-watson-transcription-woh.md)
+* [start-watson-transcription](../workflowoperationhandlers/start-watson-transcription-woh.md)
+* [attach-watson-transcription](../workflowoperationhandlers/attach-watson-transcription-woh.md)
