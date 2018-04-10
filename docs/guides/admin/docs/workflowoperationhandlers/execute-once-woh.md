@@ -26,7 +26,7 @@ in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-sub
 |target-tags       |execservice, -trim|List of tags that will be applied to the resulting Mediapackage element. Tags starting with "-" will be deleted from the element instead, if present. The resulting element may be the same as the input element.|No|
 
 If `set-workflow-properties` is true, the command should write a plain-text properties file to the location specified by
-#{out} in the key-value format supported by the [Java
+`#{out}` in the key-value format supported by the [Java
 Properties](http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#load-java.io.Reader-) class, for example:
 
 ````

@@ -1,4 +1,6 @@
-#Log-in In order to log-in to the Opencast administrative user interfaces you will need to request a username and
+# Log-in
+
+In order to log-in to the Opencast administrative user interfaces you will need to request a username and
 password from your system administrator. See the [Users section](users.md) for more information about how to create
 users.
 

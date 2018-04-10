@@ -53,7 +53,7 @@ The `<config_dir>/encoding` folder allows you to quickly augment Opencast's exis
 adding new configuration files. The file names should follow the pattern `*.properties`.
 
 
-###The Encoding Profile
+### The Encoding Profile
 
 Encoding profiles consist of a set of key-value pairs that conform to the following pattern:
 

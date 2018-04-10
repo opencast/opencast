@@ -89,8 +89,8 @@ If your capture agent supports configuring custom capture agent properties, inst
 live.streamingUrl, live.resolution, live.streamName, you can update the capture agent firmware to pass the following
 when registering to Opencast:
 
-- capture.device.names: add 'live' to the current list of devices
-- capture.device.live.resolution.WIDTHxHEIGHT=STREAMING_URL_USED_BY_PLAYER: one for each desired stream
+* capture.device.names: add 'live' to the current list of devices
+* capture.device.live.resolution.WIDTHxHEIGHT=STREAMING_URL_USED_BY_PLAYER: one for each desired stream
 
 Then, the LiveScheduleService will generate as many live tracks as the resolutions registered, with their streaming
 urls, using 'presenter/delivery' (or the flavor configured, but only one flavor can be used).
@@ -98,16 +98,16 @@ urls, using 'presenter/delivery' (or the flavor configured, but only one flavor 
 If a property capture.device.live.resolution.WIDTHxHEIGHT was registered, it will take precedence over the
 LiveScheduleService configuration.
 
-####Example 1: 
+#### Example 1: 
 
-####Capture agent does not register with capture.device.live.resolution.WIDTHxHEIGHT
+#### Capture agent does not register with capture.device.live.resolution.WIDTHxHEIGHT
 
 If:
 
-- live.streamingUrl=rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION
-- live.streamName=#{caName}-#{flavor}.stream
-- live.targetFlavors=presenter/delivery
-- capture agent name: ca01
+* live.streamingUrl=rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION
+* live.streamName=#{caName}-#{flavor}.stream
+* live.targetFlavors=presenter/delivery
+* capture agent name: ca01
 
 Then, the capture agent should stream to ('/' is replaced by '_'):
 rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/ca01-presenter_delivery.stream
@@ -117,9 +117,9 @@ _live.streamingUrl_ may be very different from the url the capture agent streams
 used by the player will be something like live.streamingUrl=rtmp://xyz.live.edgefcs.net/live/ and the capture agent's
 publish url something like rtmp://a.bcd.e.akamaientrypoint.net/EntryPoint. The stream name should always match.
 
-####Example 2: 
+#### Example 2: 
 
-####Capture agent registers with capture.device.live.resolution.WIDTHxHEIGHT
+#### Capture agent registers with capture.device.live.resolution.WIDTHxHEIGHT
 
 If the capture agent registers itself with:
 
@@ -133,8 +133,8 @@ If the capture agent registers itself with:
 
 The LiveScheduleService will generate a media package with two live tracks having the following urls:
 
-- rtmp://xyz.live.edgefcs.net/live/presenter.stream-1920x540@12345
-- rtmp://xyz.live.edgefcs.net/live/presenter.stream-960x270@12345
+* rtmp://xyz.live.edgefcs.net/live/presenter.stream-1920x540@12345
+* rtmp://xyz.live.edgefcs.net/live/presenter.stream-960x270@12345
 
 
 ### Step 3: Configure the Workflow

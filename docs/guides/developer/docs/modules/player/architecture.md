@@ -133,7 +133,7 @@ plugin. The Core Reference describes the plugin object, before and after it is b
 
 Have a look to the code of a plugin to get an impression about the plugin implementation.
 
-##Model View Controller Support
+## Model View Controller Support
 
 The Theodul player supports MVC design patterns for each plugin based on methods and objects of the BackboneJS library.
 It is not necessary to design a plugin in MVC style but it is highly recommended. An overview of the methods and objects

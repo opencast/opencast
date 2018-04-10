@@ -11,7 +11,7 @@ The IncidentCreatorWorkflowOperationHandler creates an incident on a dummy job u
 |details	|"tagged,+rss" / "-rss,+tagged"| Some details: title=content;title=content;...|EMPTY|
 |params|"presentation/tagged"|Some params: key=value;key=value;...|EMPTY|
 
-##Operation Example
+## Operation Example
 
     <operation
       id="incident"

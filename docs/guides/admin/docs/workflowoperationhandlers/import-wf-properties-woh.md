@@ -18,7 +18,7 @@ properties to a Java properties file.
 
 \* mandatory configuration key
 
-##Operation Example
+## Operation Example
 
     <operation
       id="import-wf-properties"

@@ -13,7 +13,7 @@ There is only one configuration key "channel-id". This is the channel to remove 
 
 ## Operation Examples
 
-####Retract from Internal Channel
+#### Retract from Internal Channel
     <!-- Remove the internal publication if the mediapackage is being deleted. -->
     <operation
       id="retract-configure"
@@ -24,7 +24,7 @@ There is only one configuration key "channel-id". This is the channel to remove 
       </configurations>
     </operation>
 
-####Retract from External API
+#### Retract from External API
 
     <operation
       id="retract-configure"

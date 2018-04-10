@@ -28,7 +28,7 @@ from the media package element URI) to *target-filename*. In case the *source-fl
 media package elements, a sequentially increasing integer number (starting at 1) can be used within *target-filename* in
 Java string formatting manner to ensure unique filenames.
 
-##Operation Example
+## Operation Example
 
     <operation id="copy"
              description="Copy sources to my disk"

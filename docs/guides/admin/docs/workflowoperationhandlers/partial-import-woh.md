@@ -34,7 +34,7 @@ stream which makes the operation more expensive in terms of load.
 Note that it is allowed to set the configuration keys 'target-presenter-flavor' and 'target-presentation-flavor' to the
 same value.
 
-##Operation Example
+## Operation Example
 
 What exactly the PartialImportWorkflowOperation does is best described by example. In our example, a capture agent
 records three sources:
@@ -140,7 +140,7 @@ To achieve this, the PartialImportWorkflowOperation performs the following steps
    target tracks will also be re-encoded using that encoding profile in case its file extensions don't match the
    *required_extensions*.
 
-##SMIL File Structure
+## SMIL File Structure
 
 The PartialImportWorkflowOperation expects a specific subset of SMIL that is described in this section.
 The overall structure of the SMIL file is shown by example below:
@@ -175,7 +175,7 @@ partial track in milliseconds) The *audio* elements are used to indicate that th
 audio-only media file, whereas *video* elements can refer to either video-only or audio-video media files. The following
 combinations result in a defined behavior:
 
-###Supported Combinations of Video and Audio Elements
+### Supported Combinations of Video and Audio Elements
 
 |video|audio|resulting track|
 |-----|-----|---------------|
@@ -187,7 +187,7 @@ combinations result in a defined behavior:
 All other combinations of *video* and *audio* elements result in unspecified behavior of the
 PartialImportWorkflowOperation.
 
-###Order of Video and Audio Elements
+### Order of Video and Audio Elements
 
 Within a sequence (*seq*), the *video* elements most occur in ascending order considering the values of their attributes
 *begin*. The same holds for *audio* elements. Note the *video* and *audio* elements are processed individually, so the
@@ -196,14 +196,14 @@ order of occurrences of *video* and *audio* elements are independent from each o
 **Important:** The PartialImportWorkflowOperation will not process *video* or *audio* elements correctly if the order of
 appearance in the SMIL file is not correct.
 
-###Overlapping Partial Tracks
+### Overlapping Partial Tracks
 
 The behavior of overlapping partial tracks is unspecified, i.e. for a given element *e* (*video* or *audio*), the value
 of *begin* for the subsequent element *(e+1)* of the same type (*video* or *audio*) within the same sequence must be
 equal or greater than *e.begin + e.dur*, i.e. make sure that the following invariant holds: *(e+1).begin >= e.begin +
 e.dur*
 
-##Encoding Profiles The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing.
+## Encoding Profiles The PartialImportWorkflowOperation uses a number of encoding profiles to perform its processing.
 Some of the encoding profiles can be explicitly configured by the user, others are used implicitly in means of being
 hard-coded and are not supposed to be changed by the user.
 

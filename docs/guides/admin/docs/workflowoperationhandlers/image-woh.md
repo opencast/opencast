@@ -4,7 +4,7 @@
 The ImageWorkflowOperation will extract still images from a video using FFmpeg and a list of given encoding profiles.
 Both absolute and relative positions can be used.
 
-##Parameter Table
+## Parameter Table
 
 |configuration keys|example|description|
 |------------------|-------|-----------| 

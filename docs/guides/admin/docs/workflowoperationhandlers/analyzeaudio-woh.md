@@ -50,7 +50,7 @@ Example result track:
 (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)	|FALSE|
 
 
-##Operation Example
+## Operation Example
 
     <operation
       id="analyze-audio"
