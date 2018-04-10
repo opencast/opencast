@@ -1,35 +1,37 @@
-Architecture
-============
+Asset Manager
+=============
 
-Modules
--------
+Architecture
+------------
+
+### Modules
+
 The AssetManager consists of the following modules:
 
-- `asset-manager-api`  
+* `asset-manager-api`  
 An API module defining the core AssetManager functions, properties and the query language.
-- `asset-manager-impl`  
+* `asset-manager-impl`  
 The default implementation of the AssetManager as an OSGi service, containing the storage API for pluggable asset stores.
-- `asset-manager-storage-fs`  
+* `asset-manager-storage-fs`  
 The default  implementation of the AssetStore. Depends on asset-manager-impl.
-- `asset-manager-util`  
+* `asset-manager-util`  
 Additional functionality for the AssetManager providing utilities such as starting workflows on archived snapshots, etc.
-- `asset-manager-workflowoperation`  
+* `asset-manager-workflowoperation`  
 A workflow operation handler to take media package snapshots of a media package from inside a running workflow.
 
-High Level View
----------------
+### High Level View
+
 TODO Describes components and how they relate.
 
-Classes
--------
+### Classes
+
 TODO Most important classes and how they relate
 
-
 Default Implementation
-======================
+----------------------
 
-AssetStore
-----------
+### AssetStore
+
 Assets are stored in the following directory structure.
 
     $BASE_PATH
@@ -39,38 +41,40 @@ Assets are stored in the following directory structure.
                  |— manifest.xml
                  |— <media_package_element_id>.<ext>
 
-Database
+### Database
 --------
+
 The asset manager uses four tables
 
-- `mh_assets_snapshot`  
+* `mh_assets_snapshot`  
   Manages snapshots. Each snapshot may be linked to zero or more assets.
-- `mh_assets_asset`  
+* `mh_assets_asset`  
   Manages the assets of a snapshot.
-- `mh_assets_properties`  
+* `mh_assets_properties`  
   Manages the properties. This table is indirectly linked to the snapshot table via column `mediapackage_id`. 
-- `mh_assets_version_claim`  
+* `mh_assets_version_claim`  
   Manages the next free version number per episode. 
 
-Security
---------
+### Security
+
 TODO
 
 
 Usage
-=====
+-----
 
-Taking Snapshots
-----------------
+### Taking Snapshots
+
 TODO
 
-Working with Properties
------------------------
+### Working with Properties
+
 Properties are associated with an episode, not a single snapshot. They act as annotations helping services to work with
 saved media packages without having to implement their own storage layer. Properties are typed and can be used to create
 queries.
 
-### Getting Started
+#### Getting Started
+
 Let's start with an fictious example of an ApprovalService. The approval service keeps track of approvals given by an
 editor to publish a media package. Only approved media packages may be published and the editor should also be able to
 leave a comment defining a publication as prohibited. Here, three properties are needed, an approval flag, a text field
@@ -159,7 +163,7 @@ In our use case we could reduce IO even further since we're only interested in t
 This is the query returns only the latest snapshots of all episodes being approved together with the date of approval.
 Now that you've seen how to create properties let's move on to delete them again.
 
-### Deleting Properties
+#### Deleting Properties
 Properties are deleted pretty much like they are queried, using a delete query.
 
     q.delete(q.propertiesOf(p.allProperties())).run();
@@ -181,17 +185,17 @@ Or multiple properties at once.
 
 Please see the query API documentation for further information.
 
-### Value Types
+#### Value Types
 The following type are available for properties:
 
-- Long
-- String
-- Date
-- Boolean
-- Version  
+* Long
+* String
+* Date
+* Boolean
+* Version  
   Version is the AssetManager type that abstracts a snapshot version.
 
-### Decomposing properties
+#### Decomposing properties
 Since properties are type safe they cannot be accessed directly. 
 If you know the type of the property you can access its value using a type evidence constant.
 
@@ -218,14 +222,14 @@ type `Fn` taking the raw value as input and returning a String.
 The class `org.opencastproject.assetmanager.api.fn.Properties` contains various utility functions to help extracting
 values from properties.
 
-### Using PropertySchema
+#### Using PropertySchema
 You've already seen that a property is constructed from a media package id, a namespace, a property name and a value.
 Since this is a bit cumbersome, the API features an abstract base class to construct property schemas. The resulting
 schema implementations encapsulate all the string constants so that you don't have to deal with them manually. Please
 see the example in the _Getting Started_ section. It is strongly recommended to work with schemas as much as possible.
 
-Creating and Running Queries
-----------------------------
+### Creating and Running Queries
+
 Creating and running a query is a two step process. First, you create a new `AQueryBuilder`.
 
     AQueryBuilder q = am.createQuery();
@@ -252,13 +256,14 @@ predicates then a call to r.getRecords() yields an empty stream. Please note tha
 does not mean that the result set is actually streamed—or lazily loaded—from the database. The `Stream` interface is
 just far more powerful than the collection types from JCL.
 
-### A note on immutability
+#### A note on immutability
+
 Please note that all classes of the query API are immutable and therefore safe to be used in a concurrent environment.
 Whenever you call a factory method on an instance of one of the query classes a new instance is yielded. They never
 mutate state.
 
-Accessing Query Results
------------------------
+### Accessing Query Results
+
 Running a query yields an object of type `AResult` which in turn yields the found result records. Besides it also
 provides some general result metadata like the set limit, offset etc. An `ARecord` holds the found snapshots and
 properties, depending on the select targets and the predicates. If no snapshots have been selected then, none will be
@@ -273,8 +278,8 @@ the result in an enrichment.
 
 `RichAResult` features methods to directly access all fetched snapshots and properties.
 
-Deleting Snapshots
-------------------
+### Deleting Snapshots
+
 This works exactly like deleting properties, except that you need to specify snapshots instead of properties. 
 Please note that it's also possible to specify snapshots and properties simultanously.
 
@@ -284,14 +289,14 @@ The above query deletes all snapshots but the latest. This is a good query to fr
 
 Snapshots can only be deleted per owner.
 
-Query Language Reference
-------------------------
+### Query Language Reference
+
 The query API features
 
-- select clause and targets
-- where clause with boolean and relational operations, nesting of boolean operations
-- selecting by properties
-- order-by clause
-- querying and deleting
+* select clause and targets
+* where clause with boolean and relational operations, nesting of boolean operations
+* selecting by properties
+* order-by clause
+* querying and deleting
 
 Please see the API doc for further information about the various elements and how to create them.

@@ -1,4 +1,7 @@
-# Introduction
+
+# Application API
+
+## Introduction
 
 The Application API can be accessed in two different ways: Either using a single dedicated user with access to
 everything (“super user”) or by implementing more fine grained access through user and role switching upon every request
@@ -10,7 +13,7 @@ downside of this approach is a potential security risk as well as the inability 
 external applications back to the actual user who actually triggered the changes. The second method is more cumbersome
 to implement but leads a much improved control and assessment of security.
 
-# Delegation of Authorization
+## Delegation of Authorization
 
 In situations where the provider of the API offers a super user who is allowed “sudo” requests that are executed on
 behalf of another user, the API is actually delegating authorization to the client application. In this cause
@@ -20,7 +23,7 @@ of roles (with a few exceptions for security reasons).
 Note that in order to allow for user switching, a specific role needs to be assigned to the super user, and that role
 cannot be obtained by manipulating the role set (see [Role switching](#role-switching)).
 
-## User switching
+### User switching
 
 When working with a super user, it is considered a best practice to specify a dedicated execution user upon each request
 whenever possible and reasonable. This way, creation or modification of resources can later be audited and mapped back
@@ -47,7 +50,7 @@ Response code             | Comment
 `412 Precondition failed` | The user specified in the X-RUN-AS-USER header does not exist
 
 
-## Role switching
+### Role switching
 
 Rather than specifying an execution user, the client might choose to specify a set of roles that should be used when
 executing the request. This technique is recommended in cases where the users are not managed by the API. By specifying
@@ -71,15 +74,15 @@ Response code             | Comment
 `403 (FORBIDDEN)`         | The roles cannot be granted to due to potential escalation of privileges
 
 
-# Best practice
+## Best practice
 
-## One user per external application
+### One user per external application
 
 As a best practice, the API provider should create one super user per external application and tenant, so that access
 through that super user can be controlled, limited and turned off individually for each external application and tenant.
 
 
-## Preference for user and role switching
+### Preference for user and role switching
 
 Client implementations accessing the API through a super user are urged to implement and enforce user and role switching
 as much as possible, since it allows for auditing of user activity on the API and introduces less risk by running
@@ -88,13 +91,13 @@ requests with a limited set of privileges.
 Obviously, if all requests are executed using the super user directly, it is not possible to track which user initiated
 a given action.
 
-# Access Control
+## Access Control
 
 Most events in Opencast come with an access control list (ACL), containing entries that map actions to roles, either
 allowing or denying that action. Opencast currently only supports the ability to explicitly allow an action and consider
 everything else to be denied.
 
-## Roles
+### Roles
 
 When a user authenticates against Opencast, it is assigned its set of roles that determine the user's access to Opencast
 data entities. There are multiple ways to associate roles with a user:

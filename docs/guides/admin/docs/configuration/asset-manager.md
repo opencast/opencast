@@ -1,8 +1,11 @@
-Config Options
-==============
+Asset Manager Configuration
+===========================
 
-File System Based Asset Store
------------------------------
+Config Options
+--------------
+
+### File System Based Asset Store
+
 Configure the file system based asset store in custom.properties.
 
 - `org.opencastproject.episode.rootdir`  
@@ -13,7 +16,8 @@ Configure the file system based asset store in custom.properties.
   `${org.opencastproject.storage.dir}/archive` as its base path.
 
 Deployment
-==========
+----------
+
 The following bundles have to be added to the `system.properties`
 
 - asset-manager-api
@@ -22,11 +26,11 @@ The following bundles have to be added to the `system.properties`
 - asset-manager-util
 - asset-manager-workflowoperation
 
-How can I use a different storage backend?
-------------------------------------------
+### How can I use a different storage backend?
+
 Replace the `asset-manager-storage-fs` bundle with another bundle that exports an implementation of the `AssetStore` interface.
 
-How can I use a totally different AssetManager implementation?
---------------------------------------------------------------
+### How can I use a totally different AssetManager implementation?
+
 Replace both `asset-manager-impl` and `asset-manager-storage-fs` bundles 
 with a bundle that exports an implementation of the `asset-manager-api`.

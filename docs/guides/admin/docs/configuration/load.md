@@ -91,10 +91,10 @@ Step 4: Restart Opencast
 Many of these configuration files are only read on startup, so restarting Opencast is strongly recommended.
 
 Troubleshooting
-===============
+---------------
 
-Help, my system has deadlocked, or there are jobs which are always queued even if the system is otherwise idle
---------------------------------------------------------------------------------------------------------------
+### Help, my system has deadlocked, or there are jobs which are always queued even if the system is otherwise idle
+
 
 This can be caused by setting a job weight that exceeds the maximum load for *all* services of a given type.  For
 example, if you have a single worker with 8 cores and set an encoding job to have a jobload of 9.  Fortunately, there is

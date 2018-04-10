@@ -1,4 +1,6 @@
-# Introduction
+# Security API
+
+## Introduction
 
 Opencast is distributing encoded media to download and streaming servers to make that media available to end users. At
 the same time, that media needs to be protected such that - once provided a link to the download and/or streaming
@@ -11,12 +13,12 @@ As a consequence, users of the API who are presenting URLs to distributed media 
 those urls are signed, otherwise the distribution servers will refuse to deliver the content and respond with a `401 NOT
 AUTHORIZED` status.
 
-## Best practices
+### Best practices
 
 The use of signed URLs requires a set of best practices to be followed when clients interact with the API, most notably
 in the area of performance and caching.
 
-### Performance
+#### Performance
 
 When consuming URLs that need to be signed before handing them to the user, client implementors may be inclinded to use
 the `sign=true` parameter for the events queries to request all URLs to be already signed. On one hand, this saves the
@@ -24,13 +26,13 @@ client implementation from having to explicitly sign those URLs that users are v
 signing URLs introduces an overhead to performance for the pre-signing of all urls that are sent to the client, so in
 these cases it will be important to make sure not to transfer large lists *and* require presigning.
 
-### Caching
+#### Caching
 
 One obvious caveat when using pre-signed URLs is the use of cached responses. As described above, signed URLs have a
 maxmimum life time and therefore need to be refreshed on a regular basis so that a user's request to play back a
 recording won't be rejected by the distribution servers.
 
-### Secure access by source IP
+#### Secure access by source IP
 
 The signing facility of the security API provides the ability to sign URLs and restrict that URL to a given IP address.
 
@@ -39,7 +41,7 @@ important to note that in many network setups, source IP addresses of network pa
 translation (NAT) with NAT replacing the original source address from private networks with a single public address,
 thereby diminishing the security impact of adding the source IP address immensely.
 
-# URL Signing
+## URL Signing
 
 ### POST /api/security/sign
 

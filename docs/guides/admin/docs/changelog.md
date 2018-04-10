@@ -1,8 +1,10 @@
-Opencast 4.x
-============
+Changelog
+========
 
-Opencast 4.3
+Opencast 4.x
 ------------
+
+### Opencast 4.3
 
 *Released on March 28, 2018*
 
@@ -12,8 +14,7 @@ Opencast 4.3
 - [[MH-12789]](https://opencast.jira.com/browse/MH-12789) - Remove tabs and trailing spaces in LTI tools
 - [[MH-12790]](https://opencast.jira.com/browse/MH-12790) - Make LTI respect player configuration
 
-Opencast 4.2
-------------
+### Opencast 4.2
 
 *Released on March 14, 2018*
 
@@ -38,8 +39,7 @@ Opencast 4.2
 - [[MH-12668]](https://opencast.jira.com/browse/MH-12668) - Update admin ui build pipeline
 - [[MH-12651]](https://opencast.jira.com/browse/MH-12651) - Scheduling repeating events through Admin UI is very slow
 
-Opencast 4.1
-------------
+### Opencast 4.1
 
 *Released on Februar 7, 2018*
 
@@ -77,8 +77,7 @@ Opencast 4.1
 - [[MH-12476]](https://opencast.jira.com/browse/MH-12476) - Delay start of job dispatching on startup
 - [[MH-10016]](https://opencast.jira.com/browse/MH-10016) - Cannot Change Default Workflow
 
-Opencast 4.0
-------------
+### Opencast 4.0
 
 *Released on December 8, 2017*
 
@@ -291,10 +290,10 @@ Opencast 4.0
 
 
 Opencast 3.x
-============
-
-Opencast 3.5
 ------------
+
+### Opencast 3.5
+
 *Released on February 6, 2018*
 
 - [[MH-12620]](https://opencast.jira.com/browse/MH-12620) - Document ActiveMQ memory requirements
@@ -307,8 +306,8 @@ Opencast 3.5
 - [[MH-12399]](https://opencast.jira.com/browse/MH-12399) - Oaipmh Retract very slow
 
 
-Opencast 3.4
-------------
+### Opencast 3.4
+
 *Released on December 4, 2017*
 
 - [[MH-12588]](https://opencast.jira.com/browse/MH-12588) - Stream Security Leaks Secrets
@@ -340,8 +339,8 @@ Opencast 3.4
 - [[MH-11042]](https://opencast.jira.com/browse/MH-11042) - Admin UI NG tests fail in +5:30 timezone
 
 
-Opencast 3.3
-------------
+### Opencast 3.3
+
 *Released on September 21, 2017*
 
 - [[MH-12383]](https://opencast.jira.com/browse/MH-12383) - Upgrade/Unify Library Versions
@@ -378,8 +377,8 @@ Opencast 3.3
 - [[MH-11768]](https://opencast.jira.com/browse/MH-11768) - Timeline preview images
 
 
-Opencast 3.2
-------------
+### Opencast 3.2
+
 *Released on August 16, 2017*
 
 - [[MH-12347]](https://opencast.jira.com/browse/MH-12347) - Opencast generates invalid XML catalogs when a "default"
@@ -418,8 +417,8 @@ Opencast 3.2
 - [[MH-10523]](https://opencast.jira.com/browse/MH-10523) - Misleading exception parameter in getFileFromCollection
 
 
-Opencast 3.1
-------------
+### Opencast 3.1
+
 *Released on July 14, 2017*
 
 - [[MH-12296]](https://opencast.jira.com/browse/MH-12296) - getSeries Performance Issue
@@ -435,8 +434,8 @@ Opencast 3.1
   translations
 
 
-Opencast 3.0
-------------
+### Opencast 3.0
+
 *Released on June 13, 2017*
 
 - [[MH-12257]](https://opencast.jira.com/browse/MH-12257) - HttpsFilter is not called before
@@ -637,10 +636,10 @@ Opencast 3.0
 - [[MH-10310]](https://opencast.jira.com/browse/MH-10310) - Add ERROR state for capture agent
 
 Opencast 2.3.x
-==============
-
-Opencast 2.3.5
 --------------
+
+### Opencast 2.3.5
+
 *Released on December 04, 2017*
 
 - [[MH-12588]](https://opencast.jira.com/browse/MH-12588) - Stream Security Leaks Secrets
@@ -652,8 +651,8 @@ Opencast 2.3.5
 - [[MH-12000]](https://opencast.jira.com/browse/MH-12000) - Cross-tenant URL signing
 - [[MH-11042]](https://opencast.jira.com/browse/MH-11042) - Admin UI NG tests fail in +5:30 timezone
 
-Opencast 2.3.4
---------------
+### Opencast 2.3.4
+
 *Released on August 03, 2017*
 
 - [[MH-12183]](https://opencast.jira.com/browse/MH-12183) - Theodul does not load
@@ -663,8 +662,8 @@ Opencast 2.3.4
 - [[MH-12246]](https://opencast.jira.com/browse/MH-12246) - Series WOH does not apply series DublinCore catalogs
 - [[MH-12249]](https://opencast.jira.com/browse/MH-12249) - Media Module: Paging forgets search parameters
 
-Opencast 2.3.3
---------------
+### Opencast 2.3.3
+
 *Released on May 02, 2017*
 
 - [[MH-10558]](https://opencast.jira.com/browse/MH-10558) - Mime type not identified for matroska / mkv files
@@ -694,8 +693,8 @@ Opencast 2.3.3
   Opencast in a non-functional state
 - [[MH-12190]](https://opencast.jira.com/browse/MH-12190) - Script injection in Media Module and Player
 
-Opencast 2.3.2
---------------
+### Opencast 2.3.2
+
 *Released on March 22, 2017*
 
 - [[MH-11224]](https://opencast.jira.com/browse/MH-11224) - Attempting to view source metadata through the new admin UI
@@ -725,8 +724,8 @@ Opencast 2.3.2
 - [[MH-12097]](https://opencast.jira.com/browse/MH-12097) - SegmentVideoWorkflowOperation: Modules not included in Admin
   Presentation build.
 
-Opencast 2.3.1
---------------
+### Opencast 2.3.1
+
 *Released on Janurary 25, 2017*
 
 - [[MH-11267]](https://opencast.jira.com/browse/MH-11267) - Wrong notification text when deleting series
@@ -756,8 +755,8 @@ Opencast 2.3.1
 - [[MH-12006]](https://opencast.jira.com/browse/MH-12006) - Security Issue Allowing Arbitrary Code Execution
 
 
-Opencast 2.3.0
---------------
+### Opencast 2.3.0
+
 *Released on December 13, 2016*
 
 - [[MH-10342]](https://opencast.jira.com/browse/MH-10342) - As an external device I want to immediate start and stop a
@@ -868,18 +867,18 @@ Opencast 2.3.0
 
 
 Opencast 2.2.x
-==============
-
-Opencast 2.2.5
 --------------
+
+### Opencast 2.2.5
+
 *Released on June 7, 2017*
 
 - [[MH-11983]](https://opencast.jira.com/browse/MH-11983) - Only admins should be able to modify other admins
 - [[MH-12006]](https://opencast.jira.com/browse/MH-12006) - Security Issue Allowing Arbitrary Code Execution
 - [[MH-11962]](https://opencast.jira.com/browse/MH-11962) - Missing slidetext.xml should not break re-indexing
 
-Opencast 2.2.4
---------------
+### Opencast 2.2.4
+
 *Released on October 13, 2016*
 
 - [[MH-11831]](https://opencast.jira.com/browse/MH-11831) - As a service provider, I want to configure whether Opencast
@@ -888,8 +887,8 @@ Opencast 2.2.4
 - [[MH-11862]](https://opencast.jira.com/browse/MH-11862) - Search API handles roles wrong
 - [[MH-11875]](https://opencast.jira.com/browse/MH-11875) - ActiveMQ should not listen to all hosts by default
 
-Opencast 2.2.3
---------------
+### Opencast 2.2.3
+
 *Released on October 13, 2016*
 
 - [[MH-11285]](https://opencast.jira.com/browse/MH-11285) - Improve developers documentation: remote debugger with karaf
@@ -904,8 +903,8 @@ Opencast 2.2.3
 - [[MH-11800]](https://opencast.jira.com/browse/MH-11800) - LTI between Opencast and Moodle does not work
 - [[MH-11801]](https://opencast.jira.com/browse/MH-11801) - Wowza streaming server needs flv: prefix for flv files
 
-Opencast 2.2.2
---------------
+### Opencast 2.2.2
+
 *Released on September 14, 2016*
 
 - [[MH-11194]](https://opencast.jira.com/browse/MH-11194) - created themes not showing up in series branding tab
@@ -923,7 +922,7 @@ Opencast 2.2.2
 - [[MH-11755]](https://opencast.jira.com/browse/MH-11755) - No quality selection in Theodul Player
 - [[MH-11759]](https://opencast.jira.com/browse/MH-11759) - Make Inspector Unit Tests More Robust
 
-Opencast 2.2.1
+### Opencast 2.2.1
 --------------
 *Released on July 30, 2016*
 
@@ -965,8 +964,8 @@ Opencast 2.2.1
 - [[MH-11730]](https://opencast.jira.com/browse/MH-11730) - Make the automatic role prefix in LDAPUserProvider
   configurable
 
-Opencast 2.2.0
---------------
+### Opencast 2.2.0
+
 *Released on June 15, 2016*
 
 - [[MH-9511]](https://opencast.jira.com/browse/MH-9511) - Wrong log level in Tesseract
@@ -1201,10 +1200,10 @@ Opencast 2.2.0
 
 
 Opencast 2.1.x
-==============
-
-Opencast 2.1.2
 --------------
+
+### Opencast 2.1.2
+
 *Released on May 10, 2016*
 
 - [[MH-9831]](https://opencast.jira.com/browse/MH-9831) - ehcache and quartz phones home
@@ -1226,8 +1225,8 @@ Opencast 2.1.2
 - [[MH-11356]](https://opencast.jira.com/browse/MH-11356) - Update Documentation Index Page
 - [[MH-11377]](https://opencast.jira.com/browse/MH-11377) - Opencast does not have an ingest assembly
 
-Opencast 2.1.1
---------------
+### Opencast 2.1.1
+
 *Released on January 22, 2016*
 
 - [[MH-11107]](https://opencast.jira.com/browse/MH-11107) - Group list pagination not working
@@ -1238,8 +1237,8 @@ Opencast 2.1.1
 - [[MH-11280]](https://opencast.jira.com/browse/MH-11280) - Opencast fails to compile due to missing dependencies in
   test-harness
 
-Opencast 2.1.0
---------------
+### Opencast 2.1.0
+
 *Released on December 22, 2015*
 
 - [[MH-10637]](https://opencast.jira.com/browse/MH-10637) - Hello World service
@@ -1364,10 +1363,10 @@ Opencast 2.1.0
 - [[MH-11258]](https://opencast.jira.com/browse/MH-11258) - Make host configuration easier
 
 Opencast 2.0.x
-==============
-
-Opencast 2.0.2
 --------------
+
+### Opencast 2.0.2
+
 *Released on December 22, 2015*
 
 - [[MH-10235]](https://opencast.jira.com/browse/MH-10235) - Users are unable to determine the Version of Matterhorn
@@ -1406,8 +1405,8 @@ Opencast 2.0.2
   ffmpeg binary path
 - [[MH-11256]](https://opencast.jira.com/browse/MH-11256) - Opencast docs do not build anymore
 
-Opencast 2.0.1
---------------
+### Opencast 2.0.1
+
 *Released on September 3, 2015*
 
 - [[MH-10822]](https://opencast.jira.com/browse/MH-10822) - Possible to create new access policy template without a role
@@ -1421,8 +1420,8 @@ Opencast 2.0.1
 - [[MH-10995]](https://opencast.jira.com/browse/MH-10995) - Gathering workflow statistics for JMX causes extreme
   performance issues
 
-Opencast 2.0.0
---------------
+### Opencast 2.0.0
+
 *Released on July 17, 2015*
 
 - [[MH-9950]](https://opencast.jira.com/browse/MH-9950) - "Clean up"/Split up nested functions in the core routine

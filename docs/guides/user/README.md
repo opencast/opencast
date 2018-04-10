@@ -2,7 +2,7 @@
 
 This guide is the official Opencast user's manual for the open-source video capture system.
 
-# Setup
+## Setup
 
 ### Git Repository
 The source documentation is hosted on this Git repository: https://github.com/opencast/opencast
@@ -21,7 +21,7 @@ http server and build the doc:
 
     mkdocs serve
 
-# Dependencies and Requirements
+## Dependencies and Requirements
 
 * Python
 * mkdocs

@@ -1,13 +1,14 @@
-Stream Security Developer Guide
-===============================
+# Stream Security Developer Guide
+
 To get an introduction to Stream Security, please read the sub section Stream Security in the section Modules of the
 Admin Guide.
 
-# Opencast Signing Protocol
+## Opencast Signing Protocol
+
 The Signing Providers as well as the verification components that are developed by the Opencast community implement the
 policy and signature specified in the Opencast Signing Protocol. 
 
-## Policy
+### Policy
 The policy is a Base64 encoded JSON document. A human-readable version of the JSON document looks like this:
 
 ```json
@@ -51,7 +52,7 @@ Note: Be aware that Base64 encoding can have up to two ‘=’ characters at the
 necessary length divisible by 3. All components should be able to handle Base64 encoded strings with or without this
 padding (Resources signed by Opencast will have the padding characters URL encoded to ‘%3D’).
 
-## Signature
+### Signature
 The signature is a hash-based message authentication code (HMAC) based on a secret key. The algorithm used is
 HMAC-SHA-256. Only the encoded policy needs to be taken as input for the hash-calculation.
 
@@ -74,7 +75,7 @@ The same is true for the key id, which needs to be included to determine which k
 
     http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0&signature=c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4&keyId=demoKeyOne
 
-# Signing URLs from a 3rd party system
+## Signing URLs from a 3rd party system
 URL signatures also need to be issued for resources presented on and linked from a third party system (such as a custom
 video portal). There are two options for signing 3rd party system URLs:
 

@@ -1,7 +1,7 @@
 <!-- Hamburger Icon -->
 [icon_hamburger]:data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAAPCAYAAAAGRPQsAAAARklEQVQ4y2Ow6L3SCsQ/gfg/BRikv5WBCgbB8GcGKrnsF9hlIwSQEGY/CYYLiYH/mVouG1ExRqUwIxy7FGalz9RyGUbsAgCNXmeVduHT9gAAAABJRU5ErkJggg== "Edit Icon"
 
-
+# Glossary
 
 ## Recordings
 A general term used to describe activities that occur within an Opencast system including Series and Events.
