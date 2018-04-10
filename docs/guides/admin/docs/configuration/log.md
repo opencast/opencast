@@ -5,14 +5,16 @@ The settings for logging can be found in:
 
     .../etc/org.ops4j.pax.logging.cfg
 
-Each Log4J appender can be configured in a similar fashion to the graylog example down below. The following requirements have to be met:
+Each Log4J appender can be configured in a similar fashion to the graylog example down below. The following
+requirements have to be met:
 * It needs to be a Log4J appender
 * The used bundle needs to be a fragment-bundle
 
 Graylog
 -------
 
-To have all log data available and accessible in one central location one can use graylog. A guide to install graylog can be found [here](http://docs.graylog.org/en/stable/).
+To have all log data available and accessible in one central location one can use graylog. A guide to install
+graylog can be found [here](http://docs.graylog.org/en/stable/).
 
 
 Add gelfj-X.X.X.jar (works up to version 1.1.14) to the appropriate folder in the karaf system folder (e.g. `/system/org/graylog2/gelfj/X.X.X/gelfj-X.X.X.jar`)
