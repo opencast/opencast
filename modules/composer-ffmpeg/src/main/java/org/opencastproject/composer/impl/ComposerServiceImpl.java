@@ -1007,6 +1007,27 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   @Override
+  public List<Attachment> imageSync(Track sourceTrack, String profileId, double... time) throws EncoderException,
+      MediaPackageException {
+    Job job = null;
+    try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      final List<Attachment> images = image(job, sourceTrack, profileId, time);
+      job.setStatus(Job.Status.FINISHED);
+      return images;
+    } catch (ServiceRegistryException | NotFoundException e) {
+      throw new EncoderException("Unable to create a job", e);
+    } finally {
+      finallyUpdateJob(job);
+    }
+  }
+
+  @Override
   public Job image(Track sourceTrack, String profileId, Map<String, String> properties) throws EncoderException,
           MediaPackageException {
     if (sourceTrack == null)
@@ -1201,6 +1222,26 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
+    }
+  }
+
+  @Override
+  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+    Job job = null;
+    try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      Option<Attachment> result = convertImage(job, image, profileId);
+      job.setStatus(Job.Status.FINISHED);
+      return result.getOrElseNull();
+    } catch (ServiceRegistryException | NotFoundException e) {
+      throw new EncoderException("Unable to create a job", e);
+    } finally {
+      finallyUpdateJob(job);
     }
   }
 

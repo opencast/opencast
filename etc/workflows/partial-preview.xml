@@ -80,6 +80,39 @@
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Extract the thumbnail preview image for the video editor          -->
+    <!--                                                                   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <operation
+        id="image"
+        if="${presenter_work_video}"
+        exception-handler-workflow="partial-error"
+        description="Extract default thumbnail preview image from presenter track">
+      <configurations>
+        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="image"
+      if="NOT (${presenter_work_video}) AND ${presentation_work_video}"
+      exception-handler-workflow="partial-error"
+      description="Extract default thumbnail preview image from presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/work</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Silence detection                                                 -->
     <!--                                                                   -->
     <!-- Run silence detection to provide hints to the video editor.       -->

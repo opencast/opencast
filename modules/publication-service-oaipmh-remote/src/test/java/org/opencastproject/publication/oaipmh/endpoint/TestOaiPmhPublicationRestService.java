@@ -24,7 +24,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.util.NotFoundException;
@@ -65,6 +68,24 @@ public class TestOaiPmhPublicationRestService extends OaiPmhPublicationRestServi
       EasyMock.expect(job.getUri()).andReturn(OaiPmhPublicationRestServiceTest.JOB_URI).anyTimes();
       EasyMock.replay(job);
       return job;
+    }
+
+    @Override
+    public Job replace(MediaPackage mediaPackage, String repository,
+           Set<? extends MediaPackageElement> downloadElements, Set<? extends MediaPackageElement> streamingElements,
+           Set<MediaPackageElementFlavor> retractDownloadFlavors,
+           Set<MediaPackageElementFlavor> retractStreamingFlavors,
+           Set<? extends Publication> publications, boolean checkAvailability) throws PublicationException {
+      return null;
+    }
+
+    @Override
+    public Publication replaceSync(
+        MediaPackage mediaPackage, String repository, Set<? extends MediaPackageElement> downloadElements,
+        Set<? extends MediaPackageElement> streamingElements, Set<MediaPackageElementFlavor> retractDownloadFlavors,
+        Set<MediaPackageElementFlavor> retractStreamingFlavors,
+        Set<? extends Publication> publications, boolean checkAvailability) throws PublicationException {
+      return null;
     }
 
     // not used

@@ -33,6 +33,7 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.MediaPackage;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,5 +106,10 @@ public final class WorkflowPropertiesUtil {
       final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
       assetManager.setProperty(property);
     }
+  }
+
+  public static void storeProperty(final AssetManager assetManager, final MediaPackage mediaPackage,
+          final String name, final String value) {
+    storeProperties(assetManager, mediaPackage, Collections.singletonMap(name, value));
   }
 }

@@ -138,20 +138,8 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
 
       for (MediaPackageElement element : elements) {
-        MediaPackageElementFlavor flavor;
-
-        // Take subtype either from option or from element (if option is *)
-        String subtype;
-        if ("*".equals(targetFlavor.getSubtype()))
-          subtype = element.getFlavor().getSubtype();
-        else
-          subtype = targetFlavor.getSubtype();
-
-        // Take type either from option or from element (if option is *)
-        if ("*".equals(targetFlavor.getType()))
-          flavor = new MediaPackageElementFlavor(element.getFlavor().getType(), subtype);
-        else
-          flavor = new MediaPackageElementFlavor(targetFlavor.getType(), subtype);
+        // apply the target flavor to the element
+        MediaPackageElementFlavor flavor = targetFlavor.applyTo(element.getFlavor());
 
         // Copy element and set new flavor
         MediaPackageElement newElement = copyElement(element);

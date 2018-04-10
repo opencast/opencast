@@ -28,6 +28,8 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -44,6 +46,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.DefaultValue;
@@ -132,6 +135,33 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
   }
 
   @POST
+  @Path("/distributesync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "distributesync", description = "Synchronously distribute a media package element to this distribution channel", returnDescription = "The distribution", restParameters = {
+      @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+      @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
+      @RestParameter(name = "elementId", isRequired = true, description = "The element to distribute", type = Type.STRING),
+      @RestParameter(name = "checkAvailability", isRequired = false, description = "If the service should try to access the distributed element", type = Type.BOOLEAN) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution") })
+  public Response distributeSync(@FormParam("mediapackage") String mediaPackageXml,
+                             @FormParam("channelId") String channelId, @FormParam("elementId") String elementId,
+                             @DefaultValue("true") @FormParam("checkAvailability") boolean checkAvailability) throws Exception {
+    List<MediaPackageElement> result = null;
+    try {
+      Gson gson = new Gson();
+      Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      result = service.distributeSync(channelId, mediapackage, setElementIds, checkAvailability);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to distribute element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
+    } catch (Exception e) {
+      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel: {}", mediaPackageXml, elementId, e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+    return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
+  }
+
+  @POST
   @Path("/retract")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
@@ -154,6 +184,31 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();
+  }
+
+  @POST
+  @Path("/retractsync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "retractsync", description = "Synchronously retract a media package element from this distribution channel", returnDescription = "The retraction", restParameters = {
+      @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+      @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
+      @RestParameter(name = "elementId", isRequired = true, description = "The element to retract", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction") })
+  public Response retractSync(@FormParam("mediapackage") String mediaPackageXml, @FormParam("channelId") String channelId,
+                          @FormParam("elementId") String elementId) throws Exception {
+    List<MediaPackageElement> result = null;
+    try {
+      Gson gson = new Gson();
+      Set<String> setElementIds = gson.fromJson(elementId, new TypeToken<Set<String>>() { }.getType());
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      result = service.retractSync(channelId, mediapackage, setElementIds);
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to retract element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retract media package {}, element {} from aws s3 channel: {}", mediaPackageXml, elementId, e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+    return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
   }
 
   /* TODO

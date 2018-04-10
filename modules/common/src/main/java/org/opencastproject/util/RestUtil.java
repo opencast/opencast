@@ -278,6 +278,10 @@ public final class RestUtil {
       return Response.status(Response.Status.NOT_FOUND).entity(entity).type(type).build();
     }
 
+    public static Response locked() {
+      return Response.status(423).build();
+    }
+
     public static Response serverError() {
       return Response.serverError().build();
     }

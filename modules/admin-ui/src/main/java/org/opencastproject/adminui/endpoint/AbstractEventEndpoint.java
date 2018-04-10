@@ -686,7 +686,7 @@ public abstract class AbstractEventEndpoint {
 
     JSONObject json = new JSONObject();
 
-    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState())) {
+    if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
       json.put("active", true);
     } else {
       json.put("active", false);

@@ -22,10 +22,17 @@ package org.opencastproject.smil.api.util;
 
 import static org.opencastproject.util.IoSupport.withResource;
 
+import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
+import org.opencastproject.mediapackage.selector.CatalogSelector;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.functions.Misc;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.android.mms.dom.smil.parser.SmilXmlParser;
 import com.entwinemedia.fn.Fn;
@@ -43,9 +50,12 @@ import org.w3c.dom.smil.SMILDocument;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * General purpose utility functions for dealing with SMIL.
@@ -205,5 +215,33 @@ public final class SmilUtil {
     return smilDocument;
   }
 
+
+  public static SMILDocument getSmilDocumentFromMediaPackage(MediaPackage mp, MediaPackageElementFlavor smilFlavor,
+      Workspace workspace)
+      throws IOException, SAXException, NotFoundException {
+    final AbstractMediaPackageElementSelector<Catalog> smilSelector = new CatalogSelector();
+    smilSelector.addFlavor(smilFlavor);
+    final Collection<Catalog> smilCatalog = smilSelector.select(mp, false);
+    if (smilCatalog.size() == 1) {
+      return getSmilDocument(smilCatalog.iterator().next(), workspace);
+    } else {
+      logger.error("More or less than one smil catalog found: {}", smilCatalog);
+      throw new IllegalStateException("More or less than one smil catalog found!");
+    }
+  }
+
+  /** Get the SMIL document from a catalog. */
+  private static SMILDocument getSmilDocument(final Catalog smilCatalog, Workspace workspace) throws NotFoundException,
+      IOException, SAXException {
+    FileInputStream in = null;
+    try {
+      File smilXmlFile = workspace.get(smilCatalog.getURI());
+      SmilXmlParser smilParser = new SmilXmlParser();
+      in = new FileInputStream(smilXmlFile);
+      return smilParser.parse(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
 
 }

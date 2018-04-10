@@ -30,6 +30,8 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -46,6 +48,7 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.FormParam;
@@ -143,6 +146,38 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
   }
 
   @POST
+  @Path("/distributesync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "distributesync", description = "Syncrhonously distribute a media package element to this distribution channel", returnDescription = "The distribution", restParameters = {
+      @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+      @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
+      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to distribute as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+      @RestResponse(responseCode = SC_OK, description = "An XML representation of the distribution"),
+      @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
+  public Response distributeSync(@FormParam("mediapackage") String mediaPackageXml,
+                             @FormParam("channelId") String channelId,
+                             @FormParam("elementIds") String elementIds)
+      throws Exception {
+    List<MediaPackageElement> result = null;
+    try {
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      result = service.distributeSync(channelId, mediapackage, setElementIds);
+      if (result == null || result.isEmpty()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
+      }
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to distribute element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
+    } catch (Exception e) {
+      logger.warn("Error distributing element", e);
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
   @Path("/retract")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "retract", description = "Retract a media package element from this distribution channel", returnDescription = "The job that can be used to track the retraction", restParameters = {
@@ -165,6 +200,38 @@ public class WowzaAdaptiveStreamingDistributionRestService extends AbstractJobPr
        } else {
          return Response.ok(new JaxbJob(job)).build();
        }
+    } catch (IllegalArgumentException e) {
+      logger.debug("Unable to retract element: {}", e.getMessage());
+      return status(Status.BAD_REQUEST).build();
+    } catch (Exception e) {
+      logger.warn("Unable to retract mediapackage '{}' from streaming channel: {}", new Object[] { mediaPackageXml, e });
+      return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
+  @Path("/retractsync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "retractsync", description = "Synchronously retract a media package element from this distribution channel", returnDescription = "The retraction", restParameters = {
+      @RestParameter(name = "mediapackage", isRequired = true, description = "The mediapackage", type = Type.TEXT),
+      @RestParameter(name = "channelId", isRequired = true, description = "The publication channel ID", type = Type.TEXT),
+      @RestParameter(name = "elementIds", isRequired = true, description = "The elements to retract as Json Array['IdOne','IdTwo']", type = Type.STRING) }, reponses = {
+      @RestResponse(responseCode = SC_OK, description = "An XML representation of the retraction"),
+      @RestResponse(responseCode = SC_NO_CONTENT, description = "There is no streaming distribution service available")})
+  public Response retractSync(@FormParam("mediapackage") String mediaPackageXml,
+                          @FormParam("channelId") String channelId,
+                          @FormParam("elementIds") String elementIds)
+      throws Exception {
+    List<MediaPackageElement> result = null;
+    try {
+      Set<String> setElementIds = gson.fromJson(elementIds, new TypeToken<Set<String>>() { }.getType());
+      MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
+      result = service.retractSync(channelId, mediapackage, setElementIds);
+      if (result == null || result.isEmpty()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageElementParser.getArrayAsXml(result)).build();
+      }
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();

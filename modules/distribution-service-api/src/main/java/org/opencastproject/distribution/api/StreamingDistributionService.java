@@ -23,8 +23,10 @@ package org.opencastproject.distribution.api;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -37,4 +39,37 @@ public interface StreamingDistributionService extends DistributionService {
 
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
+
+  /**
+   * Distributes the given elements synchronously. This should be used rarely since load balancing will be unavailable.
+   * However, since the dispatching logic is bypassed, synchronous execution is much faster. It is useful in interactive
+   * scenarios where you synchronously wait for job execution anyway and you don't want to make the user waiting for too
+   * long.
+   *
+   * @param channelId The channel to retract from.
+   * @param mediapackage A media package holding the elements to retract.
+   * @param elementIds The IDs of the elements to retract.
+   *
+   * @return The distributed elements.
+   * @throws DistributionException In case distribution fails.
+   */
+  List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+      throws DistributionException;
+
+  /**
+   * Retracts the given elements synchronously. This should be used rarely since load balancing will be unavailable.
+   * However, since the dispatching logic is bypassed, synchronous execution is much faster. It is useful in interactive
+   * scenarios where you synchronously wait for job execution anyway and you don't want to make the user waiting for too
+   * long.
+   *
+   * @param channelId The channel to retract from.
+   * @param mediaPackage A media package holding the elements to retract.
+   * @param elementIds The IDs of the elements to retract.
+   *
+   * @return The retracted elements.
+   *
+   * @throws DistributionException In case retraction fails.
+   */
+  List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+      throws DistributionException;
 }

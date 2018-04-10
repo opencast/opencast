@@ -140,6 +140,8 @@
     <module>modules/oaipmh-remote</module>
     <module>modules/presets</module>
     <module>modules/publication-service-api</module>
+    <module>modules/publication-service-configurable</module>
+    <module>modules/publication-service-configurable-remote</module>
     <module>modules/publication-service-oaipmh</module>
     <module>modules/publication-service-oaipmh-remote</module>
     <module>modules/publication-service-youtube-remote</module>

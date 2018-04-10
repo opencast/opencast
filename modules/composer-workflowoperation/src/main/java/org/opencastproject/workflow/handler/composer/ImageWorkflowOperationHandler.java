@@ -86,6 +86,7 @@ import java.net.URI;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 /**
  * The workflow definition for handling "image" operations
@@ -214,6 +215,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
             // post process images
             for (final P2<Attachment, MediaPosition> image : $(images).zip(extraction.positions)) {
               adjustMetadata(extraction, image.get1());
+              if (image.get1().getIdentifier() == null) image.get1().setIdentifier(UUID.randomUUID().toString());
               mp.addDerived(image.get1(), extraction.track);
               final String fileName = createFileName(
                       extraction.profile.getSuffix(), extraction.track.getURI(), image.get2());

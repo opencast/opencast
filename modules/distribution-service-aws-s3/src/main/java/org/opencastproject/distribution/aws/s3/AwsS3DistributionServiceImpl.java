@@ -460,6 +460,27 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     }
   }
 
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
+         boolean checkAvailability) throws DistributionException {
+    final MediaPackageElement[] distributedElements =
+        distributeElements(channelId, mediapackage, elementIds, checkAvailability);
+    if (distributedElements == null) {
+      return null;
+    }
+    return Arrays.asList(distributedElements);
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+      throws DistributionException {
+    final MediaPackageElement[] retractedElements = retractElements(channelId, mediaPackage, elementIds);
+    if (retractedElements == null) {
+      return null;
+    }
+    return Arrays.asList(retractedElements);
+  }
+
   /**
    * Retracts the media package element with the given identifier from the distribution channel.
    *
