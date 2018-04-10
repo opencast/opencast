@@ -22,6 +22,8 @@ module.exports = function(grunt) {
               code_blocks: false,
               tables: false
             },
+            MD018: true, // require space after hash on atx style header
+            MD019: true, // prohibit multiple spaces after hash on atx style header
             MD045: true, // accessibility
           }
         },
