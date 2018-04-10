@@ -15,7 +15,7 @@ module.exports = function(grunt) {
             MD005: true, // inconsistent indentation for list items at the same level
             MD006: true, // consider starting bulleted lists at the beginning of the line
             MD007: { // unordered list indentation
-              indent: 2
+              indent: 4 // python-markdown requires 4 spaces of indentation. see https://python-markdown.github.io/#differences
             },
             MD013: { // line-length
               line_length: 120,
