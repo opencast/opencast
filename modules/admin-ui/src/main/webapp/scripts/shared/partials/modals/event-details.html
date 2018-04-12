@@ -8,9 +8,7 @@
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">
-            <!-- General -->
-        </a>
+
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
             <!-- Metadata -->
         </a>
@@ -21,6 +19,11 @@
         <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
             <!-- Assets -->
         </a>
+
+        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">
+          <!-- General -->
+        </a>
+      
         <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" ng-if="scheduling.hasProperties">
             <!-- Scheduling -->
         </a>
