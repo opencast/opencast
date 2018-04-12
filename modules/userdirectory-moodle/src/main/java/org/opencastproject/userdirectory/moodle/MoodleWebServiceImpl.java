@@ -82,8 +82,6 @@ public class MoodleWebServiceImpl implements MoodleWebService {
 
   /**
    * {@inheritDoc}
-   *
-   * @see org.opencastproject.userdirectory.moodle.MoodleWebService#coreUserGetUsersByField(CoreUserGetUserByFieldFilters, List<String>)
    */
   @Override
   public List<MoodleUser> coreUserGetUsersByField(CoreUserGetUserByFieldFilters filter, List<String> values)
