@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasValue;
 import static org.junit.Assert.assertEquals;
@@ -29,10 +29,6 @@ import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.rest.RestServiceTestEnv;
-
-import com.jayway.restassured.http.ContentType;
-import com.jayway.restassured.response.Response;
-import com.jayway.restassured.response.ResponseBody;
 
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONObject;
@@ -42,6 +38,10 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+import io.restassured.response.ResponseBody;
 
 public class ListProvidersEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestListProvidersEndpoint.class);
@@ -79,8 +79,10 @@ public class ListProvidersEndpointTest {
 
   @Test
   public void testGetWithFilters() throws ParseException {
-    Response response = given().log().all().pathParam("id", "SERVERS").parameters("filter", "name=non existing name")
-            .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).get(rt.host("/{id}.json"));
+    Response response = given().log().all().pathParam("id", "SERVERS").param("filter", "name=non existing name")
+      .when().get(rt.host("/{id}.json"))
+      .then().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+      .extract().response();
     ResponseBody body = response.getBody();
     String content = body.asString();
     JSONObject json = (JSONObject) parser.parse(content);

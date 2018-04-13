@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
@@ -29,8 +29,6 @@ import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 import org.opencastproject.adminui.api.SortType;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestServiceTestEnv;
-
-import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -49,6 +47,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
+
+import io.restassured.http.ContentType;
 
 public class SeriesEndpointTest {
 

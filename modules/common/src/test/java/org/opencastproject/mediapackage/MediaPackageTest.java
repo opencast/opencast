@@ -22,7 +22,7 @@
 
 package org.opencastproject.mediapackage;
 
-import static com.jayway.restassured.path.xml.XmlPath.from;
+import static io.restassured.path.xml.XmlPath.from;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;

@@ -21,14 +21,12 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.rest.RestServiceTestEnv;
-
-import com.jayway.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
@@ -42,6 +40,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import io.restassured.http.ContentType;
 
 public class TasksEndpointTest {
 

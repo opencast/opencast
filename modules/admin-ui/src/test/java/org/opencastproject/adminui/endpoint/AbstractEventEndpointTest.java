@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
@@ -48,7 +48,6 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
-import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -67,6 +66,7 @@ import java.io.IOException;
 
 import javax.ws.rs.WebApplicationException;
 
+import io.restassured.http.ContentType;
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class AbstractEventEndpointTest {
@@ -675,8 +675,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetCatalogAdapters() throws Exception {
-    given().expect().statusCode(HttpStatus.SC_OK).when().contentType(ContentType.JSON).body("", hasSize(2))
-            .body("title", hasItems("name 1", "name 2")).get(rt.host("catalogAdapters"));
+    given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("catalogAdapters")).then()
+            .body("title", hasItems("name 1", "name 2")).contentType(ContentType.JSON).body("", hasSize(2));
   }
 
   @Test
@@ -703,7 +703,7 @@ public class AbstractEventEndpointTest {
     String expected = IOUtils.toString(getClass().getResource("/publications.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .contentType(ContentType.JSON).get(rt.host("{eventId}/asset/publication/publications.json")).asString();
+      .get(rt.host("{eventId}/asset/publication/publications.json")).asString();
 
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 

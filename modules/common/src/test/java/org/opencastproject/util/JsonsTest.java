@@ -37,14 +37,14 @@ import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.Jsons.toJson;
 import static org.opencastproject.util.Jsons.v;
 
-import com.jayway.restassured.path.json.JsonPath;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+
+import io.restassured.path.json.JsonPath;
 
 public class JsonsTest {
   private static final Logger logger = LoggerFactory.getLogger(JsonsTest.class);

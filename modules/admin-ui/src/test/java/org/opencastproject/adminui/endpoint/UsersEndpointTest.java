@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
@@ -29,8 +29,6 @@ import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.rest.RestServiceTestEnv;
-
-import com.jayway.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
@@ -46,6 +44,8 @@ import org.junit.Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import io.restassured.http.ContentType;
 
 public class UsersEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestUsersEndpoint.class);

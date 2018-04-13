@@ -21,7 +21,7 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static com.jayway.restassured.path.json.JsonPath.from;
+import static io.restassured.path.json.JsonPath.from;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.security.api.AccessControlUtil.acl;
 import static org.opencastproject.security.api.AccessControlUtil.entry;
@@ -38,8 +38,6 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
-import com.jayway.restassured.path.json.JsonPath;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import io.restassured.path.json.JsonPath;
 
 public final class JsonConvTest {
   private static final Logger logger = LoggerFactory.getLogger(JsonConvTest.class);
