@@ -1584,19 +1584,7 @@
         <reportSets>
           <reportSet>
             <reports>
-              <report>cim</report>
-              <report>dependencies</report>
-              <report>dependency-convergence</report>
-              <report>dependency-management</report>
               <report>index</report>
-              <report>issue-tracking</report>
-              <!--              <report>license</report>-->
-              <report>mailing-list</report>
-              <!--3.3              <report>modules</report>-->
-              <report>plugin-management</report>
-              <report>plugins</report>
-              <report>project-team</report>
-              <report>scm</report>
               <report>summary</report>
             </reports>
           </reportSet>

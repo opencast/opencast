@@ -1,0 +1,19 @@
+# execute if T is $1
+_t() {
+  if [ "$T" = "$1" ]; then
+    shift
+    "$@"
+  else
+    echo "Skipping…"
+  fi
+}
+
+# execute if T is not $1
+_nt() {
+  if [ "$T" != "$1" ]; then
+    shift
+    "$@"
+  else
+    echo "Skipping…"
+  fi
+}

@@ -4,9 +4,16 @@ language: java
 
 jdk: oraclejdk8
 
+env:
+  - T=docs
+  - T=build
+  - T=site
+
 before_install:
-  - sudo apt-get -qq update
+  - . .travisrc
+  - _nt docs sudo apt-get -qq update
   - >
+     _nt docs
      sudo apt-get install -y
      bzip2
      gzip
@@ -18,25 +25,28 @@ before_install:
      tesseract-ocr
      tesseract-ocr-deu
      unzip
-  - wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
-  - tar xf ffmpeg-release-64bit-static.tar.xz
-  - sudo mv ffmpeg-*/ff* /usr/bin/
+  - _nt docs wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+  - _nt docs tar xf ffmpeg-release-64bit-static.tar.xz
+  - _nt docs sudo mv ffmpeg-*/ff* /usr/bin/
   - >
+     _nt docs
      wget https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
      wget https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
      wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
-  - sudo dpkg -i synfigstudio-1.0.2.deb
-  - sudo pip install mkdocs
+  - _nt docs sudo dpkg -i synfigstudio-1.0.2.deb
+  - _t docs sudo pip install mkdocs
 
 install:
   - true
 
 script:
-  - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
-  - (! grep -rn '	' etc)
-  - (! grep -rn ' $' etc)
-  - (cd docs/guides/admin && mkdocs build)
-  - (cd docs/guides/developer && mkdocs build)
-  - (cd docs/guides/user && mkdocs build)
-  - mvn --batch-mode clean install -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn -Pnone
+  - _t docs sh -c "! grep -rn '	' modules assemblies pom.xml --include=pom.xml"
+  - _t docs sh -c "! grep -rn ' $' modules assemblies pom.xml --include=pom.xml"
+  - _t docs sh -c "! grep -rn '	' etc"
+  - _t docs sh -c "! grep -rn ' $' etc"
+  - _t docs sh -c "cd docs/guides/admin && mkdocs build"
+  - _t docs sh -c "cd docs/guides/developer && mkdocs build"
+  - _t docs sh -c "cd docs/guides/user && mkdocs build"
+  - _t build mvn --batch-mode clean install -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  - _t site  mvn --batch-mode install -DskipTests=true -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+  - _t site  mvn --batch-mode site -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
