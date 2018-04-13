@@ -243,8 +243,12 @@ public final class AclServiceImpl implements AclService {
 
         for (MediaPackage mp : mediaPackages) {
           // remove episode xacml and update in archive service
-          if (assetManager != null)
-            assetManager.takeSnapshot(authorizationService.removeAcl(mp, AclScope.Episode));
+          try {
+            if (assetManager != null)
+              assetManager.takeSnapshot(authorizationService.removeAcl(mp, AclScope.Episode));
+          } catch (Exception e) {
+            logger.info("Error applying series ACL to mediapackage {}", mp.getIdentifier().toString());
+          }
         }
       }
       // update in series service
