@@ -40,7 +40,7 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.After;

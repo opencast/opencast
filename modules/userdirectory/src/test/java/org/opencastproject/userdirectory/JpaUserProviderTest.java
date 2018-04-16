@@ -42,7 +42,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PasswordEncoder;
 import org.opencastproject.util.data.Collections;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
