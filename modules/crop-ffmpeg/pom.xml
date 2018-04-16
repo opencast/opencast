@@ -6,15 +6,15 @@
 <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>${project.version}</version>
+    <version>5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
 </parent>
 <properties>
-    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
 </properties>
 <dependencies>
-    <!-- Matterhorn dependencies -->
+    <!-- Opencast dependencies -->
     <dependency>
         <groupId>org.opencastproject</groupId>
         <artifactId>crop-api</artifactId>
@@ -22,12 +22,12 @@
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-workspace-api</artifactId>
+        <artifactId>opencast-workspace-api</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-metadata-api</artifactId>
+        <artifactId>opencast-metadata-api</artifactId>
         <version>${project.version}</version>
     </dependency>
 
@@ -57,35 +57,13 @@
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
     <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
     </dependency>
-    <!-- Testing -->
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.easymock</groupId>
-        <artifactId>easymock</artifactId>
-        <scope>test</scope>
-    </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-common</artifactId>
+        <artifactId>opencast-common</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -94,12 +72,12 @@
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-mpeg7</artifactId>
+        <artifactId>opencast-mpeg7</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-inspection-service-ffmpeg</artifactId>
+        <artifactId>opencast-inspection-service-ffmpeg</artifactId>
         <version>${project.version}</version>
     </dependency>
 

@@ -78,6 +78,9 @@
     <module>modules/cover-image-impl</module>
     <module>modules/cover-image-remote</module>
     <module>modules/cover-image-workflowoperation</module>
+    <module>modules/crop-workflowoperation</module>
+    <module>modules/crop-api</module>
+    <module>modules/crop-ffmpeg</module>
     <module>modules/dataloader</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>

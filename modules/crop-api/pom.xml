@@ -6,32 +6,18 @@
 <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>${project.version}</version>
+    <version>5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
 </parent>
 <properties>
-    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
 </properties>
 <dependencies>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-common</artifactId>
+        <artifactId>opencast-common</artifactId>
         <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>log4j</groupId>
-        <artifactId>log4j</artifactId>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
     </dependency>
 </dependencies>
 <build>

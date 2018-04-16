@@ -55,23 +55,30 @@ import javax.ws.rs.core.Response;
 @Path("")
 @RestService(name = "crop", title = "Video Crop Service", abstractText = "This service is not ready", notes = "This is a note")
 public class CropRestEndpoint extends AbstractJobProducerEndpoint {
-  /** The logger */
+  /**
+   * The logger
+   */
   private static final Logger logger = LoggerFactory.getLogger(CropRestEndpoint.class);
 
-  /** The rest docs */
+  /**
+   * The rest docs
+   */
   protected String docs;
 
-  /** The cropper */
+  /**
+   * The cropper
+   */
   protected CropService cropService;
 
-  /** The service registry */
+  /**
+   * The service registry
+   */
   protected ServiceRegistry serviceRegistry = null;
 
   /**
    * Callback from OSGi declarative services to set the service registry.
    *
-   * @param serviceRegistry
-   *          the service registry
+   * @param serviceRegistry the service registry
    */
   protected void setServiceRegistry(ServiceRegistry serviceRegistry) {
     this.serviceRegistry = serviceRegistry;
@@ -80,8 +87,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
   /**
    * Sets the cropper.
    *
-   * @param cropService
-   *          the cropper
+   * @param cropService the cropper
    */
   protected void setCropService(CropService cropService) {
     this.cropService = cropService;
@@ -89,7 +95,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("")
-  @Produces(MediaType.TEXT_HTML)
+  @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "crop", description = "Submit a track for cropping", restParameters = {
           @RestParameter(description = "The track to crop.", isRequired = true, name = "track", type = RestParameter.Type.FILE) }, reponses = {
           @RestResponse(description = "The job ID to use when polling for the resulting mpeg7 catalog.", responseCode = HttpServletResponse.SC_OK),
@@ -123,6 +129,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
+   *
    * @see AbstractJobProducerEndpoint#getService()
    */
   @Override
@@ -136,6 +143,7 @@ public class CropRestEndpoint extends AbstractJobProducerEndpoint {
 
   /**
    * {@inheritDoc}
+   *
    * @see AbstractJobProducerEndpoint#getServiceRegistry()
    */
   @Override

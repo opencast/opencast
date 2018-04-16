@@ -6,32 +6,32 @@
 <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>${project.version}</version>
+    <version>5-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
 </parent>
 <properties>
-    <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
 </properties>
 <dependencies>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-common</artifactId>
+        <artifactId>opencast-common</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-workflow-service-api</artifactId>
-        <version>${project.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>matterhorn-workspace-api</artifactId>
+        <artifactId>opencast-workspace-api</artifactId>
         <version>${project.version}</version>
     </dependency>
     <dependency>
         <groupId>org.opencastproject</groupId>
         <artifactId>crop-api</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.opencastproject</groupId>
+        <artifactId>opencast-workflow-service-api</artifactId>
         <version>${project.version}</version>
     </dependency>
 </dependencies>

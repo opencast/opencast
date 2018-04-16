@@ -25,8 +25,9 @@ package org.opencastproject.crop.api;
  * This exception is thrown during cropping.
  */
 public class CropException extends Exception {
+
     /** The serial version ui */
-    private static final long serialVersionUID = 8647839276281407394L;
+    private static final long serialVersionUID = 1273001235244195497L;
 
     /**
      * Creates a new crop exception <code>message</code> as a reason
