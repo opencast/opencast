@@ -22,7 +22,7 @@
     <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
-    <commons-collection.version>3.2.2</commons-collection.version>
+    <commons-collections.version>4.1</commons-collections.version>
     <commons-compress.version>1.16.1</commons-compress.version>
     <httpcomponents-httpcore.version>4.4.9</httpcomponents-httpcore.version>
     <httpcomponents-httpclient.version>4.5.5</httpcomponents-httpclient.version>
@@ -1011,9 +1011,9 @@
         <version>1.11</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>${commons-collection.version}</version>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${commons-collections.version}</version>
       </dependency>
       <dependency>
         <groupId>commons-fileupload</groupId>
