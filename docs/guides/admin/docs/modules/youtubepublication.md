@@ -12,7 +12,7 @@ You need to meet these requirements to make a YouTube Publication:
 
 ## Google Developers Configuration
 
-Below is a summarized version of Google's quickstart page, which currently lives [here][googledoc].  If these
+Below is a summarized version of [Google's quickstart page][googledoc].  If these
 instructions do not work for you, or are unclear please let us know - Google has a habit of changing its configuration
 pages and we don't always notice!
 
