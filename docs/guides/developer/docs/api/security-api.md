@@ -30,21 +30,43 @@ Even though this greatly increases security in sense that signed URLs can only b
 
 Returns a signed URL that can be played back for the indicated period of time, while access is optionally restricted to the specified IP address.
 
-Form Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`url`                      | String         | The linke to encode. **required**
-`valid-until`              | date           | Until when is the signed url valid
-`valid-source`             | ip             | The IP address from which the url can be accessed
-
+Form Parameters | Required |Type                                  | Description
+:---------------|:---------|:-------------------------------------|:----------------------------
+`url`           | yes      | [`string`](types.md#basic)           | The URL to be signed
+`valid-until`   | no       | [`datetime`](types.md#date-and-time) | The date and time until when the signed URL is valid
+`valid-source`  | no       | [`string`](types.md#basic)           | The IP address from which the url can be accessed
 
 __Response__
 
-`200 (OK)`: The signed URL is returned.<br/>
+`200 (OK)`: A JSON object containing the signed URL or an error message is returned:
+
+Field         | Type                                 | Description
+:-------------|:--------------------------------'----|:-----------
+`url`         | [`string`](types.md#basic)           | The signed URL
+`valid-until` | [`datetime`](types.md#date-and-time) | The date and time until when the signed URL is valid
+
+In case of an error:
+
+Field    |Type                       | Description
+:------ -|:--------------------------|:-----------
+`error`  |[`string`](types.md#basic) | An error message describing the error
+
 `401 (NOT AUTHORIZED)`: The caller is not authorized to have the link signed.
+
+__Example__
 
 ```
 {
-  "url": "http://opencast.org/video.mp4?valid-until=2015-03-11T13:23:51Z&keyId=default&signature=lsjhdf67tefj3",
-  "valid-until": "2015-03-11T13:23:51Z"
+  "valid-until": "2018-03-19T13:08:39Z",
+  "url":"http://localhost?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTUyMTQ2NDkxOTI4NH0sIlJlc291cmNlIjoiaHR0cDpcL1wvbG9jYWxob3N0In19&keyId=demoKeyOne&signature=717dd8f958a15c1cdb7e88a61417a07bb6a1e6238d9293805cc0893f798a07e8"
 }
 ```
+
+Error example:
+
+```
+{
+  "error": "Given URL cannot be signed"
+}
+```
+

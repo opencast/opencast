@@ -5,18 +5,20 @@
 
 Returns a list of events.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
+in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
+response.
 
 Query String Parameter     |Type            | Description
 :--------------------------|:---------------|:----------------------------
-`sign`                     | `boolean`      | Whether public distribution urls should be signed.
-`withacl`                  | `boolean`      | Whether the acl metadata should be included in the response.
-`withmetadata`             | `boolean`      | Whether the metadata catalogs should be included in the response.
-`withpublications`         | `boolean`      | Whether the publication ids and urls should be included in the response.
-`filter`                   | `string`       | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                     | `string`       | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                    | `integer`      | The maximum number of results to return for a single request.
-`offset`                   | `integer`      | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
+`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
+`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
+`filter`                   | [`string`](types.md#basic)  | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
+`sort`                     | [`string`](types.md#basic)  | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
+`limit`                    | [`string`](types.md#basic)  | The maximum number of results to return for a single request.
+`offset`                   | [`string`](types.md#basic)  | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
 
 Filter Name     | Description
 :---------------|:------------------
@@ -47,60 +49,104 @@ https://opencast.example.org/api/events?sort=title:DESC&limit=5&offset=1&filter=
 
 __Response__
 
-`200 (OK)`: A (potentially empty) list of events is returned.
+`200 (OK)`: A (potentially empty) list of events is returned. The list is represented as JSON array where each element
+is a JSON object with the following fields:
+
+Field                | Type                                 | Description
+:--------------------|:-------------------------------------|:-----------
+`identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
+`creator`            | [`string`](types.md#basic)           | The technical creator of this event
+`presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
+`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`description`\*      | [`string`](types.md#basic)           | The description of this event
+`title`\*            | [`string`](types.md#basic)           | The title of this event
+`processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
+`duration`           | [`string`](types.md#basic)           | The bibliographic duration of this event
+`archive_version`    | [`string`](types.md#basic)           | The current version of this event
+`contributor`\*      | [`array[string]`](types.md#array)    | The contributors of this event
+`has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
+`location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
+`publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
+
+\* Metadata fields of metadata catalog `dublincore/episode`
+
+__Example__
 
 ```
 [
   {
-    "archive_version": 2,
-    "created": "2015-03-12T10:38:54Z",
-    "creator": "Opencast Administrator",
-    "contributors": ["Physics Department"],
-    "description": "Cooling without moving parts and using only heat as an input",
-    "duration": 7200000,
-    "has_previews": true,
-    "identifier": "e6aeb8df-a852-46cd-8128-b89de696f20e",
-    "location": "physics-e-01",
-    "presenters": ["Prof. A. Einstein"],
-    "publication_status": [ "youtube", "internal" ],
+    "identifier": "776d4970-bc2d-45c4-900a-1f80b7990cb8",
+    "creator": "Opencast Project Administrator",
+    "presenter": [
+      "Prof. X",
+      "Dr. Who"
+    ],
+    "created": "2018-03-19T16:11:48Z",
+    "subjects": [
+      "Mathematics",
+      "Basics"
+    ],
+    "start": "2018-03-19T16:11:48Z",
+    "description": "This lecture is about the very basics",
+    "title": "Lecture 1 - The Basics",
     "processing_state": "SUCCEEDED",
-    "start_time": "2015-03-20T04:00:00Z",
-    "subjects": ["Space", "Final Frontier"],
-    "title": "Einstein refrigerator"
+    "duration": 0,
+    "archive_version": 3,
+    "contributor": [
+      "Prof. X"
+    ],
+    "has_previews": true,
+    "location": "",
+    "publication_status": [
+      "internal",
+      "engage-player",
+      "api",
+      "oaipmh-default"
+    ]
   },
   {
-    "archive_version": 5,
-    "created": "2015-03-12T10:38:54Z",
-    "creator": "Opencast Administrator",
-    "contributors": ["Physics Department"],
-    "description": "The history of the universe from the big bang to black holes",
-    "duration": 7200000,
-    "has_previews": true,
-    "identifier": "f5aeb8df-a852-46cd-8128-b89de696f20e",
-    "location": "physics-e-02",
-    "presenters": ["Prof. Stephen Hawking"],
-    "publication_status": [ "youtube", "internal" ],
+    "identifier": "2356d450-b42d-94xd-2a0d-3fa04745c0cb8",
+    "creator": "Opencast Project Administrator",
+    "presenter": [
+    ],
+    "created": "2018-04-20T09:38:42Z",
+    "subjects": [
+      "Physics"
+    ],
+    "start": "2018-04-23T08:00:00Z",
+    "description": "The forces explained",
+    "title": "Lecture 8 - Advanced stuff",
     "processing_state": "SUCCEEDED",
-    "start_time": "2015-03-20T04:00:00Z",
-    "subjects": ["Space", "Final Frontier"],
-    "title": "The Theory of Everything"
+    "duration": 0,
+    "archive_version": 2,
+    "contributor": [
+    ],
+    "has_previews": true,
+    "location": "",
+    "publication_status": [
+      "internal",
+      "engage-player",
+      "api",
+      "oaipmh-default"
+    ]
   }
 ]
 ```
 
-<!--- ##################################################################### -->
 ### POST /api/events
 
 Creates an event by sending metadata, access control list, processing instructions and files in a [multipart request](http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html).
 
-Multipart Form Parameters  |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`acl`                      | `string`       | A collection of roles with their possible action
-`metadata`                 | `string`       | Event metadata as Form param
-`presenter`                | `file`         | Presenter movie track
-`presentation`             | `file`         | Presentation movie track
-`audio`                    | `file`         | Audio track
-`processing`               | `string`       | Processing instructions task configuration
+Multipart Form Parameters  |Type                             | Description
+:--------------------------|:--------------------------------|:-----------
+`acl`                      | [`acl`](types.md#acl)           | A collection of roles with their possible action
+`metadata`                 | [`catalogs`](types.md#catalogs) | Event metadata as Form param
+`presenter`                | [`file`](types.md#file)         | Presenter movie track
+`presentation`             | [`file`](types.md#file)         | Presentation movie track
+`audio`                    | [`file`](types.md#file)         | Audio track
+`processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
 
 __Sample__
 
@@ -177,57 +223,92 @@ Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20
 }
 ```
 
-<!--- ##################################################################### -->
 ### GET /api/events/{event_id}
 
 Returns a single event.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
+in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
+response.
 
-Query String Parameter     |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`sign`                     | boolean        | Whether public distribution urls should be signed.
-`withacl`                  | boolean        | Whether the acl metadata should be included in the response.
-`withmetadata`             | boolean        | Whether the metadata catalogs should be included in the response.
-`withpublications`         | boolean        | Whether the publication ids and urls should be included in the response.
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`sign`                 | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
+`withacl`              | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
+`withmetadata`         | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
+`withpublications`     | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
 
 __Response__
 
-`200 (OK)`: The event is returned.<br/>
+`200 (OK)`: The event is returned as JSON object with the following fields:
+
+Field                | Type                                 | Description
+:--------------------|:-------------------------------------|:-----------
+`identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
+`creator`            | [`string`](types.md#basic)           | The technical creator of this event
+`presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
+`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
+`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`description`\*      | [`string`](types.md#basic)           | The description of this event
+`title`\*            | [`string`](types.md#basic)           | The title of this event
+`processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
+`duration`           | [`string`](types.md#basic)           | The bibliographic duration of this event
+`archive_version`    | [`string`](types.md#basic)           | The current version of this event
+`contributor`\*      | [`array[string]`](types.md#array)    | The contributors of this event
+`has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
+`location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
+`publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
+
+\* Metadata fields of metadata catalog `dublincore/episode`
+
 `404 (NOT FOUND)`: The specified event does not exist.
 
 ```
 {
-  "archive_version": 2,
-  "created": "2015-03-12T10:38:54Z",
-  "creator": "Opencast Administrator",
-  "contributors": ["Physics Department"],
-  "description": "Cooling without moving parts and using only heat as an input",
-  "duration": 7200000,
-  "has_previews": true,
-  "identifier": "e6aeb8df-a852-46cd-8128-b89de696f20e",
-  "location": "physics-e-01",
-  "presenters": ["Prof. A. Einstein"],
-  "publication_status": [ "youtube", "internal" ],
+  "identifier": "776d4970-bc2d-45c4-900a-1f80b7990cb8",
+  "creator": "Opencast Project Administrator",
+  "presenter": [
+    "Prof. X",
+    "Dr. Who"
+  ],
+  "created": "2018-03-19T16:11:48Z",
+  "subjects": [
+    "Mathematics",
+    "Basics"
+  ],
+  "start": "2018-03-19T16:11:48Z",
+  "description": "This lecture is about the very basics",
+  "title": "Lecture 1 - The Basics",
   "processing_state": "SUCCEEDED",
-  "start_time": "2015-03-20T04:00:00Z",
-  "subjects": ["Space", "Final Frontier"],
-  "title": "Einstein refrigerator"
+  "duration": 0,
+  "archive_version": 3,
+  "contributor": [
+    "Prof. X"
+  ],
+  "has_previews": true,
+  "location": "",
+  "publication_status": [
+    "internal",
+    "engage-player",
+    "api",
+    "oaipmh-default"
+  ]
 }
 ```
-<!--- ##################################################################### -->
+
 ### POST /api/events/{event_id}
 
 Updates an event.
 
-Multipart Form Parameters  |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`acl`                      | `string`       | A collection of roles with their possible action
-`metadata`                 | `string`       | Event metadata as Form param
-`presenter`                | `file`         | Presenter movie track
-`presentation`             | `file`         | Presentation movie track
-`audio`                    | `file`         | Audio track
-`processing`               | `string`       | Processing instructions task configuration
+Multipart Form Parameters  |Type                             | Description
+:--------------------------|:--------------------------------|:-----------
+`acl`                      | [`acl`](types.md#acl)           | A collection of roles with their possible action
+`metadata`                 | [`catalogs`](types.md#catalogs) | Event metadata as Form param
+`presenter`                | [`file`](types.md#file)         | Presenter movie track
+`presentation`             | [`file`](types.md#file)         | Presentation movie track
+`audio`                    | [`file`](types.md#file)         | Audio track
+`processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
 
 __Sample__
 
@@ -261,7 +342,6 @@ __Response__
 `204 (NO CONTENT)`: The event has been updated.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.<br/>
 
-<!--- ##################################################################### -->
 ### DELETE /api/events/{event_id}
 
 Deletes an event.
@@ -278,14 +358,15 @@ Most events in Opencast come with an access control list (ACL), containing entri
 
 The section on roles in the chapter on [Authorization](authorization.md#AccessControl) will help shed some light on what kind of roles are available and how they are assigned to the current user.
 
-<!--- ##################################################################### -->
+For more information about access control lists, please refer to [Access Control Lists](types.md#access-control-lists).
+
 ### GET /api/events/{event_id}/acl
 
 Returns an event's access policy.
 
 __Response__
 
-`200 (OK)`: The access control list for the specified event is returned.<br/>
+`200 (OK)`: The access control list for the specified event is returned as [`acl`](types.md#acl).<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
 ```
@@ -303,14 +384,15 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### PUT /api/events/{event_id}/acl
 
 Update an event's access policy.
 
-Form Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`acl`                      | `string`       | Access policy
+Form Parameters |Type                   | Description
+:---------------|:----------------------|:-----------
+`acl`           | [`acl`](types.md#acl) | Access policy
+
+Note that the existing access control list will be overwritten.
 
 __Sample__
 
@@ -335,21 +417,22 @@ __Response__
 `204 (NO CONTENT)`: The access control list for the specified event is updated.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
-<!--- ##################################################################### -->
 ### POST /api/events/{event_id}/acl/{action}
 
-Grants permission to execute `action` on the specified event to any user with role `role`. Note that this is a convenience method to avoid having to build and post a complete access control list.
+Grants permission to execute `action` on the specified event to any user with role `role`. Note that this is a
+convenience method to avoid having to build and post a complete access control list.
 
-Path Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`event_id`                 | `string`       | Event identifier
-`action`                   | `string`       | The action that is allowed to be executed
+Path Parameters |Type                        | Description
+:---------------|:---------------------------|:-----------
+`event_id`      | [`string`](types.md#basic) | Event identifier
+`action`        | [`string`](types.md#basic) | The action that is allowed to be executed
 
-Form Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`role`                     | `string`       | The role that is granted permission
+Form Parameters |Type                        | Description
+:---------------|:---------------------------|:-----------
+`role`          | [`string`](types.md#basic) | The role that is granted permission
 
 
+Note that other access control lists entries will not be affected by this request.
 
 __Sample__
 
@@ -362,16 +445,17 @@ __Response__
 `204 (NO CONTENT)`: The permission has been created in the access control list of the specified event.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
-<!--- ##################################################################### -->
 ### DELETE /api/events/{event_id}/acl/{action}/{role}
 
 Revokes permission to execute `action` on the specified event from any user with role `role`.
 
-Path Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`event_id`                 | `string`       | Event identifier
-`action`                   | `string`       | The action that is no longer allowed to be executed
-`role`                     | `string`       | The role that is no longer granted permission
+Path Parameters |Type                        | Description
+:---------------|:---------------------------|:-----------
+`event_id`      | [`string`](types.md#basic) | Event identifier
+`action`        | [`string`](types.md#basic) | The action that is no longer allowed to be executed
+`role`          | [`string`](types.md#basic) | The role that is no longer granted permission
+
+Note that other access control lists entries will not be affected by this request.
 
 __Response__
 
@@ -380,14 +464,26 @@ __Response__
 
 # Metadata
 
-<!--- ##################################################################### -->
+This section describes how to use the Application API to work with metadata catalogs associated to events.
+
+Opencast manages the bibliographic metadata of series using metadata catalogs which are identified by flavors.
+The default metadata catalog for Opencast events has the flavor `dublincore/episode`. Opencast additionally supports
+extended metadata catalogs for series that can be configured.
+
+The Application API supports both the default event metadata catalog and events extended metadata catalogs.
+For the default event metadata catalog, the metadata is directly returned in the responses.
+
+Since the metadata catalogs can be configured, the Application API provides a facility to retrieve the catalog
+configuration of series metadata catalogs. For more details about this mechanism, please refer to
+["Metadata Catalogs"](types.md#metadata-catalogs).
+
 ### GET /api/events/{event_id}/metadata
 
 Returns the complete set of metadata.
 
 __Response__
 
-`200 (OK)`: The metadata collection is returned.<br/>
+`200 (OK)`: The metadata collection is returned as [`catalogs`](types.md#catalogs).<br/>
 `404 (OK)`: The specified event does not exist.
 
 ```
@@ -436,18 +532,18 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### GET /api/events/{event_id}/metadata
 
-Returns the event's metadata of the specified type. For a metadata catalog there is the flavor such as "dublincore/episode" and this is the unique type.
+Returns the event's metadata of the specified type. For a metadata catalog there is the flavor such as
+`dublincore/episode` and this is the unique type.
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to get
+Query String Parameters |Type                         | Description
+:-----------------------|:----------------------------|:-----------
+`type`                  | [`flavor`](types.md#flavor) | The type of metadata to get
 
 __Response__
 
-`200 (OK)`: The metadata collection is returned.<br/>
+`200 (OK)`: The metadata collection is returned as [`fields`](types.md#fields).<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
 ```
@@ -471,18 +567,20 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### PUT /api/events/{event_id}/metadata
 
-Update the metadata with the matching type of the specified event. For a metadata catalog there is the flavor such as "dublincore/episode" and this is the unique type.
+Update the metadata with the matching type of the specified event. For a metadata catalog there is the flavor such as
+`dublincore/episode` and this is the unique type.
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to update
+Query String Parameters |Type                         | Description
+:-----------------------|:----------------------------|:-----------
+`type`                  | [`flavor`](types.md#flavor) | The type of metadata to update
 
-Form Parameters             |Type            | Description
-:---------------------------|:---------------|:----------------------------
-`metadata`                  | `string`       | Metadata catalog in JSON format
+Form Parameters |Type                         | Description
+:---------------|:----------------------------|:-----------
+`metadata`      | [`values`](types.md#values) | Metadata fields and values to be updated
+
+Note that metadata fields not included in the form parameter `metadata` will not be updated.
 
 __Sample__
 
@@ -510,14 +608,15 @@ __Response__
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.
 
-<!--- ##################################################################### -->
 ### DELETE /api/events/{event_id}/metadata
 
 Delete the metadata namespace catalog of the specified event. This will remove all fields and values of the catalog.
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to delete
+Query String Parameters |Type                         | Description
+:-----------------------|:----------------------------|:----------------------------
+`type`                  | [`flavor`](types.md#flavor) | The type of metadata to delete
+
+Note that the metadata catalog of type `dublincore/episode` cannot be deleted.
 
 __Response__
 
@@ -527,7 +626,6 @@ __Response__
 
 # Publications
 
-<!--- ##################################################################### -->
 ### GET /api/events/{event_id}/publications
 
 Returns an event's list of publications.
@@ -554,7 +652,6 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### GET /api/events/{event_id}/publications/{publication_id}
 
 Returns a single publication.

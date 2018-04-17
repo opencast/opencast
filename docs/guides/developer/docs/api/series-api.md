@@ -6,32 +6,38 @@
 
 Returns a list of series.
 
-Query String Parameter     |Type            | Description
-:--------------------------|:---------------|:--------------------------------------------------------------------------
-`filter`                   | `string`       | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                     | `string`       | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                    | `integer`      | The maximum number of results to return for a single request.
-`offset`                   | `integer`      | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+The following query string parameters are supported to filter, sort and pagingate the returned list:
 
-Filter Name     | Description
-:---------------|:------------------
-`contributors`  | Series where the contributors specified in the metadata field match.
-`creator`       | Series where the creator specified in the metadata field match.
-`creationDate`  | Series that were created between two dates. The two dates are in UTC format to the second i.e. yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z. They are seperated by a forward slash (url encoded or not) so an example of the full filter would be CreationDate:2015-05-08T00:00:00.000Z/2015-05-10T00:00:00.000Z
-`language`      | Series based upon the language specified.
-`license`       | Series based upon the license specified.
-`organizers`    | Series where the organizers specified in the metadata field match.
-`managedAcl`    | Series who have the same managed acl name.
-`subject`       | By the subject they are a part of.
-`textFilter`    | Filters series where any part of the series' metadata fields match this value.
-`title`         | By the title of the series.
+Query String Parameter | Required | Type      | Description
+:----------------------|:---------|:----------|:-----------
+`filter`               | no       | [`string`](types.md#basic) | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
+`sort`                 | no       | [`string`](types.md#basic) | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
+`limit`                | no       | [`string`](types.md#basic) | The maximum number of results to return for a single request.
+`offset`               | no       | [`string`](types.md#basic) | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
 
-Sort Name           | Description
-:-------------------|:---------------
-`contributors`      | By the series contributors.
-`created`           | By when the series was created.
-`creator`           | By who created the series.
-`title`             | By the title of the series.
+The following filters are available:
+
+Filter Name    | Description
+:--------------|:-----------
+`contributors` | Series where the contributors specified in the metadata field match.
+`creator`      | Series where the creator specified in the metadata field match.
+`creationDate` | Series that were created between two dates. The two dates are in UTC format to the second i.e. yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z. They are seperated by a forward slash (url encoded or not) so an example of the full filter would be CreationDate:2015-05-08T00:00:00.000Z/2015-05-10T00:00:00.000Z
+`language`     | Series based upon the language specified.
+`license`      | Series based upon the license specified.
+`organizers`   | Series where the organizers specified in the metadata field match.
+`managedAcl`   | Series who have the same managed acl name.
+`subject`      | By the subject they are a part of.
+`textFilter`   | Filters series where any part of the series' metadata fields match this value.
+`title`        | By the title of the series.
+
+The list can be sorted using the following fields:
+
+Sort Name      | Description
+:--------------|:-----------
+`contributors` | By the series contributors.
+`created`      | By when the series was created.
+`creator`      | By who created the series.
+`title`        | By the title of the series.
 
 __Sample request__
 ```xml
@@ -40,69 +46,132 @@ https://opencast.domain.com/api/series?filter=creator:Default Administrator&sort
 
 __Response__
 
-`200 (OK)`: A (potentially empty) list of series is returned.
+`200 (OK)`: A (potentially empty) list of series is returned as JSON array contained JSON objects describing the series:
+
+Field           | Type                                 | Description
+:---------------|:-------------------------------------|:-----------
+`identifier`    | [`string`](types.md#basic)           | The unique identifier of the series
+`created`       | [`datetime`](types.md#date-and-time) | The data when the series was created
+`creator`       | [`string`](types.md#basic)           | The name of the user that has created the series
+`title`\*       | [`string`](types.md#basic)           | The title of the series
+`contributors`\*| [`array[string]`](types.md#array)    | The contributors of the series
+`publishers`\*  | [`array[string]`](types.md#array)    | The publishers of the series
+`subjects`\*    | [`array[string]`](types.md#array)    | The subjects of the series
+`organizers`\*  | [`array[string]`](types.md#array)    | The organizers of the series
+
+\* Metadata fields from the default metadata catalog `dublincore/series`
+
+
+__Example__
 
 ```
 [
   {
-    "contributors": ["John Doe"],
-    "title": "The Opencast API",
-    "publishers": ["John Doe"],
-    "subjects": ["Topic", "Screencast"],
-    "created": "2015-03-12T09:51:32Z",
-    "organizers": ["Opencast Community"],
-    "identifier": "763545de-7e1c-4c8a-bcd9-902511f0e15b",
-    "creator": "Opencast Administrator"
+    "identifier": "dc11ab0a-fd5b-462d-a939-0a4703df38cf",
+    "creator": "Opencast Project Administrator",
+    "created": "2018-03-19T15:40:21Z",
+    "subjects": [
+      "Mathematics"
+    ],
+    "organizers": [
+      "John Doe",
+      "Prof. X"
+    ],
+    "publishers": [
+      "University of Prof. X"
+    ],
+    "contributors": [
+      "Hans Muster",
+      "Maria Müller"
+    ],
+    "title": "Advanced Mathematics"
   },
   {
-    "contributors": ["Jane Doe"],
-    "title": "The Opencast Admin UI",
-    "publishers": ["John Doe"],
-    "subjects": ["Topic", "Screencast"],
-    "created": "2015-03-12T09:51:32Z",
-    "organizers": ["Opencast Community"],
-    "identifier": "353545de-7e1c-4c8a-bcd9-902511f0e15b",
-    "creator": "Opencast Administrator"
+    "identifier": "6a4462ca-3783-432a-81c3-962ca756dc6f",
+    "creator": "Opencast Project Administrator",
+    "created": "2018-03-19T15:41:20Z",
+    "subjects": [
+      "Physics",
+      "Mathematics"
+    ],
+    "organizers": [
+      "Dr. Who"
+    ],
+    "publishers": [
+      "University of Prof. X",
+      "Doctor Who"
+    ],
+    "contributors": [
+      "Dr. Who"
+    ],
+    "title": "Basics of Physics"
   }
 ]
 ```
 
-<!--- ##################################################################### -->
 ### GET /api/series/{series_id}
 
 Returns a single series.
 
 __Response__
 
-`200 (OK)`: The series is returned.<br/>
+`200 (OK)`: The series is returned as a JSON object containing the following fields:
+
+Field           | Type                                 | Description
+:---------------|:-------------------------------------|:-----------
+`identifier`    | [`string`](types.md#basic)           | The unique identifier of the series
+`created`       | [`datetime`](types.md#date-and-time) | The data when the series was created
+`creator`       | [`string`](types.md#basic)           | The name of the user that has created the series
+`title`\*       | [`string`](types.md#basic)           | The title of the series
+`contributors`\*| [`array[string]`](types.md#array)    | The contributors of the series
+`publishers`\*  | [`array[string]`](types.md#array)    | The publishers of the series
+`subjects`\*    | [`array[string]`](types.md#array)    | The subjects of the series
+`organizers`\*  | [`array[string]`](types.md#array)    | The organizers of the series
+`organization`\*| [`string`](types.md#basic)           | The identifier of the tenant this series belongs to
+`opt_out`       | [`string`](types.md#basic)           | Field is not used
+
+\* Fields from the default metadata catalog `dublincore/series`
+
 `404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 ```
 {
-  "identifier": "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f",
-  "title": "The Opencast API",
-  "description": "A cool demo of the Opencast API",
-  "subjects": ["Topic", "Screencast"],
+  "identifier": "dc11ab0a-fd5b-462d-a939-0a4703df38cf",
+  "creator": "Opencast Project Administrator",
+  "opt_out": false,
+  "created": "2018-03-19T15:40:21Z",
+  "subjects": [
+    "Mathematics"
+  ],
   "organization": "mh_default_org",
-  "creator": "Default Administrator",
-  "created": "2015-03-12T09:58:06Z",
-  "organizers": ["Opencast Community"],
-  "contributors": ["John Doe"],
-  "publishers": ["John Doe"],
-  "opt_out": false
+  "organizers": [
+    "John Doe",
+    "Prof. X"
+  ],
+  "description": "This is a advanced mathematics course",
+  "publishers": [
+    "University of Prof. X"
+  ],
+  "contributors": [
+    "Hans Muster",
+    "Maria Müller"
+  ],
+  "title": "Advanced Mathematics"
 }
+
 ```
 
-<!--- ##################################################################### -->
 ### POST /api/series
 
 Creates a series.
 
-Form Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`metadata`                 | String         | Series metadata
-`acl`                      | String         | A collection of roles with their possible action
-`theme`                    | String         | The theme ID to be applied to the series
+Form Parameters | Required |Type                             | Description
+:---------------|:---------|:--------------------------------|:-----------
+`metadata`      | yes      | [`catalogs`](types.md#catalogs) | Series metadata
+`acl`           | no       | [`acl`](types.md#acl)           | A collection of roles with their possible action
+`theme`         | no       | [`string`](types.md#string)     | The theme ID to be applied to the series
 
 __Sample__
 
@@ -166,7 +235,6 @@ Location: http://api.opencast.org/api/series/4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6
 }
 ```
 
-<!--- ##################################################################### -->
 ### DELETE /api/series/{series_id}
 
 Deletes a series
@@ -176,17 +244,32 @@ __Response__
 `204 (NO CONTENT)`: The series has been deleted.<br/>
 `404 (NOT FOUND)`: The specified series does not exist.
 
-# Metadata
 
-<!--- ##################################################################### -->
+## Metadata
+
+This section describes how to use the Application API to work with metadata catalogs associated to series.
+
+Opencast manages the bibliographic metadata of series using metadata catalogs which are identified by flavors.
+The default metadata catalog for Opencast series has the flavor `dublincore/series`. Opencast additionally supports
+extended metadata catalogs for series that can be configured.
+
+The Application API supports both the default series metadata catalog and series extended metadata catalogs.
+For the default series metadata catalog, the metadata is directly returned in the responses.
+
+Since the metadata catalogs can be configured, the Application API provides a facility to retrieve the catalog
+configuration of series metadata catalogs. For more details about this mechanism, please refer to
+["Metadata Catalogs"](types.md#metadata-catalogs).
+
 ### GET /api/series/{series_id}/metadata
 
 Returns a series' metadata of all types.
 
 __Response__
 
-`200 (OK)`: The series' metadata are returned.<br/>
+`200 (OK)`: The series' metadata are returned as [`catalogs`](types.md#catalogs)
 `404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 ```
 [
@@ -234,19 +317,23 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### GET /api/series/{series_id}/metadata
 
-Returns a series' metadata collection of the given type when the query string parameter type is specified. For each metadata catalog there is a unique property called the flavor such as dublincore/series so the type in this example would be "dublincore/series".
+Returns a series' metadata collection of the given type when the query string parameter type is specified. For each
+metadata catalog there is a unique property called the flavor such as dublincore/series so the type in this example
+would be "dublincore/series".
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to return
+
+Query String Parameters |Type                         | Description
+:-----------------------|:----------------------------|:-----------
+`type`                  | [`flavor`](types.md#flavor) | The type of metadata to return
 
 __Response__
 
-`200 (OK)`: The series' metadata are returned.<br/>
+`200 (OK)`: The series' metadata are returned as [`fields`](types.md#fields) above.<br/>
 `404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 ```
 [
@@ -269,21 +356,22 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### PUT /api/series/{series_id}/metadata
 
-Update a series' metadata of the given type. For a metadata catalog there is the flavor such as "dublincore/series" and this is the unique type.
+Update a series' metadata of the given type.
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to update
+Query String Parameters | Required | Type                        | Description
+:-----------------------|:---------|:----------------------------|:-----------
+`type`                  | yes      | [`flavor`](types.md#flavor) | The type of metadata to update
 
 
-Form Parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`metadata`                 | String         | Series metadata as Form param
+Form Parameters | Required | Type                        | Description
+:---------------|:---------|:----------------------------|------------
+`metadata`      | yes      | [`values`](types.md#values) | Series metadata as Form param
 
-__Sample__
+Note that metadata fields not contained in the argument won't be updated.
+
+__Example__
 
 metadata:
 ```
@@ -313,14 +401,15 @@ __Response__
 Returns: The full metadata catalog of the series
 ```
 
-<!--- ##################################################################### -->
 ### DELETE /api/series/{series_id}/metadata
 
 Deletes a series' metadata catalog of the given type. All fields and values of that catalog will be deleted.
 
-Query String Parameters    |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`type`                     | String         | The type of metadata to delete
+Query String Parameters | Required | Type                        | Description
+:-----------------------|:---------|:----------------------------|:-----------
+`type`                  | yes      | [`flavor`](types.md#flavor) | The type of metadata to delete
+
+Note that the default metadata catalog (type dublincore/series) cannot be deleted.
 
 __Response__
 
@@ -330,15 +419,16 @@ __Response__
 
 # Access Policy
 
-<!--- ##################################################################### -->
 ### GET /api/series/{series_id}/acl
 
 Returns a series' access policy.
 
 __Response__
 
-`200 (OK)`: The series' access policy is returned.<br/>
+`200 (OK)`: The series' access policy of type [`acl`](types.md#acl) is returned.<br/>
 `404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 ```
 [
@@ -355,16 +445,22 @@ __Response__
 ]
 ```
 
-<!--- ##################################################################### -->
 ### PUT /api/series/{series_id}/acl
 
 Updates a series' access policy.
 
-Parameters                 |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`acl`                      | `string`       | Access policy
+Parameters | Required | Type                  | Description
+:----------|:---------|:----------------------|:-----------
+`acl`      | yes      | [`acl`](types.md#acl) | Access policy to be applied
 
-__Sample__
+Note that the existing access policy will be overwritten.
+
+__Response__
+
+`200 (OK)`: The updated access control list of type [`acl`](types.md#acl) is returned.<br/>
+`404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 acl:
 ```
@@ -382,22 +478,38 @@ acl:
 ]
 ```
 
-__Response__
+returns
 
-`200 (OK)`: The access control list for the specified series is updated.<br/>
-`404 (NOT FOUND)`: The specified series does not exist.
+```
+[
+  {
+    "allow": true,
+    "action": "write",
+    "role": "ROLE_ADMIN"
+  },
+  {
+    "allow": true,
+    "action": "read",
+    "role": "ROLE_USER"
+  }
+]
+```
 
 # Properties
 
-<!--- ##################################################################### -->
+Properties can be assigned to series in means of key-value pairs. Both the property name (key) and property value are
+of type `string`.
+
 ### GET /api/series/{series_id}/properties
 
 Returns a series' properties.
 
 __Response__
 
-`200 (OK)`: The series' properties are returned.<br/>
+`200 (OK)`: The series' properties are returned as [`property`](types.md#property)  <br/>
 `404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
 
 ```
 {
@@ -406,16 +518,28 @@ __Response__
 }
 ```
 
-<!--- ##################################################################### -->
 ### PUT /api/series/{series_id}/properties
 
-Updates a series' properties
+Add or update properties of a series.
 
-Form parameters            |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`properties`               | `string`       | Series properties
+Form parameters | Required | Type                            | Description
+:---------------|:---------|:--------------------------------|:-----------
+`properties`    | yes      | [`property`](types.md#property) | List of properties to be assigned to the series
 
-__Sample__
+The request can be used to add new properties and/or update existing properties. Properties not included in the request
+are not affected.
+
+__Response__
+
+`200 (OK)`: The added/updated series' properties are returned as JSON object.<br/>
+`404 (NOT FOUND)`: The specified series does not exist.
+
+__Example__
+
+Assume that the series already has the properties `theme`=`1000` and `live`=`true`.
+
+To add the property `ondemand` and update the value of the existing property `live` the following form parameter is
+used:
 
 properties:
 ```
@@ -425,7 +549,21 @@ properties:
 }
 ```
 
-__Response__
+The response of the request will contain the properties added/updated by this request:
 
-`200 (OK)`: Successfully updated the series' properties.<br/>
-`404 (NOT FOUND)`: The specified series does not exist.
+```
+{
+  "ondemand": "true",
+  "live": "false"
+}
+```
+
+After this, the properties of the series are:
+
+```
+{
+  "theme": "1000",
+  "ondemand": "true",
+  "live": "false"
+}
+```
