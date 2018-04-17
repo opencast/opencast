@@ -30,20 +30,20 @@ Even though this greatly increases security in sense that signed URLs can only b
 
 Returns a signed URL that can be played back for the indicated period of time, while access is optionally restricted to the specified IP address.
 
-Form Parameters |Required |Type                                  | Description
-:---------------|:--------|:-------------------------------------|:----------------------------
-`url`           |yes      | [`string`](types.md#basic)           | The URL to be singned
-`valid-until`   |no       | [`datetime`](types.md#date-and-time) | Until when is the signed url valid
-`valid-source`  |no       | [`string`](types.md#basic)           |The IP address from which the url can be accessed
+Form Parameters | Required |Type                                  | Description
+:---------------|:---------|:-------------------------------------|:----------------------------
+`url`           | yes      | [`string`](types.md#basic)           | The URL to be signed
+`valid-until`   | no       | [`datetime`](types.md#date-and-time) | The date and time until when the signed URL is valid
+`valid-source`  | no       | [`string`](types.md#basic)           | The IP address from which the url can be accessed
 
 __Response__
 
 `200 (OK)`: A JSON object containing the signed URL or an error message is returned:
 
-Field         | Type                                | Description
-:-------------|:------------------------------------|:-----------
-`url`         |[`string`](types.md#basic)           | The signed URL
-`valid-until` |[`datetime`](types.md#date-and-time) | The date and time until the signed URL is valid
+Field         | Type                                 | Description
+:-------------|:--------------------------------'----|:-----------
+`url`         | [`string`](types.md#basic)           | The signed URL
+`valid-until` | [`datetime`](types.md#date-and-time) | The date and time until when the signed URL is valid
 
 In case of an error:
 

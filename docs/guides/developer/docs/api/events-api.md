@@ -535,7 +535,7 @@ __Response__
 ### GET /api/events/{event_id}/metadata
 
 Returns the event's metadata of the specified type. For a metadata catalog there is the flavor such as
-"dublincore/episode" and this is the unique type.
+`dublincore/episode` and this is the unique type.
 
 Query String Parameters |Type                         | Description
 :-----------------------|:----------------------------|:-----------
@@ -570,7 +570,7 @@ __Response__
 ### PUT /api/events/{event_id}/metadata
 
 Update the metadata with the matching type of the specified event. For a metadata catalog there is the flavor such as
-"dublincore/episode" and this is the unique type.
+`dublincore/episode` and this is the unique type.
 
 Query String Parameters |Type                         | Description
 :-----------------------|:----------------------------|:-----------
