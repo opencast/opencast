@@ -20,7 +20,7 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
