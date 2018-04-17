@@ -5,7 +5,9 @@
 
 Returns a list of events.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this response.
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
+in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
+response.
 
 Query String Parameter     |Type            | Description
 :--------------------------|:---------------|:----------------------------
@@ -48,7 +50,7 @@ https://opencast.example.org/api/events?sort=title:DESC&limit=5&offset=1&filter=
 __Response__
 
 `200 (OK)`: A (potentially empty) list of events is returned. The list is represented as JSON array where each element
-is a JSON objects with the following fields:
+is a JSON object with the following fields:
 
 Field                | Type                                 | Description
 :--------------------|:-------------------------------------|:-----------

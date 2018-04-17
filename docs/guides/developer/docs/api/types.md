@@ -123,7 +123,8 @@ The following sections define data types that are used to manage metadata catalo
 
 ### fields
 
-Each metadata catalogs has a list of metadata fields that is described as JSON objects with the following fields:
+Each metadata catalogs has a list of metadata fields that is described as array of JSON objects with the following 
+fields:
 
 Field          | Optional | Type                | Description
 :--------------|:---------|:--------------------|:-----------
@@ -176,14 +177,14 @@ To modifiy values of metadata catalogs, a JSON array with JSON objects contained
 
 Field   | Required | Description
 :-------|:---------|:-----------
-`id`    | yes      | The `id` of the metadata field
+`id`    | yes      | The technical identifier of the metadata field
 `value` | yes      | The value of the metadata field
 
 Notes:
 
 - Fields which are not included in `catalog_values` will not be updated
-- Readonly fields MUST NOT be written
-- Required fields MUST NOT be written with empty strings
+- Attempting to write readonly fields will result in error
+- Attempting to write empty values to a required field will result in error
 
 ```
 [
@@ -207,11 +208,11 @@ Notes:
 Besides the metadata configuration, the full metadata catalog configuration includes some additional fields
 describing the catalog itself:
 
-Field  | Type               | Description
-:------|:-------------------|:-----------
-label  | [`string`](#basic) | Displayable name of the metadata catalog
-flavor | [`string`](#basic) | The flavor of the metadata catalog
-fields | [`string`](#basic) | An array of JSON objects describing the metadata field configurations of the metadata catalogs
+Field  | Type                | Description
+:------|:--------------------|:-----------
+label  | [`string`](#basic)  | Displayable name of the metadata catalog
+flavor | [`string`](#basic)  | The flavor of the metadata catalog
+fields | [`fields`](#fields) | An array of JSON objects describing the metadata field configurations of the metadata catalogs
 
 __Example__
 
