@@ -751,6 +751,9 @@ public class SeriesEndpoint {
     if (isBlank(metadataParam))
       return R.badRequest("Required parameter 'metadata' is missing or invalid");
 
+    if (isBlank(aclParam))
+      return R.badRequest("Required parameter 'acl' is missing or invalid");
+
     MetadataList metadataList;
     try {
       metadataList = deserializeMetadataList(metadataParam);
