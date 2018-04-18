@@ -43,7 +43,6 @@
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
     <bundle>mvn:com.google.code.gson/gson/2.8.2</bundle>
-    <bundle>mvn:commons-collections/commons-collections/${commons-collection.version}</bundle>
     <bundle>mvn:commons-fileupload/commons-fileupload/1.3.3</bundle>
     <bundle>mvn:commons-io/commons-io/2.6</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
@@ -51,6 +50,7 @@
     <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/com.springsource.org.apache.commons.beanutils/1.8.3</bundle>
+    <bundle>mvn:org.apache.commons/commons-collections4/${commons-collections.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-csv/1.5</bundle>
     <bundle>mvn:org.apache.commons/commons-lang3/3.7</bundle>

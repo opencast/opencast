@@ -30,7 +30,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
-import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.collections4.IteratorUtils;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
