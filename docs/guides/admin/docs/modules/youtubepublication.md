@@ -93,7 +93,7 @@ becomes
 
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
-        <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" disabled="disabled" />
+        <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
 becomes
 
         <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" />

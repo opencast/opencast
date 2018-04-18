@@ -35,7 +35,7 @@
               <label for="retractFromOaiPmh">Default OAI-PMH Repository</label>
             </li>
             <li>
-              <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" disabled="disabled" />
+              <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
               <label for="retractFromYouTube">YouTube</label>
             </li>
           </ul>
