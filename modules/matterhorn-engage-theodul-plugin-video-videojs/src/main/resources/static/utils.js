@@ -32,7 +32,30 @@ define(["jquery"], function($) {
         if (types.length > 0) {
             return types[0];
         }
-        return "presenter" // fallback value, should never be returned, but does no harm 
+        return "presenter" // fallback value, should never be returned, but does no harm
+    };
+
+    Utils.prototype.checkIfMimeTypeAvailableForFlavor = function(videoSource, mimeType, flavor) {
+        if (videoSource && videoSource[flavor]) {
+          $(videoSource[flavor]).each(function (i, source) {
+            if (source.type === mimeType) return true;
+          })
+        }
+        return false;
+    };
+
+    Utils.prototype.removeQualityTag = function(track) {
+        if (track && track.tags && track.tags.tag) {
+          var i = 0;
+          while (i < track.tags.tag.length) {
+            if (track.tags.tag[i].indexOf("-quality") > 0) {
+              track.tags.tag.splice(i, 1);
+            } else {
+              i++;
+            }
+          }
+        }
+        return track;
     };
 
     Utils.prototype.getFlavorForVideoDisplay = function(videoDisplay) {
@@ -46,7 +69,7 @@ define(["jquery"], function($) {
         var values = data.split("_");
         if (values.length === 3) {
             return (values[2]);
-        }        
+        }
     }
 
     /**

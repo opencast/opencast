@@ -28,6 +28,7 @@ import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.util.IoSupport;
+import org.opencastproject.util.PropertiesUtil;
 
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
@@ -63,7 +64,7 @@ public class MetadataListTest {
       IoSupport.closeQuietly(in);
     }
 
-    episodeDublinCoreCatalogUIAdapter.updated(episodeCatalogProperties);
+    episodeDublinCoreCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
   }
 
   @Test

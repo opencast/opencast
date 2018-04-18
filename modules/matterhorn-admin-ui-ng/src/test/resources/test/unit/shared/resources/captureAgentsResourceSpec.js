@@ -38,8 +38,8 @@ describe('Recordings API Resource', function () {
             $httpBackend.flush();
             expect(data.rows.length).toBe(3);
             expect(data.rows[0].id).toBe(data.rows[0].name);
-            expect(data.rows[0].status).toBe('ok');
-            expect(data.rows[0].name).toBe('•mock• agent4');
+            expect(data.rows[0].status).toBe('idle');
+            expect(data.rows[0].name).toBe('agent1');
             expect(data.rows[0].updated).toBe('2014-05-26T15:37:02Z');
         });
 
@@ -54,7 +54,7 @@ describe('Recordings API Resource', function () {
             it('uses the name as the ID', function () {
                 var data = CaptureAgentsResource.query();
                 $httpBackend.flush();
-                expect(data.rows[0].id).toEqual('•mock• agent4');
+                expect(data.rows[0].id).toEqual('agent1');
             });
         });
     });

@@ -87,7 +87,7 @@ public class JobsListProvider implements ResourceListProvider {
           }
         }
       } catch (WorkflowDatabaseException ex) {
-        logger.error("Failed to get available workflow definitions from workflow service: {}", new Object[] { ex.getMessage() });
+        logger.error("Failed to get available workflow definitions from workflow service: {}", ex.getMessage());
       }
     }
 

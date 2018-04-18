@@ -23,12 +23,14 @@ package org.opencastproject.oaipmh.matterhorn;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.UrlSupport.url;
 
+import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.XmlUtil;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Document;
@@ -37,6 +39,7 @@ import org.w3c.dom.Node;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 
 /**
  * The matterhorn-inlined metadata provider provides whole media packages, series and episode DublinCores and series ACLs.
@@ -74,11 +77,13 @@ public class MatterhornInlinedMetadataProvider implements MetadataProvider {
     XmlGen xml = new XmlGen(Option.<String>none()) {
       @Override
       public Element create() {
-        return $e("inlined", NS_URI, parse(Option.option(item.getMediaPackageXml())),
-                  $e("episode-dc", NS_URI, parse(item.getEpisodeDublinCoreXml())),
-                  $e("series-dc", NS_URI,
-                     parse(item.getSeriesDublinCoreXml()),
-                     parse(item.getSeriesAclXml())));
+        List<Node> inlinedNodes = Collections.list(parse(Option.option(item.getMediaPackageXml())));
+        for (SearchResultElementItem elementItem : item.getElements()) {
+          inlinedNodes.add($e(elementItem.getType(), NS_URI,
+                  $a("type", elementItem.getFlavor()),
+                  parse(Option.option(elementItem.getXml()))));
+        }
+        return $e("inlined", NS_URI, inlinedNodes);
       }
 
       private Node parse(Option<String> xml) {

@@ -32,6 +32,7 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreByteFormat;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
@@ -45,15 +46,12 @@ import org.opencastproject.util.RequireUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Set;
@@ -115,7 +113,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
   @Override
   public MetadataCollection getRawFields() {
     DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-    Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
+    Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
     populateEmptyFields(dublinCoreMetadata, emptyFields);
     return dublinCoreMetadata;
   }
@@ -126,7 +124,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {
       DublinCoreMetadataCollection dublinCoreMetadata = new DublinCoreMetadataCollection();
-      Set<String> emptyFields = new TreeSet<String>(dublinCoreProperties.keySet());
+      Set<String> emptyFields = new TreeSet<>(dublinCoreProperties.keySet());
       getFieldValuesFromDublinCoreCatalog(dublinCoreMetadata, emptyFields, optDCCatalog.get());
       populateEmptyFields(dublinCoreMetadata, emptyFields);
       return Opt.some((MetadataCollection) dublinCoreMetadata);
@@ -141,6 +139,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
             RequireUtil.requireNotBlank(seriesId, "seriesId"));
     if (optDCCatalog.isSome()) {
       final DublinCoreCatalog dc = optDCCatalog.get();
+      dc.addBindings(config.getXmlNamespaceContext());
       DublinCoreMetadataUtil.updateDublincoreCatalog(dc, metadata);
       saveDublinCoreCatalog(seriesId, dc);
       return true;
@@ -157,7 +156,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
    * @throws ConfigurationException
    *           if there is a configuration error
    */
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     config = CatalogUIAdapterConfiguration.loadFromDictionary(properties);
     organization = getCfg(properties, CONF_ORGANIZATION_KEY);
     flavor = MediaPackageElementFlavor.parseFlavor(getCfg(properties, CONF_FLAVOR_KEY));
@@ -195,17 +194,18 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
       Opt<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId),
               flavor.getType());
       if (seriesElementData.isSome()) {
-        InputStream is = null;
-        try {
-          is = new ByteArrayInputStream(seriesElementData.get());
-          return Opt.some(DublinCores.read(is));
-        } finally {
-          IOUtils.closeQuietly(is);
-        }
+        final DublinCoreCatalog dc = DublinCoreByteFormat.read(seriesElementData.get());
+        // Make sure that the catalog has its flavor set.
+        // It may happen, when updating a system, that already saved catalogs
+        // do not have a flavor.
+        dc.setFlavor(flavor);
+        dc.addBindings(config.getXmlNamespaceContext());
+        return Opt.some(dc);
       } else {
         final DublinCoreCatalog dc = DublinCores.mkStandard();
         dc.addBindings(config.getXmlNamespaceContext());
         dc.setRootTag(new EName(config.getCatalogXmlRootNamespace(), config.getCatalogXmlRootElementName()));
+        dc.setFlavor(flavor);
         return Opt.some(dc);
       }
     } catch (SeriesException e) {

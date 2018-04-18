@@ -26,7 +26,7 @@ import com.entwinemedia.fn.Fn;
 import javax.persistence.EntityManager;
 
 /** Persistence environment to perform a transaction. */
-public abstract class PersistenceEnv {
+public abstract class PersistenceEnv implements AutoCloseable {
   /** Run code inside a transaction. */
   public abstract <A> A tx(Fn<EntityManager, A> transactional);
 
@@ -34,12 +34,12 @@ public abstract class PersistenceEnv {
   public <A> Fn<Fn<EntityManager, A>, A> tx() {
     return new Fn<Fn<EntityManager, A>, A>() {
       @Override
-      public A ap(Fn<EntityManager, A> transactional) {
+      public A apply(Fn<EntityManager, A> transactional) {
         return tx(transactional);
       }
     };
   }
 
   /** Close the environment and free all associated resources. */
-  public abstract void close();
+  @Override public abstract void close();
 }

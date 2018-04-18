@@ -6,6 +6,7 @@
             "contributor2": "My second contributor",
             "contributor3": "My third contributor"
         },
+        "translatable": false,
         "type": "select"
     },
     "textFilter": {

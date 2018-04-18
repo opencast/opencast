@@ -31,4 +31,21 @@ public interface EncoderEngineFactory {
    * @return A new encoder engine
    */
   EncoderEngine newEncoderEngine(EncodingProfile profile);
+
+  /**
+   * Track a given encoder engine to ensure it is cleaned up if the factory is closed.
+   * @param encoderEngine encoder engine to track
+   */
+  void track(EncoderEngine encoderEngine);
+
+  /**
+   * Stop tracking a given encoder engine.
+   * @param encoderEngine Encoder engine to stop tracking
+   */
+  void untrack(EncoderEngine encoderEngine);
+
+  /**
+   * Close the encoder engine factory, ensuring that in the process all tracked engines are properly shut down.
+   */
+  void close();
 }

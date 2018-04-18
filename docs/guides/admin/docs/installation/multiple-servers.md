@@ -180,11 +180,16 @@ Define that the file repository shall access all files locally:
 Set the base URL of the server hosting the administrative tools. Again use a domain name instead of an IP address if
 possible:
 
-    org.opencastproject.admin.ui.url=http://<ADMIN-URL>:8080
+    prop.org.opencastproject.admin.ui.url=http://<ADMIN-URL>:8080
 
 Set the base URL of the server hosting the engage tools (usually the presentation node):
 
-    org.opencastproject.engage.ui.url=http://<ENGAGE-URL>:8080
+    prop.org.opencastproject.engage.ui.url=http://<ENGAGE-URL>:8080
+
+Set the base URL of the file server. When using a shared filesystem between servers,
+set all servers to use the same URL (e.g. URL of the admin node).
+
+    prop.org.opencastproject.file.repo.url=http://<ADMIN-URL>:8080
 
 ### org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg
 

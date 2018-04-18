@@ -255,9 +255,9 @@ public abstract class AbstractJobProducer implements JobProducer {
      *          the current running job
      */
     JobRunner(Job job, Job currentJob) {
-      this.jobId = job.getId();
+      jobId = job.getId();
       if (currentJob != null) {
-        this.currentJobId = some(currentJob.getId());
+        currentJobId = some(currentJob.getId());
       } else {
         currentJobId = none();
       }

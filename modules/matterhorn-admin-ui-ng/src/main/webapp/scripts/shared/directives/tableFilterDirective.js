@@ -9,7 +9,6 @@ angular.module('adminNg.directives')
         },
         link: function (scope) {
             scope.formatDateRange = Language.formatDateRange;
-            scope.filterMap = {};
 
             scope.getOptionLabel = function (filter) {
                 var optionLabel;
@@ -35,7 +34,8 @@ angular.module('adminNg.directives')
                     scope.filters.map[key] = {
                         options: {},
                         type: scope.filters.filters[key].type,
-                        label: scope.filters.filters[key].label
+                        label: scope.filters.filters[key].label,
+                        translatable: scope.filters.filters[key].translatable
                     };
                     var options = scope.filters.filters[key].options;
                     angular.forEach(options, function(option) {
@@ -56,7 +56,7 @@ angular.module('adminNg.directives')
             };
 
             scope.filters.$promise.then(function () {
-                scope.filters.map = scope.filterMap;
+                scope.filters.map = {};
                 if (Object.keys(scope.filters.map).length === 0) {
                     scope.initializeMap();
                 }
@@ -72,6 +72,7 @@ angular.module('adminNg.directives')
                 scope.selectedFilter = null;
                 scope.showFilterSelector = false;
                 Storage.remove('filter');
+                angular.element('.main-filter').val('').trigger('chosen:updated');
             };
 
             scope.removeFilter = function (name, filter) {
@@ -86,11 +87,13 @@ angular.module('adminNg.directives')
             }, 250);
 
             scope.getFilterName = function(){
-                for(var i in scope.filters.filters){
-                    if(scope.filters.filters[i] === scope.selectedFilter){
-                        return i;
-                    }
+              if (angular.isDefined(scope.selectedFilter) && angular.isDefined(scope.selectedFilter.label)) {
+                for(var i in scope.filters.filters) {
+                  if (angular.equals(scope.filters.filters[i].label, scope.selectedFilter.label)) {
+                    return i;
+                  }
                 }
+              }
             };
 
             scope.selectFilterSelectValue = function (filter)  {
@@ -113,7 +116,9 @@ angular.module('adminNg.directives')
                     return;
                 }
                 if (filter.period.to && filter.period.from) {
-                    filter.value = new Date(filter.period.from).toISOString() + '/' + new Date(filter.period.to).toISOString();
+                    var from = new Date(new Date(filter.period.from).setHours(0, 0, 0, 0));
+                    var to = new Date(new Date(filter.period.to).setHours(23, 59, 59, 999));
+                    filter.value = from.toISOString() + '/' + to.toISOString();
                 }
 
                 if (filter.value) {
@@ -195,7 +200,7 @@ angular.module('adminNg.directives')
                 scope.activeProfile = index;
             };
 
-            scope.onChnageSelectMainFilter = function(selectedFilter) {
+            scope.onChangeSelectMainFilter = function(selectedFilter) {
                 scope.filter = selectedFilter;
                 scope.openSecondFilter(selectedFilter);
             }

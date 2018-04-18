@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - example response of an
+  - http://some.opencast/oaipmh/default?metadataPrefix=matterhorn-inlined&verb=ListRecords
+  - request
+  -->
+<OAI-PMH xmlns="http://www.openarchives.org/OAI/2.0/"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd">
+  <responseDate>2016-05-17T12:42:16Z</responseDate>
+  <request metadataPrefix="matterhorn-inlined" until="2016-05-17" verb="ListRecords">http://localhost:8080/oaipmh
+  </request>
+  <ListRecords>
+    <record>
+      <header>
+        <identifier>id-1</identifier>
+        <datestamp>2011-05-01</datestamp>
+      </header>
+      <metadata>
+        <inlined xmlns="http://www.opencastproject.org/oai/matterhorn-inlined">
+          <mediapackage xmlns="http://mediapackage.opencastproject.org"
+            duration="1004400000"
+            id="10.0000/5820"
+            start="2007-12-05T13:40:00">
+            <metadata>
+              <catalog id="catalog-1" type="dublincore/episode">
+                <mimetype>text/xml</mimetype>
+                <url>episode-dublincore.xml</url>
+              </catalog>
+              <catalog id="catalog-2" ref="series:foobar-series" type="dublincore/series">
+                <mimetype>text/xml</mimetype>
+                <url>series-dublincore.xml</url>
+              </catalog>
+              <catalog id="catalog-3" type="mpeg-7/text">
+                <mimetype>text/xml</mimetype>
+                <url>mpeg7.xml</url>
+              </catalog>
+              <catalog id="catalog-4" type="security/xacml+series">
+                <mimetype>text/xml</mimetype>
+                <url>xacml.xml</url>
+              </catalog>
+            </metadata>
+          </mediapackage>
+          <episode-dc>
+            <dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+              xmlns:oc="http://www.opencastproject.org/matterhorn/"
+              xmlns:dcterms="http://purl.org/dc/terms/">
+              <dcterms:identifier>
+                10.0000/5820
+              </dcterms:identifier>
+              <dcterms:isPartOf>10.0000/1</dcterms:isPartOf>
+              <dcterms:title xml:lang="en">
+                ABC
+              </dcterms:title>
+              <dcterms:subject>
+                x, y, z
+              </dcterms:subject>
+              <dcterms:description xml:lang="en">
+                Introduction lecture from the Institute for
+                Atmospheric and Climate Science.
+              </dcterms:description>
+              <dcterms:publisher>
+                ETH Zurich, Switzerland
+              </dcterms:publisher>
+              <dcterms:publisher>
+                ETH Zürich, Switzerland
+              </dcterms:publisher>
+              <dcterms:modified xsi:type="dcterms:W3CDTF">
+                2007-12-05
+              </dcterms:modified>
+              <dcterms:format xsi:type="dcterms:IMT">
+                video/x-dv
+              </dcterms:format>
+              <oc:promoted>
+                true
+              </oc:promoted>
+            </dublincore>
+          </episode-dc>
+          <series-dc>
+            <dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+              xmlns:dcterms="http://purl.org/dc/terms/">
+              <dcterms:title>
+                Land and Vegetation: Key players on the Climate Scene
+              </dcterms:title>
+              <dcterms:created xsi:type="dcterms:W3CDTF">2008-03-05</dcterms:created>
+              <dcterms:language>eng</dcterms:language>
+              <dcterms:type>MovingImage/LectureRecording</dcterms:type>
+              <dcterms:subject>
+                climate, land, vegetation
+              </dcterms:subject>
+              <dcterms:description xml:lang="en">
+                Introduction lecture from the Institute for
+                Atmospheric and Climate Science.
+              </dcterms:description>
+              <dcterms:publisher>
+                ETH Zurich, Switzerland
+              </dcterms:publisher>
+              <dcterms:identifier>
+                10.0000/1
+              </dcterms:identifier>
+              <dcterms:modified xsi:type="dcterms:W3CDTF">
+                2007-12-05
+              </dcterms:modified>
+              <dcterms:format xsi:type="dcterms:IMT">
+                video/x-dv
+              </dcterms:format>
+            </dublincore>
+            <Policy xmlns="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+              PolicyId="mediapackage-1"
+              RuleCombiningAlgId="urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides"
+              Version="2.0">
+              <Target>
+                <Resources>
+                  <Resource>
+                    <ResourceMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                      <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">mediapackage-1</AttributeValue>
+                      <ResourceAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id"
+                        DataType="http://www.w3.org/2001/XMLSchema#string" />
+                    </ResourceMatch>
+                  </Resource>
+                </Resources>
+              </Target>
+              <Rule Effect="Permit" RuleId="SERIES_2_STUDENT_read_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_STUDENT</AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_INSTRUCTOR_read_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR
+                    </AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_ADMIN_read_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">read</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_INSTRUCTOR_contribute_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">contribute</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR
+                    </AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_ADMIN_contribute_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">contribute</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_INSTRUCTOR_write_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">write</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_INSTRUCTOR
+                    </AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Permit" RuleId="SERIES_2_ADMIN_write_Permit">
+                <Target>
+                  <Actions>
+                    <Action>
+                      <ActionMatch MatchId="urn:oasis:names:tc:xacml:1.0:function:string-equal">
+                        <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">write</AttributeValue>
+                        <ActionAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id"
+                          DataType="http://www.w3.org/2001/XMLSchema#string" />
+                      </ActionMatch>
+                    </Action>
+                  </Actions>
+                </Target>
+                <Condition>
+                  <Apply FunctionId="urn:oasis:names:tc:xacml:1.0:function:string-is-in">
+                    <AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SERIES_2_ADMIN</AttributeValue>
+                    <SubjectAttributeDesignator AttributeId="urn:oasis:names:tc:xacml:2.0:subject:role"
+                      DataType="http://www.w3.org/2001/XMLSchema#string" />
+                  </Apply>
+                </Condition>
+              </Rule>
+              <Rule Effect="Deny" RuleId="DenyRule" />
+            </Policy>
+          </series-dc>
+        </inlined>
+      </metadata>
+    </record>
+    <record>
+      <header status="deleted">
+        <identifier>id-2</identifier>
+        <datestamp>2011-06-01</datestamp>
+      </header>
+    </record>
+  </ListRecords>
+</OAI-PMH>

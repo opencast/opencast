@@ -2,8 +2,7 @@
 
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2>
-            {{ 'EVENTS.EVENTS.DETAILS.HEADER' | translate:titleParams }}
+        <h2 translate="EVENTS.EVENTS.DETAILS.HEADER" translate-values="{{titleParams}}">
             <!-- Event details - {{resourceId}} -->
         </h2>
     </header>
@@ -22,7 +21,9 @@
         <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
             <!-- Assets -->
         </a>
-<!--        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW">Scheduling</a> -->
+        <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" ng-if="scheduling.hasProperties">
+            <!-- Scheduling -->
+        </a>
         <a ng-click="openTab('workflows')" data-modal-tab="workflows" ng-class="{ active: tab == 'workflows' }" translate="EVENTS.EVENTS.DETAILS.TABS.WORKFLOWS" with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW">
             <!-- Workflows -->
         </a>
@@ -122,7 +123,10 @@
                                 <tr>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
-                                    <th class="medium"></th>
+                                    <th class="medium">
+                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAttachmentsResource', 'newassetupload', false, true)" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
+                                      </a>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -178,14 +182,20 @@
 
     <div class="modal-content" data-modal-tab-content="scheduling">
         <div class="modal-body">
-            <div data-admin-ng-notifications="" context="event-scheduling"></div>
-            <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
-
+                <div data-admin-ng-notifications="" context="event-scheduling"></div>
+                <div data-admin-ng-notifications="" context="events-access"></div>
+                <table ng-show="conflicts.length > 0" class="main-tbl scheduling-conflict">
+                    <tr ng-repeat="conflict in conflicts">
+                        <td>{{ conflict.title }}</td>
+                        <td>{{ conflict.start }}</td>
+                        <td>{{ conflict.end }}</td>
+                    </tr>
+                </table>
                 <!-- Scheduling configuration -->
                 <div class="obj tbl-details" ng-if="scheduling.hasProperties">
                     <header>
-                        <span translate="EVENTS.EVENTS.DETAILS.HEADER">
+                        <span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
                             <!-- Scheduling configuration -->
                         </span>
                     </header>
@@ -208,8 +218,9 @@
                             </tr>
                             <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.hour" ng-change="saveScheduling()"
@@ -217,6 +228,7 @@
                                         ng-options="h.index as h.value for h in hours"
                                     />
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.minute" ng-change="saveScheduling()"
@@ -224,14 +236,15 @@
                                         ng-options="m.index as m.value for m in minutes"
                                     />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.start.hour | addLeadingZeros : 2 }} : {{ source.start.minute | addLeadingZeros : 2}}
                                 </td>
                             </tr>
                             <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.hour" ng-change="saveScheduling()"
@@ -240,6 +253,7 @@
                                     />
 
                                     <select chosen
+                                        ng-disabled="checkingConflicts"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.minute" ng-change="saveScheduling()"
@@ -247,18 +261,15 @@
                                         ng-options="m.index as m.value for m in minutes"
                                     />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.duration.hour | addLeadingZeros : 2 }} : {{ source.duration.minute | addLeadingZeros : 2}}
                                 </td>
                             </tr>
                             <tr>
-                                <td>{{ 'EVENTS.EVENTS.DETAILS.SCHEDULING.PLACEHOLDER.PRESENTERS' | translate }}</td>
-                                <td>{{ source.presenters }}</td>
-                            </tr>
-                            <tr>
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
-                                <td ng-if="!checkingConflicts && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                 <select chosen pre-select-from="captureAgents"
+                                    ng-disabled="checkingConflicts"
                                     data-width="'200px'"
                                     ng-change="roomChanged(); saveScheduling()"
                                     data-disable-search-threshold="8"
@@ -267,7 +278,7 @@
                                     data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
                                 />
                                 </td>
-                                <td ng-if="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                                <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     {{ source.device.name }}
                                 </td>
                             </tr>
@@ -288,15 +299,15 @@
 
                 </div>
 
-                <!-- Participation status -->
+                <!-- Participation status: Uncomment once participation management comes in
                 <div class="obj">
                     <header translate="EVENTS.EVENTS.DETAILS.SCHEDULING.CAPTION">
-                        <!-- Participation Status -->
+                        Participation Status
                     </header>
                     <div class="obj-container padded">
                         <p>
                             <span translate="EVENTS.EVENTS.DETAILS.SCHEDULING.REVIEW_STATUS.CAPTION">
-                                <!-- Review status -->
+                                Review status
                             </span>
                             : {{ participation.review_status }}
                         </p>
@@ -304,19 +315,19 @@
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeNow-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(false)" value="false" >
                                 <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.READY" for="executeNow-toggle">
-                                    <!-- Ready for recording -->
+                                    Ready for recording
                                 </label>
                             </div>
                             <div class="row">
                                 <input type="radio" name="execute-toggle" id="executeLater-toggle" ng-disabled="participation.read_only || transactions.read_only" ng-model="participation.opt_out" ng-change="updateOptout(true)" value="true" >
                                 <label translate="EVENTS.EVENTS.DETAILS.SCHEDULING.OPTEDOUT.OPTEDOUT" for="executeLater-toggle">
-                                    <!-- Opted out -->
+                                    Opted out
                                 </label>
                             </div>
                         </div>
                     </div>
                 </div>
-
+                -->
             </div>
         </div>
     </div>
@@ -337,8 +348,9 @@
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TYPE"><!-- Type --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></th>
                                             <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">
-                                                <!-- Submitted -->
+                                            <!-- Submitted -->
                                             </th>
+                                            <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" class="fit"><!-- Actions --></th>
                                             <th class="medium"></th>
                                         </tr>
                                     </thead>
@@ -348,6 +360,12 @@
                                             <td>{{ item.workflow }}</td>
                                             <td>{{ item.status }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
+                                            <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')" class="fa fa-hand-stop-o fa-fw" style="color:red"><!-- Abort -->
+                                                </a>
+                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')" class="fa fa-refresh fa-fw"><!-- Retry -->
+                                                </a>
+                                            </td>
                                             <td>
                                                 <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)" translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
                                                     <!-- Details -->
@@ -524,7 +542,7 @@
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
-                                                        ng-change="accessSave(policy)"
+                                                        ng-change="accessChanged(policy.role)"
                                                         ng-options="id as id for (id, type) in roles"
                                                         ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
@@ -537,8 +555,8 @@
                                                 <td class="fit text-center"><input type="checkbox" ng-model="policy.read" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit text-center"><input type="checkbox" ng-model="policy.write" ng-change="accessSave(policy)" ng-disabled="(transactions.read_only) || !$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')"/></td>
                                                 <td class="fit editable" ng-if="hasActions">
-                                                    <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT') && !transactions.read_only" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
-                                                    <div ng-if="((!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')) || transactions.read_only)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
+                                                    <div ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT') && !transactions.read_only" save="accessSave" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
+                                                    <div ng-if="((!$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')) || transactions.read_only)" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
                                                 </td>
                                                 <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" class="fit"><a ng-show="!transactions.read_only" ng-click="deletePolicy(policy)" class="remove"></a>
                                                 </td>
@@ -804,6 +822,29 @@
                </div>
            </div>
         </div>
+    </div>
+    <div class="modal-content" data-modal-tab-content="newAssetUpload" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD">
+      <div class="modal-body">
+        <div data-admin-ng-notifications="" context="events-access"></div>
+        <div class="full-col">
+          <div class="obj tbl-container operations-tbl">
+            <header translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD"><!-- Attachments --></header>
+            <div class="obj-container">
+              <!-- Note: attributes passed to the upload Directive cannot be cammel cased or contain dashes -->
+              <div admin-ng-upload-asset assetoptions="uploadAssetOptions" filebindcontainer="newAssets" >
+                <!-- init "assetoptions" for content transcluded by the asset upload directive -->
+              </div>
+              <footer>
+                <a ng-click="saveAssets()" ng-keyup="saveAssetsKeyUp($event)"
+                  data-modal-tab="next" class="submit" tabindex="100"
+                  ng-class="active">
+                  {{ "EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" | translate}}
+                </a>
+              </footer>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">

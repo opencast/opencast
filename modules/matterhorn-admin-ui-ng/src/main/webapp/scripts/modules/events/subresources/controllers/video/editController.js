@@ -22,8 +22,11 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('VideoEditCtrl', ['$scope', 'PlayerAdapter', 'VideoService', 'HotkeysService',
-    function ($scope, PlayerAdapter, VideoService, HotkeysService) {
+.controller('VideoEditCtrl', ['$scope', 'PlayerAdapter', 'VideoService', 'HotkeysService', 'Notifications',
+    function ($scope, PlayerAdapter, VideoService, HotkeysService, Notifications) {
+
+        var NOTIFICATION_CONTEXT = 'video-editor-event-access';
+        var notificationId = 0;
 
         $scope.split = function () {
             var segment = VideoService.getCurrentSegment($scope.player, $scope.video),
@@ -147,6 +150,23 @@ angular.module('adminNg.controllers')
           "Play end of segment", function(event) {
               event.preventDefault();
               $scope.replayEndOfSegment();
+        });
+
+        $scope.$on('ACTIVE_TRANSACTION', function() {
+            if (!$scope.submitButton) {
+                $scope.submitButton = true;
+                notificationId = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, -1);
+            }
+        });
+
+        $scope.$on('NO_ACTIVE_TRANSACTION', function() {
+            if ($scope.submitButton) {
+                $scope.submitButton = false;
+                if (notificationId) {
+                    Notifications.remove(notificationId, NOTIFICATION_CONTEXT);
+                    notificationId = 0;
+                }
+            }
         });
 
     }

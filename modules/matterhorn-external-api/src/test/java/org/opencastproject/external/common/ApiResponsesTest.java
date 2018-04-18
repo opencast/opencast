@@ -20,9 +20,9 @@
  */
 package org.opencastproject.external.common;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.junit.Assert.assertEquals;
 
@@ -46,7 +46,7 @@ public class ApiResponsesTest {
 
   @Test
   public void testJsonOk() throws Exception {
-    final JValue json = j(f("id", v("abcd")), f("values", a(v("a"), v("b"))));
+    final JValue json = obj(f("id", v("abcd")), f("values", arr(v("a"), v("b"))));
     Response response = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, json);
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());

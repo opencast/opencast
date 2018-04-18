@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Mpeg7 xmlns="urn:mpeg:mpeg7:schema:2001" xmlns:mpeg7="urn:mpeg7:schema:2001" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Description xsi:type="ContentEntityType">
+    <MultimediaContent xsi:type="VideoType">
+      <Video id="videosegment">
+        <MediaLocator>
+          <MediaUri>track.mp4</MediaUri>
+        </MediaLocator>
+        <MediaTime>
+          <MediaRelTimePoint>T00:00:00:0F1000</MediaRelTimePoint>
+          <MediaDuration>PT02M24S554N1000F</MediaDuration>
+        </MediaTime>
+        <TemporalDecomposition criteria="temporal" gap="false" overlap="false">
+          <VideoSegment id="segment-1">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:00:0F1000</MediaRelTimePoint>
+              <MediaDuration>PT04S818N1000F</MediaDuration>
+            </MediaTime>
+          </VideoSegment>
+          <VideoSegment id="segment-2">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:04:818F1000</MediaRelTimePoint>
+              <MediaDuration>PT04S818N1000F</MediaDuration>
+            </MediaTime>
+          </VideoSegment>
+          <VideoSegment id="segment-3">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:09:636F1000</MediaRelTimePoint>
+              <MediaDuration>PT04S818N1000F</MediaDuration>
+            </MediaTime>
+          </VideoSegment>
+          <VideoSegment id="segment-4">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:14:454F1000</MediaRelTimePoint>
+              <MediaDuration>PT04S818N1000F</MediaDuration>
+            </MediaTime>
+          </VideoSegment>
+          <VideoSegment id="segment-5">
+            <MediaTime>
+              <MediaRelTimePoint>T00:00:19:272F1000</MediaRelTimePoint>
+              <MediaDuration>PT04S818N1000F</MediaDuration>
+            </MediaTime>
+          </VideoSegment>
+        </TemporalDecomposition>
+      </Video>
+    </MultimediaContent>
+  </Description>
+</Mpeg7>

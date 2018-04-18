@@ -148,7 +148,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
 
   /** {@link #read(String)} as a function, returning none on error. */
   public static final Fn<String, Opt<DublinCoreCatalog>> readOptFromString = new Fn<String, Opt<DublinCoreCatalog>>() {
-    @Override public Opt<DublinCoreCatalog> ap(String xml) {
+    @Override public Opt<DublinCoreCatalog> apply(String xml) {
       return readOpt(xml);
     }
   };
@@ -177,7 +177,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     if (dc.getRootTag() != null) {
       final Element rootElement = doc.createElementNS(dc.getRootTag().getNamespaceURI(), dc.toQName(dc.getRootTag()));
       doc.appendChild(rootElement);
-      for (CatalogEntry element : DublinCoreUtil.getPropertiesSorted(dc)) {
+      for (CatalogEntry element : dc.getEntriesSorted()) {
         rootElement.appendChild(element.toXml(doc));
       }
       return doc;

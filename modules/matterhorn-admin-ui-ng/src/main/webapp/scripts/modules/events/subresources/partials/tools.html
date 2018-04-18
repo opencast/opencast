@@ -33,12 +33,16 @@
                         ng-model="video.workflow"
                         ng-options="workflow.id as workflow.name for workflow in video.workflows" />
 
-                    <a ng-click="submit()" ng-class="{disabled: submitButton}" class="save-and-close-button">
-                        {{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' | translate }}
+                    <a ng-click="submit()"
+                        ng-class="{disabled: submitButton}"
+                        class="save-and-close-button"
+                        translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                        <!-- Save and Continue -->
                     </a>
                 </div>
             </div>
         </div>
+        <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
         <div class="tab-menu">
             <nav class="view-controller">
                 <a ng-class="{active: tab === 'playback'}"
@@ -68,7 +72,7 @@
             </div>-->
             <div class="event-container" ng-controller="EventCtrl">
                 <div>
-                    <nav class="view-controller">
+                    <nav class="modal-nav view-controller-secondary">
                         <a ng-class="{active: area === 'segments'}" ng-if="tab === 'editor'"
                             ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
                         <a ng-class="{active: area === 'metadata'}"
@@ -190,6 +194,7 @@
 
                 <div ng-if="area === 'segments'">
                   <div class="area-body">
+                    <div class="segments-area">
                       <div class="video-toolbar">
                           <div class="start-column">
                               <div class="primary-functions function-buttons">
@@ -211,11 +216,13 @@
                           </div>
                       </div>
                       <div data-admin-ng-segments="" data-video="video" data-player="player"></div>
+                    </div>
                   </div>
                 </div>
 
             </div>
 
+            <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
             <div class="video-editor-actions-toolbar">
                 <div class="video-nav-controls">
                     <a class="return-button" ng-click="navigateTo('/events/events')" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
@@ -230,8 +237,11 @@
                             ng-model="video.workflow"
                             ng-options="workflow.id as workflow.name for workflow in video.workflows" />
 
-                        <a ng-click="submit()" ng-class="{disabled: submitButton}" class="save-and-close-button">
-                            {{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' | translate }}
+                        <a ng-click="submit()"
+                           ng-class="{disabled: submitButton}"
+                           class="save-and-close-button"
+                           translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                          <!-- Save and Continue -->
                         </a>
                     </div>
                 </div>

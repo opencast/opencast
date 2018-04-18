@@ -21,22 +21,23 @@ angular.module('adminNg.services')
          * @returns {*}
          */
         this.findByAdapterTypeAndElementId = function (adapterType, element) {
-            var factory, adapter;
-
             if (typeof adapters[adapterType] === 'undefined') {
-
                 // create entry for adapterType if not existent
                 adapters[adapterType] = {};
             }
 
             if (typeof adapters[adapterType][element.id] === 'undefined') {
-                // lazy create adapter on demand over factory if not existent
-                factory = $injector.get('PlayerAdapterFactory' + adapterType);
-                adapter = factory.create(element);
-                adapters[adapterType][element.id] = adapter;
+                adapters[adapterType][element.id] = this.createNewAdapter(adapterType, element);
             }
             return adapters[adapterType][element.id];
         };
+
+        this.createNewAdapter = function (adapterType, element) {
+            var factory, adapter;
+            factory = $injector.get('PlayerAdapterFactory' + adapterType);
+            adapter = factory.create(element);
+            return adapter;
+        }
 
     };
 

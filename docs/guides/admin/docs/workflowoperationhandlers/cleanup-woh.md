@@ -1,25 +1,32 @@
-# CleanupWorkflowOperationHandler
+CleanupWorkflowOperationHandler
+===============================
 
-## Description
-This opertaion removes all files in the working file repository for mediapackage elements that don't match one of the
-*preserve-flavors* configuration value.
-It is used as last workflow operation in a workflow to ensure that temporary processing artefacts are removed from the working file repository.
+Description
+-----------
 
-## Parameter Table
+This operation removes all files from the workspace and the working file repository which belong to media package
+elements of the running workflow unless their flavor is matched by the value configured in `preserve-flavors`.  It is
+usually used as last workflow operation in a workflow to ensure that temporary processing artefacts are removed.
 
-|Configuration Key|Example                |Description                                       |
-|-----------------|-----------------------|--------------------------------------------------|
-|preserve-flavors  |security/\*,\*/source |Comma-separated list of flavors to be preserved.  |
-|delete-external   |true                  |Whether to try to delete external working file repository URIs using HTTP delete. Default is false.|
-|delay             |5                     |Time to wait in seconds before removing files. Default is 1s.|
 
-\* mandatory configuration key
+Parameter Table
+---------------
 
-Notes:
+|Configuration Key|Example      |Description                                                        |Default|
+|-----------------|-------------|-------------------------------------------------------------------|-------|
+|preserve-flavors |`security/*` |Comma-separated list of flavors to be preserved.                   |       |
+|delete-external  |`true`       |If files from external working file repositories should be deleted |`false`|
+|delay            |`5`          |Seconds to wait before removing files                              |`1`    |
 
-* If *delete-external* is set to true, all externally referenced media package elements will be removed from its source independent of the value of *preserve-flavors*
+### Notes
 
-##Operation Example
+- If `delete-external` is set to `true`, the externally referenced media package elements will be removed from its
+  source where the value of `preserve-flavors` does not match
+- If you have an shared working file repository setting `delete-external` to `false` will speed up the cleanup process
+  while still removing all files.
+
+Operation Example
+-----------------
 
     <operation
       id="cleanup"
@@ -31,4 +38,3 @@ Notes:
         <configuration key="delay">5</configuration>
       </configurations>
     </operation>
-

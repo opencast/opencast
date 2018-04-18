@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -188,7 +188,7 @@ public class ServerEndpoint {
     query.setLimit(limit);
     query.setOffset(offset);
 
-    List<JSONObject> servers = new ArrayList<JSONObject>();
+    List<JSONObject> servers = new ArrayList<>();
     // Get service statistics for all hosts and services
     List<ServiceStatistics> servicesStatistics = serviceRegistry.getServiceStatistics();
     for (HostRegistration server : serviceRegistry.getHostRegistrations()) {
@@ -201,7 +201,7 @@ public class ServerEndpoint {
       int totalServiceOnHost = 0;
       int offlineJobProducerServices = 0;
       int totalJobProducerServices = 0;
-      Set<String> serviceTypes = new HashSet<String>();
+      Set<String> serviceTypes = new HashSet<>();
       for (ServiceStatistics serviceStat : servicesStatistics) {
         if (server.getBaseUrl().equals(serviceStat.getServiceRegistration().getHost())) {
           totalServiceOnHost++;
@@ -281,9 +281,9 @@ public class ServerEndpoint {
         ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
                 || SearchQuery.Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 
@@ -321,7 +321,7 @@ public class ServerEndpoint {
       Long vMeanRunTime = (Long) server.get(KEY_MEAN_RUN_TIME);
       Long vMeanQueueTime = (Long) server.get(KEY_MEAN_QUEUE_TIME);
 
-      jsonServers.add(j(f(KEY_ONLINE, v(vOnline)),
+      jsonServers.add(obj(f(KEY_ONLINE, v(vOnline)),
               f(KEY_MAINTENANCE, v(vMaintenance)),
               f(KEY_HOSTNAME, v(vHostname)),
               f(KEY_CORES, v(vCores)),

@@ -53,7 +53,7 @@ You can also run a local version of [Grunt][1] and [NodeJS][2] from the Opencast
 
 ```bash
 cd modules/matterhorn-admin-ui-ng
-export PATH=$PATH:node:node_modules/grunt-cli/bin:node_modules/karma/bin
+export PATH=node:node_modules/grunt-cli/bin:node_modules/karma/bin:$PATH
 ```
 
 *Note: The node and node_modules folders are created during the Maven build process.*

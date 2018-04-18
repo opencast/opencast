@@ -48,6 +48,9 @@ angular.module('adminNg.directives')
                     // Prevent the modal from closing.
                     event.stopPropagation();
                 }
+                if (event.keyCode === 13) {
+                  scope.submit();
+                }
             };
 
             scope.submit = function () {

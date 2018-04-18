@@ -22,7 +22,7 @@
 package org.opencastproject.caption.api;
 
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageException;
 
 /**
@@ -38,7 +38,7 @@ public interface CaptionService {
    * about language.
    *
    * @param input
-   *          Catalog containing captions
+   *          MediaPackageElement containing captions
    * @param inputFormat
    *          format of imported captions
    * @param outputFormat
@@ -50,7 +50,7 @@ public interface CaptionService {
    * @throws MediaPackageException
    *           if the catalog is invalid
    */
-  Job convert(Catalog input, String inputFormat, String outputFormat)
+  Job convert(MediaPackageElement input, String inputFormat, String outputFormat)
           throws UnsupportedCaptionFormatException, CaptionConverterException, MediaPackageException;
 
   /**
@@ -58,7 +58,7 @@ public interface CaptionService {
    * about language.
    *
    * @param input
-   *          Catalog containing captions
+   *          MediaPackageElement containing captions
    * @param inputFormat
    *          format of imported captions
    * @param outputFormat
@@ -72,7 +72,7 @@ public interface CaptionService {
    * @throws MediaPackageException
    *           if the catalog is invalid
    */
-  Job convert(Catalog input, String inputFormat, String outputFormat, String language)
+  Job convert(MediaPackageElement input, String inputFormat, String outputFormat, String language)
           throws UnsupportedCaptionFormatException, CaptionConverterException, MediaPackageException;
 
   /**
@@ -88,7 +88,7 @@ public interface CaptionService {
    * @throws CaptionConverterException
    *           if parser encounters exception
    */
-  String[] getLanguageList(Catalog input, String format) throws UnsupportedCaptionFormatException,
-          CaptionConverterException;
+  String[] getLanguageList(MediaPackageElement input, String format)
+          throws UnsupportedCaptionFormatException, CaptionConverterException;
 
 }

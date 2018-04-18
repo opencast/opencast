@@ -1,10 +1,6 @@
 <div class="video-player">
     <div>
-        <video id="player" controls ng-if="controls === 'true'">
-            <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
-            Your browser does not support HTML5 video.
-        </video>
-        <video id="player" ng-if="controls === 'false'">
+        <video id="player">
             <source ng-repeat="preview in video.previews" ng-src="{{ preview.uri | trusted }}" type="video/mp4" />
             Your browser does not support HTML5 video.
         </video>

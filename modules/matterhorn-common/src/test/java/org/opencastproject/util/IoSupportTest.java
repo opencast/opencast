@@ -211,4 +211,32 @@ public class IoSupportTest {
     assertTrue(dst.isFile());
     assertEquals(src.length(), dst.length());
   }
+
+  @Test(expected = NotFoundException.class)
+  public void testLockedNotFoundException() throws NotFoundException, IOException {
+    final File file = IoSupport.file("foo/bar.txt");
+    IoSupport.locked(file, new Effect.X<File>() {
+      @Override
+      protected void xrun(File a) throws Exception {
+        Assert.fail("The path to the file to lock does not exist and should not be created.");
+      }
+    });
+  }
+
+  @Test(expected = NotFoundException.class)
+  public void testLockedParentDirNotExist() throws NotFoundException, IOException {
+    File file = testFolder.newFolder("foo");
+    file = IoSupport.file(file.toPath().toString(), "bar/some.txt");
+    try {
+      IoSupport.locked(file, new Effect.X<File>() {
+        @Override
+        protected void xrun(File a) throws Exception {
+          Assert.fail("The parent directory isn't exist and should not be created.");
+        }
+      });
+    } catch (Exception e) {
+      FileUtils.deleteDirectory(file);
+      throw e;
+    }
+  }
 }

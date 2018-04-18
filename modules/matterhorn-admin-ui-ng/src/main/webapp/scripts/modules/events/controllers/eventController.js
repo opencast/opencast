@@ -24,14 +24,16 @@
 angular.module('adminNg.controllers')
 .controller('EventCtrl', [
     '$scope', 'Notifications', 'EventTransactionResource', 'EventMetadataResource', 'EventAssetsResource',
-    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource',
+    'EventCatalogsResource', 'CommentResource', 'EventWorkflowsResource', 'EventWorkflowActionResource',
     'ResourcesListResource', 'UserRolesResource', 'EventAccessResource', 'EventGeneralResource',
-    'OptoutsResource', 'EventParticipationResource', 'NewEventProcessingResource',
+    'OptoutsResource', 'EventParticipationResource', 'EventSchedulingResource', 'NewEventProcessingResource',
     'OptoutSingleResource', 'CaptureAgentsResource', 'ConflictCheckResource', 'Language', 'JsHelper', '$sce', '$timeout', 'EventHelperService',
+    'UploadAssetOptions', 'EventUploadAssetResource', 'Table',
     function ($scope, Notifications, EventTransactionResource, EventMetadataResource, EventAssetsResource, EventCatalogsResource, CommentResource,
-        EventWorkflowsResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
-        OptoutsResource, EventParticipationResource, NewEventProcessingResource,
-        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService) {
+        EventWorkflowsResource, EventWorkflowActionResource, ResourcesListResource, UserRolesResource, EventAccessResource, EventGeneralResource,
+        OptoutsResource, EventParticipationResource, EventSchedulingResource, NewEventProcessingResource,
+        OptoutSingleResource, CaptureAgentsResource, ConflictCheckResource, Language, JsHelper, $sce, $timeout, EventHelperService, UploadAssetOptions,
+        EventUploadAssetResource, Table) {
 
         var roleSlice = 100;
         var roleOffset = 0;
@@ -190,11 +192,13 @@ angular.module('adminNg.controllers')
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
-                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                      me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT);
+                      $scope.$emit('ACTIVE_TRANSACTION');
                     } else {
                       if (!angular.isUndefined(me.transactionNotification)) {
                           Notifications.remove(me.transactionNotification, NOTIFICATION_CONTEXT);
                       }
+                      $scope.$emit('NO_ACTIVE_TRANSACTION');
                     }
                 });
 
@@ -211,9 +215,17 @@ angular.module('adminNg.controllers')
                             roles[key] = key;
                         }
                     }, this);
-		            return roles;
-		        });
+                    return roles;
+                });
               }, this);
+            },
+            cleanupScopeResources = function() {
+              $timeout.cancel($scope.checkForActiveTransactionsTimer);
+              if ($scope.lastNotificationId) {
+                  Notifications.remove($scope.lastNotificationId, 'event-scheduling');
+                  $scope.lastNotificationId = undefined;
+              }
+              me.clearConflicts();
             },
             fetchChildResources = function (id) {
                 $scope.general = EventGeneralResource.get({ id: id }, function () {
@@ -238,22 +250,16 @@ angular.module('adminNg.controllers')
 
                 $scope.metadata =  EventMetadataResource.get({ id: id }, function (metadata) {
                     var episodeCatalogIndex;
-                    var locationIndex = -1;
-
                     angular.forEach(metadata.entries, function (catalog, index) {
                         if (catalog.flavor === mainCatalog) {
                             $scope.episodeCatalog = catalog;
                             episodeCatalogIndex = index;
                             var keepGoing = true;
                             var tabindex = 2;
-                            angular.forEach(catalog.fields, function (entry, fieldIndex) {
+                            angular.forEach(catalog.fields, function (entry) {
                                 if (entry.id === 'title' && angular.isString(entry.value)) {
                                     $scope.titleParams = { resourceId: entry.value.substring(0,70) };
                                 }
-                                else if (entry.id === 'location') {
-                                    locationIndex = fieldIndex;
-                                }
-
                                 if (keepGoing && entry.locked) {
                                     metadata.locked = entry.locked;
                                     keepGoing = false;
@@ -263,14 +269,71 @@ angular.module('adminNg.controllers')
                         }
                     });
 
-                    if (locationIndex > -1) {
-                        $scope.setCaptureAgents(locationIndex);
-                    }
-
                     if (angular.isDefined(episodeCatalogIndex)) {
                         metadata.entries.splice(episodeCatalogIndex, 1);
                     }
                 });
+
+                //<===============================
+                // Enable asset upload (catalogs and attachments) to existing events
+
+                // Retrieve option configuration for asset upload
+                UploadAssetOptions.getOptionsPromise().then(function(data){
+                    if (data) {
+                        $scope.assetUploadWorkflowDefId = data.workflow;
+                        $scope.uploadAssetOptions = [];
+                        // Filter out asset options of type "track".
+                        // Not allowing tracks to be added to existing mediapackages
+                        // for this iteration of the upload option feature.
+                        // TODO: consider enabling track uploads to existing mps.
+                        angular.forEach(data.options, function(option) {
+                          if (option.type !== 'track') {
+                             $scope.uploadAssetOptions.push(option);
+                          }
+                        });
+                        // if no asset options, undefine the option variable
+                        $scope.uploadAssetOptions = $scope.uploadAssetOptions.length > 0 ? $scope.uploadAssetOptions : undefined;
+                        $scope.newAssets = {};
+                    }
+                });
+                $scope.saveAssetsKeyUp = function (event) {
+                    if (event.keyCode === 13 || event.keyCode === 32) {
+                        $scope.saveAssets();
+                    }
+                };
+
+                // Save and start upload asset request and workflow
+                $scope.saveAssets = function() {
+                    // The transaction becomes read-only if a workflow is running for this event.
+                    // Ref endpoint hasActiveTransaction(@PathParam("eventId") String eventId)
+                    if ($scope.transactions.read_only) {
+                        me.transactionNotification = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, 3000);
+                        return;
+                    }
+                    // Verify there are assets to upload
+                    if (angular.equals($scope.newAssets, {})) {
+                        return;
+                    }
+                    var userdata = { metadata: {}};
+
+                    // save metadata map (contains flavor mapping used by the server)
+                    userdata.metadata["assets"] = ($scope.uploadAssetOptions);
+
+                    // save file assets (passed in a separate request field from its metadata map)
+                    userdata["upload-asset"] = $scope.newAssets;
+
+                    // save workflow definition id (defined in the asset upload configuration provided-list)
+                    userdata["workflow"] = $scope.assetUploadWorkflowDefId;
+
+                    EventUploadAssetResource.save({id: $scope.resourceId }, userdata, function (data) {
+                        me.transactionNotification = Notifications.add('success', 'EVENTS_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                        }, function () {
+                        me.transactionNotification = Notifications.add('error', 'EVENTS_NOT_CREATED', NOTIFICATION_CONTEXT, 6000);
+                        $scope.openTab('assets');
+                    });
+                };
+                // <==========================
 
                 $scope.acls = ResourcesListResource.get({ resource: 'ACL' });
                 $scope.actions = {};
@@ -305,6 +368,30 @@ angular.module('adminNg.controllers')
                             setWorkflowConfig();
                         });
                     }
+                });
+
+                $scope.source = EventSchedulingResource.get({ id: id }, function (source) {
+                    source.presenters = angular.isArray(source.presenters) ? source.presenters.join(', ') : '';
+                    $scope.scheduling.hasProperties = true;
+                    CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+                        $scope.captureAgents = data.rows;
+                        angular.forEach(data.rows, function (agent) {
+                            var inputs;
+                            if (agent.id === $scope.source.agentId) {
+                                source.device = agent;
+                                // Retrieve agent inputs configuration
+                                if (angular.isDefined(source.agentConfiguration['capture.device.names'])) {
+                                    inputs = source.agentConfiguration['capture.device.names'].split(',');
+                                    source.device.inputMethods = {};
+                                    angular.forEach(inputs, function (input) {
+                                        source.device.inputMethods[input] = true;
+                                    });
+                                }
+                            }
+                        });
+                    });
+                }, function () {
+                   $scope.scheduling.hasProperties = false;
                 });
 
                 $scope.access = EventAccessResource.get({ id: id }, function (data) {
@@ -359,46 +446,48 @@ angular.module('adminNg.controllers')
         $scope.hours = JsHelper.initArray(24);
         $scope.minutes = JsHelper.initArray(60);
 
-        this.conflicts = [];
+        $scope.conflicts = [];
+  
         this.readyToPollConflicts = function () {
-            var data = $scope.source, result;
-            result = angular.isDefined(data) && angular.isDefined(data.start) &&
-                angular.isDefined(data.start.date) && data.start.date.length > 0 &&
-                angular.isDefined(data.device) &&
-                angular.isDefined(data.device.id) && data.device.id.length > 0;
-
-            return result;
+            var data = $scope.source;
+            return angular.isDefined(data) &&
+                angular.isDefined(data.start) && angular.isDefined(data.start.date) && data.start.date.length > 0 &&
+                angular.isDefined(data.duration) &&
+                angular.isDefined(data.duration.hour) && angular.isDefined(data.duration.minute) &&
+                angular.isDefined(data.device) && angular.isDefined(data.device.id) && data.device.id.length > 0;
         };
 
+        this.clearConflicts = function () {
+          $scope.conflicts = [];
+          if (me.notificationConflict) {
+              Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
+              me.notifictationConflict = undefined;
+          }
+        }
+
         this.noConflictsDetected = function () {
-            while (me.conflicts.length > 0) {
-                me.conflicts.pop();
-            }
-            me.checkingConflicts = false;
+            me.clearConflicts();
+            $scope.checkingConflicts = false;
         };
 
         this.conflictsDetected = function (response) {
+            me.clearConflicts();
             if (response.status === 409) {
-                if (me.notification) {
-                    Notifications.remove(me.notification, SCHEDULING_CONTEXT);
-                }
-                me.conflicts = []; // reset
-                me.notification = Notifications.add('error', 'CONFLICT_DETECTED', SCHEDULING_CONTEXT);
-                var data = response.data;
-                angular.forEach(data, function (d) {
-                    me.conflicts.push({
-                        title: d.title,
-                        start: Language.toLocalTime(d.start.substr(6, d.start.length)),
-                        end: Language.toLocalTime(d.end.substr(5, d.end.length))
+                me.notificationConflict = Notifications.add('error', 'CONFLICT_DETECTED', SCHEDULING_CONTEXT);
+                angular.forEach(response.data, function (data) {
+                    $scope.conflicts.push({
+                        title: data.title,
+                        start: Language.formatDateTime('medium', data.start),
+                        end: Language.formatDateTime('medium', data.end)
                     });
                 });
             }
-            me.checkingConflicts = false;
+            $scope.checkingConflicts = false;
         };
 
         $scope.checkConflicts = function () {
             return new Promise(function(resolve, reject) {
-                me.checkingConflicts = true;
+                $scope.checkingConflicts = true;
                 if (me.readyToPollConflicts()) {
                     ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
                         .$promise.then(function() {
@@ -408,7 +497,7 @@ angular.module('adminNg.controllers')
                             reject();
                         });
                 } else {
-                   me.checkingConflicts = false;
+                   $scope.checkingConflicts = false;
                    resolve();
                 }
             });
@@ -417,9 +506,7 @@ angular.module('adminNg.controllers')
         $scope.saveScheduling = function () {
             if (me.readyToPollConflicts()) {
                 ConflictCheckResource.check($scope.source, function () {
-                    while (me.conflicts.length > 0) {
-                        me.conflicts.pop();
-                    }
+                    me.clearConflicts();
 
                     $scope.source.agentId = $scope.source.device.id;
                     $scope.source.agentConfiguration['capture.device.names'] = '';
@@ -431,6 +518,11 @@ angular.module('adminNg.controllers')
                             }
                             $scope.source.agentConfiguration['capture.device.names'] += key;
                         }
+                    });
+
+                    EventSchedulingResource.save({
+                        id: $scope.resourceId,
+                        entries: $scope.source
                     });
                 }, me.conflictsDetected);
             }
@@ -541,7 +633,9 @@ angular.module('adminNg.controllers')
         fetchChildResources($scope.resourceId);
 
         $scope.$on('change', function (event, id) {
+            cleanupScopeResources();
             fetchChildResources(id);
+            checkForActiveTransactions();
         });
 
         $scope.transactions = {
@@ -574,130 +668,20 @@ angular.module('adminNg.controllers')
             return fn;
         };
 
-        $scope.setSourceFields = function(catalog) {
-            var sourceFieldValues = $scope.source || {};
-            var keyMappings = {startTime: 'time', startDate: 'start', location: 'device', duration: ''};
-
-            angular.forEach(catalog.fields, function(entry) {
-                var curKey = keyMappings[entry.id] || entry.id;
-                if (angular.isDefined(keyMappings[entry.id]) &&
-                    !angular.isDefined(sourceFieldValues[curKey])) {
-                    sourceFieldValues[curKey] = {};
-                }
-
-                switch (entry.id) {
-                    case 'duration':
-                        sourceFieldValues.duration = entry.value
-                                                         .split(':')
-                                                         .reduce(function(result, current, index) {
-                                                         //expecting ['hh','mm','ss'], dont log value for index >2 or <0
-                                                             var timeUnit = index == 2 ? 'second' : (index === 1 ? 'minute': !index ? 'hour' : '');
-                                                             if (timeUnit) {
-                                                                 result[timeUnit] = current;
-                                                             }
-                                                             return result;
-                                                         }, {});
-                        break;
-
-                    case 'startTime':
-                        sourceFieldValues.time = {
-                                                       hour: (entry.hours < 10 ? '0' : '') + entry.hours,
-                                                     minute: (entry.minutes < 10 ? '0' : '') + entry.minutes
-                                                 };
-                        break;
-
-                    case 'location':
-                        sourceFieldValues.initialAgentId = sourceFieldValues.initialAgentId || entry.value;
-                    case 'identifier':
-                    case 'startDate':
-                        setSourceField(entry.id,entry.value);
-                        break;
-                }
-            });
-
-            function setSourceField(field, value) {
-                if (field == 'startDate') {
-                     sourceFieldValues.start.date = value;
-                }
-                else if (field == 'identifier') {
-                     sourceFieldValues.eventId = value;
-                }
-                else if (field == 'location') {
-                     sourceFieldValues.device.id = value;
-                }
-            }
-
-            angular.forEach(sourceFieldValues.time, function(val, key) {
-                sourceFieldValues.start[key] = val;
-            });
-
-            $scope.source = sourceFieldValues;
-            return $scope;
-        }
-
         $scope.metadataSave = function (id, callback, catalog) {
             catalog.attributeToSend = id;
-
-            var conflictFields = ['location', 'startDate', 'startTime' ,'duration'];
-
-            if (id && conflictFields.indexOf(id) > -1) {
-                $scope
-                    .setSourceFields(catalog)
-                    .checkConflicts()
-                        .then(function() {
-                            $scope.performMetadataSave(id, callback, catalog);
-                        })
-                        .catch(function(err) {
-                            if (angular.isDefined(callback)) {
-                                callback();
-                            }
-                            if (angular.isDefined($scope.source.device) && !$scope.source.device.id) {
-                                angular.forEach($scope.episodeCatalog.fields, function(entry) {
-                                    if (entry.id === 'location') {
-                                        entry.value = $scope.source.initialAgentId;
-                                    }
-                                });
-                            }
-                        });
-            }
-            else {
-                $scope.performMetadataSave(id, callback, catalog);
-            }
-        };
-
-        $scope.performMetadataSave = function(id, callback, catalog) {
-            var chosenDevice = angular.isDefined($scope.source) ? $scope.source.device || {} : {};
-
-            if (!catalog.attributeToSend || (catalog.attributeToSend == 'location' && chosenDevice.id) ||
-                 catalog.attributeToSend != 'location') {
-                EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
-                    if (angular.isDefined(callback)) {
-                        callback();
-                    }
-
-                    // Mark the saved attribute as saved
-                    angular.forEach(catalog.fields, function (entry) {
-                        if (entry.id === id) {
-                            entry.saved = true;
-                        }
-                    });
-                });
-
-                if (catalog.attributetoSend === 'location') {
-                    $scope.source.initialAgentId = $scope.episodeCatalog.fields
-                                                       .filter(function(entry) {
-                                                           return entry.id === 'location';
-                                                       })
-                                                       .reduce(function(collect, entry) {
-                                                           return collect + entry.value;
-                                                       }, '');
+            EventMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
+                if (angular.isDefined(callback)) {
+                    callback();
                 }
-            }
-
-            else {
-                //invalid location, let user know
-            }
-        }
+                // Mark the saved attribute as saved
+                angular.forEach(catalog.fields, function (entry) {
+                    if (entry.id === id) {
+                        entry.saved = true;
+                    }
+                });
+            });
+        };
 
         $scope.components = ResourcesListResource.get({ resource: 'components' });
 
@@ -715,12 +699,12 @@ angular.module('adminNg.controllers')
         };
 
         $scope.comment = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, type: 'comment' },
                 { text: $scope.myComment.text, reason: $scope.myComment.reason },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -728,18 +712,18 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
             );
         };
 
         $scope.reply = function () {
-        	$scope.myComment.saving = true;
+            $scope.myComment.saving = true;
             CommentResource.save({ resource: 'event', resourceId: $scope.resourceId, id: $scope.replyToId, type: 'comment', reply: 'reply' },
                 { text: $scope.myComment.text, resolved: $scope.myComment.resolved },
                 function () {
-                	$scope.myComment.saving = false;
-                	$scope.myComment.text = '';
+                    $scope.myComment.saving = false;
+                    $scope.myComment.text = '';
 
                     $scope.comments = CommentResource.query({
                         resource: 'event',
@@ -747,7 +731,7 @@ angular.module('adminNg.controllers')
                         type: 'comments'
                     });
                 }, function () {
-                	$scope.myComment.saving = false;
+                    $scope.myComment.saving = false;
                 }
 
             );
@@ -755,11 +739,11 @@ angular.module('adminNg.controllers')
         };
 
         this.accessSaved = function () {
-          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 5000);
+          Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT);
         };
 
         this.accessNotSaved = function () {
-          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT, 30000);
+          Notifications.add('error', 'ACL_NOT_SAVED', NOTIFICATION_CONTEXT);
 
           $scope.access = EventAccessResource.get({ id: $scope.resourceId }, function (data) {
               if (angular.isDefined(data.episode_access)) {
@@ -767,6 +751,11 @@ angular.module('adminNg.controllers')
                   changePolicies(json.acl.ace, true);
               }
           });
+        };
+
+        $scope.accessChanged = function (role) {
+          if (!role) return;
+          $scope.accessSave();
         };
 
         $scope.accessSave = function () {
@@ -880,38 +869,20 @@ angular.module('adminNg.controllers')
             );
         };
 
-        $scope.modal_close = $scope.close;
-        // CERV-1048 override default close of the modal to stop checking for active transactions.
-        $scope.close = function () {
-            $timeout.cancel($scope.checkForActiveTransactionsTimer);
-            if ($scope.lastNotificationId) {
-                Notifications.remove($scope.lastNotificationId, 'event-scheduling');
-                $scope.lastNotificationId = undefined;
-            }
-            $scope.modal_close();
-        };
         checkForActiveTransactions();
-
-        $scope.setCaptureAgents = function(locationIndex) {
-            var agentCollection = {};
-            CaptureAgentsResource.query().$promise
-                .then(function(agents) {
-                    if (agents.length === 0) {
-                        return;
-                    }
-
-                    angular.forEach(agents.rows, function(agent) {
-                        if (angular.isDefined(agent) && angular.isDefined(agent.id) &&
-                            !angular.isDefined(agentCollection[agent.id])) {
-                            agentCollection[agent.id] = agent.name;
-                        }
-                    });
-
-                    $scope.episodeCatalog.fields[locationIndex]
-                        .collection = agentCollection;
-                    $scope.setSourceFields($scope.episodeCatalog);
-                });
         
-        }
+        $scope.workflowAction = function (wfId, action) {
+        	EventWorkflowActionResource.save({id: $scope.resourceId, wfId: wfId, action: action}, function () {
+                Notifications.add('success', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            }, function () {
+                Notifications.add('error', 'EVENTS_PROCESSING_ACTION_' + action);
+                $scope.modal_close();
+            });
+        };
+
+        $scope.$on('$destroy', function () {
+            cleanupScopeResources();
+        });
     }
 ]);

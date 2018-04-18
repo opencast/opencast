@@ -58,9 +58,6 @@ public class Ingestor {
 
   public static final String WFR_COLLECTION = "inbox";
 
-  /** The working file repository, we deliberately don't use the Workspace! */
-  private final WorkingFileRepository workingFileRepository;
-
   private final IngestService ingestService;
 
   private final SecurityContext secCtx;
@@ -99,7 +96,6 @@ public class Ingestor {
    */
   public Ingestor(IngestService ingestService, WorkingFileRepository workingFileRepository, SecurityContext secCtx,
       String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads) {
-    this.workingFileRepository = workingFileRepository;
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;

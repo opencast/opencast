@@ -7,15 +7,13 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-
   <properties>
     <matterhorn.basedir>${project.basedir}/../..</matterhorn.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -27,8 +25,19 @@
       <artifactId>matterhorn-waveform-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>

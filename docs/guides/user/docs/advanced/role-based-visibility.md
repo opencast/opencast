@@ -89,6 +89,7 @@ There are quite a number of roles to provide selective access to the tabs offere
 |ROLE_UI_EVENTS_DETAILS_METADATA_VIEW  |Display tab *Metadata*                   |
 |ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW    |Display tab *Assets*                     |
 |ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW |Display tab *Workflows*                  |
+|ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW|Display tab *Scheduling*                 |
 |ROLE_UI_EVENTS_DETAILS_ACL_VIEW       |Display tab *Access Policy*              |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW  |Display tab *Comments*                   |
 
@@ -99,6 +100,7 @@ For the individual tabs, it is possible to further provide access:
 |ROLE_UI_EVENTS_DETAILS_METADATA_EDIT    |Allow the user to edit *Metadata*        |
 |ROLE_UI_EVENTS_DETAILS_ACL_EDIT         |Allow the user to edit *Access Policy*   |
 |ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT   |Allow the user to edit *Workflows*       |
+|ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT  |Allow the user to edit *Scheduling*      |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE  |Allow the user to create comments        |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE  |Allow the user to delete comments        |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT    |Allow the user to edit comments          |
@@ -132,9 +134,19 @@ For the individual tabs, it is possible to further provide access:
 
 ### Capture: Locations
 
-|Role                                  |User Interface                           |
-|--------------------------------------|-----------------------------------------|
-|ROLE_UI_LOCATIONS_VIEW                |Display *Locations* page                 |
+|Role                                  |User Interface                                         |
+|--------------------------------------|-------------------------------------------------------|
+|ROLE_UI_LOCATIONS_VIEW                |Display *Locations* page                               |
+|ROLE_UI_LOCATIONS_DELETE              |Display *Delete* action in *Locations* table           |
+|ROLE_UI_LOCATIONS_DETAILS_VIEW        |Display *Location Details* action in *Locations* table |
+
+There are quite a number of roles to provide selective access to the tabs offered by the *Locations Details* modal:
+
+|Role                                         |User Interface                   |
+|---------------------------------------------|---------------------------------|
+|ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW  |Display tab *Capabilities*       |
+|ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW |Display tab *Configuration*      |
+|ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW       |Display tab *General*            |
 
 ### Systems: Jobs, Servers and Services
 

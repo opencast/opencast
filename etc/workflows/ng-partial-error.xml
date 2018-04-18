@@ -25,37 +25,14 @@
       </configurations>
     </operation>
 
-    <!-- Send email -->
+    <!-- Archive the current state of the media package -->
 
     <operation
-      id="send-email"
-      fail-on-error="false"
-      description="Send e-mail notification">
-      <configurations>
-        <!-- Note that you can use variable substitution in to, subject, body e.g. ${(catalogs['episode']['FIELD']!'root@localhost'}  -->
-        <configuration key="to">root@localhost</configuration>
-        <configuration key="subject">Recording failed to process</configuration>
-        <configuration key="body-template-file">errorDetails</configuration>
-      </configurations>
-    </operation>
-
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-    <!-- Preserve the current state                                        -->
-    <!--                                                                   -->
-    <!-- Create a zip file from the current state of the recording.        -->
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-
-    <!-- Zip the mediapackage -->
-
-    <operation
-      id="zip"
+      id="snapshot"
       fail-on-error="false"
       description="Preserve the current recording state">
       <configurations>
-        <configuration key="zip-collection">failed.zips</configuration>
-        <configuration key="include-flavors">*/source,dublincore/*</configuration>
-        <configuration key="target-flavor">archive/zip</configuration>
-        <configuration key="compression">false</configuration>
+        <configuration key="source-flavors">*/source,dublincore/*</configuration>
       </configurations>
     </operation>
 
@@ -65,9 +42,6 @@
       id="cleanup"
       fail-on-error="false"
       description="Cleaning up">
-      <configurations>
-        <configuration key="preserve-flavors">archive/zip</configuration>
-      </configurations>
     </operation>
 
   </operations>

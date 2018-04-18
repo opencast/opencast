@@ -48,6 +48,7 @@ public interface SolrFields {
   String OPT_OUT = "opt_out";
 
   /** Dublin core fields */
+  String IDENTIFIER_KEY = "dc_identifier";
   String TITLE_KEY = "dc_title";
   String SUBJECT_KEY = "dc_subject";
   String CREATOR_KEY = "dc_creator";

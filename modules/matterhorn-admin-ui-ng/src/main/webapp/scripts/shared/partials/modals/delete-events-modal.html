@@ -17,8 +17,8 @@
         <div class="modal-body">
 
             <div class="full-col">
-                <div class="obj list-obj" ng-form="deleteForm">
-                    <div class="modal-alert danger" ng-if="events.unpublished.has">
+                <div class="list-obj" ng-form="deleteForm">
+                    <div class="modal-alert danger obj" ng-if="events.unpublished.has">
                         <p translate="BULK_ACTIONS.DELETE_EVENTS_WARNING_LINE1">
                             <!-- You have chosen to delete an event. Once deleted all metadata,
                                  audio and video will be deleted and can not be retrieved. -->
@@ -52,12 +52,10 @@
                         </div> <!-- obj -->
                     </div><!-- full-col -->
 
-                    <div class="full-col" ng-if="!events.unpublished.has">
-                        <div class="obj">
-                            <p translate="BULK_ACTIONS.DELETE.EVENTS.UNPUBLISHED.NONE">
-                                <!-- None of the selected events can be deleted without leaving orphan files. -->
-                            </p>
-                        </div>
+                    <div class="full-col obj" ng-if="!events.unpublished.has">
+                        <p translate="BULK_ACTIONS.DELETE.EVENTS.UNPUBLISHED.NONE">
+                            <!-- None of the selected events can be deleted without leaving orphan files. -->
+                        </p>
                     </div>
 
                 </div><!-- deleteForm-->
@@ -81,9 +79,9 @@
 
         <div class="modal-body">
             <div class="full-col">
-                <div class="obj list-obj" ng-form="retractForm">
+                <div class="list-obj" ng-form="retractForm">
 
-                    <div class="modal-alert danger" ng-if="events.published.has">
+                    <div class="modal-alert danger obj" ng-if="events.published.has">
                         <p translate="BULK_ACTIONS.DELETE.EVENTS.PUBLISHED.WARNING">
                             <!-- Some events can not be deleted as they have already been published and deleting
                                  them would leave the published files with no way to delete them. Instead run a start
@@ -92,27 +90,25 @@
                     </div>
 
                     <div class="obj tbl-details" ng-if="events.published.has">
-                        <div class="obj">
-                            <header translate="BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS">
+                        <header translate="BULK_ACTIONS.DELETE.EVENTS.RETRACT_EVENTS">
                                 <!-- Retract Events -->
-                            </header>
-                            <table class="main-tbl">
-                                <thead>
-                                    <tr>
-                                        <th class="small"><input type="checkbox" ng-model="published.allSelected" ng-change="published.allSelectedChanged()" class="select-all-cbox"/></th>
-                                        <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
-                                        <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="row in published.rows">
-                                        <td><input type="checkbox" ng-model="row.selected" ng-change="published.rowSelectionChanged($index)" class="child-cbox"/></td>
-                                        <td>{{ row.title }}</td>
-                                        <td>{{ row.presenters }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        </header>
+                        <table class="main-tbl">
+                            <thead>
+                                <tr>
+                                    <th class="small"><input type="checkbox" ng-model="published.allSelected" ng-change="published.allSelectedChanged()" class="select-all-cbox"/></th>
+                                    <th translate="EVENTS.EVENTS.TABLE.TITLE"><!-- Title --></th>
+                                    <th translate="EVENTS.EVENTS.TABLE.CREATORS"><!-- Presenter --></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in published.rows">
+                                    <td><input type="checkbox" ng-model="row.selected" ng-change="published.rowSelectionChanged($index)" class="child-cbox"/></td>
+                                    <td>{{ row.title }}</td>
+                                    <td>{{ row.presenters }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <div class="obj tbl-details" ng-if="events.published.has">

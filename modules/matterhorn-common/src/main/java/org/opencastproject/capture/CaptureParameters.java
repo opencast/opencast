@@ -96,6 +96,12 @@ public interface CaptureParameters {
   /** The time between attempts to push the agent's capabilities to the state service */
   String AGENT_CAPABILITIES_REMOTE_POLLING_INTERVAL = "capture.agent.capabilities.remote.polling.interval";
 
+  /** Agent configuration property indicating how the agent was registered */
+  String AGENT_REGISTRATION_TYPE = "org.opencastproject.registration.type";
+
+  /** Agent configuration value indicating ad-hoc registration */
+  String AGENT_REGISTRATION_TYPE_ADHOC = "ad-hoc";
+
   /**
    * Settings which control the recording state service
    */

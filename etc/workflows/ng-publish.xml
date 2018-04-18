@@ -11,6 +11,15 @@
     <![CDATA[
       <div id="workflow-configuration">
         <fieldset>
+          <legend>Video Quality</legend>
+          <ul>
+            <li>
+              <input id="flagMultiQuality" name="flagMultiQuality" type="checkbox" class="configField" value="false" />
+              <label for="flagMultiQuality">Multi Quality Videos for Adaptive Streaming</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
           <legend>Publish to:</legend>
           <ul id="publicationConfigurationPanel" class="workflow-configuration-subpanel">
             <li>
@@ -79,6 +88,7 @@
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="publishToAws">false</configuration>
+        <configuration key="flagMultiQuality">false</configuration>
       </configurations>
     </operation>
 
@@ -127,7 +137,7 @@
     <!-- Archive the recording -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive publishing information">
       <configurations>
         <configuration key="source-tags">archive</configuration>

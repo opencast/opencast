@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService"
+	activate="activate" immediate="true">
+	<implementation
+		class="org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService" />
+	<property name="service.description" value="IBM Watson Transcription Service" />
+	<property name="provider" value="ibm.watson" />
+	<service>
+		<provide interface="org.opencastproject.transcription.api.TranscriptionService" />
+		<provide
+			interface="org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService" />
+	</service>
+
+	<reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+		cardinality="1..1" policy="static" bind="setWorkspace" />
+	<reference name="serviceRegistry"
+		interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+		cardinality="1..1" policy="static" bind="setServiceRegistry" />
+	<reference name="securityService"
+		interface="org.opencastproject.security.api.SecurityService"
+		cardinality="1..1" policy="static" bind="setSecurityService" />
+	<reference name="userDirectoryService"
+		interface="org.opencastproject.security.api.UserDirectoryService"
+		cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+	<reference name="organizationDirectoryService"
+		interface="org.opencastproject.security.api.OrganizationDirectoryService"
+		cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+	<reference name="database"
+		interface="org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase"
+		policy="static" cardinality="1..1" bind="setDatabase" />
+    <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager"
+            cardinality="1..1" policy="static" bind="setAssetManager"/>
+	<reference name="smtpService" interface="org.opencastproject.kernel.mail.SmtpService"
+		    cardinality="1..1" policy="static" bind="setSmtpService" />		
+	<reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+		    cardinality="1..1" policy="static" bind="setWorkflowService" />		
+	<reference name="workingFileRepository" interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"
+		    cardinality="1..1" policy="static" bind="setWorkingFileRepository" />		
+</scr:component>

@@ -133,7 +133,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
       default:
         logger.warn(
                 "Unknown action '{}' for comment with description '{}' and reason '{}'. It should be one of the following: ",
-                new Object[] { inputAction, description, reason, StringUtils.join(Operation.values(), ",") });
+                inputAction, description, reason, StringUtils.join(Operation.values(), ","));
     }
     WorkflowOperationResult result = createResult(workflowInstance.getMediaPackage(), Action.CONTINUE,
             (new Date().getTime()) - date.getTime());
@@ -161,7 +161,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
               securityService.getOrganization().getId(), description, workflowInstance.getCreator(), reason, false);
       eventCommentService.updateComment(comment);
     } else {
-      logger.warn("Not creating comment with '{}' text and '{}' reason as it already exists for this event.",
+      logger.debug("Not creating comment with '{}' text and '{}' reason as it already exists for this event.",
               description, reason);
     }
   }
@@ -189,7 +189,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
               optComment.get().getModificationDate(), optComment.get().getReplies());
       eventCommentService.updateComment(comment);
     } else {
-      logger.warn("Not resolving comment with '{}' text and '{}' reason as it doesn't exist.", description, reason);
+      logger.debug("Not resolving comment with '{}' text and/or '{}' reason as it doesn't exist.", description, reason);
     }
   }
 
@@ -215,23 +215,23 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
       try {
         eventCommentService.deleteComment(optComment.get().getId().get());
       } catch (NotFoundException e) {
-        logger.warn("Not deleting comment with '{}' text and '{}' reason and id '{}' as it doesn't exist.",
-                new Object[] { description, reason, optComment.get().getId() });
+        logger.debug("Not deleting comment with '{}' text and '{}' reason and id '{}' as it doesn't exist.",
+                description, reason, optComment.get().getId());
       }
     } else {
-      logger.warn("Not deleting comment with '{}' text and '{}' reason as it doesn't exist.", description, reason);
+      logger.debug("Not deleting comment with '{}' text and/or '{}' reason as it doesn't exist.", description, reason);
     }
   }
 
   /**
-   * Find a comment by its reason and description.
+   * Find a comment by its reason, description or both
    *
    * @param eventId
    *          The event id to search the comments for.
    * @param reason
-   *          The reason for the comment.
+   *          The reason for the comment (optional)
    * @param description
-   *          The description for the comment.
+   *          The description for the comment (optional)
    * @return The comment if one is found matching the reason and description.
    * @throws EventCommentException
    *           Thrown if there was a problem finding the comment.
@@ -239,30 +239,26 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   private Opt<EventComment> findComment(String eventId, String reason, String description) throws EventCommentException {
     Opt<EventComment> comment = Opt.none();
     List<EventComment> eventComments = eventCommentService.getComments(eventId);
+
     for (EventComment existingComment : eventComments) {
-      if (isSameComment(existingComment, reason, description)) {
+      // Match on reason and description
+      if (reason != null && description != null
+          && reason.equals(existingComment.getReason()) && description.equals(existingComment.getText())) {
+        comment = Opt.some(existingComment);
+        break;
+      }
+      // Match on reason only
+      if (reason != null && description == null && reason.equals(existingComment.getReason())) {
+        comment = Opt.some(existingComment);
+        break;
+      }
+      // Match on description only
+      if (reason == null && description != null && description.equals(existingComment.getText())) {
         comment = Opt.some(existingComment);
         break;
       }
     }
     return comment;
-  }
-
-  /**
-   * Determines if a comment has a given reason and description.
-   *
-   * @param comment
-   *          The comment to compare.
-   * @param reason
-   *          The reason for the comment.
-   * @param description
-   *          The description for the comment.
-   * @return True if the two properties match.
-   */
-  private boolean isSameComment(EventComment comment, String reason, String description) {
-    return description == null ? comment.getText() == null
-            : description.equals(comment.getText())
-                    && (reason == null ? comment.getReason() == null : reason.equals(comment.getReason()));
   }
 
   /**

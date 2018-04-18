@@ -20,12 +20,12 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.Stream.$;
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_0_0;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -36,6 +36,7 @@ import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
@@ -88,7 +89,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -100,13 +100,16 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -119,12 +122,15 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -173,6 +179,8 @@ public class EventsEndpoint implements ManagedService {
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
+
+  private Map<String, MetadataField<?>> configuredMetadataFields = new TreeMap<>();
 
   /** The resolutions */
   private enum CommentResolution {
@@ -261,9 +269,8 @@ public class EventsEndpoint implements ManagedService {
   }
 
   /** OSGi callback if properties file is present */
-  @SuppressWarnings("rawtypes")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {
       properties = new Hashtable();
@@ -285,6 +292,8 @@ public class EventsEndpoint implements ManagedService {
     // Default to DEFAULT_PREVIEW_SUBTYPE
     previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
+
+    configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
   }
 
   @GET
@@ -318,51 +327,50 @@ public class EventsEndpoint implements ManagedService {
     ArrayList<TrackImpl> tracks = new ArrayList<>();
 
     for (final Event event : indexService.getEvent(id, externalIndex)) {
-      for (final MediaPackage mp : indexService.getEventMediapackage(event)) {
-        for (Track track : mp.getTracks()) {
-          if (track instanceof TrackImpl) {
-            tracks.add((TrackImpl) track);
-          }
+      final MediaPackage mp = indexService.getEventMediapackage(event);
+      for (Track track : mp.getTracks()) {
+        if (track instanceof TrackImpl) {
+          tracks.add((TrackImpl) track);
         }
-
-        List<JValue> tracksJson = new ArrayList<>();
-        for (Track track : tracks) {
-          List<JField> fields = new ArrayList<>();
-          if (track.getChecksum() != null)
-            fields.add(f("checksum", v(track.getChecksum().toString())));
-          if (track.getDescription() != null)
-            fields.add(f("description", v(track.getDescription())));
-          if (track.getDuration() != null)
-            fields.add(f("duration", v(track.getDuration())));
-          if (track.getElementDescription() != null)
-            fields.add(f("element-description", v(track.getElementDescription())));
-          if (track.getFlavor() != null)
-            fields.add(f("flavor", v(track.getFlavor().toString())));
-          if (track.getIdentifier() != null)
-            fields.add(f("identifier", v(track.getIdentifier())));
-          if (track.getMimeType() != null)
-            fields.add(f("identifier", v(track.getMimeType().toString())));
-          fields.add(f("size", v(track.getSize())));
-          if (track.getStreams() != null) {
-            List<JField> streams = new ArrayList<>();
-            for (Stream stream : track.getStreams()) {
-              streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
-            }
-            fields.add(f("streams", j(streams)));
-          }
-          if (track.getTags() != null) {
-            List<JValue> tags = new ArrayList<>();
-            for (String tag : track.getTags()) {
-              tags.add(v(tag));
-            }
-            fields.add(f("tags", a(tags)));
-          }
-          if (track.getURI() != null)
-            fields.add(f("uri", v(track.getURI().toString())));
-          tracksJson.add(j(fields));
-        }
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(tracksJson));
       }
+
+      List<JValue> tracksJson = new ArrayList<>();
+      for (Track track : tracks) {
+        List<Field> fields = new ArrayList<>();
+        if (track.getChecksum() != null)
+          fields.add(f("checksum", v(track.getChecksum().toString())));
+        if (track.getDescription() != null)
+          fields.add(f("description", v(track.getDescription())));
+        if (track.getDuration() != null)
+          fields.add(f("duration", v(track.getDuration())));
+        if (track.getElementDescription() != null)
+          fields.add(f("element-description", v(track.getElementDescription())));
+        if (track.getFlavor() != null)
+          fields.add(f("flavor", v(track.getFlavor().toString())));
+        if (track.getIdentifier() != null)
+          fields.add(f("identifier", v(track.getIdentifier())));
+        if (track.getMimeType() != null)
+          fields.add(f("identifier", v(track.getMimeType().toString())));
+        fields.add(f("size", v(track.getSize())));
+        if (track.getStreams() != null) {
+          List<Field> streams = new ArrayList<>();
+          for (Stream stream : track.getStreams()) {
+            streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
+          }
+          fields.add(f("streams", obj(streams)));
+        }
+        if (track.getTags() != null) {
+          List<JValue> tags = new ArrayList<>();
+          for (String tag : track.getTags()) {
+            tags.add(v(tag));
+          }
+          fields.add(f("tags", arr(tags)));
+        }
+        if (track.getURI() != null)
+          fields.add(f("uri", v(track.getURI().toString())));
+        tracksJson.add(obj(fields));
+      }
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(tracksJson));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -402,9 +410,11 @@ public class EventsEndpoint implements ManagedService {
 
   private Response updateEvent(String eventId, HttpServletRequest request) {
     try {
+      Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+      Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
       for (final Event event : indexService.getEvent(eventId, externalIndex)) {
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
-                request, getEventCatalogUIAdapters());
+                request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
         if (eventHttpServletRequest.getMetadataList().isSome()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), externalIndex);
         }
@@ -472,10 +482,12 @@ public class EventsEndpoint implements ManagedService {
           IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     JSONObject source = new JSONObject();
     source.put("type", "UPLOAD");
+    Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
+    Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
     EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.createFromHttpServletRequest(request,
-            ingestService, getEventCatalogUIAdapters(), source);
+            ingestService, getEventCatalogUIAdapters(), source, startDatePattern, startTimePattern);
     String eventId = indexService.createEvent(eventHttpServletRequest);
-    return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), j(f("identifier", v(eventId))));
+    return ApiResponses.Json.created(VERSION_1_0_0, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
   }
 
   @GET
@@ -639,11 +651,10 @@ public class EventsEndpoint implements ManagedService {
     for (IndexObject item : events) {
       eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withPublications, withSignedUrls));
     }
-    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(eventsList));
+    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(eventsList));
   }
 
-  private void extendEventsStatusOverview(List<JField> fields, Series series)
-          throws SearchIndexException {
+  private void extendEventsStatusOverview(List<Field> fields, Series series) throws SearchIndexException {
     EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
             getSecurityService().getUser()).withoutActions().withSeriesId(series.getIdentifier());
     SearchResult<Event> result = externalIndex.getByQuery(query);
@@ -668,7 +679,7 @@ public class EventsEndpoint implements ManagedService {
       }
     }
 
-    fields.add(f("events", j(f("BLACKLISTED", v(blacklisted)), f("OPTED_OUT", v(optOut)), f("READY", v(ready)))));
+    fields.add(f("events", obj(f("BLACKLISTED", v(blacklisted)), f("OPTED_OUT", v(optOut)), f("READY", v(ready)))));
   }
 
   /**
@@ -694,40 +705,40 @@ public class EventsEndpoint implements ManagedService {
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withPublications,
           Boolean withSignedUrls) throws IndexServiceException, SearchIndexException, NotFoundException {
-    List<JField> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     if (event.getArchiveVersion() != null)
       fields.add(f("archive_version", v(event.getArchiveVersion())));
-    fields.add(f("created", vN(event.getCreated())));
-    fields.add(f("creator", vN(event.getCreator())));
-    fields.add(f("contributor", jsonArrayFromList(event.getContributors())));
-    fields.add(f("description", vN(event.getDescription())));
+    fields.add(f("created", v(event.getCreated(), Jsons.BLANK)));
+    fields.add(f("creator", v(event.getCreator(), Jsons.BLANK)));
+    fields.add(f("contributor", arr($(event.getContributors()).map(Functions.stringToJValue))));
+    fields.add(f("description", v(event.getDescription(), Jsons.BLANK)));
     fields.add(f("has_previews", v(event.hasPreview())));
-    fields.add(f("identifier", vN(event.getIdentifier())));
-    fields.add(f("location", vN(event.getLocation())));
-    fields.add(f("presenter", jsonArrayFromList(event.getPresenters())));
-    List<String> publicationIds = new ArrayList<>();
+    fields.add(f("identifier", v(event.getIdentifier(), BLANK)));
+    fields.add(f("location", v(event.getLocation(), BLANK)));
+    fields.add(f("presenter", arr($(event.getPresenters()).map(Functions.stringToJValue))));
+    List<JValue> publicationIds = new ArrayList<>();
     if (event.getPublications() != null) {
       for (Publication publication : event.getPublications()) {
-        publicationIds.add(publication.getChannel());
+        publicationIds.add(v(publication.getChannel()));
       }
     }
-    fields.add(f("publication_status", jsonArrayFromList(publicationIds)));
-    fields.add(f("processing_state", vN(event.getWorkflowState())));
-    fields.add(f("start", vN(event.getTechnicalStartTime())));
+    fields.add(f("publication_status", arr(publicationIds)));
+    fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
+    fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
     if (event.getTechnicalEndTime() != null) {
       long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
                     - new DateTime(event.getTechnicalStartTime()).getMillis();
       fields.add(f("duration", v(duration)));
     }
     if (StringUtils.trimToNull(event.getSubject()) != null) {
-      fields.add(f("subjects", a(splitSubjectIntoArray(event.getSubject()))));
+      fields.add(f("subjects", arr(splitSubjectIntoArray(event.getSubject()))));
     } else {
-      fields.add(f("subjects", a()));
+      fields.add(f("subjects", arr()));
     }
-    fields.add(f("title", vN(event.getTitle())));
+    fields.add(f("title", v(event.getTitle(), BLANK)));
     if (withAcl != null && withAcl) {
       AccessControlList acl = getAclFromEvent(event);
-      fields.add(f("acl", a(AclUtils.serializeAclToJson(acl))));
+      fields.add(f("acl", arr(AclUtils.serializeAclToJson(acl))));
     }
     if (withMetadata != null && withMetadata) {
       try {
@@ -742,16 +753,16 @@ public class EventsEndpoint implements ManagedService {
       }
     }
     if (withPublications != null && withPublications) {
-      List<JValue> publications = getPublications(event.getIdentifier(), withSignedUrls);
-      fields.add(f("publications", a(publications)));
+      List<JValue> publications = getPublications(event, withSignedUrls);
+      fields.add(f("publications", arr(publications)));
     }
-    return j(fields);
+    return obj(fields);
   }
 
   private List<JValue> splitSubjectIntoArray(final String subject) {
     return com.entwinemedia.fn.Stream.$(subject.split(",")).map(new Fn<String, JValue>() {
       @Override
-      public JValue ap(String a) {
+      public JValue apply(String a) {
         return v(a.trim());
       }
     }).toList();
@@ -768,7 +779,7 @@ public class EventsEndpoint implements ManagedService {
           throws Exception {
     for (final Event event : indexService.getEvent(id, externalIndex)) {
       AccessControlList acl = getAclFromEvent(event);
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(AclUtils.serializeAclToJson(acl)));
+      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -798,7 +809,7 @@ public class EventsEndpoint implements ManagedService {
         accessControlList = indexService.updateEventAcl(id, accessControlList, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl with '{}' because: {}",
-                new Object[] { id, acl, ExceptionUtils.getStackTrace(e) });
+                id, acl, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -847,7 +858,7 @@ public class EventsEndpoint implements ManagedService {
         withNewAce = indexService.updateEventAcl(id, withNewAce, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}' because: {}",
-                new Object[] { id, action, role, ExceptionUtils.getStackTrace(e) });
+                id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -888,7 +899,7 @@ public class EventsEndpoint implements ManagedService {
         withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, externalIndex);
       } catch (IllegalArgumentException e) {
         logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}' because: {}",
-                new Object[] { id, action, role, ExceptionUtils.getStackTrace(e) });
+                id, action, role, ExceptionUtils.getStackTrace(e));
         return Response.status(Status.FORBIDDEN).build();
       }
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
@@ -908,12 +919,60 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
       Opt<MetadataList> metadataList = getEventMetadataById(id);
-      if (metadataList.isSome())
-        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, metadataList.get().toJSON());
+      if (metadataList.isSome()) {
+        MetadataList actualList = metadataList.get();
+
+        // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
+        Opt<MetadataCollection> collection = actualList.getMetadataByFlavor("dublincore/episode");
+        if (collection.isSome()) convertStartDateTimeToApiV1(collection.get());
+
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, actualList.toJSON());
+      }
       else
         return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
     } else {
       return getEventMetadataByType(id, type);
+    }
+  }
+
+  private void convertStartDateTimeToApiV1(MetadataCollection collection) throws java.text.ParseException {
+
+    if (!collection.getOutputFields().containsKey("startDate")) return;
+
+    MetadataField<String> oldStartDateField = (MetadataField<String>) collection.getOutputFields().get("startDate");
+    SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(oldStartDateField.getPattern().get());
+    Date startDate = sdf.parse(oldStartDateField.getValue().get());
+
+    if (configuredMetadataFields.containsKey("startDate")) {
+      MetadataField<String> startDateField = (MetadataField<String>) configuredMetadataFields.get("startDate");
+      startDateField = MetadataField.createTemporalStartDateMetadata(startDateField.getInputID(),
+              Opt.some(startDateField.getOutputID()),
+              startDateField.getLabel(),
+              startDateField.isReadOnly(),
+              startDateField.isRequired(),
+              startDateField.getPattern().getOr("yyyy-MM-dd"),
+              startDateField.getOrder(),
+              startDateField.getNamespace());
+      sdf.applyPattern(startDateField.getPattern().get());
+      startDateField.setValue(sdf.format(startDate));
+      collection.removeField(oldStartDateField);
+      collection.addField(startDateField);
+    }
+
+    if (configuredMetadataFields.containsKey("startTime")) {
+      MetadataField<String> startTimeField = (MetadataField<String>) configuredMetadataFields.get("startTime");
+      startTimeField = MetadataField.createTemporalStartTimeMetadata(
+              startTimeField.getInputID(),
+              Opt.some(startTimeField.getOutputID()),
+              startTimeField.getLabel(),
+              startTimeField.isReadOnly(),
+              startTimeField.isRequired(),
+              startTimeField.getPattern().getOr("HH:mm"),
+              startTimeField.getOrder(),
+              startTimeField.getNamespace());
+      sdf.applyPattern(startTimeField.getPattern().get());
+      startTimeField.setValue(sdf.format(startDate));
+      collection.addField(startTimeField);
     }
   }
 
@@ -928,11 +987,12 @@ public class EventsEndpoint implements ManagedService {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     catalogUIAdapters.remove(this.eventCatalogUIAdapter);
-    Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-    if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+    MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+    if (catalogUIAdapters.size() > 0) {
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
-        metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+        MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
+        if (fields != null) metadataList.add(catalogUIAdapter, fields);
       }
     }
     // TODO: This is slow:
@@ -967,17 +1027,19 @@ public class EventsEndpoint implements ManagedService {
         MetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter);
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
+        convertStartDateTimeToApiV1(collection);
         return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, collection.toJSON());
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-      if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+      if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            MetadataCollection fields = catalogUIAdapter.getFields(optMediaPackage.get());
+            MetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
+            convertStartDateTimeToApiV1(fields);
             return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, fields.toJSON());
           }
         }
@@ -1005,12 +1067,12 @@ public class EventsEndpoint implements ManagedService {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
     } catch (ParseException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}' because: {}",
-              new Object[] { id, type, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, ExceptionUtils.getStackTrace(e)));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}' because: {}",
-              new Object[] { id, type, metadataJSON, ExceptionUtils.getStackTrace(e) });
+              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
       return RestUtil.R.badRequest(e.getMessage());
     }
 
@@ -1041,14 +1103,14 @@ public class EventsEndpoint implements ManagedService {
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      Opt<MediaPackage> optMediaPackage = indexService.getEventMediapackage(event);
-      if (catalogUIAdapters.size() > 0 && optMediaPackage.isSome()) {
+      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
+      if (catalogUIAdapters.size() > 0) {
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
-            collection = catalogUIAdapter.getFields(optMediaPackage.get());
+            collection = catalogUIAdapter.getFields(mediaPackage);
             adapter = eventCatalogUIAdapter;
           } else {
-            metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(optMediaPackage.get()));
+            metadataList.add(catalogUIAdapter, catalogUIAdapter.getFields(mediaPackage));
           }
         }
       }
@@ -1060,30 +1122,59 @@ public class EventsEndpoint implements ManagedService {
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField<?> field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
                   MetadataField.copyMetadataFieldWithValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+        } else if ("startDate".equals(key)) {
+          // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get(key);
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = field.getPattern().get();
+          if (configuredMetadataFields.containsKey("startDate")) {
+            apiPattern = configuredMetadataFields.get("startDate").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
+        } else if ("startTime".equals(key)) {
+          // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
+          MetadataField<String> field = (MetadataField<String>) collection.getOutputFields().get("startDate");
+          Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
+          }
+          String apiPattern = "HH:mm";
+          if (configuredMetadataFields.containsKey("startTime")) {
+            apiPattern = configuredMetadataFields.get("startTime").getPattern().getOr(apiPattern);
+          }
+          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
+          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern().get());
+          DateTime oldStartDate = new DateTime(sdf.parse(field.getValue().get()), DateTimeZone.UTC);
+          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
+          DateTime updatedStartDate = oldStartDate.withTime(
+                  newStartDate.hourOfDay().get(),
+                  newStartDate.minuteOfHour().get(),
+                  newStartDate.secondOfMinute().get(),
+                  newStartDate.millisOfSecond().get());
+          collection.removeField(field);
+          collection.addField(MetadataField.copyMetadataFieldWithValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
-
           MetadataField<?> field = collection.getOutputFields().get(key);
-          if (field == null) {
-            return ApiResponses.notFound(
-                    "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
-                    key, id, type);
-          } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-            return R.badRequest(String.format(
-                    "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
-                    key, type));
+          Opt<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isSome()) {
+            return error.get();
           }
           collection.removeField(field);
           collection.addField(MetadataField.copyMetadataFieldWithValue(field, updatedFields.get(key)));
@@ -1095,6 +1186,19 @@ public class EventsEndpoint implements ManagedService {
       return ApiResponses.Json.noContent(ApiVersion.VERSION_1_0_0);
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+  }
+
+  private Opt<Response> validateField(MetadataField<?> field, String key, String id, String type, Map<String, String> updatedFields) {
+    if (field == null) {
+      return Opt.some(ApiResponses.notFound(
+              "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
+              key, id, type));
+    } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
+      return Opt.some(R.badRequest(String.format(
+              "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
+              key, type)));
+    }
+    return Opt.none();
   }
 
   @DELETE
@@ -1126,11 +1230,11 @@ public class EventsEndpoint implements ManagedService {
         return ApiResponses.notFound(e.getMessage());
       } catch (IndexServiceException e) {
         logger.error("Unable to remove metadata catalog with type '{}' from event '{}' because {}",
-                new Object[] { type, id, ExceptionUtils.getStackTrace(e) });
+                type, id, ExceptionUtils.getStackTrace(e));
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
       } catch (IllegalStateException e) {
         logger.debug("Unable to remove metadata catalog with type '{}' from event '{}' because {}",
-                new Object[] { type, id, ExceptionUtils.getStackTrace(e) });
+                type, id, ExceptionUtils.getStackTrace(e));
         throw new WebApplicationException(e, Status.BAD_REQUEST);
       } catch (UnauthorizedException e) {
         return Response.status(Status.UNAUTHORIZED).build();
@@ -1150,9 +1254,12 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign) throws Exception {
     try {
-      return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(getPublications(id, sign)));
-    } catch (NotFoundException e) {
-      return ApiResponses.notFound(e.getMessage());
+      final Opt<Event> event = indexService.getEvent(id, externalIndex);
+      if (event.isSome()) {
+        return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(getPublications(event.get(), sign)));
+      } else {
+        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+      }
     } catch (SearchIndexException e) {
       logger.error("Unable to get list of publications from event with id '{}' because {}", id,
               ExceptionUtils.getStackTrace(e));
@@ -1160,15 +1267,15 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private final Fn2<Publication, Boolean, JObjectWrite> publicationToJson = new Fn2<Publication, Boolean, JObjectWrite>() {
+  private final Fn2<Publication, Boolean, JObject> publicationToJson = new Fn2<Publication, Boolean, JObject>() {
     @Override
-    public JObjectWrite ap(Publication publication, Boolean sign) {
+    public JObject apply(Publication publication, Boolean sign) {
       String url = publication.getURI() == null ? "" : publication.getURI().toString();
-      return j(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
-              f("mediatype", vN(publication.getMimeType())), f("url", v(url)),
-              f("media", a(getPublicationTracksJson(publication, sign))),
-              f("attachments", a(getPublicationAttachmentsJson(publication, sign))),
-              f("metadata", a(getPublicationCatalogsJson(publication, sign))));
+      return obj(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
+              f("mediatype", v(publication.getMimeType(), BLANK)), f("url", v(url)),
+              f("media", arr(getPublicationTracksJson(publication, sign))),
+              f("attachments", arr(getPublicationAttachmentsJson(publication, sign))),
+              f("metadata", arr(getPublicationCatalogsJson(publication, sign))));
     }
 
     private String getMediaPackageElementUri(MediaPackageElement element, Boolean sign) {
@@ -1203,7 +1310,7 @@ public class EventsEndpoint implements ManagedService {
       for (Track track : publication.getTracks()) {
 
         VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-        List<JField> trackInfo = new ArrayList<>();
+        List<Field> trackInfo = new ArrayList<>();
 
         if (videoStreams.length > 0) {
           // Only supporting one stream, like in many other places...
@@ -1223,12 +1330,12 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        tracks.add(j(f("id", vN(track.getIdentifier())), f("mediatype", vN(track.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(track, sign))), f("flavor", vN(track.getFlavor())),
-                f("size", v(track.getSize())), f("checksum", vN(track.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(track.getTags()))),
-                f("has_audio", v(track.hasAudio())), f("has_video", v(track.hasVideo())),
-                f("duration", v(track.getDuration())), f("description", vN(track.getDescription()))).merge(trackInfo));
+        tracks.add(obj(f("id", v(track.getIdentifier(), BLANK)), f("mediatype", v(track.getMimeType(), BLANK)),
+                f("url", v(getMediaPackageElementUri(track, sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
+                f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
+                f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
+                f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration())),
+                f("description", v(track.getDescription(), BLANK))).merge(trackInfo));
       }
       return tracks;
     }
@@ -1236,11 +1343,12 @@ public class EventsEndpoint implements ManagedService {
     private List<JValue> getPublicationAttachmentsJson(Publication publication, Boolean sign) {
       List<JValue> attachments = new ArrayList<>();
       for (Attachment attachment : publication.getAttachments()) {
-        attachments.add(j(f("id", vN(attachment.getIdentifier())), f("mediatype", vN(attachment.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(attachment, sign))), f("flavor", vN(attachment.getFlavor())),
-                f("ref", vN(attachment.getReference())), f("size", v(attachment.getSize())),
-                f("checksum", vN(attachment.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(attachment.getTags())))));
+        attachments.add(
+                obj(f("id", v(attachment.getIdentifier(), BLANK)), f("mediatype", v(attachment.getMimeType(), BLANK)),
+                        f("url", v(getMediaPackageElementUri(attachment, sign), BLANK)),
+                        f("flavor", v(attachment.getFlavor(), BLANK)), f("ref", v(attachment.getReference(), BLANK)),
+                        f("size", v(attachment.getSize())), f("checksum", v(attachment.getChecksum(), BLANK)),
+                        f("tags", arr(attachment.getTags()))));
       }
       return attachments;
     }
@@ -1248,25 +1356,18 @@ public class EventsEndpoint implements ManagedService {
     private List<JValue> getPublicationCatalogsJson(Publication publication, Boolean sign) {
       List<JValue> catalogs = new ArrayList<>();
       for (Catalog catalog : publication.getCatalogs()) {
-        catalogs.add(j(f("id", vN(catalog.getIdentifier())), f("mediatype", vN(catalog.getMimeType())),
-                f("url", vN(getMediaPackageElementUri(catalog, sign))), f("flavor", vN(catalog.getFlavor())),
-                f("size", v(catalog.getSize())), f("checksum", vN(catalog.getChecksum())),
-                f("tags", jsonArrayFromList(Arrays.<String> toList().apply(catalog.getTags())))));
+        catalogs.add(obj(f("id", v(catalog.getIdentifier(), BLANK)), f("mediatype", v(catalog.getMimeType(), BLANK)),
+                f("url", v(getMediaPackageElementUri(catalog, sign), BLANK)),
+                f("flavor", v(catalog.getFlavor(), BLANK)), f("size", v(catalog.getSize())),
+                f("checksum", v(catalog.getChecksum(), BLANK)), f("tags", arr(catalog.getTags()))));
       }
       return catalogs;
     }
   };
 
-  private List<JValue> getPublications(String id, Boolean withSignedUrls)
-          throws NotFoundException, SearchIndexException {
-    for (final Event event : indexService.getEvent(id, externalIndex)) {
-      List<JValue> pubJSON = new ArrayList<>();
-      pubJSON = new ArrayList<JValue>(com.entwinemedia.fn.Stream.$(event.getPublications())
-              .filter(EventUtils.internalChannelFilter).map(publicationToJson._2(withSignedUrls)).toList());
-
-      return pubJSON;
-    }
-    throw new NotFoundException(String.format("Unable to find event with id '%s'", id));
+  private List<JValue> getPublications(Event event, Boolean withSignedUrls) {
+    return new ArrayList<JValue>($(event.getPublications()).filter(EventUtils.internalChannelFilter)
+            .map(publicationToJson._2(withSignedUrls)).toList());
   }
 
   @GET
@@ -1290,14 +1391,13 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private JObjectWrite getPublication(String eventId, String publicationId, Boolean withSignedUrls)
+  private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls)
           throws SearchIndexException, NotFoundException {
     for (final Event event : indexService.getEvent(eventId, externalIndex)) {
-      List<Publication> publications = com.entwinemedia.fn.Stream.$(event.getPublications())
-              .filter(EventUtils.internalChannelFilter).toList();
+      List<Publication> publications = $(event.getPublications()).filter(EventUtils.internalChannelFilter).toList();
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
-          return com.entwinemedia.fn.Stream.$(publication).map(publicationToJson._2(withSignedUrls)).head2();
+          return $(publication).map(publicationToJson._2(withSignedUrls)).head2();
         }
       }
       throw new NotFoundException(
@@ -1382,7 +1482,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private JValue getJsonStream(Stream stream) {
-    List<JField> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     if (stream instanceof AudioStream) {
       AudioStream audioStream = (AudioStream) stream;
       if (audioStream.getBitDepth() != null)
@@ -1446,7 +1546,7 @@ public class EventsEndpoint implements ManagedService {
       if (videoStream.getScanType() != null)
         fields.add(f("scantype", v(videoStream.getScanType().toString())));
     }
-    return j(fields);
+    return obj(fields);
   }
 
   private String getEventUrl(String eventId) {

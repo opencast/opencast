@@ -104,7 +104,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS = new TreeMap<>();
     CONFIG_OPTIONS.put(DOWNLOAD_FLAVORS,
             "Distribute any mediapackage elements with one of these (comma separated) flavors to download");
     CONFIG_OPTIONS.put(DOWNLOAD_TAGS,
@@ -153,22 +153,22 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     // Check which tags have been configured
-    String downloadTags = StringUtils.trimToEmpty(workflowInstance.getCurrentOperation()
-            .getConfiguration(DOWNLOAD_TAGS));
-    String downloadFlavors = StringUtils.trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(
-            DOWNLOAD_FLAVORS));
-    String streamingTags = StringUtils.trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(
-            STREAMING_TAGS));
-    String streamingFlavors = StringUtils.trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(
-            STREAMING_FLAVORS));
+    String downloadTags = StringUtils
+            .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(DOWNLOAD_TAGS));
+    String downloadFlavors = StringUtils
+            .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(DOWNLOAD_FLAVORS));
+    String streamingTags = StringUtils
+            .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(STREAMING_TAGS));
+    String streamingFlavors = StringUtils
+            .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(STREAMING_FLAVORS));
     boolean checkAvailability = option(workflowInstance.getCurrentOperation().getConfiguration(CHECK_AVAILABILITY))
             .bind(trimToNone).map(toBool).getOrElse(true);
     String repository = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(REPOSITORY));
 
     Opt<String> externalChannel = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME);
     Opt<String> externalTempalte = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_TEMPLATE);
-    Opt<MimeType> externalMimetype = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE).bind(
-            MimeTypes.toMimeType);
+    Opt<MimeType> externalMimetype = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE)
+            .bind(MimeTypes.toMimeType);
 
     if (repository == null)
       throw new IllegalArgumentException("No repository has been specified");
@@ -208,8 +208,8 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
     }
 
     try {
-      Set<String> downloadElementIds = new HashSet<String>();
-      Set<String> streamingElementIds = new HashSet<String>();
+      Set<String> downloadElementIds = new HashSet<>();
+      Set<String> streamingElementIds = new HashSet<>();
 
       // Look for elements matching the tag
       for (MediaPackageElement elem : downloadElements) {
@@ -265,7 +265,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       if (newElement == null) {
         logger.warn(
                 "Publication to OAI-PMH repository '{}' failed, unable to parse the payload '{}' from job '{}' to a mediapackage element",
-                new String[] { repository, job.getPayload(), job.toString() });
+                repository, job.getPayload(), job.toString());
         return createResult(mediaPackage, Action.CONTINUE);
       }
 

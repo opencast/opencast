@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.impl.index.event;
 
-import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -1166,7 +1166,7 @@ public class Event implements IndexObject {
       return;
     }
 
-    if (StringUtils.isNotBlank(getSchedulingStatus()) && (this.archiveVersion == null || this.archiveVersion <= 0)) {
+    if (StringUtils.isNotBlank(getSchedulingStatus())) {
       eventStatus = "EVENTS.EVENTS.STATUS.SCHEDULED";
       return;
     }

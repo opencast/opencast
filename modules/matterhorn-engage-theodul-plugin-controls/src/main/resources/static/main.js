@@ -69,6 +69,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     sliderMousein: new Engage.Event('Slider:mouseIn', 'the mouse entered the slider', 'trigger'),
     sliderMouseout: new Engage.Event('Slider:mouseOut', 'the mouse is off the slider', 'trigger'),
     sliderMousemove: new Engage.Event('Slider:mouseMoved', 'the mouse is moving over the slider', 'trigger'),
+    sliderMousemovePreview: new Engage.Event('Slider:mouseMovedPreview', 'the mouse is moving over the slider', 'trigger'),
     seek: new Engage.Event('Video:seek', 'seek video to a given position in seconds', 'trigger'),
     seekLeft: new Engage.Event('Video:seekLeft', '', 'trigger'),
     seekRight: new Engage.Event('Video:seekRight', '', 'trigger'),
@@ -158,7 +159,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var embedHeightThree = 360;
   var embedHeightFour = 480;
   var embedHeightFive = 720;
-  var min_segment_duration = 5000;
+  var min_segment_duration = 1000;
   var logoLink = false;
   var logo = plugin_path + 'images/logo.png';
   var showEmbed = true;
@@ -229,6 +230,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var id_loginlogout = 'loginlogout';
   var id_str_loginlogout = 'str_loginlogout';
   var id_dropdownMenuLoginInfo = 'dropdownMenuLoginInfo';
+  var id_timeline_preview = 'timeline_preview_canvas';
+  var id_timeline_preview_img = 'timeline_preview_canvas_img';
   var class_dropdown = 'dropdown-toggle';
   var videosReady = false;
   var enableFullscreenButton = false;
@@ -251,6 +254,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
   var usingFlash = false;
   var isAudioOnly = false;
   var segments = {};
+  var timelinePreview;
+  var timelinePreviewsImageCount;
+  var timelinePreviewsImageSize = {};
+  var timelinePreviewsTileResolution = {};
+  var timelinePreviewsError = true;
   var mediapackageError = false;
   var aspectRatioTriggered = false;
   var aspectRatioWidth;
@@ -440,6 +448,46 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
 
         segments = Utils.repairSegmentLength(segments, duration, min_segment_duration);
 
+       try {
+        // find timeline preview images in media package
+        var attachments = Engage.model.get('mediaPackage').get('attachments');
+
+        var timelinePreviewsRegex = /(timeline)+\S*(preview)+/i;
+        timelinePreview = $(attachments).filter(function(index) {
+          return $(attachments[index]).attr('type').search(timelinePreviewsRegex) !== -1;
+        });
+
+        console.log("timelinePreviews loaded: ", timelinePreview);
+
+        var timelinePreviewsProperties = timelinePreview.get(0).additionalProperties;
+
+        timelinePreviewsProperties.property.forEach(function(property) {
+            switch (property.key) {
+                case "imageCount":
+                    timelinePreviewsImageCount = property.$;
+                    break;
+                case "imageSizeX":
+                    timelinePreviewsImageSize[0] = property.$;
+                    break;
+                case "imageSizeY":
+                    timelinePreviewsImageSize[1] = property.$;
+                    break;
+                case "resolutionX":
+                    timelinePreviewsTileResolution[0] = property.$;
+                    break;
+                case "resolutionY":
+                    timelinePreviewsTileResolution[1] = property.$;
+                    break;
+            }
+        });
+
+        timelinePreviewsError = false;
+
+    } catch (e) {
+        timelinePreviewsError = true;
+        console.error("No valid timelinepreviews image was found.", e);
+    }
+
         if (Engage.model.get('meInfo')) {
           if (Engage.model.get('meInfo').get('logo_player')) {
             logo = Engage.model.get('meInfo').get('logo_player');
@@ -548,6 +596,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         timeUpdate();
         addNonFlashEvents();
         checkLoginStatus();
+        setTimelinePreviewsImage();
       }
     }
   });
@@ -907,10 +956,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         isSliding = false;
         Engage.trigger(plugin.events.sliderStop.getName(), ui.value);
       });
+      $('#' + id_slider).on(event_slide, function (e) {
+        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
+      });
       $('#' + id_slider).mouseover(function (e) {
         e.preventDefault();
         Engage.trigger(plugin.events.sliderMousein.getName());
-      }).mouseout(function (e) {
+      }).mouseleave(function (e) {
         e.preventDefault();
         Engage.trigger(plugin.events.sliderMouseout.getName());
       }).mousemove(function (e) {
@@ -919,6 +971,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
         var dur = (duration && (duration > 0)) ? duration : 1;
         currPos = (currPos < 0) ? 0 : ((currPos > 1) ? 1 : currPos);
         Engage.trigger(plugin.events.sliderMousemove.getName(), currPos * dur);
+        Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
       });
       // volume event
       $('#' + id_volumeSlider).on(event_slide, function (event, ui) {
@@ -948,6 +1001,9 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
           }).mouseout(function (e) {
             e.preventDefault();
             Engage.trigger(plugin.events.segmentMouseout.getName(), i);
+          }).mousemove(function (e) {
+            e.preventDefault();
+            Engage.trigger(plugin.events.sliderMousemovePreview.getName(), e.clientX);
           });
         });
       }
@@ -1183,6 +1239,26 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
     }
   };
 
+  function setTimelinePreviewsImage() {
+    if (!timelinePreviewsError) {
+      try {
+        $('#' + id_timeline_preview_img).attr('src', timelinePreview.get(0).url);
+
+        // if no valid resolution is stored within the timeline previews attachment, read out the size of the image
+        if (typeof timelinePreviewsTileResolution[0] === 'undefined' || timelinePreviewsTileResolution[0] <= 0
+                || typeof timelinePreviewsTileResolution[1] === 'undefined' || timelinePreviewsTileResolution[1] <= 0) {
+          var img = document.getElementById(id_timeline_preview_img);
+
+          timelinePreviewsTileResolution[0] = img.naturalWidth / timelinePreviewsImageSize[0];
+          timelinePreviewsTileResolution[1] = img.naturalHeight / timelinePreviewsImageSize[1];
+        }
+      } catch (ex) {
+          timelinePreviewsError = true;
+          console.log("The timeline previews image cannot be set or the resolution cannot be found", ex);
+      }
+    }
+  }
+
   /**
    * Initializes the plugin
    */
@@ -1383,11 +1459,86 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bootbox', 'enga
       Engage.on(plugin.events.segmentMouseover.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).addClass('segmentHover');
+            if (!timelinePreviewsError) {
+                $('#' + id_timeline_preview).addClass('timelinePreviewHover');
+            }
         }
       });
       Engage.on(plugin.events.segmentMouseout.getName(), function (no) {
         if (!mediapackageError) {
           $('#' + id_segmentNo + no).removeClass('segmentHover');
+          $('#' + id_timeline_preview).removeClass('timelinePreviewHover');
+        }
+      });
+      Engage.on(plugin.events.sliderMouseout.getName(), function () {
+        if (!mediapackageError) {
+          $('#' + id_timeline_preview).removeClass('timelinePreviewHover');
+        }
+      });
+      Engage.on(plugin.events.sliderMousemovePreview.getName(), function (pos) {
+        if (!mediapackageError && !timelinePreviewsError) {
+          $('#' + id_timeline_preview).addClass('timelinePreviewHover');
+
+          // get number of saved preview images in the timeline preview image
+          var imageSize = timelinePreviewsImageSize;
+
+          // size of each of the images
+          var width = timelinePreviewsTileResolution[0];
+          var height = timelinePreviewsTileResolution[1];
+
+          // make sure the image size was set correctly
+          if (width <= 0 || height <= 0) {
+            setTimelinePreviewsImage();
+            width = timelinePreviewsTileResolution[0];
+            height = timelinePreviewsTileResolution[1];
+          }
+
+          var wrapperOffset = Math.ceil($('#' + id_slider).offset().left);
+
+          // calculate position on timeline, so that it ranges from 0 at the start to 1 at the end of the video
+          var posPercent = ((pos - wrapperOffset) / $('#' + id_slider).width());
+
+          // index of the image that previews that part of the video
+          var num = (timelinePreviewsImageCount) * posPercent;
+          if (num < 0) {
+              num = 0;
+          }
+          if (num >= (timelinePreviewsImageCount)) {
+              num = (timelinePreviewsImageCount) - 1;
+          }
+
+          // position of this image in the timeline previews image
+          var offsetX = width * Math.floor(num % imageSize[0]);
+          var offsetY = height * Math.floor(num / imageSize[1]);
+
+          var pageWidth = $(window).width();
+
+          // draw only the current preview image into the canvas
+          var canvas = document.getElementById(id_timeline_preview);
+          canvas.width = width;
+          canvas.height = height;
+          var ctx = canvas.getContext("2d");
+          var img = document.getElementById(id_timeline_preview_img);
+          ctx.drawImage(img, offsetX, offsetY, width, height, 0, 0, width, height);
+
+          var wrapperHeight = $('#navigation_wrapper').height();
+          var offsetLeft = (pos - wrapperOffset) - (width / 2);
+
+          // clamp left: in case the preview image would exceed the page on the left, move it back to window border
+          if (pos < width / 2 ) {
+              offsetLeft = -wrapperOffset;
+          }
+
+          // clamp right: in case the preview image would exceed the page on the right, move it back to window border
+          if (pos > pageWidth - (width + 6) / 2) {
+              offsetLeft = (pageWidth - (width + 3)) - wrapperOffset;
+          }
+
+          var offsetBottom = Engage.controls_top? 0 : canvas.height + wrapperHeight + 10;
+
+          // move the image to the mouse position at a fixed height above the timeline
+          $('#' + id_timeline_preview).css({'bottom': Math.round(offsetBottom) + 'px'});
+          $('#' + id_timeline_preview).css({'left': Math.round(offsetLeft) + 'px'});
         }
       });
 

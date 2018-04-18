@@ -599,7 +599,7 @@ public final class EventIndexUtils {
         } else {
           Integer triesLeft = new Integer(tries - i);
           logger.debug("Not able to find the series {} in the search index for the event {}. Will try {} more times.",
-                  new Object[] { event.getSeriesId(), event.getIdentifier(), triesLeft });
+                  event.getSeriesId(), event.getIdentifier(), triesLeft);
           try {
             Thread.sleep(sleep);
           } catch (InterruptedException e) {
@@ -676,7 +676,7 @@ public final class EventIndexUtils {
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              new Object[] { organization, currentManagedAcl, ExceptionUtils.getStackTrace(e) });
+              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e));
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -687,7 +687,7 @@ public final class EventIndexUtils {
         } catch (SearchIndexException e) {
           logger.warn(
                   "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}' because {}",
-                  new Object[] { event, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e) });
+                  event, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e));
         }
       }
     }
@@ -713,7 +713,7 @@ public final class EventIndexUtils {
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              new Object[] { organization, managedAcl, ExceptionUtils.getStackTrace(e) });
+              organization, managedAcl, ExceptionUtils.getStackTrace(e));
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -723,7 +723,7 @@ public final class EventIndexUtils {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
           logger.warn("Unable to update event '{}' to remove managed acl '{}' because {}",
-                  new Object[] { event, managedAcl, ExceptionUtils.getStackTrace(e) });
+                  event, managedAcl, ExceptionUtils.getStackTrace(e));
         }
       }
     }

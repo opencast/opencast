@@ -21,14 +21,15 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
+import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.util.TextFilter;
@@ -39,7 +40,6 @@ import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.matterhorn.search.SearchQuery.Order;
 import org.opencastproject.matterhorn.search.SortCriterion;
-import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.data.Option;
@@ -48,8 +48,9 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -61,6 +62,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -138,7 +140,7 @@ public class CaptureAgentsEndpoint {
     }
 
     // Filter agents by filter criteria
-    List<Agent> filteredAgents = new ArrayList<Agent>();
+    List<Agent> filteredAgents = new ArrayList<>();
     for (Entry<String, Agent> entry : service.getKnownAgents().entrySet()) {
       Agent agent = entry.getValue();
 
@@ -187,9 +189,9 @@ public class CaptureAgentsEndpoint {
     filteredAgents = new SmartIterator<Agent>(limit, offset).applyLimitAndOffset(filteredAgents);
 
     // Run through and build a map of updates (rather than states)
-    List<JValue> agentsJSON = new ArrayList<JValue>();
+    List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs));
+      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -211,18 +213,78 @@ public class CaptureAgentsEndpoint {
     return Response.status(SC_OK).build();
   }
 
-  private JValue generateJsonAgent(Agent agent, boolean withInputs) {
-    List<JField> fields = new ArrayList<JField>();
-    fields.add(f("Status", vN(agent.getState())));
+  @GET
+  @Path("{name}")
+  @Produces({ MediaType.APPLICATION_JSON })
+  @RestQuery(
+    name = "getAgent",
+    description = "Return the capture agent including its configuration and capabilities",
+    pathParameters = {
+      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = RestParameter.Type.STRING),
+    }, restParameters = {}, reponses = {
+      @RestResponse(description = "A JSON representation of the capture agent", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND)
+    }, returnDescription = "")
+  public Response getAgent(@PathParam("name") String agentName)
+          throws NotFoundException {
+    if (service != null) {
+      Agent agent = service.getAgent(agentName);
+      if (agent != null) {
+        return okJson(generateJsonAgent(agent, true, true));
+      } else {
+        return Response.status(Status.NOT_FOUND).build();
+      }
+    } else {
+      return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
+  }
+
+  /**
+   * Generate a JSON Object for the given capture agent with its related blacklist periods
+   *
+   * @param agent
+   *          The target capture agent
+   * @param withInputs
+   *          Whether the agent has inputs
+   * @param details
+   *          Whether the configuration and capabilities should be serialized
+   * @return A {@link JValue} representing the capture agent
+   */
+  private JValue generateJsonAgent(Agent agent, boolean withInputs, boolean details) {
+    List<Field> fields = new ArrayList<>();
+    fields.add(f("Status", v(agent.getState(), Jsons.BLANK)));
     fields.add(f("Name", v(agent.getName())));
-    fields.add(f("Update", vN(DateTimeSupport.toUTC(agent.getLastHeardFrom()))));
+    fields.add(f("Update", v(toUTC(agent.getLastHeardFrom()), Jsons.BLANK)));
+    fields.add(f("URL", v(agent.getUrl(), Jsons.BLANK)));
 
     if (withInputs) {
       String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? a() : generateJsonDevice(devices.split(","))));
+      fields.add(f("inputs", (StringUtils.isEmpty(devices)) ? arr() : generateJsonDevice(devices.split(","))));
     }
 
-    return j(fields);
+    if (details) {
+      fields.add(f("configuration", generateJsonProperties(agent.getConfiguration())));
+      fields.add(f("capabilities", generateJsonProperties(agent.getCapabilities())));
+    }
+
+    return obj(fields);
+  }
+
+  /**
+   * Generate JSON property list
+   *
+   * @param properties
+   *          Java properties to be serialized
+   * @return A JSON array containing the Java properties as key/value paris
+   */
+  private JValue generateJsonProperties(Properties properties) {
+    List<JValue> fields = new ArrayList<>();
+    if (properties != null) {
+      for (String key : properties.stringPropertyNames()) {
+        fields.add(obj(f("key", v(key)), f("value", v(properties.getProperty(key)))));
+      }
+    }
+    return arr(fields);
   }
 
   /**
@@ -233,11 +295,11 @@ public class CaptureAgentsEndpoint {
    * @return A {@link JValue} representing the devices
    */
   private JValue generateJsonDevice(String[] devices) {
-    List<JValue> jsonDevices = new ArrayList<JValue>();
+    List<JValue> jsonDevices = new ArrayList<>();
     for (String device : devices) {
-      jsonDevices.add(j(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
+      jsonDevices.add(obj(f("id", v(device)), f("value", v(TRANSLATION_KEY_PREFIX + device.toUpperCase()))));
     }
-    return a(jsonDevices);
+    return arr(jsonDevices);
   }
 
 }

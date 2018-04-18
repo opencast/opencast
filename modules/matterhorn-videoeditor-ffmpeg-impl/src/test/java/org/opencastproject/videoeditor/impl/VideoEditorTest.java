@@ -62,7 +62,6 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -128,7 +127,7 @@ public class VideoEditorTest {
    * Copies test files to the local file system, since jmf is not able to access movies from the resource section of a
    * bundle.
    *
-   * @throws Except
+   * @throws Exception
    *           if setup fails
    */
   @BeforeClass
@@ -139,14 +138,14 @@ public class VideoEditorTest {
     track1.setFlavor(new MediaPackageElementFlavor("source", "presentater"));
     track1.setMimeType(MimeTypes.MJPEG);
     track1.addStream(new VideoStreamImpl());
-    track1.setDuration(new Long(movieDuration));
+    track1.setDuration(movieDuration);
 
     track2 = TrackImpl.fromURI(VideoEditorTest.class.getResource(mediaResource).toURI());
     track2.setIdentifier("track-2");
     track2.setFlavor(new MediaPackageElementFlavor("source", "presentater"));
     track2.setMimeType(MimeTypes.MJPEG);
     track2.addStream(new VideoStreamImpl());
-    track2.setDuration(new Long(movieDuration));
+    track2.setDuration(movieDuration);
 
     /* Start of Smil mockups */
 
@@ -249,23 +248,21 @@ public class VideoEditorTest {
   @Before
   public void setUp() throws Exception {
 
-    tempFile1 = File.createTempFile(getClass().getName(), ".mp4"); // output file
+    File tmpDir = folder.newFolder(getClass().getName());
+    tempFile1 = new File(tmpDir, "testoutput.mp4"); // output file
 
     /* mock the workspace for the input/output file */
     // workspace.get(new URI(sourceTrackUri));
-    Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    Workspace workspace = EasyMock.createMock(Workspace.class);
+    EasyMock.expect(workspace.rootDirectory()).andReturn(tmpDir.getAbsolutePath());
     EasyMock.expect(workspace.get(track1.getURI())).andReturn(new File(track1.getURI())).anyTimes();
     EasyMock.expect(workspace.get(track2.getURI())).andReturn(new File(track2.getURI())).anyTimes();
-    EasyMock.expect(
-            workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-                    (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-                      @Override
-                      public URI answer() throws Throwable {
-                          InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-                          IOUtils.copy(in, new FileOutputStream(tempFile1));
-                          return tempFile1.toURI();
-                      }
-                    });
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
+      InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
+      IOUtils.copy(in, new FileOutputStream(tempFile1));
+      return tempFile1.toURI();
+    });
 
     /* mock the role/org/security dependencies */
     User anonymous = new JaxbUser("anonymous", "test", new DefaultOrganization(), new JaxbRole(

@@ -26,7 +26,16 @@ angular.module('adminNg.controllers')
                   Table.fetch();
               }, 500);
               Modal.$scope.close();
+
+              // Reset all states
+              angular.forEach($scope.states, function(state)  {
+                if (angular.isDefined(state.stateController.reset)) {
+                    state.stateController.reset();
+                }
+              });
+
               Notifications.add('success', 'GROUP_ADDED');
+
           }, function (response) {
         	  if(response.status === 409) {
                   Notifications.add('error', 'GROUP_CONFLICT', 'add-group-form');

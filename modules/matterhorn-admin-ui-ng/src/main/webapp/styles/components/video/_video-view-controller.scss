@@ -25,6 +25,7 @@
     padding: 12px 20px;
     background: $primary-color-blue;
     border: $thin-border-stroke $primary-color-blue;
+    border-radius: 4px 4px 0 0;
 
     a {
         font-size: 12px;
@@ -49,6 +50,12 @@
     }
 }
 
+.view-controller-secondary {
+    border-radius: 4px 4px 0 0;
+}
+
 .event-container {
-  margin-top: 12px;
+  margin: 12px 0;
+  border: $thin-border-stroke $main-border-color;
+  border-radius: 4px;
 }

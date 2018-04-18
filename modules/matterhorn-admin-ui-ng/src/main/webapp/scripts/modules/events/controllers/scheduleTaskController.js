@@ -54,7 +54,7 @@ function ($scope, Table, NewEventProcessing, TaskResource, Notifications, decora
         if ($scope.valid()) {
             var eventIds = $scope.getSelectedIds(), payload;
             payload = {
-                workflows: $scope.processing.ud.workflow.id,
+                workflow: $scope.processing.ud.workflow.id,
                 configuration: $scope.processing.getWorkflowConfig(),
                 eventIds: eventIds
             };

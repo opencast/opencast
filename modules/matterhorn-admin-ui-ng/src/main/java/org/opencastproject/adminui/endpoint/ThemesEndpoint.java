@@ -21,11 +21,11 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.Opt.nul;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
@@ -73,8 +73,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -245,7 +246,7 @@ public class ThemesEndpoint {
     // If the results list if empty, we return already a response.
     if (results.getPageSize() == 0) {
       logger.debug("No themes match the given filters.");
-      return okJsonList(themesJSON, Opt.nul(offset).or(0), Opt.nul(limit).or(0), 0);
+      return okJsonList(themesJSON, nul(offset).getOr(0), nul(limit).getOr(0), 0);
     }
 
     for (SearchResultItem<org.opencastproject.index.service.impl.index.theme.Theme> item : results.getItems()) {
@@ -253,7 +254,7 @@ public class ThemesEndpoint {
       themesJSON.add(themeToJSON(theme, false));
     }
 
-    return okJsonList(themesJSON, Opt.nul(offset).or(0), Opt.nul(limit).or(0), results.getHitCount());
+    return okJsonList(themesJSON, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
   }
 
   @GET
@@ -294,9 +295,9 @@ public class ThemesEndpoint {
     List<JValue> seriesValues = new ArrayList<JValue>();
     for (SearchResultItem<Series> item : results.getItems()) {
       Series series = item.getSource();
-      seriesValues.add(j(f("id", v(series.getIdentifier())), f("title", v(series.getTitle()))));
+      seriesValues.add(obj(f("id", v(series.getIdentifier())), f("title", v(series.getTitle()))));
     }
-    return okJson(j(f("series", a(seriesValues))));
+    return okJson(obj(f("series", arr(seriesValues))));
   }
 
   @POST
@@ -546,26 +547,26 @@ public class ThemesEndpoint {
    * @return the JSON representation of this theme.
    */
   private JValue themeToJSON(org.opencastproject.index.service.impl.index.theme.Theme theme, boolean editResponse) {
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<Field>();
     fields.add(f("id", v(theme.getIdentifier())));
     fields.add(f("creationDate", v(DateTimeSupport.toUTC(theme.getCreationDate().getTime()))));
     fields.add(f("default", v(theme.isDefault())));
     fields.add(f("name", v(theme.getName())));
     fields.add(f("creator", v(theme.getCreator())));
-    fields.add(f("description", vN(theme.getDescription())));
+    fields.add(f("description", v(theme.getDescription(), Jsons.BLANK)));
     fields.add(f("bumperActive", v(theme.isBumperActive())));
-    fields.add(f("bumperFile", vN(theme.getBumperFile())));
+    fields.add(f("bumperFile", v(theme.getBumperFile(), Jsons.BLANK)));
     fields.add(f("trailerActive", v(theme.isTrailerActive())));
-    fields.add(f("trailerFile", vN(theme.getTrailerFile())));
+    fields.add(f("trailerFile", v(theme.getTrailerFile(), Jsons.BLANK)));
     fields.add(f("titleSlideActive", v(theme.isTitleSlideActive())));
-    fields.add(f("titleSlideMetadata", vN(theme.getTitleSlideMetadata())));
-    fields.add(f("titleSlideBackground", vN(theme.getTitleSlideBackground())));
+    fields.add(f("titleSlideMetadata", v(theme.getTitleSlideMetadata(), Jsons.BLANK)));
+    fields.add(f("titleSlideBackground", v(theme.getTitleSlideBackground(), Jsons.BLANK)));
     fields.add(f("licenseSlideActive", v(theme.isLicenseSlideActive())));
-    fields.add(f("licenseSlideDescription", vN(theme.getLicenseSlideDescription())));
-    fields.add(f("licenseSlideBackground", vN(theme.getLicenseSlideBackground())));
+    fields.add(f("licenseSlideDescription", v(theme.getLicenseSlideDescription(), Jsons.BLANK)));
+    fields.add(f("licenseSlideBackground", v(theme.getLicenseSlideBackground(), Jsons.BLANK)));
     fields.add(f("watermarkActive", v(theme.isWatermarkActive())));
-    fields.add(f("watermarkFile", vN(theme.getWatermarkFile())));
-    fields.add(f("watermarkPosition", vN(theme.getWatermarkPosition())));
+    fields.add(f("watermarkFile", v(theme.getWatermarkFile(), Jsons.BLANK)));
+    fields.add(f("watermarkPosition", v(theme.getWatermarkPosition(), Jsons.BLANK)));
     if (editResponse) {
       extendStaticFileInfo("bumperFile", theme.getBumperFile(), fields);
       extendStaticFileInfo("trailerFile", theme.getTrailerFile(), fields);
@@ -573,14 +574,14 @@ public class ThemesEndpoint {
       extendStaticFileInfo("licenseSlideBackground", theme.getLicenseSlideBackground(), fields);
       extendStaticFileInfo("watermarkFile", theme.getWatermarkFile(), fields);
     }
-    return j(fields);
+    return obj(fields);
   }
 
-  private void extendStaticFileInfo(String fieldName, String staticFileId, List<JField> fields) {
+  private void extendStaticFileInfo(String fieldName, String staticFileId, List<Field> fields) {
     if (StringUtils.isNotBlank(staticFileId)) {
       try {
         fields.add(f(fieldName.concat("Name"), v(staticFileService.getFileName(staticFileId))));
-        fields.add(f(fieldName.concat("Url"), vN(staticFileRestService.getStaticFileURL(staticFileId).toString())));
+        fields.add(f(fieldName.concat("Url"), v(staticFileRestService.getStaticFileURL(staticFileId).toString(), Jsons.BLANK)));
       } catch (IllegalStateException | NotFoundException e) {
         logger.error("Error retreiving static file '{}' : {}", staticFileId, ExceptionUtils.getStackTrace(e));
       }
@@ -594,27 +595,27 @@ public class ThemesEndpoint {
     String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName() : theme
             .getCreator().getUsername();
 
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<Field>();
     fields.add(f("id", v(theme.getId().getOrElse(-1L))));
     fields.add(f("creationDate", v(DateTimeSupport.toUTC(theme.getCreationDate().getTime()))));
     fields.add(f("default", v(theme.isDefault())));
     fields.add(f("name", v(theme.getName())));
     fields.add(f("creator", v(creator)));
-    fields.add(f("description", vN(theme.getDescription())));
+    fields.add(f("description", v(theme.getDescription(), Jsons.BLANK)));
     fields.add(f("bumperActive", v(theme.isBumperActive())));
-    fields.add(f("bumperFile", vN(theme.getBumperFile())));
+    fields.add(f("bumperFile", v(theme.getBumperFile(), Jsons.BLANK)));
     fields.add(f("trailerActive", v(theme.isTrailerActive())));
-    fields.add(f("trailerFile", vN(theme.getTrailerFile())));
+    fields.add(f("trailerFile", v(theme.getTrailerFile(), Jsons.BLANK)));
     fields.add(f("titleSlideActive", v(theme.isTitleSlideActive())));
-    fields.add(f("titleSlideMetadata", vN(theme.getTitleSlideMetadata())));
-    fields.add(f("titleSlideBackground", vN(theme.getTitleSlideBackground())));
+    fields.add(f("titleSlideMetadata", v(theme.getTitleSlideMetadata(), Jsons.BLANK)));
+    fields.add(f("titleSlideBackground", v(theme.getTitleSlideBackground(), Jsons.BLANK)));
     fields.add(f("licenseSlideActive", v(theme.isLicenseSlideActive())));
-    fields.add(f("licenseSlideDescription", vN(theme.getLicenseSlideDescription())));
-    fields.add(f("licenseSlideBackground", vN(theme.getLicenseSlideBackground())));
+    fields.add(f("licenseSlideDescription", v(theme.getLicenseSlideDescription(), Jsons.BLANK)));
+    fields.add(f("licenseSlideBackground", v(theme.getLicenseSlideBackground(), Jsons.BLANK)));
     fields.add(f("watermarkActive", v(theme.isWatermarkActive())));
-    fields.add(f("watermarkFile", vN(theme.getWatermarkFile())));
-    fields.add(f("watermarkPosition", vN(theme.getWatermarkPosition())));
-    return j(fields);
+    fields.add(f("watermarkFile", v(theme.getWatermarkFile(), Jsons.BLANK)));
+    fields.add(f("watermarkPosition", v(theme.getWatermarkPosition(), Jsons.BLANK)));
+    return obj(fields);
   }
 
   /**

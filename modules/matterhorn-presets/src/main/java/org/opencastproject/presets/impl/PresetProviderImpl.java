@@ -62,7 +62,7 @@ public class PresetProviderImpl implements PresetProvider {
       } catch (Exception e) {
         logger.warn(
                 "Unable to get the property {} from the series {} so we will try to find it in the organization. The exception was ",
-                new Object[] { propertyName, seriesID, ExceptionUtils.getStackTrace(e) });
+                propertyName, seriesID, ExceptionUtils.getStackTrace(e));
       }
     }
     if (StringUtils.isBlank(propertyValue)) {

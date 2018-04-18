@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
@@ -32,7 +31,6 @@ import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEven
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -43,15 +41,14 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
@@ -78,8 +75,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-import uk.co.datumedge.hamcrest.json.SameJSONAs;
-
 public class DublinCoreCatalogUIAdapterTest {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogUIAdapterTest.class);
   private static final String TEMPORAL_DUBLIN_CORE_KEY = "temporal";
@@ -101,7 +96,7 @@ public class DublinCoreCatalogUIAdapterTest {
   private static final String TITLE_STRING = "Event Metadata";
 
   private Dictionary<String, String> dictionary;
-  private Properties eventProperties;
+  private Dictionary<String, String> eventProperties;
   private ListProvidersService listProvidersService;
   private MediaPackage mediapackage;
   private MediaPackageElementFlavor mediaPackageElementFlavor;
@@ -116,7 +111,6 @@ public class DublinCoreCatalogUIAdapterTest {
   private FileInputStream startDateTimeDurationCatalog;
   private DublinCoreCatalog dc;
   private MetadataField<String> startDateMetadataField;
-  private MetadataField<String> startTimeMetadataField;
   private MetadataField<String> durationMetadataField;
 
   private DublinCoreMetadataCollection metadata;
@@ -131,10 +125,7 @@ public class DublinCoreCatalogUIAdapterTest {
     dc = DublinCores.read(startDateTimeDurationCatalog);
     metadata = new DublinCoreMetadataCollection();
     startDateMetadataField = MetadataField.createTemporalStartDateMetadata(TEMPORAL_DUBLIN_CORE_KEY,
-            Opt.some("startDate"), "START_DATE_LABEL", false, false, "yyyy-MM-dd", Opt.<Integer> none(),
-            Opt.<String> none());
-    startTimeMetadataField = MetadataField.createTemporalStartTimeMetadata(TEMPORAL_DUBLIN_CORE_KEY,
-            Opt.some("startTime"), "START_DATE_LABEL", false, false, "HH:mm:ss", Opt.<Integer> none(),
+            Opt.some("startDate"), "START_DATE_LABEL", false, false, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.<Integer> none(),
             Opt.<String> none());
     durationMetadataField = MetadataField.createDurationMetadataField(TEMPORAL_DUBLIN_CORE_KEY, Opt.some("duration"),
             "DURATION_LABEL", false, false, Opt.<Integer> none(), Opt.<String> none());
@@ -150,15 +141,14 @@ public class DublinCoreCatalogUIAdapterTest {
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
                     EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
-    EasyMock.expect(
-            listProvidersService.isTranslatable(EasyMock.anyString()))
-            .andThrow(new ListProviderException("not implemented")).anyTimes();
     EasyMock.replay(listProvidersService);
 
-    eventProperties = new Properties();
-    InputStream in = getClass().getResourceAsStream("/catalog-adapter/dublincore.properties");
-    eventProperties.load(in);
+    Properties props = new Properties();
+    InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");
+    props.load(in);
     in.close();
+
+    eventProperties = PropertiesUtil.toDictionary(props);
 
     mediaPackageElementFlavor = new MediaPackageElementFlavor(FLAVOR_STRING.split("/")[0], FLAVOR_STRING.split("/")[1]);
 
@@ -255,20 +245,6 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testGetFields() throws Exception {
-    String eventJson = IOUtils.toString(getClass().getResource("/catalog-adapter/dublincore.json"));
-
-    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter = new ConfigurableEventDCCatalogUIAdapter();
-    configurationDublinCoreCatalogUIAdapter.setListProvidersService(listProvidersService);
-    configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
-    configurationDublinCoreCatalogUIAdapter.updated(eventProperties);
-
-    MetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
-    assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(abstractMetadata.toJSON()))
-            .allowingAnyArrayOrdering());
-  }
-
-  @Test
   public void testStoreFields() throws Exception {
     String temporal = "temporal";
     String expectedTemporal = "start=2016-03-01T09:27:35Z; end=2016-03-01T11:43:12Z; scheme=W3C-DTF;";
@@ -297,12 +273,8 @@ public class DublinCoreCatalogUIAdapterTest {
     dublinCoreMetadata.addField(durationField, "02:15:37", listProvidersService);
 
     MetadataField<String> startDate = MetadataField.createTemporalStartDateMetadata(temporal, Opt.some("startDate"),
-            label, true, true, "yyyy-MM-dd", Opt.<Integer> none(), Opt.<String> none());
-    dublinCoreMetadata.addField(startDate, "2016-03-01", listProvidersService);
-
-    MetadataField<String> startTime = MetadataField.createTemporalStartTimeMetadata(temporal, Opt.some("startTime"),
-            label, true, true, "HH:mm:ss", Opt.<Integer> none(), Opt.<String> none());
-    dublinCoreMetadata.addField(startTime, "09:27:35", listProvidersService);
+            label, true, true, "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Opt.<Integer> none(), Opt.<String> none());
+    dublinCoreMetadata.addField(startDate, "2016-03-01T09:27:35.000Z", listProvidersService);
 
     configurationDublinCoreCatalogUIAdapter.storeFields(mediapackage, dublinCoreMetadata);
     assertTrue(writtenCatalog.hasCaptured());
@@ -312,47 +284,6 @@ public class DublinCoreCatalogUIAdapterTest {
     assertEquals(expectedTitle, updatedCatalog.get(new EName(DublinCore.TERMS_NS_URI, "title")).get(0).getValue());
     assertEquals(expectedMissing, updatedCatalog.get(new EName(DublinCore.TERMS_NS_URI, "missing")).get(0).getValue());
     assertEquals(expectedTemporal, updatedCatalog.get(new EName(DublinCore.TERMS_NS_URI, temporal)).get(0).getValue());
-  }
-
-  @Test
-  public void testGetCurrentStartTime() {
-    int startHour = 19;
-    int startMinute = 35;
-    int startSecond = 19;
-    int endHour = 20;
-    int endMinute = 48;
-    int endSecond = 23;
-
-    // Test a none() period
-    Opt<DCMIPeriod> emptyPeriod = Opt.<DCMIPeriod> none();
-    DateTime result = DublinCoreMetadataUtil.getCurrentStartTime(emptyPeriod);
-    assertEquals(0, result.getHourOfDay());
-    assertEquals(0, result.getMinuteOfHour());
-    assertEquals(0, result.getSecondOfMinute());
-
-    DateTime periodStart = new DateTime(2014, 11, 04, startHour, startMinute, startSecond, DateTimeZone.UTC);
-    DateTime periodEnd = new DateTime(2014, 11, 04, endHour, endMinute, endSecond, DateTimeZone.UTC);
-
-    // Test a period that is missing the start date
-    DCMIPeriod withoutStartPeriod = new DCMIPeriod(null, periodEnd.toDate());
-    result = DublinCoreMetadataUtil.getCurrentStartTime(Opt.some(withoutStartPeriod));
-    assertEquals(0, result.getHourOfDay());
-    assertEquals(0, result.getMinuteOfHour());
-    assertEquals(0, result.getSecondOfMinute());
-
-    // Test a period with a start but no end.
-    DCMIPeriod withoutEndPeriod = new DCMIPeriod(periodStart.toDate(), null);
-    result = DublinCoreMetadataUtil.getCurrentStartTime(Opt.some(withoutEndPeriod));
-    assertEquals(startHour, result.getHourOfDay());
-    assertEquals(startMinute, result.getMinuteOfHour());
-    assertEquals(startSecond, result.getSecondOfMinute());
-
-    // Test a period with both a start and an end.
-    DCMIPeriod standardPeriod = new DCMIPeriod(periodStart.toDate(), periodEnd.toDate());
-    result = DublinCoreMetadataUtil.getCurrentStartTime(Opt.some(standardPeriod));
-    assertEquals(startHour, result.getHourOfDay());
-    assertEquals(startMinute, result.getMinuteOfHour());
-    assertEquals(startSecond, result.getSecondOfMinute());
   }
 
   @Test
@@ -389,9 +320,9 @@ public class DublinCoreCatalogUIAdapterTest {
   }
 
   @Test
-  public void testSetTemporalStartDateInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(startDateMetadataField, "2013-10-29", listProvidersService);
-    DublinCoreMetadataUtil.setTemporalStartDate(dc, startDateMetadataField, temporalEname);
+  public void testSetStartDateInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
+    metadata.addField(startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
+    DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
     assertEquals(INPUT_PERIOD, result.get(0).getValue());
@@ -399,37 +330,18 @@ public class DublinCoreCatalogUIAdapterTest {
 
   @Test
   public void testSetTemporalStartDateInputNewValueExpectsChange() throws IOException, URISyntaxException {
-    startDateMetadataField.setValue("2013-10-29");
-    metadata.addField(startDateMetadataField, "2013-10-29", listProvidersService);
-    DublinCoreMetadataUtil.setTemporalStartDate(dc, startDateMetadataField, temporalEname);
+    startDateMetadataField.setValue("2013-10-29T19:35:19.000Z");
+    metadata.addField(startDateMetadataField, "2013-10-29T19:35:19.000Z", listProvidersService);
+    DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());
     assertEquals(CHANGED_START_DATE_PERIOD, result.get(0).getValue());
   }
 
   @Test
-  public void testSetTemporalStartTimeInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
-    metadata.addField(startTimeMetadataField, "", listProvidersService);
-    DublinCoreMetadataUtil.setTemporalStartDate(dc, startTimeMetadataField, temporalEname);
-    List<DublinCoreValue> result = dc.get(temporalEname);
-    assertEquals(1, result.size());
-    assertEquals(INPUT_PERIOD, result.get(0).getValue());
-  }
-
-  @Test
-  public void testSetTemporalStartTimeInputNewValueExpectsChange() throws IOException, URISyntaxException {
-    startTimeMetadataField.setValue("18:35:19");
-    metadata.addField(startTimeMetadataField, "18:35:19", listProvidersService);
-    DublinCoreMetadataUtil.setTemporalStartTime(dc, startTimeMetadataField, temporalEname);
-    List<DublinCoreValue> result = dc.get(temporalEname);
-    assertEquals(1, result.size());
-    assertEquals(CHANGED_START_TIME_PERIOD, result.get(0).getValue());
-  }
-
-  @Test
   public void testSetDurationInputEmptyValueExpectsNoChange() throws IOException, URISyntaxException {
     metadata.addField(durationMetadataField, "", listProvidersService);
-    DublinCoreMetadataUtil.setTemporalStartDate(dc, startTimeMetadataField, temporalEname);
+    DublinCoreMetadataUtil.setStartDate(dc, startDateMetadataField, temporalEname);
     DublinCoreMetadataUtil.setDuration(dc, durationMetadataField, temporalEname);
     List<DublinCoreValue> result = dc.get(temporalEname);
     assertEquals(1, result.size());

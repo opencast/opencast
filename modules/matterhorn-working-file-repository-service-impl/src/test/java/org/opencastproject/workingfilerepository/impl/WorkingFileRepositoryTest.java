@@ -24,19 +24,24 @@ package org.opencastproject.workingfilerepository.impl;
 
 import static org.junit.Assert.fail;
 
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -50,9 +55,21 @@ public class WorkingFileRepositoryTest {
 
   @Before
   public void setUp() throws Exception {
+    Organization organization = EasyMock.createMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn("org1").anyTimes();
+    Map<String, String> orgProps = new HashMap<String, String>();
+    orgProps.put(MatterhornConstants.WFR_URL_ORG_PROPERTY, UrlSupport.DEFAULT_BASE_URL);
+    EasyMock.expect(organization.getProperties()).andReturn(orgProps).anyTimes();
+    EasyMock.replay(organization);
+
+    SecurityService securityService = EasyMock.createMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.replay(securityService);
+
+    repo.setSecurityService(securityService);
     repo.rootDirectory = "target" + File.separator + "repotest";
     repo.serverUrl = UrlSupport.DEFAULT_BASE_URL;
-    repo.serviceUrl = new URI(UrlSupport.concat(UrlSupport.DEFAULT_BASE_URL, WorkingFileRepositoryImpl.URI_PREFIX));
+    repo.servicePath = WorkingFileRepositoryImpl.URI_PREFIX;
     repo.createRootDirectory();
 
     // Put an image file into the repository using the mediapackage / element storage
@@ -197,4 +214,37 @@ public class WorkingFileRepositoryTest {
       IOUtils.closeQuietly(in);
     }
   }
+
+  @Test
+  public void testCleanupOldFilesFromCollectionNothingToDelete() throws Exception {
+    // Cleanup files older than 1 day, nothing should be deleted
+    boolean result = repo.cleanupOldFilesFromCollection(collectionId, 1);
+    Assert.assertTrue(result);
+    InputStream in = null;
+    try {
+      in = repo.getFromCollection(collectionId, filename);
+      Assert.assertNotNull(in);
+    } finally {
+      IOUtils.closeQuietly(in);
+    }
+  }
+
+  @Test
+  public void testCleanupOldFilesFromCollectionSomethingToDelete() throws Exception {
+    // Cleanup files older than 0 days, file should be deleted
+    boolean result = repo.cleanupOldFilesFromCollection(collectionId, 0);
+    Assert.assertTrue(result);
+    try {
+      Assert.assertTrue(repo.getFromCollection(collectionId, filename) == null);
+    } catch (NotFoundException e) {
+      // This is intended
+    }
+  }
+
+  @Test
+  public void testCleanupOldFilesFromNonExistentCollection() throws Exception {
+    boolean result = repo.cleanupOldFilesFromCollection("UNKNOWN", 0);
+    Assert.assertFalse(result);
+  }
+
 }

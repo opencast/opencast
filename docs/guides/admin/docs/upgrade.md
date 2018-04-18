@@ -1,51 +1,88 @@
-Upgrading Opencast 2.3 To 3.0
+Upgrading Opencast 3.0 To 4.0
 =============================
 
-This guide describes how to upgrade Opencast 2.3.x to 3.x. In case you need information about how to upgrade older
+This guide describes how to upgrade Opencast 3.0.x to 4.0.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
 
 How to Upgrade
 --------------
 
-1. Download Opencast 3.0
-2. Stop your current Opencast instance
-3. Back-up Opencast files and database (optional)
-4. [Upgrade the database](#database-migration)
-5. Update the third party tools
-6. Replace Opencast 2.3 with 3.0
-7. Recreate admin ui search index
-8. Review the configuration changes and adjust your configuration accordingly
+1. Stop your current Opencast instance
+2. Back-up Opencast files and database (optional)
+3. [Upgrade the database](#database-migration)
+4. Replace Opencast 3.0 with 4.0
+6. Review the [configuration changes](releasenotes#working-file-repository-configuration) and adjust your configuration accordingly
+7. [Upgrade the ActiveMQ configuration](#activemq-migration)
+8. [Migrate the scheduler service](#scheduler-migration)
+9. [Re-build ElasticSearch index](#re-build-elasticsearch-index)
+10. Drop the old scheduler database table: `DROP TABLE mh_scheduled_event;`
+11. Delete the old scheduler Solr data directory (`data/solr-indexes/scheduler`)
 
 
 Database Migration
 ------------------
 
-Opencast 3.0 includes the following database changes:
+Opencast 4.0 includes database changes for the new asset manager and scheduler.  As with all database migrations, we
+recommend to make a database backup before attempting the upgrade.
 
-1. Support for OAI-PMH (MH-12013)
-2. Fix for a mis-named role name for the External API (MH-12015)
+You can find the database upgrade script at `…/docs/upgrade/3.0_to_4.0/mysql5.sql`.
 
-It should be needless to say that this migration should not take a lot of time and should be safe. Nevertheless, as with
-all database migrations, we recommend to make a database backup before attempting the upgrade.
+Additionally, you need to ensure your Opencast user is granted all necessary rights. Additional to previous
+versions, `GRANT CREATE TEMPORARY TABLES` is required as well. You can simply re-set your users following the user
+set-up step from the [database configuration guide](configuration/database/#step-1-create-an-opencast-database)
 
-You can find the database upgrade script at `…/docs/upgrade/2.3_to_3.0/`.
 
-Recreate Admin UI Search Index
-------------------------------
+ActiveMQ Migration
+------------------
 
-MH-11861 needs the admin ui search index to be recreated. This can be achieved by calling POST /admin-ng/index/recreateIndex
-using the REST-API Docs.
-Note the rebuilding the search index may take hours depending on how much data needs to be reindexed.
+Opencast 4.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
+configuration guide](configuration/message-broker/) to deploy a new configuration. No data migration is required for
+this since the message broker only contains temporary data.
 
-Configuration Changes
----------------------
 
-1. The parameter "karaf.shutdown.pid.file" is renamed to "karaf.pid.file" (MH-12188)
-2. The optional organization property 'prop.adminui.user.listname' can be used to set the display format of users in
-    the group editor (MH-12211)
+Scheduler Migration
+-------------------
 
-Requirements Changes
---------------------
+The new scheduler service adds support for extended metadata and is bound to the new asset manager. Data from the old
+scheduler need to be migrated if Opencast contains upcoming, scheduled events. If you do not have any upcoming,
+scheduled events in your system, you can safely skip this step.
 
-Note that Opencast 3.0 requires Java 1.8. In case you used Java 1.7 for Opencast 2.3, you will also need to update Java.
+The migration of the scheduler service uses the data of the old scheduling database table which therefore is not deleted
+by the database migration script.
+
+To start the migration follow these steps:
+
+1. Delete the existing indexes in `data/index` and `data/solr-indexes/scheduler`
+2. Configure the destination organization for the migration by configuring the organizational context in the
+   `custom.properties`. Do that by adding a configuration key like:
+   `org.opencastproject.migration.organization=mh_default_org`.
+3. Start Opencast
+4. Check the logs for errors!
+5. After the migration is done, remove `org.opencastproject.migration.organization` again from `custom.properties´ to
+   avoid further migration attempts.
+
+
+Re-Build ElasticSearch Index
+----------------------------
+
+The introduction of the new scheduler service requires an update to the ElasticSearch index:
+
+1. If you did not do that during the scheduler migration, delete the index directory at `data/index`
+2. Start Opencast if you have not already, waiting until it has started completely.
+3. Use one of the following methods to recreate the index:
+
+    - Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
+    - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+      symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
+      `/recreateIndex`.
+
+    In both cases, the resulting page is empty but should return a HTTP status 200.
+
+4. If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
+
+    - Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
+    - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+      symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
+      `/recreateIndex`.
+

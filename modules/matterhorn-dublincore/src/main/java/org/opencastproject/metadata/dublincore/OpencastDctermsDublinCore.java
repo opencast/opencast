@@ -243,26 +243,36 @@ public abstract class OpencastDctermsDublinCore {
 
   /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of {@link Precision#Day}. */
   public void setCreated(Date date) {
-    setDate(PROPERTY_CREATED, date, Precision.Day);
+    // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
+    // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
+    // have unwanted side effects, like setting the wrong recording time, on imported data, or third-party REST calls.
+    if (getTemporal().isNone()) {
+      setDate(PROPERTY_CREATED, date, Precision.Day);
+    }
   }
 
   /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of {@link Precision#Day}. */
   public void setCreated(Temporal t) {
-    t.fold(new Match<Unit>() {
-      @Override public Unit period(DCMIPeriod period) {
-        setCreated(period.getStart());
-        return Unit.unit;
-      }
+    // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
+    // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
+    // have unwanted side effects, like setting the wrong recording time, on imported data, or third-party REST calls.
+    if (getTemporal().isNone()) {
+      t.fold(new Match<Unit>() {
+        @Override public Unit period(DCMIPeriod period) {
+          setCreated(period.getStart());
+          return Unit.unit;
+        }
 
-      @Override public Unit instant(Date instant) {
-        setCreated(instant);
-        return Unit.unit;
-      }
+        @Override public Unit instant(Date instant) {
+          setCreated(instant);
+          return Unit.unit;
+        }
 
-      @Override public Unit duration(long duration) {
-        return Unit.unit;
-      }
-    });
+        @Override public Unit duration(long duration) {
+          return Unit.unit;
+        }
+      });
+    }
   }
 
   /** Remove the {@link DublinCore#PROPERTY_CREATED} property. */
@@ -455,6 +465,9 @@ public abstract class OpencastDctermsDublinCore {
    */
   public void setTemporal(Date from, Date to) {
     setPeriod(PROPERTY_TEMPORAL, from, to, Precision.Second);
+
+    // make sure that DC created is synchronized with start date, as discussed in MH-12250
+    setDate(PROPERTY_CREATED, from, Precision.Day);
   }
 
   /** Remove the {@link DublinCore#PROPERTY_TEMPORAL} property. */
@@ -588,7 +601,7 @@ public abstract class OpencastDctermsDublinCore {
   }
 
   private final Fn<String, DublinCoreValue> mkValue = new Fn<String, DublinCoreValue>() {
-    @Override public DublinCoreValue ap(String v) {
+    @Override public DublinCoreValue apply(String v) {
       return DublinCoreValue.mk(v);
     }
   };

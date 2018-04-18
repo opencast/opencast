@@ -61,6 +61,8 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
+There are more options available than in this example. The easiest way of creating that file is probably to create a copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
+
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:
 

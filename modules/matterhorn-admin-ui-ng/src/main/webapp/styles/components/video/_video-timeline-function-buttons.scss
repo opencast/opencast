@@ -19,13 +19,16 @@
  *
  */
 
-
+.video-toolbar .function-buttons a:first-child {
+    margin-left: 0;
+}
 .video-toolbar .function-buttons a {
     @include btn(white);
     font-size: 12px;
     font-weight: $weight-semibold;
-    padding: 6px;
+    padding: 10px;
     display: inline-block;
+    margin-left: 6px;
 
     // Function Icons
     $pseudo-position: before;

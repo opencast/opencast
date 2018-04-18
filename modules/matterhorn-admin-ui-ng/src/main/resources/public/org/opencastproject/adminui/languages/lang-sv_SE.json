@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "Händelsen kunde inte sparas",
       "EVENTS_NOT_UPDATED_ID": "Händelsen {{ id }} kunde inte sparas",
       "EVENTS_NOT_UPDATED_ALL": "Ingen av händelserna kunde sparas",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Bearbetning fortsätts...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Bearbetning kunde inte fortsättas.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Bearbetning avbryts...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Bearbetning kunde inte avbrytas.",
       "SERIES_UPDATED_NB": "{{ number }} serier har uppdaterats",
       "SERIES_UPDATED_ALL": "Alla serier har uppdaterats",
       "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "Ladda upp",
                   "RECORDING_ELEMENTS": "Inspelningselement",
+                  "RECORDING_METADATA": "Metadata av inspelningen",
                   "SEGMENTABLE": {
                      "SHORT": "Transparanger",
                      "DETAIL": "Filen innehåller en inspelning av transparanger (Keynote, Powerpoint, etc)."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "Endast ljud",
                      "DETAIL": "Filen innehåller endast ljud."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Flera delar",
+                     "DETAIL": "En uppsättning filer som innehåller olika delar av händelsen."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "Välj workflow",
                "SELECT_WORKFLOW_EMPTY": "Ingen workflow hittades",
                "WORKFLOW": "Workflow"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Uppladdning av resurser",
+               "SELECT_TYPE": "Välj typ av resurs",
+               "ADD": "Lägg till resurs",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Lektionsanteckningar/Handout",
+                  "CAPTIONS_DFXP": "Undertexter DFXP",
+                  "CAPTIONS_WEBVTT": "Undertexter WebVTT",
+                  "PREVIEW_IMAGE": "Förhandsgranskningsbilden",
+                  "SMIL": "SMIL-katalogen",
+                  "TRACK_PARTS": "Delar av spår"
+               }
             },
             "ACCESS": {
                "CAPTION": "Åtkomstpolicy",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "Aktioner",
                "DETAILS": "Detaljer",
                "DESCRIPTION": "",
                "ID": "ID",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "Svartlistad från",
             "BLACKLIST_TO": "Svartlistad tills",
             "ACTION": "Åtgärder"
+         },
+         "DETAILS": {
+            "HEADER": "Händelsedetaljer - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Allmänt",
+               "CONFIGURATION": "Konfiguration",
+               "CAPABILITIES": "Funktioner"
+            },
+            "GENERAL": {
+               "CAPTION": "Allmänt",
+               "NAME": "Namn",
+               "URL": "URL",
+               "STATUS": "Status",
+               "UPDATE": "Senast hört av"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Konfiguration",
+               "NO_CONFIGURATION": "Ingen konfiguration given"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Funktioner",
+               "NO_CAPABILITIES": "Inga funktioner given"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "På gång",
       "FINISHED": "Avslutade",
+      "PAUSED": "Pausad",
       "FAILED": "Misslyckad",
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Schemalagd",

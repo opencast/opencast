@@ -81,6 +81,7 @@ angular.module('adminNg', [
     $translateProvider.useLoader('customLanguageLoader', options);
     $translateProvider.preferredLanguage('en_US'); // This triggers the configuration process of our custom loader
     $translateProvider.useMissingTranslationHandler('customMissingTranslationHandler');
+    $translateProvider.useSanitizeValueStrategy('escape');
 }])
 .config(['$logProvider', function ($logProvider) {
     $logProvider.debugEnabled(false);

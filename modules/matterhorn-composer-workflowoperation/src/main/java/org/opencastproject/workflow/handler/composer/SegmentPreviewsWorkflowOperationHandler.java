@@ -85,7 +85,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
   static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS = new TreeMap<>();
     CONFIG_OPTIONS.put("source-flavor", "The \"flavor\" of the track to use as a video source input");
     CONFIG_OPTIONS.put("source-tags",
             "The required tags that must exist on the track for the track to be used as a video source");
@@ -132,7 +132,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
    *          the catalog service
    */
   protected void setMpeg7CatalogService(Mpeg7CatalogService catalogService) {
-    this.mpeg7CatalogService = catalogService;
+    mpeg7CatalogService = catalogService;
   }
 
   /**
@@ -152,6 +152,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
    *      JobContext)
    */
+  @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     logger.debug("Running segments preview workflow operation on {}", workflowInstance);
@@ -208,7 +209,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
     List<String> sourceTagSet = asList(sourceTags);
 
     // Select the tracks based on the tags and flavors
-    Set<Track> videoTrackSet = new HashSet<Track>();
+    Set<Track> videoTrackSet = new HashSet<>();
     for (Track track : mediaPackage.getTracksByTags(sourceTagSet)) {
       if (sourceVideoFlavor == null
               || (track.getFlavor() != null && sourceVideoFlavor.equals(track.getFlavor().toString()))) {
@@ -220,7 +221,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     if (videoTrackSet.size() == 0) {
       logger.debug("Mediapackage {} has no suitable tracks to extract images based on tags {} and flavor {}",
-              new Object[] { mediaPackage, sourceTags, sourceVideoFlavor });
+              mediaPackage, sourceTags, sourceVideoFlavor);
       return createResult(mediaPackage, Action.CONTINUE);
     } else {
 
@@ -237,7 +238,8 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         if (segmentCatalogs.length > 0) {
           mpeg7 = loadMpeg7Catalog(segmentCatalogs[0]);
           if (segmentCatalogs.length > 1)
-            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})", t, mpeg7);
+            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})", t,
+                    mpeg7);
         } else {
           logger.debug("No segments catalog found for track {}", t);
           continue;
@@ -266,7 +268,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
           Iterator<? extends Segment> segmentIterator = decomposition.segments();
 
-          List<MediaTimePoint> timePointList = new LinkedList<MediaTimePoint>();
+          List<MediaTimePoint> timePointList = new LinkedList<>();
           while (segmentIterator.hasNext()) {
             Segment segment = segmentIterator.next();
             MediaTimePoint tp = segment.getMediaTime().getMediaTimePoint();
@@ -293,8 +295,8 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
           // add this receipt's queue time to the total
           totalTimeInQueue += job.getQueueTime();
 
-          List<? extends MediaPackageElement> composedImages = MediaPackageElementParser.getArrayFromXml(job
-                  .getPayload());
+          List<? extends MediaPackageElement> composedImages = MediaPackageElementParser
+                  .getArrayFromXml(job.getPayload());
           Iterator<MediaTimePoint> it = timePointList.iterator();
 
           for (MediaPackageElement element : composedImages) {

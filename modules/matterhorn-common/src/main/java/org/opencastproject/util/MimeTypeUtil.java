@@ -24,6 +24,9 @@ package org.opencastproject.util;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.data.Opt;
+
 /** Utility functions for mime types. */
 public final class MimeTypeUtil {
   private MimeTypeUtil() {
@@ -45,4 +48,24 @@ public final class MimeTypeUtil {
     }
   };
 
+  public static final class Fns {
+    private Fns() {
+    }
+
+    /** {@link org.opencastproject.util.MimeType#getSuffix()} as a function. */
+    public static final Fn<MimeType, Opt<String>> suffix = new Fn<MimeType, Opt<String>>() {
+      @Override
+      public Opt<String> apply(MimeType mimeType) {
+        return mimeType.getSuffix().toOpt();
+      }
+    };
+
+    /** {@link org.opencastproject.util.MimeType#toString()} as a function. */
+    public static final Fn<MimeType, String> toString = new Fn<MimeType, String>() {
+      @Override
+      public String apply(MimeType mimeType) {
+        return mimeType.toString();
+      }
+    };
+  }
 }

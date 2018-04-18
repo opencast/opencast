@@ -39,6 +39,8 @@ public class SeriesQuery {
   protected String text;
   /** Series id search */
   protected String seriesId;
+  /** Option for an inexact series id match */
+  protected boolean fuzzyMatch;
   /** Series title search */
   protected String seriesTitle;
   /** Creator search */
@@ -79,7 +81,7 @@ public class SeriesQuery {
 
   /** Sort fields */
   public enum Sort {
-    TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE
+    TITLE, SUBJECT, CREATOR, PUBLISHER, CONTRIBUTOR, ABSTRACT, DESCRIPTION, CREATED, AVAILABLE_FROM, AVAILABLE_TO, LANGUAGE, RIGHTS_HOLDER, SPATIAL, TEMPORAL, IS_PART_OF, REPLACES, TYPE, ACCESS, LICENCE, IDENTIFIER
   }
 
   /**
@@ -523,6 +525,24 @@ public class SeriesQuery {
    */
   public void setEdit(boolean edit) {
     this.edit = edit;
+  }
+
+  /**
+   * Option for partial matches on a series Id. The default is exact match.
+   *
+   * @return true for allowing fuzzy match on series Id, false for exact match
+   */
+  public boolean isFuzzyMatch() {
+    return fuzzyMatch;
+  }
+
+  /**
+   * Set the fuzzyMatch boolean flag
+   *
+   * @param fuzzyMatch
+   */
+  public void setFuzzyMatch(boolean fuzzyMatch) {
+    this.fuzzyMatch = fuzzyMatch;
   }
 
 }

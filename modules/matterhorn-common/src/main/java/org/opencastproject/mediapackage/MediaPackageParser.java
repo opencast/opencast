@@ -25,6 +25,7 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.DateTimeSupport;
 
+import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
@@ -35,6 +36,7 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -285,6 +287,63 @@ public final class MediaPackageParser {
       marshaller.marshal(mediaPackage, out);
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    }
+  }
+
+  /**
+   * Serializes media package list to a string.
+   *
+   * @param mediaPackages
+   *          media package list to be serialized
+   * @return serialized media package list
+   * @throws MediaPackageException
+   *           if serialization fails
+   */
+  public static String getArrayAsXml(List<MediaPackage> mediaPackages) throws MediaPackageException {
+    try {
+      StringBuilder builder = new StringBuilder();
+      if (mediaPackages.isEmpty())
+        return builder.toString();
+      builder.append(getAsXml(mediaPackages.get(0)));
+      for (int i = 1; i < mediaPackages.size(); i++) {
+        builder.append("###");
+        builder.append(getAsXml(mediaPackages.get(i)));
+      }
+      return builder.toString();
+    } catch (Exception e) {
+      if (e instanceof MediaPackageException) {
+        throw (MediaPackageException) e;
+      } else {
+        throw new MediaPackageException(e);
+      }
+    }
+  }
+
+  /**
+   * Parses the serialized media package list.
+   *
+   * @param xml
+   *          String to be parsed
+   * @return parsed media package list
+   * @throws MediaPackageException
+   *           if de-serialization fails
+   */
+  public static List<MediaPackage> getArrayFromXml(String xml) throws MediaPackageException {
+    try {
+      List<MediaPackage> mediaPackages = new LinkedList<MediaPackage>();
+      if (StringUtils.isBlank(xml))
+        return mediaPackages;
+      String[] xmlArray = xml.split("###");
+      for (String xmlElement : xmlArray) {
+        mediaPackages.add(getFromXml(xmlElement.trim()));
+      }
+      return mediaPackages;
+    } catch (Exception e) {
+      if (e instanceof MediaPackageException) {
+        throw (MediaPackageException) e;
+      } else {
+        throw new MediaPackageException(e);
+      }
     }
   }
 

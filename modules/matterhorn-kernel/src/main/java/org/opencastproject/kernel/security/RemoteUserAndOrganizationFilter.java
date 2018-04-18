@@ -91,8 +91,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
    *      javax.servlet.FilterChain)
    */
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-          ServletException {
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+          throws IOException, ServletException {
 
     HttpServletRequest httpRequest = (HttpServletRequest) request;
 
@@ -184,8 +184,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
           }
         }
 
-        logger.trace("Switching from user '{}' to user '{}' from request header '{}'",
-                new Object[] { originalUser.getUsername(), requestedUser.getUsername(), USER_HEADER });
+        logger.trace("Switching from user '{}' to user '{}' from request header '{}'", originalUser.getUsername(),
+                requestedUser.getUsername(), USER_HEADER);
         securityService.setUser(requestedUser);
       }
 
@@ -235,8 +235,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         // Set roles to requested user
         requestedUser = new JaxbUser(requestedUser.getUsername(), requestedUser.getPassword(), requestedUser.getName(),
                 requestedUser.getEmail(), requestedUser.getProvider(), requestedUser.canLogin(),
-                JaxbOrganization.fromOrganization(requestedUser.getOrganization()), Stream.$(requestedRoles)
-                        .map(toJaxbRole._2(requestedOrganization)).toSet());
+                JaxbOrganization.fromOrganization(requestedUser.getOrganization()),
+                Stream.$(requestedRoles).map(toJaxbRole._2(requestedOrganization)).toSet());
         logger.trace("Request roles '{}' are amended to user '{}'", rolesHeader, requestedUser.getUsername());
         securityService.setUser(requestedUser);
       }
@@ -291,7 +291,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
   private static final Fn2<String, Organization, JaxbRole> toJaxbRole = new Fn2<String, Organization, JaxbRole>() {
     @Override
-    public JaxbRole ap(String role, Organization organization) {
+    public JaxbRole apply(String role, Organization organization) {
       return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
     }
   };

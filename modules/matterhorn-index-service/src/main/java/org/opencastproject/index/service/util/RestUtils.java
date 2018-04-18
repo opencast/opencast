@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.format;
 
@@ -40,11 +40,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,7 +76,7 @@ public final class RestUtils {
    * @return an OK response
    */
   public static Response okJson(JValue json) {
-    return Response.ok(stream(serializer.toJsonFx(json)), MediaType.APPLICATION_JSON_TYPE).build();
+    return Response.ok(stream(serializer.fn.toJson(json)), MediaType.APPLICATION_JSON_TYPE).build();
   }
 
   /**
@@ -89,7 +87,7 @@ public final class RestUtils {
    * @return an OK response
    */
   public static Response conflictJson(JValue json) {
-    return Response.status(Status.CONFLICT).entity(stream(serializer.toJsonFx(json)))
+    return Response.status(Status.CONFLICT).entity(stream(serializer.fn.toJson(json)))
             .type(MediaType.APPLICATION_JSON_TYPE).build();
   }
 
@@ -147,23 +145,23 @@ public final class RestUtils {
   public static Response okJsonList(List<JValue> jsonList, int offset, int limit, long total) {
     if (jsonList == null)
       throw new IllegalArgumentException("The list of value must not be null.");
-    JValue respone = j(f("results", a(jsonList)), f("count", v(jsonList.size())), f("offset", v(offset)),
+    JValue response = obj(f("results", arr(jsonList)), f("count", v(jsonList.size())), f("offset", v(offset)),
             f("limit", v(limit)), f("total", v(total)));
 
-    return okJson(respone);
+    return okJson(response);
   }
 
   /**
    * Create a streaming response entity. Pass it as an entity parameter to one of the response builder methods like
    * {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
    */
-  public static StreamingOutput stream(final Fx<Writer> out) {
+  public static StreamingOutput stream(final Fx<OutputStream> out) {
     return new StreamingOutput() {
       @Override
       public void write(OutputStream s) throws IOException, WebApplicationException {
-        final Writer writer = new BufferedWriter(new OutputStreamWriter(s));
-        out.ap(writer);
-        writer.close();
+        try (final BufferedOutputStream bs = new BufferedOutputStream(s)) {
+          out.apply(bs);
+        }
       }
     };
   }
@@ -267,7 +265,7 @@ public final class RestUtils {
       }
     };
 
-    stream(serializer.toJsonFx(json)).write(output);
+    stream(serializer.fn.toJson(json)).write(output);
 
     return output.toString();
   }

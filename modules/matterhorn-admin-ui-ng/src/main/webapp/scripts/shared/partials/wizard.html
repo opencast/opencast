@@ -14,12 +14,12 @@
 <footer>
     <a ng-if="!wizard.isLast()" ng-click="wizard.toTab($event)" ng-keyup="keyUp($event)"
         data-modal-tab="next" class="submit" tabindex="100"
-        ng-class="{active: wizard.getCurrentState().stateController.isValid(), inactive: !wizard.getCurrentState().stateController.isValid()}">
+        ng-class="{active: wizard.getCurrentStateController().isValid(), inactive: !wizard.getCurrentStateController().isValid()}">
         {{ 'WIZARD.NEXT_STEP' | translate }}
     </a>
-    <a ng-if="wizard.isLast()" ng-click="wizard.submit()" ng-keyup="keyUpSubmit($event)"
+    <a ng-if="wizard.isLast()" ng-click="!wizard.getCurrentStateController().isDisabled && wizard.submit()" ng-keyup="keyUpSubmit($event)"
         data-modal-tab="next" class="submit" tabindex="100"
-        ng-class="active">
+        ng-class="{active: !wizard.getCurrentStateController().isDisabled, inactive: wizard.getCurrentStateController().isDisabled}">
         {{ wizard.getFinalButtonTranslation() | translate}}
     </a>
     <a ng-if="wizard.hasPrevious()" ng-click="wizard.toTab($event)" ng-keyup="keyUp($event)"

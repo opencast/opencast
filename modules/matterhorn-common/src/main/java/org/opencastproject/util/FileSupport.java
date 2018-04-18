@@ -19,7 +19,6 @@
  *
  */
 
-
 package org.opencastproject.util;
 
 import static java.lang.String.format;
@@ -333,7 +332,7 @@ public final class FileSupport {
         Files.copy(sourcePath, targetPath);
       } catch (IOException e) {
         logger.debug("Copy file because creating a hard-link at '{}' for existing file '{}' did not work: {}",
-                new Object[] { targetPath, sourcePath, ExceptionUtils.getStackTrace(e) });
+                targetPath, sourcePath, ExceptionUtils.getStackTrace(e));
         if (overwrite) {
           Files.copy(sourcePath, targetPath, REPLACE_EXISTING);
         } else {
@@ -370,7 +369,7 @@ public final class FileSupport {
       deleteIfExists(targetPath);
       createLink(targetPath, sourcePath);
     } catch (Exception e) {
-      logger.debug("Unable to create a link from {} to {}: {}", new Object[] { sourcePath, targetPath, e });
+      logger.debug("Unable to create a link from {} to {}: {}", sourcePath, targetPath, e);
       return false;
     }
 
@@ -473,8 +472,30 @@ public final class FileSupport {
    *          the file or directory
    * @see #delete(File, boolean)
    */
-  public static boolean delete(File f) {
+  public static boolean delete(File f) throws IOException {
     return delete(f, false);
+  }
+
+  /**
+   * Like {@link #delete(File)} but does not throw any IO exceptions.
+   * In case of an IOException it will only be logged at warning level and the method returns false.
+   */
+  public static boolean deleteQuietly(File f) {
+    return deleteQuietly(f, false);
+  }
+
+  /**
+   * Like {@link #delete(File, boolean)} but does not throw any IO exceptions.
+   * In case of an IOException it will only be logged at warning level and the method returns false.
+   */
+  public static boolean deleteQuietly(File f, boolean recurse) {
+    try {
+      return delete(f, recurse);
+    } catch (IOException e) {
+      logger.warn("Cannot delete " + f.getAbsolutePath() + " because of IOException"
+                       + (e.getMessage() != null ? " " + e.getMessage() : ""));
+      return false;
+    }
   }
 
   /**
@@ -489,13 +510,16 @@ public final class FileSupport {
    * @param recurse
    *          <code>true</code> to do a recursive deletes for directories
    */
-  public static boolean delete(File f, boolean recurse) {
+  public static boolean delete(File f, boolean recurse) throws IOException {
     if (f == null)
       return false;
     if (!f.exists())
       return false;
     if (f.isDirectory()) {
       String[] children = f.list();
+      if (children == null) {
+        throw new IOException("Cannot list content of directory " + f.getAbsolutePath());
+      }
       if (children != null) {
         if (children.length > 0 && !recurse)
           return false;

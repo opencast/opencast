@@ -1,17 +1,30 @@
 {
-  "FILTERS.USERS.ROLES.LABEL": {
-    "ROLE_ADMIN": "FILTERS.USERS.ROLES.ROLE_ADMIN",
-    "ROLE_ANONYMOUS": "FILTERS.USERS.ROLES.ROLE_ANONYMOUS"
+  "Role":{
+    "translatable":false,
+    "options":{
+      "ROLE_OAUTH_USER":"ROLE_OAUTH_USER",
+      "ROLE_SUDO":"ROLE_SUDO",
+      "ROLE_ADMIN":"ROLE_ADMIN"
+    },
+    "label":"FILTERS.USERS.ROLE.LABEL",
+    "type":"select"
   },
-  "FILTERS.USERS.USERNAME.LABEL": {
-    "admin": "admin",
-    "matterhorn_system_account": "matterhorn_system_account"
+  "Name":{
+    "translatable":false,
+    "options":{
+      "Opencast Project Administrator":"Opencast Project Administrator",
+      "System User":"System User"
+    },
+    "label":"FILTERS.USERS.NAME.LABEL",
+    "type":"select"
   },
-  "FILTERS.USERS.NAME.LABEL": {
-    "Digest User": "Digest User",
-    "Admin User": "Admin User"
-  },
-  "FILTERS.USERS.USER_DIRECTORY.LABEL": {
-    "matterhorn-in-memory": "matterhorn-in-memory"
+  "Provider":{
+    "translatable":false,
+    "options":{
+      "system":"system",
+      "opencast":"opencast"
+    },
+    "label":"FILTERS.USERS.PROVIDER.LABEL",
+    "type":"select"
   }
 }

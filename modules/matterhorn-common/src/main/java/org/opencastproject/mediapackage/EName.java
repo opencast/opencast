@@ -27,8 +27,13 @@ import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
 
-import java.io.Serializable;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.Serializable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
@@ -36,14 +41,12 @@ import javax.xml.XMLConstants;
 /**
  * An XML <dfn>Expanded Name</dfn>, cf. <a href="http://www.w3.org/TR/xml-names11/#dt-expname">W3C definition</a>.
  * <p>
- * Expanded names in XML consists of a namespace name (URI) and a local part.
- * In opposite to <dfn>Qualified Names</dfn>,
- * cf. <a href="http://www.w3.org/TR/xml-names11/#dt-qualname">W3C definition</a> -
- * which are made from an optional prefix and the local part - expanded names are <em>not</em> subject to
- * namespace interpretation.
+ * Expanded names in XML consists of a namespace name (URI) and a local part. In opposite to <dfn>Qualified Names</dfn>,
+ * cf. <a href="http://www.w3.org/TR/xml-names11/#dt-qualname">W3C definition</a> - which are made from an optional
+ * prefix and the local part - expanded names are <em>not</em> subject to namespace interpretation.
  * <p>
- * Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a
- * complete definition and reference.
+ * Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a complete definition
+ * and reference.
  */
 @Immutable
 @ParametersAreNonnullByDefault
@@ -52,6 +55,12 @@ public final class EName implements Serializable, Comparable<EName> {
 
   private final String namespaceURI;
   private final String localName;
+
+  /**
+   * A pattern to parse strings as ENames. A String representing an EName may start with a Namespace among curly braces
+   * ("{" and "}") and then it must contain a local name *without* any curly braces.
+   */
+  private static final Pattern pattern = Pattern.compile("^(?:\\{(?<namespace>[^{}\\s]*)\\})?(?<localname>[^{}\\s]+)$");
 
   /**
    * Create a new expanded name.
@@ -97,8 +106,8 @@ public final class EName implements Serializable, Comparable<EName> {
   }
 
   /**
-   * Check, if this name belongs to a namespace, i.e. its namespace URI
-   * is not {@link javax.xml.XMLConstants#NULL_NS_URI}.
+   * Check, if this name belongs to a namespace, i.e. its namespace URI is not
+   * {@link javax.xml.XMLConstants#NULL_NS_URI}.
    */
   public boolean hasNamespace() {
     return !XMLConstants.NULL_NS_URI.equals(namespaceURI);
@@ -132,5 +141,78 @@ public final class EName implements Serializable, Comparable<EName> {
     } else {
       return r;
     }
+  }
+
+  /**
+   * Parse a W3C compliant string representation <code>{namespaceURI}localname</code>.
+   *
+   * A String representing an EName may start with a namespace among curly braces ("{" and "}") and then it must contain
+   * a local name *without* any blank characters or curly braces.
+   *
+   * This is a superset of the character restrictions defined by the XML standard, where neither namespaces nor local
+   * names may contain curly braces or spaces.
+   *
+   * Examples:
+   *
+   * <ul>
+   * <li>{http://my-namespace}mylocalname
+   * <li>{}localname-with-explicit-empty-namespace
+   * <li>localname-without-namespace
+   * </ul>
+   *
+   * Incorrect examples:
+   *
+   * <ul>
+   * <li>{namespace-only}
+   * <li>contains{curly}braces
+   * </ul>
+   *
+   * @param strEName
+   *          A {@link java.lang.String} representing an {@code EName}
+   * @param defaultNameSpace
+   *          A NameSpace to apply if the provided {@code String} does not have any. Please note that a explicit empty
+   *          NameSpace **is** a NameSpace. If this argument is blank or {@code null}, it has no effect.
+   */
+  public static EName fromString(String strEName, @Nullable String defaultNameSpace) throws IllegalArgumentException {
+    Matcher m = pattern.matcher(strEName);
+
+    if (m.matches()) {
+      if (StringUtils.isNotBlank(defaultNameSpace) && m.group("namespace") == null)
+        return new EName(defaultNameSpace, m.group("localname"));
+      else
+        return new EName(StringUtils.trimToEmpty(m.group("namespace")), m.group("localname"));
+    }
+    throw new IllegalArgumentException(format("Cannot parse '%s' as EName", strEName));
+  }
+
+  /**
+   * Parse a W3C compliant string representation <code>{namespaceURI}localname</code>.
+   *
+   * A String representing an EName may start with a namespace among curly braces ("{" and "}") and then it must contain
+   * a local name *without* any curly braces.
+   *
+   * This is a superset of the character restrictions defined by the XML standard, where neither namespaces nor local
+   * names may contain curly braces.
+   *
+   * Examples:
+   *
+   * <ul>
+   * <li>{http://my-namespace}mylocalname
+   * <li>localname-without-namespace
+   * </ul>
+   *
+   * Incorrect examples:
+   *
+   * <ul>
+   * <li>{namespace-only}
+   * <li>contains{curly}braces
+   * </ul>
+   *
+   * @param strEName
+   *          A {@link java.lang.String} representing an {@code EName}
+   *
+   */
+  public static EName fromString(String strEName) throws IllegalArgumentException {
+    return EName.fromString(strEName, null);
   }
 }

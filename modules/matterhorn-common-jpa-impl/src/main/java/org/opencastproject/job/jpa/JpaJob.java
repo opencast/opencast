@@ -170,6 +170,10 @@ public class JpaJob {
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateCreated;
 
+  public Date getDateStarted() {
+    return dateStarted;
+  }
+
   @Column(name = "date_started")
   @Temporal(TemporalType.TIMESTAMP)
   private Date dateStarted;
@@ -190,6 +194,19 @@ public class JpaJob {
 
   @Column(name = "job_load")
   private Float jobLoad;
+
+  public String getBlockedJobIds() {
+    StringBuffer sb = new StringBuffer();
+    for (Long id : blockedJobIds) {
+      sb.append(id);
+      sb.append(" ");
+    }
+    return sb.toString();
+  }
+
+  public Long getBlockingJobId() {
+    return blockingJobId;
+  }
 
   /** The list of job IDs that are blocking this job from continuing. */
   @Column(name = "blocking_job_list")
@@ -294,7 +311,7 @@ public class JpaJob {
   public static Fn<JpaJob, Job> fnToJob() {
     return new Fn<JpaJob, Job>() {
       @Override
-      public Job ap(JpaJob jobJpa) {
+      public Job apply(JpaJob jobJpa) {
         return jobJpa.toJob();
       }
     };
@@ -440,6 +457,15 @@ public class JpaJob {
 
   public List<JpaJob> getChildJobs() {
     return childJobs;
+  }
+
+  public String getChildJobsString() {
+    StringBuilder sb = new StringBuilder();
+    for (JpaJob job : getChildJobs()) {
+      sb.append(job.getId());
+      sb.append(" ");
+    }
+    return sb.toString();
   }
 
   public FailureReason getFailureReason() {

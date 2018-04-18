@@ -21,15 +21,13 @@
 
 package org.opencastproject.capture.admin.impl;
 
-import org.opencastproject.capture.admin.api.Recording;
-import org.opencastproject.capture.admin.api.RecordingState;
-import org.opencastproject.capture.admin.api.RecordingStateUpdate;
+import org.opencastproject.scheduler.api.Recording;
+import org.opencastproject.scheduler.api.RecordingState;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class RecordingStateUpdateTest {
   private Recording recording = null;
@@ -37,7 +35,28 @@ public class RecordingStateUpdateTest {
 
   @Before
   public void setUp() throws InterruptedException {
-    recording = new RecordingImpl("test", RecordingState.CAPTURING);
+    final long lastHeardFrom = System.currentTimeMillis();
+    recording = new Recording() {
+
+      @Override
+      public void setState(String newState) {
+      }
+
+      @Override
+      public String getState() {
+        return RecordingState.CAPTURING;
+      }
+
+      @Override
+      public Long getLastCheckinTime() {
+        return lastHeardFrom;
+      }
+
+      @Override
+      public String getID() {
+        return "test";
+      }
+    };
     Assert.assertNotNull(recording);
     Thread.sleep(5);
     rsu = new RecordingStateUpdate(recording);
@@ -60,7 +79,7 @@ public class RecordingStateUpdateTest {
   }
 
   @Test
-  //This is a stupid test, but it gets us up to 100%...
+  // This is a stupid test, but it gets us up to 100%...
   public void blank() {
     rsu = new RecordingStateUpdate();
     Assert.assertNotNull(rsu);

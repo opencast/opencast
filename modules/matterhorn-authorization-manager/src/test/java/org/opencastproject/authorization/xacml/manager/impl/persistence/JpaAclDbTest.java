@@ -74,7 +74,7 @@ public final class JpaAclDbTest {
     // update with new name
     final ManagedAcl org1AclUpdated = new ManagedAclImpl(org1Acl.getId(), "public2", org1Acl.getOrganizationId(), org1Acl.getAcl());
     assertTrue(p.updateAcl(org1AclUpdated));
-    assertEquals("public", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
+    assertEquals("public2", p.getAcl(org1, org1AclUpdated.getId()).get().getName());
     // try to update a non-existing ACL
     assertFalse(p.updateAcl(new ManagedAclImpl(27427492384723L, "public2", org1.getId(), org1Acl.getAcl())));
     assertEquals(2, p.getAcls(org1).size());

@@ -33,15 +33,7 @@
       "id":"startDate",
       "label":"EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
       "type":"date",
-      "value":"2014-11-04",
-      "required":false
-   },
-   {
-      "readOnly":false,
-      "id":"startTime",
-      "label":"EVENTS.EVENTS.DETAILS.METADATA.START_TIME",
-      "type":"time",
-      "value":"19:00:00",
+      "value":"2014-11-04T19:00:00.000Z",
       "required":false
    },
    {

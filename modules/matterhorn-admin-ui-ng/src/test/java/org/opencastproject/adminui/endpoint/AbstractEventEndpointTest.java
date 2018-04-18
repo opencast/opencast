@@ -22,23 +22,25 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.opencast.OpencastArchive;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.capture.admin.api.Recording;
-import org.opencastproject.capture.admin.api.RecordingState;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.rest.NotFoundExceptionMapper;
 import org.opencastproject.rest.RestServiceTestEnv;
+import org.opencastproject.scheduler.api.Recording;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -46,6 +48,7 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.data.Opt;
+import com.jayway.restassured.http.ContentType;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
@@ -53,6 +56,7 @@ import org.easymock.EasyMock;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -65,8 +69,6 @@ import javax.ws.rs.WebApplicationException;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
-// TODO re-ignore tests
-@Ignore
 public class AbstractEventEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestEventEndpoint.class,
           NotFoundExceptionMapper.class);
@@ -77,39 +79,25 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testGetEvent() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/event.json"));
+    given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK)
+            // TODO: add all serialised props to mock and check here
+            .body("id", equalTo("asdasd")).body("title", equalTo("title"))
+            .body("event_status", equalTo("EVENTS.EVENTS.STATUS.ARCHIVE")).body("has_preview", equalTo(false))
+            .body("review_status", equalTo("UNSENT")).body("has_open_comments", equalTo(false))
+            .body("series.id", equalTo("seriesId")).body("technical_start", equalTo("2013-03-20T04:00:00Z"))
+            .body("start_date", equalTo("2013-03-20T04:00:00Z")).when().get(rt.host("/{eventId}"));
 
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("/{eventId}")).asString();
-    assertThat(eventString, SameJSONAs.sameJSONAs(result));
-  }
-
-  @Test
-  public void testGetEventsRecordingsAndRecipients() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/recordingsAndRecipients.json"));
-
-    String result = given().queryParam("eventIds", "1").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("/events/sendmessage")).asString();
-
-    assertThat(eventString, SameJSONAs.sameJSONAs(result));
-  }
-
-  @Test
-  public void testGetRecordingMessages() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventMessages.json"));
-
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/messages")).asString();
-
-    assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
   public void testGetEventGeneralTab() throws Exception {
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/general.json"));
+
     String eventString = IOUtils.toString(getClass().getResource("/eventGeneral.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/general")).asString();
+            .get(rt.host("{eventId}/general.json")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
@@ -128,6 +116,14 @@ public class AbstractEventEndpointTest {
   public void testGetEventComment() throws Exception {
     String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
 
+    // wrong event id
+    given().pathParam("eventId", "notExists").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/comment/{commentId}"));
+
+    // not existing comment
+    given().pathParam("eventId", "asdasd").pathParam("commentId", 99999).expect()
+            .statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when().get(rt.host("{eventId}/comment/{commentId}"));
+
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect()
             .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/comment/{commentId}")).asString();
 
@@ -139,7 +135,7 @@ public class AbstractEventEndpointTest {
     String eventString = IOUtils.toString(getClass().getResource("/eventParticipation.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/participation")).asString();
+            .get(rt.host("{eventId}/participation.json")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
@@ -156,21 +152,26 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testCreateEventComment() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .post(rt.host("{eventId}/comment"));
 
     given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
             .post(rt.host("{eventId}/comment"));
 
-    String result = given().pathParam("eventId", "asdasd").formParam("text", "Test").expect()
-            .header("Location", "http://localhost:8080/asdasd/comment/65").statusCode(HttpStatus.SC_CREATED).when()
-            .post(rt.host("{eventId}/comment")).asString();
+    given().pathParam("eventId", "asdasd").formParam("text", "Comment 2").given().formParam("reason", "Defect").expect()
+            .header("Location", "http://localhost:8080/asdasd/comment/65").statusCode(HttpStatus.SC_CREATED)
+            .body("reason", equalTo("Defect")).body("id", equalTo(65)).body("text", equalTo("Comment 2")).when()
+            .post(rt.host("{eventId}/comment"));
 
-    assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
   public void testResolveEventComment() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventCommentResolved.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().post(rt.host("{eventId}/comment/{commentId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect()
             .statusCode(HttpStatus.SC_OK).when().post(rt.host("{eventId}/comment/{commentId}")).asString();
@@ -180,6 +181,9 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testDeleteEventComment() throws Exception {
+    given().pathParam("eventId", "notExists").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().delete(rt.host("{eventId}/comment/{commentId}"));
+
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).expect().statusCode(HttpStatus.SC_NO_CONTENT)
             .when().delete(rt.host("{eventId}/comment/{commentId}"));
   }
@@ -202,8 +206,8 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
-    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77)
-            .formParam("text", "Text").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77).formParam("text", "Text")
+            .expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78)
@@ -229,15 +233,18 @@ public class AbstractEventEndpointTest {
     JSONArray replies = (JSONArray) parse.get("replies");
     JSONObject reply = (JSONObject) replies.get(1);
     Assert.assertEquals("Text", reply.get("text"));
-    Assert.assertEquals("true", reply.get("resolvedStatus"));
+    Assert.assertEquals(true, parse.get("resolvedStatus"));
   }
 
   @Test
   public void testGetEventMetadata() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
 
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/metadata.json"));
+
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/metadata")).asString();
+            .get(rt.host("{eventId}/metadata.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -246,14 +253,24 @@ public class AbstractEventEndpointTest {
   public void testUpdateEventMetadata() throws Exception {
     String metadataJson = IOUtils.toString(getClass().getResource("/eventMetadata.json"));
 
-    given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .put(rt.host("{eventId}/metadata"));
-
-    given().pathParam("eventId", "asdasd").formParam("metadata", "adfasdf").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/metadata"));
+    given().pathParam("eventId", "notExists").formParam("metadata", "metadata").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().put(rt.host("{eventId}/metadata"));
 
     given().pathParam("eventId", "asdasd").formParam("metadata", metadataJson).expect().statusCode(HttpStatus.SC_OK)
             .when().put(rt.host("{eventId}/metadata"));
+  }
+
+  @Test
+  public void testGetEventScheduling() throws Exception {
+    String eventSchedulingString = IOUtils.toString(getClass().getResource("/eventScheduling.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/scheduling.json"));
+
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/scheduling.json")).asString();
+
+    assertThat(eventSchedulingString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
@@ -267,18 +284,37 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  public void testGetEventMedia() throws Exception {
-    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventMedia.json"));
+  public void testGetMediaList() throws Exception {
+    String expected = IOUtils.toString(getClass().getResource("/eventMedia.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/asset/media/media.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/asset/media/media.json")).asString();
 
-    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
+    assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
+  }
+
+  @Test
+  public void testGetMedia() throws Exception {
+    String expected = IOUtils.toString(getClass().getResource("/eventMediaDetail.json"));
+
+    given().pathParam("eventId", "asdasd").pathParam("id", "notFound").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/asset/media/{id}.json"));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("id", "publish-track-1").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/asset/media/{id}.json")).asString();
+
+    assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
   }
 
   @Test
   public void testGetEventCatalogs() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalogs.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/asset/catalog/catalogs.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/asset/catalog/catalogs.json")).asString();
@@ -287,8 +323,27 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  public void testGetEventAttachements() throws Exception {
+  public void testGetCatalog() throws Exception {
+    String eventMetadataString = IOUtils.toString(getClass().getResource("/eventCatalog.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("id", "publish-catalog-1").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host("{eventId}/asset/catalog/{id}.json"));
+
+    given().pathParam("eventId", "asdasd").pathParam("id", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/asset/catalog/{id}.json"));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("id", "publish-catalog-1").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/asset/catalog/{id}.json")).asString();
+
+    assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
+  public void testGetAttachmentsList() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventAttachments.json"));
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/asset/attachment/attachments.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("{eventId}/asset/attachment/attachments.json")).asString();
@@ -297,11 +352,31 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
+  public void testGetAttachment() throws Exception {
+    String expected = IOUtils.toString(getClass().getResource("/eventAttachmentSingle.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("id", "publish-attachment-2").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host("{eventId}/asset/attachment/{id}.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("id", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/asset/attachment/{id}.json"));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("id", "publish-attachment-2").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/asset/attachment/{id}.json")).asString();
+
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
   public void testGetEventWorkflows() throws Exception {
+
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/workflows.json")).asString();
+
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflows.json"));
 
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/workflows")).asString();
+    String result = given().pathParam("eventId", "workflowid").expect().statusCode(HttpStatus.SC_OK).when()
+            .get(rt.host("{eventId}/workflows.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -310,11 +385,18 @@ public class AbstractEventEndpointTest {
   public void testGetEventWorkflow() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventWorkflow.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}"));
+    String path = "{eventId}/workflows/{workflowId}";
+    given().pathParam("eventId", "notExists").pathParam("workflowId", "asdasd").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host(path));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 23).expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}")).asString();
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host(path));
+
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "9999").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host(path));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", "1").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host(path)).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -323,11 +405,18 @@ public class AbstractEventEndpointTest {
   public void testGetEventOperations() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperations.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/operations"));
+    String path = "{eventId}/workflows/{workflowId}/operations.json";
+    given().pathParam("eventId", "notExists").pathParam("workflowId", "notExists").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host(path));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 23).expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/operations")).asString();
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "xxxx").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host(path));
+
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "9999").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host(path));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", "1").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host(path)).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -336,17 +425,24 @@ public class AbstractEventEndpointTest {
   public void testGetEventOperation() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventOperation.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asdasd").pathParam("operationPosition", "asdasd")
-            .expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
+    String path = "{eventId}/workflows/{workflowId}/operations/{operationPosition}";
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", "asdasd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}"));
+    given().pathParam("eventId", "notExists").pathParam("workflowId", "notExists").pathParam("operationPosition", "1")
+            .expect().statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host(path));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("operationPosition", 3)
-            .expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/operations/{operationPosition}")).asString();
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "xxxx").pathParam("operationPosition", "1").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host(path));
+
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "9999").pathParam("operationPosition", "1").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host(path));
+
+    // found but invalid operation position - its null
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "9999").pathParam("operationPosition", "99").expect()
+            .statusCode(HttpStatus.SC_NOT_FOUND).when().get(rt.host(path));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", "1")
+            .pathParam("operationPosition", "1").expect().statusCode(HttpStatus.SC_OK).when().get(rt.host(path))
+            .asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -355,29 +451,34 @@ public class AbstractEventEndpointTest {
   public void testGetEventErrors() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventErrors.json"));
 
-    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().get(rt.host("{eventId}/workflows/{workflowId}/errors"));
+    given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").expect().statusCode(HttpStatus.SC_BAD_REQUEST)
+            .when().get(rt.host("{eventId}/workflows/{workflowId}/errors.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("workflowId", 3).expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/workflows/{workflowId}/errors.json"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors")).asString();
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors.json"))
+            .asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
+  @Ignore
   public void testGetEventError() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventError.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", "asd").pathParam("errorId", "asd").expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
+            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"));
 
     given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", "asd").expect()
             .statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"));
+            .get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"));
 
     String result = given().pathParam("eventId", "asdasd").pathParam("workflowId", 3).pathParam("errorId", 1).expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}"))
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/workflows/{workflowId}/errors/{errorId}.json"))
             .asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
@@ -387,10 +488,27 @@ public class AbstractEventEndpointTest {
   public void testGetEventAccessInformation() throws Exception {
     String eventAccessJson = IOUtils.toString(getClass().getResource("/eventAccess.json"));
 
-    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/access")).asString();
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/access.json"));
 
-    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result));
+    JSONObject result = (JSONObject) new JSONParser().parse(given().pathParam("eventId", "asdasd").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/access.json")).asString());
+
+    // Fix ordering for embedded acl json string
+    String expectedAclString = getAclString(eventAccessJson);
+    String aclString = getAclString(result.toJSONString());
+    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString));
+
+    JSONObject episodeAccess = (JSONObject) result.get("episode_access");
+    episodeAccess.replace("acl", expectedAclString);
+
+    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result.toJSONString()));
+  }
+
+  private String getAclString(String accessJsonString) throws ParseException {
+    JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
+    JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
+    return (String) episodeAccess.get("acl");
   }
 
   @Test
@@ -409,8 +527,8 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testUpdateEventTransition() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect()
-            .statusCode(HttpStatus.SC_NOT_FOUND).when().put(rt.host("{eventId}/transitions/{transitionId}"));
+    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().put(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_BAD_REQUEST)
             .when().put(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).formParam("transition", "adsf").expect()
@@ -423,13 +541,14 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testDeleteEventTransition() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect()
-            .statusCode(HttpStatus.SC_NOT_FOUND).when().delete(rt.host("{eventId}/transitions/{transitionId}"));
+    given().pathParam("eventId", "asdasd").pathParam("transitionId", "adf").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
     given().pathParam("eventId", "asdasd").pathParam("transitionId", 5).expect().statusCode(HttpStatus.SC_NO_CONTENT)
             .when().delete(rt.host("{eventId}/transitions/{transitionId}"));
   }
 
   @Test
+  @Ignore
   public void testGetNewMetadata() throws Exception {
     String eventMetadataString = IOUtils.toString(getClass().getResource("/newEventMetadata.json"));
 
@@ -455,12 +574,27 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  public void testGetNewAccess() throws Exception {
-    String eventAccessString = IOUtils.toString(getClass().getResource("/newEventAccess.json"));
+  public void testApplyAclToEvent() throws Exception {
+    // post nothing
+    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("notExists/access"));
 
-    String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("new/access")).asString();
+    // invalid acl format
+    given().formParam("acl", "INVALID").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+            .post(rt.host("asdasd/access"));
 
-    assertThat(eventAccessString, SameJSONAs.sameJSONAs(result));
+    // post an acl update
+    String acl = "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}";
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("asdasd/access"));
+
+    // post an acl update for an scheduled event
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("asdasd/access"));
+
+    // post an acl update for an archived event
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("archivedid/access"));
+
+    // post an acl update for an workflow event - conflict
+    given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_CONFLICT).when()
+            .post(rt.host("workflowid/access"));
   }
 
   @Test
@@ -477,27 +611,29 @@ public class AbstractEventEndpointTest {
 
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
-    expected = IOUtils.toString(getClass().getResource("/conflicts2.json"));
-    metadataString = IOUtils.toString(getClass().getResource("/conflictRequest2.json"));
-
-    result = given().formParam("metadata", metadataString).expect().statusCode(HttpStatus.SC_CONFLICT).when()
-            .post(rt.host("new/conflicts")).asString();
-
-    assertThat(expected, SameJSONAs.sameJSONAs(result));
   }
 
   @Test
+  @Ignore
   public void testCreateNewTask() throws Exception {
     given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));
     given().formParam("metadata", "asdt").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("task"));
 
     String metadataString = IOUtils.toString(getClass().getResource("/createTasksRequest.json"));
 
-    given().formParam("metadata", metadataString).expect().log().all().statusCode(HttpStatus.SC_CREATED).when()
+    given().formParam("metadata", metadataString).expect().statusCode(HttpStatus.SC_CREATED).when()
             .post(rt.host("task"));
   }
 
-  // TODO test create event
+  @Test
+  public void testCreateNewEvent() throws Exception {
+    // no multipart
+    given().expect().statusCode(HttpStatus.SC_UNSUPPORTED_MEDIA_TYPE).when().post(rt.host("new"));
+
+    // TODO: finish this test
+    given().multiPart("metadata", "some content").expect().statusCode(HttpStatus.SC_CREATED).when()
+            .post(rt.host("new"));
+  }
 
   @Test
   public void testGetEvents() throws Exception {
@@ -523,18 +659,54 @@ public class AbstractEventEndpointTest {
     // 09/17/2015 @ 8:46pm UTC
     long lastCheckinTime = 1442522772000L;
     Recording recording = createRecording(id, lastCheckinTime, RecordingState.CAPTURING);
-    String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.some(recording)));
-    String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\",\"lastCheckInTime\":\"1442522772000\"}";
+    String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.some(recording)));
+    String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\",\"lastCheckInTime\":1442522772000}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
     recording = createRecording(null, 0L, null);
-    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.some(recording)));
-    expected = "{\"lastCheckInTimeUTC\":\"1970-01-01T00:00:00Z\",\"id\":\"\",\"state\":\"\",\"lastCheckInTime\":\"0\"}";
+    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.some(recording)));
+    expected = "{\"lastCheckInTimeUTC\":\"1970-01-01T00:00:00Z\",\"id\":\"\",\"state\":\"\",\"lastCheckInTime\":0}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
-    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.ap(Opt.<Recording> none()));
+    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.<Recording> none()));
     expected = "{}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
+  public void testGetCatalogAdapters() throws Exception {
+    given().expect().statusCode(HttpStatus.SC_OK).when().contentType(ContentType.JSON).body("", hasSize(2))
+            .body("title", hasItems("name 1", "name 2")).get(rt.host("catalogAdapters"));
+  }
+
+  @Test
+  public void testGetPublication() throws Exception {
+    String expected = IOUtils.toString(getClass().getResource("/publication.json"));
+
+    given().pathParam("eventId", "notExists").pathParam("id", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/asset/publication/{id}.json"));
+
+    given().pathParam("eventId", "asdasd").pathParam("id", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND)
+            .when().get(rt.host("{eventId}/asset/publication/{id}.json"));
+
+    String result = given().pathParam("eventId", "asdasd").pathParam("id", "presentation-1").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/asset/publication/{id}.json")).asString();
+
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
+  public void testGetPublicationList() throws Exception {
+    given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+            .get(rt.host("{eventId}/asset/publication/publications.json"));
+
+    String expected = IOUtils.toString(getClass().getResource("/publications.json"));
+
+    String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
+            .contentType(ContentType.JSON).get(rt.host("{eventId}/asset/publication/publications.json")).asString();
+
+    assertThat(expected, SameJSONAs.sameJSONAs(result));
+
   }
 
   @BeforeClass
@@ -550,8 +722,7 @@ public class AbstractEventEndpointTest {
   public static final class TestEnv {
     private AdminUIConfiguration adminUIConfiguration;
     private WorkflowService workflowService;
-    private OpencastArchive archive;
-    private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
+    private AssetManager assetManager;
     private JobEndpoint jobService;
     private AclService aclService;
     private EventCommentService eventCommentService;
@@ -579,20 +750,12 @@ public class AbstractEventEndpointTest {
       this.workflowService = workflowService;
     }
 
-    public OpencastArchive getArchive() {
-      return archive;
+    public AssetManager getAssetManager() {
+      return assetManager;
     }
 
-    public void setArchive(OpencastArchive archive) {
-      this.archive = archive;
-    }
-
-    public HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-      return httpMediaPackageElementProvider;
-    }
-
-    public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-      this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+    public void setAssetManager(AssetManager assetManager) {
+      this.assetManager = assetManager;
     }
 
     public AclService getAclService() {

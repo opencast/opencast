@@ -80,7 +80,7 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
     // make the workflow service replace the variables again. This is
     // necessary to 'propagate' the parameters to the included workflow.
     final Map<String, String> props = $(wi.getConfigurationKeys()).foldl(new HashMap<String, String>(), new Fn2<HashMap<String, String>, String, HashMap<String, String>>() {
-      @Override public HashMap<String, String> ap(HashMap<String, String> sum, String key) {
+      @Override public HashMap<String, String> apply(HashMap<String, String> sum, String key) {
         sum.put(key, wi.getConfiguration(key));
         return sum;
       }

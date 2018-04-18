@@ -5,6 +5,8 @@ CREATE TABLE SEQUENCE (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('SEQ_GEN', 0);
+INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('seq_mh_assets_asset', 0);
+INSERT INTO SEQUENCE(SEQ_NAME, SEQ_COUNT) values ('seq_mh_assets_snapshot', 0);
 
 CREATE TABLE mh_bundleinfo (
   id BIGINT(20) NOT NULL,
@@ -229,18 +231,32 @@ CREATE TABLE mh_incident_text (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE mh_scheduled_event (
-  id BIGINT NOT NULL,
-  mediapackage_id VARCHAR(128),
-  dublin_core TEXT(65535),
-  capture_agent_metadata TEXT(65535),
-  access_control TEXT(65535),
-  opt_out TINYINT(1) NOT NULL DEFAULT '0',
-  blacklisted TINYINT(1) NOT NULL DEFAULT '0',
-  review_status VARCHAR(255) DEFAULT NULL,
-  review_date DATETIME DEFAULT NULL,
-  PRIMARY KEY (id)
+CREATE TABLE mh_scheduled_last_modified (
+  capture_agent_id VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (capture_agent_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_last_modified_last_modified ON mh_scheduled_last_modified (last_modified);
+
+CREATE TABLE mh_scheduled_extended_event (
+  mediapackage_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  PRIMARY KEY (mediapackage_id, organization),
+  CONSTRAINT FK_mh_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_scheduled_transaction (
+  id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  source VARCHAR(255) NOT NULL,
+  last_modified DATETIME NOT NULL,
+  PRIMARY KEY (id, organization),
+  CONSTRAINT UNQ_mh_scheduled_transaction UNIQUE (id, organization, source),
+  CONSTRAINT FK_mh_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE INDEX IX_mh_scheduled_transaction_source ON mh_scheduled_transaction (source);
 
 CREATE TABLE mh_search (
   id VARCHAR(128) NOT NULL,
@@ -267,17 +283,14 @@ CREATE TABLE mh_series (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_oaipmh (
-  id VARCHAR(128) NOT NULL,
+  mp_id VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
   repo_id VARCHAR(255) NOT NULL,
   series_id VARCHAR(128),
   deleted tinyint(1) DEFAULT '0',
   modification_date DATETIME DEFAULT NULL,
   mediapackage_xml TEXT(65535) NOT NULL,
-  series_dublincore_xml TEXT(65535),
-  episode_dublincore_xml TEXT(65535),
-  series_acl_xml TEXT(65535),
-  PRIMARY KEY (id, repo_id, organization),
+  PRIMARY KEY (mp_id, repo_id, organization),
   CONSTRAINT UNQ_mh_oaipmh UNIQUE (modification_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -290,6 +303,21 @@ FOR EACH ROW SET NEW.modification_date = NOW();
 -- set to current date and time on update
 CREATE TRIGGER mh_update_oaipmh_date BEFORE UPDATE ON `mh_oaipmh`
 FOR EACH ROW SET NEW.modification_date = NOW();
+
+CREATE TABLE mh_oaipmh_elements (
+  id INT(20) NOT NULL AUTO_INCREMENT,
+  element_type VARCHAR(16) NOT NULL,
+  flavor varchar(255) NOT NULL,
+  xml TEXT(65535) NOT NULL,
+  mp_id VARCHAR(128) NOT NULL,
+  organization VARCHAR(128) NOT NULL,
+  repo_id VARCHAR(255) NOT NULL,
+  PRIMARY KEY (id),
+  CONSTRAINT FK_mh_oaipmh_elements
+    FOREIGN KEY (mp_id, repo_id, organization)
+    REFERENCES mh_oaipmh (mp_id, repo_id, organization)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE mh_user_session (
   session_id VARCHAR(50) NOT NULL,
@@ -327,48 +355,60 @@ CREATE TABLE mh_oaipmh_harvesting (
   PRIMARY KEY (url)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE mh_archive_asset (
-  id bigint(20) NOT NULL,
-  mediapackageelement varchar(128) NOT NULL,
-  mediapackage varchar(128) NOT NULL,
-  organization varchar(128) NOT NULL,
-  checksum varchar(255) NOT NULL,
-  uri varchar(255) NOT NULL,
-  version bigint(20) NOT NULL,
-  PRIMARY KEY (id),
-  CONSTRAINT UNQ_mh_archive_asset UNIQUE (organization,mediapackage,mediapackageelement,version),
-  CONSTRAINT FK_mh_archive_asset_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+CREATE TABLE mh_assets_snapshot (
+  id BIGINT PRIMARY KEY NOT NULL,
+  archival_date DATETIME NOT NULL,
+  availability VARCHAR(32) NOT NULL,
+  mediapackage_id VARCHAR(128) NOT NULL,
+  mediapackage_xml LONGTEXT NOT NULL,
+  series_id VARCHAR(128),
+  organization_id VARCHAR(128) NOT NULL,
+  owner VARCHAR(256) NOT NULL,
+  version BIGINT NOT NULL,
+  --
+  CONSTRAINT UNQ_mh_assets_snapshot UNIQUE (mediapackage_id, version),
+  CONSTRAINT FK_mh_assets_snapshot_organization FOREIGN KEY (organization_id) REFERENCES mh_organization (id),
+  INDEX IX_mh_assets_snapshot_archival_date (archival_date),
+  INDEX IX_mh_assets_snapshot_mediapackage_id (mediapackage_id),
+  INDEX IX_mh_assets_snapshot_organization_id (organization_id),
+  INDEX IX_mh_assets_snapshot_owner (owner)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX IX_mh_archive_asset_mediapackage on mh_archive_asset (mediapackage);
-CREATE INDEX IX_mh_archive_asset_checksum on mh_archive_asset (checksum);
-CREATE INDEX IX_mh_archive_asset_uri on mh_archive_asset (uri);
-
-CREATE TABLE mh_archive_episode (
-  id varchar(128) NOT NULL,
-  version bigint(20) NOT NULL,
-  organization varchar(128) NOT NULL DEFAULT '',
-  deleted tinyint(1) NOT NULL DEFAULT '0',
-  access_control mediumtext,
-  mediapackage_xml mediumtext,
-  modification_date datetime DEFAULT NULL,
-  PRIMARY KEY (id,version,organization),
-  CONSTRAINT FK_mh_archive_episode_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+CREATE TABLE mh_assets_asset (
+  id BIGINT PRIMARY KEY NOT NULL,
+  snapshot_id BIGINT NOT NULL,
+  checksum VARCHAR(64) NOT NULL,
+  mediapackage_element_id VARCHAR(128) NOT NULL,
+  mime_type VARCHAR(64),
+  size BIGINT NOT NULL,
+  --
+  INDEX IX_mh_assets_asset_checksum (checksum),
+  INDEX IX_mh_assets_asset_mediapackage_element_id (mediapackage_element_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX IX_mh_archive_episode_id on mh_archive_episode (id);
-CREATE INDEX IX_mh_archive_episode_organization on mh_archive_episode (organization);
-CREATE INDEX IX_mh_archive_episode_version on mh_archive_episode (version);
-CREATE INDEX IX_mh_archive_episode_deleted on mh_archive_episode (deleted);
-
-CREATE TABLE mh_archive_version_claim (
-  mediapackage varchar(128) NOT NULL,
-  last_claimed bigint(20) NOT NULL,
-  PRIMARY KEY (mediapackage)
+CREATE TABLE mh_assets_properties (
+  id BIGINT PRIMARY KEY NOT NULL,
+  val_bool TINYINT(1) DEFAULT 0,
+  val_date DATETIME,
+  val_long BIGINT,
+  val_string VARCHAR(255),
+  mediapackage_id VARCHAR(128) NOT NULL,
+  namespace VARCHAR(128) NOT NULL,
+  property_name VARCHAR(128) NOT NULL,
+  --
+  INDEX IX_mh_assets_properties_val_date (val_date),
+  INDEX IX_mh_assets_properties_val_long (val_long),
+  INDEX IX_mh_assets_properties_val_string (val_string),
+  INDEX IX_mh_assets_properties_val_bool (val_bool),
+  INDEX IX_mh_assets_properties_mediapackage_id (mediapackage_id),
+  INDEX IX_mh_assets_properties_namespace (namespace),
+  INDEX IX_mh_assets_properties_property_name (property_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX IX_mh_archive_version_claim_mediapackage on mh_archive_version_claim (mediapackage);
-CREATE INDEX IX_mh_archive_version_claim_last_claimed on mh_archive_version_claim (last_claimed);
+CREATE TABLE mh_assets_version_claim (
+  mediapackage_id VARCHAR(128) PRIMARY KEY NOT NULL,
+  last_claimed BIGINT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- ACL manager
@@ -622,4 +662,16 @@ CREATE TABLE mh_themes (
     watermark_file VARCHAR(128),
     PRIMARY KEY (id),
     CONSTRAINT FK_mh_themes_organization FOREIGN KEY (organization) REFERENCES mh_organization (id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE mh_ibm_watson_transcript_job (
+    id BIGINT(20) NOT NULL,
+    media_package_id VARCHAR(128) NOT NULL,
+    track_id VARCHAR(128) NOT NULL,
+    job_id  VARCHAR(128) NOT NULL,
+    date_created datetime NOT NULL,
+    date_completed datetime DEFAULT NULL,
+    status VARCHAR(128) DEFAULT NULL,
+    track_duration BIGINT NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

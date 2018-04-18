@@ -142,7 +142,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     logger.info("Running Tesseract: {} {}", binary, opts);
     try {
       final int exitCode = ProcessRunner.run(ProcessRunner.mk(binary, opts), fnLogDebug, new Pred<String>() {
-        @Override public Boolean ap(String line) {
+        @Override public Boolean apply(String line) {
           if (!line.trim().startsWith("Page") && !line.trim().startsWith("Tesseract Open Source OCR Engine")) {
             logger.warn(line);
           }
@@ -219,7 +219,7 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
   }
 
   private static final Pred<String> fnLogDebug = new Pred<String>() {
-    @Override public Boolean ap(String s) {
+    @Override public Boolean apply(String s) {
       logger.debug(s);
       return true;
     }

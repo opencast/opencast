@@ -100,7 +100,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     logger.info("Start exporting workflow properties for workflow {}", workflowInstance);
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final Set<String> keys = $(getOptConfig(workflowInstance, KEYS_PROPERTY)).bind(Strings.splitCsv).toSet();
-    final String targetFlavorString = getOptConfig(workflowInstance, TARGET_FLAVOR_PROPERTY).or(DEFAULT_TARGET_FLAVOR);
+    final String targetFlavorString = getOptConfig(workflowInstance, TARGET_FLAVOR_PROPERTY).getOr(DEFAULT_TARGET_FLAVOR);
     final Stream<String> targetTags = $(getOptConfig(workflowInstance, TARGET_TAGS_PROPERTY)).bind(Strings.splitCsv);
     final MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorString);
 

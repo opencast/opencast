@@ -17,6 +17,7 @@
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
       cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   </scr:component>
+
   <scr:component name="org.opencastproject.dataloader.EventsLoader" activate="activate" immediate="true">
     <implementation class="org.opencastproject.dataloader.EventsLoader" />
     <property name="service.description" value="Loads event test data" />
@@ -31,8 +32,8 @@
       cardinality="1..1" policy="static" bind="setSeriesService" />
     <reference name="scheduler-service" interface="org.opencastproject.scheduler.api.SchedulerService"
       cardinality="1..1" policy="static" bind="setSchedulerService" />
-    <reference name="archive" interface="org.opencastproject.archive.api.Archive"
-      cardinality="1..1" policy="static" bind="setArchive" />
+    <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
+      cardinality="1..1" policy="static" bind="setAssetManager" />
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
       cardinality="1..1" policy="static" bind="setSecurityService" />
     <reference name="WorkflowService" interface="org.opencastproject.workflow.api.WorkflowService"

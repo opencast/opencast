@@ -77,4 +77,5 @@ When a user authenticates against Opencast, it is assigned its set of roles that
 2. Directly through membership in groups (ROLE_GROUP_&lt;group name&gt;)
 3. Indirectly through membership in groups (whatever roles have been assigned to the group)
 
-In addition, a special role is assigned that uniquely identifies a user ("user role"). This role is formed like `ROLE_USER_<user login>` and can be determined by evaluating the `role` attribute in the Base API's call to [/info/me](/base-api/#get-apiinfome).
+In addition, a special role is assigned that uniquely identifies a user ("user role"). The user role can be determined by
+evaluating the `userrole` attribute in the Base API's call to [/info/me](base-api/#get-apiinfome).

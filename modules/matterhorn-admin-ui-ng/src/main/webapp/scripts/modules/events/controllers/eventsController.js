@@ -22,9 +22,15 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications',
-    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications) {
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications, ResourceModal, ConfirmationModal, EventHasSnapshotsResource) {
         // Configure the table service
+        $scope.todayFilterValue = function() {
+            var now = new Date();
+            var from = new Date(now.setHours(0, 0, 0, 0)).toISOString();
+            var to = new Date(now.setHours(23, 59, 59, 999)).toISOString();
+            return from + "/" + to;
+        };
         $scope.stats = Stats;
         $scope.stats.configure({
             stats: [
@@ -32,6 +38,10 @@ angular.module('adminNg.controllers')
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
              description: 'DASHBOARD.SCHEDULED'},
+            {filters: [{name: 'startDate',
+                        filter:'FILTERS.EVENTS.START_DATE',
+                        value: $scope.todayFilterValue()}],
+             description: 'DATES.TODAY'},
             {filters: [{name: 'status',
                         filter: 'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.RECORDING'}],
@@ -40,6 +50,10 @@ angular.module('adminNg.controllers')
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING'}],
              description: 'DASHBOARD.RUNNING'},
+            {filters: [{name: 'status',
+                        filter:'FILTERS.EVENTS.STATUS.LABEL',
+                        value: 'EVENTS.EVENTS.STATUS.PAUSED'}],
+             description: 'DASHBOARD.PAUSED'},
             {filters: [{name: 'status',
                         filter:'FILTERS.EVENTS.STATUS.LABEL',
                         value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
@@ -68,18 +82,20 @@ angular.module('adminNg.controllers')
                 name:  'presenter',
                 label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
             }, {
+                template: 'modules/events/partials/eventsSeriesCell.html',
                 name:  'series_name',
                 label: 'EVENTS.EVENTS.TABLE.SERIES'
             }, {
-                name:  'date',
+                name:  'technical_date',
                 label: 'EVENTS.EVENTS.TABLE.DATE'
             }, {
-                name:  'start_date',
+                name:  'technical_start',
                 label: 'EVENTS.EVENTS.TABLE.START'
             }, {
-                name:  'end_date',
+                name:  'technical_end',
                 label: 'EVENTS.EVENTS.TABLE.STOP'
             }, {
+                template: 'modules/events/partials/eventsLocationCell.html',
                 name:  'location',
                 label: 'EVENTS.EVENTS.TABLE.LOCATION'
             }, {
@@ -88,6 +104,7 @@ angular.module('adminNg.controllers')
                 template: 'modules/events/partials/publishedCell.html',
                 dontSort: true
             }, {
+                template: 'modules/events/partials/eventsStatusCell.html',
                 name:  'event_status',
                 label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
             }, {
@@ -108,6 +125,16 @@ angular.module('adminNg.controllers')
                         publication.label = publication.name;
                     }
                 });
+                row.checkedDelete = function() {
+                  EventHasSnapshotsResource.get({id: row.id},function(o) {
+                    if ((angular.isUndefined(row.publications) || row.publications.length <= 0 || !o.hasSnapshots) && !row.has_preview )
+                          // Works, opens simple modal
+                          ConfirmationModal.show('confirm-modal',Table.delete,row);
+                      else
+                          // works, opens retract
+                          ResourceModal.show('retract-published-event-modal',row.id);
+                  });
+                }
             }
         });
 

@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "לא היתה אפשרות לשמור את האירוע",
       "EVENTS_NOT_UPDATED_ID": "לא היתה אפשרות לשמור את האירוע {{ id }}",
       "EVENTS_NOT_UPDATED_ALL": "לא הייתה אפשרות לשמור אף אחד מהאירועים",
+      "EVENTS_PROCESSING_ACTION_RETRY": "מתחיל עיבוד מחדש...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "לא הייתה אפשרות להתחיל עיבוד מחדש.",
+      "EVENTS_PROCESSING_ACTION_NONE": "מפסיק עיבוד...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "לא ניתן היה לעצור את העיבוד.",
       "SERIES_UPDATED_NB": "{{ number }} סדרות עודכנו בהצלחה",
       "SERIES_UPDATED_ALL": "כל הסדרות עודכנו בהצלחה",
       "SERIES_NOT_UPDATED": "לא היתה אפשרות לשמור את הסידרה",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "העלאה",
                   "RECORDING_ELEMENTS": "רכיבי הקלטה",
+                  "RECORDING_METADATA": "הקלטת מטא נתונים",
                   "SEGMENTABLE": {
                      "SHORT": "שקופיות",
                      "DETAIL": "הקובץ מכיל הקלטה של מצגת שקופיות (Keynote, Powerpoint, וכו ')."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "שמע בלבד",
                      "DETAIL": "הקובץ מכיל רק שמע."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "מספר חלקים",
+                     "DETAIL": "קבוצה של קבצים המכילים חלקים שונים של האירוע."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "בחר מהלך עבודה",
                "SELECT_WORKFLOW_EMPTY": "לא נמצא מהלך עבודה",
                "WORKFLOW": "מהלך עבודה"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "האלעת נכסים",
+               "SELECT_TYPE": "בחר סוג נכס",
+               "ADD": "הוסף נכס",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "הערות בכתב יד",
+                  "CAPTIONS_DFXP": "כתוביות DFXP",
+                  "CAPTIONS_WEBVTT": "כתוביות לכבדי שמיעה WebVTT",
+                  "PREVIEW_IMAGE": "תמונת תצוגה מקדימה",
+                  "SMIL": "קטלוג סימלונים",
+                  "TRACK_PARTS": "עקוב אחר חלקים"
+               }
             },
             "ACCESS": {
                "CAPTION": "מדיניות גישה",
@@ -738,7 +760,7 @@
                }
             },
             "SCHEDULING": {
-               "CAPTION": "מצב משתתפים",
+               "CAPTION": "תצורת תיזמון",
                "REVIEW_STATUS": {
                   "CAPTION": "סקור מצב"
                },
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
                "DESCRIPTION": "",
                "ID": "מזהה",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "ברשימה השחורה מ",
             "BLACKLIST_TO": "ברשימה השחורה עד",
             "ACTION": "פעולות"
+         },
+         "DETAILS": {
+            "HEADER": "פרטי מיקום - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "כללי",
+               "CONFIGURATION": "הגדרות",
+               "CAPABILITIES": "יכולות"
+            },
+            "GENERAL": {
+               "CAPTION": "כללי",
+               "NAME": "שם",
+               "URL": "כתובת",
+               "STATUS": "מצב",
+               "UPDATE": "נשמע לאחרונה"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "הגדרות",
+               "NO_CONFIGURATION": "לא סופקו הגדרות"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "יכולות",
+               "NO_CAPABILITIES": "לא סופקו יכולות"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "רץ",
       "FINISHED": "הסתיים",
+      "PAUSED": "מושהה",
       "FAILED": "נכשל",
       "FINISHED_WITH_COMMENTS": "משימות",
       "SCHEDULED": "מתוזמן",

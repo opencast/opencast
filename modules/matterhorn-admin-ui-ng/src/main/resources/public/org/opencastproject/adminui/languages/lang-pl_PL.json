@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "Nie można było zapisać wydarzenia",
       "EVENTS_NOT_UPDATED_ID": "Nie można zapisać zdarzenia {{ id }}",
       "EVENTS_NOT_UPDATED_ALL": "Żadne wydarzenie nie mogło zostać zapisane",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Wznowienie przetwarzania...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Nie można wznowić przetwarzania.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Przerywanie przetwarzania...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Nie udało się przerwać przetwarzania.",
       "SERIES_UPDATED_NB": "Seria {{ number }} została pomyślnie zaktualizowana",
       "SERIES_UPDATED_ALL": "Wszystkie serie zostały pomyślnie zaktualizowane",
       "SERIES_NOT_UPDATED": "Nie udało się zapisać serii",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "Wgraj na serwer",
                   "RECORDING_ELEMENTS": "Elementy nagrywające",
+                  "RECORDING_METADATA": "Informacje o nagraniu",
                   "SEGMENTABLE": {
                      "SHORT": "Slajdy",
                      "DETAIL": "Plik zawiera nagranie prezentacji slajdów (Keynote, Powerpoint itd.)."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "Tylko dźwięk",
                      "DETAIL": "Plik zawiera tylko dźwięk."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Wiele elementów",
+                     "DETAIL": "Zestaw plików tworzących całość wydarzenia."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "Wybierz ciąg zadaniowy",
                "SELECT_WORKFLOW_EMPTY": "Nie znaleziono przepływu pracy",
                "WORKFLOW": "Przepływ pracy"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Napisy",
+               "SELECT_TYPE": "Wybierz typ zasobu",
+               "ADD": "Dodaj zasób",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Materiały uzupełniające",
+                  "CAPTIONS_DFXP": "Napisy w formacie DFXP",
+                  "CAPTIONS_WEBVTT": "Napisy w formacie WebVTT",
+                  "PREVIEW_IMAGE": "Obraz podglądowy",
+                  "SMIL": "Katalog Smil",
+                  "TRACK_PARTS": "Składowe ścieżki"
+               }
             },
             "ACCESS": {
                "CAPTION": "Zasady dostępu",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "Actions",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "",
                "ID": "Identyfikator",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "Na czarnej liście od",
             "BLACKLIST_TO": "Na czarnej liście do",
             "ACTION": "Działania"
+         },
+         "DETAILS": {
+            "HEADER": "Location details - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "General",
+               "CONFIGURATION": "Configuration",
+               "CAPABILITIES": "Capabilities"
+            },
+            "GENERAL": {
+               "CAPTION": "General",
+               "NAME": "Name",
+               "URL": "Url",
+               "STATUS": "Status",
+               "UPDATE": "Last heard from"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Configuration",
+               "NO_CONFIGURATION": "No configuration provided"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Capabilities",
+               "NO_CAPABILITIES": "No capabilities provided"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "W toku",
       "FINISHED": "Zakończone",
+      "PAUSED": "Wstrzymane",
       "FAILED": "Zakończone niepowodzeniem",
       "FINISHED_WITH_COMMENTS": "Do zrobienia",
       "SCHEDULED": "Zaplanowane",

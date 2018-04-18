@@ -38,6 +38,7 @@ angular.module('adminNg.directives')
             };
 
             scope.leaveEditMode = function () {
+                scope.addValue(scope.params.value, scope.value);
                 scope.editMode = false;
                 scope.value = '';
             };

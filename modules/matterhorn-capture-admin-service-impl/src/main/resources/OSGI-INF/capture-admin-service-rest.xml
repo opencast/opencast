@@ -11,4 +11,6 @@
   </service>
   <reference name="service-impl" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
     cardinality="0..1" policy="dynamic" bind="setService" unbind="unsetService" />
+  <reference name="scheduler-service" interface="org.opencastproject.scheduler.api.SchedulerService"
+    cardinality="1..1" policy="static" bind="setSchedulerService" />
 </scr:component>

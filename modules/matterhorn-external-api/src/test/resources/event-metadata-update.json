@@ -10,5 +10,14 @@
   {
     "id": "description",
     "value": ""
+  },
+  {
+    "id": "startDate",
+    "value": "2017-08-12"
+  },
+  {
+    "id": "startTime",
+    "value": "22:22:00Z"
   }
+
 ]

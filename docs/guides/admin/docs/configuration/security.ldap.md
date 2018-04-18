@@ -1,38 +1,54 @@
 LDAP Authentication and Authorization (without CAS)
 ===================================================
 
+---
+
 > *This page describes how to use only an LDAP server to authenticate users in Opencast. If you just want to use LDAP*
 *as an identity provider for another authentication mechanism, such as a CAS server, this guide does not apply to*
 *you.*
 >
 > *You may find the instructions to configure an LDAP-backed CAS server [here](security.cas.md).*
 
+---
 
-Authentication
---------------
+> *The variable `$OPENCAST_ETC` used below stands for the location of Opencast's configuration folder within your*
+*system. Its location varies depending on whether Opencast was installed from source or a packaged version (e.g. RPM)*
+*was used:*
+>
+> * ***Source installation:** The `etc` folder within the directory containing the Opencast code.*
+> * ***Packaged installation:*** A subdirectory of your system's usual configuration directory, most likely*
+> *`/etc/opencast`.*
 
-In order to authenticate your Opencast users using an LDAP server, you must follow the following steps:
+---
+
+
+Set up an LDAP provider
+-----------------------
 
 ### Step 1 ###
 
-In a single-tenant deployment, your `security.xml` file is under `OPENCAST_HOME/security/mh_default_org.xml`. In an
-RPM-based installation, it is located in `/etc/opencast/security/mh_default_org.xml`. You should make a backup copy of
-the file and substitute it by the sample file named `security_sample_ldap.xml-example`. In other words:
+Opencast's `security.xml` files are located in the folder `$OPENCAST_ETC/security`. In a single-tenant deployment, the
+file is named `$OPENCAST_ETC/security/mh_default_org.xml` for the default organization. In a multi-tenant installation,
+or when a non-default organization is used, the file(s) are `$OPENCAST_ETC/security/<organization_id>.xml`.
 
-    $> cd etc/security
+You should make a backup copy of the file and substitute it with the sample file named `security_sample_ldap.xml-example`.
+In other words:
+
+    $> cd $OPENCAST_ETC/security
     $> mv mh_default_org.xml mh_default_org.xml.old
     $> cp security_sample_ldap.xml-example mh_default_org.xml
 
-The sample file should be exactly the same as the default security file, except for the parts only relevant to the
-LDAP. If you have done custom modifications to your security file, make sure to incorporate them to the new file, too.
+The sample file should be exactly the same as the replaced security file, except for the parts only relevant to the
+LDAP which will be discussed below. If you have done custom modifications to your security file, please make sure to
+incorporate them to the new file, too.
+
 
 ### Step 2 ###
 
-Add the necessary configuration values to the LDAP section of the new security file. The comments should be
-self-explanatory.
+Add the necessary configuration values to the LDAP section of the new security file.
 
 The first relevant section defines a context source. This contains the basic login information that enables Opencast to
-request user information to the LDAP server in order to authenticate them.
+request information about users from the LDAP server in order to authenticate them.
 
     <bean id="contextSource"
       class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
@@ -88,79 +104,45 @@ filter. The filter requires three parameters:
 Both methods are not mutually exclusive --i.e. both can be activated at the same time, even though only the first one
 is uncommented in the sample file because it is the most usual.
 
-Authorization
--------------
+The last constructor argument is defined as follows:
 
-Now the system knows all the information necessary to authenticate users against the LDAP, but also need some
-authorization information, to tell which services the user is allowed to use and which resources is allowed to see
-and/or modify.
+    <!-- Defines how the user attributes are converted to authorities (roles) -->
+    <constructor-arg ref="authoritiesPopulator" />
 
-### Step 1 ###
+, which refers to the following definition:
 
-The following snippet in the `security.xml` file provides the necessary information to map LDAP attributes to roles
-during authentication and in single-machine environments.
+    <osgi:reference id="authoritiesPopulator" cardinality="1..1"
+                    interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
+                    filter="(instanceId=theId)"/>
 
-    <constructor-arg>
-      <!-- Get the authorities (roles) according to a certain attribute in the authenticated user -->
-      <bean class="org.opencastproject.kernel.userdirectory.LdapAttributeAuthoritiesPopulator">
-        <constructor-arg>
-          <!-- List of attribute names in the user from which roles will be created -->
-          <!-- The specified attributes must meet few requirements:
-                 * They may be single-valued or multivalued
-                 * They may contain single roles or comma-separated role lists
-    
-               The attributes read will be processed in the following way:
-                 * Whitespace will converted to underscores ("_")
-                 * Sequences of underscores ("_") will be collapsed into a single one.
-          -->
-          <list>
-            <value>attributeName1</value>
-            <value>attributeName2</value>
-          </list>
-        </constructor-arg>
-        <!-- Whether or not to make all the extracted roles uppercase. 'true' by default. -->
-        <!-- <property name="convertToUpperCase" value="true"/> -->
-    
-        <!-- Define a prefix to be appended to every role extracted from the LDAP. -->
-        <!-- The convertToUpperCase property also affects the prefix -->
-        <!-- <property name="rolePrefix" value=""/> -->
-    
-        <!-- Additional roles that will be added to those obtained from the attributes above -->
-        <!-- The convertToUpperCase and rolePrefix properties also affect the roles indicated here-->
-        <!-- <property name="additionalAuthorities">
-          <set>
-            <value>additional_authority_1</value>
-            <value>additional_authority_2</value>
-          </set>
-        </property> -->
-      </bean>
-    </constructor-arg>
+You may edit `theId` to any value, ideally one that is descriptive of the LDAP connection being configured. The same
+value used here must be set as the `org.opencastproject.userdirectory.ldap.id` in the LDAP configuration file described
+below.
 
-As you can see, the sample file is quite self-explanatory: a list of attribute names is provided, each of which will
-contain the roles this user will be assigned to. These attributes may be multivalued (i.e. they may appear several
-times in the user) and/or they may contain a comma-separated list of roles. The syntax of the roles found will be
-checked so that they contain no whitespaces (they will be substituted by underscore characters  -"_"-) and all the
-resulting underscore sequences will be collapsed to a single character. The resulting roles will be converted to
-uppercase and finally assigned to the user.
+### <a name="cfg"></a> Step 3 ###
 
-Apart from the previous processing, a series of properties may be used to further customize the role syntax. In
-particular, a prefix can be defined, which will be appended to every role obtained using the process described above.
-The role capitalisation can also be disabled if desired.
-
-Finally, it is possible to define an additional set of roles that will be appended to the list obtained by inspecting
-the LDAP according to the configuration. In other words, every user will have, at least, the roles defined in this
-list. The roles will be processed in the same way as the roles obtained from the LDAP server.
-
-### Step 2 ###
-
-> *This step is only necessary in Opencast deployments along multiple machines.*
-
-Make a copy of the file `etc/org.opencastproject.userdirectory.ldap.cfg.template` in the same directory and name it as:
+Make a copy of the file `$OPENCAST_ETC/org.opencastproject.userdirectory.ldap.cfg.template` in the same directory and
+rename it as:
 
     org.opencastproject.userdirectory.ldap-<ID>.cfg
 
-, where `<ID>` is a unique indentifier for each LDAP connection. Edit the parameters in the file with the same
-information as in the `security.xml` file. The contents should be self-explanatory.
+, where `<ID>` is a unique identifier for each LDAP connection. This identifier is only use to distinguish between the
+files and is not used internally. It might have any value, but for the sake of clarity, it is recommended to use the
+same value as in the `org.opencastproject.userdirectory.ldap.id` parameter in the file.
+
+
+### Step 4 ###
+
+Edit the parameters in the file with your particular configuration. Unfortunately, some of those are duplicated in the
+`security.xml` file, but this situation cannot currently be avoided.
+
+The parameters that are exclusive to this `.cfg` file control the user authorization, i.e. how the roles obtained from
+the LDAP are handled and assigned to the users. Please refer to the documentation in the file itself to know the meaning
+of these parameters and how to use them.
+
+**IMPORTANT**: The `org.opencastproject.userdirectory.ldap.id` parameter in the file must be configured to the same value
+as the ID of the OSGI reference in the `security.xml` file above (at the end of the step #2).
+
 
 Combination with Existing authorization Mechanisms
 --------------------------------------------------
@@ -181,11 +163,12 @@ appear on the security file. The relevant snippet is this:
 
 By switching the position of the authentication providers, you will give them more or less priority.
 
+
 Adding more LDAP servers
 ------------------------
 
 More LDAP servers can be added to the configuration by including the LDAP-related sections as many times as necessary
-with their corresponding configurations. All the defined authentication providers must be added to the providers list
+with their corresponding configurations. The new authentication providers must also be added to the providers list
 at the bottom of the file. Please see the example below:
 
     <bean id="contextSource"
@@ -198,7 +181,7 @@ at the bottom of the file. Please see the example below:
       <!-- Password of the user above -->
       <property name="password" value="mypassword" />
     </bean>
-    
+
     <bean id="ldapAuthProvider"
       class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
       <constructor-arg>
@@ -227,44 +210,9 @@ at the bottom of the file. Please see the example below:
         </bean>
       </constructor-arg>
       <!-- Defines how the user attributes are converted to authorities (roles) -->
-      <constructor-arg>
-        <!-- Get the authorities (roles) according to a certain attribute in the authenticated user -->
-        <bean class="org.opencastproject.kernel.userdirectory.LdapAttributeAuthoritiesPopulator">
-          <constructor-arg>
-            <!-- List of attribute names in the user from which roles will be created -->
-            <!-- The specified attributes must meet few requirements:
-                   * They may be single-valued or multivalued
-                   * They may contain single roles or comma-separated role lists
-     
-              The attributes read will be processed in the following way:
-                   * Whitespace will converted to underscores ("_")
-                   * Sequences of underscores ("_") will be collapsed into a single one.
-            -->
-            <list>
-              <value>attributeName1</value>
-              <value>attributeName2</value>
-            </list>
-          </constructor-arg>
-          <!-- Whether or not to make all the extracted roles uppercase. 'true' by default. -->
-          <!-- <property name="convertToUpperCase" value="true"/> -->
-    
-          <!-- Define a prefix to be appended to every role extracted from the LDAP. -->
-          <!-- The convertToUpperCase property also affects the prefix -->
-          <!-- <property name="rolePrefix" value=""/> -->
-    
-          <!-- Additional roles that will be added to those obtained from the attributes above -->
-          <!-- The convertToUpperCase and rolePrefix properties also affect the roles indicated here-->
-          <!-- <property name="additionalAuthorities">
-            <set>
-              <value>additional_authority_1</value>
-              <value>additional_authority_2</value>
-            </set>
-          </property>
-          -->
-        </bean>
-      </constructor-arg>
+      <constructor-arg ref="authoritiesPopulator" />
     </bean>
-    
+
     <!-- PLEASE NOTE: The ID below must be changed for each context source instance -->
     <bean id="contextSource2"
       class="org.springframework.security.ldap.DefaultSpringSecurityContextSource">
@@ -272,7 +220,7 @@ at the bottom of the file. Please see the example below:
       <property name="userDn" value="uid=user-id,ou=GroupName,dc=my-institution,dc=country" />
       <property name="password" value="mypassword" />
     </bean>
-    
+
     <!-- PLEASE NOTE: The ID below must be changed for each LDAP authentication provider instance -->
     <bean id="ldapAuthProvider2"
       class="org.springframework.security.ldap.authentication.LdapAuthenticationProvider">
@@ -296,27 +244,22 @@ at the bottom of the file. Please see the example below:
            </property>
          </bean>
       </constructor-arg>
-      <constructor-arg>
-        <bean class="org.opencastproject.kernel.userdirectory.LdapAttributeAuthoritiesPopulator">
-          <constructor-arg>
-            <list>
-              <value>otherAttributeName1</value>
-              <value>otherAttributeName2</value>
-            </list>
-          </constructor-arg>
-       <property name="rolePrefix" value="my_prefix_"/>
-       <property name="additionalAuthorities">
-         <set>
-           <value>default_role_1</value>
-           <value>default_role_2</value>
-         </set>
-       </property>
-        </bean>
-      </constructor-arg>
-    </bean>
-    
+      <!-- Defines how the user attributes are converted to authorities (roles) -->
+      <!-- PLEASE NOTE: the ref below must match the corresponding authoritiesPopulator -->
+      <constructor-arg ref="authoritiesPopulator2" />
+	</bean>
+
     <!-- [ ... SKIPPED LINES ... ] -->
-    
+
+    <osgi:reference id="authoritiesPopulator" cardinality="1..1"
+                    interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
+                    filter="(instanceId=theId)"/>
+    <osgi:reference id="authoritiesPopulator2" cardinality="1..1"
+                    interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
+                    filter="(instanceId=theId2)"/>
+
+    <!-- [ ... SKIPPED LINES ... ] -->
+
     <sec:authentication-manager alias="authenticationManager">
       <sec:authentication-provider user-service-ref="userDetailsService">
         <sec:password-encoder hash="md5">
@@ -327,3 +270,8 @@ at the bottom of the file. Please see the example below:
       <sec:authentication-provider ref="ldapAuthProvider2" />
       <sec:authentication-provider ref="ldapAuthProvider" />
     </sec:authentication-manager>
+
+
+Then, a separate `.cfg` must be generated for each of the configured providers, as explained [here](#cfg). Please make
+sure to configure the `org.opencastproject.userdirectory.ldap.id` parameter correctly. In this case, the values should
+be `theId` and `theId2`, respectively.

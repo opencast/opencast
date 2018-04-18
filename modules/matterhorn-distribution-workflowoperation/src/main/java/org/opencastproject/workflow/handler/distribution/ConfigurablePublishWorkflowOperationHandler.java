@@ -66,7 +66,7 @@ import java.util.UUID;
 
 /**
  * WOH that distributes selected elements to an internal distribution channel and adds reflective publication elements
- *  to the media package.
+ * to the media package.
  */
 
 public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWorkflowOperationHandlerBase {
@@ -142,7 +142,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
    */
   public URI populateUrlWithVariables(String urlPattern, MediaPackage mp, String pubUUID)
           throws WorkflowOperationException {
-    Map<String, Object> values = new HashMap<String, Object>();
+    Map<String, Object> values = new HashMap<>();
     values.put(EVENT_ID_TEMPLATE_KEY, mp.getIdentifier().compact());
     values.put(PUBLICATION_ID_TEMPLATE_KEY, pubUUID);
     String playerPath = securityService.getOrganization().getProperties().get(PLAYER_PROPERTY);
@@ -185,11 +185,11 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       }
     }
 
-    final boolean withPublishedElements = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
-            op.getConfiguration(WITH_PUBLISHED_ELEMENTS)));
+    final boolean withPublishedElements = BooleanUtils
+            .toBoolean(StringUtils.trimToEmpty(op.getConfiguration(WITH_PUBLISHED_ELEMENTS)));
 
-    boolean checkAvailability = BooleanUtils.toBoolean(StringUtils.trimToEmpty(
-            op.getConfiguration(CHECK_AVAILABILITY)));
+    boolean checkAvailability = BooleanUtils
+            .toBoolean(StringUtils.trimToEmpty(op.getConfiguration(CHECK_AVAILABILITY)));
 
     if (getPublications(mp, channelId).size() > 0) {
       final String rePublishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
@@ -197,7 +197,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       switch (rePublishStrategy) {
 
         case ("fail"):
-          //fail is a dummy function for further distribution strategies
+          // fail is a dummy function for further distribution strategies
           fail(mp);
           break;
         case ("merge"):
@@ -234,19 +234,19 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     if (sourceFlavors.length > 0 || sourceTags.length > 0) {
       if (!withPublishedElements) {
         Set<MediaPackageElement> elements = distribute(selector.select(mp, false), mp, channelId, mode,
-            checkAvailability);
+                checkAvailability);
         if (elements.size() > 0) {
           for (MediaPackageElement element : elements) {
-              // Make sure the mediapackage is prompted to create a new identifier for this element
-              element.setIdentifier(null);
-              PublicationImpl.addElementToPublication(publication, element);
+            // Make sure the mediapackage is prompted to create a new identifier for this element
+            element.setIdentifier(null);
+            PublicationImpl.addElementToPublication(publication, element);
           }
         } else {
           logger.info("No element found for distribution in media package '{}'", mp);
           return createResult(mp, Action.CONTINUE);
         }
       } else {
-        List<MediaPackageElement> publishedElements = new ArrayList<MediaPackageElement>();
+        List<MediaPackageElement> publishedElements = new ArrayList<>();
         for (Publication alreadyPublished : mp.getPublications()) {
           publishedElements.addAll(Arrays.asList(alreadyPublished.getAttachments()));
           publishedElements.addAll(Arrays.asList(alreadyPublished.getCatalogs()));
@@ -267,47 +267,48 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return createResult(mp, Action.CONTINUE);
   }
 
-  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements,  MediaPackage mediapackage,
+  private Set<MediaPackageElement> distribute(Collection<MediaPackageElement> elements, MediaPackage mediapackage,
           String channelId, String mode, boolean checkAvailability) throws WorkflowOperationException {
 
-    Set<MediaPackageElement> result = new HashSet<MediaPackageElement>();
+    Set<MediaPackageElement> result = new HashSet<>();
 
-    Set<String> bulkElementIds = new HashSet<String>();
-    Set<String> singleElementIds = new HashSet<String>();
+    Set<String> bulkElementIds = new HashSet<>();
+    Set<String> singleElementIds = new HashSet<>();
 
     for (MediaPackageElement element : elements) {
-      if (MODE_BULK.equals(mode) || (MODE_MIXED.equals(mode) && (element.getElementType() != MediaPackageElement.Type.Track))) {
+      if (MODE_BULK.equals(mode)
+              || (MODE_MIXED.equals(mode) && (element.getElementType() != MediaPackageElement.Type.Track))) {
         bulkElementIds.add(element.getIdentifier());
       } else {
         singleElementIds.add(element.getIdentifier());
       }
     }
 
-    Set<Job> jobs = new HashSet<Job>();
+    Set<Job> jobs = new HashSet<>();
     if (bulkElementIds.size() > 0) {
       logger.info("Start bulk publishing of {} elements of media package '{}' to publication channel '{}'",
-          new Object[] { bulkElementIds.size(), mediapackage, channelId });
+              bulkElementIds.size(), mediapackage, channelId);
       try {
         Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
         jobs.add(job);
       } catch (DistributionException | MediaPackageException e) {
         logger.error("Creating the distribution job for {} elements of media package '{}' failed: {}",
-                new Object[] { bulkElementIds.size(), mediapackage, getStackTrace(e) });
+                bulkElementIds.size(), mediapackage, getStackTrace(e));
         throw new WorkflowOperationException(e);
       }
     }
     if (singleElementIds.size() > 0) {
       logger.info("Start single publishing of {} elements of media package '{}' to publication channel '{}'",
-          new Object[] { singleElementIds.size(), mediapackage, channelId });
+              singleElementIds.size(), mediapackage, channelId);
       for (String elementId : singleElementIds) {
         try {
-            Job job = distributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
-            jobs.add(job);
-          } catch (DistributionException | MediaPackageException e) {
-            logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}",
-                    new Object[] { elementId, mediapackage, getStackTrace(e) });
-            throw new WorkflowOperationException(e);
-          }
+          Job job = distributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
+          jobs.add(job);
+        } catch (DistributionException | MediaPackageException e) {
+          logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}", elementId,
+                  mediapackage, getStackTrace(e));
+          throw new WorkflowOperationException(e);
+        }
       }
     }
 
@@ -320,8 +321,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           List<? extends MediaPackageElement> elems = MediaPackageElementParser.getArrayFromXml(job.getPayload());
           result.addAll(elems);
         } catch (MediaPackageException e) {
-          logger.error("Job '{}' returned payload ({}) that could not be parsed to media package elements: {}",
-                  new Object[] { job, job.getPayload(), ExceptionUtils.getStackTrace(e) });
+          logger.error("Job '{}' returned payload ({}) that could not be parsed to media package elements: {}", job,
+                  job.getPayload(), ExceptionUtils.getStackTrace(e));
           throw new WorkflowOperationException(e);
         }
       }
@@ -331,11 +332,12 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
     return result;
   }
 
-/**
- * Dummy function for further publication strategies
- * @param mp
- * @throws WorkflowOperationException
- */
+  /**
+   * Dummy function for further publication strategies
+   *
+   * @param mp
+   * @throws WorkflowOperationException
+   */
   private void fail(MediaPackage mp) throws WorkflowOperationException {
     logger.error("There is already a Published Media, fail Stragy for Mediapackage {}", mp.getIdentifier());
     throw new WorkflowOperationException("There is already a Published Media, fail Stragy for Mediapackage ");

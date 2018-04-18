@@ -24,6 +24,8 @@ import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
 import static org.opencastproject.publication.api.OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX;
+import static org.opencastproject.util.OsgiUtil.getOptCfg;
+import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -33,15 +35,22 @@ import org.opencastproject.job.api.JobBarrier.Result;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.series.SeriesItem;
+import org.opencastproject.metadata.api.MediaPackageMetadata;
+import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
+import org.opencastproject.oaipmh.persistence.Query;
 import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -55,17 +64,38 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.List;
 
-public class OaiPmhUpdatedEventHandler {
+public class OaiPmhUpdatedEventHandler implements ManagedService {
+
+  // config keys
+  private static final String CFG_PROPAGATE_EPISODE = "propagate.episode";
+  private static final String CFG_FLAVORS = "flavors";
+  private static final String CFG_TAGS = "tags";
+
+  /** Whether to propagate episode meta data changes to OAI-PMH or not */
+  private boolean propagateEpisode = false;
+
+  /** List of flavors to redistribute */
+  private List<MediaPackageElementFlavor> flavors = new ArrayList<>();
+
+  /** List of tags to redistribute */
+  private List<String> tags = new ArrayList<>();
 
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(OaiPmhUpdatedEventHandler.class);
@@ -212,12 +242,21 @@ public class OaiPmhUpdatedEventHandler {
         }
 
         // Update the series dublin core
-        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
-          DublinCoreCatalog seriesDublinCore = seriesItem.getSeries();
-          mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+        if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())
+                || SeriesItem.Type.UpdateElement.equals(seriesItem.getType())) {
+          DublinCoreCatalog seriesDublinCore = null;
+          MediaPackageElementFlavor catalogType = null;
+          if (SeriesItem.Type.UpdateCatalog.equals(seriesItem.getType())) {
+            seriesDublinCore = seriesItem.getMetadata();
+            mp.setSeriesTitle(seriesDublinCore.getFirst(DublinCore.PROPERTY_TITLE));
+            catalogType = MediaPackageElements.SERIES;
+          } else {
+            seriesDublinCore = seriesItem.getExtendedMetadata();
+            catalogType = MediaPackageElementFlavor.flavor(seriesItem.getElementType(), "series");
+          }
 
           // Update the series dublin core
-          Catalog[] seriesCatalogs = mp.getCatalogs(MediaPackageElements.SERIES);
+          Catalog[] seriesCatalogs = mp.getCatalogs(catalogType);
           if (seriesCatalogs.length == 1) {
             Catalog c = seriesCatalogs[0];
             String filename = FilenameUtils.getName(c.getURI().toString());
@@ -258,17 +297,17 @@ public class OaiPmhUpdatedEventHandler {
         oaiPmhPersistence.store(mp, item.getRepository());
       }
     } catch (ServiceRegistryException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (NotFoundException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (MediaPackageException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (IOException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (DistributionException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } catch (OaiPmhDatabaseException e) {
-      logger.warn(e.getMessage());
+      logger.error(e.getMessage());
     } finally {
       securityService.setOrganization(prevOrg);
       securityService.setUser(prevUser);
@@ -321,4 +360,117 @@ public class OaiPmhUpdatedEventHandler {
     return true;
   }
 
+  public void handleEvent(AssetManagerItem.TakeSnapshot snapshotItem) {
+    if (!propagateEpisode) {
+      logger.trace("Skipping automatic propagation of episode meta data to OAI-PMH since it is turned off.");
+      return;
+    }
+
+    //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
+    logger.debug("Handling {}", snapshotItem);
+
+    // We must be an administrative user to make a query to the OaiPmhPublicationService
+    final User prevUser = securityService.getUser();
+    final Organization prevOrg = securityService.getOrganization();
+
+    try {
+      securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
+      Query query = QueryBuilder.query().mediaPackageId(snapshotItem.getMediapackage()).build();
+      SearchResult result = oaiPmhPersistence.search(query);
+      if (result.getItems().size() > 1) {
+        logger.error("Found multiple ({}) OAI-PMH records for media package: {}", result.getItems().size(),
+            snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+      if (result.getItems().size() < 1) {
+        logger.trace("There is no OAI-PMH record to update for media package {}. Skipping.",
+            snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+
+      if (result.getItems().get(0).isDeleted()) {
+        logger.trace("This OAI-PMH record has been deleted {}. Skipping.",
+                snapshotItem.getMediapackage().getIdentifier());
+        return;
+      }
+
+      SearchResultItem item = result.getItems().get(0);
+      MediaPackage repoMp = item.getMediaPackage(); // This is the media package from OAI-PMH which has to be updated.
+
+      // distribute all changed elements of media package.
+      MediaPackage newMp = snapshotItem.getMediapackage();
+      for (MediaPackageElement mpe : newMp.elements()) {
+        if (mpe instanceof Publication || !containsFlavor(flavors, mpe.getFlavor()) || !containsTag(tags, mpe.getTags())) {
+          continue;
+        }
+        Job distributionJob = distributionService.distribute(PUBLICATION_CHANNEL_PREFIX.concat(item.getRepository()),
+                newMp, mpe.getIdentifier());
+        JobBarrier barrier = new JobBarrier(null, serviceRegistry, distributionJob);
+        Result jobResult = barrier.waitForJobs();
+        if (jobResult.getStatus().get(distributionJob).equals(FINISHED)) {
+          MediaPackageElement distributedElement = getFromXml(serviceRegistry.getJob(distributionJob.getId()).getPayload());
+          MediaPackageElement toRemove = (MediaPackageElement) distributedElement.clone();
+          toRemove.setIdentifier(null); // We cannot use id here because it differs when package is published initially.
+          repoMp.remove(toRemove);
+          repoMp.add(distributedElement);
+        } else {
+          logger.error("Unable to distribute media package element {}", mpe.getIdentifier());
+        }
+      }
+
+      // We now apply the new meta data to the media package
+      final MediaPackageMetadata metadata = dublinCoreService.getMetadata(newMp);
+      MediaPackageMetadataSupport.populateMediaPackageMetadata(repoMp, metadata);
+      repoMp.setSeries(newMp.getSeries());
+      repoMp.setSeriesTitle(newMp.getSeriesTitle());
+
+      // Update the OAI-PMH persistence with the updated mediapackage
+      oaiPmhPersistence.store(repoMp, item.getRepository());
+    } catch (DistributionException | MediaPackageException | ServiceRegistryException | OaiPmhDatabaseException
+        | NotFoundException e) {
+      logger.error(e.getMessage());
+    } finally {
+      securityService.setOrganization(prevOrg);
+      securityService.setUser(prevUser);
+    }
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
+    this.flavors = new ArrayList<>();
+    this.tags = new ArrayList<>();
+
+    final Option<Boolean> propagateEpisode = getOptCfgAsBoolean(dictionary, CFG_PROPAGATE_EPISODE);
+    if (propagateEpisode.isSome()) {
+      this.propagateEpisode = propagateEpisode.get();
+    }
+
+    final Option<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
+    if (flavorsRaw.isSome()) {
+      final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
+      for (String flavorString : flavorStrings) {
+        flavors.add(MediaPackageElementFlavor.parseFlavor(flavorString));
+      }
+    }
+
+    final Option<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
+    if (tagsRaw.isSome()) {
+      final String[] tags = tagsRaw.get().split("\\s*,\\s*");
+      this.tags.addAll(Arrays.asList(tags));
+    }
+  }
+
+  private static boolean containsFlavor(List<MediaPackageElementFlavor> flavors, MediaPackageElementFlavor flavor) {
+    for (MediaPackageElementFlavor current : flavors) {
+      if (current.matches(flavor)) return true;
+    }
+    return flavors.isEmpty();
+  }
+
+  private static boolean containsTag(List<String> tags, String[] mpeTags) {
+    for (String current : mpeTags) {
+      if (tags.contains(current)) return true;
+    }
+    return tags.isEmpty();
+  }
 }

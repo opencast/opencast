@@ -33,7 +33,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.endpoint.ToolsEndpoint.EditingInfo;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
-import org.opencastproject.archive.api.Archive;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -97,7 +97,7 @@ public class ToolsEndpointTest {
     EasyMock.expect(param3.getId()).andReturn("param-1bd5e839-0a74-4310-b1d2-daba07914f79").anyTimes();
     EasyMock.replay(param1, param2, param3);
 
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(param1);
     params.add(param2);
     params.add(param3);
@@ -107,7 +107,7 @@ public class ToolsEndpointTest {
     EasyMock.expect(group1.getId()).andReturn(trackParamGroupId).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
@@ -146,13 +146,13 @@ public class ToolsEndpointTest {
     EasyMock.expect(object4.getSrc()).andReturn(new URI(trackSrc)).anyTimes();
     EasyMock.replay(object4);
 
-    List<SmilMediaObject> objects1 = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects1 = new ArrayList<>();
     objects1.add(object1);
-    List<SmilMediaObject> objects2 = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects2 = new ArrayList<>();
     objects2.add(object2);
-    List<SmilMediaObject> objects3 = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects3 = new ArrayList<>();
     objects3.add(object3);
-    List<SmilMediaObject> objects4 = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects4 = new ArrayList<>();
     objects4.add(object4);
 
     SmilMediaContainer objectContainer1 = EasyMock.createNiceMock(SmilMediaContainer.class);
@@ -179,7 +179,7 @@ public class ToolsEndpointTest {
     EasyMock.expect(objectContainer4.getElements()).andReturn(objects4).anyTimes();
     EasyMock.replay(objectContainer4);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer1);
     containerObjects.add(objectContainer2);
     containerObjects.add(objectContainer3);
@@ -210,7 +210,7 @@ public class ToolsEndpointTest {
     endpoint.setSmilService(smilService);
 
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<String, String>();
+    Hashtable<String, String> dictionary = new Hashtable<>();
     dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, "preview");
     dictionary.put(AdminUIConfiguration.OPT_WAVEFORM_SUBTYPE, "waveform");
     dictionary.put(AdminUIConfiguration.OPT_SMIL_CATALOG_FLAVOR, "smil/cutting");
@@ -251,8 +251,8 @@ public class ToolsEndpointTest {
   @Test
   public void testEditingInfoParse() throws Exception {
     JSONParser parser = new JSONParser();
-    final EditingInfo editingInfo = ToolsEndpoint.EditingInfo.parse((JSONObject) parser.parse(IOUtils
-            .toString(getClass().getResourceAsStream("/tools/POST-editor.json"))));
+    final EditingInfo editingInfo = ToolsEndpoint.EditingInfo.parse(
+            (JSONObject) parser.parse(IOUtils.toString(getClass().getResourceAsStream("/tools/POST-editor.json"))));
 
     final List<Tuple<Long, Long>> segments = editingInfo.getConcatSegments();
     assertEquals(4, segments.size());
@@ -275,14 +275,14 @@ public class ToolsEndpointTest {
     final String smilId = "s-afe311c6-9161-41f4-98d0-e951fe66d89e";
 
     Workspace workspace = createNiceMock(Workspace.class);
-    expect(workspace.put(same(mpId), same(smilId), same("cut.smil"), anyObject(InputStream.class))).andReturn(
-            archiveElementURI);
+    expect(workspace.put(same(mpId), same(smilId), same("cut.smil"), anyObject(InputStream.class)))
+            .andReturn(archiveElementURI);
     replay(workspace);
     endpoint.setWorkspace(workspace);
 
-    Archive<?> archive = createNiceMock(Archive.class);
-    replay(archive);
-    endpoint.setArchive(archive);
+    AssetManager assetManager = createNiceMock(AssetManager.class);
+    replay(assetManager);
+    endpoint.setAssetManager(assetManager);
 
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(new IdImpl(mpId));
 

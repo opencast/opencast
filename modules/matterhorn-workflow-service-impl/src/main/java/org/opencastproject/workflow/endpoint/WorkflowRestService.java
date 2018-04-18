@@ -46,7 +46,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.systems.MatterhornConstants;
 import org.opencastproject.util.LocalHashMap;
-import org.opencastproject.util.MultiResourceLock;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.util.UrlSupport;
@@ -77,7 +76,7 @@ import org.opencastproject.workflow.impl.WorkflowServiceImpl;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.FnX;
+import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -97,6 +96,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -134,6 +134,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   public static final String DESCENDING_SUFFIX = "_DESC";
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowRestService.class);
+
   /** The default server URL */
   protected String serverUrl = UrlSupport.DEFAULT_BASE_URL;
   /** The default service URL */
@@ -146,7 +147,7 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   private Workspace workspace;
 
   /** Resource lock */
-  private final MultiResourceLock lock = new MultiResourceLock();
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
 
   /**
    * Callback from the OSGi declarative services to set the service registry.
@@ -688,53 +689,53 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     } else {
       map = properties.getMap();
     }
-    return lock.synchronize(workflowInstanceId, new FnX<Long, Response>() {
-      @Override
-      public Response apx(Long workflowInstanceId) throws Exception {
-        try {
-          WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
-          if (!WorkflowState.PAUSED.equals(workflow.getState())) {
-            logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
-            return Response.status(Status.CONFLICT).build();
-          }
-
-          if (mediaPackage != null) {
-            MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
-            MediaPackage oldMp = workflow.getMediaPackage();
-
-            // Delete removed elements from workspace
-            for (MediaPackageElement elem : oldMp.getElements()) {
-              if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
-                continue;
-              try {
-                workspace.delete(elem.getURI());
-                logger.info("Deleted removed mediapackge element {}", elem);
-              } catch (NotFoundException e) {
-                logger.info("Removed mediapackage element {} is already deleted", elem);
-              }
-            }
-
-            workflow.setMediaPackage(newMp);
-            service.update(workflow);
-          }
-          workflow = service.resume(workflowInstanceId, map);
-          return Response.ok(workflow).build();
-        } catch (NotFoundException e) {
-          return Response.status(Status.NOT_FOUND).build();
-        } catch (UnauthorizedException e) {
-          return Response.status(Status.UNAUTHORIZED).build();
-        } catch (IllegalStateException e) {
-          logger.warn(ExceptionUtils.getMessage(e));
-          return Response.status(Status.CONFLICT).build();
-        } catch (WorkflowException e) {
-          logger.error(ExceptionUtils.getMessage(e), e);
-          return Response.serverError().build();
-        } catch (Exception e) {
-          logger.error(ExceptionUtils.getMessage(e), e);
-          return Response.serverError().build();
-        }
+    final Lock lock = this.lock.get(workflowInstanceId);
+    lock.lock();
+    try {
+      WorkflowInstance workflow = service.getWorkflowById(workflowInstanceId);
+      if (!WorkflowState.PAUSED.equals(workflow.getState())) {
+        logger.warn("Can not resume workflow '{}', not in state paused but {}", workflow, workflow.getState());
+        return Response.status(Status.CONFLICT).build();
       }
-    });
+
+      if (mediaPackage != null) {
+        MediaPackage newMp = MediaPackageParser.getFromXml(mediaPackage);
+        MediaPackage oldMp = workflow.getMediaPackage();
+
+        // Delete removed elements from workspace
+        for (MediaPackageElement elem : oldMp.getElements()) {
+          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+            continue;
+          try {
+            workspace.delete(elem.getURI());
+            logger.info("Deleted removed mediapackge element {}", elem);
+          } catch (NotFoundException e) {
+            logger.info("Removed mediapackage element {} is already deleted", elem);
+          }
+        }
+
+        workflow.setMediaPackage(newMp);
+        service.update(workflow);
+      }
+      workflow = service.resume(workflowInstanceId, map);
+      return Response.ok(workflow).build();
+    } catch (NotFoundException e) {
+      return Response.status(Status.NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.UNAUTHORIZED).build();
+    } catch (IllegalStateException e) {
+      logger.warn(ExceptionUtils.getMessage(e));
+      return Response.status(Status.CONFLICT).build();
+    } catch (WorkflowException e) {
+      logger.error(ExceptionUtils.getMessage(e), e);
+      return Response.serverError().build();
+    } catch (Exception e) {
+      logger.error(ExceptionUtils.getMessage(e), e);
+      return Response.serverError().build();
+    }
+    finally {
+      lock.unlock();
+    }
   }
 
   @POST

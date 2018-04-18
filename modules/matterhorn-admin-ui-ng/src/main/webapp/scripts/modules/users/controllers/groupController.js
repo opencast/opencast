@@ -101,6 +101,10 @@ angular.module('adminNg.controllers')
           }
         };
 
+        $scope.getSubmitButtonState = function () {
+          return $scope.groupForm.$valid ? 'active' : 'disabled';
+        };
+
         reloadRoles();
         AuthService.getUser().$promise.then(function(current_user) {
           reloadUsers(current_user);

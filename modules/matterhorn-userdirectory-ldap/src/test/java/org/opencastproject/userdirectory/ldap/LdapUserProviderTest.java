@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.ldap;
 
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.User;
 
 import org.junit.Assert;
@@ -37,9 +36,10 @@ public class LdapUserProviderTest {
 
   @Before
   public void setUp() throws Exception {
-    service = new LdapUserProviderInstance("sample_pid", new DefaultOrganization(), "ou=people,dc=berkeley,dc=edu",
-            "(uid={0})", "ldap://ldap.berkeley.edu", null, null, "berkeleyEduAffiliations,departmentNumber", null, 100,
-            10, null);
+    /*
+     * service = new LdapUserProviderInstance("sample_pid", new DefaultOrganization(), "ou=people,dc=berkeley,dc=edu",
+     * "(uid={0})", "ldap://ldap.berkeley.edu", null, null, "berkeleyEduAffiliations,departmentNumber", null, 100, 10);
+     */
   }
 
   @Ignore("Ignore this test by default, since it requires internet connectivity, and the user's details may change.")

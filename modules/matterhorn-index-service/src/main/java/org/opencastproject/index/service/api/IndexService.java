@@ -75,8 +75,11 @@ public interface IndexService {
    *
    * @param id
    *          the group id
+   * @param index
+   *          the index to search
    * @return a group or none if not found wrapped in an option
    * @throws SearchIndexException
+   *           Thrown if the index cannot be read
    */
   Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException;
 
@@ -95,6 +98,9 @@ public interface IndexService {
    *          A comma separated list of roles to add to this group.
    * @param members
    *          A comma separated list of roles to add to this group.
+   * @return The Response from the update
+   * @throws NotFoundException
+   *           Thrown if the group was not found
    */
   Response updateGroup(String id, String name, String description, String roles, String members)
           throws NotFoundException;
@@ -110,6 +116,7 @@ public interface IndexService {
    *          A comma separated list of roles to add to this group.
    * @param members
    *          A comma separated list of members to add to this group.
+   * @return The Response from the update
    */
   Response createGroup(String name, String description, String roles, String members);
 
@@ -122,6 +129,7 @@ public interface IndexService {
    *          The index to get the event from.
    * @return an event or none if not found wrapped in an option
    * @throws SearchIndexException
+   *           Thrown if the index cannot be read
    */
   Opt<Event> getEvent(String id, AbstractSearchIndex index) throws SearchIndexException;
 
@@ -194,8 +202,41 @@ public interface IndexService {
    * @param id
    *          The id for the event to remove.
    * @return true if the event was found and removed.
+   * @throws NotFoundException
+   *           Thrown if the group was not found
+   * @throws UnauthorizedException
+   *           Thrown if the action is unauthorized
    */
   boolean removeEvent(String id) throws NotFoundException, UnauthorizedException;
+
+  /**
+   * Create or Update an existing event asset.
+   *
+   * The request contains a JSON describing asset type,
+   *  flavor, subflavor, the mpId, a workflow description id to initiate on the event,
+   *  and the asset file streams in a multipart form.
+   *  Existing type-flavor matches are updated, otherwise the asset is added.
+   *
+   * @param request
+   *          The http servlet request containing metadata, workflow id, and file streams
+   * @param mp
+   *          The mediapackage to update
+   * @return the workflow instance id that was started
+   * @throws ParseException
+   *           Thrown if unable to parse the start and end UTC date and time.
+   * @throws IOException
+   *           Thrown if unable to update the event's DublinCoreCatalog
+   * @throws MediaPackageException
+   *           Thrown if unable to update the event's {@link MediaPackage}
+   * @throws NotFoundException
+   *           Thrown if the specified workflow definition cannot be found.
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to create the new event.
+   * @throws IndexServiceException
+   *            Thrown if the update assets workflow cannot be started
+   */
+  String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws ParseException, IOException,
+          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException;
 
   /**
    * Update an event's metadata using a {@link MetadataList}
@@ -233,6 +274,8 @@ public interface IndexService {
    *           Thrown if the metadata was not formatted correctly.
    * @throws IndexServiceException
    *           Thrown if there was an error updating the event.
+   * @throws SearchIndexException
+   *           Thrown if there was an error searching the search index.
    * @throws NotFoundException
    *           Thrown if the {@link Event} could not be found.
    * @throws UnauthorizedException
@@ -256,6 +299,8 @@ public interface IndexService {
    *           Thrown if the metadata was not formatted correctly.
    * @throws IndexServiceException
    *           Thrown if there was an error updating the event.
+   * @throws SearchIndexException
+   *           Thrown if there was an error searching the search index.
    * @throws NotFoundException
    *           Thrown if the {@link Event} could not be found.
    * @throws UnauthorizedException
@@ -276,6 +321,8 @@ public interface IndexService {
    *           Thrown if there was a problem getting the catalog for the event.
    * @throws NotFoundException
    *           Thrown if unable to find a catalog that matches the flavor.
+   * @throws UnauthorizedException
+   *           Thrown if the action is unauthorized.
    */
   void removeCatalogByFlavor(Event event, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException, UnauthorizedException;
@@ -295,15 +342,19 @@ public interface IndexService {
    *           already distributed it.
    * @throws IndexServiceException
    *           Thrown if there was a problem updating the ACL for an event.
+   * @throws SearchIndexException
+   *           Thrown if there was an error searching the search index.
    * @throws NotFoundException
    *           Thrown if the event cannot be found to update.
+   * @throws UnauthorizedException
+   *           Thrown if the action is unauthorized.
    */
   AccessControlList updateEventAcl(String id, AccessControlList acl, AbstractSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint.
-  Opt<MediaPackage> getEventMediapackage(Event event) throws IndexServiceException;
+  MediaPackage getEventMediapackage(Event event) throws IndexServiceException;
 
   // TODO remove when it is no longer needed by AbstractEventEndpoint
   Source getEventSource(Event event);
@@ -339,6 +390,7 @@ public interface IndexService {
    *          the abstract search index
    * @return a series or none if not found wrapped in an option
    * @throws SearchIndexException
+   *           Thrown if there is an error when using the search index.
    */
   Opt<Series> getSeries(String seriesId, AbstractSearchIndex searchIndex) throws SearchIndexException;
 
@@ -357,6 +409,21 @@ public interface IndexService {
    */
   String createSeries(String metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
 
+  /**
+   * Create a series from a set of metadata and options.
+   *
+   * @param metadataList
+   *          The metadata for the series
+   * @param options
+   *          Options for the series
+   * @param optAcl
+   *          ACLs for the series
+   * @param optThemeId
+   *          Themes for the series
+   * @return The series id.
+   * @throws IndexServiceException
+   *           Thrown if there are issues with processing the request.
+   */
   String createSeries(MetadataList metadataList, Map<String, String> options, Opt<AccessControlList> optAcl,
           Opt<Long> optThemeId) throws IndexServiceException;
 
@@ -365,6 +432,12 @@ public interface IndexService {
    *
    * @param id
    *          The id of the series to remove.
+   * @throws NotFoundException
+   *           Thrown if the series is not found
+   * @throws SeriesException
+   *           Thrown if an error removing the series
+   * @throws UnauthorizedException
+   *           Thrown if the activity is unauthorized
    */
   void removeSeries(String id) throws NotFoundException, SeriesException, UnauthorizedException;
 
@@ -387,6 +460,14 @@ public interface IndexService {
    *          Whether the event should be moved into opted out.
    * @param index
    *          The index to update the event in.
+   * @throws NotFoundException
+   *           Thrown if the event could not be found.
+   * @throws SchedulerException
+   *           Thrown if there was an error in the scheduler service
+   * @throws SearchIndexException
+   *           Thrown if there was and error in search index
+   * @throws UnauthorizedException
+   *           Thrown if the current user is unable to update the event.
    */
   void changeOptOutStatus(String eventId, boolean optout, AbstractSearchIndex index)
           throws NotFoundException, SchedulerException, SearchIndexException, UnauthorizedException;
@@ -462,10 +543,10 @@ public interface IndexService {
    *          The series to remove the catalog from.
    * @param flavor
    *          The flavor that will match the catalog.
+   * @throws IndexServiceException
+   *           Thrown if there was an error reading the given event.
    * @throws NotFoundException
    *           Thrown if the catalog cannot be found.
-   * @throws IllegalArgumentException
-   *           Thrown if the series or flavor is null.
    */
   void removeCatalogByFlavor(Series series, MediaPackageElementFlavor flavor)
           throws IndexServiceException, NotFoundException;
@@ -484,5 +565,12 @@ public interface IndexService {
    *           Thrown if there was an error reading the given event.
    */
   boolean hasActiveTransaction(String eventId) throws NotFoundException, UnauthorizedException, IndexServiceException;
+
+  /**
+   * Checks if the given event has snapshots
+   * @param eventId the event to check
+   * @return <code>true</code> if the event has snapshots, <code>false</code> otherwise
+   */
+  boolean hasSnapshots(String eventId);
 
 }

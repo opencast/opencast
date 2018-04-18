@@ -28,7 +28,7 @@
       "SPANISH":"Spanish",
       "ROMANSH":"Romansh",
       "POLISH":"Polish",
-      "PORTUGESE":"Portugese",
+      "PORTUGESE":"Portuguese",
       "SLOVENIAN":"Slovenian",
       "SWEDISH":"Swedish",
       "RUSSIAN":"Russian",
@@ -103,6 +103,10 @@
      "EVENTS_NOT_UPDATED":  "The event could not be saved",
      "EVENTS_NOT_UPDATED_ID":  "The event {{ id }} could not be saved",
      "EVENTS_NOT_UPDATED_ALL":  "None of the events could be saved",
+     "EVENTS_PROCESSING_ACTION_RETRY": "Processing being resumed...",
+     "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Processing could not be resumed.",
+     "EVENTS_PROCESSING_ACTION_NONE": "Processing being aborted...",
+     "EVENTS_PROCESSING_ACTION_NOT_NONE": "Processing could not be aborted.",
      "SERIES_UPDATED_NB":   "{{ number }} series have been successfully updated",
      "SERIES_UPDATED_ALL":   "All series have been successfully updated",
      "SERIES_NOT_UPDATED":  "The series could not be saved",
@@ -354,6 +358,7 @@
            "UPLOAD": {
                "CAPTION": "Upload",
                "RECORDING_ELEMENTS": "Recording elements",
+               "RECORDING_METADATA": "Recording metadata",
                "SEGMENTABLE": {
                    "SHORT" : "Slides",
                    "DETAIL": "The file contains a recording of a slide presentation (Keynote, Powerpoint, etc)."
@@ -365,6 +370,10 @@
                "AUDIO_ONLY": {
                    "SHORT": "Audio only",
                    "DETAIL": "The file contains only audio."
+               },
+               "MULTIPLE_PARTS": {
+                   "SHORT": "Multiple parts",
+                   "DETAIL": "A set of files containing different parts of the event."
                }
            },
            "DATE_TIME": {
@@ -391,6 +400,19 @@
            "SELECT_WORKFLOW": "Select workflow",
            "SELECT_WORKFLOW_EMPTY": "No workflow found",
            "WORKFLOW": "Workflow"
+         },
+         "UPLOAD_ASSET": {
+           "CAPTION": "Asset Upload",
+           "SELECT_TYPE": "Select asset type",
+           "ADD": "Add Asset",
+           "OPTION": {
+               "CLASS_HANDOUT_NOTES":"Class handout notes",
+               "CAPTIONS_DFXP" : "Captions DFXP",
+               "CAPTIONS_WEBVTT" : "Captions WebVTT",
+               "PREVIEW_IMAGE" : "Preview image",
+               "SMIL": "Smil catalog",
+               "TRACK_PARTS": "Track parts"
+           }
          },
          "ACCESS": {
            "CAPTION": "Access policy",
@@ -459,7 +481,7 @@
          "PROCESSED": "Finished",
          "RECORDING_FAILURE": "Recording failure",
          "PROCESSING_FAILURE": "Processing failure",
-         "PROCESSING_CANCELED": "Processing canceled"
+         "PROCESSING_CANCELED": "Processing canceled"         
        },
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
@@ -739,7 +761,7 @@
            }
          },
           "SCHEDULING": {
-            "CAPTION": "Participation status",
+            "CAPTION": "Scheduling configuration",
             "REVIEW_STATUS": {
               "CAPTION": "Review status"
             },
@@ -759,6 +781,7 @@
            }
           },
           "WORKFLOWS": {
+            "ACTIONS": "Actions",
             "DETAILS": "Details",
             "DESCRIPTION": "",
             "ID": "ID",
@@ -989,6 +1012,29 @@
          "BLACKLIST_FROM": "Blacklisted from",
          "BLACKLIST_TO":   "Blacklisted until",
          "ACTION":    "Actions"
+       },
+       "DETAILS": {
+          "HEADER": "Location details - {{resourceId}}",
+          "TAB": {
+           "GENERAL": "General",
+           "CONFIGURATION": "Configuration",
+           "CAPABILITIES": "Capabilities"
+          },
+          "GENERAL": {
+            "CAPTION": "General",
+            "NAME": "Name",
+            "URL": "Url",
+            "STATUS": "Status",
+            "UPDATE": "Last heard from"
+          },
+          "CONFIGURATION": {
+            "CAPTION": "Configuration",
+            "NO_CONFIGURATION": "No configuration provided"
+          },
+          "CAPABILITIES": {
+            "CAPTION": "Capabilities",
+            "NO_CAPABILITIES": "No capabilities provided"
+          }
        }
      },
      "BLACKLISTS": {
@@ -1070,7 +1116,7 @@
          "DESCRIPTION": {
             "ROLES": "Roles and groups that can be or are already assigned to the user.",
             "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
-            "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership." 
+            "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
          },
          "FORM": {
             "USERNAME":        "Username",
@@ -1540,14 +1586,14 @@
      "LOGIN":    "Login",
      "ERROR":    "Incorrect username and / or password"
    },
-   "TABLE_FILTERS": { 
-     "FILTER_SELECTION": { 
-       "PLACEHOLDER": "Please select a filter…", 
-       "NO_OPTIONS": "No filters found" 
-     }, 
-     "FILTER_VALUE_SELECTION": { 
-       "PLACEHOLDER": "Please select a value…", 
-       "NO_OPTIONS": "No values found" 
+   "TABLE_FILTERS": {
+     "FILTER_SELECTION": {
+       "PLACEHOLDER": "Please select a filter…",
+       "NO_OPTIONS": "No filters found"
+     },
+     "FILTER_VALUE_SELECTION": {
+       "PLACEHOLDER": "Please select a value…",
+       "NO_OPTIONS": "No values found"
      },
      "CLEAR":       "Clear all filters",
      "REMOVE":      "Remove filter",
@@ -1789,6 +1835,7 @@
    "DASHBOARD":{
        "RUNNING":   "Running",
        "FINISHED":  "Finished",
+       "PAUSED" :   "Paused",
        "FAILED" :   "Failed",
        "FINISHED_WITH_COMMENTS": "Todo",
        "SCHEDULED" : "Scheduled",

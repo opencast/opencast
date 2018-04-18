@@ -36,6 +36,7 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
@@ -117,21 +118,25 @@ public final class WorkspaceImpl implements Workspace {
 
   private final Object lock = new Object();
 
+  /** The workspace root directory */
   private String wsRoot = null;
-  private int maxAgeInSeconds = -1;
-  private int garbageCollectionPeriodInSeconds = -1;
+
+  /** If true, hardlinking can be done between working file repository and workspace */
   private boolean linkingEnabled = false;
 
   private TrustedHttpClient trustedHttpClient;
 
+  /** The working file repository */
   private WorkingFileRepository wfr = null;
-  private String wfrRoot = null;
-  private String wfrUrl = null;
+
+  /** The path mappable */
+  private PathMappable pathMappable = null;
 
   private CopyOnWriteArraySet<String> staticCollections = new CopyOnWriteArraySet<String>();
 
   private boolean waitForResourceFlag = false;
 
+  /** The workspce cleaner */
   private WorkspaceCleaner workspaceCleaner = null;
 
   public WorkspaceImpl() {
@@ -196,7 +201,8 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Test whether hard linking between working file repository and workspace is possible
-    if (wfr instanceof PathMappable) {
+    if (pathMappable != null) {
+      String wfrRoot = pathMappable.getPathPrefix();
       File srcFile = new File(wfrRoot, ".linktest");
       try {
         FileUtils.touch(srcFile);
@@ -228,6 +234,7 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Set up the garbage collection timer
+    int garbageCollectionPeriodInSeconds = -1;
     if (ensureContextProp(cc, WORKSPACE_CLEANUP_PERIOD_KEY)) {
       String period = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_PERIOD_KEY);
       try {
@@ -235,10 +242,12 @@ public final class WorkspaceImpl implements Workspace {
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection period ({}={})",
                 WORKSPACE_CLEANUP_PERIOD_KEY, period);
+        garbageCollectionPeriodInSeconds = -1;
       }
     }
 
     // Activate garbage collection
+    int maxAgeInSeconds = -1;
     if (ensureContextProp(cc, WORKSPACE_CLEANUP_MAX_AGE_KEY)) {
       String age = cc.getBundleContext().getProperty(WORKSPACE_CLEANUP_MAX_AGE_KEY);
       try {
@@ -246,6 +255,7 @@ public final class WorkspaceImpl implements Workspace {
       } catch (NumberFormatException e) {
         logger.warn("Invalid configuration for workspace garbage collection max age ({}={})",
                 WORKSPACE_CLEANUP_MAX_AGE_KEY, age);
+        maxAgeInSeconds = -1;
       }
     }
 
@@ -287,9 +297,10 @@ public final class WorkspaceImpl implements Workspace {
   public File get(final URI uri) throws NotFoundException, IOException {
     final File inWs = toWorkspaceFile(uri);
 
-    if (wfrRoot != null && wfrUrl != null) {
-      if (uri.toString().startsWith(wfrUrl)) {
-        final String localPath = uri.toString().substring(wfrUrl.length());
+    if (pathMappable != null && StringUtils.isNotBlank(pathMappable.getPathPrefix())
+            && StringUtils.isNotBlank(pathMappable.getUrlPrefix())) {
+      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist and is it up to date?
         logger.trace("Looking up {} at {}", uri.toString(), wfrCopy.getAbsolutePath());
@@ -317,9 +328,9 @@ public final class WorkspaceImpl implements Workspace {
   @Override
   public File read(final URI uri) throws NotFoundException, IOException {
 
-    if (wfrRoot != null && wfrUrl != null) {
-      if (uri.toString().startsWith(wfrUrl)) {
-        final String localPath = uri.toString().substring(wfrUrl.length());
+    if (pathMappable != null) {
+      if (uri.toString().startsWith(pathMappable.getUrlPrefix())) {
+        final String localPath = uri.toString().substring(pathMappable.getUrlPrefix().length());
         final File wfrCopy = workingFileRepositoryFile(localPath);
         // does the file exist?
         logger.trace("Looking up {} at {} for read", uri.toString(), wfrCopy.getAbsolutePath());
@@ -698,8 +709,7 @@ public final class WorkspaceImpl implements Workspace {
     String path = collectionURI.toString();
     String filename = FilenameUtils.getName(path);
     String collection = getCollection(collectionURI);
-    logger.debug("Moving {} from {} to {}/{}",
-            new String[] { filename, collection, toMediaPackage, toMediaPackageElement });
+    logger.debug("Moving {} from {} to {}/{}", filename, collection, toMediaPackage, toMediaPackageElement);
     // move locally
     File original = toWorkspaceFile(collectionURI);
     if (original.isFile()) {
@@ -784,7 +794,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /** Return a file object pointing into the working file repository. */
   private File workingFileRepositoryFile(String... path) {
-    return new File(path(cons(String.class, wfrRoot, path)));
+    return new File(path(cons(String.class, pathMappable.getPathPrefix(), path)));
   }
 
   /**
@@ -839,9 +849,8 @@ public final class WorkspaceImpl implements Workspace {
   public void setRepository(WorkingFileRepository repo) {
     this.wfr = repo;
     if (repo instanceof PathMappable) {
-      this.wfrRoot = ((PathMappable) repo).getPathPrefix();
-      this.wfrUrl = ((PathMappable) repo).getUrlPrefix();
-      logger.info("Mapping workspace to working file repository using {}", wfrRoot);
+      this.pathMappable = (PathMappable) repo;
+      logger.info("Mapping workspace to working file repository using {}", pathMappable.getPathPrefix());
     }
   }
 
@@ -906,5 +915,17 @@ public final class WorkspaceImpl implements Workspace {
       }
     }
     logger.info("Finished cleanup of workspace");
+  }
+
+  @Override
+  public void cleanup(Id mediaPackageId) throws IOException {
+    final File f = workspaceFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
+    logger.debug("Clean workspace media package directory {}", f);
+    FileUtils.deleteDirectory(f);
+  }
+
+  @Override
+  public String rootDirectory() {
+    return wsRoot;
   }
 }

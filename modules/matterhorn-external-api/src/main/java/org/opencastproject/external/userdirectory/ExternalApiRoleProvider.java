@@ -76,7 +76,7 @@ public class ExternalApiRoleProvider implements RoleProvider {
     InputStream in = null;
     try {
       in = getClass().getResourceAsStream(rolesFile);
-      roles = new TreeSet<String>(IOUtils.readLines(in, "UTF-8"));
+      roles = new TreeSet<>(IOUtils.readLines(in, "UTF-8"));
     } catch (IOException e) {
       logger.error("Unable to read available roles: {}", ExceptionUtils.getStackTrace(e));
     } finally {
@@ -137,14 +137,14 @@ public class ExternalApiRoleProvider implements RoleProvider {
 
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
-    public Role ap(String role, Organization organization) {
+    public Role apply(String role, Organization organization) {
       return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "External API Role", Type.INTERNAL);
     }
   };
 
   private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
     @Override
-    public Boolean ap(String role, String query) {
+    public Boolean apply(String role, String query) {
       return like(role, query);
     }
   };

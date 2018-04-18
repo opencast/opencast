@@ -36,11 +36,11 @@ import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
-import static org.opencastproject.util.persistence.PersistenceUtil.newTestPersistenceEnv;
 
 import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistence.PersistenceEnv;
+import org.opencastproject.util.persistence.PersistenceEnvs;
 
 import com.jayway.restassured.path.json.JsonPath;
 
@@ -80,7 +80,7 @@ public class BundleInfoRestEndpointTest {
 
   @Before
   public void before() {
-    penv = newTestPersistenceEnv(OsgiBundleInfoDb.PERSISTENCE_UNIT);
+    penv = PersistenceEnvs.testPersistenceEnv(OsgiBundleInfoDb.PERSISTENCE_UNIT);
   }
 
   @After
@@ -132,14 +132,14 @@ public class BundleInfoRestEndpointTest {
 
   @Test
   public void testBundlesEmptyResponse() {
-    expect().log().all().body("count", equalTo(0)).when().get(rt.host("/bundles/list"));
+    expect().body("count", equalTo(0)).when().get(rt.host("/bundles/list"));
   }
 
   @Test
   public void testBundlesNonEmptyResponse1() {
     db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-2", 2L, "1.4.0", some("5e34af")));
-    expect().log().all()
+    expect()
             // number is expected but jersey returns a string
             .body("count", equalTo(2)).body("bundleInfos[0].bundleId", equalTo(1))
             .body("bundleInfos[1].bundleSymbolicName", equalTo("bundle-2")).when().get(rt.host("/bundles/list"));
@@ -148,7 +148,7 @@ public class BundleInfoRestEndpointTest {
   @Test
   public void testBundlesNonEmptyResponse2() {
     db.store(bundleInfo("localhost", "bundle-2", 2L, "1.4.0", none("")));
-    expect().log().all().body("count", equalTo(1)).body("bundleInfos[0].buildNumber", equalTo(null)).when()
+    expect().body("count", equalTo(1)).body("bundleInfos[0].buildNumber", equalTo(null)).when()
             .get(rt.host("/bundles/list"));
   }
 
@@ -158,7 +158,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-2", 2L, "1.4.0", some("5e34af")));
     // default bundle name prefix is "matterhorn"
-    expect().log().all().statusCode(404).when().get(rt.host("/bundles/check"));
+    expect().statusCode(404).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -167,7 +167,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
-    expect().log().all().body(equalTo("true")).when().get(rt.host("/bundles/check"));
+    expect().body(equalTo("true")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -176,7 +176,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e0000")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
-    expect().log().all().body(equalTo("false")).when().get(rt.host("/bundles/check"));
+    expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -185,7 +185,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.1", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
-    expect().log().all().body(equalTo("false")).when().get(rt.host("/bundles/check"));
+    expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -194,7 +194,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", none("")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
-    expect().log().all().body(equalTo("false")).when().get(rt.host("/bundles/check"));
+    expect().body(equalTo("false")).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -203,7 +203,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.0", some("5e34af")));
-    given().param("prefix", "matterhorn", "bundle").expect().log().all().body(equalTo("true")).when()
+    given().param("prefix", "matterhorn", "bundle").expect().body(equalTo("true")).when()
             .get(rt.host("/bundles/check"));
   }
 
@@ -213,7 +213,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
-    given().param("prefix", "matterhorn", "bundle").expect().log().all().body(equalTo("false")).when()
+    given().param("prefix", "matterhorn", "bundle").expect().body(equalTo("false")).when()
             .get(rt.host("/bundles/check"));
   }
 
@@ -223,7 +223,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("otherhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "bundle-1", 2L, "1.4.1", some("5e34af")));
-    given().param("prefix", "bla", "blubb").expect().log().all().statusCode(404).when().get(rt.host("/bundles/check"));
+    given().param("prefix", "bla", "blubb").expect().statusCode(404).when().get(rt.host("/bundles/check"));
   }
 
   @Test
@@ -231,7 +231,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
-    expect().log().all().body("consistent", equalTo(true)).body("version", equalTo("1.4.0"))
+    expect().body("consistent", equalTo(true)).body("version", equalTo("1.4.0"))
             .body("buildNumber", equalTo("5e34af")).when().get(rt.host("/bundles/version"));
   }
 
@@ -240,7 +240,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.1", some("5e34af")));
-    expect().log().all().body("consistent", equalTo(false)).body("", not(hasKey("version")))
+    expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", hasItems("5e34af"))
             .body("versions.version", hasItems("1.4.0", "1.4.1")).when().get(rt.host("/bundles/version"));
   }
@@ -250,7 +250,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", some("5e34a")));
     db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
-    expect().log().all().body("consistent", equalTo(false)).body("", not(hasKey("version")))
+    expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", hasItems("5e34af", "5e34a"))
             .body("versions.version", hasItems("1.4.0")).when().get(rt.host("/bundles/version"));
   }
@@ -260,7 +260,7 @@ public class BundleInfoRestEndpointTest {
     db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", some("5e34af")));
     db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", none("")));
     db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", some("5e34af")));
-    expect().log().all().body("consistent", equalTo(false)).body("", not(hasKey("version")))
+    expect().body("consistent", equalTo(false)).body("", not(hasKey("version")))
             .body("", not(hasKey("buildNumber"))).body("versions.buildNumber", iterableWithSize(2))
             .body("versions.buildNumber", hasItems(null, "5e34af")).body("versions.version", hasItems("1.4.0"))
             .body("versions.buildNumber", hasItems("5e34af")).when().get(rt.host("/bundles/version"));

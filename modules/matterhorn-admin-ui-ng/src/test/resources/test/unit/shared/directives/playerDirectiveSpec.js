@@ -54,7 +54,7 @@ describe('adminNg.directives.playerDirective', function () {
         spyOn(angular, 'element').and.returnValue($('<video id=player/>'));
 
         // mock repository.create(..)
-        spyOn(repository, 'findByAdapterTypeAndElementId').and.returnValue(adapter);
+        spyOn(repository, 'createNewAdapter').and.returnValue(adapter);
 
 
         $httpBackend.whenGET('/i18n/languages.json')

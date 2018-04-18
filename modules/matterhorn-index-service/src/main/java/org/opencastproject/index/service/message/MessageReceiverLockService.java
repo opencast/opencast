@@ -20,24 +20,30 @@
  */
 package org.opencastproject.index.service.message;
 
-import org.opencastproject.util.MultiResourceLock;
-
 import com.entwinemedia.fn.Fn;
+import com.google.common.util.concurrent.Striped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.locks.Lock;
 
 public class MessageReceiverLockService {
 
   private static final Logger logger = LoggerFactory.getLogger(MessageReceiverLockService.class);
 
-  private final MultiResourceLock lock = new MultiResourceLock();
+  private final Striped<Lock> lock = Striped.lazyWeakLock(1024);
 
   public <K, A> A synchronize(K resource, Fn<K, A> function) {
+    final Lock lock = this.lock.get(resource);
+    lock.lock();
     logger.debug("Locked resource '{}'", resource);
-    A result = lock.synchronize(resource, function);
-    logger.debug("Released locked resource '{}'", resource);
-    return result;
+    try {
+      return function.apply(resource);
+    } finally {
+      lock.unlock();
+      logger.debug("Released locked resource '{}'", resource);
+    }
   }
 
 }

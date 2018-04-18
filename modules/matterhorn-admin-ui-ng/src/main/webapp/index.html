@@ -15,12 +15,15 @@
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
+        <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
         <link rel="shortcut icon" href="img/favicon.ico">
         <script>
             window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
         </script>
         <script type="text/javascript" src="lib/jquery-ui.js"></script>
         <script type="text/javascript" src="lib/datepicker/i18n/jquery-ui-i18n.js"></script>
+        <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
+        <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
         <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
         <script type="text/javascript" src="lib/backbone-1.1.0.js"></script>
         <script type="text/javascript" src="lib/visualsearch.js"></script>
@@ -52,11 +55,25 @@
 
                 <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
                     <a href="{{mediaModuleUrl}}">
-                        <span class="fa fa-play-circle-o"><!-- Media Module --></span>
+                        <span class="fa fa-play-circle"><!-- Media Module --></span>
                     </a>
                 </div>
 
-                <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
+                <div class="nav-dd info-dd" id="info-dd" old-admin-ng-dropdown="" with-role="ROLE_ADMIN">
+                  <i class="fa fa-bell" aria-hidden="true"></i>
+                    <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
+                    <ul class="dropdown-ul">
+                      <li ng-repeat="(key, value) in services.service"><!-- service directive -->
+                        <a ng-click="toServices($event)" service-name="{{ key }}">
+                          <span>{{ key }}</span>
+                          <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
+                          <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
+                        </a>
+                      </li><!-- directive end -->
+                    </ul>
+                </div>
+
+              <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
                     id="help-dd" old-admin-ng-dropdown="">
                     <div class="fa fa-question-circle"></div>
                     <ul class="dropdown-ul">
@@ -105,21 +122,20 @@
         <!-- build:js({.tmp,src/main}) scripts/bower.js -->
         <!-- bower:js -->
         <script src="../../bower_components/angular/angular.js"></script>
-        <script src="../../bower_components/angular-md5/angular-md5.js"></script>
-        <script src="../../bower_components/angular-translate/angular-translate.js"></script>
         <script src="../../bower_components/angular-route/angular-route.js"></script>
         <script src="../../bower_components/angular-resource/angular-resource.js"></script>
         <script src="../../bower_components/angular-animate/angular-animate.js"></script>
         <script src="../../bower_components/angular-messages/angular-messages.js"></script>
+        <script src="../../bower_components/angular-md5/angular-md5.js"></script>
+        <script src="../../bower_components/angular-translate/angular-translate.js"></script>
+        <script src="../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+        <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
         <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
         <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
+        <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
-
         <!-- build:js({.tmp,src/main/webapp}) scripts/vendor.js -->
-        <script src="scripts/lib/angular-file-upload/angular-file-upload-shim.js"></script>
-        <script src="scripts/lib/angular/angular-local-storage.js"></script>
-        <script src="scripts/lib/angular-file-upload/angular-file-upload.js"></script>
         <script src="scripts/lib/angular-chosen.js"></script>
         <script src="scripts/lib/angular-sortable.js"></script>
         <script src="scripts/lib/video-js/video.js"></script>
@@ -148,6 +164,7 @@
         <script src="scripts/shared/services/regexService.js"></script>
         <script src="scripts/shared/services/eventHelperService.js"></script>
         <script src="scripts/shared/services/hotkeysService.js"></script>
+        <script src="scripts/shared/services/restServiceMonitor.js"></script>
         <script src="scripts/shared/resources/resources.js"></script>
         <script src="scripts/shared/resources/identityResource.js"></script>
         <script src="scripts/shared/resources/versionResource.js"></script>
@@ -161,6 +178,7 @@
         <script src="scripts/shared/resources/seriesEventsResource.js"></script>
         <script src="scripts/shared/resources/seriesThemeResource.js"></script>
         <script src="scripts/shared/resources/eventMetadataResource.js"></script>
+        <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
         <script src="scripts/shared/resources/newEventMetadataResource.js"></script>
         <script src="scripts/shared/resources/newEventProcessingResource.js"></script>
         <script src="scripts/shared/resources/newEventResource.js"></script>
@@ -175,6 +193,7 @@
         <script src="scripts/shared/resources/eventParticipationResource.js"></script>
         <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
+        <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowsResource.js"></script>
         <script src="scripts/shared/resources/eventTransactionResource.js"></script>
         <script src="scripts/shared/resources/eventErrorsResource.js"></script>
@@ -182,11 +201,13 @@
         <script src="scripts/shared/resources/eventWorkflowDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
+        <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
         <script src="scripts/shared/resources/eventAttachmentsResource.js"></script>
         <script src="scripts/shared/resources/eventCatalogsResource.js"></script>
         <script src="scripts/shared/resources/eventAssetsResource.js"></script>
         <script src="scripts/shared/resources/eventAccessResource.js"></script>
         <script src="scripts/shared/resources/eventGeneralResource.js"></script>
+        <script src="scripts/shared/resources/eventHasSnapshotsResource.js"></script>
         <script src="scripts/shared/resources/toolsResource.js"></script>
         <script src="scripts/shared/resources/commentResource.js"></script>
         <script src="scripts/shared/resources/usersResource.js"></script>
@@ -195,6 +216,7 @@
         <script src="scripts/shared/resources/groupResource.js"></script>
         <script src="scripts/shared/resources/aclsResource.js"></script>
         <script src="scripts/shared/resources/aclResource.js"></script>
+        <script src="scripts/shared/resources/captureAgentResource.js"></script>
         <script src="scripts/shared/resources/captureAgentsResource.js"></script>
         <script src="scripts/shared/resources/userRolesResource.js"></script>
         <script src="scripts/shared/resources/serversResource.js"></script>
@@ -217,6 +239,7 @@
         <script src="scripts/shared/services/wizards/new-event/source.js"></script>
         <script src="scripts/shared/services/wizards/new-event/summary.js"></script>
         <script src="scripts/shared/services/wizards/new-event/states.js"></script>
+        <script src="scripts/shared/services/wizards/new-event/uploadAssetNewEvent.js"></script>
         <script src="scripts/shared/services/wizards/new-group/summary.js"></script>
         <script src="scripts/shared/services/wizards/new-group/users.js"></script>
         <script src="scripts/shared/services/wizards/new-group/roles.js"></script>
@@ -265,6 +288,7 @@
         <script src="scripts/shared/directives/directives.js"></script>
         <script src="scripts/shared/directives/customIcon.js"></script>
         <script src="scripts/shared/directives/datepickerDirective.js"></script>
+        <script src="scripts/shared/directives/datetimepickerDirective.js"></script>
         <script src="scripts/shared/directives/focushere.js"></script>
         <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
         <script src="scripts/shared/directives/passwordCheckDirective.js"></script>
@@ -296,8 +320,10 @@
         <script src="scripts/shared/directives/preSelectFromDirective.js"></script>
         <script src="scripts/shared/directives/loadingScrollerDirective.js"></script>
         <script src="scripts/shared/directives/opencastScrollGlue.js"></script>
+        <script src="scripts/shared/directives/uploadAssetDirective.js"></script>
         <script src="scripts/shared/services/resourceModalService.js"></script>
         <script src="scripts/shared/services/confirmationModalService.js"></script>
+        <script src="scripts/shared/services/uploadAssetOptionsService.js"></script>
         <script src="scripts/shared/controllers/controllers.js"></script>
         <script src="scripts/shared/controllers/navigationController.js"></script>
         <script src="scripts/shared/controllers/applicationController.js"></script>
@@ -319,6 +345,7 @@
         <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
         <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
         <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
+        <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
         <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>
         <script src="scripts/modules/recordings/controllers/locationblacklistController.js"></script>

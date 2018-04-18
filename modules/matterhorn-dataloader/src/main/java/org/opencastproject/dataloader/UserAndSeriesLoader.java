@@ -169,8 +169,8 @@ public class UserAndSeriesLoader {
           Organization org = organizationDirectoryService.getOrganization(DEFAULT_ORGANIZATION_ID);
           try {
             JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(org);
-            securityService.setUser(new JaxbUser("userandseriesloader", "demo", jaxbOrganization, new JaxbRole(
-                    SecurityConstants.GLOBAL_ADMIN_ROLE, jaxbOrganization)));
+            securityService.setUser(new JaxbUser("userandseriesloader", "demo", jaxbOrganization,
+                    new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE, jaxbOrganization)));
             securityService.setOrganization(org);
 
             try {
@@ -208,10 +208,12 @@ public class UserAndSeriesLoader {
 
       logger.info("Finished loading sample series and users");
 
-      loadGroup("admin", DEFAULT_ORGANIZATION_ID, "Admins", "Admin group", new String[] { COURSE_ADMIN_ROLE,
-              INSTRUCTOR_ROLE, INSTRUCTOR_ROLE }, new String[] { "admin1", "admin2", "admin3", "admin4" });
-      loadGroup("instructor", DEFAULT_ORGANIZATION_ID, "Instructors", "Instructors group", new String[] { USER_ROLE,
-              INSTRUCTOR_ROLE }, new String[] { "instructor1", "instructor2", "instructor3", "instructor4" });
+      loadGroup("admin", DEFAULT_ORGANIZATION_ID, "Admins", "Admin group",
+              new String[] { COURSE_ADMIN_ROLE, INSTRUCTOR_ROLE, INSTRUCTOR_ROLE },
+              new String[] { "admin1", "admin2", "admin3", "admin4" });
+      loadGroup("instructor", DEFAULT_ORGANIZATION_ID, "Instructors", "Instructors group",
+              new String[] { USER_ROLE, INSTRUCTOR_ROLE },
+              new String[] { "instructor1", "instructor2", "instructor3", "instructor4" });
       loadGroup("student", DEFAULT_ORGANIZATION_ID, "Students", "Students group", new String[] { USER_ROLE },
               new String[] { "student1", "student2", "student3", "student4" });
 
@@ -236,16 +238,17 @@ public class UserAndSeriesLoader {
     String lowerCasePrefix = rolePrefix.toLowerCase();
     int totalUsers = numPerSeries * NUM_SERIES;
 
-    logger.info("Adding sample {}s, usernames and passwords are {}1/{}1... {}{}/{}{}", new Object[] { lowerCasePrefix,
-            lowerCasePrefix, lowerCasePrefix, lowerCasePrefix, totalUsers, lowerCasePrefix, totalUsers });
+    logger.info("Adding sample {}s, usernames and passwords are {}1/{}1... {}{}/{}{}", lowerCasePrefix, lowerCasePrefix,
+            lowerCasePrefix, lowerCasePrefix, totalUsers, lowerCasePrefix, totalUsers);
 
     for (int i = 1; i <= totalUsers; i++) {
       if (jpaUserProvider.loadUser(lowerCasePrefix + i, orgId) == null) {
-        Set<JpaRole> roleSet = new HashSet<JpaRole>();
+        Set<JpaRole> roleSet = new HashSet<>();
         for (String additionalRole : additionalRoles) {
           roleSet.add(new JpaRole(additionalRole, getOrganization(orgId)));
         }
-        roleSet.add(new JpaRole(SERIES_PREFIX + (((i - 1) % NUM_SERIES) + 1) + "_" + rolePrefix, getOrganization(orgId)));
+        roleSet.add(
+                new JpaRole(SERIES_PREFIX + (((i - 1) % NUM_SERIES) + 1) + "_" + rolePrefix, getOrganization(orgId)));
         JpaUser user = new JpaUser(lowerCasePrefix + i, lowerCasePrefix + i, getOrganization(orgId),
                 jpaUserProvider.getName(), true, roleSet);
         try {
@@ -277,12 +280,12 @@ public class UserAndSeriesLoader {
   protected void loadGroup(String groupId, String orgId, String name, String description, String[] additionalRoles,
           String[] members) {
     if (jpaGroupRoleProvider.loadGroup(groupId, orgId) == null) {
-      Set<JpaRole> roles = new HashSet<JpaRole>();
+      Set<JpaRole> roles = new HashSet<>();
       for (String additionalRole : additionalRoles) {
         roles.add(new JpaRole(additionalRole, getOrganization(orgId)));
       }
-      JpaGroup group = new JpaGroup(groupId, getOrganization(orgId), name, description, roles, new HashSet<String>(
-              Arrays.asList(members)));
+      JpaGroup group = new JpaGroup(groupId, getOrganization(orgId), name, description, roles,
+              new HashSet<>(Arrays.asList(members)));
       try {
         jpaGroupRoleProvider.addGroup(group);
       } catch (Exception e) {
@@ -298,7 +301,7 @@ public class UserAndSeriesLoader {
    *          the organization
    */
   protected void loadLdapUser(String organizationId) {
-    Set<JpaRole> ldapUserRoles = new HashSet<JpaRole>();
+    Set<JpaRole> ldapUserRoles = new HashSet<>();
     ldapUserRoles.add(new JpaRole(USER_ROLE, getOrganization(organizationId)));
     // This is the public identifier for Josh Holtzman in the UC Berkeley Directory, which is available for anonymous
     // binding.
@@ -306,8 +309,8 @@ public class UserAndSeriesLoader {
 
     if (jpaUserProvider.loadUser(ldapUserId, organizationId) == null) {
       try {
-        jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", getOrganization(organizationId), jpaUserProvider
-                .getName(), true, ldapUserRoles));
+        jpaUserProvider.addUser(new JpaUser(ldapUserId, "ldap", getOrganization(organizationId),
+                jpaUserProvider.getName(), true, ldapUserRoles));
         logger.debug("Added ldap user '{}' into organization '{}'", ldapUserId, organizationId);
       } catch (UnauthorizedException ex) {
         logger.error("Unable to add an administrative user because you have not enough permissions.");

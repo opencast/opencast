@@ -26,20 +26,6 @@ angular.module('adminNg.controllers')
     function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
-            // FIMXE When changing tabs, video playback breaks. Using playback
-            // controls after a tab change works for audio, but there is no
-            // video. Perhaps it results in an orphaned <video> element.
-            //
-            // The following hack prevents a racing condition between setting
-            // the path and a reload by preventing the path change from
-            // triggering a render sync before the reload takes place.
-            var lastRoute, off;
-            lastRoute = $route.current;
-            off = $scope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                off();
-                $window.location.reload();
-            });
             $location.path(path).replace();
         };
 
@@ -48,7 +34,7 @@ angular.module('adminNg.controllers')
         $scope.tab      = $route.current.params.tab;
         if ($scope.tab === "editor") {
           $scope.area   = "segments";
-        } else {
+        } else if ($scope.tab === "playback") {
           $scope.area   = "metadata";
         }
         $scope.id       = $route.current.params.itemId;
@@ -56,8 +42,23 @@ angular.module('adminNg.controllers')
         $scope.event.eventId = $scope.id;
 
         $scope.openTab = function (tab) {
-            $scope.navigateTo('events/' + $scope.resource + '/' +
-                $scope.id + '/tools/' + tab);
+            $scope.tab = tab;
+            if ($scope.tab === "editor") {
+              $scope.area   = "segments";
+            } else if ($scope.tab === "playback") {
+              $scope.area   = "metadata";
+            }
+
+            // This fixes a problem where video playback breaks after switching tabs. Changing the location seems
+            // to be destructive to the <video> element working together with opencast's external controls.
+            var lastRoute, off;
+            lastRoute = $route.current;
+            off = $scope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                off();
+            });
+
+            $scope.navigateTo('/events/' + $scope.resource + '/' + $scope.id + '/tools/' + tab);
         };
 
         $scope.openArea = function (area) {

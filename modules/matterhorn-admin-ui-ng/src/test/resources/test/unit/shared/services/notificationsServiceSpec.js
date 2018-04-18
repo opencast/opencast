@@ -3,6 +3,15 @@ describe('Notifications', function () {
 
     beforeEach(module('adminNg.services'));
 
+    beforeEach(module(function ($provide) {
+	var service = {
+	    get: function () {
+		return {$promise: {then: function () {}}};
+	    }
+	};
+	$provide.value('IdentityResource', service);
+    }));
+
     beforeEach(inject(function (_$httpBackend_, _Notifications_) {
         $httpBackend = _$httpBackend_;
         $httpBackend.whenGET('/resources/components.json').respond(JSON.stringify({

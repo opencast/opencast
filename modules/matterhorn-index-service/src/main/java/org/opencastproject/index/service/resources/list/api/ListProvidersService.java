@@ -50,9 +50,9 @@ public interface ListProvidersService {
    * Defines if keys and values of the given list should be translated in the administrative user interface.
    *
    * @param listName the name of the list
-   * @return true, if the results should be translated, false otherwise
+   * @return if the results should be translated
    *
-   * @throws org.opencastproject.index.service.exception.ListProviderException
+   * @throws ListProviderException
    *              if no list provider found for the given list name
    */
   boolean isTranslatable(String listName) throws ListProviderException;

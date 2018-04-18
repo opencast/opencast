@@ -115,8 +115,6 @@
      "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "SERIES_ACL_LOCKED": "Editing Access Policies is not allowed when operations are running on an event that is part of the series",
-     "SERIES_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
-     "EVENT_ACL_MISSING_READWRITE_ROLE": "The Access Policy requires at least one role with Read and Write permissions.",
      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "The event opt-out status has been successfully updated.",
      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Error while updating the event opt-out status.",
      "EVENT_PARTICIPATION_STATUS_READONLY": "The participation status can not be updated as the scheduling start date is in the past.",
@@ -302,6 +300,19 @@
              "TITLE": "Extended metadata"
            }
          },
+         "UPLOAD_ASSET": {
+           "CAPTION": "Asset Upload",
+           "SELECT_TYPE": "Select asset type",
+           "ADD": "Add Asset",
+           "OPTION": {
+               "CLASS_HANDOUT_NOTES":"Class handout notes",
+               "CAPTIONS_DFXP" : "Captions DFXP",
+               "CAPTIONS_WEBVTT" : "Captions WebVTT",
+               "PREVIEW_IMAGE" : "Preview image",
+               "SMIL": "Smil catalog",
+               "TRACK_PARTS": "Track parts"
+           }
+         },
          "SOURCE": {
            "CAPTION": "Source",
            "SELECT_SOURCE": "Select source",
@@ -328,7 +339,11 @@
                "AUDIO_ONLY": {
                    "SHORT": "Audio only",
                    "DETAIL": "The file contains only audio."
-               }
+               },
+               "MULTIPLE_PARTS": {
+                   "SHORT": "Multiple parts",
+                   "DETAIL": "A set of files containing different parts of the event."
+                }
            },
            "DATE_TIME": {
                "CAPTION": "Schedule",
@@ -808,7 +823,6 @@
            "CAPTION": "Theme",
            "DESCRIPTION": "",
            "TITLE": "Theme",
-           "DESCRIPTION": "",
            "LABEL": "No theme",
            "EMPTY": "No theme found"
          },

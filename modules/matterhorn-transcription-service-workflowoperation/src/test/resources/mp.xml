@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage xmlns:ns2="http://mediapackage.opencastproject.org" start="2016-10-21T16:28:00Z"
+    id="mpId1" duration="65526">
+    <ns2:title>Transcription Test</ns2:title>
+    <ns2:series>20170119999</ns2:series>
+    <ns2:seriestitle>Test Fall 2017</ns2:seriestitle>
+    <ns2:license>Creative Commons 3.0: Attribution-NonCommercial-NoDerivs</ns2:license>
+    <ns2:media>
+        <ns2:track type="presenter/source" id="track-1">
+            <ns2:mimetype>video/mp4</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/track-1/6/track.mp4</ns2:url>
+            <ns2:checksum type="md5">86e00858498528608a98ec54156bd4d8</ns2:checksum>
+            <ns2:duration>66337</ns2:duration>
+            <ns2:audio id="audio-1">
+                <ns2:device/>
+                <ns2:encoder type="AAC (Advanced Audio Coding)"/>
+                <ns2:channels>1</ns2:channels>
+                <ns2:bitrate>128005.0</ns2:bitrate>
+            </ns2:audio>
+            <ns2:video id="video-1">
+                <ns2:device/>
+                <ns2:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+                <ns2:bitrate>2748924.0</ns2:bitrate>
+                <ns2:framerate>30.0</ns2:framerate>
+                <ns2:resolution>960x540</ns2:resolution>
+            </ns2:video>
+        </ns2:track>
+        <ns2:track ref="track:track-1" type="presenter/delivery"
+            id="4efce592-fce6-4e0b-9e5f-37cb924cf847">
+            <ns2:mimetype>video/mp4</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+                <ns2:tag>engage</ns2:tag>
+                <ns2:tag>multiaudio</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/4efce592-fce6-4e0b-9e5f-37cb924cf847/6/track.mp4</ns2:url>
+            <ns2:checksum type="md5">eae9144fb42f2b3f08ccb4ceae7b776c</ns2:checksum>
+            <ns2:duration>65527</ns2:duration>
+            <ns2:audio id="audio-1">
+                <ns2:device/>
+                <ns2:encoder type="AAC (Advanced Audio Coding)"/>
+                <ns2:channels>1</ns2:channels>
+                <ns2:bitrate>128000.0</ns2:bitrate>
+            </ns2:audio>
+            <ns2:video id="video-1">
+                <ns2:device/>
+                <ns2:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+                <ns2:bitrate>2591178.0</ns2:bitrate>
+                <ns2:framerate>30.0</ns2:framerate>
+                <ns2:resolution>960x540</ns2:resolution>
+            </ns2:video>
+        </ns2:track>
+        <ns2:track ref="track:track-1" type="presenter/delivery"
+            id="db8ba692-f04f-4864-a1b3-f22ea6cad0c9">
+            <ns2:mimetype>video/mp4</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+                <ns2:tag>engage</ns2:tag>
+                <ns2:tag>multiaudio</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/db8ba692-f04f-4864-a1b3-f22ea6cad0c9/6/track.mp4</ns2:url>
+            <ns2:checksum type="md5">5d0e65afc09febc3e3dea8ef61f81d23</ns2:checksum>
+            <ns2:duration>65527</ns2:duration>
+            <ns2:audio id="audio-1">
+                <ns2:device/>
+                <ns2:encoder type="AAC (Advanced Audio Coding)"/>
+                <ns2:channels>1</ns2:channels>
+                <ns2:bitrate>96000.0</ns2:bitrate>
+            </ns2:audio>
+            <ns2:video id="video-1">
+                <ns2:device/>
+                <ns2:encoder type="H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"/>
+                <ns2:bitrate>422808.0</ns2:bitrate>
+                <ns2:framerate>30.0</ns2:framerate>
+                <ns2:resolution>480x270</ns2:resolution>
+            </ns2:video>
+        </ns2:track>
+        <ns2:track ref="track:4efce592-fce6-4e0b-9e5f-37cb924cf847" type="audio/ogg"
+            id="audioTrack1">
+            <ns2:mimetype>audio/ogg</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+                <ns2:tag>transcript</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/c6b9d203-f95b-44da-b181-59d296affa34/6/track.ogg</ns2:url>
+            <ns2:checksum type="md5">94aba0afc70fa074a2eb59299d51c7ed</ns2:checksum>
+            <ns2:duration>65526</ns2:duration>
+            <ns2:audio id="audio-1">
+                <ns2:device/>
+                <ns2:encoder type="Vorbis"/>
+                <ns2:channels>1</ns2:channels>
+                <ns2:bitrate>16000.0</ns2:bitrate>
+            </ns2:audio>
+        </ns2:track>
+    </ns2:media>
+    <ns2:metadata>
+        <ns2:catalog type="dublincore/episode" id="aa1731c3-a66c-469d-bc04-49c651be5efd">
+            <ns2:mimetype>text/xml</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+                <ns2:tag>engage</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/aa1731c3-a66c-469d-bc04-49c651be5efd/6/catalog.xml</ns2:url>
+            <ns2:checksum type="md5">97151cf6a9670ca56a9a71827e812917</ns2:checksum>
+        </ns2:catalog>
+        <ns2:catalog type="dublincore/series" id="b482d7a9-c5a3-498a-9c05-a58253ef109d">
+            <ns2:mimetype>text/xml</ns2:mimetype>
+            <ns2:tags>
+                <ns2:tag>archive</ns2:tag>
+                <ns2:tag>engage</ns2:tag>
+            </ns2:tags>
+            <ns2:url>http://opencast.server.com/episode/archive/mediapackage/137e416e-111b-49f9-b6c0-24b55877a2ce/b482d7a9-c5a3-498a-9c05-a58253ef109d/6/catalog.xml</ns2:url>
+            <ns2:checksum type="md5">1cab95c23267cd42c3cc288a8b533c03</ns2:checksum>
+        </ns2:catalog>
+     </ns2:metadata>
+    <ns2:attachments/>
+    <ns2:publications/>   
+</ns2:mediapackage>

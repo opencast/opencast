@@ -91,6 +91,8 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
             .andReturn(null).anyTimes();
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.OUTPUT_FILENAME_PROPERTY))
             .andReturn(null).anyTimes();
+    EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.SET_WF_PROPS_PROPERTY))
+            .andReturn("false").anyTimes();
     // these two need to supply a real string
     EasyMock.expect(operation.getConfiguration(ExecuteOnceWorkflowOperationHandler.EXPECTED_TYPE_PROPERTY))
             .andReturn(expectedTypeString).anyTimes();
@@ -120,7 +122,7 @@ public class ExecuteOnceWorkflowOperationHandlerTest {
         HashMap<Job, Status> map = Stream.mk(jobs).foldl(new HashMap<Job, Status>(),
                 new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
           @Override
-          public HashMap<Job, Status> ap(HashMap<Job, Status> a, Job b) {
+          public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
             a.put(b, Status.FINISHED);
             return a;
           }

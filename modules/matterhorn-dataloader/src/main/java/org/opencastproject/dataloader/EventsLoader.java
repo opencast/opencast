@@ -21,7 +21,10 @@
 
 package org.opencastproject.dataloader;
 
-import org.opencastproject.archive.api.Archive;
+import static com.entwinemedia.fn.Prelude.chuck;
+import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
+
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -31,13 +34,10 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
-import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore;
+import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore.Series;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -65,6 +65,8 @@ import org.opencastproject.workflow.api.WorkflowParser;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -86,6 +88,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -110,7 +113,7 @@ public class EventsLoader {
   /** The scheduler service */
   protected SchedulerService schedulerService = null;
 
-  protected Archive<?> archive = null;
+  protected AssetManager assetManager = null;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -128,17 +131,17 @@ public class EventsLoader {
 
   private String systemUserName;
 
-  private final AccessControlList defaultAcl = new AccessControlList(new AccessControlEntry("ROLE_ADMIN",
-          Permissions.Action.WRITE.toString(), true), new AccessControlEntry("ROLE_ADMIN",
-          Permissions.Action.READ.toString(), true), new AccessControlEntry("ROLE_USER",
-          Permissions.Action.READ.toString(), true));
+  private final AccessControlList defaultAcl = new AccessControlList(
+          new AccessControlEntry("ROLE_ADMIN", Permissions.Action.WRITE.toString(), true),
+          new AccessControlEntry("ROLE_ADMIN", Permissions.Action.READ.toString(), true),
+          new AccessControlEntry("ROLE_USER", Permissions.Action.READ.toString(), true));
 
   /**
    * Callback on component activation.
    */
   protected void activate(ComponentContext cc) throws Exception {
-    boolean loadTestData = BooleanUtils.toBoolean(cc.getBundleContext().getProperty(
-            "org.opencastproject.dataloader.testdata"));
+    boolean loadTestData = BooleanUtils
+            .toBoolean(cc.getBundleContext().getProperty("org.opencastproject.dataloader.testdata"));
 
     String csvPath = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.dataloader.csv"));
 
@@ -153,7 +156,7 @@ public class EventsLoader {
     }
   }
 
-  private void addArchiveEntry(final WorkflowInstance workflowInstance) {
+  private void addArchiveEntry(final MediaPackage mediaPackage) {
     final User user = securityService.getUser();
     final Organization organization = securityService.getOrganization();
     singleThreadExecutor.execute(new Runnable() {
@@ -162,16 +165,81 @@ public class EventsLoader {
         SecurityUtil.runAs(securityService, organization, user, new Effect0() {
           @Override
           protected void run() {
-            archive.add(workflowInstance.getMediaPackage());
+            assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
           }
         });
       }
     });
   }
 
-  private WorkflowInstance addWorkflowEntry(EventEntry event, DublinCoreCatalog episodeDublinCore) throws Exception {
+  private void addWorkflowEntry(MediaPackage mediaPackage) throws Exception {
+    WorkflowDefinition def = workflowService.getWorkflowDefinitionById("full");
+    WorkflowInstance workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, securityService.getUser(),
+            securityService.getOrganization(), new HashMap<String, String>());
+    workflowInstance.setState(WorkflowState.SUCCEEDED);
+
+    String xml = WorkflowParser.toXml(workflowInstance);
+
+    // create job
+    Job job = serviceRegistry.createJob(WorkflowService.JOB_TYPE, "START_WORKFLOW", null, null, false);
+    job.setStatus(Status.FINISHED);
+    job.setPayload(xml);
+    job = serviceRegistry.updateJob(job);
+
+    workflowInstance.setId(job.getId());
+    workflowService.update(workflowInstance);
+  }
+
+  private void addSchedulerEntry(EventEntry event, MediaPackage mediaPackage) throws Exception {
+    Date endDate = new DateTime(event.getRecordingDate().getTime()).plusMinutes(event.getDuration()).toDate();
+    schedulerService.addEvent(event.getRecordingDate(), endDate, event.getCaptureAgent(),
+            Collections.<String> emptySet(), mediaPackage, Collections.<String, String> emptyMap(),
+            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.some("org.opencastproject.dataloader"),
+            SchedulerService.ORIGIN);
+    cleanUpMediaPackage(mediaPackage);
+  }
+
+  private void execute(CSVParser csv) throws Exception {
+    List<EventEntry> events = parseCSV(csv);
+    logger.info("Found {} events to populate", events.size());
+
+    int i = 1;
+    final Date now = new Date();
+    for (EventEntry event : events) {
+      logger.info("Populating event {}", i);
+
+      createSeries(event);
+
+      MediaPackage mediaPackage = getBasicMediaPackage(event);
+
+      if (now.after(event.getRecordingDate())) {
+        addWorkflowEntry(mediaPackage);
+        if (event.isArchive())
+          addArchiveEntry(mediaPackage);
+      } else {
+        addSchedulerEntry(event, mediaPackage);
+      }
+      logger.info("Finished populating event {}", i++);
+    }
+  }
+
+  private void cleanUpMediaPackage(MediaPackage mp) {
+    for (MediaPackageElement element : mp.getElements()) {
+      try {
+        workspace.delete(element.getURI());
+      } catch (NotFoundException e) {
+        logger.warn("Unable to find (and hence, delete), this mediapackage '{}' element '{}'", mp.getIdentifier(),
+                element.getIdentifier());
+      } catch (IOException e) {
+        chuck(e);
+      }
+    }
+  }
+
+  private MediaPackage getBasicMediaPackage(EventEntry event) throws Exception {
     URL baseMediapackageUrl = EventsLoader.class.getResource("/base_mediapackage.xml");
     MediaPackage mediaPackage = MediaPackageParser.getFromXml(IOUtils.toString(baseMediapackageUrl));
+    DublinCoreCatalog episodeDublinCore = getBasicEpisodeDublinCore(event);
     mediaPackage.setDate(event.getRecordingDate());
     mediaPackage.setIdentifier(new IdImpl(episodeDublinCore.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER)));
     mediaPackage.setTitle(event.getTitle());
@@ -205,51 +273,7 @@ public class EventsLoader {
         IOUtils.closeQuietly(in);
       }
     }
-
-    WorkflowDefinition def = workflowService.getWorkflowDefinitionById("full");
-    WorkflowInstance workflowInstance = new WorkflowInstanceImpl(def, mediaPackage, null, securityService.getUser(),
-            securityService.getOrganization(), new HashMap<String, String>());
-    workflowInstance.setState(WorkflowState.SUCCEEDED);
-
-    String xml = WorkflowParser.toXml(workflowInstance);
-
-    // create job
-    Job job = serviceRegistry.createJob(WorkflowService.JOB_TYPE, "START_WORKFLOW", null, null, false);
-    job.setStatus(Status.FINISHED);
-    job.setPayload(xml);
-    job = serviceRegistry.updateJob(job);
-
-    workflowInstance.setId(job.getId());
-    workflowService.update(workflowInstance);
-    return workflowInstance;
-  }
-
-  private void addSchedulerEntry(EventEntry event, DublinCoreCatalog episodeDublinCore) throws Exception {
-    schedulerService.addEvent(episodeDublinCore, new HashMap<String, String>());
-  }
-
-  private void execute(CSVParser csv) throws Exception {
-    List<EventEntry> events = parseCSV(csv);
-    logger.info("Found {} events to populate", events.size());
-
-    int i = 1;
-    final Date now = new Date();
-    for (EventEntry event : events) {
-      logger.info("Populating event {}", i);
-
-      createSeries(event);
-
-      DublinCoreCatalog episodeDublinCore = getBasicEpisodeDublinCore(event);
-
-      if (now.after(event.getRecordingDate())) {
-        WorkflowInstance workflowInstance = addWorkflowEntry(event, episodeDublinCore);
-        if (event.isArchive())
-          addArchiveEntry(workflowInstance);
-      } else {
-        addSchedulerEntry(event, episodeDublinCore);
-      }
-      logger.info("Finished populating event {}", i++);
-    }
+    return mediaPackage;
   }
 
   private void createSeries(EventEntry event) throws SeriesException, UnauthorizedException, NotFoundException {
@@ -260,44 +284,32 @@ public class EventsLoader {
       // Test if the series already exist, it does not create it.
       seriesService.getSeries(event.getSeries().get());
     } catch (NotFoundException e) {
-      DublinCoreCatalog catalog = DublinCores.mkOpencastSeries().getCatalog();
-      catalog.set(DublinCore.PROPERTY_IDENTIFIER, event.getSeries().get());
-      if (event.getSeriesName().isSome())
-        catalog.set(DublinCore.PROPERTY_TITLE, event.getSeriesName().get());
+      Series catalog = DublinCores.mkOpencastSeries(event.getSeries().get());
+      catalog.updateTitle(event.getSeriesName().toOpt());
 
       // If the series does not exist, we create it.
-      seriesService.updateSeries(catalog);
+      seriesService.updateSeries(catalog.getCatalog());
       seriesService.updateAccessControl(event.getSeries().get(), defaultAcl);
     }
   }
 
   private DublinCoreCatalog getBasicEpisodeDublinCore(EventEntry event) throws IOException {
-    DublinCoreCatalog catalog = DublinCores.mkOpencastEpisode().getCatalog();
-    catalog.set(DublinCore.PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
-    catalog.set(DublinCore.PROPERTY_TITLE, event.getTitle());
-    catalog.set(DublinCore.PROPERTY_SPATIAL, event.getCaptureAgent());
-    catalog.set(DublinCore.PROPERTY_SOURCE, event.getSource());
-    catalog.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(event.getRecordingDate(), Precision.Day));
-    catalog.set(DublinCore.PROPERTY_CONTRIBUTOR, event.getContributor());
-    for (String creator : event.getPresenters()) {
-      catalog.add(DublinCore.PROPERTY_CREATOR, creator);
-    }
-
-    if (event.getDescription().isSome())
-      catalog.set(DublinCore.PROPERTY_DESCRIPTION, event.getDescription().get());
-
-    final DublinCoreValue period = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(event.getRecordingDate(),
-            new DateTime(event.getRecordingDate().getTime()).plusMinutes(event.getDuration()).toDate()),
-            Precision.Second);
-    catalog.set(DublinCore.PROPERTY_TEMPORAL, period);
-
-    if (event.getSeries().isSome())
-      catalog.set(DublinCoreCatalog.PROPERTY_IS_PART_OF, event.getSeries().get());
-    return catalog;
+    OpencastDctermsDublinCore.Episode catalog = DublinCores.mkOpencastEpisode(Opt.<String> none());
+    catalog.setTitle(event.getTitle());
+    catalog.setSpatial(event.getCaptureAgent());
+    catalog.setSource(event.getSource());
+    catalog.setCreated(event.getRecordingDate());
+    catalog.setContributor(event.getContributor());
+    catalog.setCreators(event.getPresenters());
+    catalog.updateDescription(event.getDescription().toOpt());
+    catalog.setTemporal(event.getRecordingDate(),
+            new DateTime(event.getRecordingDate().getTime()).plusMinutes(event.getDuration()).toDate());
+    catalog.updateIsPartOf(event.getSeries().toOpt());
+    return catalog.getCatalog();
   }
 
   private List<EventEntry> parseCSV(CSVParser csv) {
-    List<EventEntry> arrayList = new ArrayList<EventEntry>();
+    List<EventEntry> arrayList = new ArrayList<>();
     for (CSVRecord record : csv) {
       String title = record.get(0);
       String description = StringUtils.trimToNull(record.get(1));
@@ -391,11 +403,11 @@ public class EventsLoader {
   }
 
   /**
-   * @param archive
-   *          the archive to set
+   * @param assetManager
+   *          the asset manager to set
    */
-  public void setArchive(Archive<?> archive) {
-    this.archive = archive;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   /**

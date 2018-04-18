@@ -43,6 +43,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ListProvidersServiceImpl implements ListProvidersService {
 
@@ -51,7 +52,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
 
   public static final String REVIEW_STATUS = "review_status";
 
-  private Map<String, ResourceListProvider> providers = new HashMap<String, ResourceListProvider>();
+  private Map<String, ResourceListProvider> providers = new ConcurrentHashMap<String, ResourceListProvider>();
 
   /** OSGi callback for provider. */
   public void addProvider(ResourceListProvider provider) {

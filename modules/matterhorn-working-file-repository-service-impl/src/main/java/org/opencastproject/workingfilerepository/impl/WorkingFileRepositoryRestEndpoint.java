@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.IoSupport.withFile;
+import static org.opencastproject.util.MimeTypes.getMimeType;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.fileResponse;
 import static org.opencastproject.util.RestUtil.partialFileResponse;
@@ -64,7 +65,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -89,9 +89,6 @@ import javax.ws.rs.core.Response;
 public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl {
 
   private static final Logger logger = LoggerFactory.getLogger(WorkingFileRepositoryRestEndpoint.class);
-
-  private final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(getClass().getClassLoader()
-          .getResourceAsStream("mimetypes"));
 
   /** The Apache Tika parser */
   private Parser tikaParser;
@@ -193,8 +190,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(HttpStatus.SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -214,7 +211,28 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from collection '{}': {}", new Object[] { fileName, collectionId, e });
+      logger.error("Unable to delete element '{}' from collection '{}': {}", fileName, collectionId, e);
+      return Response.serverError().entity(e.getMessage()).build();
+    }
+  }
+
+  @DELETE
+  @Path(WorkingFileRepository.COLLECTION_PATH_PREFIX + "cleanup/{collectionId}/{numberOfDays}")
+  @RestQuery(name = "cleanupOldFilesFromCollection", description = "Remove the files from the working repository under /collectionId that are older than N days", returnDescription = "No content", pathParameters = {
+          @RestParameter(name = "collectionId", description = "the collection identifier", isRequired = true, type = STRING),
+          @RestParameter(name = "numberOfDays", description = "files older than this number of days will be deleted", isRequired = true, type = STRING) }, reponses = {
+                  @RestResponse(responseCode = SC_NO_CONTENT, description = "Files deleted"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Collection not found") })
+  public Response restCleanupOldFilesFromCollection(@PathParam("collectionId") String collectionId,
+          @PathParam("numberOfDays") long days) {
+    try {
+      if (this.cleanupOldFilesFromCollection(collectionId, days))
+        return Response.noContent().build();
+      else
+        return Response.status(SC_NOT_FOUND).build();
+    } catch (Exception e) {
+      logger.error("Unable to delete files older than '{}' days from collection '{}': {}",
+              days, collectionId, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -238,7 +256,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         return Response.notModified(md5).build();
       }
     } catch (IOException e) {
-      logger.warn("Error reading digest of {}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID });
+      logger.warn("Error reading digest of {}/{}", mediaPackageElementID, mediaPackageElementID);
     }
     try {
       return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
@@ -248,8 +266,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         }
       }).orError(new NotFoundException()).get();
     } catch (IllegalStateException e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -296,24 +314,24 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         return Response.notModified(md5).build();
       }
     } catch (IOException e) {
-      logger.warn("Error reading digest of {}/{}/{}", new Object[] { mediaPackageElementID, mediaPackageElementID,
-              fileName });
+      logger.warn("Error reading digest of {}/{}/{}", mediaPackageElementID, mediaPackageElementID,
+              fileName);
     }
 
     try {
       if (StringUtils.isNotBlank(range)) {
         logger.debug("trying to retrieve range: {}", range);
-        return partialFileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
+        return partialFileResponse(getFile(mediaPackageID, mediaPackageElementID), getMimeType(fileName),
                 some(fileName), range).tag(md5).build();
 
       } else {
         // No If-Non-Match header provided, or the file changed in the meantime
-        return fileResponse(getFile(mediaPackageID, mediaPackageElementID), mimeMap.getContentType(fileName),
+        return fileResponse(getFile(mediaPackageID, mediaPackageElementID), getMimeType(fileName),
                 some(fileName)).tag(md5).build();
       }
     } catch (Exception e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", new Object[] { mediaPackageElementID,
-              mediaPackageID, e });
+      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+              mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }
@@ -327,7 +345,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
           @PathParam("fileName") String fileName) throws NotFoundException {
-    return fileResponse(getFileFromCollection(collectionId, fileName), mimeMap.getContentType(fileName), some(fileName))
+    return fileResponse(getFileFromCollection(collectionId, fileName), getMimeType(fileName), some(fileName))
             .build();
   }
 
@@ -399,8 +417,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.copyTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
-              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
+      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}",
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -423,8 +441,8 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.moveTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}", new Object[] {
-              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e });
+      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}",
+              fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }

@@ -21,9 +21,11 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.Stream.$;
+import static com.entwinemedia.fn.data.Opt.nul;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -31,9 +33,8 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.index.service.util.JSONUtils;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.data.Option;
@@ -45,26 +46,22 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.Gson;
 
-import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.codehaus.jettison.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -97,23 +94,23 @@ public class TasksEndpoint {
 
   private WorkflowService workflowService;
 
-  private Archive<?> archive;
+  private AssetManager assetManager;
 
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
+  private Workspace workspace;
 
   /** OSGi callback for the workflow service. */
   public void setWorkflowService(WorkflowService workflowService) {
     this.workflowService = workflowService;
   }
 
-  /** OSGi callback for the archive service. */
-  public void setArchive(Archive<?> archive) {
-    this.archive = archive;
+  /** OSGi callback to set the asset manager. */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
-  /** OSGi callback for the http mediapackage element provider. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
+  /** OSGi callback to set the workspace. */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   protected void activate(BundleContext bundleContext) {
@@ -127,14 +124,14 @@ public class TasksEndpoint {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
 
     // This is the JSON Object which will be returned by this request
-    List<JValue> actions = new ArrayList<JValue>();
+    List<JValue> actions = new ArrayList<>();
     try {
       List<WorkflowDefinition> workflowsDefinitions = workflowService.listAvailableWorkflowDefinitions();
       for (WorkflowDefinition wflDef : workflowsDefinitions) {
         if (wflDef.containsTag(tags)) {
-          actions.add(j(f("id", v(wflDef.getId())), f("title", v(Opt.nul(wflDef.getTitle()).or(""))),
-                  f("description", v(Opt.nul(wflDef.getDescription()).or(""))),
-                  f("configuration_panel", v(Opt.nul(wflDef.getConfigurationPanel()).or("")))));
+          actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
+                  f("description", v(nul(wflDef.getDescription()).getOr(""))),
+                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
         }
       }
     } catch (WorkflowDatabaseException e) {
@@ -142,7 +139,7 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    return okJson(a(actions));
+    return okJson(arr(actions));
   }
 
   @POST
@@ -156,11 +153,10 @@ public class TasksEndpoint {
       logger.warn("No metadata set");
       return RestUtil.R.badRequest("No metadata set");
     }
-
-    JSONParser parser = new JSONParser();
-    JSONObject metadataJson;
+    Gson gson = new Gson();
+    Map metadataJson = null;
     try {
-      metadataJson = (JSONObject) parser.parse(metadata);
+      metadataJson = gson.fromJson(metadata, Map.class);
     } catch (Exception e) {
       logger.warn("Unable to parse metadata {}", metadata);
       return RestUtil.R.badRequest("Unable to parse metadata");
@@ -170,28 +166,22 @@ public class TasksEndpoint {
     if (StringUtils.isBlank(workflowId))
       return RestUtil.R.badRequest("No workflow set");
 
-    JSONArray eventIds = (JSONArray) metadataJson.get("eventIds");
+    List eventIds = (List) metadataJson.get("eventIds");
     if (eventIds == null)
-      return RestUtil.R.badRequest("No eventIds set");
+        return RestUtil.R.badRequest("No eventIds set");
 
-    JSONObject configuration = (JSONObject) metadataJson.get("configuration");
-    Stream<Entry<String, String>> options = Stream.empty();
-    if (configuration != null) {
-      try {
-        options = options.append(JSONUtils.toMap(
-                new org.codehaus.jettison.json.JSONObject(configuration.toJSONString())).entrySet());
-      } catch (JSONException e) {
-        logger.warn("Unable to parse workflow options to map: {}", ExceptionUtils.getStackTrace(e));
-        return RestUtil.R.badRequest("Unable to parse workflow options to map");
+    Map<String, String> configuration = (Map<String, String>) metadataJson.get("configuration");
+    if (configuration == null) {
+      configuration = new HashMap<>();
+    } else {
+      Iterator<String> confKeyIter = configuration.keySet().iterator();
+      while (confKeyIter.hasNext()) {
+        String confKey = confKeyIter.next();
+        if (StringUtils.equalsIgnoreCase("eventIds", confKey)) {
+          confKeyIter.remove();
+        }
       }
     }
-
-    Map<String, String> optionsMap = options.filter(new Fn<Map.Entry<String, String>, Boolean>() {
-      @Override
-      public Boolean ap(Entry<String, String> a) {
-        return !"eventIds".equalsIgnoreCase(a.getKey());
-      }
-    }).foldl(new HashMap<String, String>(), TasksEndpoint.<String, String> mapFold());
 
     WorkflowDefinition wfd;
     try {
@@ -201,41 +191,31 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    List<WorkflowInstance> instances = archive.applyWorkflow(workflow(wfd, optionsMap),
-            httpMediaPackageElementProvider.getUriRewriter(), IteratorUtils.toList(eventIds.iterator()));
+    final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+    final List<WorkflowInstance> instances = workflows.applyWorkflowToLatestVersion(eventIds,
+            workflow(wfd, configuration)).toList();
 
     if (eventIds.size() != instances.size()) {
       logger.debug("Can't start one or more tasks.");
       return Response.status(Status.BAD_REQUEST).build();
     }
-
-    JSONObject json = new JSONObject();
-    JSONArray workflows = new JSONArray();
-
-    for (int i = 0; i < instances.size(); i++) {
-      workflows.add(instances.get(i).getId());
-    }
-
-    json.put("workflows", workflows);
-
-    return Response.status(Status.CREATED)
-            .entity(json.toJSONString()).build();
+    return Response.status(Status.CREATED).entity(gson.toJson($(instances).map(getWorkflowIds).toList())).build();
   }
 
   private static <A, B> Fn2<Map<A, B>, Entry<A, B>, Map<A, B>> mapFold() {
     return new Fn2<Map<A, B>, Entry<A, B>, Map<A, B>>() {
       @Override
-      public Map<A, B> ap(Map<A, B> sum, Entry<A, B> a) {
+      public Map<A, B> apply(Map<A, B> sum, Entry<A, B> a) {
         sum.put(a.getKey(), a.getValue());
         return sum;
       }
     };
   }
 
-  private static final Fn<WorkflowInstance, String> getWorkflowIds = new Fn<WorkflowInstance, String>() {
+  private static final Fn<WorkflowInstance, Long> getWorkflowIds = new Fn<WorkflowInstance, Long>() {
     @Override
-    public String ap(WorkflowInstance a) {
-      return Long.toString(a.getId());
+    public Long apply(WorkflowInstance a) {
+      return a.getId();
     }
   };
 

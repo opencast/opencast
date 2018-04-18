@@ -132,6 +132,18 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_COLOR */
   public static final String WAVEFORM_COLOR_CONFIG_KEY = "waveform.color";
 
+  /** The default filter to be optionally prepended to the showwavespic filter */
+  public static final String DEFAULT_WAVEFORM_FILTER_PRE = null;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_FILTER_PRE */
+  public static final String WAVEFORM_FILTER_PRE_CONFIG_KEY = "waveform.filter.pre";
+
+  /** The default filter to be optionally appended to the showwavespic filter */
+  public static final String DEFAULT_WAVEFORM_FILTER_POST = null;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_FILTER_POST */
+  public static final String WAVEFORM_FILTER_POST_CONFIG_KEY = "waveform.filter.post";
+
   /** Resulting collection in the working file repository */
   public static final String COLLECTION_ID = "waveform";
 
@@ -164,6 +176,12 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
 
   /** The waveform colors per audio channel */
   private String[] waveformColor = DEFAULT_WAVEFORM_COLOR;
+
+  /** Filter to be prepended to the showwavespic filter */
+  private String waveformFilterPre = DEFAULT_WAVEFORM_FILTER_PRE;
+
+  /** Filter to be appended to the showwavespic filter */
+  private String waveformFilterPost = DEFAULT_WAVEFORM_FILTER_POST;
 
   /** Reference to the service registry */
   private ServiceRegistry serviceRegistry = null;
@@ -264,6 +282,20 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       if (StringUtils.isNotEmpty(colorValue) && StringUtils.isNotBlank(colorValue)) {
         waveformColor = StringUtils.split(colorValue, ", |:;");
       }
+    }
+
+    val = properties.get(WAVEFORM_FILTER_PRE_CONFIG_KEY);
+    if (val != null) {
+      waveformFilterPre = StringUtils.trimToNull((String) val);
+    } else {
+      waveformFilterPre = null;
+    }
+
+    val = properties.get(WAVEFORM_FILTER_POST_CONFIG_KEY);
+    if (val != null) {
+      waveformFilterPost = StringUtils.trimToNull((String) val);
+    } else {
+      waveformFilterPost = null;
     }
   }
 
@@ -421,7 +453,12 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @return ffmpeg filter parameter
    */
   private String createWaveformFilter(Track track) {
-    StringBuilder filterBuilder = new StringBuilder("showwavespic=");
+    StringBuilder filterBuilder = new StringBuilder("");
+    if (waveformFilterPre != null) {
+      filterBuilder.append(waveformFilterPre);
+      filterBuilder.append(",");
+    }
+    filterBuilder.append("showwavespic=");
     filterBuilder.append("split_channels=");
     filterBuilder.append(waveformSplitChannels ? 1 : 0);
     filterBuilder.append(":s=");
@@ -432,6 +469,10 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     filterBuilder.append(waveformScale);
     filterBuilder.append(":colors=");
     filterBuilder.append(StringUtils.join(Arrays.asList(waveformColor), "|"));
+    if (waveformFilterPost != null) {
+      filterBuilder.append(",");
+      filterBuilder.append(waveformFilterPost);
+    }
     return filterBuilder.toString();
   }
 

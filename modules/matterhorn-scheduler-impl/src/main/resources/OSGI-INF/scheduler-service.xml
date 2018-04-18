@@ -13,22 +13,24 @@
     cardinality="1..1" policy="static" bind="setMessageReceiver" />
   <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
     cardinality="1..1" policy="static" bind="setMessageSender" />    
-  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
   <reference name="scheduler-persistence" interface="org.opencastproject.scheduler.impl.SchedulerServiceDatabase"
     cardinality="1..1" policy="static" bind="setPersistence" />    
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
     cardinality="1..1" policy="static" bind="setWorkspace" />
-  <reference name="scheduler-index" interface="org.opencastproject.scheduler.impl.SchedulerServiceIndex"
-    cardinality="1..1" policy="static" bind="setIndex" />
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
     cardinality="1..1" policy="static" bind="setSecurityService" />
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
     cardinality="1..1" policy="static" bind="setSeriesService" />
-  <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
-    cardinality="1..1" policy="static" bind="setWorkflowService" />
-  <reference name="agentService" interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
-    cardinality="0..1" policy="dynamic" bind="setCaptureAgentStateService" unbind="unsetCaptureAgentStateService" />
-  <reference name="dublincore-service" interface="org.opencastproject.metadata.dublincore.DublinCoreCatalogService"
-    cardinality="1..1" policy="static" bind="setDublinCoreCatalogService" />
+  <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
+    cardinality="1..1" policy="static" bind="setAssetManager" />
+  <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
+    cardinality="1..1" policy="static" bind="setAuthorizationService" />
+  <reference name="conflict-handler" interface="org.opencastproject.scheduler.api.ConflictHandler"
+    cardinality="1..1" policy="static" bind="setConflictHandler" />
+  <reference name="conflict-notifiers" interface="org.opencastproject.scheduler.api.ConflictNotifier"
+    cardinality="0..n" policy="dynamic" bind="addConflictNotifier" unbind="removeConflictNotifier" />
+  <reference name="event-catalog-ui-adapter" interface="org.opencastproject.metadata.dublincore.EventCatalogUIAdapter"
+    cardinality="0..n" policy="dynamic" bind="addCatalogUIAdapter" unbind="removeCatalogUIAdapter" />
+  <reference name="org-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+    cardinality="1..1" policy="static" bind="setOrgDirectoryService" />
 </scr:component>

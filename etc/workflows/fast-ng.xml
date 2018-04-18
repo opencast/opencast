@@ -51,18 +51,20 @@
         <configuration key="comment">false</configuration>
         <configuration key="publishToMediaModule">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
+        <configuration key="uploadedSearchPreview">false</configuration>
       </configurations>
     </operation>
 
-    <!-- Apply ACL from series to the mediapackage -->
+    <!-- Apply metadata from series to the mediapackage -->
 
     <operation
       id="series"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
-      description="Applying access control entries from series">
+      description="Applying series metadata">
       <configurations>
         <configuration key="apply-acl">true</configuration>
+        <configuration key="attach">*</configuration>
       </configurations>
     </operation>
 
@@ -77,6 +79,18 @@
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
         <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag any optionally uploaded assets -->
+    <operation
+      id="tag"
+      if="${downloadSourceflavorsExist}"
+      exception-handler-workflow="ng-partial-error"
+      description="Tagging uploaded assets for distribution">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -122,10 +136,10 @@
     </operation>
 
     <!-- encode to engage search result thumbnails -->
-
+    <!-- skip this when manually uploaded */search+preview -->
     <operation
       id="image"
-      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
       description="Creating Engage search result thumbnails">
@@ -184,6 +198,22 @@
         <configuration key="reference-tags">engage-download</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+	<!-- Generate timeline preview images -->
+
+    <operation
+      id="timelinepreviews"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
       </configurations>
     </operation>
 
@@ -251,7 +281,7 @@
     <!-- Archive the current state of the media package -->
 
     <operation
-      id="archive"
+      id="snapshot"
       fail-on-error="true"
       exception-handler-workflow="ng-partial-error"
       description="Archiving">

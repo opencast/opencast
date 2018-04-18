@@ -22,9 +22,9 @@ package org.opencastproject.oaipmh.persistence;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * An item that was found as part of a search. Typically a {@link SearchResultItem} will be included in a
@@ -47,25 +47,26 @@ public interface SearchResultItem {
   /** @return the repository id */
   String getRepository();
 
-  /** @return the series dublincore catalog */
-  Option<DublinCoreCatalog> getSeriesDublinCore();
-
-  /** @return the serialized series dublincore catalog */
-  Option<String> getSeriesDublinCoreXml();
-
-  /** @return the serialized ACL XML of the series */
-  Option<String> getSeriesAclXml();
-
-  /** @return the episode dublincore catalog */
-  Option<DublinCoreCatalog> getEpisodeDublinCore();
-
-  /** @return the serialized episode dublincore catalog */
-  Option<String> getEpisodeDublinCoreXml();
-
   /** @return the last modification date */
   Date getModificationDate();
 
   /** Return <code>true</code> if the mediapackage has been deleted. */
   boolean isDeleted();
 
+  /** @return the list of media package search result elements belongs to this media package */
+  List<SearchResultElementItem> getElements();
+
+  /**
+   * @return the episode dublincore catalog if it was published with this media package
+   * @throws OaiPmhDatabaseException if the episode dublincore catalog wasn't published with this media package
+   *            or if the dublincore catalog can not be parsed
+   */
+  DublinCoreCatalog getEpisodeDublinCore() throws OaiPmhDatabaseException;
+
+  /**
+   * @return the series dublincore catalog if it was published with this media package
+   * @throws OaiPmhDatabaseException if the series dublincore catalog wasn't published with this media package
+   *            or if the dublincore catalog can not be parsed
+   */
+  DublinCoreCatalog getSeriesDublinCore() throws OaiPmhDatabaseException;
 }

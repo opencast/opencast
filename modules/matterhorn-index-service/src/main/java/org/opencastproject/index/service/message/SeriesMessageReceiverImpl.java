@@ -67,7 +67,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
       case UpdateCatalog:
         logger.debug("Received Update Series for index {}", getSearchIndex().getIndexName());
 
-        DublinCoreCatalog dc = seriesItem.getSeries();
+        DublinCoreCatalog dc = seriesItem.getMetadata();
         String seriesId = dc.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);
 
         // Load or create the corresponding series
@@ -163,6 +163,9 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           return;
         }
         return;
+      case UpdateElement:
+        // nothing to do
+        break;
       default:
         throw new IllegalArgumentException("Unhandled type of SeriesItem");
     }

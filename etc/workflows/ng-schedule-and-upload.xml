@@ -11,6 +11,32 @@
   <configuration_panel>
     <![CDATA[
       <div id="workflow-configuration">
+
+        <fieldset>
+          <legend>Video Qualities</legend>
+          <ul>
+            <li>
+              <input id="flagQuality360p" name="flagQuality360p" type="checkbox" class="configField" value="false" />
+              <label for="flagQuality360p">360p resolution</label>
+            </li>
+            <li>
+              <input id="flagQuality480p" name="flagQuality480p" type="checkbox" class="configField" value="false" />
+              <label for="flagQuality480p">480p resolution</label>
+            </li>
+            <li>
+              <input id="flagQuality720p" name="flagQuality720p" type="checkbox" class="configField" value="true" checked="checked"/>
+              <label for="flagQuality720p">720p resolution (HDready)</label>
+            </li>
+            <li>
+              <input id="flagQuality1080p" name="flagQuality1080p" type="checkbox" class="configField" value="false" />
+              <label for="flagQuality1080p">1080p resolution (FullHD)</label>
+            </li>
+            <li>
+              <input id="flagQuality2160p" name="flagQuality2160p" type="checkbox" class="configField" value="false" />
+              <label for="flagQuality2160p">2160p resolution (UltraHD)</label>
+            </li>
+          </ul>
+        </fieldset>
         <fieldset>
           <legend>Add a comment that the recording needs:</legend>
           <ul>
@@ -118,13 +144,30 @@
         <configuration key="straightToPublishing">true</configuration>
         <configuration key="flagForCutting">false</configuration>
         <configuration key="flagForReview">false</configuration>
+        <configuration key="flagQuality360p">false</configuration>
+        <configuration key="flagQuality480p">false</configuration>
+        <configuration key="flagQuality720p">true</configuration>
+        <configuration key="flagQuality1080p">false</configuration>
+        <configuration key="flagQuality2160p">false</configuration>
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="publishToAws">false</configuration>
+        <configuration key="uploadedSearchPreview">false</configuration>
       </configurations>
     </operation>
+
+    <operation
+      id="export-wf-properties"
+      fail-on-error="true"
+      exception-handler-workflow="ng-partial-error"
+      description="Export workflow settings to Java properties file">
+      <configurations>
+        <configuration key="target-flavor">processing/defaults</configuration>
+      </configurations>
+    </operation>
+
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Prepare asset                                                     -->
@@ -148,7 +191,7 @@
     <!-- Archive the source material -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive raw recording after ingest">
       <configurations>
         <configuration key="source-tags">archive</configuration>
@@ -178,7 +221,7 @@
     <!-- Archive with previews generated -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive preview information">
       <configurations>
         <configuration key="source-tags">archive</configuration>
@@ -246,7 +289,7 @@
     <!-- Archive the recording -->
 
     <operation
-      id="archive"
+      id="snapshot"
       if="${straightToPublishing}"
       description="Archive publishing information">
       <configurations>

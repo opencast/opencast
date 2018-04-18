@@ -242,8 +242,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetPresentationFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTATION_FLAVOR), "presentation");
     final Opt<EncodingProfile> forceProfile = getForceEncodingProfile(operation);
-    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).or("false"));
-    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).or("false"));
+    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
+    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
 
     //
@@ -463,8 +463,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       Track[] targetPresenterTracks = mediaPackage.getTracks(targetPresenterFlavor);
       for (Track track : targetPresenterTracks) {
         if (forceEncoding || trackNeedsTobeEncodedToStandard(track, requiredExtensions)) {
-          logger.debug("Encoding '{}' flavored track '{}' with standard encoding profile {}", new Object[] {
-                  targetPresenterFlavor, track.getURI(), forceProfile.get() });
+          logger.debug("Encoding '{}' flavored track '{}' with standard encoding profile {}",
+                  targetPresenterFlavor, track.getURI(), forceProfile.get());
           queueTime += encodeToStandard(mediaPackage, forceProfile.get(), targetPresenterFlavor, track);
           elementsToClean.add(track);
           mediaPackage.remove(track);
@@ -475,8 +475,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
         Track[] targetPresentationTracks = mediaPackage.getTracks(targetPresentationFlavor);
         for (Track track : targetPresentationTracks) {
           if (forceEncoding || trackNeedsTobeEncodedToStandard(track, requiredExtensions)) {
-            logger.debug("Encoding '{}' flavored track '{}' with standard encoding profile {}", new Object[] {
-                    targetPresentationFlavor, track.getURI(), forceProfile.get() });
+            logger.debug("Encoding '{}' flavored track '{}' with standard encoding profile {}",
+                    targetPresentationFlavor, track.getURI(), forceProfile.get());
             queueTime += encodeToStandard(mediaPackage, forceProfile.get(), targetPresentationFlavor, track);
             elementsToClean.add(track);
             mediaPackage.remove(track);
@@ -506,7 +506,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     } else {
       targetCopyFlavor = deriveAudioFlavor(targetFlavor);
     }
-    logger.debug("Copying track {} with flavor {} using target flavor {}", new Object[] { track.getURI(), track.getFlavor(), targetCopyFlavor });
+    logger.debug("Copying track {} with flavor {} using target flavor {}", track.getURI(), track.getFlavor(), targetCopyFlavor);
     copyPartialToSource(mediaPackage, targetCopyFlavor, track);
   }
 
@@ -623,7 +623,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws WorkflowOperationException {
     return getOptConfig(woi, FORCE_ENCODING_PROFILE).map(new Fn<String, EncodingProfile>() {
       @Override
-      public EncodingProfile ap(String profileName) {
+      public EncodingProfile apply(String profileName) {
         for (EncodingProfile profile : Opt.nul(composerService.getProfile(profileName))) {
           return profile;
         }
@@ -706,8 +706,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     if (forceDivisible && (trackDimension.getB().getHeight() % 2 != 0 || trackDimension.getB().getWidth() % 2 != 0)) {
       Dimension scaledDimension = Dimension.dimension((trackDimension.getB().getWidth() / 2) * 2, (trackDimension
               .getB().getHeight() / 2) * 2);
-      logger.info("Determined output dimension {} scaled down from {} for track {}", new Object[] { scaledDimension,
-              trackDimension.getB(), trackDimension.getA() });
+      logger.info("Determined output dimension {} scaled down from {} for track {}", scaledDimension,
+              trackDimension.getB(), trackDimension.getA());
       return scaledDimension;
     } else {
       logger.info("Determined output dimension {} for track {}", trackDimension.getB(), trackDimension.getA());
@@ -755,7 +755,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     if (elements.length == 1 && trackToTrim.getDuration() / 1000 > videoDuration) {
       Long trimSeconds = (long) (trackToTrim.getDuration() / 1000 - videoDuration);
       logger.info("Shorten track {} to target duration {} by {} seconds",
-              new String[] { trackToTrim.toString(), videoDuration.toString(), trimSeconds.toString() });
+              trackToTrim.toString(), videoDuration.toString(), trimSeconds.toString());
       return trimEnd(mediaPackage, trimProfile, trackToTrim, videoDuration, elementsToClean);
     } else if (elements.length > 1) {
       logger.warn("Multiple tracks with flavor {} found! Trimming not possible!", targetFlavor);
@@ -811,7 +811,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     }
 
     logger.debug("Check for mux between '{}' and '{}' flavors and found video track '{}' and audio track '{}'",
-            new Object[] { targetPresentationFlavor, targetPresenterFlavor, videoTrack, audioTrack });
+            targetPresentationFlavor, targetPresenterFlavor, videoTrack, audioTrack);
     if (videoTrack != null && audioTrack != null) {
       queueTime += mux(mediaPackage, videoTrack, audioTrack, elementsToClean);
       return queueTime;
@@ -866,8 +866,8 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       copyTrack.setIdentifier(elementID);
       copyTrack.referTo(track);
       mediaPackage.add(copyTrack);
-      logger.info("Copied partial source element {} to {} with target flavor {}", new String[] { track.toString(),
-              copyTrack.toString(), targetFlavor.toString() });
+      logger.info("Copied partial source element {} to {} with target flavor {}", track.toString(),
+              copyTrack.toString(), targetFlavor.toString());
     } finally {
       IOUtils.closeQuietly(in);
     }
@@ -966,13 +966,12 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
             } else {
               double fillTime = (beginInMs - position) / 1000d;
               if (NODE_TYPE_AUDIO.equals(e.getNodeName())) {
-                logger.info("Fill {} audio track gap from {} to {} with silent audio", new String[] { type.get(),
-                        Double.toString(positionInSeconds), Double.toString(beginInSeconds) });
+                logger.info("Fill {} audio track gap from {} to {} with silent audio", type.get(),
+                        Double.toString(positionInSeconds), Double.toString(beginInSeconds));
                 tracks.add(getSilentAudio(fillTime, elementsToClean, operationId));
               } else {
-                logger.info(
-                        "Fill {} track gap from {} to {} with image frame",
-                        new String[] { type.get(), Double.toString(positionInSeconds), Double.toString(beginInSeconds) });
+                logger.info("Fill {} track gap from {} to {} with image frame",
+                        type.get(), Double.toString(positionInSeconds), Double.toString(beginInSeconds));
                 Track previousTrack = tracks.get(tracks.size() - 1);
                 Attachment tempLastImageFrame = extractLastImageFrame(previousTrack, elementsToClean);
                 tracks.add(createVideoFromImage(tempLastImageFrame, fillTime, elementsToClean));

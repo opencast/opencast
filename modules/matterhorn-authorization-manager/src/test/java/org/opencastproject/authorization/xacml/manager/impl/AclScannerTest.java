@@ -28,19 +28,18 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
-import org.opencastproject.kernel.security.SecurityServiceSpringImpl;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.util.data.Option;
 
@@ -82,9 +81,9 @@ public class AclScannerTest {
     orgService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgService.getOrganizations()).andReturn(orgs).anyTimes();
 
+    final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+
     final MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
-    final HttpMediaPackageElementProvider httpMediaPackageElementProvider = EasyMock
-            .createNiceMock(HttpMediaPackageElementProvider.class);
 
     final AclTransitionDb aclTransitionDb = EasyMock.createNiceMock(AclTransitionDb.class);
     List<EpisodeACLTransition> episodeTransitions = new ArrayList<>();
@@ -94,20 +93,20 @@ public class AclScannerTest {
             .andReturn(new TransitionResultImpl(episodeTransitions, seriesTransitions)).anyTimes();
 
     // EasyMock.replay(aclDb);
-    EasyMock.replay(orgService, messageSender, httpMediaPackageElementProvider, aclTransitionDb);
+    EasyMock.replay(orgService, messageSender, aclTransitionDb, securityService);
 
     AclServiceFactory aclServiceFactory = new AclServiceFactory() {
       @Override
       public AclService serviceFor(Organization org) {
-        return new AclServiceImpl(new DefaultOrganization(), aclDb, aclTransitionDb, null, null, null, null, null,
-                httpMediaPackageElementProvider, null, null, null, messageSender);
+        return new AclServiceImpl(new DefaultOrganization(), aclDb, aclTransitionDb, null, null, null, null,
+                messageSender, null);
       }
     };
 
     aclScanner = new AclScanner();
     aclScanner.setAclServiceFactory(aclServiceFactory);
     aclScanner.setOrganizationDirectoryService(orgService);
-    aclScanner.setSecurityService(new SecurityServiceSpringImpl());
+    aclScanner.setSecurityService(securityService);
   }
 
   @Test

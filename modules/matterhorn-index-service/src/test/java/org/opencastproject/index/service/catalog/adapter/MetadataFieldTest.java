@@ -22,7 +22,7 @@
 package org.opencastproject.index.service.catalog.adapter;
 
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -58,7 +58,7 @@ public class MetadataFieldTest {
   private String endTime = "endTime";
   private Opt<String> optOutputID = Opt.some(defaultOutputID);
   private String label = "A_LABEL_FOR_THIS_PROPERTY";
-  private Map<String, String> collection = new TreeMap<String, String>();
+  private Map<String, String> collection = new TreeMap<>();
   private Opt<Map<String, String>> optCollection = Opt.some(collection);
   private String collectionID = "Collection_ID";
   private Opt<String> optCollectionID = Opt.some(collectionID);
@@ -120,7 +120,7 @@ public class MetadataFieldTest {
 
     SimpleDateFormat dateFormat = new SimpleDateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    String expectedJSON = RestUtils.getJsonString(j(f("readOnly", v(readOnly)), f("id", v(defaultInputID)),
+    String expectedJSON = RestUtils.getJsonString(obj(f("readOnly", v(readOnly)), f("id", v(defaultInputID)),
             f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
             f("value", v(dateFormat.format(testDate))), f("required", v(required))));
 

@@ -82,6 +82,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -92,14 +93,14 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import junit.framework.Assert;
 
 public class WorkflowServiceImplTest {
 
@@ -151,6 +152,7 @@ public class WorkflowServiceImplTest {
     handlerRegistrations.add(new HandlerRegistration("opPause", new ResumableTestWorkflowOperationHandler()));
     handlerRegistrations.add(new HandlerRegistration("failOnHost", new FailOnHostWorkflowOperationHandler()));
     handlerRegistrations.add(new HandlerRegistration("failOneTime", new FailOnceWorkflowOperationHandler()));
+    handlerRegistrations.add(new HandlerRegistration("failTwice", new FailTwiceWorkflowOperationHandler()));
 
     scanner = new WorkflowDefinitionScanner();
 
@@ -510,6 +512,22 @@ public class WorkflowServiceImplTest {
     return instance;
   }
 
+  protected WorkflowInstance retryAndWait(WorkflowInstance instance, String retryStrategy, WorkflowState stateToWaitFor)
+          throws Exception {
+    WorkflowStateListener stateListener = new WorkflowStateListener(stateToWaitFor);
+    service.addWorkflowListener(stateListener);
+    Map<String, String> props = new HashMap<String, String>();
+    props.put("retryStrategy", retryStrategy);
+    WorkflowInstance wfInstance = null;
+    synchronized (stateListener) {
+      wfInstance = service.resume(instance.getId(), props);
+      stateListener.wait();
+    }
+    service.removeWorkflowListener(stateListener);
+
+    return wfInstance;
+  }
+
   @Test
   public void testPagedGetWorkflowByText() throws Exception {
     // Ensure that the database doesn't have any workflow instances
@@ -648,6 +666,7 @@ public class WorkflowServiceImplTest {
 
     WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
+    opDef.setMaxAttempts(2);
     def.add(opDef);
 
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
@@ -663,8 +682,123 @@ public class WorkflowServiceImplTest {
     Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
 
     Assert.assertTrue(failOneTimeOperation.getState() == OperationState.RETRY);
-    Assert.assertTrue(failOneTimeOperation.getMaxAttempts() == -1);
+    Assert.assertTrue(failOneTimeOperation.getMaxAttempts() == 2);
     Assert.assertTrue(failOneTimeOperation.getFailedAttempts() == 1);
+  }
+
+  @Test
+  public void testRetryStrategyHoldMaxAttemptsThree() throws Exception {
+    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
+    def.setId("workflow-definition-1");
+    def.setTitle("workflow-definition-1");
+    def.setDescription("workflow-definition-1");
+    def.setPublished(true);
+    service.registerWorkflowDefinition(def);
+
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
+    opDef.setRetryStrategy(RetryStrategy.HOLD);
+    opDef.setMaxAttempts(3);
+    def.add(opDef);
+
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.PAUSED);
+
+    WorkflowOperationInstance errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations()
+            .get(0);
+    WorkflowOperationInstance failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
+
+    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
+    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
+
+    // Try operation a second time, simulate user selecting RETRY
+    retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.PAUSED);
+
+    errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
+    failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
+
+    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
+    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+
+    // Try operation a third time, it should succeed, simulate user selecting RETRY
+    retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.SUCCEEDED);
+
+    failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.SUCCEEDED);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+  }
+
+  @Test
+  public void testRetryStrategyHoldFailureByUser() throws Exception {
+    WorkflowDefinitionImpl def = new WorkflowDefinitionImpl();
+    def.setId("workflow-definition-1");
+    def.setTitle("workflow-definition-1");
+    def.setDescription("workflow-definition-1");
+    def.setPublished(true);
+    service.registerWorkflowDefinition(def);
+
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
+    opDef.setRetryStrategy(RetryStrategy.HOLD);
+    opDef.setMaxAttempts(3);
+    opDef.setFailWorkflowOnException(true);
+    def.add(opDef);
+
+    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.PAUSED);
+
+    WorkflowOperationInstance errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations()
+            .get(0);
+    WorkflowOperationInstance failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
+
+    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
+    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 1);
+
+    // Try operation a second time, simulate user selecting RETRY
+    retryAndWait(service.getWorkflowById(workflow.getId()), "RETRY", WorkflowState.PAUSED);
+
+    errorResolutionOperation = service.getWorkflowById(workflow.getId()).getOperations().get(1);
+    failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
+
+    Assert.assertTrue(errorResolutionOperation.getTemplate().equals(WorkflowServiceImpl.ERROR_RESOLUTION_HANDLER_ID));
+    Assert.assertTrue(errorResolutionOperation.getState() == OperationState.PAUSED);
+    Assert.assertTrue(errorResolutionOperation.getFailedAttempts() == 0);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.RETRY);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
+
+    // Simulate user selecting 'fail'
+    retryAndWait(service.getWorkflowById(workflow.getId()), "NONE", WorkflowState.FAILED);
+
+    failTwiceOperation = service.getWorkflowById(workflow.getId()).getOperations().get(2);
+
+    Assert.assertTrue("failTwice".equals(failTwiceOperation.getTemplate()));
+    Assert.assertTrue(failTwiceOperation.getState() == OperationState.FAILED);
+    Assert.assertTrue(failTwiceOperation.getMaxAttempts() == 3);
+    Assert.assertTrue(failTwiceOperation.getFailedAttempts() == 2);
   }
 
   @Test
@@ -894,6 +1028,30 @@ public class WorkflowServiceImplTest {
       if (!hasRun) {
         hasRun = true;
         throw new WorkflowOperationException("This operation handler fails on the first run, but succeeds thereafter");
+      }
+      return createResult(CONTINUE);
+    }
+  }
+
+  class FailTwiceWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
+
+    /** How many times this handler has been run */
+    private int times = 0;
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
+     *      org.opencastproject.job.api.JobContext)
+     */
+    @Override
+    public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+            throws WorkflowOperationException {
+      times++;
+      if (times < 3) {
+        throw new WorkflowOperationException(
+                "This operation handler fails on the first two runs, but succeeds thereafter. This is run number "
+                        + times + ".");
       }
       return createResult(CONTINUE);
     }

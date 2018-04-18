@@ -40,7 +40,12 @@
     <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW, ROLE_UI_EVENTS_CREATE" />
+    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW, ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW, ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/asset/assets.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/attachment/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/catalog/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/publication/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/catalogAdapters" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/events.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
@@ -49,9 +54,12 @@
     <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/general.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/hasActiveTransaction" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/hasSnapshots.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/scheduling.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/workflows.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
@@ -90,6 +98,7 @@
     <sec:intercept-url pattern="/admin-ng/resources/providers.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/THEMES.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
 
     <sec:intercept-url pattern="/email/template/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
@@ -111,12 +120,14 @@
     <sec:intercept-url pattern="/email/template" method="POST" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_CREATE" />
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
     <sec:intercept-url pattern="/services/sanitize" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVICES_STATUS_EDIT" />
+    <sec:intercept-url pattern="/staticfiles" method="POST" access="ROLE_ADMIN, ROLE_UI_THEMES_CREATE, ROLE_UI_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/acl" method="POST" access="ROLE_ADMIN, ROLE_UI_ACLS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/deleteEvents" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/new" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/new/conflicts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/optouts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_STATUS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/assets" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
@@ -134,6 +145,7 @@
 
     <sec:intercept-url pattern="/email/template/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_ACLS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
@@ -262,6 +274,9 @@
     <!-- Enable access to the LTI tools -->
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
+
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />
     <sec:intercept-url pattern="/admin-ng/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />
@@ -287,6 +302,10 @@
     <!-- Opencast is shipping its own implementation of the anonymous filter -->
     <sec:custom-filter ref="anonymousFilter" position="ANONYMOUS_FILTER" />
 
+    <!-- Shibboleth header authentication filter
+    <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
+    -->
+
     <!-- Enables "remember me" functionality -->
     <sec:remember-me key="opencast" user-service-ref="userDetailsService" />
 
@@ -298,6 +317,11 @@
 
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
+
+    <!-- Shibboleth log out
+         Please specifiy the URL to return to after logging out
+    <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
+    -->
 
   </sec:http>
 
@@ -315,8 +339,8 @@
         <!-- Basic authentication  -->
         <!-- <ref bean="basicAuthenticationFilter" /> -->
 
-        <!-- 2-legged oauth is used by trusted 3rd party applications, including LTI producers. -->
-        <!-- If you do not plan to use OAuth, comment this out. -->
+        <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
+        <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
         <!-- <ref bean="oauthProtectedResourceFilter" /> -->
       </list>
     </property>
@@ -416,12 +440,13 @@
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <!-- This is required for LTI. If you plan to use LTI, uncomment this and set
-       custom values for consumerkey and consumersecret:
+  <!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
+  <!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
+
   <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
     <constructor-arg index="0" ref="userDetailsService" />
-    <constructor-arg index="1" value="consumerkey" />
-    <constructor-arg index="2" value="consumersecret" />
+    <constructor-arg index="1" value="CONSUMERKEY" />
+    <constructor-arg index="2" value="CONSUMERSECRET" />
     <constructor-arg index="3" value="constructorName" />
   </bean>
 
@@ -436,15 +461,52 @@
     <property name="authHandler">
       <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
         <constructor-arg index="0" ref="userDetailsService" />
-        < ! - - Uncomment to allow the included keys to be trusted to provide known user details
+
+        <!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
+        <!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
+
+        <!--
         <constructor-arg index="1" ref="securityService" />
         <constructor-arg index="2">
           <list>
-            <value>trustedKey</value>
-            <value>trustedKey2</value>
+            <value>CONSUMERKEY</value>
           </list>
         </constructor-arg>
-        - - >
+        -->
+
+      </bean>
+    </property>
+  </bean>
+
+  <!-- ###################### -->
+  <!-- # Shibboleth Support # -->
+  <!-- ###################### -->
+
+  <!-- General Shibboleth header extration filter
+  <bean id="shibbolethHeaderFilter"
+        class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
+    <property name="principalRequestHeader" value="<this need to be configured>"/>
+    <property name="authenticationManager" ref="authenticationManager" />
+    <property name="userDetailsService" ref="userDetailsService" />
+    <property name="userDirectoryService" ref="userDirectoryService" />
+    <property name="shibbolethLoginHandler" ref="aaiLoginHandler" />
+    <property name="exceptionIfHeaderMissing" value="false" />
+  </bean>
+  -->
+
+  <!-- AAI header extractor and user generator
+  <bean id="aaiLoginHandler" class="org.opencastproject.security.aai.ConfigurableLoginHandler">
+    <property name="securityService" ref="securityService" />
+    <property name="userReferenceProvider" ref="userReferenceProvider" />
+  </bean>
+  -->
+
+  <!--
+  <bean id="preauthAuthProvider"
+        class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+    <property name="preAuthenticatedUserDetailsService">
+      <bean id="userDetailsServiceWrapper" class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
+        <property name="userDetailsService" ref="userDetailsService"/>
       </bean>
     </property>
   </bean>
@@ -493,43 +555,7 @@
       </bean>
     </constructor-arg>
     <!-- Defines how the user attributes are converted to authorities (roles) -->
-    <constructor-arg>
-      <!-- Get the authorities (roles) according to a certain attribute in the authenticated user -->
-      <!-- See the documentation of the class below to know the expected attribute format -->
-      <bean class="org.opencastproject.kernel.userdirectory.LdapAttributeAuthoritiesPopulator">
-        <constructor-arg>
-          <!-- List of attribute names in the user from which roles will be created -->
-          <!-- The specified attributes must meet few requirements:
-                 * They may be single-valued or multivalued
-                 * They may contain single roles or comma-separated role lists
-
-	       The attributes read will be processed in the following way:
-                 * Whitespace will converted to underscores ("_")
-		 * Sequences of underscores ("_") will be collapsed into a single one.
-	  -->
-          <list>
-            <value>attributeName1</value>
-            <value>attributeName2</value>
-          </list>
-        </constructor-arg>
-	<!-- Whether or not to make all the extracted roles uppercase. 'true' by default. -->
-	<!-- <property name="convertToUpperCase" value="true"/> -->
-
-	<!-- Define a prefix to be appended to every role extracted from the LDAP. -->
-	<!-- The convertToUpperCase property also affects the prefix -->
-	<!-- <property name="rolePrefix" value=""/> -->
-
-	<!-- Additional roles that will be added to those obtained from the attributes above -->
-	<!-- The convertToUpperCase and rolePrefix properties also affect the roles indicated here-->
-	<property name="additionalAuthorities">
-	  <set>
-	    <!-- Apparently, some web UIs require the user to always have the ROLE_ANONYMOUS present -->
-	    <value>ROLE_ANONYMOUS</value>
-	    <!-- <value>additional_authority_2</value> -->
-	  </set>
-	</property>
-      </bean>
-    </constructor-arg>
+    <constructor-arg ref="authoritiesPopulator" />
   </bean>
 
   <!-- #################### -->
@@ -545,10 +571,14 @@
 
   <!-- Uncomment to enable external users e.g. used together shibboleth -->
   <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.JpaUserReferenceProvider"  /> -->
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
 
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
+
+  <osgi:reference id="authoritiesPopulator" cardinality="1..1"
+                  interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
+                  filter="(instanceId=theId)"/>
 
 
   <!-- ############################# -->
@@ -557,10 +587,10 @@
 
   <!-- The JPA user directory stores md5 hashed, salted passwords, so we must use a username-salted md5 password encoder. -->
   <sec:authentication-manager alias="authenticationManager">
+    <!-- Uncomment this if using Shibboleth authentication -->
+    <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <sec:password-encoder hash="md5">
-        <sec:salt-source user-property="username" />
-      </sec:password-encoder>
+      <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
     </sec:authentication-provider>
     <sec:authentication-provider ref="ldapAuthProvider" />
   </sec:authentication-manager>

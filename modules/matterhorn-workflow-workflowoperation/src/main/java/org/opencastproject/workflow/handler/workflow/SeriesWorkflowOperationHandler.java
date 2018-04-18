@@ -20,8 +20,11 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
+import static java.lang.String.format;
+
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -43,6 +46,8 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.XmlNamespaceBinding;
+import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -68,6 +73,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -90,8 +96,14 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** Name of the configuration option that provides the flavors of the series catalogs to attach */
   public static final String ATTACH_PROPERTY = "attach";
 
-  /** Name of the configuration option that provides wheter the ACL should be applied or not */
+  /** Name of the configuration option that provides whether the ACL should be applied or not */
   public static final String APPLY_ACL_PROPERTY = "apply-acl";
+
+  /** Name of the configuration key that specifies the list of series metadata to be copied to the episode */
+  public static final String COPY_METADATA_PROPERTY = "copy-metadata";
+
+  /** Name of the configuration key that specifies the default namespace for the metadata to be copied to the episode */
+  public static final String DEFAULT_NS_PROPERTY = "default-namespace";
 
   /** The authorization service */
   private AuthorizationService authorizationService;
@@ -106,7 +118,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private SecurityService securityService;
 
   /** The list series catalog UI adapters */
-  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<SeriesCatalogUIAdapter>();
+  private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<>();
 
   /**
    * Callback for the OSGi declarative services configuration.
@@ -159,10 +171,16 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   }
 
   static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS = new TreeMap<>();
     CONFIG_OPTIONS.put(SERIES_PROPERTY, "The optional series identifier");
     CONFIG_OPTIONS.put(ATTACH_PROPERTY, "The flavors of the series catalogs to attach to the mediapackage.");
     CONFIG_OPTIONS.put(APPLY_ACL_PROPERTY, "Whether the ACL should be applied or not");
+    CONFIG_OPTIONS.put(COPY_METADATA_PROPERTY,
+            "A blank- or comma-separated list of metadata fields to copy to the episode catalog, "
+                    + "when they are defined in the series' catalog but not in the episode's");
+    CONFIG_OPTIONS.put(DEFAULT_NS_PROPERTY,
+            format("The default Namespace assumed when the metadata fields are not fully qualified. Defaults to '%s'",
+                    DublinCore.TERMS_NS_URI));
   }
 
   /**
@@ -191,7 +209,11 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     Opt<String> optSeries = getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY);
     Opt<String> optAttachFlavors = getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY);
     Boolean applyAcl = getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).map(toBoolean)
-            .or(false);
+            .getOr(false);
+    Opt<String> optCopyMetadata = getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY);
+    String defaultNamespace = getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY)
+            .getOr(DublinCore.TERMS_NS_URI);
+    logger.debug("Using default namespace: '{}'", defaultNamespace);
 
     if (optSeries.isSome() && !optSeries.get().equals(mediaPackage.getSeries())) {
       logger.info("Changing series id from '{}' to '{}'", StringUtils.trimToEmpty(mediaPackage.getSeries()),
@@ -221,14 +243,39 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     }
 
     mediaPackage.setSeriesTitle(series.getFirst(DublinCore.PROPERTY_TITLE));
+
+    // Process extra metadata
+    HashSet<EName> extraMetadata = new HashSet<>();
+    if (optCopyMetadata.isSome()) {
+      for (String strEName : optCopyMetadata.get().split(",+\\s*"))
+        try {
+          if (!strEName.isEmpty()) {
+            extraMetadata.add(EName.fromString(strEName, defaultNamespace));
+          }
+        } catch (IllegalArgumentException iae) {
+          logger.warn("Ignoring incorrect dublincore metadata property: '{}'", strEName);
+        }
+    }
+
     // Update the episode catalog
     for (Catalog episodeCatalog : mediaPackage.getCatalogs(MediaPackageElements.EPISODE)) {
       DublinCoreCatalog episodeDublinCore = DublinCoreUtil.loadDublinCore(workspace, episodeCatalog);
+      // Make sure the MP catalog has bindings defined
+      episodeDublinCore.addBindings(
+              XmlNamespaceContext.mk(XmlNamespaceBinding.mk(DublinCore.TERMS_NS_PREFIX, DublinCore.TERMS_NS_URI)));
+      episodeDublinCore.addBindings(XmlNamespaceContext
+              .mk(XmlNamespaceBinding.mk(DublinCore.ELEMENTS_1_1_NS_PREFIX, DublinCore.ELEMENTS_1_1_NS_URI)));
+      episodeDublinCore.addBindings(XmlNamespaceContext
+              .mk(XmlNamespaceBinding.mk(DublinCores.OC_PROPERTY_NS_PREFIX, DublinCores.OC_PROPERTY_NS_URI)));
       episodeDublinCore.set(DublinCore.PROPERTY_IS_PART_OF, seriesId);
+      for (EName property : extraMetadata) {
+        if (!episodeDublinCore.hasValue(property) && series.hasValue(property)) {
+          episodeDublinCore.set(property, series.get(property));
+        }
+      }
       try (InputStream in = IOUtils.toInputStream(episodeDublinCore.toXmlString(), "UTF-8")) {
         String filename = FilenameUtils.getName(episodeCatalog.getURI().toString());
-        URI uri = workspace.put(mediaPackage.getIdentifier().toString(), episodeCatalog.getIdentifier(), filename,
-                IOUtils.toInputStream(episodeDublinCore.toXmlString(), "UTF-8"));
+        URI uri = workspace.put(mediaPackage.getIdentifier().toString(), episodeCatalog.getIdentifier(), filename, in);
         episodeCatalog.setURI(uri);
         // setting the URI to a new source so the checksum will most like be invalid
         episodeCatalog.setChecksum(null);
@@ -329,7 +376,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
   private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
     @Override
-    public Boolean ap(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
+    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
       return catalogUIAdapter.getOrganization().equals(organization);
     }
   };
@@ -337,7 +384,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** Convert a string into a boolean. */
   private static final Fn<String, Boolean> toBoolean = new Fn<String, Boolean>() {
     @Override
-    public Boolean ap(String s) {
+    public Boolean apply(String s) {
       return BooleanUtils.toBoolean(s);
     }
   };

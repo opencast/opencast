@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.junit.Assert.assertEquals;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
@@ -31,21 +32,17 @@ import com.jayway.restassured.http.ContentType;
 
 import org.apache.http.HttpStatus;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-@Ignore
 public class TasksEndpointTest {
 
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestTasksEndpoint.class);
@@ -57,25 +54,32 @@ public class TasksEndpointTest {
     InputStream stream = TasksEndpointTest.class.getResourceAsStream("/taskProcessing.json");
     InputStreamReader reader = new InputStreamReader(stream);
     JSONArray expected = (JSONArray) new JSONParser().parse(reader);
-    JSONArray actual = (JSONArray) parser.parse(given().queryParam("tags", "archive").expect().log().all()
-            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when().get(rt.host("/processing.json"))
-            .asString());
+    JSONArray actual = (JSONArray) parser
+            .parse(given().queryParam("tags", "ng-archive").expect().statusCode(HttpStatus.SC_OK)
+                    .contentType(ContentType.JSON).when().get(rt.host("/processing.json")).asString());
 
-    Assert.assertEquals(expected.size(), actual.size());
+    assertEquals(expected, actual);
   }
 
   @Test
   public void testCreateTask() throws ParseException, IOException {
-    InputStream stream = TasksEndpointTest.class.getResourceAsStream("/taskNew.json");
-    InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject metadata = (JSONObject) new JSONParser().parse(reader);
+    given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
 
-    given().formParam("metadata", "empty").expect().log().all().statusCode(HttpStatus.SC_BAD_REQUEST).when()
-            .post(rt.host("/new"));
+    given().formParam("metadata", "empty").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
 
-    String result = given().formParam("metadata", metadata.toJSONString()).expect().log().all()
-            .statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
-    Assert.assertEquals("5,10", result);
+    given().formParam("metadata", "{\"configuration\":{}, \"eventIds\":[]}").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
+
+    given().formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{}}").expect()
+            .statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
+
+    given().formParam("metadata", "{\"workflow\":\"exception\", \"configuration\":{}, \"eventIds\":[\"id1\",\"id2\"]}")
+            .expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when().post(rt.host("/new"));
+
+    String result = given()
+            .formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{}, \"eventIds\":[\"id1\",\"id2\"]}")
+            .expect().statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
+    assertEquals("[5,10]", result);
   }
 
   @Before

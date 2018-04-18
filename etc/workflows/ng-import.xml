@@ -79,7 +79,7 @@
     <!-- Archive the current state of the mediapackage -->
 
     <operation
-      id="archive"
+      id="snapshot"
       fail-on-error="true"
       exception-handler-workflow="error"
       description="Archiving">

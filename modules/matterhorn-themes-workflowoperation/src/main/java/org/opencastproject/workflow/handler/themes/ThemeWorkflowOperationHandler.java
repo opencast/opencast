@@ -183,15 +183,15 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     logger.debug("Running theme workflow operation on workflow {}", workflowInstance.getId());
 
     final MediaPackageElementFlavor bumperFlavor = getOptConfig(workflowInstance, BUMPER_FLAVOR).map(
-            toMediaPackageElementFlavor).or(new MediaPackageElementFlavor("branding", "bumper"));
+            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "bumper"));
     final MediaPackageElementFlavor trailerFlavor = getOptConfig(workflowInstance, TRAILER_FLAVOR).map(
-            toMediaPackageElementFlavor).or(new MediaPackageElementFlavor("branding", "trailer"));
+            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "trailer"));
     final MediaPackageElementFlavor titleSlideFlavor = getOptConfig(workflowInstance, TITLE_SLIDE_FLAVOR).map(
-            toMediaPackageElementFlavor).or(new MediaPackageElementFlavor("branding", "title-slide"));
+            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "title-slide"));
     final MediaPackageElementFlavor licenseSlideFlavor = getOptConfig(workflowInstance, LICENSE_SLIDE_FLAVOR).map(
-            toMediaPackageElementFlavor).or(new MediaPackageElementFlavor("branding", "license-slide"));
+            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "license-slide"));
     final MediaPackageElementFlavor watermarkFlavor = getOptConfig(workflowInstance, WATERMARK_FLAVOR).map(
-            toMediaPackageElementFlavor).or(new MediaPackageElementFlavor("branding", "watermark"));
+            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "watermark"));
     final List<String> bumperTags = asList(workflowInstance.getConfiguration(BUMPER_TAGS));
     final List<String> trailerTags = asList(workflowInstance.getConfiguration(TRAILER_TAGS));
     final List<String> titleSlideTags = asList(workflowInstance.getConfiguration(TITLE_SLIDE_TAGS));
@@ -363,7 +363,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   private static Fn<String, MediaPackageElementFlavor> toMediaPackageElementFlavor = new Fn<String, MediaPackageElementFlavor>() {
     @Override
-    public MediaPackageElementFlavor ap(String flavorString) {
+    public MediaPackageElementFlavor apply(String flavorString) {
       return MediaPackageElementFlavor.parseFlavor(flavorString);
     }
   };

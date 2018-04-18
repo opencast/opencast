@@ -5,6 +5,7 @@ angular.module('adminNg.services')
         this.isValid = function () {
             return true;
         };
+        this.isDisabled = false;
     };
     return new Summary();
 }]);

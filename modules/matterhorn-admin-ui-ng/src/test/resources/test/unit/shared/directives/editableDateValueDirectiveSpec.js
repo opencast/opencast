@@ -14,6 +14,10 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
             },
             formatDate: function(format, input){
                 return ('short' === format && input === '2015-12-05') ? '05.12.2015' : '';
+            },
+            formatDateTime: function(format, input){
+                // Unconditional return since this is local time and we want to avoid timzone issues
+                return '05.12.2015 00:00';
             }
         });
     }));
@@ -32,7 +36,7 @@ describe('adminNg.directives.adminNgEditableSingleValue', function () {
     });
 
     it('displays the date in german format', function () {
-        expect(element.html()).toContain('05.12.2015');
+        expect(element.html()).toContain('05.12.2015 00:00');
     });
 
     it('is not editable by default', function () {

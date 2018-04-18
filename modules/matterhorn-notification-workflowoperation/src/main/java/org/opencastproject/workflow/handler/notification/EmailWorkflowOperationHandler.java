@@ -53,6 +53,8 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   // Configuration properties used in the workflow definition
   static final String TO_PROPERTY = "to";
+  static final String CC_PROPERTY = "cc";
+  static final String BCC_PROPERTY = "bcc";
   static final String SUBJECT_PROPERTY = "subject";
   static final String BODY_PROPERTY = "body";
   static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
@@ -66,7 +68,9 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   @Override
   protected void activate(ComponentContext cc) {
     super.activate(cc);
-    addConfigurationOption(TO_PROPERTY, "The mail address to send to");
+    addConfigurationOption(TO_PROPERTY, "The mail address(es) to send to");
+    addConfigurationOption(CC_PROPERTY, "The mail address(es) to send to as \"carbon copy\"");
+    addConfigurationOption(BCC_PROPERTY, "The mail address(es) to send to as \"blind carbon copy\"");
     addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
     addConfigurationOption(BODY_PROPERTY, "The email body text (or email template)");
     addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
@@ -85,8 +89,10 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // MediaPackage from previous workflow operations
     MediaPackage srcPackage = workflowInstance.getMediaPackage();
 
-    // To, subject, body can be Freemarker templates
+    // "To", "CC", "BCC", subject, body can be Freemarker templates
     String to = applyTemplateIfNecessary(workflowInstance, operation, TO_PROPERTY);
+    String cc = applyTemplateIfNecessary(workflowInstance, operation, CC_PROPERTY);
+    String bcc = applyTemplateIfNecessary(workflowInstance, operation, BCC_PROPERTY);
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText = null;
     String body = operation.getConfiguration(BODY_PROPERTY);
@@ -103,9 +109,12 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     try {
-      logger.debug("Sending e-mail notification to {} with subject {} and body {}", to, subject, bodyText);
-      smtpService.send(to, subject, bodyText);
-      logger.info("E-mail notification sent to {}", to);
+      logger.debug(
+              "Sending e-mail notification with subject {} and body {} to {}, CC addresses {} and BCC addresses {}",
+              subject, bodyText, to, cc, bcc);
+      // "To", "CC" and "BCC" can be comma- or space-separated lists of emails
+      smtpService.send(to, cc, bcc, subject, bodyText);
+      logger.info("E-mail notification sent to {}, CC addresses {} and BCC addresses {}", to, cc, bcc);
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
     }

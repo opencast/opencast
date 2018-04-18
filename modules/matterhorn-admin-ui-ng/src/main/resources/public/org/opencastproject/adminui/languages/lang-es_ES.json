@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "No se ha podido guardar el evento",
       "EVENTS_NOT_UPDATED_ID": "No se ha podido guardar el evento {{ id }}",
       "EVENTS_NOT_UPDATED_ALL": "No se ha podido guardar ningún evento",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Reiniciando el proceso...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "El proceso no ha podido ser reiniciado.",
+      "EVENTS_PROCESSING_ACTION_NONE": "El proceso está siendo interrumpido...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "El proceso no ha podido interrumpirse.",
       "SERIES_UPDATED_NB": "{{ number }} series se han actualizado correctamente",
       "SERIES_UPDATED_ALL": "Todas las series se han actualizado correctamente",
       "SERIES_NOT_UPDATED": "No se ha podido guardar la serie",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "Subir archivos",
                   "RECORDING_ELEMENTS": "Elementos de la grabación",
+                  "RECORDING_METADATA": "Metadatos",
                   "SEGMENTABLE": {
                      "SHORT": "Diapositivas",
                      "DETAIL": "El archivo contiene la grabación de una presentación de diapositivas (Keynote, Powerpoint, etc.)."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "Solo audio",
                      "DETAIL": "El archivo solo contiene audio."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Multiparte",
+                     "DETAIL": "Un conjunto de ficheros que contienen las diferentes partes de un evento."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "Seleccione flujo de trabajo",
                "SELECT_WORKFLOW_EMPTY": "No hay flujos de trabajo disponibles",
                "WORKFLOW": "Flujo de trabajo"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Subida de recursos",
+               "SELECT_TYPE": "Seleccione un tipo de contenido",
+               "ADD": "Añadir recurso",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Notas",
+                  "CAPTIONS_DFXP": "Subtítulos DXFP",
+                  "CAPTIONS_WEBVTT": "Subtítulos WebVTT",
+                  "PREVIEW_IMAGE": "Imagen de vista previa",
+                  "SMIL": "Catálogo SMIL",
+                  "TRACK_PARTS": "Pistas"
+               }
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "Acciones",
                "DETAILS": "Detalles",
                "DESCRIPTION": "",
                "ID": "Identificador",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "En la lista negra desde",
             "BLACKLIST_TO": "En la lista negra hasta",
             "ACTION": "Acciones"
+         },
+         "DETAILS": {
+            "HEADER": "Detalles del evento - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "General",
+               "CONFIGURATION": "Configuración",
+               "CAPABILITIES": "Capacidades"
+            },
+            "GENERAL": {
+               "CAPTION": "General",
+               "NAME": "Nombre",
+               "URL": "URL",
+               "STATUS": "Estado",
+               "UPDATE": "Última conexión desde"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Configuración",
+               "NO_CONFIGURATION": "Falta configuración"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Capacidades",
+               "NO_CAPABILITIES": "Faltan capacidades"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "Procesando",
       "FINISHED": "Procesado",
+      "PAUSED": "En pausa",
       "FAILED": "Error",
       "FINISHED_WITH_COMMENTS": "Pendiente",
       "SCHEDULED": "Programado",

@@ -1,4 +1,4 @@
-<section ng-form="theme-form" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ThemeFormCtrl">
+<section ng-form="themeForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ThemeFormCtrl">
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
         <h2 translate="CONFIGURATION.THEMES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">
@@ -63,13 +63,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'generalForm'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'generalForm'">
         <a ng-click="navigateTo('bumperForm', currentForm, [generalForm])"
             data-modal-tab="next" class="submit"
-            ng-class="{active: generalForm.$valid, inactive: generalForm.$invalid}">
+            ng-class="{active: generalForm.$valid, disabled: generalForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
     </footer>
@@ -115,13 +115,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'bumperForm'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'bumperForm'">
         <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm])"
             data-modal-tab="next" class="submit"
-            ng-class="{active: bumperForm.$valid, inactive: bumperForm.$invalid}">
+            ng-class="{active: bumperForm.$valid, disabled: bumperForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
         <a ng-click="navigateTo('generalForm', currentForm, [generalForm])"
@@ -166,13 +166,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'trailerForm'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'trailerForm'">
         <a ng-click="navigateTo('titleslideForm', currentForm, [generalForm, bumperForm, trailerForm])"
             data-modal-tab="next" class="submit"
-            ng-class="{active: trailerForm.$valid, inactive: trailerForm.$invalid}">
+            ng-class="{active: trailerForm.$valid, disabled: trailerForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
         <a ng-click="navigateTo('bumperForm', currentForm, [generalForm, bumperForm])"
@@ -238,13 +238,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'titleslideForm'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'titleslideForm'">
         <a ng-click="navigateTo('watermarkForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
             data-modal-tab="next" class="submit"
-            ng-class="{active: titleslideForm.$valid, inactive: titleslideForm.$invalid}">
+            ng-class="{active: titleslideForm.$valid, disabled: titleslideForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
         <a ng-click="navigateTo('trailerForm', currentForm, [generalForm, bumperForm, trailerForm])"
@@ -319,13 +319,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'watermarkForm'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'watermarkForm'">
         <a ng-click="navigateTo('summary', [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])"
            data-modal-tab="next" class="submit"
-           ng-class="{active: watermarkForm.$valid, inactive: watermarkForm.$invalid}">
+           ng-class="{active: watermarkForm.$valid, disabled: watermarkForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
         <a ng-click="navigateTo('titleslideForm', [generalForm, bumperForm, trailerForm, titleslideForm])"
@@ -383,13 +383,13 @@
         </div>
     </div>
     <footer ng-if="action === 'edit' && currentForm === 'summary'">
-        <a class="submit" ng-class="{active: valid(), inactive: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit" ng-class="{active: valid(), disabled: !valid()}" ng-click="submit()">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
     <footer ng-if="action === 'add' && currentForm === 'summary'">
         <a ng-click="submit()"
            data-modal-tab="next" class="submit"
-           ng-class="{active: theme-form.$valid, inactive: theme-form.$invalid}">
+           ng-class="{active: themeForm.$valid, disabled: themeForm.$invalid}">
            {{ 'SUBMIT' | translate }}
         </a>
         <a ng-click="navigateTo('watermarkForm', currentForm, [generalForm, bumperForm, trailerForm, titleslideForm, watermarkForm])"
@@ -423,7 +423,7 @@
         </div>
     </div>
     <footer ng-if="currentForm === 'usage'">
-        <a class="submit inactive">{{ 'SUBMIT' | translate }}</a>
+        <a class="submit disabled">{{ 'SUBMIT' | translate }}</a>
         <a class="cancel" ng-click="cancel()">{{ 'CANCEL' | translate }}</a>
     </footer>
 

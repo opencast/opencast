@@ -30,6 +30,7 @@ import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowOperationAbortedException;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -56,8 +57,8 @@ final class WorkflowOperationWorker {
   /**
    * Boolean expression parser that interprets non replaced variable strings of pattern <code>${VAR}</code> as false.
    */
-  private static final Bool booleanExpressionEvaluator = new Bool(LIA.mk(Parsers.token(Parsers.regex(Pattern.compile("\\$\\{.*?\\}")))
-          .bind(Parsers.ignorePrevious(Parsers.yield(false)))));
+  private static final Bool booleanExpressionEvaluator = new Bool(LIA.mk(Parsers
+          .token(Parsers.regex(Pattern.compile("\\$\\{.*?\\}"))).bind(Parsers.ignorePrevious(Parsers.yield(false)))));
 
   private WorkflowOperationHandler handler = null;
   private WorkflowInstance workflow = null;
@@ -76,8 +77,7 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
-          WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow, WorkflowServiceImpl service) {
     this.handler = handler;
     this.workflow = workflow;
     this.service = service;
@@ -97,8 +97,8 @@ final class WorkflowOperationWorker {
    * @param service
    *          the workflow service.
    */
-  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow,
-          Map<String, String> properties, WorkflowServiceImpl service) {
+  WorkflowOperationWorker(WorkflowOperationHandler handler, WorkflowInstance workflow, Map<String, String> properties,
+          WorkflowServiceImpl service) {
     this(handler, workflow, service);
     this.properties = properties;
   }
@@ -139,7 +139,7 @@ final class WorkflowOperationWorker {
    *          the handler
    */
   public void setHandler(WorkflowOperationHandler operationHandler) {
-    this.handler = operationHandler;
+    handler = operationHandler;
   }
 
   /**
@@ -158,8 +158,8 @@ final class WorkflowOperationWorker {
           result = resume();
           break;
         default:
-          throw new IllegalStateException("Workflow operation '" + operation + "' is in unexpected state '"
-                  + operation.getState() + "'");
+          throw new IllegalStateException(
+                  "Workflow operation '" + operation + "' is in unexpected state '" + operation.getState() + "'");
       }
       if (result == null || Action.CONTINUE.equals(result.getAction()) || Action.SKIP.equals(result.getAction())) {
         if (handler != null) {
@@ -167,8 +167,13 @@ final class WorkflowOperationWorker {
         }
       }
       workflow = service.handleOperationResult(workflow, result);
+      return workflow;
     } catch (JobCanceledException e) {
       logger.info(e.getMessage());
+      return workflow;
+    } catch (WorkflowOperationAbortedException e) {
+      // Don't log it as error because it was aborted by the user
+      logger.info("Workflow operation '" + operation + "' aborted by user");
     } catch (Exception e) {
       Throwable t = e.getCause();
       if (t != null) {
@@ -178,12 +183,11 @@ final class WorkflowOperationWorker {
       }
       // the associated job shares operation's id
       service.getServiceRegistry().incident().unhandledException(operation.getId(), Severity.FAILURE, e);
-      try {
-        workflow = service.handleOperationException(workflow, operation);
-      } catch (Exception e2) {
-        logger.error("Error handling workflow operation '{}' failure: {}", new Object[] { operation, e2.getMessage(),
-                e2 });
-      }
+    }
+    try {
+      workflow = service.handleOperationException(workflow, operation);
+    } catch (Exception e2) {
+      logger.error("Error handling workflow operation '{}' failure: {}", operation, e2.getMessage(), e2);
     }
     return workflow;
   }
@@ -255,8 +259,8 @@ final class WorkflowOperationWorker {
    * @throws IllegalStateException
    *           if the workflow operation cannot be resumed
    */
-  public WorkflowOperationResult resume() throws WorkflowOperationException, WorkflowException, IllegalStateException,
-          UnauthorizedException {
+  public WorkflowOperationResult resume()
+          throws WorkflowOperationException, WorkflowException, IllegalStateException, UnauthorizedException {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
 
     // Make sure we have a (suitable) handler

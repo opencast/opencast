@@ -47,8 +47,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Based on the given service configuration this service factory will create new instances of
@@ -70,7 +70,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   private static final String CATALOG_TYPE_SERIES = "series";
 
   /** Map with service registrations of registered {@link SeriesCatalogUIAdapter} instances. */
-  private final Map<String, ServiceRegistration> adapterServiceRegistrations = new HashMap<String, ServiceRegistration>();
+  private final Map<String, ServiceRegistration<?>> adapterServiceRegistrations = new ConcurrentHashMap<>();
 
   /** Reference to a {@link ListProvidersService} instance. */
   private ListProvidersService listProvidersService;
@@ -91,8 +91,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
 
   /** OSGi callback for deactivating component. */
   void deactivate() {
-    for (ServiceRegistration serviceRegistration : adapterServiceRegistrations.values()) {
-      bundleContext.ungetService(serviceRegistration.getReference());
+    for (String pid : adapterServiceRegistrations.keySet()) {
+      deleted(pid);
     }
   }
 
@@ -102,7 +102,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   }
 
   @Override
-  public void updated(String pid, @SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
     final String type = getCfg(properties, CONF_TYPE_KEY);
     Option<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
     final boolean isCommonMetadata = optCommonMetadata.isSome() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
@@ -116,7 +116,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
     switch (type) {
       case CATALOG_TYPE_EVENTS: {
         if (adapterServiceRegistrations.containsKey(pid)) {
-          ServiceRegistration serviceRegistration = adapterServiceRegistrations.get(pid);
+          ServiceRegistration<?> serviceRegistration = adapterServiceRegistrations.get(pid);
           ConfigurableEventDCCatalogUIAdapter adapter = (ConfigurableEventDCCatalogUIAdapter) bundleContext
                   .getService(serviceRegistration.getReference());
           adapter.updated(properties);
@@ -140,7 +140,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           adapter.setWorkspace(workspace);
           adapter.updated(properties);
 
-          ServiceRegistration configurationRegistration = bundleContext.registerService(adapterClassesNames, adapter,
+          ServiceRegistration<?> configurationRegistration = bundleContext.registerService(adapterClassesNames, adapter,
                   null);
           adapterServiceRegistrations.put(pid, configurationRegistration);
         }
@@ -148,7 +148,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
       }
       case CATALOG_TYPE_SERIES: {
         if (adapterServiceRegistrations.containsKey(pid)) {
-          ServiceRegistration serviceRegistration = adapterServiceRegistrations.get(pid);
+          ServiceRegistration<?> serviceRegistration = adapterServiceRegistrations.get(pid);
           ConfigurableSeriesDCCatalogUIAdapter adapter = (ConfigurableSeriesDCCatalogUIAdapter) bundleContext
                   .getService(serviceRegistration.getReference());
           adapter.updated(properties);
@@ -171,8 +171,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
           adapter.setSeriesService(seriesService);
           adapter.updated(properties);
 
-          ServiceRegistration adapterServiceRegistration = bundleContext.registerService(adapterClassesNames, adapter,
-                  null);
+          ServiceRegistration<?> adapterServiceRegistration = bundleContext.registerService(adapterClassesNames,
+                  adapter, null);
           adapterServiceRegistrations.put(pid, adapterServiceRegistration);
         }
         break;
@@ -186,8 +186,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   @Override
   public void deleted(String pid) {
     if (adapterServiceRegistrations.containsKey(pid)) {
-      ServiceRegistration serviceRegistration = adapterServiceRegistrations.remove(pid);
-      bundleContext.ungetService(serviceRegistration.getReference());
+      ServiceRegistration<?> serviceRegistration = adapterServiceRegistrations.remove(pid);
+      serviceRegistration.unregister();
       logger.info("Service registration for PID {} removed", pid);
     }
   }

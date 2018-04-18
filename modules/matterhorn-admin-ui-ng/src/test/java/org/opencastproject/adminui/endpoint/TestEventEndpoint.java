@@ -21,9 +21,13 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.easymock.EasyMock.anyString;
+import static org.easymock.EasyMock.expect;
+import static org.opencastproject.capture.CaptureParameters.INGEST_WORKFLOW_DEFINITION;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
+import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.UrlSupport.uri;
+import static org.opencastproject.util.PropertiesUtil.toDictionary;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.some;
@@ -32,21 +36,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.adminui.endpoint.AbstractEventEndpointTest.TestEnv;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
-import org.opencastproject.archive.api.UriRewriter;
-import org.opencastproject.archive.api.Version;
-import org.opencastproject.archive.base.StoragePath;
-import org.opencastproject.archive.base.persistence.AbstractArchiveDb;
-import org.opencastproject.archive.base.persistence.ArchiveDb;
-import org.opencastproject.archive.base.storage.DeletionSelector;
-import org.opencastproject.archive.base.storage.ElementStore;
-import org.opencastproject.archive.opencast.OpencastArchive;
-import org.opencastproject.archive.opencast.OpencastArchivePublisher;
-import org.opencastproject.archive.opencast.OpencastQuery;
-import org.opencastproject.archive.opencast.OpencastResultItem;
-import org.opencastproject.archive.opencast.OpencastResultSet;
-import org.opencastproject.archive.opencast.solr.SolrIndexManager;
-import org.opencastproject.archive.opencast.solr.SolrRequester;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.EpisodeACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -63,8 +52,13 @@ import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.index.service.api.IndexService.Source;
+import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
-import org.opencastproject.index.service.impl.IndexServiceImpl;
+import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
+import org.opencastproject.index.service.impl.index.event.Event;
+import org.opencastproject.index.service.impl.index.event.EventSearchQuery;
+import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.job.api.Incident;
@@ -74,22 +68,31 @@ import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.IncidentTreeImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
+import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
+import org.opencastproject.matterhorn.search.impl.SearchResultItemImpl;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
-import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.mediapackage.PublicationImpl;
+import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.mediapackage.track.AbstractStreamImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
-import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
-import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
+import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.schema.OcDublinCore;
-import org.opencastproject.schema.OcDublinCoreUtil;
+import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
+import org.opencastproject.scheduler.api.TechnicalMetadata;
+import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -111,13 +114,12 @@ import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.Incidents;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.VCell;
-import org.opencastproject.util.persistence.PersistenceEnv;
-import org.opencastproject.util.persistence.PersistenceUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -125,27 +127,38 @@ import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workflow.api.WorkflowSet;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.solr.client.solrj.SolrServer;
-import org.apache.solr.client.solrj.SolrServerException;
+import com.entwinemedia.fn.data.Opt;
+
+import net.fortuna.ical4j.model.property.RRule;
+
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
+import org.joda.time.DateTime;
 import org.junit.Ignore;
+import org.osgi.service.cm.ConfigurationException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import javax.ws.rs.Path;
 
@@ -156,9 +169,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
   private final MediaPackageBuilderImpl mpBuilder = new MediaPackageBuilderImpl();
 
-  /** The solr root directory */
-  private final String solrRoot = "target" + File.separator + "opencast" + File.separator + "archiveindex";
-
   private final JaxbOrganization defaultOrganization = new DefaultOrganization();
 
   private final JaxbOrganization opencastOrganization = new JaxbOrganization("opencastproject.org");
@@ -168,26 +178,16 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   /** A user with permissions. */
   private final User userWithPermissions = new JaxbUser("sample", null, "WithPermissions", "with@permissions.com",
           "test", defaultOrganization,
-          new HashSet<JaxbRole>(Arrays.asList(new JaxbRole("ROLE_STUDENT", defaultOrganization),
-                  new JaxbRole("ROLE_OTHERSTUDENT", defaultOrganization),
-                  new JaxbRole(defaultOrganization.getAnonymousRole(), defaultOrganization))));
+          new HashSet<>(Arrays.asList(new JaxbRole("ROLE_STUDENT", defaultOrganization, "test"),
+                  new JaxbRole("ROLE_OTHERSTUDENT", defaultOrganization, "test"),
+                  new JaxbRole(defaultOrganization.getAnonymousRole(), defaultOrganization, "test"))));
 
   /** A user without permissions. */
   private final User userWithoutPermissions = new JaxbUser("sample", null, "WithoutPermissions",
           "without@permissions.com", "test", opencastOrganization,
-          new HashSet<JaxbRole>(Arrays.asList(new JaxbRole("ROLE_NOTHING", opencastOrganization))));
+          new HashSet<>(Arrays.asList(new JaxbRole("ROLE_NOTHING", opencastOrganization, "test"))));
 
   private final User defaultUser = userWithPermissions;
-
-  private final UriRewriter rewriter = new UriRewriter() {
-    @Override
-    public URI apply(Version version, MediaPackageElement mpe) {
-      return uri("http://episodes", mpe.getMediaPackage().getIdentifier(), mpe.getIdentifier(), version,
-              mpe.getElementType().toString().toLowerCase() + "."
-                      + mpe.getMimeType().getSuffix().getOrElse(".unknown"));
-
-    }
-  };
 
   /** Answers with a constant response. */
   public static class Responder<A> implements IAnswer<A> {
@@ -212,8 +212,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     // security service
     final SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    Responder<User> userResponder = new Responder<User>(defaultUser);
-    Responder<Organization> organizationResponder = new Responder<Organization>(defaultOrganization);
+    Responder<User> userResponder = new Responder<>(defaultUser);
+    Responder<JaxbOrganization> organizationResponder = new Responder<>(defaultOrganization);
     EasyMock.expect(securityService.getUser()).andAnswer(userResponder).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andAnswer(organizationResponder).anyTimes();
     EasyMock.replay(securityService);
@@ -224,14 +224,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(urlSigningService);
     env.setUrlSigningService(urlSigningService);
 
-    // AdminUISearchIndex
-    AdminUISearchIndex searchIndex = EasyMock.createNiceMock(AdminUISearchIndex.class);
-    EasyMock.replay(searchIndex);
-    env.setIndex(searchIndex);
-
     // Preview subtype
     AdminUIConfiguration adminUIConfiguration = new AdminUIConfiguration();
-    Hashtable<String, String> dictionary = new Hashtable<String, String>();
+    Hashtable<String, String> dictionary = new Hashtable<>();
     dictionary.put(AdminUIConfiguration.OPT_PREVIEW_SUBTYPE, PREVIEW_SUBTYPE);
     adminUIConfiguration.updated(dictionary);
     env.setAdminUIConfiguration(adminUIConfiguration);
@@ -247,9 +242,17 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(
             authorizationService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
             .andReturn(true).anyTimes();
+
+    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class)))
+            .andReturn(new Tuple<MediaPackage, Attachment>(loadMpFromResource("jobs_mediapackage1"),
+                    new AttachmentImpl()));
+
     EasyMock.replay(authorizationService);
 
-    List<ManagedAcl> managedAcls = new ArrayList<ManagedAcl>();
+    env.setAuthorizationService(authorizationService);
+
+    List<ManagedAcl> managedAcls = new ArrayList<>();
     ManagedAcl managedAcl1 = new ManagedAclImpl(43L, "Public", defaultOrganization.getId(), acl);
     managedAcls.add(managedAcl1);
     managedAcls.add(new ManagedAclImpl(44L, "Private", defaultOrganization.getId(), acl));
@@ -259,6 +262,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     AclService aclService = EasyMock.createNiceMock(AclService.class);
     EasyMock.expect(aclService.getAcls()).andReturn(managedAcls).anyTimes();
+    EasyMock.expect(aclService.applyAclToEpisode(EasyMock.anyString(), EasyMock.anyObject(AccessControlList.class),
+            EasyMock.anyObject(Option.class))).andReturn(true).anyTimes();
     EasyMock.expect(aclService.getTransitions(EasyMock.anyObject(TransitionQuery.class))).andReturn(transitionResult)
             .anyTimes();
     EasyMock.replay(aclService);
@@ -305,7 +310,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.replay(workspace);
 
     // workflow service
-    WorkflowSetImpl workflowSet = new WorkflowSetImpl();
+    final WorkflowSetImpl workflowSet = new WorkflowSetImpl();
 
     WorkflowDefinition wfD = new WorkflowDefinitionImpl();
     wfD.setTitle("Full");
@@ -323,8 +328,13 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.setDescription("Test description");
     wfD2.setConfigurationPanel("<h2>Test</h2>");
 
-    final WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD,
-            loadMpFromResource("jobs_mediapackage1"), 2L, null, null, new HashMap<String, String>());
+    MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");
+    // the id is set dynamic - lets force an id so we can get a consistent json respons
+    Track mp1Track = mp1.getTrack("publish-track-1");
+    ((AbstractStreamImpl) mp1Track.getStreams()[0]).setIdentifier("fortesting");
+
+    final WorkflowInstanceImpl workflowInstanceImpl1 = new WorkflowInstanceImpl(wfD, mp1, 2L, null, null,
+            new HashMap<String, String>());
     final WorkflowInstanceImpl workflowInstanceImpl2 = new WorkflowInstanceImpl(wfD,
             loadMpFromResource("jobs_mediapackage2"), 2L, null, null, new HashMap<String, String>());
     final WorkflowInstanceImpl workflowInstanceImpl3 = new WorkflowInstanceImpl(wfD,
@@ -346,112 +356,20 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(workflowService.getWorkflowDefinitionById(EasyMock.anyString())).andReturn(wfD).anyTimes();
     EasyMock.expect(workflowService.getWorkflowById(EasyMock.anyLong())).andReturn(workflowInstanceImpl1).anyTimes();
     EasyMock.expect(workflowService.getWorkflowInstances(EasyMock.anyObject(WorkflowQuery.class)))
-            .andReturn(workflowSet).anyTimes();
+            .andAnswer(new IAnswer<WorkflowSet>() {
+              @Override
+              public WorkflowSet answer() throws Throwable {
+                WorkflowQuery query = (WorkflowQuery) EasyMock.getCurrentArguments()[0];
+                if (query.getId() != null && Long.parseLong(query.getId()) == 9999L) {
+                  return new WorkflowSetImpl();
+                } else {
+                  return workflowSet;
+                }
+              }
+            }).anyTimes();
     EasyMock.expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2));
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);
-
-    // Persistence storage
-    final PersistenceEnv penv = PersistenceUtil.newTestPersistenceEnv("org.opencastproject.archive.base.persistence");
-    ArchiveDb episodeDatabase = new AbstractArchiveDb() {
-      @Override
-      protected PersistenceEnv getPenv() {
-        return penv;
-      }
-
-      @Override
-      protected SecurityService getSecurityService() {
-        return securityService;
-      }
-    };
-
-    // element store
-    final ElementStore elementStore = EasyMock.createNiceMock(ElementStore.class);
-    EasyMock.expect(elementStore.delete(EasyMock.<DeletionSelector> anyObject())).andReturn(true).once();
-    EasyMock.expect(elementStore.copy(EasyMock.<StoragePath> anyObject(), EasyMock.<StoragePath> anyObject()))
-            .andReturn(true).anyTimes();
-    EasyMock.replay(elementStore);
-
-    final SolrServer solrServer = OpencastArchivePublisher.setupSolr(new File(solrRoot));
-    final SolrRequester solrRequester = new SolrRequester(solrServer) {
-      @Override
-      public OpencastResultSet find(OpencastQuery q) throws SolrServerException {
-        if (q.getMediaPackageId().isSome()) {
-          return new OpencastResultSet() {
-            @Override
-            public List<OpencastResultItem> getItems() {
-              List<OpencastResultItem> items = new ArrayList<OpencastResultItem>();
-              items.add(getOpencastResultItem(acl, workflowInstanceImpl3));
-              return items;
-            }
-
-            @Override
-            public String getQuery() {
-              return "";
-            }
-
-            @Override
-            public long getTotalSize() {
-              return 1;
-            }
-
-            @Override
-            public long getLimit() {
-              return 0;
-            }
-
-            @Override
-            public long getOffset() {
-              return 0;
-            }
-
-            @Override
-            public long getSearchTime() {
-              return 0;
-            }
-          };
-        } else {
-          return new OpencastResultSet() {
-            @Override
-            public List<OpencastResultItem> getItems() {
-              List<OpencastResultItem> items = new ArrayList<>();
-              items.add(getOpencastResultItem(acl, workflowInstanceImpl1));
-              items.add(getOpencastResultItem(acl, workflowInstanceImpl2));
-              items.add(getOpencastResultItem(acl, workflowInstanceImpl3));
-              return items;
-            }
-
-            @Override
-            public String getQuery() {
-              return "";
-            }
-
-            @Override
-            public long getTotalSize() {
-              return 3;
-            }
-
-            @Override
-            public long getLimit() {
-              return 0;
-            }
-
-            @Override
-            public long getOffset() {
-              return 0;
-            }
-
-            @Override
-            public long getSearchTime() {
-              return 0;
-            }
-          };
-        }
-      }
-    };
-
-    // mpeg7 service
-    final Mpeg7CatalogService mpeg7CatalogService = new Mpeg7CatalogService();
 
     // series service
     final SeriesServiceImpl seriesService = new SeriesServiceImpl();
@@ -486,10 +404,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     StaticMetadataServiceDublinCoreImpl metadataSvcs = new StaticMetadataServiceDublinCoreImpl();
     metadataSvcs.setWorkspace(workspace);
 
-    final SolrIndexManager solrIndex = new SolrIndexManager(solrServer, workspace,
-            VCell.cell(Arrays.asList((StaticMetadataService) metadataSvcs)), seriesService, mpeg7CatalogService,
-            securityService);
-
     // Org directory
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
     EasyMock.replay(messageSender);
@@ -497,13 +411,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     MessageReceiver messageReceiver = EasyMock.createNiceMock(MessageReceiver.class);
     EasyMock.replay(messageReceiver);
 
-    OpencastArchive archive = new OpencastArchive(solrIndex, solrRequester, securityService, authorizationService,
-            orgDirectory, serviceRegistry, workflowService, workspace, episodeDatabase, elementStore, "root",
-            messageSender, messageReceiver);
-    env.setArchive(archive);
-
-
-    Date now = new Date(DateTimeSupport.fromUTC("2014-06-05T09:15:56Z"));
+    final Date now = DateTime.parse("2014-06-05T09:15:56Z").toDate();
     EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
             userWithPermissions, "Sick", true, now, now);
     EventComment comment2 = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 2",
@@ -512,20 +420,25 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             now);
     comment2.addReply(reply);
 
+    final Capture<EventComment> c = Capture.newInstance();
     EventCommentService eventCommentService = EasyMock.createNiceMock(EventCommentService.class);
     EasyMock.expect(eventCommentService.getComments(EasyMock.anyString())).andReturn(Arrays.asList(comment, comment2))
             .anyTimes();
-    EasyMock.expect(eventCommentService.getComment(EasyMock.anyLong())).andReturn(comment2);
-    EasyMock.expect(eventCommentService.updateComment(EasyMock.anyObject(EventComment.class))).andReturn(comment2);
+    EasyMock.expect(eventCommentService.getComment(65L)).andReturn(comment2);
+    EasyMock.expect(eventCommentService.getComment(33L)).andReturn(comment2);
+    EasyMock.expect(eventCommentService.getComment(99999L)).andReturn(null);
+    EasyMock.expect(eventCommentService.updateComment(EasyMock.capture(c))).andAnswer(new IAnswer<EventComment>() {
+      @Override
+      public EventComment answer() throws Throwable {
+        EventComment current = c.getValue();
+        EventComment result = EventComment.create(Option.some(65L), current.getEventId(), current.getOrganization(),
+                current.getText(), current.getAuthor(), current.getReason(), current.isResolvedStatus(), now, now,
+                current.getReplies());
+        return result;
+      }
+    });
     EasyMock.replay(eventCommentService);
     env.setEventCommentService(eventCommentService);
-
-    HttpMediaPackageElementProvider httpMediaPackageElementProvider = EasyMock
-            .createNiceMock(HttpMediaPackageElementProvider.class);
-    EasyMock.expect(httpMediaPackageElementProvider.getUriRewriter()).andReturn(rewriter).anyTimes();
-    EasyMock.replay(httpMediaPackageElementProvider);
-
-    env.setHttpMediaPackageElementProvider(httpMediaPackageElementProvider);
 
     Map<String, String> licences = new HashMap<>();
     licences.put("uuid-series1", "Series 1");
@@ -533,24 +446,16 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-            EasyMock.anyObject(Organization.class), false)).andReturn(licences).anyTimes();
+            EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
 
     final IncidentTree r = new IncidentTreeImpl(
-            Immutables
-                    .list(mkIncident(Severity.INFO), mkIncident(Severity.INFO),
-                            mkIncident(
-                                    Severity.INFO)),
-            Immutables
-                    .<IncidentTree> list(
-                            new IncidentTreeImpl(
-                                    Immutables
-                                            .list(mkIncident(Severity.INFO),
-                                                    mkIncident(
-                                                            Severity.WARNING)),
-                                    Immutables.<IncidentTree> list(new IncidentTreeImpl(
-                                            Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
-                                            Immutables.<IncidentTree> nil())))));
+            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
+            Immutables.<IncidentTree> list(
+                    new IncidentTreeImpl(Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
+                            Immutables.<IncidentTree> list(new IncidentTreeImpl(
+                                    Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)), Immutables
+                                            .<IncidentTree> nil())))));
 
     IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
     EasyMock.expect(incidentService.getIncident(EasyMock.anyLong())).andReturn(mkIncident(Severity.INFO)).anyTimes();
@@ -565,16 +470,50 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     endpoint.activate(null);
     env.setJobService(endpoint);
 
-    List<DublinCoreCatalog> catalogs = new ArrayList<>();
+    // date, duration, title
+    List<MediaPackage> events = new ArrayList<>();
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    catalogs.add(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml")));
-    DublinCoreCatalogList dublinCoreCatalogList = new DublinCoreCatalogList(catalogs, 1);
+    mp.setTitle("Land and Vegetation: Key players on the Climate Scene");
+    mp.setDuration(36000L);
+    mp.setDate(new Date());
+    mp.setIdentifier(new IdImpl("asdasd"));
+    events.add(mp);
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
+    EasyMock.expect(schedulerService.search(EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class)))
+            .andReturn(events).anyTimes();
+    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(RRule.class),
+            EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(),
+            EasyMock.anyObject(TimeZone.class))).andReturn(events).anyTimes();
     EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
-            EasyMock.anyObject(Date.class))).andReturn(dublinCoreCatalogList).anyTimes();
-    EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(), EasyMock.anyString()))
-            .andReturn(dublinCoreCatalogList).anyTimes();
+            EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
+            EasyMock.anyString());
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
+    Map<String, String> workFlowConfig = new HashMap<>();
+    workFlowConfig.put("someworkflowconfig", "somevalue");
+    EasyMock.expect(schedulerService.getWorkflowConfig("workflowid")).andReturn(workFlowConfig).anyTimes();
+    Map<String, String> captureAgentConfig = new HashMap<>();
+    captureAgentConfig.put(INGEST_WORKFLOW_DEFINITION, "somevalue");
+    expect(schedulerService.getCaptureAgentConfiguration("workflowid")).andReturn(captureAgentConfig).anyTimes();
+
+    Set<String> userIds = new HashSet<>();
+    userIds.add("user1");
+    userIds.add("user2");
+    Map<String, String> caProperties = new HashMap<>();
+    caProperties.put("test", "true");
+    caProperties.put("clear", "all");
+    Map<String, String> wfProperties = new HashMap<>();
+    wfProperties.put("test", "false");
+    wfProperties.put("skip", "true");
+    TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
+            new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), false, userIds,
+            wfProperties, caProperties, Opt.<Recording> none());
+    expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
+
     EasyMock.replay(schedulerService);
     env.setSchedulerService(schedulerService);
 
@@ -590,17 +529,113 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     Properties episodeCatalogProperties = getCatalogProperties(getClass(), "/episode-catalog.properties");
 
-    episodeDublinCoreCatalogUIAdapter.updated(episodeCatalogProperties);
+    episodeDublinCoreCatalogUIAdapter.updated(toDictionary(episodeCatalogProperties));
 
-    IndexServiceImpl indexService = new IndexServiceImpl();
-    indexService.addCatalogUIAdapter(catalogUIAdapter);
-    indexService.setCommonEventCatalogUIAdapter(episodeDublinCoreCatalogUIAdapter);
-    indexService.setSecurityService(securityService);
-    indexService.setSeriesService(seriesService);
-    indexService.setWorkspace(workspace);
+    Series series = new Series();
+    series.setOptOut(true);
+
+    Event event = createEvent("asdasd", "title", Source.SCHEDULE);
+    Event event2 = createEvent("archivedid", "title 2", Source.ARCHIVE);
+    Event event3 = createEvent("workflowid", "title 3", Source.WORKFLOW);
+
+    SearchResultItem[] list = new SearchResultItem[3];
+    list[0] = new SearchResultItemImpl<>(1, event);
+    list[1] = new SearchResultItemImpl<>(1, event2);
+    list[2] = new SearchResultItemImpl<>(1, event3);
+
+    SearchResultImpl<Event> eventSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
+    EasyMock.expect(eventSearchResult.getHitCount()).andReturn(3L).anyTimes();
+    EasyMock.expect(eventSearchResult.getPageSize()).andReturn(3L).anyTimes();
+    EasyMock.expect(eventSearchResult.getItems()).andReturn(list).anyTimes();
+    EasyMock.replay(eventSearchResult);
+
+    // AdminUISearchIndex
+    AdminUISearchIndex searchIndex = EasyMock.createNiceMock(AdminUISearchIndex.class);
+    EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
+            .anyTimes();
+    EasyMock.replay(searchIndex);
+    env.setIndex(searchIndex);
+
+    List<EventCatalogUIAdapter> eventCatalogAdapterList = new ArrayList<>();
+    eventCatalogAdapterList.add(createEventCatalogUIAdapter("name 1"));
+    eventCatalogAdapterList.add(createEventCatalogUIAdapter("name 2"));
+
+    IndexService indexService = EasyMock.createNiceMock(IndexService.class);
+    EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Opt.some(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
+    EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
+    EasyMock.expect(indexService.getSeries("seriesId", searchIndex)).andReturn(Opt.some(series)).anyTimes();
+    EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
+    EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
+    EasyMock.expect(indexService.getCommonEventCatalogUIAdapter()).andReturn(eventCatalogAdapterList.get(0)).anyTimes();
+    EasyMock.expect(indexService.getEventSource(event)).andReturn(Source.SCHEDULE).anyTimes();
+    EasyMock.expect(indexService.getEventSource(event2)).andReturn(Source.ARCHIVE).anyTimes();
+    EasyMock.expect(indexService.getEventSource(event3)).andReturn(Source.WORKFLOW).anyTimes();
+    MetadataList metaDataList = new MetadataList();
+    EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject(AbstractSearchIndex.class))).andReturn(metaDataList).anyTimes();
+    EasyMock.replay(indexService);
     env.setIndexService(indexService);
+  }
 
-    // TODO authorization service
+  private Event createEvent(String id, String title, Source source) throws URISyntaxException {
+    Event event = EasyMock.createNiceMock(Event.class);
+    EasyMock.expect(event.getIdentifier()).andReturn(id).anyTimes();
+    EasyMock.expect(event.getTitle()).andReturn(title).anyTimes();
+    EasyMock.expect(event.getSeriesId()).andReturn("seriesId").anyTimes();
+    EasyMock.expect(event.getReviewStatus()).andReturn(ReviewStatus.UNSENT.toString()).anyTimes();
+    EasyMock.expect(event.getEventStatus()).andReturn("EVENTS.EVENTS.STATUS.ARCHIVE").anyTimes();
+    EasyMock.expect(event.getOptedOut()).andReturn(true).anyTimes();
+    EasyMock.expect(event.getRecordingStartDate()).andReturn("2013-03-20T04:00:00Z").anyTimes();
+    EasyMock.expect(event.getRecordingEndDate()).andReturn("2013-03-20T05:00:00Z").anyTimes();
+    EasyMock.expect(event.getTechnicalStartTime()).andReturn("2013-03-20T04:00:00Z").anyTimes();
+    EasyMock.expect(event.getTechnicalEndTime()).andReturn("2013-03-20T05:00:00Z").anyTimes();
+    List<Publication> publist = new ArrayList<>();
+    publist.add(new PublicationImpl("engage", "rest", new URI("engage.html?e=p-1"), MimeType.mimeType("text", "xml")));
+    EasyMock.expect(event.getPublications()).andReturn(publist).anyTimes();
+    EasyMock.expect(event.getAccessPolicy())
+            .andReturn(
+                    "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN\"},{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}\"")
+            .anyTimes();
+
+    EasyMock.expect(event.hasRecordingStarted()).andReturn(true);
+
+    // Simulate different event sources
+    switch (source) {
+      case ARCHIVE:
+        EasyMock.expect(event.getArchiveVersion()).andReturn(1000L).anyTimes();
+        break;
+      case SCHEDULE:
+        EasyMock.expect(event.getWorkflowId()).andReturn(1000L).anyTimes();
+        break;
+      default:
+        // nothing!
+    }
+    EasyMock.replay(event);
+    return event;
+  }
+
+  private EventCatalogUIAdapter createEventCatalogUIAdapter(final String s) throws IOException, ConfigurationException {
+    Properties eventProperties = new Properties();
+    InputStream in = getClass().getResourceAsStream("/episode-catalog.properties");
+    eventProperties.load(in);
+    in.close();
+
+    Dictionary<String, String> properties = PropertiesUtil.toDictionary(eventProperties);
+    CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter() {
+      @Override
+      public String getUITitle() {
+        return s;
+      }
+
+      @Override
+      public MetadataCollection getFields(MediaPackage mediapackage) {
+        return super.getFields(null);
+      }
+    };
+    commonEventCatalogUIAdapter.updated(properties);
+    return commonEventCatalogUIAdapter;
   }
 
   private Agent getAgent() {
@@ -745,61 +780,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             }));
   }
 
-  private OpencastResultItem getOpencastResultItem(final AccessControlList acl,
-          final WorkflowInstanceImpl workflowInstance) {
-    return new OpencastResultItem() {
-      @Override
-      public String getMediaPackageId() {
-        return workflowInstance.getMediaPackage().getIdentifier().compact();
-      }
-
-      @Override
-      public Option<OcDublinCore> getSeriesDublinCore() {
-        return Option.some(OcDublinCoreUtil
-                .create(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore2.xml")))
-                .getDublinCore());
-      }
-
-      @Override
-      public MediaPackage getMediaPackage() {
-        return workflowInstance.getMediaPackage();
-      }
-
-      @Override
-      public Option<String> getSeriesId() {
-        return Option.option(workflowInstance.getMediaPackage().getSeries());
-      }
-
-      @Override
-      public AccessControlList getAcl() {
-        return acl;
-      }
-
-      @Override
-      public Version getVersion() {
-        return Version.version(1);
-      }
-
-      @Override
-      public String getOrganizationId() {
-        return defaultOrganization.getId();
-      }
-
-      @Override
-      public OcDublinCore getDublinCore() {
-        return OcDublinCoreUtil
-                .create(DublinCores.read(TestEventEndpoint.class.getResourceAsStream("/dublincore3.xml")))
-                .getDublinCore();
-      }
-
-      @Override
-      public boolean isLatestVersion() {
-        return true;
-      }
-
-    };
-  }
-
   private MediaPackage loadMpFromResource(String name) throws Exception {
     URI publishedMediaPackageURI = getClass().getResource("/" + name + ".xml").toURI();
     return mpBuilder.loadFromXml(publishedMediaPackageURI.toURL().openStream());
@@ -813,16 +793,6 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public WorkflowService getWorkflowService() {
     return env.getWorkflowService();
-  }
-
-  @Override
-  public OpencastArchive getArchive() {
-    return env.getArchive();
-  }
-
-  @Override
-  public HttpMediaPackageElementProvider getHttpMediaPackageElementProvider() {
-    return env.getHttpMediaPackageElementProvider();
   }
 
   @Override

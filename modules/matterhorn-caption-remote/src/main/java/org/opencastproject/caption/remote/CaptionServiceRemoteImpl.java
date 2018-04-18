@@ -26,7 +26,7 @@ import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.caption.api.UnsupportedCaptionFormatException;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobParser;
-import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
@@ -61,19 +61,20 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
   }
 
   /**
-   * @see org.opencastproject.caption.api.CaptionService#convert(Catalog, String, String)
+   * @see org.opencastproject.caption.api.CaptionService#convert(MediaPackageElement, String, String)
    */
   @Override
-  public Job convert(Catalog input, String inputFormat, String outputFormat) throws UnsupportedCaptionFormatException,
+  public Job convert(MediaPackageElement input, String inputFormat, String outputFormat)
+          throws UnsupportedCaptionFormatException,
           CaptionConverterException, MediaPackageException {
     return convert(input, inputFormat, outputFormat, null);
   }
 
   /**
-   * @see org.opencastproject.caption.api.CaptionService#convert(Catalog, String, String, String)
+   * @see org.opencastproject.caption.api.CaptionService#convert(MediaPackageElement, String, String, String)
    */
   @Override
-  public Job convert(Catalog input, String inputFormat, String outputFormat, String language)
+  public Job convert(MediaPackageElement input, String inputFormat, String outputFormat, String language)
           throws UnsupportedCaptionFormatException, CaptionConverterException, MediaPackageException {
     HttpPost post = new HttpPost("/convert");
     try {
@@ -105,10 +106,11 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
   }
 
   /**
-   * @see org.opencastproject.caption.api.CaptionService#getLanguageList(Catalog, String)
+   * @see org.opencastproject.caption.api.CaptionService#getLanguageList(MediaPackageElement, String)
    */
   @Override
-  public String[] getLanguageList(Catalog input, String format) throws UnsupportedCaptionFormatException,
+  public String[] getLanguageList(MediaPackageElement input, String format)
+          throws UnsupportedCaptionFormatException,
           CaptionConverterException {
     HttpPost post = new HttpPost("/languages");
     try {

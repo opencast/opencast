@@ -635,7 +635,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
           int current = 1;
           logger.info(
                   "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
-                  new Object[] { indexName, securityService.getOrganization().getId(), total });
+                  indexName, securityService.getOrganization().getId(), total);
           for (JpaGroup group : groups) {
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     GroupItem.update(JaxbGroup.fromGroup(group)));
@@ -652,7 +652,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
       @Override
       protected void run() {
-        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                 IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
       }
     });
@@ -671,6 +671,21 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   @Override
   public String getClassName() {
     return JpaGroupRoleProvider.class.getName();
+  }
+
+  @Override
+  public MessageSender getMessageSender() {
+    return messageSender;
+  }
+
+  @Override
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Override
+  public String getSystemUserName() {
+    return SecurityUtil.getSystemUserName(cc);
   }
 
 }

@@ -21,6 +21,8 @@
 
 package org.opencastproject.rest;
 
+import org.opencastproject.util.MimeTypes;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -31,7 +33,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 
-import javax.activation.MimetypesFileTypeMap;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,10 +47,6 @@ public class StaticResource extends HttpServlet {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(StaticResource.class);
-
-  /** The mimetypes to use for delivering files */
-  private static final MimetypesFileTypeMap mimeMap = new MimetypesFileTypeMap(
-          StaticResource.class.getClassLoader().getResourceAsStream("mimetypes"));
 
   /** The classpath to search for the static resources */
   protected String classpath = null;
@@ -99,8 +96,8 @@ public class StaticResource extends HttpServlet {
       alias = (String) componentProperties.get("alias");
     if (classpath == null)
       classpath = (String) componentProperties.get("classpath");
-    logger.info("registering classpath:{} at {} with welcome file {} {}",
-            new Object[] { classpath, alias, welcomeFile, welcomeFileSpecified ? "" : "(via default)" });
+    logger.info("registering classpath:{} at {} with welcome file {} {}", classpath, alias, welcomeFile,
+            welcomeFileSpecified ? "" : "(via default)");
   }
 
   public String getDefaultUrl() {
@@ -117,7 +114,7 @@ public class StaticResource extends HttpServlet {
     String pathInfo = req.getPathInfo();
     String servletPath = req.getServletPath();
     String path = pathInfo == null ? servletPath : servletPath + pathInfo;
-    logger.debug("handling path {}, pathInfo={}, servletPath={}", new Object[] { path, pathInfo, servletPath });
+    logger.debug("handling path {}, pathInfo={}, servletPath={}", path, pathInfo, servletPath);
 
     // If the URL points to a "directory", redirect to the welcome file
     if ("/".equals(path) || alias.equals(path) || (alias + "/").equals(path)) {
@@ -127,7 +124,7 @@ public class StaticResource extends HttpServlet {
       } else {
         redirectPath = alias + "/" + welcomeFile;
       }
-      logger.debug("redirecting {} to {}", new String[] { path, redirectPath });
+      logger.debug("redirecting {} to {}", path, redirectPath);
       resp.sendRedirect(redirectPath);
       return;
     }
@@ -155,7 +152,7 @@ public class StaticResource extends HttpServlet {
       resp.sendError(404);
       return;
     }
-    logger.debug("opening url {} {}", new Object[] { classpathToResource, url });
+    logger.debug("opening url {} {}", classpathToResource, url);
     InputStream in = null;
     try {
       in = url.openStream();
@@ -168,8 +165,8 @@ public class StaticResource extends HttpServlet {
     } finally {
       IOUtils.closeQuietly(in);
     }
-    String contentType = mimeMap.getContentType(url.getPath());
-    if (!"application/octet-stream".equals(contentType)) {
+    String contentType = MimeTypes.getMimeType(url.getPath());
+    if (!MimeTypes.DEFAULT_TYPE.equals(contentType)) {
       resp.setHeader("Content-Type", contentType);
     }
     try {

@@ -2,9 +2,16 @@ angular.module('adminNg.services')
 .provider('Notifications', function () {
     var notifications = {},
         keyList = {},
-        defaultDuration = 5000,
         uniqueId = 0;
-    this.$get = ['$rootScope', function ($rootScope) {
+
+    this.$get = ['$rootScope', '$injector', function ($rootScope, $injector) {
+        var AuthService;
+
+        // notification durations for different log level in seconds
+        var notificationDurationError = -1,
+            notificationDurationSuccess = 5,
+            notificationDurationWarning = 5;
+
         var scope = $rootScope.$new(),
             initContext = function (context) {
                 if (angular.isDefined(keyList[context])) {
@@ -19,6 +26,27 @@ angular.module('adminNg.services')
             };
 
         scope.get = function (context) {
+            var ADMIN_NOTIFICATION_DURATION_ERROR = 'admin.notification.duration.error',
+                ADMIN_NOTIFICATION_DURATION_SUCCESS = 'admin.notification.duration.success',
+                ADMIN_NOTIFICATION_DURATION_WARNING = 'admin.notification.duration.warning';
+
+            // We bind to AuthService here to prevent a circular dependency to $http
+            if (!AuthService) { AuthService = $injector.get('AuthService'); }
+
+            if (AuthService) {
+                AuthService.getUser().$promise.then(function(user) {
+                    if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_ERROR])) {
+                        notificationDurationError = user.org.properties[ADMIN_NOTIFICATION_DURATION_ERROR];
+                    }
+                    if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_SUCCESS])) {
+                        notificationDurationSuccess = user.org.properties[ADMIN_NOTIFICATION_DURATION_SUCCESS];
+                    }
+                    if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING])) {
+                        notificationDurationWarning = user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING];
+                    }
+                });
+            }
+
             if (!context) {
                 context = 'global';
             }
@@ -48,15 +76,20 @@ angular.module('adminNg.services')
 
         scope.add = function (type, key, context, duration, messageParams) {
             if (angular.isUndefined(duration)) {
+                // fall back to defaults
                 switch (type) {
                     case 'error':
+                        duration = notificationDurationError;
+                        break;
                     case 'success':
+                        duration = notificationDurationSuccess;
+                        break;
                     case 'warning':
-                        if (angular.isUndefined(duration)) {
-                            duration = defaultDuration;
-                        }
+                        duration = notificationDurationWarning;
                         break;
                 }
+                // default durations are in seconds. duration needs to be in milliseconds
+                if (duration > 0) duration *= 1000;
             }
 
             if (!context) {

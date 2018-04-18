@@ -21,11 +21,10 @@
 
 package org.opencastproject.index.service.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
@@ -35,9 +34,10 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
@@ -69,40 +69,40 @@ public final class JSONUtils {
   }
 
   /**
-   * Turn a map into a {@link JObjectWrite} object
+   * Turn a map into a {@link JObject} object
    *
    * @param map
    *          the source map
-   * @return a new {@link JObjectWrite} generated with the map values
+   * @return a new {@link JObject} generated with the map values
    */
-  public static JObjectWrite mapToJSON(Map<String, String> map) {
+  public static JObject mapToJSON(Map<String, String> map) {
     if (map == null) {
       throw new IllegalArgumentException("Map must not be null!");
     }
 
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<Field>();
     for (Entry<String, String> item : map.entrySet()) {
-      fields.add(f(item.getKey(), vN(item.getValue())));
+      fields.add(f(item.getKey(), v(item.getValue(), Jsons.BLANK)));
     }
-    return j(fields);
+    return obj(fields);
   }
 
   /**
-   * Turn a set into a {@link JObjectWrite} object
+   * Turn a set into a {@link JObject} object
    *
    * @param set
    *          the source set
-   * @return a new {@link JObjectWrite} generated with the map values
+   * @return a new {@link JObject} generated with the map values
    */
   public static JValue setToJSON(Set<String> set) {
     if (set == null) {
-      return a();
+      return arr();
     }
     List<JValue> arrEntries = new ArrayList<JValue>();
     for (String item : set) {
-      arrEntries.add(vN(item));
+      arrEntries.add(v(item, Jsons.BLANK));
     }
-    return a(arrEntries);
+    return arr(arrEntries);
   }
 
   /**
@@ -121,13 +121,13 @@ public final class JSONUtils {
       throw new IllegalArgumentException("The separator must be defined!");
 
     if (StringUtils.isBlank(list))
-      return a();
+      return arr();
 
     List<JValue> values = new ArrayList<JValue>();
     for (String value : list.split(separator))
       values.add(v(value));
 
-    return a(values);
+    return arr(values);
   }
 
   /**
@@ -160,12 +160,12 @@ public final class JSONUtils {
   public static JValue filtersToJSON(ResourceListQuery query, ListProvidersService listProvidersService,
           Organization org) throws ListProviderException {
 
-    List<JField> filtersJSON = new ArrayList<JField>();
-    List<JField> fields = null;
+    List<Field> filtersJSON = new ArrayList<Field>();
+    List<Field> fields = null;
     List<ResourceListFilter<?>> filters = query.getAvailableFilters();
 
     for (ResourceListFilter<?> f : filters) {
-      fields = new ArrayList<JField>();
+      fields = new ArrayList<Field>();
 
       fields.add(f("type", v(f.getSourceType().toString().toLowerCase())));
       fields.add(f("label", v(f.getLabel())));
@@ -174,24 +174,28 @@ public final class JSONUtils {
 
       if (listProviderName.isSome()) {
         Map<String, String> values = null;
+        boolean translatable = false;
 
-        if (!listProvidersService.hasProvider(listProviderName.get()))
+        if (!listProvidersService.hasProvider(listProviderName.get())) {
           values = new HashMap<String, String>();
-        else
+        } else {
           values = listProvidersService.getList(listProviderName.get(), query, org, false);
-
-        List<JField> valuesJSON = new ArrayList<JField>();
-        for (Entry<String, String> entry : values.entrySet()) {
-          valuesJSON.add(f(entry.getKey(), vN(entry.getValue())));
+          translatable = listProvidersService.isTranslatable(listProviderName.get());
         }
 
-        fields.add(f("options", j(valuesJSON)));
+        List<Field> valuesJSON = new ArrayList<Field>();
+        for (Entry<String, String> entry : values.entrySet()) {
+          valuesJSON.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+        }
+
+        fields.add(f("options", obj(valuesJSON)));
+        fields.add(f("translatable", translatable));
       }
 
-      filtersJSON.add(f(f.getName(), j(fields)));
+      filtersJSON.add(f(f.getName(), obj(fields)));
     }
 
-    return j(filtersJSON);
+    return obj(filtersJSON);
   }
 
   /**
@@ -214,7 +218,7 @@ public final class JSONUtils {
     if (start == null || end == null)
       throw new IllegalArgumentException("The given start or end date from the period must not be null!");
 
-    return j(f("start", v(formatIsoDate(start))), f("end", v(formatIsoDate(end))));
+    return obj(f("start", v(formatIsoDate(start))), f("end", v(formatIsoDate(end))));
   }
 
   /**

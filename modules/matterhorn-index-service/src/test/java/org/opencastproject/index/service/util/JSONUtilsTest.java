@@ -164,7 +164,7 @@ public class JSONUtilsTest {
 
     JValue result = JSONUtils.filtersToJSON(query, listProvidersService, defaultOrganization);
 
-    StreamingOutput stream = RestUtils.stream(serializer.toJsonFx(result));
+    StreamingOutput stream = RestUtils.stream(serializer.fn.toJson(result));
     ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
     try {
       stream.write(resultStream);

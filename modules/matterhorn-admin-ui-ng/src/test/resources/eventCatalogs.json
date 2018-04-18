@@ -1,23 +1,29 @@
 [
-    {
-        "id": "catalog-1",
-        "mimetype": "text/xml",
-        "tags": ["archive", "engage"],
-        "type": "episode/dublincore",
-        "url": "http://episodes/10.0000/1/publish-track-1/1/track.mov"
-    },
-    {
-        "id": "catalog-2",
-        "mimetype": "text/xml",
-        "tags": ["archive", "engage"],
-        "type": "episode/dublincore",
-        "url": "http://episodes/10.0000/1/publish-track-2/1/track.mov"
-    },
-    {
-        "id": "catalog-3",
-        "mimetype": "text/xml",
-        "tags": ["archive", "engage"],
-        "type": "episode/dublincore",
-        "url": "http://episodes/10.0000/1/publish-track-3/1/track.mov"
-    }
+  {
+    "tags": [],
+    "id": "publish-catalog-1",
+    "mimetype": "text\/xml",
+    "type": "dublincore\/episode",
+    "url": "dublincore.xml"
+  },
+  {
+    "tags": [
+      "engage",
+      "publish"
+    ],
+    "id": "publish-catalog-2",
+    "mimetype": "text\/xml",
+    "type": "metadata\/mpeg-7",
+    "url": "mpeg7.xml"
+  },
+  {
+    "tags": [
+      "engage",
+      "publish"
+    ],
+    "id": "publish-catalog-3",
+    "mimetype": "text\/xml",
+    "type": "presentation\/source",
+    "url": "mpeg7.xml"
+  }
 ]

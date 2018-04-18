@@ -7,7 +7,8 @@ angular.module('adminNg.directives')
 
             element.bind('change', function () {
                 scope.$apply(function () {
-                    modelSetter(scope, element[0].files[0]);
+                    // allow multiple element files
+                    modelSetter(scope, element[0].files);
                 });
             });
 
@@ -17,3 +18,4 @@ angular.module('adminNg.directives')
        }
     };
 }]);
+

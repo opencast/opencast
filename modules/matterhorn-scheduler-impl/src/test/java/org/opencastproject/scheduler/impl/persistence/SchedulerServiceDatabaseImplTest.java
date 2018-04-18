@@ -21,91 +21,148 @@
 
 package org.opencastproject.scheduler.impl.persistence;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.opencastproject.util.persistencefn.PersistenceUtil.mkTestEntityManagerFactory;
+import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
+import com.entwinemedia.fn.Prelude;
+
+import org.easymock.EasyMock;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Properties;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Tests persistent storage.
- *
  */
 public class SchedulerServiceDatabaseImplTest {
 
   private SchedulerServiceDatabaseImpl schedulerDatabase;
-  private DublinCoreCatalogService dcService;
 
   /**
    * @throws java.lang.Exception
    */
   @Before
   public void setUp() throws Exception {
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.replay(securityService);
 
     schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    dcService = new DublinCoreCatalogService();
-    schedulerDatabase.setEntityManagerFactory(mkTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
-    schedulerDatabase.setDublinCoreService(dcService);
+    schedulerDatabase
+            .setEntityManagerFactory(newTestEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    schedulerDatabase.setSecurityService(securityService);
     schedulerDatabase.activate(null);
   }
 
   @Test
-  public void testStoringAndDeleting() throws Exception {
-    DublinCoreCatalog catalog = dcService.newInstance();
-    catalog.add(DublinCore.PROPERTY_TITLE, "Test");
-    catalog.add(DublinCore.PROPERTY_IDENTIFIER, "1");
-
-    schedulerDatabase.storeEvents(catalog);
-    schedulerDatabase.deleteEvent(1);
-  }
-
-  @Test
-  public void testMergingAndRetrieving() throws Exception {
-    DublinCoreCatalog firstCatalog = dcService.newInstance();
-    firstCatalog.add(DublinCore.PROPERTY_TITLE, "Test");
-    firstCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "1");
-
-    DublinCoreCatalog secondCatalog = dcService.newInstance();
-    secondCatalog.add(DublinCore.PROPERTY_TITLE, "Test");
-    secondCatalog.add(DublinCore.PROPERTY_IDENTIFIER, "2");
-
-    schedulerDatabase.storeEvents(firstCatalog);
-    schedulerDatabase.updateEvent(firstCatalog);
-    assertTrue("Should contain only one event", schedulerDatabase.getAllEvents().length == 1);
-
-    schedulerDatabase.storeEvents(secondCatalog);
-    assertTrue("Should contain two events", schedulerDatabase.getAllEvents().length == 2);
-  }
-
-  @Test
-  public void testMetadataAdding() throws Exception {
-    DublinCoreCatalog catalog = dcService.newInstance();
-    catalog.add(DublinCore.PROPERTY_TITLE, "Test");
-    catalog.add(DublinCore.PROPERTY_IDENTIFIER, "1");
-
-    Properties properties = new Properties();
-    properties.put("properties.test", "test");
-
-    schedulerDatabase.storeEvents(catalog);
-    schedulerDatabase.updateEventWithMetadata(1, properties);
-
-    Properties caProperties = schedulerDatabase.getEventMetadata(1);
-    assertNotNull("Metadata properties should be stored", caProperties);
+  public void testLastModifed() throws Exception {
+    Date now = new Date();
+    String agentId = "agent1";
 
     try {
-      schedulerDatabase.updateEventWithMetadata(2, properties);
-      fail("Should fail with not found exception");
+      schedulerDatabase.getLastModified(agentId);
+      Assert.fail();
     } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
     }
+
+    Assert.assertTrue(schedulerDatabase.getLastModifiedDates().isEmpty());
+
+    schedulerDatabase.touchLastEntry(agentId);
+
+    Date lastModified = schedulerDatabase.getLastModified(agentId);
+    Assert.assertTrue(lastModified.after(now));
+
+    Map<String, Date> dates = schedulerDatabase.getLastModifiedDates();
+    Assert.assertEquals(1, dates.size());
+    lastModified = dates.get(agentId);
+    Assert.assertTrue(lastModified.after(now));
+  }
+
+  @Test
+  public void testTransactions() throws Exception {
+    String id = "uuid";
+    String source = "source";
+
+    try {
+      schedulerDatabase.getTransactionId(source);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+
+    try {
+      schedulerDatabase.getTransactionSource(id);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+
+    try {
+      schedulerDatabase.getTransactionLastModified(id);
+      Assert.fail();
+    } catch (NotFoundException e) {
+      Assert.assertNotNull(e);
+    }
+
+    Assert.assertFalse(schedulerDatabase.hasTransaction(source));
+
+    schedulerDatabase.storeTransaction(id, source);
+
+    Assert.assertTrue(schedulerDatabase.hasTransaction(source));
+
+    try {
+      Assert.assertEquals(id, schedulerDatabase.getTransactionId(source));
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+
+    try {
+      Assert.assertEquals(source, schedulerDatabase.getTransactionSource(id));
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+
+    Prelude.sleep(500L);
+
+    Date now = new Date();
+
+    try {
+      Date date = schedulerDatabase.getTransactionLastModified(id);
+      Assert.assertTrue(now.after(date));
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+
+    Prelude.sleep(500L);
+
+    schedulerDatabase.storeTransaction(id, source);
+
+    try {
+      Date date = schedulerDatabase.getTransactionLastModified(id);
+      Assert.assertTrue(now.before(date));
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+
+    List<String> transactions = schedulerDatabase.getTransactions();
+    Assert.assertEquals(1, transactions.size());
+
+    try {
+      schedulerDatabase.deleteTransaction(id);
+    } catch (NotFoundException e) {
+      Assert.fail();
+    }
+
+    transactions = schedulerDatabase.getTransactions();
+    Assert.assertEquals(0, transactions.size());
   }
 
 }

@@ -150,6 +150,10 @@ angular.module('adminNg.controllers')
             return { height : $scope.role.searchable ? '26em' : '30em' };
         }
 
+        $scope.getSubmitButtonState = function () {
+          return $scope.userForm.$valid && $scope.manageable ? 'active' : 'disabled';
+        };
+
         // Retrieve a list of user so the form can be validated for user
         // uniqueness.
         $scope.users = [];

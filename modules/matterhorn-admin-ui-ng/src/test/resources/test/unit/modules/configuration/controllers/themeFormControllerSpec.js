@@ -91,12 +91,12 @@ describe('Theme Form Controller', function () {
                 expect($scope.valid).toBeDefined();
             });
 
-            it('returns false if no theme-form is in the scope', function () {
+            it('returns false if no themeForm is in the scope', function () {
                 expect($scope.valid()).toBeFalsy();
             });
 
-            it('returns true if theme-form is in the scope', function () {
-                $scope['theme-form'] = {
+            it('returns true if themeForm is in the scope', function () {
+                $scope['themeForm'] = {
                     $valid: true
                 };
                 expect($scope.valid()).toBeTruthy();

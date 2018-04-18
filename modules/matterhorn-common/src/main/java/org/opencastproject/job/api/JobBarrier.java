@@ -39,6 +39,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.OptimisticLockException;
+
 /**
  * This class is a utility implementation that will wait for all given jobs to change their status to either one of:
  * <ul>
@@ -153,11 +155,17 @@ public final class JobBarrier {
         waiter.setStatus(Job.Status.WAITING);
         List<Long> blockedForJobs = new LinkedList<Long>();
         for (Job j : jobs) {
-          Job blockerJob = this.serviceRegistry.getJob(j.getId());
-          blockedForJobs.add(blockerJob.getId());
-          blockerJob.setBlockingJobId(waiter.getId());
-          // FYI not updating local j in jobs collection
-          this.serviceRegistry.updateJob(blockerJob);
+          try {
+            if (setBlockerJob(j, waiter)) {
+              blockedForJobs.add(j.getId());
+            }
+          } catch (OptimisticLockException e) {
+            // Try again, this happens if the job finishes before we get here
+            // If the same exception happens again then we're in a very weird state
+            if (setBlockerJob(j, waiter)) {
+              blockedForJobs.add(j.getId());
+            }
+          }
         }
         waiter.setBlockedJobIds(blockedForJobs);
         this.serviceRegistry.updateJob(waiter);
@@ -168,6 +176,29 @@ public final class JobBarrier {
       }
     } else {
       logger.debug("No waiting job set, unable to put waiting job into waiting state");
+    }
+  }
+
+  /**
+   * Sets j's blocking job ID (ie, the job which it is blocking) to waiter's ID
+   * @param j
+   *   The job doing the blocking
+   * @param waiter
+   *   The job blocking, waiting for its child to finish
+   * @return
+   *   True if j is an active job and has been successfully updated, false if it is not an active job
+   * @throws ServiceRegistryException
+   * @throws NotFoundException
+   */
+  private boolean setBlockerJob(Job j, Job waiter) throws ServiceRegistryException, NotFoundException {
+    Job blockerJob = this.serviceRegistry.getJob(j.getId());
+    if (j.getStatus().isActive()) {
+      blockerJob.setBlockingJobId(waiter.getId());
+      // FYI not updating local j in jobs collection
+      this.serviceRegistry.updateJob(blockerJob);
+      return true;
+    } else {
+      return false;
     }
   }
 

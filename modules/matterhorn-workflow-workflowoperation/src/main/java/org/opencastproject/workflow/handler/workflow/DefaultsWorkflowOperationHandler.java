@@ -18,8 +18,6 @@
  * the License.
  *
  */
-
-
 package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
@@ -102,16 +100,16 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
         String preset = getPreset(organization, seriesID, key);
         if (StringUtils.isNotBlank(preset)) {
           properties.put(key, preset);
-          logger.info("Configuration key '{}' of workflow {} is set to preset value '{}'", key, id, preset);
+          logger.debug("Configuration key '{}' of workflow {} is set to preset value '{}'", key, id, preset);
         } else {
           String defaultValue = operation.getConfiguration(key);
           properties.put(key, defaultValue);
-          logger.info("Configuration key '{}' of workflow {} is set to default value '{}' specified in workflow", key,
+          logger.debug("Configuration key '{}' of workflow {} is set to default value '{}' specified in workflow", key,
                   id, defaultValue);
         }
       } else {
         properties.put(key, value);
-        logger.info("Configuration key '{}' of workflow {} is set to '{}' specified in event.", key, id, value);
+        logger.debug("Configuration key '{}' of workflow {} is set to '{}' specified in event.", key, id, value);
       }
     }
     return createResult(workflowInstance.getMediaPackage(), properties, Action.CONTINUE, 0);

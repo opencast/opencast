@@ -46,6 +46,8 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,8 +83,6 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
         MediaPackage mp = wf.getMediaPackage();
         eventId = mp.getIdentifier().toString();
 
-        Option<DublinCoreCatalog> loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
-
         // Load or create the corresponding recording event
         Event event = null;
         try {
@@ -102,8 +102,13 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
             event.setAccessPolicy(AccessControlParser.toJsonSilent(activeAcl.getA()));
           }
 
-          if (loadedDC.isSome())
-            updateEvent(event, loadedDC.get());
+          try {
+            Opt<DublinCoreCatalog> loadedDC = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
+            if (loadedDC.isSome())
+              updateEvent(event, loadedDC.get());
+          } catch (Throwable t) {
+            logger.warn("Unable to load dublincore catalog for the workflow {}", wf.getId(), t);
+          }
 
           updateEvent(event, mp);
         } catch (SearchIndexException e) {

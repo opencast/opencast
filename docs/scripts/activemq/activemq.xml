@@ -74,10 +74,11 @@
           </virtualDestinationInterceptor>
           <virtualDestinationInterceptor>
             <virtualDestinations>
-              <compositeQueue name="ARCHIVE.QUEUE">
+              <compositeQueue name="ASSETMANAGER.QUEUE">
                 <forwardTo>
-                  <queue physicalName="ARCHIVE.Adminui" />
-                  <queue physicalName="ARCHIVE.Externalapi" />
+                  <queue physicalName="ASSETMANAGER.Adminui" />
+                  <queue physicalName="ASSETMANAGER.Externalapi" />
+                  <queue physicalName="ASSETMANAGER.Conductor" />
                 </forwardTo>
               </compositeQueue>
             </virtualDestinations>
@@ -98,16 +99,6 @@
                 <forwardTo>
                   <queue physicalName="GROUP.Adminui" />
                   <queue physicalName="GROUP.Externalapi" />
-                </forwardTo>
-              </compositeQueue>
-            </virtualDestinations>
-          </virtualDestinationInterceptor>
-          <virtualDestinationInterceptor>
-            <virtualDestinations>
-              <compositeQueue name="RECORDING.QUEUE">
-                <forwardTo>
-                  <queue physicalName="RECORDING.Adminui" />
-                  <queue physicalName="RECORDING.Externalapi" />
                 </forwardTo>
               </compositeQueue>
             </virtualDestinations>

@@ -47,8 +47,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -87,6 +93,9 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   /** Property containing the tags that the resulting mediapackage elements will be assigned */
   public static final String TARGET_TAGS_PROPERTY = "target-tags";
 
+  /** Property to control whether command output will be used to set workflow properties */
+  public static final String SET_WF_PROPS_PROPERTY = "set-workflow-properties";
+
   /** The text analyzer */
   protected ExecuteService executeService;
 
@@ -109,6 +118,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
             "The type of the element returned by this operation. Accepted values are: manifest, timeline, track, catalog, attachment, other");
     CONFIG_OPTIONS.put(TARGET_FLAVOR_PROPERTY, "The flavor that the resulting mediapackage elements will be assigned");
     CONFIG_OPTIONS.put(TARGET_TAGS_PROPERTY, "The tags that the resulting mediapackage elements will be assigned");
+    CONFIG_OPTIONS.put(SET_WF_PROPS_PROPERTY, "If true, command output will be used to set workflow properties");
   }
 
   /**
@@ -142,6 +152,8 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
     String expectedTypeStr = StringUtils.trimToNull(operation.getConfiguration(EXPECTED_TYPE_PROPERTY));
 
+    boolean setWfProps = Boolean.valueOf(StringUtils.trimToNull(operation.getConfiguration(SET_WF_PROPS_PROPERTY)));
+
     // Unmarshall target flavor
     MediaPackageElementFlavor targetFlavor = null;
     if (targetFlavorStr != null)
@@ -166,51 +178,73 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     try {
       Job job = executeService.execute(exec, params, mediaPackage, outputFilename, expectedType, load);
 
+      WorkflowOperationResult result = null;
+
       // Wait for all jobs to be finished
       if (!waitForStatus(job).isSuccess())
         throw new WorkflowOperationException("Execute operation failed");
 
       if (StringUtils.isNotBlank(job.getPayload())) {
 
-        resultElement = MediaPackageElementParser.getFromXml(job.getPayload());
+        if (setWfProps) {
+          // The job payload is a file with set of properties for the workflow
+          resultElement = MediaPackageElementParser.getFromXml(job.getPayload());
 
-        if (resultElement.getElementType() == MediaPackageElement.Type.Track) {
-          // Have the track inspected and return the result
-          Job inspectionJob = null;
-          inspectionJob = inspectionService.inspect(resultElement.getURI());
-          JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
-          if (!barrier.waitForJobs().isSuccess()) {
-            throw new ExecuteException("Media inspection of " + resultElement.getURI() + " failed");
+          final Properties properties = new Properties();
+          File propertiesFile = workspace.get(resultElement.getURI());
+          try (InputStream is = new FileInputStream(propertiesFile)) {
+            properties.load(is);
+          }
+          logger.debug("Loaded {} properties from {}", properties.size(), propertiesFile);
+          workspace.deleteFromCollection(ExecuteService.COLLECTION, propertiesFile.getName());
+
+          Map<String, String> wfProps = new HashMap<String, String>((Map) properties);
+
+          result = createResult(mediaPackage, wfProps, Action.CONTINUE, job.getQueueTime());
+        } else {
+          // The job payload is a new element for the MediaPackage
+          resultElement = MediaPackageElementParser.getFromXml(job.getPayload());
+
+          if (resultElement.getElementType() == MediaPackageElement.Type.Track) {
+            // Have the track inspected and return the result
+            Job inspectionJob = null;
+            inspectionJob = inspectionService.inspect(resultElement.getURI());
+            JobBarrier barrier = new JobBarrier(job, serviceRegistry, inspectionJob);
+            if (!barrier.waitForJobs().isSuccess()) {
+              throw new ExecuteException("Media inspection of " + resultElement.getURI() + " failed");
+            }
+
+            resultElement = MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
           }
 
-          resultElement = MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
-        }
+          // Store new element to mediaPackage
+          mediaPackage.add(resultElement);
+          URI uri = workspace.moveTo(resultElement.getURI(), mediaPackage.getIdentifier().toString(),
+                  resultElement.getIdentifier(), outputFilename);
+          resultElement.setURI(uri);
 
-        // Store new element to mediaPackage
-        mediaPackage.add(resultElement);
-        // Store new element to mediaPackage
-        URI uri = workspace.moveTo(resultElement.getURI(), mediaPackage.getIdentifier().toString(),
-                resultElement.getIdentifier(), outputFilename);
-        resultElement.setURI(uri);
+          // Set new flavor
+          if (targetFlavor != null)
+            resultElement.setFlavor(targetFlavor);
 
-        // Set new flavor
-        if (targetFlavor != null)
-          resultElement.setFlavor(targetFlavor);
-
-        // Set new tags
-        if (targetTags != null) {
-          // Assume the tags starting with "-" means we want to eliminate such tags form the result element
-          for (String tag : asList(targetTags)) {
-            if (tag.startsWith("-"))
-              // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
-              resultElement.removeTag(tag.replaceAll("^-+", ""));
-            else
-              resultElement.addTag(tag);
+          // Set new tags
+          if (targetTags != null) {
+            // Assume the tags starting with "-" means we want to eliminate such tags form the result element
+            for (String tag : asList(targetTags)) {
+              if (tag.startsWith("-"))
+                // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
+                resultElement.removeTag(tag.replaceAll("^-+", ""));
+              else
+                resultElement.addTag(tag);
+            }
           }
+          result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());
         }
+      } else {
+        // Payload is empty
+        result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());
       }
 
-      WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());
       logger.debug("Execute operation {} completed", operation.getId());
 
       return result;

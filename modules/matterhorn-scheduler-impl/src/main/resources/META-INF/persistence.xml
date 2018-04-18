@@ -8,7 +8,9 @@
   <persistence-unit name="org.opencastproject.scheduler.impl.persistence" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/matterhorn)</non-jta-data-source>
-    <class>org.opencastproject.scheduler.impl.persistence.EventEntity</class>
+    <class>org.opencastproject.scheduler.impl.persistence.ExtendedEventDto</class>
+    <class>org.opencastproject.scheduler.impl.persistence.LastModifiedDto</class>
+    <class>org.opencastproject.scheduler.impl.persistence.TransactionDto</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />

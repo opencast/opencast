@@ -182,6 +182,27 @@
 /* border-bottom: 1px solid #cccccc; */
 }
 
+.timelinePreview {
+    position: absolute;
+    visibility: hidden;
+    margin-left: 20px;
+    display: none;
+}
+
+.timelinePreviewHover {
+    visibility: visible;
+    position: relative;
+    margin-left: 20px;
+    display: block;
+    border: 2px solid white;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px black;
+}
+
+.timeline_preview_container {
+    height: 0px;
+}
+
 .dropdown-submenu {
     position: relative;
 }

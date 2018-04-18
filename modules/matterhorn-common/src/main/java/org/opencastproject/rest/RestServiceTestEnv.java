@@ -26,25 +26,24 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.ClassNamesResourceConfig;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.jersey.spi.container.servlet.ServletContainer;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Random;
@@ -57,6 +56,7 @@ import java.util.regex.Pattern;
  * <p>
  * Write REST unit tests using <a href="http://code.google.com/p/rest-assured/">rest assured</a>.
  * <h3>Example Usage</h3>
+ * 
  * <pre>
  *   import static com.jayway.restassured.RestAssured.*;
  *   import static com.jayway.restassured.matcher.RestAssuredMatchers.*;
@@ -77,7 +77,9 @@ import java.util.regex.Pattern;
  *   }
  *   }
  * </pre>
+ * 
  * Add the following dependencies to your pom
+ * 
  * <pre>
  * &lt;dependency&gt;
  *   &lt;groupId&gt;com.jayway.restassured&lt;/groupId&gt;
@@ -94,7 +96,7 @@ import java.util.regex.Pattern;
  * </pre>
  */
 public final class RestServiceTestEnv {
-  private HttpServer hs;
+  private Server hs;
 
   private final URL baseUrl;
   private final Option<? extends ResourceConfig> cfg;
@@ -102,8 +104,8 @@ public final class RestServiceTestEnv {
   private static final Logger logger = LoggerFactory.getLogger(RestServiceTestEnv.class);
 
   /**
-   * Create an environment for <code>baseUrl</code>.
-   * The base URL should be the URL where the service to test is mounted, e.g. http://localhost:8090/test
+   * Create an environment for <code>baseUrl</code>. The base URL should be the URL where the service to test is
+   * mounted, e.g. http://localhost:8090/test
    */
   private RestServiceTestEnv(URL baseUrl, Option<? extends ResourceConfig> cfg) {
     this.baseUrl = baseUrl;
@@ -111,12 +113,12 @@ public final class RestServiceTestEnv {
   }
 
   public static RestServiceTestEnv testEnvScanAllPackages(URL baseUrl) {
-    return new RestServiceTestEnv(baseUrl, Option.<ResourceConfig>none());
+    return new RestServiceTestEnv(baseUrl, Option.<ResourceConfig> none());
   }
 
   public static RestServiceTestEnv testEnvScanPackages(URL baseUrl, Package... servicePkgs) {
     return new RestServiceTestEnv(baseUrl,
-                                  some(new PackagesResourceConfig(toArray(String.class, mlist(servicePkgs).map(pkgName).value()))));
+            some(new PackagesResourceConfig(toArray(String.class, mlist(servicePkgs).map(pkgName).value()))));
   }
 
   public static RestServiceTestEnv testEnvForClasses(URL baseUrl, Class... restServices) {
@@ -132,20 +134,18 @@ public final class RestServiceTestEnv {
   }
 
   /**
-   * Return a localhost base URL with a random port between 8081 and 9000.
-   * The method features a port usage detection to ensure it returns a free port.
+   * Return a localhost base URL with a random port between 8081 and 9000. The method features a port usage detection to
+   * ensure it returns a free port.
    */
   public static URL localhostRandomPort() {
     for (int tries = 100; tries > 0; tries--) {
       final URL url = UrlSupport.url("http", "localhost", 8081 + new Random(System.currentTimeMillis()).nextInt(919));
-      InputStream in = null;
       try {
         final URLConnection con = url.openConnection();
         con.setConnectTimeout(1000);
         con.setReadTimeout(1000);
         con.getInputStream();
       } catch (IOException e) {
-        IoSupport.closeQuietly(in);
         return url;
       }
     }
@@ -162,19 +162,21 @@ public final class RestServiceTestEnv {
     return baseUrl.getPort();
   }
 
-  /** Return the base URL of the HTTP server. <code>http://host:port</code>
-  public URL getBaseUrl() {
-    return baseUrl;
-  }
-
-  /** Call in BeforeClass annotated method. */
+  /**
+   * Return the base URL of the HTTP server. <code>http://host:port</code> public URL getBaseUrl() { return baseUrl; }
+   *
+   * Call in @BeforeClass annotated method.
+   */
   public void setUpServer() {
     try {
       // cut of any base pathbasestUrl might have
-      final URI host = new URL(baseUrl.getProtocol(), baseUrl.getHost(), baseUrl.getPort(), "/").toURI();
-      logger.info("Start http server at " + host);
-      if (cfg.isSome()) hs = HttpServerFactory.create(host, cfg.get());
-      else hs = HttpServerFactory.create(host);
+      int port = baseUrl.getPort();
+      logger.info("Start http server at port " + port);
+      hs = new Server(port);
+      ServletContainer servletContainer = cfg.isSome() ? new ServletContainer(cfg.get()) : new ServletContainer();
+      ServletHolder jerseyServlet = new ServletHolder(servletContainer);
+      ServletContextHandler context = new ServletContextHandler(hs, "/");
+      context.addServlet(jerseyServlet, "/*");
       hs.start();
     } catch (Exception e) {
       chuck(e);
@@ -185,12 +187,17 @@ public final class RestServiceTestEnv {
   public void tearDownServer() {
     if (hs != null) {
       logger.info("Stop http server");
-      hs.stop(0);
+      try {
+        hs.stop();
+      } catch (Exception e) {
+        logger.warn("Stop http server - failed {}", e.getMessage());
+      }
     }
   }
 
   private static final Function<Package, String> pkgName = new Function<Package, String>() {
-    @Override public String apply(Package pkg) {
+    @Override
+    public String apply(Package pkg) {
       return pkg.getName();
     }
   };

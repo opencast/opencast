@@ -13,7 +13,7 @@ files:
 
   -
     source: '/modules/**/src/main/resources/static/language/en-US.json'
-    translation: '/modules/**/src/main/resources/static/language/%locale%.json'
+    translation: '/%original_path%/%locale%.json'
 
   -
     source: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/en-US.json'

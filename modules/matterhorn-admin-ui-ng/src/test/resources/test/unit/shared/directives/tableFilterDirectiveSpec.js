@@ -38,7 +38,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                     'brown': 'BROWN',
                     'white': 'WHITE',
                     'black': 'BLACK'
-                }
+                },
+                translatable: true
             },
             type: {
                 label: 'TYPE',
@@ -46,7 +47,8 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 options: {
                     'chair': 'CHAIR',
                     'table': 'TABLE'
-                }
+                },
+                translatable: true
             }
         }));
 
@@ -72,8 +74,6 @@ describe('adminNg.directives.adminNgTableFilter', function () {
     it('restores filters after fetching them', function () {
         expect(element.scope().filters.filters.type.label).toEqual('TYPE');
         expect(element.scope().filters.filters.color.label).toEqual('COLOR');
-        expect(element.find('span.ng-multi-value')).toHaveText(/TYPE/);
-        expect(element.find('span.ng-multi-value')).toHaveText(/COLOR/);
     });
 
     it('restores filter profiles', function () {
@@ -155,9 +155,13 @@ describe('adminNg.directives.adminNgTableFilter', function () {
                 var fromDate = new Date('2015-01-01');
                 var toDate = new Date('2015-01-02');
                 var filter = { period: { type: "period", from: fromDate, to: toDate } };
+                var expectedFromDate = new Date(fromDate);
+                expectedFromDate.setHours(0, 0, 0, 0);
+                var expectedToDate = new Date(toDate);
+                expectedToDate.setHours(23, 59, 59, 999);
                 spyOn(Storage, 'put');
                 element.find('div').scope().selectFilterPeriodValue(filter);
-                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, fromDate.toISOString() + '/' + toDate.toISOString());
+                expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, expectedFromDate.toISOString() + '/' + expectedToDate.toISOString());
             });
         });
     });

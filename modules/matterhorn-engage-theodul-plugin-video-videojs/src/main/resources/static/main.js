@@ -155,10 +155,11 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var videojs_swf_path = 'lib/video-js/video-js.swf';
   var synchronizePath = 'lib/synchronize-min';
   /* https://github.com/CallToPower/Synchronize.js */
-  var mediaSourcesPath = 'lib/video-js/videojs-media-sources.min';
-  /* https://github.com/videojs/videojs-contrib-media-sources */
-  var hlsPath = 'lib/video-js/videojs.hls.min';
+  var hlsPath = 'lib/video-js/videojs-contrib-hls.min';
   /* https://github.com/videojs/videojs-contrib-hls */
+  var dashPath = 'lib/video-js/dash.all.min';
+  var dashPluginPath = 'lib/video-js/videojs-dash.min';
+  /* https://github.com/videojs/videojs-contrib-dash */
   var videoAreaAspectRatio;
   var checkVideoDisplaySizeTimeout = 1500;
   var audioLoadTimeoutCheckDelay = 5000;
@@ -183,6 +184,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var aspectRatio = null;
   var singleVideoPaddingTop = '56.25%';
   var initCount = 7;
+  var videoDisplayReady = 0;
   var infoMeChange = 'change:infoMe';
   var mediapackageError = false;
   var videoDisplayNamePrefix = 'videojs_videodisplay_';
@@ -233,6 +235,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   var globalVideoSource = [];
   var videoResultions = [];
   var loadHls = false;
+  var loadDash = false;
   var flavors = '';
   var mimetypes = '';
   var translations = [];
@@ -389,7 +392,8 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var sortedResolutionsList = [];
     sortedResolutionsList = _.map(qualitiesList, function(quality) {
       var currentTrack = filterTracksByTag(tracks, quality + '-quality')[0];
-      return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
+      if (currentTrack !== undefined && currentTrack.resolution !== undefined)
+        return [quality, currentTrack.resolution.substring(0, currentTrack.resolution.indexOf('x'))];
     });
     sortedResolutionsList.sort(compareQuality);
     foundQualities = [];
@@ -998,14 +1002,13 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
 
     if ((aspectRatio != null) && (videoDisplays.length > 0)) {
       calculateAspectRatioForVideos(videoDataView, videoDisplays, aspectRatio);
+      registerZoomLevelEvents();
     } else {
       Engage.trigger(plugin.events.aspectRatioSet.getName(), -1, -1, -1);
     }
 
     // small hack for the posters: A poster is only being displayed when controls=true, so do it manually
     $('.' + class_vjsposter).show();
-
-    registerZoomLevelEvents();
 
     Engage.trigger(plugin.events.numberOfVideodisplaysSet.getName(), videoDisplays.length);
 
@@ -1249,15 +1252,30 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
   }
 
   function prepareRenderingVideoDisplay(videoDataView) {
+    if (loadHls) videoDisplayReady++;
+    if (loadDash) videoDisplayReady++;
     if (loadHls) {
-      require([relative_plugin_path + mediaSourcesPath], function () {
-        Engage.log('Video: Lib videojs media sources loaded');
-        require([relative_plugin_path + hlsPath], function () {
-          Engage.log('Video: Lib videojs HLS playback loaded');
-          renderVideoDisplay(videoDataView);
+      require([relative_plugin_path + hlsPath], function () {
+        Engage.log('Video: Lib videojs HLS playback loaded');
+        videoDisplayReady--;
+        renderVideoDisplayIfReady(videoDataView);
+      });
+    }
+    if (loadDash) {
+      require([relative_plugin_path + dashPath], function () {
+        require([relative_plugin_path + dashPluginPath], function () {
+          Engage.log('Video: Lib videojs DASH playback loaded');
+          videoDisplayReady--;
+          renderVideoDisplayIfReady(videoDataView);
         });
       });
-    } else {
+    }
+
+    renderVideoDisplayIfReady(videoDataView);
+  }
+
+  function renderVideoDisplayIfReady(videoDataView) {
+    if (videoDisplayReady === 0) {
       renderVideoDisplay(videoDataView);
     }
   }
@@ -1623,19 +1641,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var $videoDisplay = $('#' + videoDisplay);
 
     if (!isMobileMode) {
-      videodisplayMaster
-        .on('play', function () {
+      videodisplayMaster.on('play', function () {
           startVideoPlayer(videodisplayMaster);
-        })
-        .on('pause', function () {
+      });
+      videodisplayMaster.on('pause', function () {
           Engage.trigger(plugin.events.pause.getName(), true);
-        })
-        .on('ended', function () {
+      });
+      videodisplayMaster.on('ended', function () {
           Engage.trigger(plugin.events.ended.getName(), true);
-        })
-        .on('timeupdate', function () {
+      });
+      videodisplayMaster.on('timeupdate', function () {
           Engage.trigger(plugin.events.timeupdate.getName(), videodisplayMaster.currentTime(), true);
-        });
+      });
     } else {
       // To get rid of the undesired "click on poster to play" functionality,
       // we remove all event listeners attached to the vjs posters by cloning the dom element.
@@ -1875,13 +1892,12 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
 
-    videodisplayMaster
-      .on(event_html5player_volumechange, function () {
+    videodisplayMaster.on(event_html5player_volumechange, function () {
         Engage.trigger(plugin.events.volumechange.getName(), videodisplayMaster.volume());
-      })
-      .on(event_html5player_fullscreenchange, function () {
+    });
+    videodisplayMaster.on(event_html5player_fullscreenchange, function () {
         Engage.trigger(plugin.events.fullscreenChange.getName());
-      });
+    });
 
     var $videoDisplayClass = $('.' + id_videoDisplayClass);
 
@@ -2114,7 +2130,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     });
     /* listen on videoFormatsFound event with query argument */
     Engage.on(plugin.events.videoFormatsFound.getName(), function (query) {
-      if (query === true) {
+      if (query === true && qualities.length > 1) {
         Engage.trigger(plugin.events.videoFormatsFound.getName(), qualities);
       }
     });
@@ -2147,10 +2163,6 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
     var flavors = '';
     var mimetypes = '';
 
-    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
-    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
-    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
-
     if (mediaInfo.tracks && (mediaInfo.tracks.length > 0)) {
       for (var k = 0; k < mediaInfo.tracks.length; ++k) {
         if (flavors.indexOf(mediaInfo.tracks[k].type) < 0) {
@@ -2176,6 +2188,10 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
         }
       }
     }
+
+    var allowedTags = Engage.model.get('meInfo').get('allowedtags');
+    var allowedFormats = Engage.model.get('meInfo').get('allowedformats');
+    mediaInfo.tracks = filterTracksByFormat(filterTracksByTag(mediaInfo.tracks, allowedTags), allowedFormats);
 
     return {
       flavors: flavors.substring(0, flavors.length - 1),
@@ -2204,13 +2220,18 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
             }
             var resolution = (track.video && track.video.resolution) ? track.video.resolution : '';
             // filter for different video sources
-            Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ')');
-            if (track.mimetype == 'application/dash+xml') {
+            var mainFlavor = Utils.extractFlavorMainType(track.type);
+            Engage.log('Video: Adding video source: ' + track.url + ' (' + track.mimetype + ') for flavor ' + mainFlavor );
+            if (track.mimetype === 'application/dash+xml') {
+              if (Utils.checkIfMimeTypeAvailableForFlavor(videoSources, 'application/dash+xml', mainFlavor)) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+              track = Utils.removeQualityTag(track);
               loadDash = true;
-            } else if (track.mimetype == 'application/x-mpegURL') {
+            } else if (track.mimetype === 'application/x-mpegURL') {
+              if (Utils.checkIfMimeTypeAvailableForFlavor(videoSources, 'application/x-mpegURL', mainFlavor)) return; //patch for broken Distribution Service that may contain Adaptive Streaming format multiple times
+              track = Utils.removeQualityTag(track);
               loadHls = true;
             }
-            videoSources[Utils.extractFlavorMainType(track.type)].push({
+            videoSources[mainFlavor].push({
               src: track.url,
               type: track.mimetype,
               typemh: track.type,

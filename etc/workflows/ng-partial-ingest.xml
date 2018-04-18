@@ -70,6 +70,19 @@
       </configurations>
     </operation>
 
+    <!-- Tag any optionally uploaded assets -->
+
+    <operation
+      id="tag"
+      if="${downloadSourceflavorsExist}"
+      exception-handler-workflow="ng-partial-error"
+      description="Tagging uploaded assets for distribution">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
+      </configurations>
+    </operation>
+
     <!-- Tag the incoming metadata catalogs for publishing -->
 
     <operation

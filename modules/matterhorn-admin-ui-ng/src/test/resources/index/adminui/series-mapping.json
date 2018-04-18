@@ -45,8 +45,8 @@
 
             "theme": { "type" : "long", "store" : "no" },
 
-            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
 
         },
         "dynamic_templates" : [

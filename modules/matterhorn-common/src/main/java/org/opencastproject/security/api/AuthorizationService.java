@@ -26,7 +26,9 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
+import java.io.InputStream;
 import java.util.List;
+
 
 /**
  * Provides generation and interpretation of policy documents in media packages
@@ -80,6 +82,15 @@ public interface AuthorizationService {
    * @return the set of permissions and explicit denials
    */
   Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp);
+
+  /**
+   * Gets the active permissions as specified by the given XACML attachment.
+   *
+   * @param in
+   *          the XACML attachment used to determine a set of permissions and explicit denials
+   * @return a set of permissions and explicit denials
+   */
+  Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in);
 
   /**
    * Gets the permissions by its scope associated with this media package, as specified by its XACML attachment.

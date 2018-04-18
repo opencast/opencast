@@ -23,8 +23,8 @@ package org.opencastproject.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -52,7 +52,7 @@ public class SmartIterator<A> {
   public Map<String, A> applyLimitAndOffset(Map<String, A> map) {
     iterator = map.entrySet().iterator();
 
-    Map<String, A> filteredMap = new HashMap<String, A>();
+    Map<String, A> filteredMap = new LinkedHashMap<String, A>();
     int i = 0;
     while (isRecordRequired(filteredMap.size())) {
       Entry<String, A> item = (Entry<String, A>) iterator.next();

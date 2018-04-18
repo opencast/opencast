@@ -64,6 +64,9 @@ public interface ExecuteService {
   /** Name of the form parameter in the REST endpoints that contains the element type of the generated file */
   String TYPE_FORM_PARAMETER = "expectedType";
 
+  /** The collection for the executor files */
+  String COLLECTION = "executor";
+
   /**
    * Execute the operation specified by {@code exec} with the argument string indicated by {@code args}.
    * 

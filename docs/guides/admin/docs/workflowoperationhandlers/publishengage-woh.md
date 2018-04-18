@@ -1,12 +1,16 @@
-# PublishEngageWorkflowOperation
+PublishEngageWorkflowOperation
+==============================
 
 
-## Description
+Description
+-----------
 
-The PublishEngageWorkflowOperation will bring your media to the engage distribution channels (streaming, progressive download, …)
+The PublishEngageWorkflowOperation will bring your media to the engage distribution channels (streaming, progressive
+download, …)
 
 
-## Parameter Table
+Parameter Table
+---------------
 
 |configuration keys         |description                                                                   |
 |---------------------------|------------------------------------------------------------------------------|
@@ -16,15 +20,16 @@ The PublishEngageWorkflowOperation will bring your media to the engage distribut
 |download-target-subflavors |Subflavor to use for distributed material                                     |
 |download-target-tags       |Modify tags of published media                                                |
 |strategy                   |If there is no key, published media would be retracted before publishing      |
-|                           | <configuration key="strategy">merge</configuration>                          |
-|		   	    |merges new publication with existing publication				   |
+|                           |`<configuration key="strategy">merge</configuration>`                         |
+|                           |merges new publication with existing publication                              |
 |streaming-source-flavors   |Specifies which media should be published to the streaming server             |
 |streaming-source-tags      |Specifies which media should be published to the streaming server             |
-|streaming-tagret-tags      |Modify tags of published media                                                |
+|streaming-target-tags      |Modify tags of published media                                                |
 |streaming-target-subflavors|Subflavor to use for distributed material                                     |
 
 
-## Operation Example
+Operation Example
+-----------------
 
     <operation
         id="publish-engage"

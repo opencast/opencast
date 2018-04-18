@@ -28,12 +28,18 @@ import org.opencastproject.composer.impl.ffmpeg.FFmpegEncoderEngine;
 
 import org.osgi.service.component.ComponentContext;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * A simple encoder engine factory that always returns an ffmpeg encoder engine, regardless of which profile is
  * specified.
  */
 public class EncoderEngineFactoryImpl implements EncoderEngineFactory {
   protected ComponentContext cc;
+
+  /** tracked encoder engines */
+  private Set<EncoderEngine> encoderEngineSet = new HashSet<>();
 
   protected void activate(ComponentContext cc) {
     this.cc = cc;
@@ -48,6 +54,24 @@ public class EncoderEngineFactoryImpl implements EncoderEngineFactory {
   public EncoderEngine newEncoderEngine(EncodingProfile profile) {
     FFmpegEncoderEngine engine = new FFmpegEncoderEngine();
     engine.activate(cc);
+    track(engine);
     return engine;
+  }
+
+  @Override
+  public void track(EncoderEngine encoderEngine) {
+    encoderEngineSet.add(encoderEngine);
+  }
+
+  @Override
+  public void untrack(EncoderEngine encoderEngine) {
+    encoderEngineSet.remove(encoderEngine);
+  }
+
+  @Override
+  public void close() {
+    for (EncoderEngine encoderEngine: encoderEngineSet) {
+      encoderEngine.close();
+    }
   }
 }

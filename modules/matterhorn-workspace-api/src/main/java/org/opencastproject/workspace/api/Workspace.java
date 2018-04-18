@@ -21,6 +21,7 @@
 
 package org.opencastproject.workspace.api;
 
+import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.NotFoundException;
 
@@ -269,5 +270,20 @@ public interface Workspace extends StorageUsage {
    *          the maximal age in seconds of a file before deletion is performed
    */
   void cleanup(int maxAge);
+
+  /**
+   * Clean up all elements of one media package from the local workspace, not touching the working file repository.
+   *
+   * @param mediaPackageId
+   *          Id specifying the media package to remove files for.
+   */
+  void cleanup(Id mediaPackageId) throws IOException;
+
+  /**
+   * Returns the workspace's root directory
+   *
+   * @return Path to the workspace root directory
+   */
+  String rootDirectory();
 
 }

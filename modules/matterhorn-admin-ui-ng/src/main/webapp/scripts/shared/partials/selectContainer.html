@@ -17,7 +17,7 @@
                     ng-disabled="disabled"
                     ng-init="markedForAddition = []"
                     ng-class="{ disabled: disabled , scrollable: 'true'}"
-                    ng-options="item.name|translate group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: 'name' : false"
+                    ng-options="item.name group by item[groupBy] for item in resource.available | filter: customFilter() | orderBy: 'name' : false"
                     loading-scroller="loadMore()"
                     style="min-height: 11em;"
                     ng-style="getHeight()"

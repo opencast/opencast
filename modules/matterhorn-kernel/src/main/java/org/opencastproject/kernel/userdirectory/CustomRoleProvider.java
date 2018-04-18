@@ -91,7 +91,7 @@ public class CustomRoleProvider implements RoleProvider {
    */
   protected void activate(ComponentContext cc) {
 
-    roles = new TreeSet<String>();
+    roles = new TreeSet<>();
     String customRoleList = StringUtils.trimToNull(cc.getBundleContext().getProperty(CUSTOM_ROLES_KEY));
 
     if (customRoleList != null) {
@@ -181,14 +181,14 @@ public class CustomRoleProvider implements RoleProvider {
 
   private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
     @Override
-    public Role ap(String role, Organization organization) {
+    public Role apply(String role, Organization organization) {
       return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "Custom Role", Type.INTERNAL);
     }
   };
 
   private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
     @Override
-    public Boolean ap(String role, String query) {
+    public Boolean apply(String role, String query) {
       return like(role, query);
     }
   };

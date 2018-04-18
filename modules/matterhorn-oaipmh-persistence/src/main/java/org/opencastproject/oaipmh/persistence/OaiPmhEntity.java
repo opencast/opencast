@@ -20,28 +20,45 @@
  */
 package org.opencastproject.oaipmh.persistence;
 
-import java.util.Date;
+import org.opencastproject.mediapackage.Attachment;
+import org.opencastproject.mediapackage.Catalog;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.IdClass;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 
-@Entity(name = "OaiPmhEntity") @IdClass(OaiPmhEntityId.class)
+@Entity(name = "OaiPmhEntity")
+@IdClass(OaiPmhEntityId.class)
 @Table(name = "mh_oaipmh", uniqueConstraints = @UniqueConstraint(columnNames = { "modification_date" }))
-@NamedQueries({ @NamedQuery(name = "OaiPmh.findById", query = "SELECT o FROM OaiPmhEntity o WHERE o.mediaPackageId=:mediaPackageId AND o.repositoryId=:repository AND o.organization=:organization") })
+@NamedQueries({ @NamedQuery(name = "OaiPmh.findById",
+        query = "SELECT o FROM OaiPmhEntity o "
+                + "WHERE o.mediaPackageId=:mediaPackageId"
+                + " AND o.repositoryId=:repository"
+                + " AND o.organization=:organization") })
 public class OaiPmhEntity {
 
   /** media package id, primary key */
   @Id
-  @Column(name = "id", length = 128)
+  @Column(name = "mp_id", length = 128)
   private String mediaPackageId;
 
   /** Organization id */
@@ -77,20 +94,14 @@ public class OaiPmhEntity {
   @Column(name = "mediapackage_xml", length = 65535)
   private String mediaPackageXML;
 
-  /** Serialized series dublincore */
-  @Lob
-  @Column(name = "series_dublincore_xml", length = 65535)
-  private String seriesDublinCoreXML;
-
-  /** Serialized series ACL XML */
-  @Lob
-  @Column(name = "series_acl_xml", length = 65535)
-  private String seriesAclXML;
-
-  /** Serialized episode dublincore */
-  @Lob
-  @Column(name = "episode_dublincore_xml", length = 65535)
-  private String episodeDublinCoreXML;
+  /** List of serialized media package element entities */
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+  @JoinColumns({
+    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "mh_oaipmh_elements"),
+    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "mh_oaipmh_elements"),
+    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "mh_oaipmh_elements")
+  })
+  private List<OaiPmhElementEntity> mediaPackageElements = new ArrayList<>();
 
   /**
    * Default constructor without any import.
@@ -207,42 +218,65 @@ public class OaiPmhEntity {
   }
 
   /**
-   * @return the serialized series dublincore
+   * @return serialized media package attachment entities
    */
-  public String getSeriesDublinCoreXML() {
-    return seriesDublinCoreXML;
+  public List<OaiPmhElementEntity> getAttachments() {
+    return getMediaPackageElementsOfType(Attachment.TYPE.name());
   }
 
   /**
-   * Sets the serialized series dublincore
-   * 
-   * @param seriesDublinCoreXML
+   * @return serialized media package catalog entities
    */
-  public void setSeriesDublinCoreXML(String seriesDublinCoreXML) {
-    this.seriesDublinCoreXML = seriesDublinCoreXML;
+  public List<OaiPmhElementEntity> getCatalogs() {
+    return getMediaPackageElementsOfType(Catalog.TYPE.name());
   }
 
   /**
-   * @return the serialized episode dublincore
+   * A list of serialized media package element entities, filtered by given type
+   *
+   * @param elementType type of media package element to filter on
+   * @return serialized media package elements of given type
    */
-  public String getEpisodeDublinCoreXML() {
-    return episodeDublinCoreXML;
+  private List<OaiPmhElementEntity> getMediaPackageElementsOfType(String elementType) {
+    // as we do not expect to many media package elements per media package, we can filter them in java
+    List<OaiPmhElementEntity> filteredElements = new ArrayList<>();
+    for (OaiPmhElementEntity element : mediaPackageElements) {
+      if (StringUtils.equals(elementType, element.getElementType()))
+        filteredElements.add(element);
+    }
+    return filteredElements;
   }
 
   /**
-   * Sets the serialized episode dublincore
-   * 
-   * @param episodeDublinCoreXML
+   * @return all serialized media package element entities
    */
-  public void setEpisodeDublinCoreXML(String episodeDublinCoreXML) {
-    this.episodeDublinCoreXML = episodeDublinCoreXML;
+  public List<OaiPmhElementEntity> getMediaPackageElements() {
+    return mediaPackageElements;
   }
 
-  public String getSeriesAclXML() {
-    return seriesAclXML;
+  /**
+   * Add an serialized media package element
+   *
+   * @param mediaPackageElementEntity serialized media package element to add
+   */
+  public void addMediaPackageElement(OaiPmhElementEntity mediaPackageElementEntity) {
+    mediaPackageElements.add(mediaPackageElementEntity);
+    mediaPackageElementEntity.setOaiPmhEntity(this);
   }
 
-  public void setSeriesAclXML(String seriesAclXML) {
-    this.seriesAclXML = seriesAclXML;
+  /**
+   * Remove media package element entity from the list of elements
+   *
+   * @param mediaPackageElementEntity serialized media package element entity to remove
+   */
+  public void removeMediaPackageElement(OaiPmhElementEntity mediaPackageElementEntity) {
+    mediaPackageElements.remove(mediaPackageElementEntity);
+  }
+
+  /**
+   * Clear the list of media package element entities
+   */
+  public void removeAllMediaPackageElements() {
+    mediaPackageElements.clear();
   }
 }

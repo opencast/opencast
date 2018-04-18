@@ -138,7 +138,6 @@ public class AgentImpl implements Agent {
   public AgentImpl(String agentName, String organization, String agentState, String agentUrl, Properties configuration) {
     name = agentName;
     this.setState(agentState);
-    this.setLastHeardFrom(System.currentTimeMillis());
     this.setUrl(agentUrl);
     this.setOrganization(organization);
     // Agents with no capabilities are allowed. These can/will be updated after the agent is built if necessary.
@@ -161,6 +160,7 @@ public class AgentImpl implements Agent {
    */
   public void setState(String newState) {
     state = newState;
+    setLastHeardFrom(System.currentTimeMillis());
   }
 
   /**

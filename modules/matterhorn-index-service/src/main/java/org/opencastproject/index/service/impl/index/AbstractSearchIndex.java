@@ -59,8 +59,9 @@ import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
+
+import com.entwinemedia.fn.Fn;
 
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -135,7 +136,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     recreateService(IndexRecreateObject.Service.Series);
     recreateService(IndexRecreateObject.Service.Scheduler);
     recreateService(IndexRecreateObject.Service.Workflow);
-    recreateService(IndexRecreateObject.Service.Archive);
+    recreateService(IndexRecreateObject.Service.AssetManager);
     recreateService(IndexRecreateObject.Service.Comments);
   }
 
@@ -169,8 +170,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
         IndexRecreateObject indexRecreateObject = (IndexRecreateObject) message.getObject();
         switch (indexRecreateObject.getStatus()) {
           case Update:
-            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", new Object[] { indexRecreateObject.getService(),
-                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()) });
+            logger.info("Updating service: '{}' with {}/{} finished, {}% complete.", indexRecreateObject.getService(),
+                    indexRecreateObject.getCurrent(), indexRecreateObject.getTotal(), (int) (indexRecreateObject.getCurrent() * 100 / indexRecreateObject.getTotal()));
             if (indexRecreateObject.getCurrent() == indexRecreateObject.getTotal()) {
               logger.info("Waiting for service '{}' indexing to complete", indexRecreateObject.getService());
             }
@@ -181,8 +182,8 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
             break;
           case Error:
             logger.error("Error updating service '{}' with {}/{} finished.",
-                    new Object[] { indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
-                            indexRecreateObject.getTotal() });
+                    indexRecreateObject.getService(), indexRecreateObject.getCurrent(),
+                            indexRecreateObject.getTotal());
             throw new IndexServiceException(
                     format("Error updating service '%s' with %s/%s finished.", indexRecreateObject.getService(),
                             indexRecreateObject.getCurrent(), indexRecreateObject.getTotal()));
@@ -347,7 +348,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
   }
 
   /**
-   * Delete an event from the archive
+   * Delete an event from the asset manager.
    *
    * @param organization
    *          The organization the event is a part of.
@@ -360,7 +361,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws NotFoundException
    *           Thrown if the event cannot be found.
    */
-  public void deleteArchive(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
+  public void deleteAssets(String organization, User user, String uid) throws SearchIndexException, NotFoundException {
     Event event = EventIndexUtils.getEvent(uid, organization, user, this);
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
@@ -453,7 +454,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new EventQueryBuilder(query));
 
     try {
-      return executeQuery(query, requestBuilder, new Function<SearchMetadataCollection, Event>() {
+      return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Event>() {
         @Override
         public Event apply(SearchMetadataCollection metadata) {
           try {
@@ -483,7 +484,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new GroupQueryBuilder(query));
 
     try {
-      return executeQuery(query, requestBuilder, new Function<SearchMetadataCollection, Group>() {
+      return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Group>() {
         @Override
         public Group apply(SearchMetadataCollection metadata) {
           try {
@@ -510,7 +511,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     // Create the request builder
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new SeriesQueryBuilder(query));
     try {
-      return executeQuery(query, requestBuilder, new Function<SearchMetadataCollection, Series>() {
+      return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Series>() {
         @Override
         public Series apply(SearchMetadataCollection metadata) {
           try {
@@ -538,7 +539,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new ThemeQueryBuilder(query));
 
     try {
-      return executeQuery(query, requestBuilder, new Function<SearchMetadataCollection, Theme>() {
+      return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Theme>() {
         @Override
         public Theme apply(SearchMetadataCollection metadata) {
           try {
@@ -559,7 +560,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @param field
    *          the field name
    * @param types
-   *          an optional array of document types
+   *          an optional array of document types, if none is set all types are searched
    * @return the list of terms
    */
   public List<String> getTermsForField(String field, Option<String[]> types) {
@@ -572,7 +573,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
     SearchResponse response = search.execute().actionGet();
 
-    List<String> terms = new ArrayList<String>();
+    List<String> terms = new ArrayList<>();
     Terms aggs = response.getAggregations().get(facetName);
 
     for (Bucket bucket : aggs.getBuckets()) {
@@ -595,7 +596,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    */
   protected <T> SearchResult<T> executeQuery(SearchQuery query, SearchRequestBuilder requestBuilder,
-          Function<SearchMetadataCollection, T> toSearchResult) throws SearchIndexException {
+          Fn<SearchMetadataCollection, T> toSearchResult) throws SearchIndexException {
     // Execute the query and try to get hold of a query response
     SearchResponse response = null;
     try {
@@ -607,7 +608,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     // Create and configure the query result
     long hits = response.getHits().getTotalHits();
     long size = response.getHits().getHits().length;
-    SearchResultImpl<T> result = new SearchResultImpl<T>(query, hits, size);
+    SearchResultImpl<T> result = new SearchResultImpl<>(query, hits, size);
     result.setSearchTime(response.getTookInMillis());
 
     // Walk through response and create new items with title, creator, etc:
@@ -619,7 +620,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
       for (SearchHitField field : doc.getFields().values()) {
         String name = field.getName();
-        SearchMetadata<Object> m = new SearchMetadataImpl<Object>(name);
+        SearchMetadata<Object> m = new SearchMetadataImpl<>(name);
         // TODO: Add values with more care (localized, correct type etc.)
 
         // Add the field values
@@ -642,7 +643,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
       // item
       try {
         T document = toSearchResult.apply(metadata);
-        SearchResultItem<T> item = new SearchResultItemImpl<T>(score, document);
+        SearchResultItem<T> item = new SearchResultItemImpl<>(score, document);
         result.addResultItem(item);
       } catch (Throwable t) {
         logger.warn("Error during search result serialization: '{}'. Skipping this search result.", t.getMessage());

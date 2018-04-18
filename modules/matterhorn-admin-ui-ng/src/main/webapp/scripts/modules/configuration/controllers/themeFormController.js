@@ -17,8 +17,8 @@ angular.module('adminNg.controllers')
         };
 
         $scope.valid = function () {
-            if (angular.isDefined($scope['theme-form'])) {
-                return $scope['theme-form'].$valid;
+            if (angular.isDefined($scope.themeForm)) {
+                return $scope.themeForm.$valid;
             }
             return false;
         };

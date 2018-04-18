@@ -2,22 +2,22 @@
     {
         "id": "publish-track-1",
         "mimetype": "video/quicktime",
-        "tags": ["archive", "engage"],
-        "type": "presenter/source",
-        "url": "http://episodes/10.0000/1/publish-track-1/1/track.mov"
+        "tags": ["engage"],
+        "type": "presentation/source",
+        "url": "media.mov"
     },
     {
         "id": "publish-track-2",
         "mimetype": "video/quicktime",
-        "tags": ["archive", "engage"],
-        "type": "presenter/source",
-        "url": "http://episodes/10.0000/1/publish-track-2/1/track.mov"
+        "tags": ["engage", "publish"],
+        "type": "presentation/source",
+        "url": "media.mov"
     },
     {
         "id": "publish-track-3",
         "mimetype": "video/quicktime",
-        "tags": ["archive", "engage"],
-        "type": "presenter/source",
-        "url": "http://episodes/10.0000/1/publish-track-3/1/track.mov"
+        "tags": ["engage", "publish"],
+        "type": "presentation/source",
+        "url": "media.mov"
     }
 ]

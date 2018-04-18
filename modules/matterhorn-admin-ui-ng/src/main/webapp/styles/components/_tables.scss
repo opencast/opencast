@@ -59,6 +59,12 @@
             border-right: none;
         }
 
+        input[type=checkbox] {
+            margin-left: 1px;
+            margin-right: 1px;
+            vertical-align: middle;
+        }
+
         // Aesthetic Style
         border-right: 1px solid #c9d0d6;
         border-left: 1px solid #fff;
@@ -252,6 +258,14 @@
                 color: #808080;
             }
 
+            &.crosslink {
+                border-bottom: 1px solid transparent;
+
+                &:hover {
+                    border-bottom: 1px solid;
+                }
+             }
+
             .notification {
                 position: absolute;
                 top: -3px;
@@ -293,7 +307,7 @@
         span[data-status=idle]:before {
             background: $green;
         }
-        
+
         span[data-status="shutting_down"]:before,span[data-status=unknown]:before {
             background: $yellow;
         }
@@ -337,6 +351,7 @@
             border-radius: $main-border-radius;
             display: inline-block;
             padding-left: 10px;
+            vertical-align: middle;
         }
 
         .hidden-input {

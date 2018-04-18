@@ -161,6 +161,37 @@
         margin-right: 5px;
     }
 
+    // RestService Dropdown
+    // ----------------------------------------
+    .info-dd{
+        max-height: 20px;
+        max-width: 20px;
+        .dropdown-ul{
+            width: auto;
+            top: 31px;
+            right: -7px;
+        }
+        .fa-bell-o{
+            float: right;
+        }
+        #error-count{
+            display: inline-block;
+            min-width: 10px;
+            padding: 4px 7px;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: middle;
+            border-radius: 100%;
+            background-color: red;
+            position: relative;
+            bottom: 25px;
+            left: 10px;
+        }
+    }
 }
 
 // Dropdown Icon

@@ -57,14 +57,14 @@ public class GroupMessageReceiverImpl extends BaseMessageReceiverImpl<GroupItem>
 
         logger.debug(
                 "Update the group with id '{}', name '{}', description '{}', organization '{}', roles '{}', members '{}'",
-                new Object[] { jaxbGroup.getGroupId(), jaxbGroup.getName(), jaxbGroup.getDescription(),
-                        jaxbGroup.getOrganization(), jaxbGroup.getRoles(), jaxbGroup.getMembers() });
+                jaxbGroup.getGroupId(), jaxbGroup.getName(), jaxbGroup.getDescription(), jaxbGroup.getOrganization(),
+                jaxbGroup.getRoles(), jaxbGroup.getMembers());
         try {
           Group group = GroupIndexUtils.getOrCreate(jaxbGroup.getGroupId(), organization, user, getSearchIndex());
           group.setName(jaxbGroup.getName());
           group.setDescription(jaxbGroup.getDescription());
           group.setMembers(jaxbGroup.getMembers());
-          Set<String> roles = new HashSet<String>();
+          Set<String> roles = new HashSet<>();
           for (Role role : jaxbGroup.getRoles()) {
             roles.add(role.getName());
           }

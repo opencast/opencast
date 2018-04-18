@@ -22,6 +22,8 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.util.IoSupport;
+
 import org.junit.Ignore;
 
 import java.util.Calendar;
@@ -78,4 +80,8 @@ public final class TestUtil {
     return c.getTime();
   }
 
+  /** Read a catalog from the classpath. */
+  public static DublinCoreCatalog read(String dcFile) throws Exception {
+    return DublinCoreXmlFormat.read(IoSupport.classPathResourceAsFile(dcFile).get());
+  }
 }

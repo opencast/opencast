@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+	name="org.opencastproject.transcription.ibmwatson.endpoint.IBMWatsonTranscriptionRestService"
+	immediate="true" activate="activate">
+	<implementation
+		class="org.opencastproject.transcription.ibmwatson.endpoint.IBMWatsonTranscriptionRestService" />
+	<property name="service.description" value="IBM Watson Transcription REST Endpoint" />
+	<property name="opencast.service.type" value="org.opencastproject.transcription.ibmwatson" />
+	<property name="opencast.service.path" value="/transcripts/watson" />
+	<property name="opencast.service.jobproducer" value="true" />
+
+	<service>
+		<provide
+			interface="org.opencastproject.transcription.ibmwatson.endpoint.IBMWatsonTranscriptionRestService" />
+	</service>
+	<reference name="transcriptionService"
+		interface="org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService"
+		cardinality="1..1" policy="static" bind="setTranscriptionService" />
+	<reference name="serviceRegistry"
+		interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+		cardinality="1..1" policy="static" bind="setServiceRegistry" />
+</scr:component>

@@ -1,0 +1,27 @@
+[
+  {
+    "flavor": "dublincore/episode",
+    "fields": [
+      {
+        "id": "title",
+        "value": "updated title"
+      },
+      {
+        "id": "subjects",
+        "value": ["updated subject 1", "updated subject 2"]
+      },
+      {
+        "id": "description",
+        "value": "updated desciption"
+      },
+      {
+        "id": "startDate",
+        "value": "2017-08-11"
+      },
+      {
+        "id": "startTime",
+        "value": "11:11:00Z"
+      }
+    ]
+  }
+]

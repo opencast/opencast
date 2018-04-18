@@ -38,6 +38,7 @@ import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -73,7 +74,7 @@ public class EventCatalogUIAdapterTest {
   private static final String TITLE_STRING = "Event Metadata";
 
   private Dictionary<String, String> dictionary;
-  private Properties eventProperties;
+  private Dictionary<String, String> eventProperties;
   private ListProvidersService listProvidersService;
   private MediaPackage mediapackage;
   private MediaPackageElementFlavor mediaPackageElementFlavor;
@@ -98,10 +99,12 @@ public class EventCatalogUIAdapterTest {
             .andThrow(new ListProviderException("not implemented")).anyTimes();
     EasyMock.replay(listProvidersService);
 
-    eventProperties = new Properties();
+    Properties props = new Properties();
     InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");
-    eventProperties.load(in);
+    props.load(in);
     in.close();
+
+    eventProperties = PropertiesUtil.toDictionary(props);
 
     mediaPackageElementFlavor = new MediaPackageElementFlavor(FLAVOR_STRING.split("/")[0], FLAVOR_STRING.split("/")[1]);
 

@@ -9,7 +9,7 @@ angular.module('adminNg.resources')
                 // Create a default segment spanning the entire track
                 if (data.segments.length === 0) {
                     data.segments.push({
-                        start: 0, end: data.duration
+                        start: 0, end: +data.duration
                     });
                 }
 

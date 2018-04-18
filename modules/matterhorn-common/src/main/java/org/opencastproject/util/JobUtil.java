@@ -389,7 +389,7 @@ public final class JobUtil {
   public static long sumQueueTime(List<Job> jobs) {
     return $(jobs).foldl(0L, new Fn2<Long, Job, Long>() {
       @Override
-      public Long ap(Long sum, Job job) {
+      public Long apply(Long sum, Job job) {
         return sum + job.getQueueTime();
       }
     });
@@ -399,7 +399,7 @@ public final class JobUtil {
   public static List<Job> getNonFinished(List<Job> jobs) {
     return $(jobs).filter(new Pred<Job>() {
       @Override
-      public Boolean ap(Job job) {
+      public Boolean apply(Job job) {
         return !job.getStatus().equals(Status.FINISHED);
       }
     }).toList();

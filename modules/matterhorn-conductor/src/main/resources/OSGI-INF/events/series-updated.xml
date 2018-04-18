@@ -10,16 +10,13 @@
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
             cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-            cardinality="1..1" policy="static" bind="setMessageReceiver" />    
-    <reference name="seriesUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
+            cardinality="1..1" policy="static" bind="setMessageReceiver" />
+    <reference name="seriesUpdatedEventHandler" interface="org.opencastproject.event.handler.SeriesUpdatedEventHandler"
             cardinality="1..1" policy="static" bind="setSeriesUpdatedEventHandler"/>
-    <reference name="workflowPermissionsUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"
+    <reference name="workflowPermissionsUpdatedEventHandler" interface="org.opencastproject.event.handler.WorkflowPermissionsUpdatedEventHandler"
             cardinality="1..1" policy="static" bind="setWorkflowPermissionsUpdatedEventHandler"/>
-    <reference name="archivePermissionsUpdatedEventHandler"
-            interface="org.opencastproject.event.handler.ArchivePermissionsUpdatedEventHandler"
-            cardinality="1..1" policy="dynamic" bind="setArchivePermissionsUpdatedEventHandler"/>
+    <reference name="assetManagerPermissionsUpdatedEventHandler" interface="org.opencastproject.event.handler.AssetManagerUpdatedEventHandler"
+            cardinality="1..1" policy="static" bind="setAssetManagerUpdatedEventHandler"/>
     <reference name="oaiPmhUpdatedEventHandler"
             interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"
             cardinality="1..1" policy="dynamic" bind="setOaiPmhUpdatedEventHandler"/>
@@ -73,19 +70,16 @@
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
             cardinality="1..1" policy="static" bind="setWorkspace"/>
   </scr:component>
-  <scr:component
-          name="org.opencastproject.event.handler.ArchivePermissionsUpdatedEventHandler"
-          immediate="true"
-          activate="activate">
-    <implementation class="org.opencastproject.event.handler.ArchivePermissionsUpdatedEventHandler"/>
-    <property name="service.description" value="Archive Permissions Updated Event Handler"/>
+
+  <scr:component name="org.opencastproject.event.handler.AssetManagerUpdatedEventHandler"
+          immediate="true" activate="activate">
+    <implementation class="org.opencastproject.event.handler.AssetManagerUpdatedEventHandler"/>
+    <property name="service.description" value="Archive Updated Event Handler"/>
     <service>
-      <provide interface="org.opencastproject.event.handler.ArchivePermissionsUpdatedEventHandler"/>
+      <provide interface="org.opencastproject.event.handler.AssetManagerUpdatedEventHandler"/>
     </service>
-	<reference name="archive" interface="org.opencastproject.archive.api.Archive"
-	        cardinality="1..1" policy="static" bind="setArchive" />
-	<reference name="httpMediaPackageElementProvider" interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
-	        cardinality="1..1" policy="static" bind="setHttpMediaPackageElementProvider" />
+    <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager"
+            cardinality="1..1" policy="static" bind="setAssetManager" />
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
             cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="authorizationService" interface="org.opencastproject.security.api.AuthorizationService"
@@ -101,7 +95,9 @@
     immediate="true" activate="activate">
     <implementation class="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
     <property name="service.description" value="OAI-PMH Updated Event Handler" />
+    <property name="service.pid" value="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler"/>
     <service>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
       <provide interface="org.opencastproject.event.handler.OaiPmhUpdatedEventHandler" />
     </service>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"

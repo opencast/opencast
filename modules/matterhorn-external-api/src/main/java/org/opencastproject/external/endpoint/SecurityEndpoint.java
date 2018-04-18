@@ -21,8 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.v;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -91,7 +90,12 @@ public class SecurityEndpoint implements ManagedService {
   }
 
   @Override
-  public void updated(@SuppressWarnings("rawtypes") Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      log.info("No configuration available, using defaults");
+      return;
+    }
+
     Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
             .map(com.entwinemedia.fn.fns.Strings.toLongF);
     if (expiration.isSome()) {
@@ -137,12 +141,11 @@ public class SecurityEndpoint implements ManagedService {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
         log.warn("Error while trying to sign url '{}': {}", url, getStackTrace(e));
-        return ApiResponses.Json.ok(VERSION_1_0_0, j(f("error", v("Error while signing url"))));
+        return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("error", "Error while signing url")));
       }
-      return ApiResponses.Json.ok(VERSION_1_0_0,
-              j(f("url", v(signedUrl)), f("valid-until", v(toUTC(validUntil.getMillis())))));
+      return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
     } else {
-      return ApiResponses.Json.ok(VERSION_1_0_0, j(f("error", v("Given URL cannot be signed"))));
+      return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("error", "Given URL cannot be signed")));
     }
   }
 }

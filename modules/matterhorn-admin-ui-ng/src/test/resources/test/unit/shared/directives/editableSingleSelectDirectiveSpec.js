@@ -30,7 +30,7 @@ describe('adminNg.directives.adminNgEditableSingleSelect', function () {
     });
 
     it('displays the label', function () {
-        expect(element.find('span').text()).toContain('item2');
+        expect(element.find('span').text()).toContain('-- SELECT_NO_OPTIONS --');
     });
 
     it('becomes editable when clicked', function () {

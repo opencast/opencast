@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-message-broker-api</artifactId>
   <packaging>bundle</packaging>
@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -28,7 +28,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-archive-api</artifactId>
+      <artifactId>matterhorn-asset-manager-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -54,7 +54,6 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -70,8 +69,7 @@
             <Export-Package>
               org.opencastproject.message.broker.api;version=${project.version},
               org.opencastproject.message.broker.api.acl;version=${project.version},
-              org.opencastproject.message.broker.api.agent;version=${project.version},
-              org.opencastproject.message.broker.api.archive;version=${project.version},
+              org.opencastproject.message.broker.api.assetmanager;version=${project.version},
               org.opencastproject.message.broker.api.comments;version=${project.version},
               org.opencastproject.message.broker.api.group;version=${project.version},
               org.opencastproject.message.broker.api.index;version=${project.version},

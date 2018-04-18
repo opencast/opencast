@@ -284,7 +284,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
       }
       Stream<String> stream = Stream.$(IOUtils.readLines(rolesIS)).filter(new Fn<String, Boolean>() {
         @Override
-        public Boolean ap(String line) {
+        public Boolean apply(String line) {
           if (StringUtils.trimToEmpty(line).startsWith("#"))
             return false;
           return true;

@@ -21,12 +21,10 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
-import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -34,7 +32,6 @@ import org.opencastproject.message.broker.api.acl.AclItem;
 import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -42,9 +39,9 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
@@ -63,25 +60,21 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   private AclTransitionDb transitionDb;
   private AclDb aclDb;
   private SeriesService seriesService;
-  private Archive<?> archive;
+  private AssetManager assetManager;
   private AuthorizationService authorizationService;
-  private SearchService searchService;
   private WorkflowService workflowService;
   private SecurityService securityService;
-  private HttpMediaPackageElementProvider httpMediaPackageElementProvider;
-  private ServiceRegistry serviceRegistry;
-  private DistributionService distributionService;
   private MessageReceiver messageReceiver;
   private MessageSender messageSender;
+  private Workspace workspace;
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectoryService;
   private ComponentContext cc;
 
   @Override
   public AclService serviceFor(Organization org) {
-    return new AclServiceImpl(org, aclDb, transitionDb, seriesService, archive, searchService, workflowService,
-            securityService, httpMediaPackageElementProvider, authorizationService, distributionService,
-            serviceRegistry, messageSender);
+    return new AclServiceImpl(org, aclDb, transitionDb, seriesService, assetManager, workflowService,
+            authorizationService, messageSender, workspace);
   }
 
   /** OSGi DI callback. */
@@ -100,18 +93,18 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   }
 
   /** OSGi DI callback. */
-  public void setArchive(Archive<?> archive) {
-    this.archive = archive;
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  /** OSGi DI callback. */
+  public void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
   }
 
   /** OSGi DI callback. */
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /** OSGi DI callback. */
-  public void setSearchService(SearchService searchService) {
-    this.searchService = searchService;
   }
 
   /** OSGi DI callback. */
@@ -122,21 +115,6 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   /** OSGi DI callback. */
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
-  }
-
-  /** OSGi DI callback. */
-  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = serviceRegistry;
-  }
-
-  /** OSGi DI callback. */
-  public void setDistributionService(DistributionService distributionService) {
-    this.distributionService = distributionService;
-  }
-
-  /** OSGi DI callback. */
-  public void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider httpMediaPackageElementProvider) {
-    this.httpMediaPackageElementProvider = httpMediaPackageElementProvider;
   }
 
   /** OSGi DI callback. */
@@ -182,7 +160,7 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
       @Override
       protected void run() {
-        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                 IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Acl));
       }
     });
@@ -214,4 +192,18 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
     return OsgiAclServiceFactory.class.getName();
   }
 
+  @Override
+  public MessageSender getMessageSender() {
+    return messageSender;
+  }
+
+  @Override
+  public SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Override
+  public String getSystemUserName() {
+    return SecurityUtil.getSystemUserName(cc);
+  }
 }

@@ -203,7 +203,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   public static final Fn<Job, Boolean> operationIsStartWorkflow = new Fn<Job, Boolean>() {
     @Override
-    public Boolean ap(Job job) {
+    public Boolean apply(Job job) {
       return WorkflowServiceImpl.Operation.START_WORKFLOW.toString().equals(job.getOperation());
     }
   };

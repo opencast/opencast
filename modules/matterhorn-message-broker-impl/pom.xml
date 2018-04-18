@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>matterhorn-message-broker-impl</artifactId>
   <packaging>bundle</packaging>
@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -63,7 +63,6 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
-
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -75,7 +74,6 @@
       <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
-
     <!-- Testing -->
     <dependency>
       <groupId>junit</groupId>
@@ -93,14 +91,12 @@
       <version>2.9.1</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -133,8 +129,7 @@
               !org.springframework.xml.transform,
               !sun.management,
               org.opencastproject.message.broker.api.acl,
-              org.opencastproject.message.broker.api.agent,
-              org.opencastproject.message.broker.api.archive,
+              org.opencastproject.message.broker.api.assetmanager,
               org.opencastproject.message.broker.api.comments,
               org.opencastproject.message.broker.api.group,
               org.opencastproject.message.broker.api.index,

@@ -28,6 +28,10 @@ import org.opencastproject.util.IoSupport;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class ENameTest {
   @Test
   public void testEquals() throws Exception {
@@ -48,5 +52,84 @@ public class ENameTest {
   public void testSerializability() {
     final EName a = new EName("http://localhost/a", "a");
     assertEquals(a, IoSupport.serializeDeserialize(a));
+  }
+
+  @Test
+  public void testCompareTo() {
+    final EName a1 = new EName("http://localhost/a", "a");
+    final EName b1 = new EName("http://localhost/b", "b");
+    final EName a2 = new EName("", "a");
+    final EName b2 = new EName("", "b");
+
+    List<EName> eNames = new ArrayList<>();
+    eNames.add(b1);
+    eNames.add(a1);
+    eNames.add(b2);
+    eNames.add(a2);
+    Collections.sort(eNames);
+
+    assertEquals(a2, eNames.get(0));
+    assertEquals(b2, eNames.get(1));
+    assertEquals(a1, eNames.get(2));
+    assertEquals(b1, eNames.get(3));
+  }
+
+  @Test
+  public void testFromString() {
+    final String[] invalids = {
+            "",
+            "{", "}",
+            "{}",
+            "{http://localhost/a}",
+            "invalid{name",
+            "invalid}name",
+            "invalid name",
+            "\t invalid\nname",
+            "{invalid namespace}correct-name",
+            "{ invalidnamespace}correct-name",
+            "{invalid{namespace}correct-name",
+            "{invalid name{space}incorrect\t name"
+            };
+    for (String invalid : invalids) {
+      try {
+        EName.fromString(invalid);
+      } catch (IllegalArgumentException iae) {
+        // This is fine
+      }
+    }
+
+    final String[] valids = {
+            "validname",
+            "{}validwithemptyNS",
+            "{http://localhost/a}valid-with-namespace"
+    };
+    final EName[] validENames = {
+            new EName("", "validname"),
+            new EName("", "validwithemptyNS"),
+            new EName("http://localhost/a", "valid-with-namespace")
+    };
+
+    for (int i = 0; i < valids.length; i++) {
+      assertEquals(validENames[i], EName.fromString(valids[i]));
+    }
+  }
+
+@Test
+  public void testFromStringDefault() {
+    final String defaultNS = "http://default.na/mespace";
+    final String[] strings = {
+            "localname",
+            "{}with-empty-namespace",
+            "{http://myname.spa/ce}localname"
+    };
+    final EName[] eNames = {
+            new EName(defaultNS, "localname"),
+            new EName("", "with-empty-namespace"),
+            new EName("http://myname.spa/ce", "localname")
+    };
+
+    for (int i = 0; i < strings.length; i++) {
+      assertEquals(eNames[i], EName.fromString(strings[i], defaultNS));
+    }
   }
 }

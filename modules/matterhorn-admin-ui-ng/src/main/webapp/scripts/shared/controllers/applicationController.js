@@ -1,9 +1,9 @@
 // The main controller that all other scopes inherit from (except isolated scopes).
 angular.module('adminNg.controllers')
 .controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
-            'ResourceModal', 'VersionResource', 'HotkeysService',
+            'ResourceModal', 'VersionResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
     function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
-              VersionResource, HotkeysService) {
+              VersionResource, HotkeysService, $interval, RestServiceMonitor){
 
         $scope.bodyClicked = function () {
             angular.element('[old-admin-ng-dropdown]').removeClass('active');
@@ -19,6 +19,8 @@ angular.module('adminNg.controllers')
         $scope.documentationUrl = undefined;
         $scope.restdocsUrl = undefined;
         $scope.mediaModuleUrl = undefined;
+        RestServiceMonitor.run();
+        $scope.services = RestServiceMonitor.getServiceStatus();
 
         AuthService.getUser().$promise.then(function (user) {
             $scope.currentUser = user;
@@ -39,6 +41,16 @@ angular.module('adminNg.controllers')
                 $scope.mediaModuleUrl = user.org.properties[MEDIA_MODULE_URL_PROPERTY];
             }
         });
+
+        //Running RestService on loop - updating $scope.service
+        $interval(function(){
+            RestServiceMonitor.run();
+            $scope.service = RestServiceMonitor.getServiceStatus();
+        }, 60000);
+
+        $scope.toServices = function(event) {
+            RestServiceMonitor.jumpToServices(event);
+        };
 
         $scope.toDoc = function () {
             if ($scope.documentationUrl) {

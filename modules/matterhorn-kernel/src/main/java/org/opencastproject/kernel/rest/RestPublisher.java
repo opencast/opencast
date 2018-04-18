@@ -162,11 +162,11 @@ public class RestPublisher implements RestConstants {
   @SuppressWarnings("unchecked")
   protected void activate(ComponentContext componentContext) {
     logger.debug("activate()");
-    this.baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
+    baseServerUri = componentContext.getBundleContext().getProperty(MatterhornConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
-    this.fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
-    this.servletRegistrationMap = new ConcurrentHashMap<>();
-    this.providers = new ArrayList<>();
+    fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
+    servletRegistrationMap = new ConcurrentHashMap<>();
+    providers = new ArrayList<>();
 
     JSONProvider jsonProvider = new MatterhornJSONProvider();
     jsonProvider.setIgnoreNamespaces(true);
@@ -419,7 +419,7 @@ public class RestPublisher implements RestConstants {
           logger.warn(
                   "{} was registered with '{}={}', but the service is not annotated with the JAX-RS "
                           + "@Path annotation",
-                  new Object[] { service, SERVICE_PATH_PROPERTY, reference.getProperty(SERVICE_PATH_PROPERTY) });
+                  service, SERVICE_PATH_PROPERTY, reference.getProperty(SERVICE_PATH_PROPERTY));
         } else {
           createEndpoint(reference, service);
         }
@@ -442,7 +442,7 @@ public class RestPublisher implements RestConstants {
     @Override
     public URL getResource(String name) {
       URL url = bundle.getResource(name);
-      logger.debug("{} found resource {} from name {}", new Object[] { this, url, name });
+      logger.debug("{} found resource {} from name {}", this, url, name);
       return url;
     }
   }

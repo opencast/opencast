@@ -76,6 +76,9 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     CONFIG_OPTIONS.put("target-tags", "The tags to apply to the encoded file");
     CONFIG_OPTIONS.put("audio-only", "Set to 'true' to process tracks containing only audio streams");
     CONFIG_OPTIONS.put("video-only", "Set to 'true' to process tracks containing only video streams");
+    // Only process the first file that matches tags/flavors
+    CONFIG_OPTIONS.put("process-first-match-only",
+            "Set to 'true' indicates only one track will be processed if more are selected");
   }
 
   /** The composer service */
@@ -241,6 +244,9 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
     // Look for elements matching the tag
     Collection<Track> elements = elementSelector.select(mediaPackage, tagsAndFlavorsOption);
 
+    String processOnlyOneConfig = StringUtils.trimToNull(operation.getConfiguration("process-first-match-only"));
+    boolean processOnlyOne = processOnlyOneConfig != null && Boolean.parseBoolean(processOnlyOneConfig);
+
     // Encode all tracks found
     long totalTimeInQueue = 0;
     Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
@@ -272,6 +278,9 @@ public class ComposeWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
         // Start encoding and wait for the result
         encodingJobs.put(composerService.encode(track, profile.getIdentifier()), new JobInformation(track, profile));
+
+        if (processOnlyOne)
+          break;
       }
     }
 

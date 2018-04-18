@@ -39,12 +39,14 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 .video-timeline {
     background: #fff;
     border: $thin-border-stroke $main-border-color;
-    margin-top: 5px;
+    margin-top: 12px;
+    border-radius: 4px;
 
     &>div {
         margin-top: 5px;
         background: #fff;
         padding: 5px 10px;
+        border-radius: 4px;
     }
 
     .tracks-wrapper {
@@ -152,6 +154,27 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
             $segment-main-height: 60px;
             $segment-main-background: ($segment-main-height - $thin-border * 2);
 
+            $segment-sliver-active-colors: lighten($segment-normal, 13%) lighten($segment-normal, 5%);
+            $segment-sliver-deleted-colors: lighten($segment-deleted, 13%) lighten($segment-deleted, 5%);
+            $num-colors: length($segment-sliver-active-colors);
+            $segment-sliver-vert-length: 8;
+
+            $sliver-active-stops: ();
+            $sliver-deleted-stops: ();
+
+            @for $j from 0 through floor($segment-sliver-vert-length/$num-colors) {
+              @for $i from 1 through $num-colors {
+                $active-color: nth($segment-sliver-active-colors, $i);
+                $deleted-color: nth($segment-sliver-deleted-colors, $i);
+                $new-active-stops: $active-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
+                                 $active-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
+                $new-deleted-stops: $deleted-color percentage(($i - 1) / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length),
+                                 $deleted-color percentage($i / $segment-sliver-vert-length + $j * $num-colors / $segment-sliver-vert-length);
+                $sliver-active-stops: join($sliver-active-stops, $new-active-stops, comma);
+                $sliver-deleted-stops: join($sliver-deleted-stops, $new-deleted-stops, comma);
+              }
+            }
+
             .segments {
                 // background image set inline
                 overflow: hidden;
@@ -177,6 +200,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                           z-index: $z-100;
                           cursor: ew-resize;
                           opacity: 0.5;
+
                     }
 
                     &:first-child .segment-seperator {
@@ -257,6 +281,43 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
                             border-left: none;
                          }
                     }
+
+                    &:not(.displayWaveform) {
+                        &+ .segment-container .segment-seperator {
+                            background-image: none !important;
+                        }
+                    }
+
+                    &.displayWaveform {
+
+                        position: relative;
+
+                        & .segment.sliver:before {
+                            content: '';
+                            height: 100%;
+                            width: 9px;
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            background: #b7d8f9;
+                            background: linear-gradient(0deg, $sliver-active-stops);
+                            border: 1px solid #71b1f3;
+                        }
+
+                        & .segment.sliver.deleted:before {
+                            background: #ec8b86;
+                            background: linear-gradient(0deg, $sliver-deleted-stops);
+
+                            border-color: #f35952;
+                        }
+
+                        &+ .segment-container {
+                            border-left: none !important;
+
+                        }
+
+                    }
+
                 }
             }
 
@@ -472,10 +533,11 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
             .zoom-control {
                 float: right;
                 margin-top: -4px;
+                margin-bottom: 4px;
 
                 &>label {
                     float: left;
-                    padding-top: 2px;
+                    line-height: 22px;
                 }
 
                 &>label:after {
@@ -484,10 +546,13 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 
                 input[type=range] {
                     width: 400px;
+                    height: 22px;
+                    margin: 0 5px;
                 }
 
                 .chosen-container {
-                    top: -7px;
+                    top: -10px;
+                    height: 22px;
                 }
             }
         }
@@ -582,10 +647,9 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 // ----------------------------------------
 
 .editor-segments {
-    background: #fff;
-    border: $thin-border-stroke $main-border-color;
-    margin-top: 5px;
-    width: 50%;
+    padding: 4px 12px 4px 12px;
+    width: 25%;
+    min-width: 400px;
 
     $segment-list-element-height: 35px;
 
@@ -593,6 +657,7 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
 
       .segment-list-entry {
           margin: 8px auto;
+          margin-left: 0;
           width: 98%;
           height: $segment-list-element-height;
           color: $dark-prim-color;
@@ -680,4 +745,9 @@ $segment-deleted-selected: darken($segment-deleted, 18%);
       }
 
     }
+}
+
+.segments-area {
+    border-radius: 4px;
+    border: $thin-border-stroke $main-border-color;
 }

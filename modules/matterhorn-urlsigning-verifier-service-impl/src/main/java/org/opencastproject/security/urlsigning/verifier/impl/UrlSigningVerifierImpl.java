@@ -78,7 +78,7 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
       // Create the configuration prefixes
       key = new StringBuilder(KEY_PREFIX).append(".").append(i).toString();
       keyId = new StringBuilder(ID_PREFIX).append(".").append(i).toString();
-      logger.debug("Looking for configuration of {}, {}", new Object[] { key, keyId});
+      logger.debug("Looking for configuration of {}, {}", key, keyId);
       // Read the key and keyId
       String keyValue = StringUtils.trimToNull((String) properties.get(key));
       String keyIdValue = StringUtils.trimToNull((String) properties.get(keyId));

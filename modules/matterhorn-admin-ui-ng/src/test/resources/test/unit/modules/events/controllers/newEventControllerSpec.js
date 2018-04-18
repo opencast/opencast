@@ -70,6 +70,9 @@ describe('New Event Controller', function () {
             }, {
                 name: 'access',
                 stateController: { ud: { access: { acl: 345 }} }
+            }, {
+                name: 'assets',
+                stateController: { ud: { options: { id: 'catalog_foobar'}} }
             }];
         });
 

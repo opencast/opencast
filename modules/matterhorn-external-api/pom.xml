@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>4.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -262,10 +262,9 @@
               OSGI-INF/external-security-endpoint.xml,
               OSGI-INF/external-series-endpoint.xml,
               OSGI-INF/message-receiver-acl.xml,
-              OSGI-INF/message-receiver-archive.xml,
+              OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
               OSGI-INF/message-receiver-group.xml,
-              OSGI-INF/message-receiver-recording.xml,
               OSGI-INF/message-receiver-scheduler.xml,
               OSGI-INF/message-receiver-series.xml,
               OSGI-INF/message-receiver-theme.xml,

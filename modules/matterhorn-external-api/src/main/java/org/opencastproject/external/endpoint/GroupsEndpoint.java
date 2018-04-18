@@ -20,11 +20,11 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
+import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -44,8 +44,9 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -126,7 +127,7 @@ public class GroupsEndpoint {
     for (SearchResultItem<Group> item : results.getItems()) {
       groupsList.add(groupToJSON(item.getSource()));
     }
-    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, a(groupsList));
+    return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(groupsList));
   }
 
   @GET
@@ -268,15 +269,15 @@ public class GroupsEndpoint {
    * @return The group in json format.
    */
   protected JValue groupToJSON(Group group) {
-    List<JField> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>();
     fields.add(f("identifier", v(group.getIdentifier())));
     fields.add(f("organization", v(group.getOrganization())));
     fields.add(f("role", v(group.getRole())));
-    fields.add(f("name", vN(group.getName())));
-    fields.add(f("description", vN(group.getDescription())));
-    fields.add(f("roles", vN(StringUtils.join(group.getRoles(), ","))));
-    fields.add(f("members", vN(StringUtils.join(group.getMembers(), ","))));
-    return j(fields);
+    fields.add(f("name", v(group.getName(), Jsons.BLANK)));
+    fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
+    fields.add(f("roles", v(join(group.getRoles(), ","), Jsons.BLANK)));
+    fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
+    return obj(fields);
   }
 
 }

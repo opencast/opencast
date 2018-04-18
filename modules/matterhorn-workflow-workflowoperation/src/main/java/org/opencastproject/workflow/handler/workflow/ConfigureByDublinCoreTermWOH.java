@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-
 import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
 
 import org.opencastproject.job.api.JobContext;
@@ -79,10 +78,8 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
   static {
     CONFIG_OPTIONS = new TreeMap<>();
 
-    CONFIG_OPTIONS.put(DCCATALOG_PROPERTY,
-            "The flavor of the catalog to examine, will throw error if not present");
-    CONFIG_OPTIONS.put(DCTERM_PROPERTY,
-            "The Dublin Core term/element to examine");
+    CONFIG_OPTIONS.put(DCCATALOG_PROPERTY, "The flavor of the catalog to examine, will throw error if not present");
+    CONFIG_OPTIONS.put(DCTERM_PROPERTY, "The Dublin Core term/element to examine");
     CONFIG_OPTIONS.put(DEFAULT_VALUE_PROPERTY,
             "The Dublin Core term/element's value if not found, if this is not given then match will fail");
     CONFIG_OPTIONS.put(MATCH_VALUE_PROPERTY,
@@ -129,7 +126,8 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
 
     // Find Catalog
-    Catalog[] catalogs = mediaPackage.getCatalogs(new MediaPackageElementFlavor("dublincore", StringUtils.lowerCase(configuredCatalog)));
+    Catalog[] catalogs = mediaPackage
+            .getCatalogs(new MediaPackageElementFlavor("dublincore", StringUtils.lowerCase(configuredCatalog)));
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
@@ -155,15 +153,15 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
 
         for (String key : currentOperation.getConfigurationKeys()) {
           // Ignore this operations configuration
-          if (DCCATALOG_PROPERTY.equals(key) || DCTERM_PROPERTY.equals(key)
-                  || DEFAULT_VALUE_PROPERTY.equals(key) || MATCH_VALUE_PROPERTY.equals(key)) {
+          if (DCCATALOG_PROPERTY.equals(key) || DCTERM_PROPERTY.equals(key) || DEFAULT_VALUE_PROPERTY.equals(key)
+                  || MATCH_VALUE_PROPERTY.equals(key)) {
             continue;
           }
 
           String value = currentOperation.getConfiguration(key);
           properties.put(key, value);
-          logger.info("Configuration key '{}' of workflow {} is set to value '{}'",
-                  new Object[]{key, workflowInstance.getId(), value});
+          logger.info("Configuration key '{}' of workflow {} is set to value '{}'", key, workflowInstance.getId(),
+                  value);
         }
 
         return createResult(mediaPackage, properties, Action.CONTINUE, 0);

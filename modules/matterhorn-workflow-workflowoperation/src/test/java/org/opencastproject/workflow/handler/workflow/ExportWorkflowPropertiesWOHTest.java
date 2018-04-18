@@ -34,10 +34,16 @@ import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
+import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
+import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,15 +57,26 @@ public class ExportWorkflowPropertiesWOHTest {
 
   public static final String FLAVOR = "processing/defaults";
 
-  private UnitTestWorkspace workspace;
+  private Workspace workspace;
   private URI uri;
+
+  @Rule
+  public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
   @Before
   public void setUp() throws Exception {
-    workspace = new UnitTestWorkspace();
-    try (InputStream is = ExportWorkflowPropertiesWOHTest.class.getResourceAsStream("/workflow-properties.xml")) {
-      uri = workspace.putInCollection("test", "workflow-properties.xml", is);
-    }
+    workspace = EasyMock.createMock(Workspace.class);
+    final Capture<InputStream> in = EasyMock.newCapture();
+    final Capture<URI> uriCapture = EasyMock.newCapture();
+    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.capture(in))).andAnswer(() -> {
+              final File file = temporaryFolder.newFile();
+              FileUtils.copyInputStreamToFile(in.getValue(), file);
+              return file.toURI();
+            }).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.capture(uriCapture))).andAnswer(() -> new File(uriCapture.getValue())).anyTimes();
+    EasyMock.replay(workspace);
+    uri = ExportWorkflowPropertiesWOHTest.class.getResource("/workflow-properties.xml").toURI();
   }
 
   @Test

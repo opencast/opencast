@@ -15,6 +15,7 @@ General Configuration
  - [Logging and Privacy Configuration](logging.and.privacy.md)
  - [Message Broker Configuration](message-broker.md)
  - [Metadata Configuration](metadata.md)
+ - [Manual Asset Upload Configuration](asset-upload-ui/index.md)
  - [Multi Tenancy Configuration](multi.tenancy.md)
  - [Security Configuration](security.md)
     - [CAS Security Configuration](security.cas.md)

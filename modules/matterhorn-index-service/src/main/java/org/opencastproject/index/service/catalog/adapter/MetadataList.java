@@ -21,9 +21,9 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -38,7 +38,7 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
@@ -90,9 +90,9 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
   }
 
   public JValue toJSON() {
-    List<JValue> catalogs = new ArrayList<JValue>();
+    List<JValue> catalogs = new ArrayList<>();
     for (Entry<String, Tuple<String, MetadataCollection>> metadata : metadataList.entrySet()) {
-      List<JField> fields = new ArrayList<JField>();
+      List<Field> fields = new ArrayList<>();
 
       MetadataCollection metadataCollection = metadata.getValue().getB();
 
@@ -105,9 +105,9 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
       fields.add(f(KEY_METADATA_TITLE, v(metadata.getValue().getA())));
       fields.add(f(KEY_METADATA_FIELDS, metadataCollection.toJSON()));
 
-      catalogs.add(j(fields));
+      catalogs.add(obj(fields));
     }
-    return a(catalogs);
+    return arr(catalogs);
   }
 
   private void makeMetadataCollectionReadOnly(MetadataCollection metadataCollection) {
@@ -194,14 +194,14 @@ public final class MetadataList implements Iterable<Entry<String, Tuple<String, 
 
   private static final Fn2<String, String, Boolean> adapterFilter = new Fn2<String, String, Boolean>() {
     @Override
-    public Boolean ap(String key, String flavor) {
+    public Boolean apply(String key, String flavor) {
       return key.equals(flavor);
     }
   };
 
   private final Fn<String, MetadataCollection> toMetadata = new Fn<String, MetadataCollection>() {
     @Override
-    public MetadataCollection ap(String key) {
+    public MetadataCollection apply(String key) {
       return metadataList.get(key).getB();
     }
   };

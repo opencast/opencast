@@ -8,7 +8,7 @@ The main focus for the new administrative ui was design and usability. While the
 
 The resulting style guide clearly describes how individual parts and pieces are to be designed, which fonts and colors are available, how notifications should be displayed to the user and much more. On top of that, the design team delivered HTML templates for each screen and dialog so that there was little left to do for the frontend engineers but turn the templates into a great looking interactive application.
 
-**Original Design Document:** [Admin UI - A Guide to Style (Admin-UI-Style-Guide-v3.pdf)](../../../../files/Admin-UI-Style-Guide-v3.pdf)
+**Original Design Document:** [Admin UI - A Guide to Style (Admin-UI-Style-Guide-v3.pdf)](../../../files/Admin-UI-Style-Guide-v3.pdf)
 
 **Links:**
 

@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης",
       "EVENTS_NOT_UPDATED_ID": "Δεν ήταν δυνατή η αποθήκευση της εκδήλωσης {{ id }}",
       "EVENTS_NOT_UPDATED_ALL": "Καμμία από τις εκδηλώσεις δεν μπορεί να αποθηκευτεί",
+      "EVENTS_PROCESSING_ACTION_RETRY": "H επεξεργασία συνεχίζεται...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Η επεξεργασία δεν θα μπορεί να συνεχιστεί.",
+      "EVENTS_PROCESSING_ACTION_NONE": "H επεξεργασία ματαιώθηκε...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Η επεξεργασία δεν θα μπορεί να ματαιωθεί.",
       "SERIES_UPDATED_NB": "{{ number }} σειρές έχουν ενημερωθεί με επιτυχία",
       "SERIES_UPDATED_ALL": "Έχουν ενημερωθεί με επιτυχία όλες οι σειρές",
       "SERIES_NOT_UPDATED": "Δεν ήταν δυνατή η αποθήκευση της σειράς",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "Ανέβασμα αρχείων",
                   "RECORDING_ELEMENTS": "Στοιχεία καταγραφής",
+                  "RECORDING_METADATA": "Μετά-δεδομένα εγγραφής",
                   "SEGMENTABLE": {
                      "SHORT": "Διαφάνειες",
                      "DETAIL": "Το αρχείο περιέχει μια καταγραφή  παρουσίασης διαφανειών (Keynote, Powerpoint, κλπ)."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "Μόνο αρχείου ήχου",
                      "DETAIL": "Το αρχείο περιέχει μόνο ήχο."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Πολλαπλά τμήματα",
+                     "DETAIL": "Ένα σύνολο αρχείων που περιέχει διάφορα τμήματα της εκδήλωσης."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "Επιλέξτε ροή εργασίας",
                "SELECT_WORKFLOW_EMPTY": "Δεν βρέθηκε ροή εργασίας",
                "WORKFLOW": "Ροή εργασίας"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Μεταφόρτωση αντικειμένου",
+               "SELECT_TYPE": "Επιλέξτε τύπο αντικειμένου",
+               "ADD": "Προσθήκη αντικειμένου",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
+                  "CAPTIONS_DFXP": "Υπότιτλοι DFXP",
+                  "CAPTIONS_WEBVTT": "Υπότιτλοι WebVTT",
+                  "PREVIEW_IMAGE": "Προεπισκόπηση εικόνας",
+                  "SMIL": "Κατάλογος Smil",
+                  "TRACK_PARTS": "Παρακολούθηση τμημάτων"
+               }
             },
             "ACCESS": {
                "CAPTION": "Πολιτική πρόσβασης",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "Ενέργειες",
                "DETAILS": "Λεπτομέρειες",
                "DESCRIPTION": "",
                "ID": "Αναγνωριστικό",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "Στη μαύρη λίστα από",
             "BLACKLIST_TO": "Στη μαύρη λίστα μέχρι",
             "ACTION": "Ενέργειες"
+         },
+         "DETAILS": {
+            "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Γενικά",
+               "CONFIGURATION": "Παραμετροποίηση",
+               "CAPABILITIES": "Δυνατότητες"
+            },
+            "GENERAL": {
+               "CAPTION": "Γενικά",
+               "NAME": "Όνομα",
+               "URL": "Διεύθυνση Url",
+               "STATUS": "Κατάσταση",
+               "UPDATE": "Τελευταία ακρόαση από"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Παραμετροποίηση",
+               "NO_CONFIGURATION": "Δεν παρέχεται καμμία παραμετροποίηση"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Δυνατότητες",
+               "NO_CAPABILITIES": "Δεν παρέχονται δυνατότητες"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "Εκτελείται",
       "FINISHED": "Ολοκληρώθηκε",
+      "PAUSED": "Σε παύση",
       "FAILED": "Απέτυχε",
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Προγραμματισμένη",

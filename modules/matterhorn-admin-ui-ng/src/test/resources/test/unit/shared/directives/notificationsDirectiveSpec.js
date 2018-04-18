@@ -15,6 +15,20 @@ describe('adminNg.directives.adminNgNotifications', function () {
         $provide.value('Language', service);
     }));
 
+    beforeEach(module(function ($provide) {
+	var service = {
+	    getUser: function () {
+		var user = {org: { properties: {
+		    "admin.notification.duration.error": -10,
+		    "admin.notification.duration.success": 50,
+		    "admin.notification.duration.warning": 50
+		}}};
+		return {$promise: {then: function (fn) { fn(user) }}};
+	    }
+	};
+	$provide.value('AuthService', service);
+    }));
+
     beforeEach(inject(function (_$rootScope_, _$compile_, _Notifications_) {
         $compile = _$compile_;
         $rootScope = _$rootScope_;

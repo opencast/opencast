@@ -24,18 +24,18 @@ SWITCH                     | streaming.oc-test.switch.ch   | Greg Logan       | 
 SWITCH                     | 10.0.207.247 (intern)         | Lars Kiesow      | Lars Kiesow        | capture agent
 
 
-Maven Repository (Nexus)
-------------------------
+Maven Repository
+----------------
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
----------------------------|-------------------------------|------------------|-----------------
-Harvard DCE                | mvncache.opencast.org         | Greg Logan       | DCE Devel group
-University of Osnabrück    | nexus.opencast.org            | Greg Logan       | Lars Kiesow
+Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
+---------------------------|-------------------------------|------------------|---------------------|---------------
+Harvard DCE                | mvncache.opencast.org         | Lars Kiesow      | DCE Devel group     | Amazon Cloud
+University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      | Lars Kiesow         |
 
 Nexus administration:
 
-- Lars Kiesow
-- Michael Stypa
+- Lars Kiesow (uos, dce)
+- Michael Stypa (uos)
 
 
 Other Hosted Services

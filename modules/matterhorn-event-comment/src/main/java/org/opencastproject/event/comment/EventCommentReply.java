@@ -21,11 +21,10 @@
 
 package org.opencastproject.event.comment;
 
+import static com.entwinemedia.fn.data.json.Jsons.BLANK;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jz;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 
@@ -37,7 +36,7 @@ import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.json.JField;
+import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 
 import org.apache.commons.lang3.StringUtils;
@@ -191,21 +190,21 @@ public final class EventCommentReply {
   }
 
   public JValue toJValue() {
-    JValue authorObj = j(f("name", vN(author.getName())), f("username", v(author.getUsername())),
-            f("email", vN(author.getEmail())));
+    JValue authorObj = obj(f("name", v(author.getName(), BLANK)), f("username", v(author.getUsername())),
+            f("email", v(author.getEmail(), BLANK)));
 
-    JValue idValue = jz;
+    JValue idValue = com.entwinemedia.fn.data.json.Jsons.ZERO;
     if (id.isSome())
       idValue = v(id.get());
 
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     fields.add(f("id", idValue));
     fields.add(f("text", v(text)));
     fields.add(f("author", authorObj));
     fields.add(f("creationDate", v(DateTimeSupport.toUTC(creationDate.getTime()))));
     fields.add(f("modificationDate", v(DateTimeSupport.toUTC(modificationDate.getTime()))));
 
-    return j(fields);
+    return obj(fields);
   }
 
 }

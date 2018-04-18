@@ -28,6 +28,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -52,9 +53,9 @@ import java.util.Set;
  */
 public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractWorkflowOperationHandler {
 
-   private static final Logger logger = LoggerFactory.getLogger(ConfigurableWorkflowOperationHandlerBase.class);
+  private static final Logger logger = LoggerFactory.getLogger(ConfigurableWorkflowOperationHandlerBase.class);
 
-   abstract DownloadDistributionService getDistributionService();
+  abstract DownloadDistributionService getDistributionService();
 
   /**
    * Adds all of the {@link Publication}'s {@link MediaPackageElement}s that would normally have not been in the
@@ -99,7 +100,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     // Add the publications to the mediapackage so that we can use the standard retract
     addPublicationElementsToMediaPackage(publication, mediapackageWithPublicationElements);
 
-    Set<String> elementIds = new HashSet<String>();
+    Set<String> elementIds = new HashSet<>();
 
     for (Attachment attachment : publication.getAttachments()) {
       elementIds.add(attachment.getIdentifier());
@@ -112,14 +113,14 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     }
 
     if (elementIds.size() > 0) {
-      logger.info("Retracting {} elements of media package {} from publication channel {}",
-              elementIds.size(), mp, channelId);
+      logger.info("Retracting {} elements of media package {} from publication channel {}", elementIds.size(), mp,
+              channelId);
       Job job = null;
       try {
         job = getDistributionService().retract(channelId, mediapackageWithPublicationElements, elementIds);
       } catch (DistributionException e) {
-        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}': {}", new Object[] {
-                elementIds.size(), channelId, getDistributionService(), getStackTrace(e) });
+        logger.error("Error while retracting '{}' elements from channel '{}' of distribution '{}': {}",
+                elementIds.size(), channelId, getDistributionService(), getStackTrace(e));
         throw new WorkflowOperationException("The retraction job did not complete successfully");
       }
       if (!waitForStatus(job).isSuccess()) {
@@ -136,7 +137,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     assert ((mp != null) && (channelId != null));
     final List<Publication> publications = Stream.mk(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
-      public Boolean ap(Publication a) {
+      public Boolean apply(Publication a) {
         return channelId.equals(a.getChannel());
       }
     }).toList();
@@ -144,8 +145,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
     return publications;
   }
 
-  public void retract(MediaPackage mp, final String channelId)
-          throws WorkflowOperationException {
+  public void retract(MediaPackage mp, final String channelId) throws WorkflowOperationException {
     assert ((mp != null) && (channelId != null));
 
     final List<Publication> publications = getPublications(mp, channelId);
@@ -157,7 +157,7 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
         mp.remove(publication);
       }
       logger.info("Successfully retracted {} publications and retracted {} elements from publication channel '{}'",
-              new Object[] { publications.size(), retractedElementsCount, channelId });
+              publications.size(), retractedElementsCount, channelId);
     } else {
       logger.info("No publications for channel {} found for media package {}", channelId, mp.getIdentifier());
     }

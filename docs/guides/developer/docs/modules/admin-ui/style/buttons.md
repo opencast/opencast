@@ -1,4 +1,5 @@
-## Main Action Buttons
+Main Action Buttons
+-------------------
 
 <div class="row-flex">
   <img src="../../../../img/buttons-4.png" alt="Main Button - Spacing" />
@@ -16,6 +17,10 @@
 </span>}</code></pre>
 </div>
 <br/>
+
+Modal Buttons
+-------------
+
 <div class="row-flex">
   <img src="../../../../img/buttons-2.png" alt="Main Button - Modal" />
 <pre style="margin-bottom: 0px;"><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Modal Button - Accept ] */</span>
@@ -39,11 +44,12 @@
 </div>
 <br/>
 
-## Action buttons
-Action buttons are used to allow the user to control steps in
-a process. Usually placed within a table view, actions include
-options to delete, process and view statistics. These action
-buttons will generally open a modal and should be placed in a specific hierarchical order for consistency.
+Action buttons
+--------------
+
+Action buttons are used to allow the user to control steps in a process. Usually placed within a table view, actions
+include options to delete, process and view statistics. These action buttons will generally open a modal and should be
+placed in a specific hierarchical order for consistency.
 
 1. Detail Actions
 2. Sub Actions

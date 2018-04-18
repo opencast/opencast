@@ -31,6 +31,108 @@ would be sufficient.  This filters out the bots, yet is simple enough that someo
 Proposal closes EOD 2017-11-17.
 ```
 
+### Rename Matterhorn Repository To Opencast
+
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on July 13, 2017
+
+```no-highlight
+Hi everyone,
+I think we have reached a point where people are wondering what the
+hell matterhorn is ;-D
+
+That is why I #propose to rename our official repository from
+matterhorn to opencast:
+
+old: https://bitbucket.org/opencast-community/matterhorn/
+new: https://bitbucket.org/opencast-community/opencast/
+
+This proposal will end on Thu Jul 13 16:00 CEST 2017
+
+Regards,
+Lars
+```
+
+### Criteria For Inclusion Of Translations
+Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on April 28, 2017
+
+```no-highlight
+Dear all,
+There are currently no rules about the criteria needed for a translation to be
+included or excluded from the official Opencast releases.
+
+I hereby propose the following rules:
+
+1.  A not yet supported translation is included into the next major release if
+    it is translated to at least 90% at the time when the release branch is cut.
+    The release managers will take the review if no other reviewer can be found.
+
+2.  A not yet supported translation may be included in the current release
+    branch anytime if it is translated to 100% and a reviewer is found. It will
+    then be part of the next minor release and major release if feasible
+
+3.  An endangered translation is a supported translation that is translated less
+    than 80% at the time when the release branch of the next major release is
+    cut. The release managers will publish a list of endangered languages if any
+
+4.  An endangered translation will be removed with the next major release if it
+    is not saved. The release managers take care of the removal in case no other
+    person will
+
+5.  An endangered translation may be saved by reaching at least 90% translated
+    until at least two weeks before the release date of the next major release
+    and a reviewer is found
+
+6. Considering the percentages of being translated, Crowdin acts as reference
+
+7. Considering the dates of the release cuts of major releases, the respective
+   releases schedules act as reference
+
+Best,
+Sven
+```
+
+### Make Maintenance Releases Easier
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on April 24, 2017
+
+```no-highlight
+Hi everyone,
+over the last years, I have cut a lot of Opencast maintenance releases.
+The process is to announce that a release will be cut, create a release
+candidate and wait 72h without veto to actually release.
+
+I have always sent out the voting mail as required by our release
+process and I can always count on the usual response: No reply.
+
+This is actually not very surprising since for example now for the
+2.3.3 release, people have either already tested the latest state of
+r/2.3.3 or are involved in the next big release already.
+
+In short this means that we always have a three day waiting period in
+which basically nothing happens. That is why I would like to change the
+process for *maintenance releases* in the following way:
+
+  A release manager may cut new maintenance releases at any time
+  without prior release candidate.
+  He should openly announce the date for a new release a week before
+  the release or at any earlier point in time.
+
+Note that this will also allow a release manager to release as fast as
+possible if necessary (e.g. security fix) since the announcement is not
+strictly required but only a strong advise.
+
+This should lessen the work for the a release managers and will enable
+more agile release processes. We also should not really loose any QA
+work since everyone knows when releases will happen and people can
+always test the latest state of a release branch which will become the
+new release.
+
+This proposal will not affect major releases where release candidates
+with three days testing period would still be required.
+
+I hope you agree with this change,
+Lars
+```
+
 ### Minor documentation changes do not require JIRA issues or PRs
 Proposed by Stephen Marquard <stephen.marquard@uct.ac.za>, passed on June 9, 2017
 

@@ -330,6 +330,18 @@ angular.module('adminNg.services')
             }
         };
 
+        this.addFilterToStorage = function(column, filter) {
+          Storage.put('filter', me.resource, column, filter);
+        }
+
+        this.addFilterToStorageForResource = function(resource, column, filter) {
+          Storage.put('filter', resource, column, filter);
+        }
+
+        this.gotoRoute = function(path) {
+          $location.path(path);
+        }
+
         // Reload the table if the language is changed
         $rootScope.$on('language-changed', function () {
             if (!me.loading) {

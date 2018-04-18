@@ -52,7 +52,7 @@ public final class OpencastMetadataCodec {
 
   /** {@link OpencastMetadataCodec#decodeDate(java.lang.String)} as a function. */
   public static final Fn<String, Date> decodeDate = new Fn<String, Date>() {
-    @Override public Date ap(String a) {
+    @Override public Date apply(String a) {
       return decodeDate(a);
     }
   };
@@ -69,7 +69,7 @@ public final class OpencastMetadataCodec {
 
   /** {@link OpencastMetadataCodec#decodeDuration(String)} as a function. */
   public static final Fn<String, Long> decodeDuration = new Fn<String, Long>() {
-    @Override public Long ap(String a) {
+    @Override public Long apply(String a) {
       return decodeDuration(a);
     }
   };
@@ -91,7 +91,7 @@ public final class OpencastMetadataCodec {
 
   /** {@link OpencastMetadataCodec#decodeTemporal(DublinCoreValue)} as a function. */
   @Nonnull public static final Fn<DublinCoreValue, Temporal> decodeTemporal = new Fn<DublinCoreValue, Temporal>() {
-    @Override public Temporal ap(DublinCoreValue a) {
+    @Override public Temporal apply(DublinCoreValue a) {
       return decodeTemporal(a);
     }
   };

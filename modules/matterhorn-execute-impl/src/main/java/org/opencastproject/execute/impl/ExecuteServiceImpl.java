@@ -102,9 +102,6 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   /** Bundle property specifying which commands can be run with this executor */
   public static final String COMMANDS_ALLOWED_PROPERTY = "commands.allowed";
 
-  /** The collection for the executor files */
-  public static final String COLLECTION = "executor";
-
   /** To allow command-line parameter substitutions configured globally i.e. in config.properties */
   private BundleContext bundleContext;
 
@@ -510,7 +507,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         // Read the command output
         if (outFile != null) {
           if (outFile.isFile()) {
-            URI newURI = workspace.putInCollection(COLLECTION, outFile.getName(), new FileInputStream(outFile));
+            URI newURI = workspace.putInCollection(ExecuteService.COLLECTION, outFile.getName(), new FileInputStream(outFile));
             if (outFile.delete()) {
               logger.debug("Deleted the local copy of the encoded file at {}", outFile.getAbsolutePath());
             } else {
@@ -518,6 +515,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
             }
             return MediaPackageElementParser.getAsXml(MediaPackageElementBuilderFactory.newInstance()
                     .newElementBuilder().elementFromURI(newURI, expectedType, null));
+          } else {
+             throw new ExecuteException("Expected output file does not exist: " + outFile.getAbsolutePath());
           }
         }
         return "";

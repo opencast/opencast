@@ -41,6 +41,13 @@ public class MimeTypeTest {
   }
 
   @Test
+  public void testMimeTypesFromName() throws Exception {
+    assertEquals("text/xml", MimeTypes.getMimeType("/a/b/somefile.xml"));
+    assertEquals("image/gif", MimeTypes.getMimeType("image.gif"));
+    assertEquals("text/css", MimeTypes.getMimeType("stylesheet.css"));
+  }
+
+  @Test
   public void testSuffixes() {
     assertTrue(MimeTypes.parseMimeType("video/mpeg").getSuffixes().length > 1);
   }

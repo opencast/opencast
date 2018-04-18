@@ -8,6 +8,11 @@
     <provide interface="org.opencastproject.index.service.api.IndexService" />
   </service>
 
+ <reference name="AclServiceFactory"
+             interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
+             cardinality="1..1"
+             policy="static"
+             bind="setAclServiceFactory" />
   <reference name="AuthorizationService"
              interface="org.opencastproject.security.api.AuthorizationService"
              cardinality="1..1"
@@ -34,20 +39,15 @@
              cardinality="1..1"
              policy="static"
              bind="setEventCommentService"/>
-  <reference name="httpMediaPackageElementProvider"
-             interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
-             cardinality="1..1"
-             policy="static"
-             bind="setHttpMediaPackageElementProvider" />
   <reference name="IngestService"
              interface="org.opencastproject.ingest.api.IngestService"
              cardinality="1..1"
              policy="static"
              bind="setIngestService" />
-  <reference bind="setOpencastArchive"
+  <reference bind="setAssetManager"
              cardinality="1..1"
-             interface="org.opencastproject.archive.opencast.OpencastArchive"
-             name="archive"
+             interface="org.opencastproject.assetmanager.api.AssetManager"
+             name="AssetManager"
              policy="static" />
   <reference name="SchedulerService"
              interface="org.opencastproject.scheduler.api.SchedulerService"

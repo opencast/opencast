@@ -5,11 +5,26 @@ angular.module('adminNg.directives')
         var currentState = $scope.states[0], step, lookupIndex, lookupState, toTab,
             getCurrentState, getCurrentStateController, getPreviousState, getNextState,
             getCurrentStateName, getCurrentStateIndex, getStateControllerByName, save, isReachable,
-            hasPrevious, isCompleted, isLast, getFinalButtonTranslation, result;
+            hasPrevious, isCompleted, isLast, getFinalButtonTranslation, sharedData, result;
+
+        // The "sharedData" attribute allows steps to preserve localized ng-repeat data
+        // at the wizard scope for cases when then the "save" callback is not sufficient.
+        // Specifically, to preserve UI visible "file" selections created within ng-repeat loops.
+        // Unlike all other html input fields, the "file" type html input is forbidden to be
+        // manually/programatically reset via javascript.
+        // This attribute is used by the asset file upload directive.
+        $scope.sharedData = {};
 
         angular.forEach($scope.states, function (state) {
             if (!angular.isDefined(state.stateController.visible)) {
                 state.stateController.visible = true;
+            }
+        });
+
+        // retrieve shared data from the state controllers
+        angular.forEach($scope.states, function (state) {
+            if (angular.isDefined(state.stateController.addSharedDataPromise)) {
+               state.stateController.addSharedDataPromise();
             }
         });
 
@@ -101,13 +116,19 @@ angular.module('adminNg.directives')
                     current: targetState
                 });
 
+               // one-time directed call to the current state
+               // to allow the state to perform exit cleanup
+               if ($scope.wizard.step.onExitStep) {
+                 $scope.wizard.step.onExitStep();
+               }
+
                 currentState = targetState;
                 $scope.wizard.step = targetState.stateController;
 
                 //FIXME: This should rather be a service I guess, so it won't be tied to modals.
                 //Its hard to unit test like this also
                 $scope.$parent.openTab(targetState.name);
-		focus();
+                focus();
             }
         };
 
@@ -157,6 +178,7 @@ angular.module('adminNg.directives')
             getCurrentStateName: getCurrentStateName,
             getStateControllerByName: getStateControllerByName,
             save: save,
+            sharedData: sharedData,
             toTab: toTab,
             isReachable: isReachable,
             isCompleted: isCompleted,

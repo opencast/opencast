@@ -18,16 +18,16 @@
  * the License.
  *
  */
-
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.Opt.nul;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static org.opencastproject.index.service.util.RestUtils.stream;
+import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
@@ -39,7 +39,6 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SortCriterion;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -66,10 +65,10 @@ import org.opencastproject.workflow.api.WorkflowSet;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JField;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.Field;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
 import org.apache.commons.lang3.StringUtils;
@@ -170,7 +169,7 @@ public class JobEndpoint {
     if (query.getFreeText().isSome())
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
-    List<Job> jobs = new ArrayList<Job>();
+    List<Job> jobs = new ArrayList<>();
     try {
       for (Job job : serviceRegistry.getActiveJobs()) {
         // filter workflow jobs
@@ -212,9 +211,9 @@ public class JobEndpoint {
         ascending = SearchQuery.Order.Ascending == sortCriterion.getOrder()
                 || SearchQuery.Order.None == sortCriterion.getOrder();
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 
@@ -327,24 +326,24 @@ public class JobEndpoint {
 
         query.withSort(sortKey, ascending);
       } catch (WebApplicationException ex) {
-        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", new Object[] { sort });
+        logger.warn("Failed to parse sort criterion \"{}\", invalid format.", sort);
       } catch (IllegalArgumentException ex) {
-        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", new Object[] { sort });
+        logger.warn("Can not apply sort criterion \"{}\", no field with this name.", sort);
       }
     }
 
-    JObjectWrite json;
+    JObject json;
     try {
       json = getTasksAsJSON(query);
     } catch (NotFoundException e) {
       return NOT_FOUND;
     }
 
-    return Response.ok(stream(serializer.toJsonFx(json)), MediaType.APPLICATION_JSON_TYPE).build();
+    return Response.ok(stream(serializer.fn.toJson(json)), MediaType.APPLICATION_JSON_TYPE).build();
   }
 
   public List<JValue> getJobsAsJSON(List<Job> jobs) {
-    List<JValue> jsonList = new ArrayList<JValue>();
+    List<JValue> jsonList = new ArrayList<>();
     for (Job job : jobs) {
       long id = job.getId();
       String jobType = job.getJobType();
@@ -361,14 +360,14 @@ public class JobEndpoint {
       String creator = job.getCreator();
       String processingHost = job.getProcessingHost();
 
-      jsonList.add(j(f("id", v(id)),
+      jsonList.add(obj(f("id", v(id)),
               f("type", v(jobType)),
               f("operation", v(operation)),
               f("status", v(status.toString())),
-              f("submitted", vN(created)),
-              f("started", vN(started)),
-              f("creator", vN(creator)),
-              f("processingHost", vN(processingHost))));
+              f("submitted", v(created, Jsons.BLANK)),
+              f("started", v(started, Jsons.BLANK)),
+              f("creator", v(creator, Jsons.BLANK)),
+              f("processingHost", v(processingHost, Jsons.BLANK))));
     }
 
     return jsonList;
@@ -383,11 +382,11 @@ public class JobEndpoint {
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JObjectWrite getTasksAsJSON(WorkflowQuery query) throws JobEndpointException, NotFoundException {
+  public JObject getTasksAsJSON(WorkflowQuery query) throws JobEndpointException, NotFoundException {
     // Get results
     WorkflowSet workflowInstances = null;
     long totalWithoutFilters = 0;
-    List<JValue> jsonList = new ArrayList<JValue>();
+    List<JValue> jsonList = new ArrayList<>();
 
     try {
       workflowInstances = workflowService.getWorkflowInstances(query);
@@ -412,13 +411,13 @@ public class JobEndpoint {
                 instanceId, e), e.getCause());
       }
 
-      jsonList.add(j(f("id", v(instanceId)), f("title", v(Opt.nul(instance.getMediaPackage().getTitle()).or(""))),
-              f("series", vN(series)), f("workflow", vN(instance.getTitle())),
+      jsonList.add(obj(f("id", v(instanceId)), f("title", v(nul(instance.getMediaPackage().getTitle()).getOr(""))),
+              f("series", v(series, Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
               f("status", v(instance.getState().toString())),
               f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
     }
 
-    JObjectWrite json = j(f("results", a(jsonList)), f("count", v(workflowInstances.getTotalCount())),
+    JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
             f("offset", v(query.getStartPage())), f("limit", v(jsonList.size())), f("total", v(totalWithoutFilters)));
     return json;
   }
@@ -431,21 +430,8 @@ public class JobEndpoint {
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JObjectWrite getTasksAsJSON(long id) throws JobEndpointException, NotFoundException {
-
-    WorkflowInstance instance;
-    try {
-      instance = workflowService.getWorkflowById(id);
-    } catch (WorkflowDatabaseException e) {
-      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
-              e.getCause());
-    } catch (NotFoundException e) {
-      throw new JobEndpointException(String.format("Not able to get the job %d from the workflow service : %s", id, e),
-              e.getCause());
-    } catch (UnauthorizedException e) {
-      throw new JobEndpointException(String.format("Not authorized to get the job %d from the workflow service : %s",
-              id, e), e.getCause());
-    }
+  public JObject getTasksAsJSON(long id) throws JobEndpointException, NotFoundException {
+    WorkflowInstance instance = getWorkflowById(id);
 
     // Retrieve submission date with the workflow instance main job
     Date created;
@@ -465,17 +451,17 @@ public class JobEndpoint {
 
     MediaPackage mp = instance.getMediaPackage();
 
-    List<JField> fields = new ArrayList<JField>();
+    List<Field> fields = new ArrayList<>();
     for (String key : instance.getConfigurationKeys()) {
-      fields.add(f(key, vN(instance.getConfiguration(key))));
+      fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
     }
 
-    return j(f("start", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "")), f("state", vN(instance.getState())),
-            f("description", vN(instance.getDescription())), f("duration", vN(duration)),
-            f("id", vN(instance.getId())), f("workflow", vN(instance.getTitle())),
-            f("workflowId", vN(instance.getTemplate())), f("title", vN(mp.getTitle())),
-            f("series", vN(mp.getSeries())), f("series_title", vN(mp.getSeriesTitle())),
-            f("license", vN(mp.getLicense())), f("configuration", j(fields)));
+    return obj(f("start", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)), f("state", v(instance.getState(), Jsons.BLANK)),
+               f("description", v(instance.getDescription(), Jsons.BLANK)), f("duration", v(duration, Jsons.BLANK)),
+               f("id", v(instance.getId(), Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
+               f("workflowId", v(instance.getTemplate(), Jsons.BLANK)), f("title", v(mp.getTitle(), Jsons.BLANK)),
+               f("series", v(mp.getSeries(), Jsons.BLANK)), f("series_title", v(mp.getSeriesTitle(), Jsons.BLANK)),
+               f("license", v(mp.getLicense(), Jsons.BLANK)), f("configuration", obj(fields)));
   }
 
   /**
@@ -488,31 +474,21 @@ public class JobEndpoint {
    * @throws NotFoundException
    */
   public JValue getOperationsAsJSON(long jobId) throws JobEndpointException, NotFoundException {
-
-    WorkflowInstance instance;
-    try {
-      instance = workflowService.getWorkflowById(jobId);
-    } catch (WorkflowDatabaseException e) {
-      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
-              e.getCause());
-    } catch (UnauthorizedException e) {
-      throw new JobEndpointException(String.format("Not authorized to get the job %d from the workflow service : %s",
-              jobId, e), e.getCause());
-    }
+    WorkflowInstance instance = getWorkflowById(jobId);
 
     List<WorkflowOperationInstance> operations = instance.getOperations();
-    List<JValue> operationsJSON = new ArrayList<JValue>();
+    List<JValue> operationsJSON = new ArrayList<>();
 
     for (WorkflowOperationInstance wflOp : operations) {
-      List<JField> fields = new ArrayList<JField>();
+      List<Field> fields = new ArrayList<>();
       for (String key : wflOp.getConfigurationKeys()) {
-        fields.add(f(key, vN(wflOp.getConfiguration(key))));
+        fields.add(f(key, v(wflOp.getConfiguration(key), Jsons.BLANK)));
       }
-      operationsJSON.add(j(f("status", vN(wflOp.getState())), f("title", vN(wflOp.getTemplate())),
-              f("description", vN(wflOp.getDescription())), f("id", vN(wflOp.getId())), f("configuration", j(fields))));
+      operationsJSON.add(obj(f("status", v(wflOp.getState(), Jsons.BLANK)), f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
+              f("description", v(wflOp.getDescription(), Jsons.BLANK)), f("id", v(wflOp.getId(), Jsons.BLANK)), f("configuration", obj(fields))));
     }
 
-    return a(operationsJSON);
+    return arr(operationsJSON);
   }
 
   /**
@@ -526,36 +502,27 @@ public class JobEndpoint {
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JObjectWrite getOperationAsJSON(long jobId, int operationPosition) throws JobEndpointException, NotFoundException {
-
-    WorkflowInstance instance;
-    try {
-      instance = workflowService.getWorkflowById(jobId);
-    } catch (WorkflowDatabaseException e) {
-      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
-              e.getCause());
-    } catch (UnauthorizedException e) {
-      throw new JobEndpointException(String.format("Not authorized to get the job %d from the workflow service : %s",
-              jobId, e), e.getCause());
-    }
+  public JObject getOperationAsJSON(long jobId, int operationPosition)
+          throws JobEndpointException, NotFoundException {
+    WorkflowInstance instance = getWorkflowById(jobId);
 
     List<WorkflowOperationInstance> operations = instance.getOperations();
 
     if (operations.size() > operationPosition) {
       WorkflowOperationInstance wflOp = operations.get(operationPosition);
-      return j(f("retry_strategy", vN(wflOp.getRetryStrategy())),
-              f("execution_host", vN(wflOp.getExecutionHost())),
+      return obj(f("retry_strategy", v(wflOp.getRetryStrategy(), Jsons.BLANK)),
+              f("execution_host", v(wflOp.getExecutionHost(), Jsons.BLANK)),
               f("failed_attempts", v(wflOp.getFailedAttempts())),
               f("max_attempts", v(wflOp.getMaxAttempts())),
-              f("exception_handler_workflow", vN(wflOp.getExceptionHandlingWorkflow())),
+              f("exception_handler_workflow", v(wflOp.getExceptionHandlingWorkflow(), Jsons.BLANK)),
               f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
-              f("description", vN(wflOp.getDescription())),
-              f("state", vN(wflOp.getState())),
-              f("job", vN(wflOp.getId())),
-              f("name", vN(wflOp.getTemplate())),
-              f("time_in_queue", v(wflOp.getTimeInQueue() == null ? 0 : wflOp.getTimeInQueue())),
-              f("started", vN(wflOp.getDateStarted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateStarted().getTime()))),
-              f("completed", vN(wflOp.getDateCompleted() == null ? null : DateTimeSupport.toUTC(wflOp.getDateCompleted().getTime())))
+              f("description", v(wflOp.getDescription(), Jsons.BLANK)),
+              f("state", v(wflOp.getState(), Jsons.BLANK)),
+              f("job", v(wflOp.getId(), Jsons.BLANK)),
+              f("name", v(wflOp.getTemplate(), Jsons.BLANK)),
+              f("time_in_queue", v(wflOp.getTimeInQueue(), v(0))),
+              f("started", wflOp.getDateStarted() != null ? v(toUTC(wflOp.getDateStarted().getTime())) : Jsons.BLANK),
+              f("completed", wflOp.getDateCompleted() != null ? v(toUTC(wflOp.getDateCompleted().getTime())) : Jsons.BLANK)
       );
     }
 
@@ -575,8 +542,8 @@ public class JobEndpoint {
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JValue getIncidentsAsJSON(long jobId, final Locale locale, boolean cascade) throws JobEndpointException,
-          NotFoundException {
+  public JValue getIncidentsAsJSON(long jobId, final Locale locale, boolean cascade)
+          throws JobEndpointException, NotFoundException {
     final List<Incident> incidents;
     try {
       final IncidentTree it = incidentService.getIncidentsOfJob(jobId, cascade);
@@ -587,13 +554,13 @@ public class JobEndpoint {
     }
     final Stream<JValue> json = $(incidents).map(new Fn<Incident, JValue>() {
       @Override
-      public JValue ap(Incident i) {
-        return j(f("id", v(i.getId())), f("severity", vN(i.getSeverity())),
-                f("timestamp", vN(DateTimeSupport.toUTC(i.getTimestamp().getTime())))).merge(
+      public JValue apply(Incident i) {
+        return obj(f("id", v(i.getId())), f("severity", v(i.getSeverity(), Jsons.BLANK)),
+                f("timestamp", v(toUTC(i.getTimestamp().getTime()), Jsons.BLANK))).merge(
                 localizeIncident(i, locale));
       }
     });
-    return a(json);
+    return arr(json);
   }
 
   /**
@@ -602,7 +569,7 @@ public class JobEndpoint {
    * @return a list of incidents
    */
   private List<Incident> flatten(IncidentTree incidentsTree) {
-    final List<Incident> incidents = new ArrayList<Incident>();
+    final List<Incident> incidents = new ArrayList<>();
     incidents.addAll(incidentsTree.getIncidents());
     for (IncidentTree descendantTree : incidentsTree.getDescendants()) {
       incidents.addAll(flatten(descendantTree));
@@ -619,12 +586,38 @@ public class JobEndpoint {
    *          the locale to be used to create title and description
    * @return JSON object
    */
-  private JObjectWrite localizeIncident(Incident incident, Locale locale) {
+  private JObject localizeIncident(Incident incident, Locale locale) {
     try {
       final IncidentL10n loc = incidentService.getLocalization(incident.getId(), locale);
-      return j(f("title", vN(loc.getTitle())), f("description", vN(loc.getDescription())));
+      return obj(f("title", v(loc.getTitle(), Jsons.BLANK)), f("description", v(loc.getDescription(), Jsons.BLANK)));
     } catch (Exception e) {
-      return j(f("title", v("")), f("description", v("")));
+      return obj(f("title", v("")), f("description", v("")));
+    }
+  }
+
+  /**
+   * Returns the workflow by the given identifier. This also returns STOPPED workflows, which is the reason for not
+   * using the existing {@link WorkflowService:getWorkflowById()} method.
+   *
+   * @param id
+   *          the workflow identifier
+   * @return the workflow instance
+   * @throws NotFoundException
+   *           it the workflow was not found
+   * @throws JobEndpointException
+   *           if there was an issue reading the workflow from the database
+   */
+  private WorkflowInstance getWorkflowById(long id) throws NotFoundException, JobEndpointException {
+    try {
+      WorkflowSet workflowInstances = workflowService
+              .getWorkflowInstances(new WorkflowQuery().withId(Long.toString(id)));
+      if (workflowInstances.getItems().length == 0)
+        throw new NotFoundException();
+
+      return workflowInstances.getItems()[0];
+    } catch (WorkflowDatabaseException e) {
+      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
+              e.getCause());
     }
   }
 
@@ -644,24 +637,25 @@ public class JobEndpoint {
     } catch (IncidentServiceException e) {
       throw new JobEndpointException(String.format("Not able to get the incident %d: %s", id, e), e.getCause());
     }
-    return j(f("id", vN(incident.getId())), f("job_id", vN(incident.getJobId())),
-            f("severity", vN(incident.getSeverity())),
-            f("timestamp", vN(DateTimeSupport.toUTC(incident.getTimestamp().getTime()))),
-            f("processing_host", vN(incident.getProcessingHost())), f("service_type", vN(incident.getServiceType())),
-            f("technical_details", vN(incident.getDescriptionParameters())),
-            f("details", a($(incident.getDetails()).map(errorDetailToJson)))).merge(localizeIncident(incident, locale));
+    return obj(f("id", v(incident.getId(), Jsons.BLANK)), f("job_id", v(incident.getJobId(), Jsons.BLANK)),
+            f("severity", v(incident.getSeverity(), Jsons.BLANK)),
+            f("timestamp", v(toUTC(incident.getTimestamp().getTime()), Jsons.BLANK)),
+            f("processing_host", v(incident.getProcessingHost(), Jsons.BLANK)), f("service_type", v(incident.getServiceType(), Jsons.BLANK)),
+            f("technical_details", v(incident.getDescriptionParameters(), Jsons.BLANK)),
+            f("details", arr($(incident.getDetails()).map(errorDetailToJson))))
+      .merge(localizeIncident(incident, locale));
   }
 
-  private final Fn<Tuple<String, String>, JObjectWrite> errorDetailToJson = new Fn<Tuple<String, String>, JObjectWrite>() {
+  private final Fn<Tuple<String, String>, JObject> errorDetailToJson = new Fn<Tuple<String, String>, JObject>() {
     @Override
-    public JObjectWrite ap(Tuple<String, String> detail) {
-      return j(f("name", vN(detail.getA())), f("value", vN(detail.getB())));
+    public JObject apply(Tuple<String, String> detail) {
+      return obj(f("name", v(detail.getA(), Jsons.BLANK)), f("value", v(detail.getB(), Jsons.BLANK)));
     }
   };
 
   private final Fn<Job, Boolean> removeWorkflowJobs = new Fn<Job, Boolean>() {
     @Override
-    public Boolean ap(Job job) {
+    public Boolean apply(Job job) {
       if (WorkflowService.JOB_TYPE.equals(job.getJobType())
               && ("START_WORKFLOW".equals(job.getOperation()) || "START_OPERATION".equals(job.getOperation())))
         return false;
@@ -726,7 +720,7 @@ public class JobEndpoint {
         result = ((Comparable)value1).compareTo(value2);
       } catch (ClassCastException ex) {
         logger.debug("Can not compare \"{}\" with \"{}\": {}",
-                new Object[] { value1, value2, ex });
+                value1, value2, ex);
       }
 
       return ascending ? result : -1 * result;

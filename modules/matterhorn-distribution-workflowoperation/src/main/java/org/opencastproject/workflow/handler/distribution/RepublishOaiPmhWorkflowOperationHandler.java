@@ -22,7 +22,6 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static com.entwinemedia.fn.fns.Strings.trimToNone;
 import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.data.Collections.smap;
@@ -99,12 +98,12 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
     final Set<MediaPackageElementFlavor> flavors = new HashSet<>();
     // Check which flavors have been configured
     final List<String> configuredFlavors = getOptConfig(wi, OPT_SOURCE_FLAVORS).bind(trimToNone).map(asList.toFn())
-            .or(Collections.<String> nil());
+            .getOr(Collections.<String> nil());
     for (String flavor : configuredFlavors) {
       flavors.add(MediaPackageElementFlavor.parseFlavor(flavor));
     }
     // Get the configured tags
-    final List<String> tags = asList(getOptConfig(wi, OPT_SOURCE_TAGS).or(""));
+    final List<String> tags = asList(getOptConfig(wi, OPT_SOURCE_TAGS).getOr(""));
     // Merge or replace?
     boolean merge = Boolean.parseBoolean(getConfig(wi, OPT_MERGE));
     // repository
@@ -160,7 +159,7 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
       publishedMp = filteredMp;
     }
     // Does the media package have a title and track?
-    if (!isPublishable(publishedMp)) {
+    if (!MediaPackageSupport.isPublishable(publishedMp)) {
       throw new WorkflowOperationException("Media package does not meet criteria for publication");
     }
     // Publish the media package to the search index
@@ -219,9 +218,8 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
     for (MediaPackageElement element : filteredMediaPackage.getElements()) {
 
       if (!keep.contains(element)) {
-        logger.info("Removing {} '{}' from media package '{}'",
-                new String[] { element.getElementType().toString().toLowerCase(), element.getIdentifier(),
-                        filteredMediaPackage.getIdentifier().toString() });
+        logger.info("Removing {} '{}' from media package '{}'", element.getElementType().toString().toLowerCase(),
+                element.getIdentifier(), filteredMediaPackage.getIdentifier().toString());
         filteredMediaPackage.remove(element);
         continue;
       }
@@ -340,17 +338,6 @@ public final class RepublishOaiPmhWorkflowOperationHandler extends AbstractWorkf
       }
     }
     return mergedMp;
-  }
-
-  /**
-   * Media package must have a title and contain tracks in order to be published.
-   *
-   * @param mp
-   *          the media package
-   * @return <code>true</code> if the media package can be published
-   */
-  private boolean isPublishable(MediaPackage mp) {
-    return !isBlank(mp.getTitle()) && mp.hasTracks();
   }
 
   /** OSGi DI. */

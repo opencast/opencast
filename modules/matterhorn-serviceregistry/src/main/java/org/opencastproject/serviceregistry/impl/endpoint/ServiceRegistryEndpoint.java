@@ -38,6 +38,7 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistration;
 import org.opencastproject.serviceregistry.api.JaxbHostRegistrationList;
+import org.opencastproject.serviceregistry.api.JaxbServiceHealth;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistration;
 import org.opencastproject.serviceregistry.api.JaxbServiceRegistrationList;
 import org.opencastproject.serviceregistry.api.JaxbServiceStatisticsList;
@@ -60,6 +61,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -229,12 +231,20 @@ public class ServiceRegistryEndpoint {
 
   @POST
   @Path("unregisterhost")
-  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.", returnDescription = "No content.", restParameters = { @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING) }, reponses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully") })
+  @RestQuery(name = "unregisterhost", description = "Removes a server from the cluster.",
+          returnDescription = "No content.",
+          restParameters = {
+          @RestParameter(name = "host", isRequired = true, description = "The host name, including the http(s) protocol", type = Type.STRING)
+          }, reponses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The host was removed successfully") })
   public Response unregister(@FormParam("host") String host) {
     try {
       serviceRegistry.unregisterHost(host);
       return Response.status(Status.NO_CONTENT).build();
     } catch (ServiceRegistryException e) {
+      if (e.getCause() instanceof IllegalArgumentException) {
+        return Response.status(Status.NOT_FOUND).entity(e.getMessage()).build();
+      }
       throw new WebApplicationException(e);
     }
   }
@@ -288,44 +298,67 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
-  @Path("health")
+  @Path("health.json")
+  @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "health", description = "Checks the status of the registered services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
           @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING, description = "The service type identifier"),
           @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host, including the http(s) protocol") }, reponses = {
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "Every service is in a proper state."),
+          @RestResponse(responseCode = SC_OK, description = "Service states returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No service of that type on that host is registered."),
-          @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "At least one service is in error state.") })
+          @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "An error has occurred during stats processing") })
+  public Response getHealthStatusAsJson(@QueryParam("serviceType") String serviceType, @QueryParam("host") String host)
+          throws NotFoundException {
+    return getHealthStatus(serviceType, host);
+  }
+
+  @GET
+  @Path("health.xml")
+  @Produces(MediaType.APPLICATION_XML)
+  @RestQuery(name = "health", description = "Checks the status of the registered services", returnDescription = "Returns NO_CONTENT if services are in a proper state", restParameters = {
+          @RestParameter(name = "serviceType", isRequired = false, type = Type.STRING, description = "The service type identifier"),
+          @RestParameter(name = "host", isRequired = false, type = Type.STRING, description = "The host, including the http(s) protocol") }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Service states returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No service of that type on that host is registered."),
+          @RestResponse(responseCode = SC_SERVICE_UNAVAILABLE, description = "An error has occurred during stats processing") })
   public Response getHealthStatus(@QueryParam("serviceType") String serviceType, @QueryParam("host") String host)
           throws NotFoundException {
     try {
+      List<ServiceRegistration> services = null;
       if (isNotBlank(serviceType) && isNotBlank(host)) {
         // This is a request for one specific service. Return it, or SC_NOT_FOUND if not found
         ServiceRegistration reg = serviceRegistry.getServiceRegistration(serviceType, host);
         if (reg == null)
           throw new NotFoundException();
 
-        if (ServiceState.ERROR.equals(reg.getServiceState()))
-          throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        services = new LinkedList<ServiceRegistration>();
+        services.add(reg);
       } else if (isBlank(serviceType) && isBlank(host)) {
         // This is a request for all service registrations
-        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrations()) {
-          if (ServiceState.ERROR.equals(reg.getServiceState()))
-            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-        }
+        services = serviceRegistry.getServiceRegistrations();
       } else if (isNotBlank(serviceType)) {
         // This is a request for all service registrations of a particular type
-        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByType(serviceType)) {
-          if (ServiceState.ERROR.equals(reg.getServiceState()))
-            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
-        }
+        services = serviceRegistry.getServiceRegistrationsByType(serviceType);
       } else if (isNotBlank(host)) {
         // This is a request for all service registrations of a particular host
-        for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByHost(host)) {
-          if (ServiceState.ERROR.equals(reg.getServiceState()))
-            throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+        services = serviceRegistry.getServiceRegistrationsByHost(host);
+      }
+
+      int healthy = 0;
+      int warning = 0;
+      int error = 0;
+      for (ServiceRegistration reg : services) {
+        if (ServiceState.NORMAL == reg.getServiceState()) {
+          healthy++;
+        } else if (ServiceState.WARNING == reg.getServiceState()) {
+          warning++;
+        } else if (ServiceState.ERROR == reg.getServiceState()) {
+          error++;
+        } else {
+           error++;
         }
       }
-      return Response.noContent().build();
+      JaxbServiceHealth stats = new JaxbServiceHealth(healthy, warning, error);
+      return Response.ok(stats).build();
     } catch (ServiceRegistryException e) {
       throw new WebApplicationException(e);
     }

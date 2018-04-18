@@ -124,3 +124,6 @@ Credits:
 Best regards,
 Lars Kiesow
 ```
+
+Once the issue has been fixed and the notice sent, the security level should be removed from the JIRA ticket so it
+becomes publicly viewable.

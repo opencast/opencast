@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "L'événement n'a pas pu être enregistré",
       "EVENTS_NOT_UPDATED_ID": "L'événement {{ id }} n’a pas pu être enregistré",
       "EVENTS_NOT_UPDATED_ALL": "Aucun des événements n'a pu être enregistré",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Reprise des traitements en cours...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Reprise de traitements impossible.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Traitement interrompu...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Le traitement ne peut être interrompu.",
       "SERIES_UPDATED_NB": "{{ number }} séries ont été mis à jour avec succès",
       "SERIES_UPDATED_ALL": "Toutes les séries ont été mis à jour avec succès",
       "SERIES_NOT_UPDATED": "La série n'a pas pu être enregistrée",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "Envoyer",
                   "RECORDING_ELEMENTS": "Éléments de l'enregistrement",
+                  "RECORDING_METADATA": "Métadonnées de l'enregistrement",
                   "SEGMENTABLE": {
                      "SHORT": "Diapositives",
                      "DETAIL": "Le fichier contient un enregistrement d'une présentation de diapositives (Keynote, Powerpoint, etc.)."
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "Audio seulement",
                      "DETAIL": "Le fichier contient uniquement une piste audio."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Pièces multiples",
+                     "DETAIL": "Un ensemble de fichiers contenant différentes parties de l'événement."
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "Sélectionnez workflow",
                "SELECT_WORKFLOW_EMPTY": "Aucun workflow trouvé",
                "WORKFLOW": "Flux de travail"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "Transfert de contenu",
+               "SELECT_TYPE": "Sélectionnez type de contenu",
+               "ADD": "Ajouter contenu",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Notes",
+                  "CAPTIONS_DFXP": "Sous-titre DFXP",
+                  "CAPTIONS_WEBVTT": "Sous-titre WebVTT",
+                  "PREVIEW_IMAGE": "Aperçu des images",
+                  "SMIL": "Catalogue Smil",
+                  "TRACK_PARTS": "Parties de la vidéo"
+               }
             },
             "ACCESS": {
                "CAPTION": "Droits d'accès",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "Actions",
                "DETAILS": "Détails",
                "DESCRIPTION": "",
                "ID": "ID",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "Bloqué de",
             "BLACKLIST_TO": "Bloqué jusqu'au",
             "ACTION": "Actions"
+         },
+         "DETAILS": {
+            "HEADER": "Détails de l'emplacement - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Général",
+               "CONFIGURATION": "Configuration",
+               "CAPABILITIES": "Capacités"
+            },
+            "GENERAL": {
+               "CAPTION": "Général",
+               "NAME": "Nom",
+               "URL": "Url",
+               "STATUS": "Statut",
+               "UPDATE": "Dernière réponse"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Configuration",
+               "NO_CONFIGURATION": "Aucune configuration fournie"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Capacités",
+               "NO_CAPABILITIES": "Aucune capacités fournies"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "En cours",
       "FINISHED": "Terminé",
+      "PAUSED": "En pause",
       "FAILED": "Echoué",
       "FINISHED_WITH_COMMENTS": "À faire",
       "SCHEDULED": "Programmé",

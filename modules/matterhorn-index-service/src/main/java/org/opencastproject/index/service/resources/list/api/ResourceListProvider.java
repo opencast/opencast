@@ -53,7 +53,8 @@ public interface ResourceListProvider {
   /**
    * Defines if keys and values of the given list should be translated in the administrative user interface.
    *
-   * @return true if the keys should be translated, false otherwise
+   * @param listName the name of the list
+   * @return if the results should be translated
    */
   boolean isTranslatable(String listName);
 }

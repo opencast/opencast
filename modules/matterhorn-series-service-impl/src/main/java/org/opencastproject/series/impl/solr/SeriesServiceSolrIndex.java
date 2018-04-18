@@ -443,6 +443,7 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
     String orgId = securityService.getOrganization().getId();
     doc.addField(SolrFields.COMPOSITE_ID_KEY, getCompositeKey(dublinCoreId, orgId));
     doc.addField(SolrFields.ORGANIZATION, orgId);
+    doc.addField(SolrFields.IDENTIFIER_KEY, dublinCoreId);
     try {
       doc.addField(SolrFields.XML_KEY, serializeDublinCore(dc));
     } catch (IOException e1) {
@@ -747,7 +748,11 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
   protected String buildSolrQueryString(SeriesQuery query, boolean forEdit) {
     String orgId = securityService.getOrganization().getId();
     StringBuilder sb = new StringBuilder();
-    appendAnd(sb, SolrFields.COMPOSITE_ID_KEY, getCompositeKey(query.getSeriesId(), orgId));
+    // Restrict to exact match on Composite series Id Key when not searching with fuzzy match
+    if (!query.isFuzzyMatch()) {
+      appendAnd(sb, SolrFields.COMPOSITE_ID_KEY, getCompositeKey(query.getSeriesId(), orgId));
+    }
+    appendFuzzy(sb, SolrFields.IDENTIFIER_KEY, query.getSeriesId());
     appendFuzzy(sb, SolrFields.TITLE_KEY, query.getSeriesTitle());
     appendFuzzy(sb, SolrFields.FULLTEXT_KEY, query.getText());
     appendFuzzy(sb, SolrFields.CREATOR_KEY, query.getCreator());
@@ -825,6 +830,8 @@ public class SeriesServiceSolrIndex implements SeriesServiceIndex {
         return SolrFields.CREATOR_KEY;
       case DESCRIPTION:
         return SolrFields.DESCRIPTION_KEY;
+      case IDENTIFIER:
+        return SolrFields.IDENTIFIER_KEY;
       case IS_PART_OF:
         return SolrFields.IS_PART_OF_KEY;
       case LANGUAGE:

@@ -50,6 +50,8 @@ xdescribe('adminNg.directives.wizardDirective', function () {
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/components.json')));
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/ACL.json')));
         $httpBackend.whenGET('/admin-ng/event/new/metadata').respond(JSON.stringify(getJSONFixture('admin-ng/event/new/metadata')));
+        $httpBackend.whenGET('/admin-ng/resources/eventUploadAssetOptions.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
         $httpBackend.whenGET('/workflow/definitions.json').respond(JSON.stringify(getJSONFixture('workflow/definitions.json')));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
@@ -66,6 +68,11 @@ xdescribe('adminNg.directives.wizardDirective', function () {
                 {
                     translation: 'EVENTS.NEW.METADATA.CAPTION',
                     name: 'metadata-extended',
+                    stateController: new TestController(true)
+                },
+                {
+                    translation: 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION',
+                    name: 'upload-asset',
                     stateController: new TestController(true)
                 },
                 {

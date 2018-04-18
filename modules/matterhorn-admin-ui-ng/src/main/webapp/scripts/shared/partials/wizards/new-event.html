@@ -62,8 +62,6 @@
                     <td>{{ conflict.end }}</td>
                 </tr>
             </table>
-
-
             <div class="obj list-obj">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE">
                     <!-- Select Source -->
@@ -107,49 +105,47 @@
                 </div>
             </div>
 
+            <!-- Track source upload options are dynamically defined in listproviders event.upload.asset.options.properties -->
             <div class="obj list-obj source-type-content" data-upload-type-content="UPLOAD" ng-class="{active: wizard.step.ud.type === 'UPLOAD'}">
-                <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS">
+              <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_ELEMENTS">
+                <!-- Recording Elements -->
+              </header>
+              <div class="obj-container">
+                <ul>
+                  <li  ng-repeat="asset in wizard.sharedData.uploadAssetOptions | filter:{type:'track'}| orderBy: 'displayOrder' track by asset.id">
+                    <div class="file-upload">
+                      <input id="{{asset.id}}" class="blue-btn file-select-btn" admin-ng-file-upload data-ng-file-select data-ng-multiple="asset.multiple"
+                        type="file" file="$parent.wizard.step.ud.upload.{{asset.id}}" tabindex="" />
+                    </div>
+                    <span  translate="{{asset.title + '.SHORT'}}">
+                    </span>
+                    <span class="ui-helper-hidden"> ({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
+                    <p translate="{{asset.title + '.DETAIL'}}">
+                    </p>
+                 </li>
+                </ul>
+              </div>
+            </div>
+            <div class="obj list-obj source-type-content" data-upload-type-content="UPLOAD" ng-class="{active: wizard.step.ud.type === 'UPLOAD'}">
+                <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.RECORDING_METADATA">
                     <!-- Recording Elements -->
                 </header>
                 <div class="obj-container">
-                    <ul>
-                        <li>
-                        <div class="file-upload">
-                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" file="wizard.step.ud.upload.segmentable" tabindex="4"/>
-                        </div>
-                        <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.SHORT">
-                            <!-- File with segmentable video -->
-                        </span>
-                        <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.DETAIL">
-                            <!-- Contains discrete images/slides/scenes (example: VGA output of presentation).
-                                 Audio in this file will be ignored if file with non-segmentable video
-                                 contains audio. -->
-                        </p>
-                        </li>
-                        <li>
-                        <div class="file-upload">
-                            <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.nonSegmentable" tabindex="5"/>
-                        </div>
-                        <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.SHORT">
-                            <!--File with non-segmentable video-->
-                        </span>
-                        <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.DETAIL">
-                            <!-- Has no clear changes that could identify new segments
-                                 (example: video of the presenter). -->
-                        </p>
-                        </li>
-                        <li>
-                            <div class="file-upload">
-                                <input class="blue-btn file-select-btn" admin-ng-file-upload type="file" type="file" file="wizard.step.ud.upload.audioOnly" tabindex="6"/>
-                            </div>
-                            <span translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.SHORT">
-                                <!-- Audio only -->
-                            </span>
-                            <p translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.DETAIL">
-                                <!--This ﬁles audio will only be used if no other files contain audio.-->
-                            </p>
-                        </li>
-                    </ul>
+                    <form novalidate name="outerForm">
+                        <table class="main-tbl">
+                            <tr ng-repeat="row in wizard.step.metadata">
+                                <td>
+                                    <span translate="{{ row.label }}"></span>
+                                    <i ng-show="row.required" class="required">*</i>
+                                </td>
+                                <td ng-if="!row.readOnly" admin-ng-editable
+                                    class="editable" name="row.id"
+                                    target="dublincore/episode"
+                                    params="row" save="$parent.wizard.save"></td>
+                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                            </tr>
+                        </table>
+                    </form>
                 </div>
             </div>
 
@@ -380,6 +376,25 @@
         </div>
     </div>
 </div>
+<!-- Asset upload  -->
+<div class="modal-content" ng-if="wizard.step.visible" ng-class="{active: isCurrentTab('upload-asset')}" data-modal-tab-content="upload-asset" data-level="1">
+  <div class="modal-body">
+    <div class="full-col">
+      <div class="obj tbl-details">
+        <header translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.SELECT_TYPE"></header>
+        <div class="obj-container">
+          <div ng-if="$parent.wizard.sharedData.uploadAssetOptions">
+            <div admin-ng-upload-asset assetoptions="$parent.wizard.sharedData.uploadAssetOptions"
+              filebindcontainer="$parent.wizard.step.ud.assets"
+              onexitscope="$parent.wizard.step.onAssetUpdate" >
+              <!-- adminNgUploadAsset directive used for asset upload selection -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="modal-content" data-modal-tab-content="processing" data-level="1">
     <div class="modal-body">
@@ -566,31 +581,37 @@
                         <tr>
                     </table>
                 </div>
+             </div>
+            <!-- Show uploaded assets in the summary -->
+            <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('upload-asset').hasAssetUploads()">
+             <header class="no-expand" translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION">
+               <!-- Metadata Extended -->
+             </header>
+             <div class="obj-container">
+               <table class="main-tbl" ng-repeat="item in wizard.getStateControllerByName('upload-asset').getAssetUploadSummary() track by item.id">
+                <tr>
+                  <td>{{ item.title | translate }}
+                    <span class="ui-helper-hidden"> ({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
+                  </td>
+                  <td>{{ item.filename }}</td>
+                <tr>
+              </table>
+             </div>
             </div>
-
             <div class="obj tbl-list">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.CAPTION"><!-- Source --></header>
                 <div class="obj-container">
-                    <table class="main-tbl" ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'UPLOAD'">
-                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries().upload.segmentable.name)">
-                            <td translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.SEGMENTABLE.SHORT">
-                                <!-- File with segmentable video -->
-                           </td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.segmentable.name }}</td>
-                        </tr>
-                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries().upload.nonSegmentable.name)">
-                            <td translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.NON_SEGMENTABLE.SHORT">
-                                <!-- File with non-segmentable video -->
-                            </td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.nonSegmentable.name }}</td>
-                        </tr>
-                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries().upload.audioOnly.name)">
-                            <td translate="EVENTS.EVENTS.NEW.SOURCE.UPLOAD.AUDIO_ONLY.SHORT">
-                                <!-- File with segmentable video -->
-                           </td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().upload.audioOnly.name }}</td>
+                    <!-- uploaded track types are dynamically defined. -->
+                    <table class="main-tbl" ng-if="wizard.getStateControllerByName('source').getUserEntries().type === 'UPLOAD'"
+                      ng-repeat="item in wizard.getStateControllerByName('source').getTrackUploadSummary() track by item.id">
+                        <tr>
+                          <td>{{ item.title + '.SHORT' | translate }}
+                            <span class="ui-helper-hidden">({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
+                          </td>
+                          <td>{{ item.filename }}</td>
                         </tr>
                     </table>
+                  <!-- scheduled items -->
                     <table class="main-tbl">
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>

@@ -48,6 +48,7 @@ import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
 import org.opencastproject.oaipmh.persistence.Query;
 import org.opencastproject.oaipmh.persistence.SearchResult;
+import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.HttpUtil;
@@ -56,6 +57,7 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
+import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
@@ -421,13 +423,47 @@ public class OaiPmhRepositoryTest {
     EasyMock.expect(item.getModificationDate()).andReturn(modified).anyTimes();
     EasyMock.expect(item.getId()).andReturn(id).anyTimes();
     EasyMock.expect(item.isDeleted()).andReturn(deleted).anyTimes();
-    EasyMock.expect(item.getEpisodeDublinCore()).andReturn(Option.option(episodeDc)).anyTimes();
-    EasyMock.expect(item.getEpisodeDublinCoreXml()).andReturn(Option.option(episodeDcXml)).anyTimes();
-    EasyMock.expect(item.getSeriesDublinCore()).andReturn(Option.option(seriesDc)).anyTimes();
-    EasyMock.expect(item.getSeriesDublinCoreXml()).andReturn(Option.option(seriesDcXml)).anyTimes();
-    EasyMock.expect(item.getSeriesAclXml()).andReturn(Option.option(xacml)).anyTimes();
     EasyMock.expect(item.getMediaPackageXml()).andReturn(mpXml).anyTimes();
-    EasyMock.replay(item);
+
+    SearchResultElementItem episodeDcElement = EasyMock.createNiceMock(SearchResultElementItem.class);
+    EasyMock.expect(episodeDcElement.getType()).andReturn("catalog").anyTimes();
+    EasyMock.expect(episodeDcElement.getFlavor()).andReturn("dublincore/episode").anyTimes();
+    EasyMock.expect(episodeDcElement.getXml()).andReturn(episodeDcXml).anyTimes();
+    EasyMock.expect(episodeDcElement.isEpisodeDublinCore()).andReturn(true).anyTimes();
+    EasyMock.expect(episodeDcElement.isSeriesDublinCore()).andReturn(false).anyTimes();
+    try {
+      EasyMock.expect(episodeDcElement.asDublinCore()).andReturn(episodeDc).anyTimes();
+    } catch (OaiPmhDatabaseException ex) { }
+
+    SearchResultElementItem seriesDcElement = EasyMock.createNiceMock(SearchResultElementItem.class);
+    EasyMock.expect(seriesDcElement.getType()).andReturn("catalog").anyTimes();
+    EasyMock.expect(seriesDcElement.getFlavor()).andReturn("dublincore/series").anyTimes();
+    EasyMock.expect(seriesDcElement.getXml()).andReturn(seriesDcXml).anyTimes();
+    EasyMock.expect(seriesDcElement.isEpisodeDublinCore()).andReturn(false).anyTimes();
+    EasyMock.expect(seriesDcElement.isSeriesDublinCore()).andReturn(true).anyTimes();
+    try {
+      EasyMock.expect(seriesDcElement.asDublinCore()).andReturn(seriesDc).anyTimes();
+    } catch (OaiPmhDatabaseException ex) { }
+
+    SearchResultElementItem securityXacmlElement = EasyMock.createNiceMock(SearchResultElementItem.class);
+    EasyMock.expect(securityXacmlElement.getType()).andReturn("catalog").anyTimes();
+    EasyMock.expect(securityXacmlElement.getFlavor()).andReturn("security/xacml+series").anyTimes();
+    EasyMock.expect(securityXacmlElement.getXml()).andReturn(xacml).anyTimes();
+    EasyMock.expect(securityXacmlElement.isEpisodeDublinCore()).andReturn(false).anyTimes();
+    EasyMock.expect(securityXacmlElement.isSeriesDublinCore()).andReturn(false).anyTimes();
+    try {
+      EasyMock.expect(securityXacmlElement.asDublinCore()).andThrow(
+              new OaiPmhDatabaseException("this is not a dublincore catalog")).anyTimes();
+    } catch (OaiPmhDatabaseException ex) { }
+
+    EasyMock.expect(item.getElements()).andReturn(
+            Collections.list(episodeDcElement, seriesDcElement, securityXacmlElement)).anyTimes();
+    try {
+      EasyMock.expect(item.getEpisodeDublinCore()).andReturn(episodeDc).anyTimes();
+      EasyMock.expect(item.getSeriesDublinCore()).andReturn(seriesDc).anyTimes();
+    } catch (OaiPmhDatabaseException ex) { }
+
+    EasyMock.replay(item, episodeDcElement, seriesDcElement, securityXacmlElement);
     return item;
   }
 

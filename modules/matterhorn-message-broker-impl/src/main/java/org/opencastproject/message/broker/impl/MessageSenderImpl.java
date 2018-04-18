@@ -33,6 +33,7 @@ import java.io.Serializable;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
+import javax.jms.Session;
 
 /**
  * A class built to send JMS messages through ActiveMQ.
@@ -50,28 +51,35 @@ public class MessageSenderImpl extends MessageBaseFacility implements MessageSen
 
   @Override
   public void sendObjectMessage(String destinationId, DestinationType type, Serializable object) {
-    if (!isConnected() && !connectMessageBroker()) {
+    if (!isConnected()) {
       logger.error("Could not send message. No connection to message broker.");
       return;
     }
     try {
-      // Create a message or use the provided one.
-      Message message = getSession().createObjectMessage(
-          new BaseMessage(securityService.getOrganization(), securityService.getUser(), object));
+      synchronized (this) {
+        Session session = getSession();
+        // This shouldn't happen after a connection has been successfully
+        // established at least once, but better be safe than sorry.
+        if (session == null)
+          return;
+        // Create a message or use the provided one.
+        Message message = session.createObjectMessage(
+                new BaseMessage(securityService.getOrganization(), securityService.getUser(), object));
 
-      Destination destination;
-      // Create the destination (Topic or Queue)
-      if (type.equals(DestinationType.Queue)) {
-        destination = getSession().createQueue(destinationId);
-      } else {
-        destination = getSession().createTopic(destinationId);
+        Destination destination;
+        // Create the destination (Topic or Queue)
+        if (type.equals(DestinationType.Queue)) {
+          destination = session.createQueue(destinationId);
+        } else {
+          destination = session.createTopic(destinationId);
+        }
+
+        // Tell the producer to send the message
+        logger.trace("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
+
+        // Send the message
+        getMessageProducer().send(destination, message);
       }
-
-      // Tell the producer to send the message
-      logger.trace("Sent message: " + message.hashCode() + " : " + Thread.currentThread().getName());
-
-      // Send the message
-      getMessageProducer().send(destination, message);
     } catch (JMSException e) {
       logger.error("Had an exception while trying to send a message", e);
     }

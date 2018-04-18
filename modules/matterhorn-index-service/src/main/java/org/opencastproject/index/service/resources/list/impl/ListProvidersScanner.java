@@ -48,8 +48,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   public static final String LIST_PROVIDERS_DIRECTORY = "listproviders";
   /** The key to look for in the properties file to name the list provider. **/
   public static final String LIST_NAME_KEY = "list.name";
-  /** The key to look for in the properties file to decide,
-   * weather the list values should be translated for human readability */
+  /** The key to look for in the properties file defining if the list's values should be translated */
   public static final String LIST_TRANSLATABLE_KEY = "list.translatable";
   /** The key to attach this list to a particular org, if not present then all orgs can get list **/
   public static final String LIST_ORG_KEY = "list.org";

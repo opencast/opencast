@@ -186,7 +186,7 @@ public class DownloadDistributionRestService extends AbstractJobProducerEndpoint
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from download channel: {}", new Object[] { mediaPackageXml, e });
+      logger.warn("Unable to retract mediapackage '{}' from download channel: {}", mediaPackageXml, e);
       return serverError();
     }
   }

@@ -103,6 +103,10 @@
       "EVENTS_NOT_UPDATED": "事件無法儲存",
       "EVENTS_NOT_UPDATED_ID": "事件 {{ id }} 無法儲存",
       "EVENTS_NOT_UPDATED_ALL": "無可儲存的事件",
+      "EVENTS_PROCESSING_ACTION_RETRY": "正在恢復處理..。",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "無法恢復處理。",
+      "EVENTS_PROCESSING_ACTION_NONE": "正在中止處理..。",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "無法中止處理。",
       "SERIES_UPDATED_NB": "{{ number }} 系列已成功更新",
       "SERIES_UPDATED_ALL": "已成功更新所有系列",
       "SERIES_NOT_UPDATED": "該系列無法儲存",
@@ -353,6 +357,7 @@
                "UPLOAD": {
                   "CAPTION": "上傳",
                   "RECORDING_ELEMENTS": "錄製內容",
+                  "RECORDING_METADATA": "記錄中繼資料",
                   "SEGMENTABLE": {
                      "SHORT": "投影片",
                      "DETAIL": "該文件包含投影片播放（Keynote和PowerPoint等）的記錄。"
@@ -364,6 +369,10 @@
                   "AUDIO_ONLY": {
                      "SHORT": "只有音訊",
                      "DETAIL": "該文件只包含音訊檔。"
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "多個部件",
+                     "DETAIL": "包含事件不同部分的一組檔案。"
                   }
                },
                "DATE_TIME": {
@@ -390,6 +399,19 @@
                "SELECT_WORKFLOW": "選擇工作流程",
                "SELECT_WORKFLOW_EMPTY": "沒有找到工作流程",
                "WORKFLOW": "工作流程"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "資源上傳",
+               "SELECT_TYPE": "選擇資源類型",
+               "ADD": "添加資源",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "類別講義備註",
+                  "CAPTIONS_DFXP": "字幕 DFXP",
+                  "CAPTIONS_WEBVTT": "字幕 WebVTT",
+                  "PREVIEW_IMAGE": "預覽圖像",
+                  "SMIL": "Smil 目錄",
+                  "TRACK_PARTS": "軌道部件"
+               }
             },
             "ACCESS": {
                "CAPTION": "存取權限",
@@ -758,6 +780,7 @@
                }
             },
             "WORKFLOWS": {
+               "ACTIONS": "操作",
                "DETAILS": "詳細信息",
                "DESCRIPTION": "",
                "ID": "ID",
@@ -988,6 +1011,29 @@
             "BLACKLIST_FROM": "從黑名單",
             "BLACKLIST_TO": "直到黑名單",
             "ACTION": "操作"
+         },
+         "DETAILS": {
+            "HEADER": "擷取位置明細",
+            "TAB": {
+               "GENERAL": "一般",
+               "CONFIGURATION": "設定",
+               "CAPABILITIES": "擴展能力"
+            },
+            "GENERAL": {
+               "CAPTION": "一般",
+               "NAME": "名稱",
+               "URL": "網址",
+               "STATUS": "狀態",
+               "UPDATE": "最後一次聽到"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "設定",
+               "NO_CONFIGURATION": "沒有設定選項"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "擴展能力",
+               "NO_CAPABILITIES": "未提供任何功能"
+            }
          }
       },
       "BLACKLISTS": {
@@ -1788,6 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "運行中",
       "FINISHED": "已完成",
+      "PAUSED": "暫停",
       "FAILED": "失敗",
       "FINISHED_WITH_COMMENTS": "待辦事項",
       "SCHEDULED": "已排程",

@@ -127,6 +127,13 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       if (element.getURI() == null)
         continue;
 
+      if (element.getElementType() == MediaPackageElement.Type.Publication) {
+        logger.debug("Skipping downloading media package element {} from media package {} "
+                + "because it is a publication: {}",
+                element.getIdentifier(), mediaPackage.getIdentifier().compact(), element.getURI());
+        continue;
+      }
+
       URI originalElementUri = element.getURI();
       if (originalElementUri.toString().startsWith(baseUrl)) {
         logger.info("Skipping downloading already existing element {}", originalElementUri);

@@ -36,6 +36,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
@@ -109,6 +110,22 @@ public final class SecurityUtil {
   public static User createSystemUser(ComponentContext cc, Organization org) {
     final String systemUserName = cc.getBundleContext().getProperty(PROPERTY_KEY_SYS_USER);
     return createSystemUser(systemUserName, org);
+  }
+
+  /**
+   * Fetch the system user name from the configuration.
+   *
+   * @see #PROPERTY_KEY_SYS_USER
+   */
+  public static String getSystemUserName(ComponentContext cc) {
+    final String systemUserName = cc.getBundleContext().getProperty(PROPERTY_KEY_SYS_USER);
+    if (systemUserName != null) {
+      return systemUserName;
+    } else {
+      throw new ConfigurationException(
+              "An Opencast installation always needs a system user name. Please configure one under the key "
+                      + PROPERTY_KEY_SYS_USER);
+    }
   }
 
   /** Get the organization <code>orgId</code>. */

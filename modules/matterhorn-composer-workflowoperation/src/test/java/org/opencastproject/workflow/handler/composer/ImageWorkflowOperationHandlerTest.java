@@ -99,26 +99,26 @@ public class ImageWorkflowOperationHandlerTest {
 
   @Test
   public void testValidateTargetBaseNameFormat() {
-    validateTargetBaseNameFormat("format-a").ap("thumbnail_%.1fs%s");
-    validateTargetBaseNameFormat("format-a").ap("thumbnail_%1$.1fs%2$s");
-    validateTargetBaseNameFormat("format-a").ap("%2$s_thumbnail_%1$.1fs%1$.1fs%2$s");
+    validateTargetBaseNameFormat("format-a").apply("thumbnail_%.1fs%s");
+    validateTargetBaseNameFormat("format-a").apply("thumbnail_%1$.1fs%2$s");
+    validateTargetBaseNameFormat("format-a").apply("%2$s_thumbnail_%1$.1fs%1$.1fs%2$s");
     try {
-      validateTargetBaseNameFormat("format-a").ap("thumbnail_%.1fs%.3f");
+      validateTargetBaseNameFormat("format-a").apply("thumbnail_%.1fs%.3f");
       fail("Invalid format passed check. Suffix format %s is missing.");
     } catch (Exception ignore) {
     }
     try {
-      validateTargetBaseNameFormat("format-a").ap("thumbnail_%.3f");
+      validateTargetBaseNameFormat("format-a").apply("thumbnail_%.3f");
       fail("Invalid format passed check. Suffix format %s is missing.");
     } catch (Exception ignore) {
     }
     try {
-      validateTargetBaseNameFormat("format-a").ap("thumbnail_%s");
+      validateTargetBaseNameFormat("format-a").apply("thumbnail_%s");
       fail("Invalid format passed check. Suffix is missing since %s does not have a positional parameter.");
     } catch (Exception ignore) {
     }
     // omitting the position should pass
-    validateTargetBaseNameFormat("format-a").ap("thumbnail_%2$s");
+    validateTargetBaseNameFormat("format-a").apply("thumbnail_%2$s");
   }
 
   @Test

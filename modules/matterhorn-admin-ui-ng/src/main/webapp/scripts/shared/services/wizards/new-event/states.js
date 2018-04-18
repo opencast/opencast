@@ -1,6 +1,6 @@
 angular.module('adminNg.services')
-.factory('NewEventStates', ['NewEventMetadata', 'NewEventMetadataExtended', 'NewEventSource', 'NewEventAccess', 'NewEventProcessing', 'NewEventSummary',
-        function (NewEventMetadata, NewEventMetadataExtended, NewEventSource, NewEventAccess, NewEventProcessing, NewEventSummary) {
+.factory('NewEventStates', ['NewEventMetadata', 'NewEventMetadataExtended', 'NewEventSource', 'NewEventUploadAsset', 'NewEventAccess', 'NewEventProcessing', 'NewEventSummary',
+        function (NewEventMetadata, NewEventMetadataExtended, NewEventSource, NewEventUploadAsset, NewEventAccess, NewEventProcessing, NewEventSummary) {
     return {
         get: function () {
             var states = [
@@ -18,6 +18,11 @@ angular.module('adminNg.services')
                     translation: 'EVENTS.EVENTS.NEW.SOURCE.CAPTION',
                     name: 'source',
                     stateController: NewEventSource
+                },
+                {
+                    translation: 'EVENTS.EVENTS.NEW.UPLOAD_ASSET.CAPTION',
+                    name: 'upload-asset',
+                    stateController: NewEventUploadAsset
                 },
                 {
                     translation: 'EVENTS.EVENTS.NEW.PROCESSING.CAPTION',

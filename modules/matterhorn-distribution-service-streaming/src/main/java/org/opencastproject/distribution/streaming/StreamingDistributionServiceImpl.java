@@ -214,8 +214,14 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
     List<MediaPackageElement> distributedElements = new ArrayList<>();
 
     for (MediaPackageElement element : elements) {
-      MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element.getIdentifier());
-      distributedElements.add(distributedElement);
+      if (MediaPackageElement.Type.Track.equals(element.getElementType())) {
+        // Streaming servers only deal with tracks
+        MediaPackageElement distributedElement = distributeElement(channelId, mediapackage, element.getIdentifier());
+        distributedElements.add(distributedElement);
+      } else {
+        logger.warn("Skipping {} {} for distribution to the streaming server (only media tracks supported)",
+                element.getElementType().toString().toLowerCase(), element.getIdentifier());
+      }
     }
     return distributedElements.toArray(new MediaPackageElement[distributedElements.size()]);
   }
@@ -244,12 +250,6 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
     // Make sure the element exists
     if (element == null) {
       throw new IllegalStateException("No element " + mpeId + " found in media package");
-    }
-    // Streaming servers only deal with tracks
-    if (!MediaPackageElement.Type.Track.equals(element.getElementType())) {
-      logger.debug("Skipping {} {} for distribution to the streaming server",
-              element.getElementType().toString().toLowerCase(), element.getIdentifier());
-      return null;
     }
     try {
       File source;

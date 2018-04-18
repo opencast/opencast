@@ -1,6 +1,6 @@
 /**
- * @license AngularJS v1.3.6
- * (c) 2010-2014 Google, Inc. http://angularjs.org
+ * @license AngularJS v1.4.14
+ * (c) 2010-2015 Google, Inc. http://angularjs.org
  * License: MIT
  */
 (function(window, angular, undefined) {'use strict';
@@ -78,8 +78,8 @@ function $RouteProvider() {
    *    - `controller` – `{(string|function()=}` – Controller fn that should be associated with
    *      newly created scope or the name of a {@link angular.Module#controller registered
    *      controller} if passed as a string.
-   *    - `controllerAs` – `{string=}` – A controller alias name. If present the controller will be
-   *      published to scope under the `controllerAs` name.
+   *    - `controllerAs` – `{string=}` – An identifier name for a reference to the controller.
+   *      If present, the controller will be published to scope under the `controllerAs` name.
    *    - `template` – `{string=|function()=}` – html template as a string or a function that
    *      returns an html template as a string which should be used by {@link
    *      ngRoute.directive:ngView ngView} or {@link ng.directive:ngInclude ngInclude} directives.
@@ -206,9 +206,9 @@ function $RouteProvider() {
 
     path = path
       .replace(/([().])/g, '\\$1')
-      .replace(/(\/)?:(\w+)([\?\*])?/g, function(_, slash, key, option) {
-        var optional = option === '?' ? option : null;
-        var star = option === '*' ? option : null;
+      .replace(/(\/)?:(\w+)(\*\?|[\?\*])?/g, function(_, slash, key, option) {
+        var optional = (option === '?' || option === '*?') ? '?' : null;
+        var star = (option === '*' || option === '*?') ? '*' : null;
         keys.push({ name: key, optional: !!optional });
         slash = slash || '';
         return ''
@@ -412,7 +412,9 @@ function $RouteProvider() {
      * @name $route#$routeChangeSuccess
      * @eventType broadcast on root scope
      * @description
-     * Broadcasted after a route dependencies are resolved.
+     * Broadcasted after a route change has happened successfully.
+     * The `resolve` dependencies are now available in the `current.locals` property.
+     *
      * {@link ngRoute.directive:ngView ngView} listens for the directive
      * to instantiate the controller and render the view.
      *
@@ -440,9 +442,11 @@ function $RouteProvider() {
      * @name $route#$routeUpdate
      * @eventType broadcast on root scope
      * @description
-     *
      * The `reloadOnSearch` property has been set to false, and we are reusing the same
      * instance of the Controller.
+     *
+     * @param {Object} angularEvent Synthetic event object
+     * @param {Route} current Current/previous route information.
      */
 
     var forceReload = false,
@@ -464,10 +468,18 @@ function $RouteProvider() {
            */
           reload: function() {
             forceReload = true;
+
+            var fakeLocationEvent = {
+              defaultPrevented: false,
+              preventDefault: function fakePreventDefault() {
+                this.defaultPrevented = true;
+                forceReload = false;
+              }
+            };
+
             $rootScope.$evalAsync(function() {
-              // Don't support cancellation of a reload for now...
-              prepareRoute();
-              commitRoute();
+              prepareRoute(fakeLocationEvent);
+              if (!fakeLocationEvent.defaultPrevented) commitRoute();
             });
           },
 
@@ -482,21 +494,15 @@ function $RouteProvider() {
            * definitions will be interpolated into the location's path, while
            * remaining properties will be treated as query params.
            *
-           * @param {Object} newParams mapping of URL parameter names to values
+           * @param {!Object<string, string>} newParams mapping of URL parameter names to values
            */
           updateParams: function(newParams) {
             if (this.current && this.current.$$route) {
-              var searchParams = {}, self=this;
-
-              angular.forEach(Object.keys(newParams), function(key) {
-                if (!self.current.pathParams[key]) searchParams[key] = newParams[key];
-              });
-
               newParams = angular.extend({}, this.current.params, newParams);
               $location.path(interpolate(this.current.$$route.originalPath, newParams));
-              $location.search(angular.extend({}, $location.search(), searchParams));
-            }
-            else {
+              // interpolate modifies newParams, only query params are left
+              $location.search(newParams);
+            } else {
               throw $routeMinErr('norout', 'Tried updating route when with no current route');
             }
           }
@@ -600,9 +606,8 @@ function $RouteProvider() {
                 if (angular.isFunction(templateUrl)) {
                   templateUrl = templateUrl(nextRoute.params);
                 }
-                templateUrl = $sce.getTrustedResourceUrl(templateUrl);
                 if (angular.isDefined(templateUrl)) {
-                  nextRoute.loadedTemplateUrl = templateUrl;
+                  nextRoute.loadedTemplateUrl = $sce.valueOf(templateUrl);
                   template = $templateRequest(templateUrl);
                 }
               }
@@ -612,8 +617,8 @@ function $RouteProvider() {
               return $q.all(locals);
             }
           }).
-          // after route change
           then(function(locals) {
+            // after route change
             if (nextRoute == $route.current) {
               if (nextRoute) {
                 nextRoute.locals = locals;
@@ -799,7 +804,6 @@ ngRouteModule.directive('ngView', ngViewFillContentFactory);
         }
 
         .view-animate.ng-enter, .view-animate.ng-leave {
-          -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
           transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 1.5s;
 
           display:block;

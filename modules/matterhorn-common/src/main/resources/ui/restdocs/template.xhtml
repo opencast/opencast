@@ -377,6 +377,15 @@
 <!-- JAVASCRIPT below here -->
 <script type="text/javascript" src="js/jquery/jquery.js"></script>
 <script type="text/javascript">
+function tryPretty(data) {
+  try {
+    var obj = JSON.parse(data)
+    return JSON.stringify(obj, undefined, 2).toString();
+  } catch(err) {
+    return data;
+  }
+}
+
 $(document).ready(function() {
 
     $("a.show_form_link").click(
@@ -546,6 +555,7 @@ $(document).ready(function() {
                           success: function(data, textStatus, request) {
                               $form.parent().find(".test_form_working").hide();
                               var responseBody = $form.parent().find(".test_form_response");
+                              data = tryPretty(data);
                               responseBody.show();
                               var msg = "Status: " + request.status + " (" + request.statusText + ")\n\n" + data;
                               responseBody.find("pre").text(msg);

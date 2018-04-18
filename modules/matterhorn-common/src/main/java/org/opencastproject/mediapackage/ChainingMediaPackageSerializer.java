@@ -76,7 +76,7 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
   public URI encodeURI(URI uri) throws URISyntaxException {
     return $(serializers).reverse().foldl(uri, new Fn2<URI, MediaPackageSerializer, URI>() {
       @Override
-      public URI ap(URI uri, MediaPackageSerializer serializer) {
+      public URI apply(URI uri, MediaPackageSerializer serializer) {
         try {
           return serializer.encodeURI(uri);
         } catch (URISyntaxException e) {
@@ -91,7 +91,7 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
   public URI decodeURI(URI uri) throws URISyntaxException {
     return $(serializers).foldl(uri, new Fn2<URI, MediaPackageSerializer, URI>() {
       @Override
-      public URI ap(URI uri, MediaPackageSerializer serializer) {
+      public URI apply(URI uri, MediaPackageSerializer serializer) {
         try {
           return serializer.decodeURI(uri);
         } catch (URISyntaxException e) {

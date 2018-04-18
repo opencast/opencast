@@ -22,24 +22,25 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.a;
+import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.j;
-import static com.entwinemedia.fn.data.json.Jsons.jsonArrayFromList;
+import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static com.entwinemedia.fn.data.json.Jsons.vN;
 import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.Objects.requireNonNull;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
+import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
-import org.opencastproject.archive.api.Archive;
-import org.opencastproject.archive.api.ArchiveException;
-import org.opencastproject.archive.api.HttpMediaPackageElementProvider;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.AssetManagerException;
+import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -84,8 +85,10 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.JObjectWrite;
+import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
+import com.entwinemedia.fn.data.json.Jsons;
+import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -165,8 +168,7 @@ public class ToolsEndpoint implements ManagedService {
   // service references
   private AdminUIConfiguration adminUIConfiguration;
   private AdminUISearchIndex searchIndex;
-  private Archive<?> archive;
-  private HttpMediaPackageElementProvider mpElementProvider;
+  private AssetManager assetManager;
   private IndexService index;
   private SecurityService securityService;
   private SmilService smilService;
@@ -185,13 +187,8 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   /** OSGi DI */
-  void setArchive(Archive<?> archive) {
-    this.archive = archive;
-  }
-
-  /** OSGi DI */
-  void setHttpMediaPackageElementProvider(HttpMediaPackageElementProvider mpElementProvider) {
-    this.mpElementProvider = mpElementProvider;
+  void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   /** OSGi DI */
@@ -225,9 +222,13 @@ public class ToolsEndpoint implements ManagedService {
   }
 
   /** OSGi callback if properties file is present */
-  @SuppressWarnings("rawtypes")
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
@@ -239,15 +240,15 @@ public class ToolsEndpoint implements ManagedService {
           @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
                   @RestResponse(description = "Available tools evaluated", responseCode = HttpServletResponse.SC_OK) })
   public Response getAvailableTools(@PathParam("mediapackageid") final String mediaPackageId) {
-    final List<JValue> jTools = new ArrayList<JValue>();
+    final List<JValue> jTools = new ArrayList<>();
     if (isEditorAvailable(mediaPackageId))
       jTools.add(v("editor"));
 
-    return RestUtils.okJson(j(f("available", a(jTools))));
+    return RestUtils.okJson(obj(f("available", arr(jTools))));
   }
 
   private List<MediaPackageElement> getPreviewElementsFromPublication(Opt<Publication> publication) {
-    List<MediaPackageElement> previewElements = new LinkedList<MediaPackageElement>();
+    List<MediaPackageElement> previewElements = new LinkedList<>();
     for (Publication p : publication) {
       for (Attachment attachment : p.getAttachments()) {
         if (elementHasPreviewFlavor(attachment)) {
@@ -278,8 +279,8 @@ public class ToolsEndpoint implements ManagedService {
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getVideoEditor", description = "Returns all the information required to get the editor tool started", returnDescription = "JSON object", pathParameters = {
           @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-                  @RestResponse(description = "Media package found", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+                  @RestResponse(description = "Media package found", responseCode = SC_OK),
+                  @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
   public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId)
           throws IndexServiceException, NotFoundException {
     if (!isEditorAvailable(mediaPackageId))
@@ -287,13 +288,12 @@ public class ToolsEndpoint implements ManagedService {
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
-    final MediaPackage mp = index.getEventMediapackage(event).orError(new NotFoundException())
-            .get();
+    final MediaPackage mp = index.getEventMediapackage(event);
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
     // Collect previews and tracks
-    List<JValue> jPreviews = new ArrayList<JValue>();
-    List<JValue> jTracks = new ArrayList<JValue>();
+    List<JValue> jPreviews = new ArrayList<>();
+    List<JValue> jTracks = new ArrayList<>();
     for (MediaPackageElement element : previewPublications) {
       final URI elementUri;
       if (urlSigningService.accepts(element.getURI().toString())) {
@@ -304,21 +304,21 @@ public class ToolsEndpoint implements ManagedService {
           }
           elementUri = new URI(urlSigningService.sign(element.getURI().toString(), expireSeconds, null, clientIP));
         } catch (URISyntaxException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
           throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
         } catch (UrlSigningException e) {
-          logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
           throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
         }
       } else {
         elementUri = element.getURI();
       }
-      jPreviews.add(j(f("uri", v(elementUri.toString()))));
+      jPreviews.add(obj(f("uri", v(elementUri.toString())), f("flavor", v(element.getFlavor().getType()))));
 
       if (!Type.Track.equals(element.getElementType()))
         continue;
 
-      JObjectWrite jTrack = j(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
+      JObject jTrack = obj(f("id", v(element.getIdentifier())), f("flavor", v(element.getFlavor().getType())));
       // Check if there's a waveform for the current track
       Opt<Attachment> optWaveform = getWaveformForTrack(mp, element);
       if (optWaveform.isSome()) {
@@ -328,17 +328,16 @@ public class ToolsEndpoint implements ManagedService {
             waveformUri = new URI(
                     urlSigningService.sign(optWaveform.get().getURI().toString(), expireSeconds, null, null));
           } catch (URISyntaxException e) {
-            logger.error("Error while trying to serialize the waveform urls because: {}",
-                    ExceptionUtils.getStackTrace(e));
+            logger.error("Error while trying to serialize the waveform urls because: {}", getStackTrace(e));
             throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
           } catch (UrlSigningException e) {
-            logger.error("Error while trying to sign the preview urls because: {}", ExceptionUtils.getStackTrace(e));
+            logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
             throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
           }
         } else {
           waveformUri = optWaveform.get().getURI();
         }
-        jTracks.add(jTrack.merge(j(f("waveform", v(waveformUri.toString())))));
+        jTracks.add(jTrack.merge(obj(f("waveform", v(waveformUri.toString())))));
       } else {
         jTracks.add(jTrack);
       }
@@ -346,23 +345,23 @@ public class ToolsEndpoint implements ManagedService {
     }
 
     // Get existing segments
-    List<JValue> jSegments = new ArrayList<JValue>();
+    List<JValue> jSegments = new ArrayList<>();
     for (Tuple<Long, Long> segment : getSegments(mp)) {
-      jSegments.add(j(f(START_KEY, v(segment.getA())), f(END_KEY, v(segment.getB()))));
+      jSegments.add(obj(f(START_KEY, v(segment.getA())), f(END_KEY, v(segment.getB()))));
     }
 
     // Get workflows
-    List<JValue> jWorkflows = new ArrayList<JValue>();
+    List<JValue> jWorkflows = new ArrayList<>();
     for (WorkflowDefinition workflow : getEditingWorkflows()) {
-      jWorkflows.add(j(f("id", v(workflow.getId())), f("name", vN(workflow.getTitle()))));
+      jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK))));
     }
 
-    return RestUtils.okJson(j(f("title", vN(mp.getTitle())),
-            f("date", vN(event.getRecordingStartDate())),
-            f("series", j(f("id", vN(event.getSeriesId())), f("title", vN(event.getSeriesName())))),
-            f("presenters", jsonArrayFromList(event.getPresenters())),
-            f("previews", a(jPreviews)), f(TRACKS_KEY, a(jTracks)),
-            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, a(jSegments)), f("workflows", a(jWorkflows))));
+    return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
+            f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+            f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+            f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
+            f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))));
   }
 
   @POST
@@ -374,12 +373,12 @@ public class ToolsEndpoint implements ManagedService {
                   @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
                   @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response editVideo(@PathParam("mediapackageid") final String mediaPackageId,
-          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException, WorkflowDatabaseException {
+          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException {
     String details;
     try (InputStream is = request.getInputStream()) {
       details = IOUtils.toString(is);
     } catch (IOException e) {
-      logger.error("Error reading request body: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error reading request body: {}", getStackTrace(e));
       return R.serverError();
     }
 
@@ -397,30 +396,31 @@ public class ToolsEndpoint implements ManagedService {
     if (optEvent.isNone()) {
       return R.notFound();
     } else {
-      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get()).orError(new NotFoundException()).get();
+      MediaPackage mediaPackage = index.getEventMediapackage(optEvent.get());
       Smil smil;
       try {
         smil = createSmilCuttingCatalog(editingInfo, mediaPackage);
       } catch (Exception e) {
-        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, ExceptionUtils.getStackTrace(e));
+        logger.warn("Unable to create a SMIL cutting catalog ({}): {}", details, getStackTrace(e));
         return R.badRequest("Unable to create SMIL cutting catalog");
       }
 
       try {
         addSmilToArchive(mediaPackage, smil);
       } catch (IOException e) {
-        logger.warn("Unable to add SMIL cutting catalog to archive: {}", ExceptionUtils.getStackTrace(e));
+        logger.warn("Unable to add SMIL cutting catalog to archive: {}", getStackTrace(e));
         return R.serverError();
       }
 
       if (editingInfo.getPostProcessingWorkflow().isSome()) {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
-          archive.applyWorkflow(ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId)),
-            mpElementProvider.getUriRewriter(), $(mediaPackage.getIdentifier().toString()).toList());
-        } catch (ArchiveException e) {
+          final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
+          workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
+                  ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId))).run();
+        } catch (AssetManagerException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
-            new Object[]{workflowId, mediaPackage, getStackTrace(e)});
+                  workflowId, mediaPackage, getStackTrace(e));
           return R.serverError();
         } catch (WorkflowDatabaseException e) {
           logger.warn("Unable to load workflow '{}' from workflow service: {}", workflowId, getStackTrace(e));
@@ -430,6 +430,7 @@ public class ToolsEndpoint implements ManagedService {
           return R.badRequest("Workflow not found");
         }
       }
+
     }
 
     return R.ok();
@@ -458,12 +459,12 @@ public class ToolsEndpoint implements ManagedService {
       if (track == null) {
         Opt<Track> trackOpt = getInternalPublication(mediaPackage).toStream().bind(new Fn<Publication, List<Track>>() {
           @Override
-          public List<Track> ap(Publication a) {
+          public List<Track> apply(Publication a) {
             return Arrays.asList(a.getTracks());
           }
         }).filter(new Fn<Track, Boolean>() {
           @Override
-          public Boolean ap(Track a) {
+          public Boolean apply(Track a) {
             return trackId.equals(a.getIdentifier());
           }
         }).head();
@@ -543,8 +544,8 @@ public class ToolsEndpoint implements ManagedService {
 
     try {
       // FIXME SWITCHP-333: Start in new thread
-      archive.add(mediaPackage);
-    } catch (ArchiveException e) {
+      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+    } catch (AssetManagerException e) {
       logger.error("Error while adding the updated media package ({}) to the archive: {}", mediaPackage.getIdentifier(),
               e.getMessage());
       throw new IOException(e);
@@ -556,7 +557,7 @@ public class ToolsEndpoint implements ManagedService {
   private Opt<Publication> getInternalPublication(MediaPackage mp) {
     return $(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
       @Override
-      public Boolean ap(Publication a) {
+      public Boolean apply(Publication a) {
         return InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel());
       }
     }).head();
@@ -589,8 +590,7 @@ public class ToolsEndpoint implements ManagedService {
     try {
       return index.getEvent(mediaPackageId, searchIndex);
     } catch (SearchIndexException e) {
-      logger.error("Error while reading event '{}' from search index: {}", mediaPackageId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Error while reading event '{}' from search index: {}", mediaPackageId, getStackTrace(e));
       return Opt.none();
     }
   }
@@ -607,12 +607,12 @@ public class ToolsEndpoint implements ManagedService {
   private Opt<Attachment> getWaveformForTrack(final MediaPackage mp, final MediaPackageElement track) {
     return $(getInternalPublication(mp)).bind(new Fn<Publication, List<Attachment>>() {
       @Override
-      public List<Attachment> ap(Publication a) {
+      public List<Attachment> apply(Publication a) {
         return Arrays.asList(a.getAttachments());
       }
     }).filter(new Fn<Attachment, Boolean>() {
       @Override
-      public Boolean ap(Attachment att) {
+      public Boolean apply(Attachment att) {
         if (track.getFlavor() == null || att.getFlavor() == null)
           return false;
 
@@ -639,7 +639,7 @@ public class ToolsEndpoint implements ManagedService {
 
     return $(workflows).filter(new Fn<WorkflowDefinition, Boolean>() {
       @Override
-      public Boolean ap(WorkflowDefinition a) {
+      public Boolean apply(WorkflowDefinition a) {
         return a.containsTag(EDITOR_WORKFLOW_TAG);
       }
     }).toList();
@@ -729,7 +729,7 @@ public class ToolsEndpoint implements ManagedService {
         if (combinedEnd > combinedStart) {
           it.remove();
           it2.remove();
-          List<Tuple<Long, Long>> newSegments = new ArrayList<Tuple<Long, Long>>(segments);
+          List<Tuple<Long, Long>> newSegments = new ArrayList<>(segments);
           newSegments.add(tuple(combinedStart, combinedEnd));
           return mergeInternal(newSegments, segments2);
         }
@@ -747,7 +747,7 @@ public class ToolsEndpoint implements ManagedService {
    * @return the list of segments
    */
   List<Tuple<Long, Long>> getSegmentsFromSmil(Smil smil) {
-    List<Tuple<Long, Long>> segments = new ArrayList<Tuple<Long, Long>>();
+    List<Tuple<Long, Long>> segments = new ArrayList<>();
     for (SmilMediaObject elem : smil.getBody().getMediaElements()) {
       if (elem instanceof SmilMediaContainer) {
         SmilMediaContainer mediaContainer = (SmilMediaContainer) elem;
@@ -759,7 +759,7 @@ public class ToolsEndpoint implements ManagedService {
               break;
             } catch (SmilException e) {
               logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}",
-                      new Object[] { videoElem, smil, e });
+                      videoElem, smil, e);
             }
           }
         }
@@ -830,4 +830,5 @@ public class ToolsEndpoint implements ManagedService {
       return workflow;
     }
   }
+
 }

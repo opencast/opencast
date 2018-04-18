@@ -40,11 +40,14 @@ pages:
 - Localization: 'localization.md'
 - Packaging: 'packaging.md'
 - Proposal Log: 'proposal-log.md'
+- Asset Manager: 'asset-manager.md'
+- Scheduler: 'scheduler.md'
 - Modules:
    - Overview: 'modules/index.md'
-   - Admin UI:
+   - Administrative user Interface:
       - Development: 'modules/admin-ui/development.md'
       - Style Guide:
+        - Overview: 'modules/admin-ui/style/index.md'
         - Color Palette: 'modules/admin-ui/style/color-palette.md'
         - Typeface: 'modules/admin-ui/style/typeface.md'
         - View Structure: 'modules/admin-ui/style/view-structure.md'
@@ -57,6 +60,7 @@ pages:
         - Dropdowns: 'modules/admin-ui/style/dropdowns.md'
         - Alerts and Indicators: 'modules/admin-ui/style/alerts-indicators.md'
         - References: 'modules/admin-ui/style/references.md'
+   - Capture Agent: 'modules/capture-agent.md'
    - Player:
       - Architecture: 'modules/player/architecture.md'
       - Core Reference: 'modules/player/core.reference.md'

@@ -42,7 +42,7 @@ public final class ProcessRunner {
   public static final Pred<String> IGNORE = Booleans.yes();
 
   public static final Pred<String> TO_CONSOLE = new Pred<String>() {
-    @Override public Boolean ap(String s) {
+    @Override public Boolean apply(String s) {
       return true;
     }
   };

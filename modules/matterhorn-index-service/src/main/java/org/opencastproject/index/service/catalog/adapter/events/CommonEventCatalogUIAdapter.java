@@ -38,7 +38,9 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Episode dublincore catalog implementation of a AbstractEventsCatalogUIAdapter
@@ -77,8 +79,11 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
     }
 
     MetadataField<?> series = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_IS_PART_OF.getLocalName());
-    if (series != null && series.isUpdated() && isNotBlank(series.getValue().get().toString()))
+    if (series != null && series.isUpdated() && series.getValue().isSome() && isNotBlank(series.getValue().get().toString())) {
       mediaPackage.setSeries(series.getValue().get().toString());
+      final Opt<String> seriesTitle = getSeriesTitle(series);
+      if (seriesTitle.isSome()) mediaPackage.setSeriesTitle(seriesTitle.get());
+    }
 
     Opt<Date> startDate = MetadataUtils.getUpdatedDateMetadata(abstractMetadata, "startDate");
     if (startDate != null && startDate.isSome())
@@ -90,6 +95,13 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
       mediaPackage.setTitle(title.getValue().get().toString());
     }
     return storeFields;
+  }
+
+  private Opt<String> getSeriesTitle(MetadataField<?> series) {
+    for (Map.Entry<String, String> e : series.getCollection().getOr(Collections.emptyMap()).entrySet()) {
+      if (e.getValue().equals(series.getValue().get().toString())) return Opt.some(e.getKey());
+    }
+    return Opt.none();
   }
 
 }

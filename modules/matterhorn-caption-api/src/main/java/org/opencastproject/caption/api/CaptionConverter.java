@@ -21,6 +21,8 @@
 
 package org.opencastproject.caption.api;
 
+import org.opencastproject.mediapackage.MediaPackageElement;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,5 +80,12 @@ public interface CaptionConverter {
    * @return caption format extension
    */
   String getExtension();
+
+  /**
+   * Get type of specific caption element (Catalog, Attachment).
+   *
+   * @return type
+   */
+  MediaPackageElement.Type getElementType();
 
 }

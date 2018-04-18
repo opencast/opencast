@@ -43,10 +43,22 @@
     <!-- Archive smil/cutting right now information to ensure we don't loose it in case later operations fail -->
 
     <operation
-      id="archive"
+      id="snapshot"
       description="Archive cutting information">
       <configurations>
         <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag any optionally uploaded assets -->
+    <operation
+      id="tag"
+      if="${downloadSourceflavorsExist}"
+      exception-handler-workflow="ng-partial-error"
+      description="Tagging uploaded assets for distribution">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -61,6 +73,7 @@
 
     <operation
       id="image"
+      if="NOT (${uploadedSearchPreview})"
       exception-handler-workflow="ng-partial-error"
       description="Creating search result thumbnails">
       <configurations>
@@ -116,7 +129,7 @@
         <configuration key="target-tags">-engage-download</configuration>
       </configurations>
     </operation>
-    
+
     <operation
       id="image"
       exception-handler-workflow="ng-partial-error"
@@ -143,6 +156,21 @@
         <configuration key="target-flavor">presenter/player+preview</configuration>
         <configuration key="target-tags">archive, engage-download</configuration>
      </configurations>
+    </operation>
+
+	<!-- Generate timeline preview images -->
+
+    <operation
+      id="timelinepreviews"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
     </operation>
 
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
@@ -277,45 +305,64 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Encode presenter (camera) to Engage player format -->
-
     <operation
+      if="${flagQuality360p}"
       id="compose"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presenter (camera) video to MP4 download">
+      description="Encoding 360p video to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presenter/themed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp4-medium.http</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,360p-quality</configuration>
+        <configuration key="encoding-profile">adaptive-360p.http</configuration>
       </configurations>
     </operation>
-
-    <!-- Encode presentation (vga) to Engage player format -->
-
     <operation
+      if="${flagQuality480p}"
       id="compose"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presentation (screen) to MP4 download">
+      description="Encoding 480p video to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presentation/themed</configuration>
-        <configuration key="target-flavor">presentation/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp4-vga-medium.http</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,480p-quality</configuration>
+        <configuration key="encoding-profile">adaptive-480p.http</configuration>
       </configurations>
     </operation>
-
-    <!-- Encode presentater (camera) to Engage player audio only format -->
-
     <operation
+      if="${flagQuality720p}"
       id="compose"
-      fail-on-error="false"
       exception-handler-workflow="ng-partial-error"
-      description="Encoding presenter (screen) to MP3 audio download">
+      description="Encoding 720p video to MP4 download">
       <configurations>
-        <configuration key="source-flavor">presenter/themed</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">mp3.http</configuration>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,720p-quality</configuration>
+        <configuration key="encoding-profile">adaptive-720p.http</configuration>
+      </configurations>
+    </operation>
+    <operation
+      if="${flagQuality1080p}"
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding 1080p video to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,1080p-quality</configuration>
+        <configuration key="encoding-profile">adaptive-1080p.http</configuration>
+      </configurations>
+    </operation>
+    <operation
+      if="${flagQuality2160p}"
+      id="compose"
+      exception-handler-workflow="ng-partial-error"
+      description="Encoding 2160p video to MP4 download">
+      <configurations>
+        <configuration key="source-flavor">*/themed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,2160p-quality</configuration>
+        <configuration key="encoding-profile">adaptive-2160p.http</configuration>
       </configurations>
     </operation>
 

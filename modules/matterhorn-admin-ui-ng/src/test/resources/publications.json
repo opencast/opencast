@@ -1,0 +1,16 @@
+[
+  {
+    "tags": [],
+    "id": "presentation-1",
+    "mimetype": "text\/html",
+    "channel": "engage",
+    "url": "engage.html?e=p-1"
+  },
+  {
+    "tags": [],
+    "id": "presentation-2",
+    "mimetype": "text\/html",
+    "channel": "oai-pmh",
+    "url": "oaipmh.html?e=p-1"
+  }
+]

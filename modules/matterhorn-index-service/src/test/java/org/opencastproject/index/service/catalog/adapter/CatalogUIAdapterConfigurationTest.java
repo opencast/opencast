@@ -24,12 +24,14 @@ package org.opencastproject.index.service.catalog.adapter;
 import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.PropertiesUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.Dictionary;
 import java.util.Properties;
 
 /**
@@ -37,20 +39,19 @@ import java.util.Properties;
  */
 public class CatalogUIAdapterConfigurationTest {
 
-  private final Properties configProperties = new Properties();
+  private Dictionary<String, String> configProperties;
 
   @Before
   public void setUpClass() throws Exception {
-    // Reset the config properties
-    configProperties.clear();
-
     // Load the config properties
     InputStream in = getClass().getResourceAsStream("/catalog-adapter/event.properties");
+    Properties props = new Properties();
     try {
-      configProperties.load(in);
+      props.load(in);
     } finally {
       IOUtils.closeQuietly(in);
     }
+    configProperties = PropertiesUtil.toDictionary(props);
   }
 
   @Test

@@ -74,6 +74,7 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 
@@ -126,7 +127,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
       @Override
       public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
-        return new HashMap<String, String>();
+        return new HashMap<>();
       }
 
       @Override
@@ -146,7 +147,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     User user3 = new JaxbUser("test3@email.ch", null, "test3", "test3@email.ch", "test", new DefaultOrganization(),
             new HashSet<JaxbRole>());
 
-    List<User> users = new ArrayList<User>();
+    List<User> users = new ArrayList<>();
     users.add(user1);
     users.add(user2);
     users.add(user3);
@@ -230,7 +231,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     CommonSeriesCatalogUIAdapter dublinCoreAdapter = new CommonSeriesCatalogUIAdapter();
     Properties seriesCatalogProperties = getCatalogProperties(getClass(), "/series-catalog.properties");
 
-    dublinCoreAdapter.updated(seriesCatalogProperties);
+    dublinCoreAdapter.updated(PropertiesUtil.toDictionary(seriesCatalogProperties));
 
     dublinCoreAdapter.setSeriesService(seriesService);
     dublinCoreAdapter.setListProvidersService(listProvidersService);
@@ -368,9 +369,9 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     adminuiSearchIndex = EasyMock.createMock(AdminUISearchIndex.class);
 
-    final Capture<SeriesSearchQuery> captureSeriesSearchQuery = new Capture<>();
-    final Capture<EventSearchQuery> captureEventSearchQuery = new Capture<>();
-    final Capture<ThemeSearchQuery> captureThemeSearchQuery = new Capture<>();
+    final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();
+    final Capture<EventSearchQuery> captureEventSearchQuery = EasyMock.newCapture();
+    final Capture<ThemeSearchQuery> captureThemeSearchQuery = EasyMock.newCapture();
 
     EasyMock.expect(adminuiSearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery)))
             .andAnswer(new IAnswer<SearchResult<Series>>() {

@@ -22,16 +22,6 @@
              interface="org.opencastproject.workflow.api.WorkflowService"
              name="workflowService"
              policy="static" />
-  <reference bind="setArchive"
-             cardinality="1..1"
-             interface="org.opencastproject.archive.opencast.OpencastArchive"
-             name="archive"
-             policy="static" />
-  <reference name="httpMediaPackageElementProvider"
-             interface="org.opencastproject.archive.api.HttpMediaPackageElementProvider"
-             cardinality="1..1"
-             policy="static"
-             bind="setHttpMediaPackageElementProvider" />
   <reference name="jobService"
              interface="org.opencastproject.adminui.endpoint.JobEndpoint"
              cardinality="1..1"

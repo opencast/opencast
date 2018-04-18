@@ -7,7 +7,12 @@
   <MimeType>
     <Type>application/java-archive</Type>
     <Description>Java archive</Description>
-    <Extensions>jar</Extensions>
+    <Extensions>ear,jar,war</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/javascript</Type>
+    <Description>JavaScript</Description>
+    <Extensions>js</Extensions>
   </MimeType>
   <MimeType>
     <Type>application/json</Type>
@@ -127,7 +132,7 @@
   <MimeType>
     <Type>audio/ogg</Type>
     <Description>Ogg audio</Description>
-    <Extensions>ogg,oga,ogv,ogx</Extensions>
+    <Extensions>ogg,oga,ogx,opus</Extensions>
   </MimeType>
   <MimeType>
     <Type>audio/vnd.qcelp</Type>
@@ -215,6 +220,11 @@
     <Extensions>wav,bwf</Extensions>
   </MimeType>
   <MimeType>
+    <Type>image/gif</Type>
+    <Description>GIF image</Description>
+    <Extensions>gif,GIF</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>image/jp2</Type>
     <Description>JPEG2000 image</Description>
     <Extensions>jp2</Extensions>
@@ -230,9 +240,9 @@
     <Extensions>jp2</Extensions>
   </MimeType>
   <MimeType>
-    <Type>image/jpg</Type>
+    <Type>image/jpeg</Type>
     <Description>JPG image</Description>
-    <Extensions>jpg</Extensions>
+    <Extensions>jpeg,jpg</Extensions>
   </MimeType>
   <MimeType>
     <Type>image/pict</Type>
@@ -243,6 +253,11 @@
     <Type>image/png</Type>
     <Description>PNG image</Description>
     <Extensions>png</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>image/svg+xml</Type>
+    <Description>SVG image</Description>
+    <Extensions>svg,svgz</Extensions>
   </MimeType>
   <MimeType>
     <Type>image/tiff</Type>
@@ -300,6 +315,16 @@
     <Extensions>ical,ics,icalendar</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/css</Type>
+    <Description>CSS</Description>
+    <Extensions>css</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>text/html</Type>
+    <Description>HTML</Description>
+    <Extensions>htm,html</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>text/plain</Type>
     <Description>Text Document</Description>
     <Extensions>txt</Extensions>
@@ -317,7 +342,7 @@
   <MimeType>
     <Type>text/xml</Type>
     <Description>XML Document</Description>
-    <Extensions>xml</Extensions>
+    <Extensions>xml,xsl</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/3gpp</Type>
@@ -357,7 +382,7 @@
   <MimeType>
     <Type>video/mp4</Type>
     <Description>MPEG-4 media</Description>
-    <Extensions>mp4</Extensions>
+    <Extensions>mp4,m4v</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/mpeg</Type>
@@ -372,12 +397,12 @@
   <MimeType>
     <Type>video/ogg</Type>
     <Description>Ogg video</Description>
-    <Extensions>ogg,oga,ogv,ogx</Extensions>
+    <Extensions>ogg,ogv,ogx</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/quicktime</Type>
     <Description>QuickTime Movie</Description>
-    <Extensions>mov,qt,mov,qt,mqv</Extensions>
+    <Extensions>mov,qt,mqv</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/sd-video</Type>

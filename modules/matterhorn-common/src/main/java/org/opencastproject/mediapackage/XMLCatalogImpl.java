@@ -21,19 +21,22 @@
 
 package org.opencastproject.mediapackage;
 
+import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 import static javax.xml.XMLConstants.DEFAULT_NS_PREFIX;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
 import static javax.xml.XMLConstants.XMLNS_ATTRIBUTE;
 import static javax.xml.XMLConstants.XML_NS_URI;
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 
-import com.entwinemedia.fn.data.ImmutableMapWrapper;
+import com.entwinemedia.fn.Fn;
+import com.entwinemedia.fn.Fns;
+import com.entwinemedia.fn.P2;
+import com.entwinemedia.fn.fns.Booleans;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
@@ -48,10 +51,12 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
@@ -68,9 +73,9 @@ import javax.xml.transform.stream.StreamResult;
  * This is a basic implementation for handling simple catalogs of metadata. It provides utility methods to store
  * key-value data.
  * <p>
- * For a definition of the terms <code>expanded name</code>, <code>qualified name</code> or <code>QName</code>,
- * <code>namespace prefix</code>, <code>local part</code> and <code>local name</code>, please see
- * <a href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>
+ * For a definition of the terms <dfn>expanded name</dfn>, <dfn>qualified name</dfn> or <dfn>QName</dfn>, <dfn>namespace
+ * prefix</dfn>, <dfn>local part</dfn> and <dfn>local name</dfn>, please see <a
+ * href="http://www.w3.org/TR/REC-xml-names">http://www.w3.org/TR/REC-xml-names</a>
  * <p>
  * By default the following namespace prefixes are bound:
  * <ul>
@@ -80,7 +85,6 @@ import javax.xml.transform.stream.StreamResult;
  * </ul>
  * <p>
  * <h3>Limitations</h3>
- *
  * XMLCatalog supports only <em>one</em> prefix binding per namespace name, so you cannot create documents like the
  * following using XMLCatalog:
  *
@@ -117,7 +121,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   protected XmlNamespaceContext bindings;
 
   /**
-   * Create an empty catalog and register the {@link javax.xml.XMLConstants#W3C_XML_SCHEMA_INSTANCE_NS_URI} namespace.
+   * Create an empty catalog and register the {@link javax.xml.XMLConstants#W3C_XML_SCHEMA_INSTANCE_NS_URI}
+   * namespace.
    */
   protected XMLCatalogImpl() {
     super();
@@ -151,7 +156,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     if (element == null)
       throw new IllegalArgumentException("Expanded name must not be null");
 
-    addElement(new CatalogEntry(element, value));
+    addElement(new CatalogEntry(element, value, NO_ATTRIBUTES));
   }
 
   /**
@@ -318,6 +323,13 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return values.toArray(new CatalogEntry[values.size()]);
     }
     return new CatalogEntry[] {};
+  }
+
+  protected List<CatalogEntry> getEntriesSorted() {
+    return $(data.values())
+        .bind(Fns.<List<CatalogEntry>>id())
+        .sort(catalogEntryComparator)
+        .toList();
   }
 
   /**
@@ -581,23 +593,23 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
   private static final Map<EName, String> NO_ATTRIBUTES = new HashMap<>();
 
+  CatalogEntry mkCatalogEntry(EName name, String value, Map<EName, String> attributes) {
+    return new CatalogEntry(name, value, attributes);
+  }
+
   /**
    * Element representation.
    */
   public final class CatalogEntry implements XmlElement, Comparable<CatalogEntry>, Serializable {
 
-    /**
-     * The serial version UID
-     */
+    /** The serial version UID */
     private static final long serialVersionUID = 7195298081966562710L;
 
     private final EName name;
 
     private final String value;
 
-    /**
-     * The attributes of this element
-     */
+    /** The attributes of this element */
     private final Map<EName, String> attributes;
 
     /**
@@ -611,17 +623,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     public CatalogEntry(EName name, String value, Map<EName, String> attributes) {
       this.name = name;
       this.value = value;
-      this.attributes = attributes;
-    }
-
-    /**
-     * Creates a new catalog element representation.
-     *
-     * @param value
-     *          the element value
-     */
-    public CatalogEntry(EName name, String value) {
-      this(name, value, NO_ATTRIBUTES);
+      this.attributes = new HashMap<>(attributes);
     }
 
     /**
@@ -663,7 +665,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * @return the attributes
      */
     public Map<EName, String> getAttributes() {
-      return new ImmutableMapWrapper<>(attributes);
+      return Collections.unmodifiableMap(attributes);
     }
 
     /**
@@ -695,7 +697,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     }
 
     private boolean eqFields(CatalogEntry that) {
-      return eq(name, that.name) && eq(value, that.value) && eq(attributes, that.attributes);
+      return this.compareTo(that) == 0;
     }
 
     /**
@@ -737,13 +739,33 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return node;
     }
 
+    /**
+     * Compare two catalog entries. Comparison order:
+     * - e_name
+     * - number of attributes (less come first)
+     * - attribute comparison (e_name -&gt; value)
+     */
     @Override
     public int compareTo(@Nonnull CatalogEntry o) {
-      final int r = getEName().compareTo(o.getEName());
-      if (r == 0) {
-        return getValue().compareTo(o.getValue());
-      } else {
-        return r;
+      int c;
+      c = getEName().compareTo(o.getEName());
+      if (c != 0) {
+        return c;
+      } else { // compare attributes
+        c = attributes.size() - o.attributes.size();
+        if (c != 0) {
+          return c;
+        } else {
+          return $(attributes.entrySet()).sort(attributeComparator)
+              .zip($(o.attributes.entrySet()).sort(attributeComparator))
+              .map(new Fn<P2<Entry<EName, String>, Entry<EName, String>>, Integer>() {
+                @Override public Integer apply(P2<Entry<EName, String>, Entry<EName, String>> as) {
+                  return attributeComparator.compare(as.get1(), as.get2());
+                }
+              })
+              .find(Booleans.ne(0))
+              .getOr(0);
+        }
       }
     }
 
@@ -756,12 +778,8 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       String namespace = name.getNamespaceURI();
       // Do not bind the "xml" namespace. It is bound by default
       if (!XML_NS_URI.equals(namespace)) {
-        String prefix = XMLCatalogImpl.this.getPrefix(name.getNamespaceURI());
-        if (DEFAULT_NS_PREFIX.equals(prefix)) {
-          root.setAttribute(XMLNS_ATTRIBUTE, name.getNamespaceURI());
-        } else {
-          root.setAttribute(XMLNS_ATTRIBUTE + ":" + prefix, name.getNamespaceURI());
-        }
+        root.setAttribute(XMLNS_ATTRIBUTE + ":" + XMLCatalogImpl.this.getPrefix(name.getNamespaceURI()),
+                name.getNamespaceURI());
       }
     }
 
@@ -770,6 +788,25 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
       return value;
     }
   }
+
+  static int doCompareTo(EName k1, String v1, EName k2, String v2) {
+    final int c = k1.compareTo(k2);
+    return c != 0 ? c : v1.compareTo(v2);
+  }
+
+  private static final Comparator<Map.Entry<EName, String>> attributeComparator =
+      new Comparator<Map.Entry<EName, String>>() {
+        @Override public int compare(Entry<EName, String> o1, Entry<EName, String> o2) {
+          return doCompareTo(o1.getKey(), o1.getValue(), o2.getKey(), o2.getValue());
+        }
+      };
+
+  private static final Comparator<CatalogEntry> catalogEntryComparator =
+      new Comparator<CatalogEntry>() {
+        @Override public int compare(CatalogEntry o1, CatalogEntry o2) {
+          return o1.compareTo(o2);
+        }
+      };
 
   // --------------------------------------------------------------------------------------------
 
