@@ -18,6 +18,22 @@
         "end":20132
       }
     ],
+    "source_tracks":[{
+      "flavor":{
+        "subtype":"source",
+        "type":"presenter"
+      },
+      "audio":{
+        "preview_image":null,
+        "hidden":false,
+        "present":true
+      },
+      "video":{
+        "preview_image":null,
+        "hidden":false,
+        "present":true
+      }
+    }],
     "tracks":["6ec443e7-b097-4470-a618-5e0d848f5252"]
   },
   "workflow": "cut-workflow"

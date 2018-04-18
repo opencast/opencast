@@ -78,6 +78,39 @@
       </configurations>
     </operation>
 
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Track previews                                                    -->
+    <!--                                                                   -->
+    <!-- Create track previews for video editor stream selection feature   -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <operation
+      id="image"
+      description="Create video preview images for presenter and presentation"
+      exception-handler-workflow="partial-error">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/video+preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.tracks.preview</configuration>
+        <configuration key="time">50%</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Once WOH waveform supports setting the image size of the waveform image,
+         those preview images should be way smaller than the preview image used for the timeline
+         as those previews cannot be zoomed -->
+    <operation
+      id="waveform"
+      fail-on-error="false"
+      description="Generating waveform">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+        <configuration key="target-flavor">*/audio+preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Extract the thumbnail preview image for the video editor          -->
     <!-- Depending on the processing settings of the event, this might be  -->

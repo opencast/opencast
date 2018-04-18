@@ -143,6 +143,7 @@ pages:
    - Retract YouTube: 'workflowoperationhandlers/retract-youtube-woh.md'
    - Segment Previews: 'workflowoperationhandlers/segmentpreviews-woh.md'
    - Segment Video: 'workflowoperationhandlers/segmentvideo-woh.md'
+   - Select Streams: 'workflowoperationhandlers/select-streams-woh.md'
    - Send Email: 'workflowoperationhandlers/send-email-woh.md'
    - Series: 'workflowoperationhandlers/series-woh.md'
    - Silence: 'workflowoperationhandlers/silence-woh.md'
