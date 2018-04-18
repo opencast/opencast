@@ -42,7 +42,6 @@ import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem.Take
 import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
-import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -149,7 +148,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
               for (Snapshot snapshot : byOrg.get(orgId)) {
                 current += 1;
                 try {
-                  TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot);
+                  TakeSnapshot takeSnapshot = mkTakeSnapshotMessage(snapshot, null);
                   getMessageSender().sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE_PREFIX + WordUtils.capitalize(indexName),
                           MessageSender.DestinationType.Queue, takeSnapshot);
                 } catch (Throwable t) {
@@ -189,7 +188,13 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
   @Override
   public Snapshot takeSnapshot(String owner, MediaPackage mp) {
     final Snapshot snapshot = super.takeSnapshot(owner, mp);
-    notifyTakeSnapshot(snapshot);
+    // We pass the original media package here, instead of using snapshot.getMediaPackage(), for security reasons.
+    // The original media package has elements with URLs of type http://.../files/... in it. These URLs will be pulled
+    // from the Workspace cache without a HTTP call.
+    // Were we to use snapshot.getMediaPackage(), we'd have a HTTP call on our hands that's secured via the asset
+    // manager security model. But the snapshot taken here doesn't have the necessary security properties installed (yet).
+    // This happens in AssetManagerWithSecurity, some layers higher up. So there's a weird loop in here.
+    notifyTakeSnapshot(snapshot, mp);
     return snapshot;
   }
 
@@ -203,11 +208,11 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
     };
   }
 
-  public void notifyTakeSnapshot(Snapshot snapshot) {
+  public void notifyTakeSnapshot(Snapshot snapshot, MediaPackage mp) {
     logger.info(format("Send update message for snapshot %s, %s to ActiveMQ",
             snapshot.getMediaPackage().getIdentifier().toString(), snapshot.getVersion()));
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
-            mkTakeSnapshotMessage(snapshot));
+            mkTakeSnapshotMessage(snapshot, mp));
   }
 
   @Override
@@ -229,9 +234,14 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
    * <p>
    * Do not call outside of a security context.
    */
-  private TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot) {
-    final AccessControlList acl = authSvc.getActiveAcl(snapshot.getMediaPackage()).getA();
-    return AssetManagerItem.add(workspace, snapshot.getMediaPackage(), acl, getVersionLong(snapshot),
+  private TakeSnapshot mkTakeSnapshotMessage(Snapshot snapshot, MediaPackage mp) {
+    final MediaPackage chosenMp;
+    if (mp != null) {
+      chosenMp = mp;
+    } else {
+      chosenMp = snapshot.getMediaPackage();
+    }
+    return AssetManagerItem.add(workspace, chosenMp, authSvc.getActiveAcl(chosenMp).getA(), getVersionLong(snapshot),
             snapshot.getArchivalDate());
   }
 

@@ -22,6 +22,7 @@
 package org.opencastproject.ingest.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
@@ -1281,7 +1282,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (activeAcl.getEntries().size() == 0) {
       String anonymousRole = securityService.getOrganization().getAnonymousRole();
       activeAcl = new AccessControlList(
-              new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
+              new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true),
+              new AccessControlEntry(GLOBAL_CAPTURE_AGENT_ROLE, Permissions.Action.WRITE.toString(), true));
       authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
