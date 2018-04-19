@@ -35,7 +35,7 @@ before_install:
      wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
   - _nt docs sudo dpkg -i synfigstudio-1.0.2.deb
   - _t docs sudo pip install mkdocs
-  - _t docs pushd docs/guides && npm install && popd
+  - _t docs sh -c "cd docs/guides && npm install"
 
 install:
   - true

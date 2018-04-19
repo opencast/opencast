@@ -100,7 +100,8 @@ Right after a cut of a new Opencast release branch `r/a.x` (from `develop`), the
 
 **Important:** Do not upload translations to Crowdin!
 
-To keep the Opencast code repository in sync with Crowdin, the translation sources should be uploaded to Crowdin as soon as possible.
+To keep the Opencast code repository in sync with Crowdin, the translation sources should be uploaded to Crowdin as soon
+as possible.
 
 ### Working with Crowdin CLI
 
@@ -140,7 +141,7 @@ Note: Do not upload translations to Crowdin. Our current subscription plan will 
 Further Information
 -------------------
 
- * [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
- * [Crowdin CLI Documentation](https://support.crowdin.com/cli-tool/#usage)
- * [Crowdin Versions Management Documentation](https://support.crowdin.com/versions-management/)
- * [Crowdin Language Codes](https://support.crowdin.com/api/language-codes/)
+* [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
+* [Crowdin CLI Documentation](https://support.crowdin.com/cli-tool/#usage)
+* [Crowdin Versions Management Documentation](https://support.crowdin.com/versions-management/)
+* [Crowdin Language Codes](https://support.crowdin.com/api/language-codes/)
