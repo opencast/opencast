@@ -1021,6 +1021,35 @@ public class SeriesEndpoint {
     return elementsCount > 0;
   }
 
+  @GET
+  @Path("{seriesId}/hasEvents.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "hasEvents", description = "Check if given series has events", returnDescription = "true if series has events, otherwise false", pathParameters = {
+    @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, reponses = {
+    @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
+    @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  public Response getSeriesEvents(@PathParam("seriesId") String seriesId) throws Exception {
+    if (StringUtils.isBlank(seriesId))
+      return RestUtil.R.badRequest("Path parameter series ID is missing");
+
+    long elementsCount = 0;
+
+    try {
+      EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+      query.withSeriesId(seriesId);
+      SearchResult<Event> result = searchIndex.getByQuery(query);
+      elementsCount = result.getHitCount();
+    } catch (SearchIndexException e) {
+      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+
+    JSONObject jsonReturnObj = new JSONObject();
+    jsonReturnObj.put("hasEvents", elementsCount > 0);
+    return Response.ok(jsonReturnObj.toString()).build();
+  }
+
   /**
    * Get a single theme
    *
