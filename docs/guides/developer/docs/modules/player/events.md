@@ -6,7 +6,9 @@ An event is defined in the events section of the plugin and looks like this:
 
     NAME: new Engage.Event("MODULE:NAME", "DESCRIPTION", "OPTION")
 
-The event has the event name "MODULE:NAME", the description DESCRIPTION and one of the options "trigger", "handler" or "both" as OPTION. When the plugin just triggers the event, the option is "trigger", when it just handles the events the option is "handler" and when it does both - trigger and handle it - the option is "both".
+The event has the event name "MODULE:NAME", the description DESCRIPTION and one of the options "trigger", "handler" or
+"both" as OPTION. When the plugin just triggers the event, the option is "trigger", when it just handles the events the
+option is "handler" and when it does both - trigger and handle it - the option is "both".
 
 An event can be triggered via
 
@@ -16,20 +18,21 @@ and can be subscribed to via
 
     Engage.on(plugin.events.NAME.getName(), function () {});
  
-The following list contains all events of the Core + of all official plugins, sorted alphabetically after "Event name" for version 1.0 of Feb 12, 2015.
+The following list contains all events of the Core + of all official plugins, sorted alphabetically after "Event name"
+for version 1.0 of Feb 12, 2015.
 
 Currently official plugins are
 
- - Controls
- - MHConnection
- - Notifications
- - Usertracking
- - Description
- - Description (Tab)
- - Slide text (Tab)
- - Shortcuts (Tab)
- - Timeline statistics
- - Videodisplay
+* Controls
+* MHConnection
+* Notifications
+* Usertracking
+* Description
+* Description (Tab)
+* Slide text (Tab)
+* Shortcuts (Tab)
+* Timeline statistics
+* Videodisplay
  
 |Name | Event name | Additional parameters|Description|Triggered in|Handled in|
 |-----|------------|----------------------|-----------|------------|----------|

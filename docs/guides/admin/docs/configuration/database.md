@@ -26,8 +26,8 @@ Setting up MariaDB/MySQL
 
 Before following this guide, you should have:
 
- - Installed the Opencast Core System
- - Followed the [Basic Configuration instructions](basic.md)
+* Installed the Opencast Core System
+* Followed the [Basic Configuration instructions](basic.md)
 
 
 ### Step 0: Set-up MariaDB/MySQL

@@ -9,15 +9,16 @@ describes how to integrate Opencast into such a system.
 
 ### Step 1
 
-First, you need to edit the file `etc/org.apache.karaf.features.cfg` and add the `opencast-security-cas` to the `featuresBoot` variable.
+First, you need to edit the file `etc/org.apache.karaf.features.cfg` and add the `opencast-security-cas` to the
+`featuresBoot` variable.
 
     featuresBoot = ..., opencast-security-cas
 
 ### Step 2
 
 In a single-tenant deployment, your `security.xml` file is under `OPENCAST_HOME/etc/security/mh_default_org.xml`. In an
-RPM/DEB based installation, it is located in `/etc/opencast/security/mh_default_org.xml`. You should make a backup copy of
-the file and substitute it by the sample file named `security_sample_cas.xml-example`. In other words:
+RPM/DEB based installation, it is located in `/etc/opencast/security/mh_default_org.xml`. You should make a backup copy
+of the file and substitute it by the sample file named `security_sample_cas.xml-example`. In other words:
 
     $> cd etc/security
     $> mv mh_default_org.xml mh_default_org.xml.old
@@ -28,7 +29,8 @@ CAS. If you have done custom modifications to your security file, make sure to i
 
 ### Step 3
 
-Add the necessary configuration values to the CAS section of the new security file. The comments should be self-explanatory.
+Add the necessary configuration values to the CAS section of the new security file. The comments should be
+self-explanatory.
 
 You must modify several settings in the sample to point to your CAS server:
 
@@ -59,15 +61,17 @@ You will also need to set the public URL for your Opencast server:
 Authorization
 -------------
 
-Now the system knows all the information necessary to authenticate users against CAS, but also need some authorization information, to tell which services the user is allowed to use and which resources is allowed to see and/or modify.
+Now the system knows all the information necessary to authenticate users against CAS, but also need some authorization
+information, to tell which services the user is allowed to use and which resources is allowed to see and/or modify.
 
 You will need to configure a UserProvider to look up users as identified by CAS.
 
-  - [Sakai User Provider](security.user.sakai.md)
-  - [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
+* [Sakai User Provider](security.user.sakai.md)
+* [LDAP User Provider](security.ldap.md) (Section `Authorization/Step 2`)
 
 
 Original documentation from University of Saskatchewan
 ------------------------------------------------------
 
-[University of Saskatchewan CAS and LDAP integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)
+[University of Saskatchewan CAS and LDAP
+integration](https://opencast.jira.com/wiki/display/MH/University+of+Saskatchewan+CAS+and+LDAP+integration)

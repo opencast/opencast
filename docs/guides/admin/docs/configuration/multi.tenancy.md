@@ -9,8 +9,8 @@ Opencast refers to tenants as *organizations*, and an HTTP request to the Openca
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
 
- - tenant1.opencast.edu
- - tenant2.opencast.edu
+* tenant1.opencast.edu
+* tenant2.opencast.edu
 
 A tenant configuration thus consists mainly of the DNS name that is mapped to that tenant.
 
@@ -56,7 +56,8 @@ installation:
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-There are more options available than in this example. The easiest way of creating that file is probably to create a copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
+There are more options available than in this example. The easiest way of creating that file is probably to create a
+copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
 
 Note that if you are running Apache httpd with mod_proxy in front of the Opencast installation, the port number will be
 -1.

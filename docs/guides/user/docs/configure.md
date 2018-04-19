@@ -3,7 +3,8 @@ There are two ways you can change the table view.
 
 ## Increase the number of visible rows on a single page
 
-In the lower right corner you will see a drop down with the number 10 in it, this represents the number of rows visible on a single page. Select another value to display more lines.
+In the lower right corner you will see a drop down with the number 10 in it, this represents the number of rows visible
+on a single page. Select another value to display more lines.
 
 ## Change the visible columns in the table view
 

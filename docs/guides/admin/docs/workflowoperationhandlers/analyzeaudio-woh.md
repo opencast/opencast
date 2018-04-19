@@ -1,19 +1,21 @@
 # AnalyzeAudioWorkflowOperationHandler
 
 ## Description
-The AnalyzeAudioiWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX (http://sox.sourceforge.net/) and writes the result back to the given track.
+The AnalyzeAudioiWorkflowOperationHandler analyzes the first audio stream of a video or audio track through SoX
+(http://sox.sourceforge.net/) and writes the result back to the given track.
 
-This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available otherwise nothing happens. Here are the internal steps done by the different inputs:
+This workflow operation handler can be used with audio and/or video files. At least one audio stream must be available
+otherwise nothing happens. Here are the internal steps done by the different inputs:
 
 ### Used with Audio only file (forceTranscode is deactivated):
- - Analyze the given audio file with SoX
- - Write analyzed audio metadata back to the given track's mediapackage.
+* Analyze the given audio file with SoX
+* Write analyzed audio metadata back to the given track's mediapackage.
 
 ### Used with Video file or with Audio only file with forceTranscode activated:
- - Extract audio file encoded as FLAC audio and save it temporary in a collection
- - Analyze the previous encoded audio file with SoX
- - Write analyzed audio metadata back to the given track's mediapackage.
- - Delete the temporary encoded FLAC audio file
+* Extract audio file encoded as FLAC audio and save it temporary in a collection
+* Analyze the previous encoded audio file with SoX
+* Write analyzed audio metadata back to the given track's mediapackage.
+* Delete the temporary encoded FLAC audio file
 
 Example result track:
 
@@ -48,7 +50,7 @@ Example result track:
 (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)	|FALSE|
 
 
-##Operation Example
+## Operation Example
 
     <operation
       id="analyze-audio"

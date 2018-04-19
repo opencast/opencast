@@ -132,7 +132,7 @@ Tasks:
 The following steps describe how to change the properties configuration.
 
 
-###Step 1. Determine your new option type and processing needs
+### Step 1. Determine your new option type and processing needs
 
 There are 3 asset upload types:
 
@@ -146,7 +146,7 @@ update or create  workflows to work with your new track flavor.
 Attachments and Catalogs, such as smil files, can also be used for processing. If you only need to publish manually
 uploaded assets with a unique flavor, this is already built into the default workflows.
 
-###Step 2. Add your new option to the list configuration
+### Step 2. Add your new option to the list configuration
 
 You add your new asset upload configuration as a row to this file:
 
@@ -171,7 +171,7 @@ The parameter key is internationalized as the display text in the admin UI
 ref: modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
 
 
-###Step 3. Add translation for the new option
+### Step 3. Add translation for the new option
 
 The option property key is internationalized for display in the Admin UI.
 Add a translation for the option property when adding new option, otherwise the Admin UI will display the raw key.

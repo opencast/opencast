@@ -17,7 +17,7 @@ Tags and flavors can be used in combination. But combined they should match one 
 
 \* **mandatory**
 
-##Operation example
+## Operation example
  
     <operation
       id="image-to-video"
@@ -34,7 +34,7 @@ Tags and flavors can be used in combination. But combined they should match one 
       </configurations>
     </operation> 
 
-##Encoding profile example
+## Encoding profile example
 
     # Image to video
     profile.image-movie.name = image to video

@@ -2,8 +2,8 @@
 
 # Information
 
-In order to assess key characteristics of the API and to test general connectivity, the API’s root url is not
-protected through authentication:
+In order to assess key characteristics of the API and to test general connectivity, the API’s root url is not protected
+through authentication:
 
 ### GET /api
 

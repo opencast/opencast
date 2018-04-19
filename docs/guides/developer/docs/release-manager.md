@@ -9,10 +9,10 @@ or her release.
 
 The release manager has the following duties:
 
- - To ensure that the release measures up to the quality expected by the community.
- - To ensure that the development process is followed and amended if required.
- - To ensure that the release is timely and does not languish in process.
- - To encourage committers to be involved in testing and fixing of bugs.
+* To ensure that the release measures up to the quality expected by the community.
+* To ensure that the development process is followed and amended if required.
+* To ensure that the release is timely and does not languish in process.
+* To encourage committers to be involved in testing and fixing of bugs.
 
 It is in the release manager's responsibility to force decisions around the release, help negotiate the acceptance or
 rejection of contributions and to provide regular updates about the release on list and during the weekly technical and
@@ -393,7 +393,8 @@ assume the final release should be based on `3.0-rc2`.
           https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
 
 
-14. Write a short paragraph about the changes to the new version, then email it to the QA Coordinator to update the Opencast website.
+14. Write a short paragraph about the changes to the new version, then email it to the QA Coordinator to update the
+    Opencast website.
 
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those

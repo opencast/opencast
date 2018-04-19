@@ -20,7 +20,9 @@ flavors are treated by Opencast as standard metadata in means of Opencast expect
 Opencast assumes specific metadata fields to be present in the standard metadata in means of defining hard-coded
 filters, table columns and search indices.
 
-To adjust the standard metadata to your specific needs, you can configure them in `/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` and `/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg`.
+To adjust the standard metadata to your specific needs, you can configure them in
+`/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` and
+`/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg`.
 
 For details on how to configure metadata catalogs, see section Configuring Metadata Catalogs.
 
@@ -32,7 +34,8 @@ described in the next section.
 
 For both events and series, Opencast support an arbitrary number of customized metadata catalogs. 
 
-To add extended metadata catalogs, create a configuration file with a valid filename of the form `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-<name>.cfg` in `/opt/opencast/etc.` on the admin node.
+To add extended metadata catalogs, create a configuration file with a valid filename of the form
+`org.opencastproject.ui.metadata.CatalogUIAdapterFactory-<name>.cfg` in `/opt/opencast/etc.` on the admin node.
 
 For details on how to configure metadata catalogs, see section Configuring Metadata Catalogs.
 
@@ -56,7 +59,8 @@ The metadata configuration file format can be logically split up into different 
  
 ### Part 2: XML serialization information
 
-The only supported serialization of catalogs is currently the XML file format. The file follows the recommendation of the Dublin Core Metadata Initiative.
+The only supported serialization of catalogs is currently the XML file format. The file follows the recommendation of
+the Dublin Core Metadata Initiative.
 
 |Configuration key             |Example                           |Description                                         |
 |------------------------------|----------------------------------|----------------------------------------------------|
@@ -65,7 +69,8 @@ The only supported serialization of catalogs is currently the XML file format. T
 
 **Namespace bindings**
 
-To properly serialize to XML each prefix has to be bound to an XML namespace. Multiple namespace bindings can be configured, each identified by its unique name.
+To properly serialize to XML each prefix has to be bound to an XML namespace. Multiple namespace bindings can be
+configured, each identified by its unique name.
 
 |Configuration key                  |Example                         |Description                                      |
 |-----------------------------------|--------------------------------|-------------------------------------------------|
@@ -74,7 +79,8 @@ To properly serialize to XML each prefix has to be bound to an XML namespace. Mu
 
 ### Part 3: Catalog fields configuration
 
-`{field-id}` must be a unique identifier for each property for a given catalog and can be the same as the input or output id to make it easy to find.
+`{field-id}` must be a unique identifier for each property for a given catalog and can be the same as the input or
+output id to make it easy to find.
 
 |Configuration key |Example |Description |
 |------------------|--------|------------|
@@ -124,7 +130,8 @@ In our examples below, we use ext/episode as a flavor, so the following operatio
     </operation>
  
  
-If you want the extended metadata to be published the same way as the standard metadata, you can update the existing tagging operation for dublincore metadata the following way
+If you want the extended metadata to be published the same way as the standard metadata, you can update the existing
+tagging operation for dublincore metadata the following way
  
     <!-- Tag the incoming metadata catalogs for publishing -->
     <operation

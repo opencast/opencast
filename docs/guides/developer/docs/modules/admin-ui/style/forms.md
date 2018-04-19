@@ -5,8 +5,10 @@ closely associated with the modal type that the form is displayed in.
 <dl>
   <dt>Step-by-Step Modal</dt>
   <dd>
-    The form displayed in the step-by-step modal is displayed in a 2 column table; where each row has a label (left column)
-    and an input field (right column). To complete the form the required fields (<code>*</code>) need to be filled in and so forth until the completion of the modal action.
+    The form displayed in the step-by-step modal is displayed in a 2 column table; where each row has a label
+    (left column)
+    and an input field (right column). To complete the form the required fields (<code>*</code>) need to be filled in
+    and so forth until the completion of the modal action.
     <br/><br/>
     The form inputs are read-only on initial display and if editable will activate when the user
     clicks on the value (underlined text) or on the edit button located on the right side of the form field.
@@ -67,7 +69,8 @@ span.editable, td.editable span {
 <dl>  
   <dt>Tabbed</dt>
   <dd>
-    The tabbed modal is normally a much smaller modal and the fields required to complete the action fewer and more specific.
+    The tabbed modal is normally a much smaller modal and the fields required to complete the action fewer and more
+    specific.
     The form has larger input fields and the labels are positioned above them.
   </dd>
 </dl>
