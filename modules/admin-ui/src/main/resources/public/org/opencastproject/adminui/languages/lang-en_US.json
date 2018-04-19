@@ -53,6 +53,7 @@
          "EVENT"              : "The following event will be deleted",
          "SERIES"             : "The following series will be deleted",
          "SERIES_WITH_EVENTS" : "The series still contains events",
+         "SERIES_WITH_EVENTS_DELETE_NOT_ALLOWED" : "Deleting series containing events is not allowed",
          "ACL"                : "The following ACL will be deleted",
          "GROUP"              : "The following group will be deleted",
          "USER"               : "The following user will be deleted",

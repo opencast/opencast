@@ -8,13 +8,16 @@
         <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES"><!-- The following series will be deleted --></span>:</p>
         <p class="delete">{{name}}</p>
     </div>
-    <div ng-if="hasEvents">
+    <div ng-if="hasEvents == true">
         <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES_WITH_EVENTS"><!-- The series contains events --></span></p>
+    </div>
+    <div ng-if="hasEvents == true && deleteSeriesWithEventsAllowed == false">
+        <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES_WITH_EVENTS_DELETE_NOT_ALLOWED"><!-- The series contains events --></span></p>
     </div>
     <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!-- Are you sure you want to continue? --></p>
 
     <div class="btn-container">
         <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()"><i><!--- Cancel --></i></a>
-        <a translate="CONFIRM" class="danger-btn" ng-click="confirm()"><i><!-- Confirm --></i></a>
+        <a ng-if="hasEvents == false || hasEvents == true && deleteSeriesWithEventsAllowed == true" translate="CONFIRM" class="danger-btn" ng-click="confirm()"><i><!-- Confirm --></i></a>
     </div>
 </section>

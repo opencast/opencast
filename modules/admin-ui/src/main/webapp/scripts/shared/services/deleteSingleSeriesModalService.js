@@ -28,7 +28,7 @@
  * partial.
  */
 angular.module('adminNg.services.modal')
-.factory('DeleteSingleSeriesModal', ['$location', 'Modal', 'SeriesHasEventsResource', function ($location, Modal, SeriesHasEventsResource) {
+.factory('DeleteSingleSeriesModal', ['$location', 'Modal', 'SeriesHasEventsResource', 'SeriesOptionsResource', function ($location, Modal, SeriesHasEventsResource, SeriesOptionsResource) {
     var DeleteSingleSeriesModal = function () {
         var me = this;
 
@@ -73,6 +73,9 @@ angular.module('adminNg.services.modal')
 
             SeriesHasEventsResource.get({id: object.id}, function (data) {
                 me.$scope.hasEvents = data.hasEvents;
+            });
+            SeriesOptionsResource.get(function (data) {
+                me.$scope.deleteSeriesWithEventsAllowed = data.deleteSeriesWithEventsAllowed;
             });
         };
 

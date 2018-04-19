@@ -90,6 +90,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -113,6 +114,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,6 +122,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -148,7 +151,7 @@ import javax.ws.rs.core.Response.Status;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class SeriesEndpoint {
+public class SeriesEndpoint implements ManagedService {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
 
@@ -158,6 +161,10 @@ public class SeriesEndpoint {
   private static final int DEFAULT_LIMIT = 100;
 
   public static final String THEME_KEY = "theme";
+
+  private Boolean deleteSeriesWithEventsAllowed = true;
+
+  public static final String SERIES_HASEVENTS_DELETE_ALLOW_KEY = "series.hasEvents.delete.allow";
 
   private SeriesService seriesService;
   private SecurityService securityService;
@@ -205,6 +212,18 @@ public class SeriesEndpoint {
         this.serverUrl = ccServerUrl;
     }
     logger.info("Activate series endpoint");
+  }
+
+  /** OSGi callback if properties file is present */
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
+    Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
+    deleteSeriesWithEventsAllowed = Boolean.parseBoolean(dictionaryValue.toString());
   }
 
   @GET
@@ -1068,4 +1087,16 @@ public class SeriesEndpoint {
     return Opt.some(result.getItems()[0].getSource());
   }
 
+  @GET
+  @Path("options.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getseriesoptions", description = "Get the series configuration options", returnDescription = "List of configuration keys", reponses = {
+    @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
+    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
+    @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  public Response getSeriesOptions() {
+    JSONObject jsonReturnObj = new JSONObject();
+    jsonReturnObj.put("deleteSeriesWithEventsAllowed", deleteSeriesWithEventsAllowed);
+    return Response.ok(jsonReturnObj.toString()).build();
+  }
 }
