@@ -1559,9 +1559,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://bitbucket.org/opencast-community/opencast.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:opencast-community/opencast.git</developerConnection>
-    <url>https://bitbucket.org/opencast-community</url>
+    <connection>scm:git:https://github.com/opencast/opencast.git</connection>
+    <developerConnection>scm:git:git@github.com:opencast/opencast.git</developerConnection>
+    <url>https://github.com/opencast/opencast/</url>
   </scm>
   <issueManagement>
     <system>jira</system>
