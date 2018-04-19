@@ -741,8 +741,9 @@ public class EventsEndpoint implements ManagedService {
    * @param withSignedUrls
    *          Whether to sign the included urls.
    * @return A {@link Response} with the accept header and body as the Json array of {@link Event}s.
-   * @throws NotFoundException
    * @throws IndexServiceException
+   * @throws SchedulerException
+   * @throws UnauthorizedException
    */
   protected Response getJsonEvents(String acceptHeader, List<IndexObject> events, Boolean withAcl, Boolean withMetadata,
           Boolean withScheduling, Boolean withPublications, Boolean withSignedUrls, ApiVersion requestedVersion)
@@ -773,10 +774,8 @@ public class EventsEndpoint implements ManagedService {
    * @return The event in json format.
    * @throws IndexServiceException
    *           Thrown if unable to get the metadata for the event.
-   * @throws SearchIndexException
-   *           Thrown if unable to get event publications from search service
-   * @throws NotFoundException
-   *           Thrown if unable to find all of the metadata
+   * @throws SchedulerException
+   * @throws UnauthorizedException
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withScheduling,
           Boolean withPublications, Boolean withSignedUrls, ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
@@ -797,7 +796,6 @@ public class EventsEndpoint implements ManagedService {
       fields.add(f("license", v(event.getLicense(), BLANK)));
       fields.add(f("is_part_of", v(event.getSeriesId(), BLANK)));
       fields.add(f("series", v(event.getSeriesName(),BLANK)));
-      fields.add(f("duration", v(event.getDuration(), BLANK)));
       fields.add(f("source", v(event.getSource(), BLANK)));
       fields.add(f("status", v(event.getEventStatus(), BLANK)));
     }
