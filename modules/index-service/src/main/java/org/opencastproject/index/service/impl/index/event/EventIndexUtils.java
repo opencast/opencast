@@ -21,7 +21,6 @@
 
 package org.opencastproject.index.service.impl.index.event;
 
-import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
 
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
@@ -473,8 +472,8 @@ public final class EventIndexUtils {
     updateTechnicalDate(event);
 
     // TODO: Add support for language
-    event.setContributors(splitStringList(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY)));
-    event.setPresenters(splitStringList(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY)));
+    event.setContributors(dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_ANY));
+    event.setPresenters(dc.get(DublinCore.PROPERTY_CREATOR, DublinCore.LANGUAGE_ANY));
     return event;
   }
 

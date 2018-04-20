@@ -102,14 +102,11 @@ public final class DublinCoreMetadataUtil {
   }
 
   /**
-   * Set the value of an iterable string, comma separated
+   * Set the value of an iterable string (each element as an separate entry)
    *
-   * @param dc
-   *          The dublin core catalog to add the iterable string value to (or remove it if empty)
-   * @param field
-   *          The {@link MetadataField} with the value to update.
-   * @param ename
-   *          The {@link EName} of the property in the {@link DublinCoreCatalog} to update.
+   * @param dc    The dublin core catalog to add the iterable string values to (or remove it if empty)
+   * @param field The {@link MetadataField} with the values to update.
+   * @param ename The {@link EName} of the property in the {@link DublinCoreCatalog} to update.
    */
   private static void setIterableString(DublinCoreCatalog dc, MetadataField<?> field, final EName ename) {
     if (field.getValue().isSome()) {
