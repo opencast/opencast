@@ -1578,7 +1578,7 @@
   </licenses>
   <scm>
     <connection>scm:git:https://github.com/opencast/opencast.git</connection>
-    <developerConnection>scm:git:git@github.com:opencast/opencast.git</developerConnection>
+    <developerConnection>scm:git:https://github.com/opencast/opencast.git</developerConnection>
     <url>https://github.com/opencast/opencast/</url>
   </scm>
   <issueManagement>
