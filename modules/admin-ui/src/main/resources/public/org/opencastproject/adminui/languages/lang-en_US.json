@@ -980,6 +980,7 @@
        "TABLE": {
          "CAPTION":      "Series",
          "TITLE":        "Series",
+         "HAS_EVENTS":    "Contains events",
          "CREATORS":     "Organizer(s)",
          "CONTRIBUTORS": "Contributor(s)",
          "CREATED":      "Created",
