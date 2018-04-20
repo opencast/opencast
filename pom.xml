@@ -9,9 +9,6 @@
   <description>Opencast is a media capture, processing, management and distribution system</description>
   <url>http://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
-  <prerequisites>
-    <maven>3.1</maven>
-  </prerequisites>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
@@ -265,6 +262,26 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M1</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.1.1</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
         <version>1.4</version>
@@ -348,6 +365,7 @@
         <configuration>
           <format>html</format>
           <aggregate>true</aggregate>
+          <check/>
         </configuration>
       </plugin>
     </plugins>
