@@ -32,7 +32,7 @@ Step 3: Configure the OAI-PMH default repository
 
 In case the repository is not included in the URL, the OAI-PMH default repository will be selected.
 
-The property to configure the OAI-PMH default repository can be found in 
+The property to configure the OAI-PMH default repository can be found in
 `etc/org.opencastproject.oaipmh.server.OaiPmhServer.cfg`
 
     default-repository=default

@@ -7,7 +7,7 @@ Both absolute and relative positions can be used.
 ## Parameter Table
 
 |configuration keys|example|description|
-|------------------|-------|-----------| 
+|------------------|-------|-----------|
 |source-flavor|presenter/source|Specifies which media should be processed.|
 |source-flavors|presenter/source, presentation/source|Specifies a list of media which should be processed. In case a flavor has been specified in *source-flavor*, it will be added to this list.|
 |source-tags	|engage	|Specifies which media should be processed.|

@@ -145,7 +145,7 @@ GET /api/events?sort=title
 Parameter | Encoding      | Description
 :---------|:--------------|:-----------
 `order`   | `asc`, `desc` | The sort order. Default value is `asc`.
-                  
+
 __Example__
 
 Ordering the list of events by title in ascending order:

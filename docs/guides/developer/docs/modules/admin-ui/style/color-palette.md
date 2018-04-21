@@ -30,7 +30,7 @@ professional environment for users. Percentage tints can be used of any of these
         <a class="dark">#5bd099</a>
       </li><li style="background-color:#6fd6a5;">
         <a class="dark">#6fd6a5</a>
-      </li>										
+      </li>
     </ul>
   </div>
 </div>
@@ -57,7 +57,7 @@ professional environment for users. Percentage tints can be used of any of these
       </li>
       <li style="background-color:#3a6993;">
         <a>#3a6993</a>
-      </li>										
+      </li>
     </ul>
   </div>
 </div>
@@ -97,7 +97,7 @@ endless palette to choose from.
             </span>
           </li>
         </ul>
-    </li>    
+    </li>
     <li>
         <ul>
           <li style="background-color:#fa1919;">
@@ -125,7 +125,7 @@ endless palette to choose from.
             </span>
           </li>
         </ul>
-      </li>    
+      </li>
       <li>
         <ul>
           <li style="background-color:#e45253;">
@@ -153,7 +153,7 @@ endless palette to choose from.
             </span>
           </li>
         </ul>
-      </li>    
+      </li>
       <li>
         <ul>
           <li style="background-color:#e4d12e;">
@@ -213,10 +213,10 @@ A selection of grayscale colors for background, border or text color use.
       </li>
       <li style="background-color:#e1e1e1;">
         <a class="dark">#e1e1e1</a>
-      </li>      
+      </li>
       <li style="background-color:#fafafa;">
         <a class="dark">#fafafa</a>
-      </li>										
+      </li>
     </ul>
   </div>
 </div>

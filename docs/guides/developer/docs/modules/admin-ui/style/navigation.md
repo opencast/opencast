@@ -8,7 +8,7 @@ for a user to easily access other sections of the Admin UI.
   <p>
     By default the main menu is hidden to allow for the maximum viewing area and to have a clean navigation area
     displaying the current important location.
-    <br/><br/>    
+    <br/><br/>
     Clicking on the main menu button displays the menu bar with all of the appropriate menu icons (Shown below).
   </p>
 </div>

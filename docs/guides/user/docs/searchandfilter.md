@@ -35,7 +35,7 @@ required operator, while the prohibit operator `-` is used to exlude items match
 
 For example, `hello +world` matches *hello world* but not *hello again*, whereas `hello -world` matches *hello* but not
 *hello world*.
-  
+
 The NOT operator `!` can be used to negate a term, so `!hello` matches all items **not** matching *hello*. The AND
 operator `&&` can be used to override the default term conjunction which is OR.
 

@@ -10,7 +10,7 @@ slides which were shown change.
 |configuration keys|example|description|
 |------------------|-------|-----------|
 |source-flavor |presentation/trimmed|Specifies which media should be processed.|
- 	 	 	 
+
 ## Operation Example
 
     <operation

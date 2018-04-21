@@ -43,7 +43,7 @@ plugin, which has a reference to the EngageModel.
 |pluginsInfo	|Backbone Model	|Contains Information's of each plugin|
 |pluginModels	|Backbone Collection	|Contains the plugin models|
 |urlParameters	|Object	|Contains the data of the URL parameters.|
- 
+
 ## Plugin Object
 
 Each plugin **must** create and return a object with some properties which are set by the plugin itself. It is recommend

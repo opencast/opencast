@@ -6,7 +6,7 @@ may be used to create a new mediapackage element, or to add configuration proper
 
 To run a command for each element in a MediaPackage, use the [Execute Many](execute-many-woh.md) operation.
 
-Commands run by this operation handler must first be included in the `commands.allowed` list in the 
+Commands run by this operation handler must first be included in the `commands.allowed` list in the
 [Execute Service](../modules/execute.md#service-configuration) configuration.
 
 ### Parameter table

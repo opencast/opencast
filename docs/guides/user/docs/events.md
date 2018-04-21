@@ -32,7 +32,7 @@ allows it. You can access the Events page from the **Main Menu > Recordings > Ev
 
 ## How to create an Event
 
-An Event can either be a single, standalone Event or one of many Events that belong to a single Series.  
+An Event can either be a single, standalone Event or one of many Events that belong to a single Series.
 
 1. Click the Add Event button and a Create New Event modal will open
 1. On the Source tab you will need to select whether the event(s) are being scheduled or uploaded.

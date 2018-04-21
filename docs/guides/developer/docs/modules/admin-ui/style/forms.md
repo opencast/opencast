@@ -13,7 +13,7 @@ closely associated with the modal type that the form is displayed in.
     The form inputs are read-only on initial display and if editable will activate when the user
     clicks on the value (underlined text) or on the edit button located on the right side of the form field.
     <br/><br/>
-    Dropdown selection boxes will appear on editing/interaction of the field, if the field is so defined.    
+    Dropdown selection boxes will appear on editing/interaction of the field, if the field is so defined.
   </dd>
 </dl>
 
@@ -53,7 +53,7 @@ span.editable, td.editable span {
 .chosen-container {
   /* Drop down selector */
   font-size: 13px;
-  font-weight: 400;    
+  font-weight: 400;
   width: 250px;
 }
 
@@ -66,7 +66,7 @@ span.editable, td.editable span {
 }
 ```
 
-<dl>  
+<dl>
   <dt>Tabbed</dt>
   <dd>
     The tabbed modal is normally a much smaller modal and the fields required to complete the action fewer and more

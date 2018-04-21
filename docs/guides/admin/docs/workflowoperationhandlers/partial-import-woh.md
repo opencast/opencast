@@ -10,7 +10,7 @@ When using the PartialImportWorkflowOperation, it is recommended to perform a me
 InspectWorkflowOperation with the option `accurate-frame-count` set to `true`. This ensures that
 the PartialImportWorkflowOperation works correctly in case of media files with incorrect framecount in their header.
 Note that the use of `accurate-frame-count` will force the InspectWorkflowOperation to decode the complete video
-stream which makes the operation more expensive in terms of load. 
+stream which makes the operation more expensive in terms of load.
 
 ## Parameter Table
 
@@ -108,7 +108,7 @@ in the SMIL file:
     </operation>
 
 In our example, the PartialImportWorkflowOperation will create the target flavors presenter/standard and
-presentation/standard as depicted below: 
+presentation/standard as depicted below:
 
 ![Figure 2](./partial-import-woh-figure-2.jpg)
 

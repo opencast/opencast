@@ -17,7 +17,7 @@ An event can be triggered via
 and can be subscribed to via
 
     Engage.on(plugin.events.NAME.getName(), function () {});
- 
+
 The following list contains all events of the Core + of all official plugins, sorted alphabetically after "Event name"
 for version 1.0 of Feb 12, 2015.
 
@@ -33,12 +33,12 @@ Currently official plugins are
 * Shortcuts (Tab)
 * Timeline statistics
 * Videodisplay
- 
+
 |Name | Event name | Additional parameters|Description|Triggered in|Handled in|
 |-----|------------|----------------------|-----------|------------|----------|
 |coreInit	|Core:init	 	 	| | |Core| |
 |plugin_load_done	|Core:plugin_load_done	 	 	| | |Core|Core, Controls, MHConnection, Notifications, Usertracking, Description, Description (Tab), Slide text (Tab), Shortcuts (Tab), Timeline statistics, Videodisplay|
-|timelineplugin_closed	|Engage:timelineplugin_closed	|*Note: No "Engage Event", just use as string, example: Engage.on("Engage:timelineplugin_closed", function() {});*| when the timeline plugin container closed	|Core| | 
+|timelineplugin_closed	|Engage:timelineplugin_closed	|*Note: No "Engage Event", just use as string, example: Engage.on("Engage:timelineplugin_closed", function() {});*| when the timeline plugin container closed	|Core| |
 |timelineplugin_opened	|Engage:timelineplugin_opened	|*Note: No "Engage Event", just use as string, example: Engage.on("Engage:timelineplugin_opened", function() {});* |when the timeline plugin container opened	|Core|Timeline statistics|
 |getMediaInfo	|MhConnection:getMediaInfo|	| |	 	 	|MHConnection|
 |getMediaPackage	|MhConnection:getMediaPackage|	| |	 	 	|MHConnection|
@@ -49,10 +49,10 @@ Currently official plugins are
 |customSuccess	|Notification:customSuccess	|msg: The message to display	|a custom success message	|Core, Controls| Notifications|
 |segmentMouseout	|Segment:mouseOut	|no: Segment number	|the mouse is off a segment	|Controls, Slide text (Tab)| Controls, Slide text (Tab)|
 |segmentMouseover	|Segment:mouseOver	|no: Segment number	|the mouse is over a segment	|Controls, Slide text (Tab)| Controls, Slide text (Tab)|
-|sliderMousein	|Slider:mouseIn	 |	|the mouse entered the slider	|Controls| | 
+|sliderMousein	|Slider:mouseIn	 |	|the mouse entered the slider	|Controls| |
 |sliderMouseout	|Slider:mouseOut	| 	|the mouse is off the slider	|Controls | |
 |sliderMousemove	|Slider:mouseMoved	|timeInMs: The time on the hovered position in ms	|the mouse is moving over the slider	| Controls | |
-|sliderStart	|Slider:start	 |	|slider started	|Controls| | 
+|sliderStart	|Slider:start	 |	|slider started	|Controls| |
 |sliderStop	|Slider:stop	|time: The time the slider stopped at	| slider stopped	|Controls|Videodisplay|
 |aspectRatioSet	|Video:aspectRatioSet	|as: (array) as[0] = width, as[1] = height, as[2] = aspect ratio in %|the aspect ratio has been calculated	|Videodisplay|Controls|
 |audioCodecNotSupported	|Video:audioCodecNotSupported	 |	|when the audio codec seems not to be supported by the browser	| Videodisplay |Notifications|
@@ -70,11 +70,11 @@ Currently official plugins are
 |muteToggle	|Video:muteToggle	 |	|toggle mute and unmute	| Core|Videodisplay|
 |nextChapter	|Video:nextChapter	| | Core | |
 |numberOfVideodisplaysSet	|Video:numberOfVideodisplaysSet	|no: Number of videodisplays	|the number of videodisplays has been set	|Videodisplay| |
-|pause	|Video:pause	|triggeredByMaster: Whether or not the event has been triggered by master	|pauses the video	
+|pause	|Video:pause	|triggeredByMaster: Whether or not the event has been triggered by master	|pauses the video
 |Core, Controls, Videodisplay| Controls, Videodisplay|
 |play	|Video:play	|triggeredByMaster: Whether or not the event has been triggered by master	|plays the video	|Core, Controls, Videodisplay| Controls,Videodisplay |
 |playPause	|Video:playPause	 |	 |	|Core|Videodisplay|
-|previousChapter	|Video:previousChapter	 	 | | |Core| | 
+|previousChapter	|Video:previousChapter	 	 | | |Core| |
 |playbackRateChanged	|Video:playbackRateChanged	|rate: The video playback rate (0.0-x, default: 1.0)	|The video playback rate changed	|Controls| Controls, Videodisplay|
 |playbackRateIncrease	|Video:playbackRateIncrease	 | | |Core|Videodisplay|
 |playbackRateDecrease	|Video:playbackRateDecrease	 | | |Core|Videodisplay|

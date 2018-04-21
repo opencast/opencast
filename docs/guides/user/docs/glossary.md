@@ -54,7 +54,7 @@ audio and video (VGA/DVI), and, depending on software and hardware support, vari
 
 ## Tasks
 Tasks are utilized by Opencast to define production processes. They contains a series of operations (also called Jobs)
-that instructs the Opencast system on how video is captured, encoded, archived, and distributed.  
+that instructs the Opencast system on how video is captured, encoded, archived, and distributed.
 
 ## Themes
 Enable an administrator to brand recordings using intro video, title slides, and watermarks. Themes can be applied on a

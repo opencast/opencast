@@ -80,7 +80,7 @@ Modal Buttons
           <span class="hljs-attribute">background-image</span>
           <span class="hljs-rule">:</span>
           <span class="hljs-value"> linear-gradient(
-            <span class="hljs-hexcolor">#39c985</span>, 
+            <span class="hljs-hexcolor">#39c985</span>,
             <span class="hljs-hexcolor">#2d9b67</span>)
           </span>
         </span>
@@ -131,12 +131,12 @@ placed in a specific hierarchical order for consistency.
   <img src="../../../../img/more-icon_2x.png" alt="More Information"/>
   <img src="../../../../img/edit-icon_2x.png" alt="Edit"/>
   <img src="../../../../img/time-icon_2x.png" alt="Time"/>
-  <img src="../../../../img/preview-icon_2x.png" alt="Preview"/>  
+  <img src="../../../../img/preview-icon_2x.png" alt="Preview"/>
   <img src="../../../../img/plus-icon_2x.png" alt="Plus"/>
   <img src="../../../../img/play-icon_2x.png" alt="Play"/>
   <img src="../../../../img/play-icon-on_2x.png" alt="Play Active"/>
   <i class="fa fa-comment fa-2x"></i>
-  <i class="fa fa-comment-o fa-2x"></i>  
+  <i class="fa fa-comment-o fa-2x"></i>
   <img src="../../../../img/remove-icon_2x.png" alt="Remove"/>
 </div>
 <br/>

@@ -6,7 +6,7 @@ Admin Guide.
 ## Opencast Signing Protocol
 
 The Signing Providers as well as the verification components that are developed by the Opencast community implement the
-policy and signature specified in the Opencast Signing Protocol. 
+policy and signature specified in the Opencast Signing Protocol.
 
 ### Policy
 The policy is a Base64 encoded JSON document. A human-readable version of the JSON document looks like this:
@@ -62,7 +62,7 @@ identifier, e.g. ‘key1’. In this example, the following key has been used:
 
 Key ID: demoKeyOne Secret Key: 6EDB5EDDCF994B7432C371D7C274F
 
-The HMAC for the signature from the previous section calculated based on the *demoKey1* is 
+The HMAC for the signature from the previous section calculated based on the *demoKey1* is
 
     c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4
 
@@ -71,7 +71,7 @@ would now look like this:
 
     http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0&signature=c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4
 
-The same is true for the key id, which needs to be included to determine which key was used to create the signature. 
+The same is true for the key id, which needs to be included to determine which key was used to create the signature.
 
     http://opencast.org/engage/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiUmVzb3VyY2UiOiJodHRwOlwvXC9vcGVuY2FzdC5vcmdcL2VuZ2FnZVwvcmVzb3VyY2UubXA0IiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTQyNTE3MDc3NzAwMCwiRGF0ZUdyZWF0ZXJUaGFuIjoxNDI1MDg0Mzc5MDAwLCJJcEFkZHJlc3MiOiIxMC4wLjAuMSJ9fX0&signature=c8712284aabc843f76a132a3a7c8997670414b2f89cb96b367d5f35d0f62a2e4&keyId=demoKeyOne
 
@@ -99,7 +99,7 @@ void setUrlSigningService(UrlSigningService service) {
   this.urlSigningService = service;
 }
 
-… 
+…
 
 String urlToSign = “http://my.custom.url/with/path.mp4”;
 long signedUrlExpiresDuration = 60;

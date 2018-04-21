@@ -18,7 +18,7 @@ across a defined period of time. Here is an example of a Series which consists o
 You can access the Series page from the **Main Menu > Recordings > Series**
 
 ## How to create a Series
-A Series contains multiple events that occur across a defined period of time.  
+A Series contains multiple events that occur across a defined period of time.
 
 1. Click the Add Series button and a Create New Series wizard will be displayed
 1. At minimum you must enter a Title for the creation of a Series. All other fields on the Metadata screen are optional.
