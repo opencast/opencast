@@ -61,11 +61,13 @@ The following table contains the workflow operations that are available in an ou
 |publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publishconfigure-woh.md)|
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
+|publish-youtube     |Distribute and publish media to YouTube                        |[Documentation](publish-youtube-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
 |retract-aws         |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-aws-woh.md)|
 |retract-configure   |Retracts media from configured publication                     |[Documentation](retractconfigure-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
+|retract-youtube     |Retracts media from YouTube                                    |[Documentation](retract-youtube-woh.md)|
 |segment-video       |Extracting segments from presentation                          |[Documentation](segmentvideo-woh.md)|
 |segmentpreviews     |Extract segment images from a video using FFmpeg               |[Documentation](segmentpreviews-woh.md)|
 |send-email          |Sends email notifications at any part of a workflow            |[Documentation](send-email-woh.md)|
