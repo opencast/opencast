@@ -69,13 +69,13 @@ Parameter Table
 
 |configuration keys|example|description|default value|
 |------------------|-------|-----------|-------------|
-|source-flavors |"presentation/work,presenter/work"	|The "flavors" of the track to use as a source input	|EMPTY|
-|source-flavor  |"presentation/work"	|The "flavor" of the track to use as a source input	|EMPTY|
-|source-tags    |"engage,atom,rss"	|The "tag" of the track to use as a source input	|EMPTY|
-|target-flavor  |"presentation/normalized"	|The flavor to apply to the normalized file	|EMPTY|
-|target-tags    |"norm"	|The tags to apply to the normalized file	|EMPTY|
-|**target-decibel**\*|-30.4	|The target RMS Level Decibel	|EMPTY|
-|force-transcode	|"true" or "false"	|Whether to force transcoding the audio stream (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)	|FALSE|
+|source-flavors      |"presentation/work,presenter/work"    |The "flavors" of the track to use as a source input    |EMPTY|
+|source-flavor       |"presentation/work"    |The "flavor" of the track to use as a source input    |EMPTY|
+|source-tags         |"engage,atom,rss"    |The "tag" of the track to use as a source input    |EMPTY|
+|target-flavor       |"presentation/normalized"    |The flavor to apply to the normalized file    |EMPTY|
+|target-tags         |"norm"    |The tags to apply to the normalized file    |EMPTY|
+|**target-decibel**\*|-30.4    |The target RMS Level Decibel    |EMPTY|
+|force-transcode     |"true" or "false"    |Whether to force transcoding the audio stream (This is needed when trying to strip an audio stream from an audio only video container, because SoX can not handle video formats, so it must be encoded to an audio format)    |FALSE|
 
 \* **required keys**
 

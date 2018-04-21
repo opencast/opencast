@@ -247,7 +247,7 @@ at the bottom of the file. Please see the example below:
       <!-- Defines how the user attributes are converted to authorities (roles) -->
       <!-- PLEASE NOTE: the ref below must match the corresponding authoritiesPopulator -->
       <constructor-arg ref="authoritiesPopulator2" />
-	</bean>
+    </bean>
 
     <!-- [ ... SKIPPED LINES ... ] -->
 

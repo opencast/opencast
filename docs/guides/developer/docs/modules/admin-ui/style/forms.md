@@ -1,4 +1,5 @@
 ## Forms
+
 There are currently **2** form conventions used in the system and they are
 closely associated with the modal type that the form is displayed in.
 
@@ -83,7 +84,7 @@ span.editable, td.editable span {
   font-size: 14px;
   font-weight: 400;
   color: #666;
-  line-height	14px
+  line-height: 14px;
 }
 
 .form-container input {

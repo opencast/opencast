@@ -79,7 +79,7 @@ For this, edit the `/etc/opencast/encoding/opencast-images.properties` and modif
 extraction:
 
     profile.text-analysis.http.ffmpeg.command = -ss #{time} -i #{in.video.path} \
-	    -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
+      -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
       -frames:v 1 -pix_fmt:v gray -r 1 #{out.dir}/#{out.name}#{out.suffix}
 
 This profile will create a gray, high contrast image. The additional light blur will reduce or remove noise and thicken

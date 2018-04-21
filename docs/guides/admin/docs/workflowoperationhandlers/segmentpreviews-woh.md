@@ -10,11 +10,11 @@ previous discovered segments.
 |------------------|-------|-----------|
 |source-flavor|presenter/source|Specifies which media should be processed.|
 |target-flavor|presenter/work|Specifies the flavor the new files will get.|
-|source-tags	|engage	|Specifies which media should be processed.	 |
-|target-tags	|engage	|Specifies the tags the new files will get.	 |
-|encoding-profile	|search-cover.http	|The encoding profile to use.	 |
-|reference-flavor	|presentation/work	|Flavor of the segments to use.	 |
-|reference-tags	|engage	|Tags of the segments to use.	 |
+|source-tags    |engage    |Specifies which media should be processed.     |
+|target-tags    |engage    |Specifies the tags the new files will get.     |
+|encoding-profile    |search-cover.http    |The encoding profile to use.     |
+|reference-flavor    |presentation/work    |Flavor of the segments to use.     |
+|reference-tags    |engage    |Tags of the segments to use.     |
 
 ## Operation Example
 
