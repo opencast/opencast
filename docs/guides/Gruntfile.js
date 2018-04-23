@@ -31,7 +31,7 @@ module.exports = function(grunt) {
             MD045: true, // accessibility
           }
         },
-        src: ["./admin/**/*.md", "./developer/**/*.md", "./user/**/*.md"]
+        src: ["./admin/**/*.md", "./developer/**/*.md", "./user/**/*.md", "../../*.md"]
       }
     }
   });
