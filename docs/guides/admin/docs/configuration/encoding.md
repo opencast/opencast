@@ -23,15 +23,15 @@ idea behind this is, to combine these separate files into one file which can lat
 
 Possible settings:
 
- - If you get an audio and a video file separately, it is possible to just copy the streams and put them together into a
+*  If you get an audio and a video file separately, it is possible to just copy the streams and put them together into a
    new file. This is very fast (you only have to copy the streams) and most importantly, it is lossless, as no
    re-encoding is done. The question is: What a/v container format can/should you use for such an operation.
- - You can try to use the video container the input video came in and just add the audio. This means that you will never
+*  You can try to use the video container the input video came in and just add the audio. This means that you will never
    have an unexpected video container you don't know of. I.e. if you put an .mp4 video in, it still uses and .mp4
    container after musing, etc. This might, however, lead to problems if you throw in an audio file that cannot be muxed
    in the specific container format (i.e. you have a FLAC audio file and an FLV container). This is, what Opencast
    does at the moment.
- - To circumvent the container problem, we could also use a container format which can hold almost everything (i.e. mkv)
+*  To circumvent the container problem, we could also use a container format which can hold almost everything (i.e. mkv)
    regardless of the input. This would mean that Opencast can handle more combinations of a/v streams but you will
    always end up with a Matroska file after muxing. Of cause, you can then encode it to mp4, etc. later on.
 
@@ -53,7 +53,7 @@ The `<config_dir>/encoding` folder allows you to quickly augment Opencast's exis
 adding new configuration files. The file names should follow the pattern `*.properties`.
 
 
-###The Encoding Profile
+### The Encoding Profile
 
 Encoding profiles consist of a set of key-value pairs that conform to the following pattern:
 

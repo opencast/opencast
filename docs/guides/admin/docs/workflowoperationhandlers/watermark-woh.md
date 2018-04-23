@@ -1,7 +1,7 @@
 ## WatermarkWorkflowOperationHandler
 
 ## Description
-The WatermarkWorkflowOperationHandler adds a custom image (usually a small one) to the source video. 
+The WatermarkWorkflowOperationHandler adds a custom image (usually a small one) to the source video.
 
 The operation needs a source video and a custom image file to create a watermarked video.
 

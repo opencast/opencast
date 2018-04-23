@@ -96,15 +96,15 @@ The Application API is designed to take full advantage of the powerful metadata 
 
 Opencast distinguishes between bibliographic metadata and technical metadata:
 
-- *Bibliographic metadata* is supposed to describe the associated objects and to be used to present those objects to
+* *Bibliographic metadata* is supposed to describe the associated objects and to be used to present those objects to
     endusers (e.g. in a video portal).
-- *Technical metadata* is used by Opencast to manage objects (e.g. permissions, processing, scheduling)
+* *Technical metadata* is used by Opencast to manage objects (e.g. permissions, processing, scheduling)
 
 For events and series, Opencast manages bibliographic metadata in metadata catalogs. There are two kind of metadata
 catalogs:
 
- - The default metadata catalogs for events (`dublincore/episode`) and series (`dublincore/series`)
- - An arbitrary number of configurable extended metadata catalogs can be configured for both events and series
+* The default metadata catalogs for events (`dublincore/episode`) and series (`dublincore/series`)
+* An arbitrary number of configurable extended metadata catalogs can be configured for both events and series
 
 While the extended metadata can be fully configured, the default metadata catalogs are supposed to hold a minimum
 set of defined metadata fields.
@@ -123,7 +123,7 @@ The following sections define data types that are used to manage metadata catalo
 
 ### fields
 
-Each metadata catalogs has a list of metadata fields that is described as array of JSON objects with the following 
+Each metadata catalogs has a list of metadata fields that is described as array of JSON objects with the following
 fields:
 
 Field          | Optional | Type                | Description
@@ -182,9 +182,9 @@ Field   | Required | Description
 
 Notes:
 
-- Fields which are not included in `catalog_values` will not be updated
-- Attempting to write readonly fields will result in error
-- Attempting to write empty values to a required field will result in error
+* Fields which are not included in `catalog_values` will not be updated
+* Attempting to write readonly fields will result in error
+* Attempting to write empty values to a required field will result in error
 
 ```
 [
@@ -310,7 +310,7 @@ ACE field  | Required | Type                | Description
 
 __Example__
 
-``` 
+```
   {
     "allow": true,
     "action": "write",

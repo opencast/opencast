@@ -1,30 +1,34 @@
-# General
+# Glossary
 
-## Client
+## General
+
+### Client
 
 A system that is using this API, making requests and consuming responses.
 
 
-# Data
+## Data
 
-## Event
+### Event
 
-A recording that is either going to take place, has been recorded using Opencast scheduling or has been uploaded either using this API or the Opencast administrative user interface. A collection of events may be grouped using a series.
+A recording that is either going to take place, has been recorded using Opencast scheduling or has been uploaded either
+using this API or the Opencast administrative user interface. A collection of events may be grouped using a series.
 
-## Series
+### Series
 
 A collection of events.
 
-# Users and Groups
+## Users and Groups
 
-## User
+### User
 
 A person accessing data provided by the API.
 
-## Producer
+### Producer
 
-A user that is managing individual recordings or groups of recordings. The producer uses the API to create, curate, publish, retract recordings.
+A user that is managing individual recordings or groups of recordings. The producer uses the API to create, curate,
+publish, retract recordings.
 
-## Spectator
+### Spectator
 
 A spectator accesses a subset of recordings that has been published by a producer.

@@ -117,11 +117,9 @@
                       <input id="{{asset.id}}" class="blue-btn file-select-btn" admin-ng-file-upload data-ng-file-select data-ng-multiple="asset.multiple"
                         type="file" file="$parent.wizard.step.ud.UPLOAD.tracks.{{asset.id}}" tabindex="" />
                     </div>
-                    <span  translate="{{asset.title + '.SHORT'}}">
-                    </span>
+                    <span>{{asset | translateOverrideFallback: 'SHORT'}}</span>
                     <span class="ui-helper-hidden"> ({{asset.type}} "{{asset.flavorType}}/{{asset.flavorSubType}}")</span>
-                    <p translate="{{asset.title + '.DETAIL'}}">
-                    </p>
+                    <p>{{asset | translateOverrideFallback: 'DETAIL'}}</p>
                  </li>
                 </ul>
               </div>
@@ -228,7 +226,7 @@
                           <td>
                             <select chosen
                                     data-width="'100px'"
-                                    tabindex="7"
+                                    tabindex="9"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.hour" ng-change="wizard.step.onTemporalValueChange('end')"
@@ -239,7 +237,7 @@
                             </select>
                             <select chosen
                                     data-width="'100px'"
-                                    tabindex="8"
+                                    tabindex="10"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.minute" ng-change="wizard.step.onTemporalValueChange('end')"
@@ -258,7 +256,7 @@
                             <td>
                             <select chosen
                                 data-width="'200px'"
-                                tabindex="9"
+                                tabindex="11"
                                 ng-disabled="wizard.step.checkingConflicts"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
@@ -274,7 +272,10 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
                             <td>
                                 <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_SINGLE.device.inputs">
-                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_SINGLE.device.inputMethods[inputMethod.id]" tabindex="10"> {{ inputMethod.id | translate }}
+                                    <input type="checkbox"
+                                        ng-model="wizard.step.ud.SCHEDULE_SINGLE.device.inputMethods[inputMethod.id]"
+                                        tabindex="12">
+                                    {{ inputMethod.id | translate }}
                                     <br>
                                 </label>
                             </td>
@@ -308,7 +309,9 @@
                             <td>
                                 <div ng-repeat="weekday in wizard.step.sortedWeekdays" class="day-check-container">{{ weekday.translation | translate }}
                                      <br>
-                                    <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.weekdays[weekday.key]"
+                                    <input
+                                        type="checkbox"
+                                        ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.weekdays[weekday.key]"
                                         ng-change="wizard.step.checkConflicts()"
                                      />
                                  </div>
@@ -320,7 +323,7 @@
                             <td>
                                 <select chosen
                                     data-width="'100px'"
-                                    tabindex="15"
+                                    tabindex="7"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
@@ -332,7 +335,7 @@
                                 </select>
                                 <select chosen
                                     data-width="'100px'"
-                                    tabindex="16"
+                                    tabindex="8"
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
@@ -350,7 +353,7 @@
                                 <select chosen
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
-                                    tabindex="17"
+                                    tabindex="9"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"
@@ -362,7 +365,7 @@
                                 <select chosen
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-width="'100px'"
-                                    tabindex="18"
+                                    tabindex="10"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"

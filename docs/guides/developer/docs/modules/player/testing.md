@@ -52,10 +52,13 @@ dependencies will be automatically resolved just like it is in the nature of mav
     </build>
 
 ## Testing The Engage Core
-This chapter gives an overview over the directory structure used for testing the theodul engage core module, the configuration for the specs in the **spec_helper.js** and how to write specs for the core.
+This chapter gives an overview over the directory structure used for testing the theodul engage core module, the
+configuration for the specs in the **spec_helper.js** and how to write specs for the core.
 
 ### Directory Structure
-The test relevant files are located in the **src/test/resources/ui/js/spec** tree. Files that filename ends on **_spec.js** are considered as files with executable tests. The **spec_helper.js** in configured in the **pom.xml** for the initial setup.
+The test relevant files are located in the **src/test/resources/ui/js/spec** tree. Files that filename ends on
+**_spec.js** are considered as files with executable tests. The **spec_helper.js** in configured in the **pom.xml** for
+the initial setup.
 
 **Directory Structure Testing Engage Core**
 

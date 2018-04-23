@@ -1,28 +1,31 @@
-Upgrading Opencast from 4.0 to 5.0
-==================================
+Upgrading Opencast
+==================
 
-Configuration Changes
----------------------
+Upgrading Opencast from 4.0 to 5.0
+----------------------------------
+
+### Configuration Changes
+
 
 As Piwik has been renamed to Matomo Opencast changed the name for the plugin and configuration keys too.
 So if you already configured an Piwik Server please adapt in `etc/org.opencastproject.organization-mh_default_org.cfg`
 the following keys:
 
-- `prop.player.piwik.server` -> `prop.player.matomo.server`
-- `prop.player.piwik.site_id` -> `prop.player.matomo.site_id`
-- `prop.player.piwik.heartbeat` -> `prop.player.matomo.heartbeat`
-- `prop.player.piwik.track_events` -> `prop.player.matomo.track_events`
+* `prop.player.piwik.server` -> `prop.player.matomo.server`
+* `prop.player.piwik.site_id` -> `prop.player.matomo.site_id`
+* `prop.player.piwik.heartbeat` -> `prop.player.matomo.heartbeat`
+* `prop.player.piwik.track_events` -> `prop.player.matomo.track_events`
 
 
 Upgrading Opencast 3.0 To 4.0
-=============================
+-----------------------------
 
 This guide describes how to upgrade Opencast 3.0.x to 4.0.x. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
 
-How to Upgrade
---------------
+### How to Upgrade
+
 
 1. Stop your current Opencast instance
 2. Back-up Opencast files and database (optional)
@@ -36,8 +39,7 @@ How to Upgrade
 11. Delete the old scheduler Solr data directory (`data/solr-indexes/scheduler`)
 
 
-Database Migration
-------------------
+### Database Migration
 
 Opencast 4.0 includes database changes for the new asset manager and scheduler.  As with all database migrations, we
 recommend to make a database backup before attempting the upgrade.
@@ -49,16 +51,14 @@ versions, `GRANT CREATE TEMPORARY TABLES` is required as well. You can simply re
 set-up step from the [database configuration guide](configuration/database/#step-1-create-an-opencast-database)
 
 
-ActiveMQ Migration
-------------------
+### ActiveMQ Migration
 
 Opencast 4.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
 configuration guide](configuration/message-broker/) to deploy a new configuration. No data migration is required for
 this since the message broker only contains temporary data.
 
 
-Scheduler Migration
--------------------
+### Scheduler Migration
 
 The new scheduler service adds support for extended metadata and is bound to the new asset manager. Data from the old
 scheduler need to be migrated if Opencast contains upcoming, scheduled events. If you do not have any upcoming,
@@ -79,8 +79,7 @@ To start the migration follow these steps:
    avoid further migration attempts.
 
 
-Re-Build ElasticSearch Index
-----------------------------
+### Re-Build ElasticSearch Index
 
 The introduction of the new scheduler service requires an update to the ElasticSearch index:
 
@@ -88,8 +87,8 @@ The introduction of the new scheduler service requires an update to the ElasticS
 2. Start Opencast if you have not already, waiting until it has started completely.
 3. Use one of the following methods to recreate the index:
 
-    - Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
-    - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+    * Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
+    * Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
       symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
       `/recreateIndex`.
 
@@ -97,8 +96,8 @@ The introduction of the new scheduler service requires an update to the ElasticS
 
 4. If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
 
-    - Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
-    - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+    * Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
+    * Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
       symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
       `/recreateIndex`.
 

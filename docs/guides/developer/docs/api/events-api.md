@@ -354,9 +354,11 @@ __Response__
 
 # Access Policy
 
-Most events in Opencast come with an access control list (ACL), containing entries that map actions to roles, either allowing or denying that action.
+Most events in Opencast come with an access control list (ACL), containing entries that map actions to roles, either
+allowing or denying that action.
 
-The section on roles in the chapter on [Authorization](authorization.md#AccessControl) will help shed some light on what kind of roles are available and how they are assigned to the current user.
+The section on roles in the chapter on [Authorization](authorization.md#AccessControl) will help shed some light on what
+kind of roles are available and how they are assigned to the current user.
 
 For more information about access control lists, please refer to [Access Control Lists](types.md#access-control-lists).
 

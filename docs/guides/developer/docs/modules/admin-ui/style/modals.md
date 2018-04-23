@@ -33,12 +33,15 @@ following types of modals are used.
   <dt>Step-by-Step</dt>
   <dd>
     <img src="../../../../img/modal-types-step.png" />
-    The step-by-step modal guides the user through the required steps to complete a particular task. The sequence of forms might have an impact on subsequent steps. The create event modal is a good example.
+    The step-by-step modal guides the user through the required steps to complete a particular task. The sequence of
+    forms might have an impact on subsequent steps. The create event modal is a good example.
   </dd>
   <dt>Tabbed</dt>
   <dd>
     <img src="../../../../img/modal-types-tab.png" />
-    The tabbed modal is used to display information divided up into logical sections. It is not that important that the sequence of forms be maintained, validation is done on all the forms before completion of the task. The edit/create user modal as shown above demonstrates the usage of a tabbed modal.</dd>
+    The tabbed modal is used to display information divided up into logical sections. It is not that important that
+    the sequence of forms be maintained, validation is done on all the forms before completion of the task. The
+    edit/create user modal as shown above demonstrates the usage of a tabbed modal.</dd>
   <dt>Single View</dt>
   <dd>
     <img src="../../../../img/modal-types-single.png" />
