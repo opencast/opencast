@@ -223,7 +223,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   private String checkIfNull(Object o, String s) {
 
-    if(o != null) {
+    if(o == null) {
       return s + "not defined";
     }
     if (o instanceof String[]) {
