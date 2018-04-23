@@ -1,13 +1,15 @@
 <a data-open-modal="group-modal" 
-    data-action="edit" 
-    data-resource-id="{{ row.id }}" 
-    class="more"
-    with-role="ROLE_UI_GROUPS_EDIT">
+  data-action="edit" 
+  data-resource-id="{{ row.id }}" 
+  class="more"
+  title="{{ 'USERS.GROUPS.TABLE.TOOLTIP.DETAILS' | translate }}"
+  with-role="ROLE_UI_GROUPS_EDIT">
 </a>
 
 <a data-confirmation-modal="confirm-modal" 
-	data-callback="table.delete" 
-	data-object="row" 
-	class="remove"
-	with-role="ROLE_UI_GROUPS_DELETE">
+  data-callback="table.delete" 
+  data-object="row" 
+  class="remove"
+  title="{{ 'USERS.GROUPS.TABLE.TOOLTIP.DELETE' | translate }}"
+  with-role="ROLE_UI_GROUPS_DELETE">
 </a>

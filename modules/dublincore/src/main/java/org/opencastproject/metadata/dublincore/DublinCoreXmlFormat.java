@@ -22,12 +22,14 @@
 package org.opencastproject.metadata.dublincore;
 
 import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.XMLCatalogImpl;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.XmlNamespaceContext;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -45,6 +47,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -76,6 +79,12 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
   private DublinCoreCatalog dc = DublinCores.mkSimple();
 
   private DublinCoreXmlFormat() {
+  }
+
+  // Option to instante catalog with intentionally emptied values
+  // used to target removal of DublinCore catalog values during update.
+  private DublinCoreXmlFormat(boolean includeEmpty) {
+    dc.includeEmpty(includeEmpty);
   }
 
   /**
@@ -165,6 +174,72 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     return new DublinCoreXmlFormat().readImpl(xml);
   }
 
+  // Optional read to optionally instantiate catalog with intentionally empty elements
+  // used to remove existing DublinCore catalog values during a merge update.
+  @Nonnull
+  public static DublinCoreCatalog read(String xml, boolean includeEmptiedElements)
+          throws IOException, SAXException, ParserConfigurationException {
+    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(
+        new InputSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))));
+  }
+
+  @Nonnull
+  public static DublinCoreCatalog read(Node xml, boolean includeEmptiedElements)
+      throws TransformerException {
+    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(xml);
+  }
+
+  @Nonnull
+  public static DublinCoreCatalog read(InputSource xml, boolean includeEmptiedElements)
+      throws IOException, SAXException, ParserConfigurationException {
+    return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(xml);
+  }
+
+  @Nonnull
+  public static DublinCoreCatalog read(File xml, boolean includeEmptiedElements)
+          throws IOException, SAXException, ParserConfigurationException {
+    try (FileInputStream in = new FileInputStream(xml)) {
+      return new DublinCoreXmlFormat(includeEmptiedElements).readImpl(new InputSource(in));
+    }
+  }
+
+  /**
+   * Merge values that are  new, changed, or emptied from the "from" catalog into the existing "into" catalog.
+   *
+   * @param fromCatalog contains targeted new values (new elements, changed element values, emptied element values).
+   * @param intoCatalog is the existing catalog that merges in the targed changes.
+   * @return the merged catalog
+   */
+  public static DublinCoreCatalog merge(DublinCoreCatalog fromCatalog, DublinCoreCatalog intoCatalog) {
+
+    // If one catalog is null, return the other.
+    if (fromCatalog == null) {
+      return intoCatalog;
+    }
+    if (intoCatalog == null) {
+      return fromCatalog;
+    }
+
+    DublinCoreCatalog mergedCatalog = (DublinCoreCatalog) intoCatalog.clone();
+    List<CatalogEntry> mergeEntries = fromCatalog.getEntriesSorted();
+
+    for (CatalogEntry mergeEntry: mergeEntries) {
+      // ignore root entry
+      if ((mergeEntry.getEName()).equals(intoCatalog.getRootTag()))
+        continue;
+
+      // if language is provided, only overwrite existing of same language
+      String lang = mergeEntry.getAttribute(XMLCatalogImpl.XML_LANG_ATTR);
+      if (StringUtils.isNotEmpty(lang)) {
+        // Passing a null value will remove the exiting value
+        mergedCatalog.set(mergeEntry.getEName(), StringUtils.trimToNull(mergeEntry.getValue()), lang);
+      } else {
+        mergedCatalog.set(mergeEntry.getEName(), StringUtils.trimToNull(mergeEntry.getValue()));
+      }
+    }
+    return mergedCatalog;
+  }
+
   public static Document writeDocument(DublinCoreCatalog dc)
           throws ParserConfigurationException, TransformerException, IOException {
     // Create the DOM document
@@ -211,7 +286,7 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
     factory.setValidating(false);
     // namespaces!
     factory.setNamespaceAware(true);
-    // read document                                   ‘
+    // read document
     factory.newSAXParser().parse(in, this);
     return dc;
   }

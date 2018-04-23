@@ -21,18 +21,29 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewGroupUsers', ['ResourcesListResource', '$location', function (ResourcesListResource) {
+.factory('NewGroupUsers', ['AuthService', 'ResourcesListResource', '$location', function (AuthService, ResourcesListResource) {
     var Users = function () {
         var me = this;
-        me.users = {
-            available: ResourcesListResource.query({ resource: 'USERS.INVERSE'}),
-            selected:  [],
-            i18n: 'USERS.GROUPS.DETAILS.USERS',
-            searchable: true
-        };
+
+        var listName = AuthService.getUser().$promise.then(function (current_user) {
+            return angular.isDefined(current_user)
+                && angular.isDefined(current_user.org)
+                && angular.isDefined(current_user.org.properties) ?
+                current_user.org.properties['adminui.user.listname'] : undefined;
+        });
 
         this.reset = function () {
+            me.users = {
+                available: [],
+                selected:  [],
+                i18n: 'USERS.GROUPS.DETAILS.USERS',
+                searchable: true
+            };
+            listName.then(function (listName) {
+                me.users.available = ResourcesListResource.query({ resource: listName || 'USERS.INVERSE.WITH.USERNAME'});
+            });
         };
+
         this.reset();
 
         this.isValid = function () {
@@ -49,5 +60,6 @@ angular.module('adminNg.services')
             return list;
         };
     };
+
     return new Users();
 }]);

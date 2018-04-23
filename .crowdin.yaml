@@ -4,8 +4,8 @@ preserve_hierarchy: true
 
 files:
   -
-    source: '/modules/admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
-    translation: '/modules/admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
+    source: '/modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
+    translation: '/modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
 
   -
     source: '/modules/engage-theodul-core/src/main/resources/ui/language/en-US.json'

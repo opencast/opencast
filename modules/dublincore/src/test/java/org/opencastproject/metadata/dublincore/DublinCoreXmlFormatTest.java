@@ -22,7 +22,10 @@ package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.util.IoSupport;
@@ -96,5 +99,48 @@ public class DublinCoreXmlFormatTest {
     final DublinCoreCatalog dc = DublinCoreXmlFormat.read(dcNode);
     assertNotNull(dc);
     assertEquals("10.0000/5820", DublinCores.mkOpencastEpisode(dc).getDcIdentifier().get());
+  }
+
+  @Test
+  public void readWithEmptyAndMergeTest() throws Exception {
+    String emtpy = "";
+    String delimiter = "|";
+    String irishTitle = "Talamh agus Fásra: Príomh-imreoirí ar an Radharc Aeráide";
+    String irishLang = "ga";
+    String germanLang = "de";
+    String fooId = "197011";
+    EName eNamepropertyFooId = new EName("http://foo.org/metadata", "id");
+    boolean marshalEmpty = true;
+
+    DublinCoreCatalog catalogWithEmpty = DublinCoreXmlFormat
+            .read(IoSupport.classPathResourceAsFile("/dublincore.xml").get(), marshalEmpty);
+    DublinCoreCatalog catalogNoEmpty = DublinCoreXmlFormat
+            .read(IoSupport.classPathResourceAsFile("/dublincore.xml").get(), !marshalEmpty);
+
+    // Loading with empty and not empty
+    assertEquals(emtpy,catalogWithEmpty.getFirst(DublinCore.PROPERTY_SPATIAL));
+    assertNull(catalogNoEmpty.getFirst(DublinCore.PROPERTY_SPATIAL));
+
+    DublinCoreCatalog mergedEmptyNoEmpty = DublinCoreXmlFormat.merge(catalogWithEmpty, catalogNoEmpty);
+
+    // Extra empty values have no effect on merge, original is not affected
+    assertEquals(catalogNoEmpty, mergedEmptyNoEmpty);
+    assertEquals(irishTitle, catalogNoEmpty.getAsText(DublinCore.PROPERTY_TITLE, irishLang, delimiter));
+    assertNull(catalogNoEmpty.getFirst(DublinCore.PROPERTY_SPATIAL));
+
+    DublinCoreCatalog catalogToMerge = DublinCoreXmlFormat
+            .read(IoSupport.classPathResourceAsFile("/dublincore-extended.xml").get(), marshalEmpty);
+
+    assertEquals("lab2", catalogToMerge.getFirst(DublinCore.PROPERTY_SPATIAL));
+
+    DublinCoreCatalog mergedToMergeNoEmpty = DublinCoreXmlFormat.merge(catalogToMerge, catalogNoEmpty);
+
+    // Merging catalog with different values removes empty values and adds or updates non-empty values
+    assertEquals("lab2", mergedToMergeNoEmpty.getFirst(DublinCore.PROPERTY_SPATIAL));
+    assertNull(mergedToMergeNoEmpty.getAsText(DublinCore.PROPERTY_TITLE, irishLang, delimiter));
+    assertNotNull(mergedToMergeNoEmpty.getAsText(DublinCore.PROPERTY_TITLE, germanLang, delimiter));
+    assertTrue("Property foo:id should be in the list of known properties.",
+            mergedToMergeNoEmpty.getProperties().contains(eNamepropertyFooId));
+    assertEquals(fooId, mergedToMergeNoEmpty.getFirstVal(eNamepropertyFooId).getValue());
   }
 }

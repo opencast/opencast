@@ -38,6 +38,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
         prop_matomo_server = "player.matomo.server",
         prop_matomo_site_id = "player.matomo.site_id",
         prop_matomo_heartbeat = "player.matomo.heartbeat",
+        prop_matomo_notification = "player.matomo.notification",
         prop_matomo_track_events = "player.matomo.track_events",
         prop_hide_video_context_menu = "player.hide_video_context_menu",
         ready = false,
@@ -66,6 +67,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                         matomo_server,
                         matomo_site_id,
                         matomo_heartbeat,
+                        matomo_notification,
                         matomo_track_events;
                     if (me && me.attributes && me.attributes.org && me.attributes.org.properties) {
                         // extract shortcuts
@@ -135,6 +137,11 @@ define(['jquery', 'backbone'], function($, Backbone) {
                             }
                             else if ((key == prop_matomo_heartbeat) && value) {
                               matomo_heartbeat = value;
+			    }
+                            else if ((key == prop_matomo_notification)) {
+                              if (value) {
+                              matomo_notification = value;
+                              } else matomo_notification = true; 
                             }
                             else if ((key == prop_matomo_track_events) && value) {
                               matomo_track_events = value;
@@ -156,6 +163,7 @@ define(['jquery', 'backbone'], function($, Backbone) {
                     me.set("matomo.server", matomo_server);
                     me.set("matomo.site_id", matomo_site_id);
                     me.set("matomo.heartbeat", matomo_heartbeat);
+                    me.set("matomo.notification", matomo_notification);
                     me.set("matomo.track_events", matomo_track_events);
                     ready = true;
                 }

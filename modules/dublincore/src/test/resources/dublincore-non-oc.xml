@@ -19,4 +19,5 @@
   <dcterms:title xml:lang="de">Ein Titel</dcterms:title>
   <oc:promoted>true</oc:promoted>
   <foo:id>197011</foo:id>
+  <foo:empty></foo:empty>
 </metadata>

@@ -26,15 +26,19 @@ angular.module('adminNg.controllers')
 
         var reloadSelectedUsers = function () {
             $scope.group.$promise.then(function() {
-                $scope.user.available.$promise.then(function() {
-                    // Now that we have the user users and the available users populate the selected and available
-                    $scope.user.selected = [];
-                    angular.forEach($scope.group.users, function (user) {
-                        $scope.user.selected.push({name: user.name, value: user.username});
+                $scope.user.all.$promise.then(function() {
+                    // Now that we have the user users and the group users populate the selected and available
+                    $scope.user.selected = $scope.user.all.filter(function (user) {
+                        var foundUser = $scope.group.users.find(function (groupUser) {
+                            return groupUser.username === user.value;
+                        });
+                        return foundUser !== undefined;
                     });
-                    // Filter the selected from the available list
-                    $scope.user.available = _.filter($scope.user.available, function(user) {
-                        return !_.findWhere($scope.user.selected, {name: user.name});
+                    $scope.user.available = $scope.user.all.filter(function (user) {
+                        var foundUser = $scope.user.selected.find(function (selectedUser) {
+                            return selectedUser.value === user.value;
+                        });
+                        return foundUser === undefined;
                     });
                 });
             });
@@ -72,7 +76,8 @@ angular.module('adminNg.controllers')
                $scope.orgProperties = current_user.org.properties;
           }
           $scope.user = {
-              available: ResourcesListResource.query({ resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
+              all: ResourcesListResource.query({ resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
+              available: [],
               selected:  [],
               i18n: 'USERS.GROUPS.DETAILS.USERS',
               searchable: true

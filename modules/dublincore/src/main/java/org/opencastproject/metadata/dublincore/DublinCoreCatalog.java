@@ -36,10 +36,10 @@ import org.opencastproject.util.data.Function2;
 import com.entwinemedia.fn.Fns;
 import com.entwinemedia.fn.data.ImmutableSetWrapper;
 
-import org.apache.commons.collections.Closure;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 
@@ -371,7 +371,8 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   }
 
   void add(EName property, String value, String language, @Nullable EName encodingScheme) {
-    if (LANGUAGE_UNDEFINED.equals(language)) {
+    // Ignore empty rootTag element
+    if (LANGUAGE_UNDEFINED.equals(language) && !property.equals(rootTag)) {
       if (encodingScheme == null) {
         addElement(property, value);
       } else {
@@ -462,7 +463,10 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   // make public
   @Override public void addElement(EName element, String value, Attributes attributes) {
-    super.addElement(element, value, attributes);
+    // Ignore empty root element
+    if (! rootTag.equals(element)) {
+      super.addElement(element, value, attributes);
+    }
   }
 
   // make public

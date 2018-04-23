@@ -50,6 +50,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.activation.MimetypesFileTypeMap;
 
@@ -74,6 +76,8 @@ public class EncoderEngine implements AutoCloseable {
   /** Set of processes to clean up */
   private Set<Process> processes = new HashSet<>();
 
+  private final Pattern outputPattern = Pattern.compile("Output .* to '(.*)':");
+
   /**
    * Creates a new abstract encoder engine with or without support for multiple job submission.
    */
@@ -89,7 +93,11 @@ public class EncoderEngine implements AutoCloseable {
    */
   File encode(File mediaSource, EncodingProfile format, Map<String, String> properties)
           throws EncoderException {
-    return process(Collections.map(Tuple.tuple("video", mediaSource)), format, properties);
+    List<File> output = process(Collections.map(Tuple.tuple("video", mediaSource)), format, properties);
+    if (output.size() != 1) {
+      throw new EncoderException(String.format("Encode expects one output file (%s found)", output.size()));
+    }
+    return output.get(0);
   }
 
   /**
@@ -153,7 +161,7 @@ public class EncoderEngine implements AutoCloseable {
    * @throws EncoderException
    *           if processing fails
    */
-  File process(Map<String, File> source, EncodingProfile profile, Map<String, String> properties)
+  List<File> process(Map<String, File> source, EncodingProfile profile, Map<String, String> properties)
           throws EncoderException {
     // Fist, update the parameters
     Map<String, String> params = new HashMap<>();
@@ -176,19 +184,25 @@ public class EncoderEngine implements AutoCloseable {
     final File parentFile = source.getOrDefault("video", source.get("audio"));
 
     final String outDir = parentFile.getAbsoluteFile().getParent();
-    final String outSuffix = processParameters(profile.getSuffix(), params);
     final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
-            + (params.containsKey("time") ? "_" + params.get("time").replace('.', '_') : "")
             + "_" + UUID.randomUUID().toString();
-    File outFile = new File(outDir, outFileName + outSuffix);
     params.put("out.dir", outDir);
     params.put("out.name", outFileName);
-    params.put("out.suffix", outSuffix);
+    if (profile.getSuffix() != null) {
+      final String outSuffix = processParameters(profile.getSuffix(), params);
+      params.put("out.suffix", outSuffix);
+    }
+
+    for (String tag : profile.getTags()) {
+      final String suffix = processParameters(profile.getSuffix(tag), params);
+      params.put("out.suffix." + tag, suffix);
+    }
 
     // create encoder process.
     final List<String> command = buildCommand(profile, params);
     logger.info("Executing encoding command: {}", command);
 
+    List<File> outFiles = new ArrayList<>();
     BufferedReader in = null;
     Process encoderProcess = null;
     try {
@@ -201,27 +215,28 @@ public class EncoderEngine implements AutoCloseable {
       in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
       String line;
       while ((line = in.readLine()) != null) {
-        handleEncoderOutput(line);
+        handleEncoderOutput(outFiles, line);
       }
 
       // wait until the task is finished
       int exitCode = encoderProcess.waitFor();
       if (exitCode != 0) {
-        throw new CmdlineEncoderException("Encoder exited abnormally with status " + exitCode, String.join(" ", command));
+        throw new EncoderException("Encoder exited abnormally with status " + exitCode);
       }
 
-      logger.info("Tracks {}  successfully encoded using profile '{}'", source, profile.getIdentifier());
-      return outFile;
+      logger.info("Tracks {} successfully encoded using profile '{}'", source, profile.getIdentifier());
+      return outFiles;
     } catch (Exception e) {
-      logger.info("Error while encoding {}  using profile '{}'",
+      logger.warn("Error while encoding {}  using profile '{}'",
               source, profile.getIdentifier(), e);
 
       // Ensure temporary data are removed
-      if (FileUtils.deleteQuietly(outFile)) {
-        logger.debug("Removed output file of failed encoding process: {}", outFile);
+      for (File outFile : outFiles) {
+        if (FileUtils.deleteQuietly(outFile)) {
+          logger.debug("Removed output file of failed encoding process: {}", outFile);
+        }
       }
-
-      throw new CmdlineEncoderException(e.getMessage(), String.join(" ", command), e);
+      throw new EncoderException(e);
     } finally {
       IoSupport.closeQuietly(in);
       IoSupport.closeQuietly(encoderProcess);
@@ -325,99 +340,6 @@ public class EncoderEngine implements AutoCloseable {
     return cmd.replaceAll("#\\{.*?\\}", "");
   }
 
-  /**
-   * Executes the command line encoder with the given set of files and properties and using the provided encoding
-   * profile.
-   *
-   * @param mediaSource
-   *          the video file
-   * @param profile
-   *          the profile identifier
-   * @return a list of the processed Tracks
-   * @throws EncoderException
-   *           if processing fails
-   */
-  List<File> parallelEncode(File mediaSource, EncodingProfile profile)
-          throws EncoderException {
-    if (mediaSource == null) {
-      throw new IllegalArgumentException("At least one track must be specified.");
-    }
-    // build command
-    BufferedReader in = null;
-    Process encoderProcess = null;
-
-    // Set encoding parameters
-    String mediaInput = FilenameUtils.normalize(mediaSource.getAbsolutePath());
-    Map<String, String> params = new HashMap<>();
-
-    // Input parameters
-    params.put("in.video.path", mediaInput);
-    params.put("in.video.name", FilenameUtils.getBaseName(mediaInput));
-    params.put("in.video.suffix", FilenameUtils.getExtension(mediaInput));
-    params.put("in.video.filename", FilenameUtils.getName(mediaInput));
-
-    // Output file
-    String outDir = mediaSource.getAbsoluteFile().getParent();
-    String outFileName = FilenameUtils.getBaseName(mediaSource.getName());
-    outFileName += "_" + UUID.randomUUID();
-
-    params.put("out.dir", outDir);
-    params.put("out.name", outFileName);
-
-    ArrayList<String> suffixes = new ArrayList<>();
-
-    for (String tag : profile.getTags()) {
-      String outSuffix = processParameters(profile.getSuffix(tag), params);
-      params.put("out.suffix" + "." + tag, outSuffix);
-      suffixes.add(outSuffix);
-    }
-
-    ArrayList<File> outFiles = new ArrayList<>();
-    for (String outSuffix : suffixes) {
-      outFiles.add(new File(mediaSource.getParent(), outFileName + outSuffix));
-    }
-
-    try {
-      // create encoder process.
-      // no special working dir is set which means the working dir of the
-      // current java process is used.
-      List<String> command = buildCommand(profile, params);
-      logger.info("Executing encoding command: {}", command);
-      ProcessBuilder processBuilder = new ProcessBuilder(command);
-      processBuilder.redirectErrorStream(REDIRECT_ERROR_STREAM);
-      encoderProcess = processBuilder.start();
-      processes.add(encoderProcess);
-
-      // tell encoder listeners about output
-      in = new BufferedReader(new InputStreamReader(encoderProcess.getInputStream()));
-      String line;
-      while ((line = in.readLine()) != null) {
-        handleEncoderOutput(line);
-      }
-
-      // wait until the task is finished
-      int exitCode = encoderProcess.waitFor();
-      if (exitCode != 0) {
-        throw new EncoderException("Encoder exited abnormally with status " + exitCode);
-      }
-
-      logger.info("Media track {} successfully encoded using profile '{}'", mediaSource.getName(),
-              profile.getIdentifier());
-      return outFiles;
-    } catch (Exception e) {
-      logger.warn("Error while encoding media {} using profile {}", mediaSource.getName(), profile.getName(), e);
-      for (File file: outFiles) {
-        if (FileUtils.deleteQuietly(file)) {
-          logger.debug("Removed output file of failed encoding process: {}", file);
-        }
-      }
-      throw new EncoderException(e);
-    } finally {
-      IoSupport.closeQuietly(in);
-      IoSupport.closeQuietly(encoderProcess);
-    }
-  }
-
   @Override
   public void close() {
     for (Process process: processes) {
@@ -434,7 +356,7 @@ public class EncoderEngine implements AutoCloseable {
    * @param message
    *          the message returned by the encoder
    */
-  private void handleEncoderOutput(String message) {
+  private void handleEncoderOutput(List<File> output, String message) {
     message = message.trim();
     if ("".equals(message))
       return;
@@ -443,6 +365,16 @@ public class EncoderEngine implements AutoCloseable {
     if (startsWithAny(message.toLowerCase(),
           new String[] {"ffmpeg version", "configuration", "lib", "size=", "frame=", "built with"})) {
       logger.trace(message);
+
+    // Handle output files
+    } else if (StringUtils.startsWith(message, "Output #")) {
+      logger.debug(message);
+      Matcher matcher = outputPattern.matcher(message);
+      if (matcher.find()) {
+        File outputFile = new File(matcher.group(1));
+        logger.info("Identified output file {}", outputFile);
+        output.add(outputFile);
+      }
 
     // Some to debug
     } else if (startsWithAny(message.toLowerCase(),

@@ -62,6 +62,7 @@ import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -286,7 +287,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     // Do the work
     final EncoderEngine encoder = getEncoderEngine();
-    File output;
+    List<File> output;
     try {
       output = encoder.process(files, profile, null);
     } catch (EncoderException e) {
@@ -302,12 +303,19 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       activeEncoder.remove(encoder);
     }
 
-    // process() did not return a file
-    if (!output.exists() || output.length() == 0)
+    // We expect zero or one file as output
+    if (output.size() == 0) {
       return none();
+    } else if (output.size() != 1) {
+      // Ensure we do not leave behind old files in the workspace
+      for (File file : output) {
+        FileUtils.deleteQuietly(file);
+      }
+      throw new EncoderException("Composite does not support multiple files as output");
+    }
 
     // Put the file in the workspace
-    URI workspaceURI = putToCollection(job, output, "encoded file");
+    URI workspaceURI = putToCollection(job, output.get(0), "encoded file");
 
     // Have the encoded track inspected and return the result
     Job inspectionJob = inspect(job, workspaceURI);
@@ -352,7 +360,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     LinkedList<Track> encodedTracks = new LinkedList<>();
     // Do the work
     int i = 0;
-    List<File> outputFiles = encoderEngine.parallelEncode(mediaFile, profile);
+    Map<String, File> source = new HashMap<>();
+    source.put("video", mediaFile);
+    List<File> outputFiles = encoderEngine.process(source, profile, null);
     activeEncoder.remove(encoderEngine);
     for (File encodingOutput: outputFiles) {
       // Put the file in the workspace
@@ -632,7 +642,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       Map<String, String> properties = new HashMap<>();
       properties.put(EncoderEngine.CMD_SUFFIX + ".compositeCommand", compositeCommand);
-      File output;
+      List<File> output;
       try {
         Map<String, File> source = new HashMap<>();
         if (upperVideoFile.isSome()) {
@@ -656,12 +666,18 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         activeEncoder.remove(encoderEngine);
       }
 
-      // composite did not return a file
-      if (!output.exists() || output.length() == 0)
-        return none();
+      // We expect one file as output
+      if (output.size() != 1) {
+        // Ensure we do not leave behind old files in the workspace
+        for (File file : output) {
+          FileUtils.deleteQuietly(file);
+        }
+        throw new EncoderException("Composite does not support multiple files as output");
+      }
+
 
       // Put the file in the workspace
-      URI workspaceURI = putToCollection(job, output, "compound file");
+      URI workspaceURI = putToCollection(job, output.get(0), "compound file");
 
       // Have the compound track inspected and return the result
       Job inspectionJob = inspect(job, workspaceURI);
