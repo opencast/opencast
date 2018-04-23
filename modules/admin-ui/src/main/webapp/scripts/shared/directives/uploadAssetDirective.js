@@ -42,7 +42,7 @@ angular.module('adminNg.directives')
            }
            // Allows sorting list on traslated title/description/caption
            scope.translatedTitle = function(asset) {
-               return $filter('translate')(asset.title);
+               return $filter('translateOverrideFallback')(asset);
            }
            //The "onexitscope"'s oldValue acts as the callback when the scope of the directive is exited.
            //The callback allow the parent scope to do work (i.e. make a summary map) based on
