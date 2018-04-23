@@ -1,23 +1,44 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="delete-single-series-modal">
+   
     <header>
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION"><!-- Confirm --></h2>
+        <h2 translate="CONFIRMATIONS.ACTIONS.CONFIRMATION"><!-- Confirmation  --></h2>
     </header>
 
-    <div>
-        <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES"><!-- The following series will be deleted --></span>:</p>
-        <p class="delete">{{name}}</p>
-    </div>
-    <div ng-if="hasEvents == true">
-        <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES_WITH_EVENTS"><!-- The series contains events --></span></p>
-    </div>
     <div ng-if="hasEvents == true && deleteSeriesWithEventsAllowed == false">
-        <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES_WITH_EVENTS_DELETE_NOT_ALLOWED"><!-- The series contains events --></span></p>
+      <div class="modal-alert danger">
+        <p translate="CONFIRMATIONS.ERRORS.SERIES_HAS_EVENTS">
+          <!-- The highlighted series cannot be deleted as they still contain events -->
+        </p>
+      </div>
+      <div class="btn-container">
+          <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()">
+            <!--- Cancel -->
+          </a>
+      </div>
     </div>
-    <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!-- Are you sure you want to continue? --></p>
 
-    <div class="btn-container">
-        <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()"><i><!--- Cancel --></i></a>
-        <a ng-if="hasEvents == false || hasEvents == true && deleteSeriesWithEventsAllowed == true" translate="CONFIRM" class="danger-btn" ng-click="confirm()"><i><!-- Confirm --></i></a>
+    <div ng-if="hasEvents == false || deleteSeriesWithEventsAllowed == true">
+
+      <div ng-if="hasEvents == true && deleteSeriesWithEventsAllowed == true" class="modal-alert warning">
+        <p translate="CONFIRMATIONS.WARNINGS.SERIES_HAS_EVENTS">
+          <!-- The highlighted series cannot be deleted as they still contain events -->
+        </p>
+      </div>
+
+      <div>
+          <p><span translate="CONFIRMATIONS.METADATA.NOTICE.SERIES"><!-- The following series will be deleted --></span>:</p>
+          <p class="delete">{{name}}</p>
+      </div>
+      <p translate="CONFIRMATIONS.CONTINUE_ACTION"><!-- Are you sure you want to continue? --></p>
+
+      <div class="btn-container">
+          <a translate="CANCEL" class="cancel-btn close-modal" ng-click="close()">
+            <!--- Cancel -->
+          </a>
+          <a translate="CONFIRM" class="danger-btn" ng-click="confirm()">
+            <!-- Confirm -->
+          </a>
+      </div>
     </div>
 </section>

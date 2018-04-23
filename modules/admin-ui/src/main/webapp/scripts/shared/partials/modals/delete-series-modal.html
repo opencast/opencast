@@ -8,7 +8,7 @@
 
         <div class="modal-body">
 
-            <div class="modal-alert danger">
+            <div class="modal-alert danger obj">
                 <p translate="BULK_ACTIONS.DELETE_SERIES_WARNING_LINE1">
                     <!-- You have chosen to delete a series. Once deleted all metadata will be deleted
                          and can not be retrieved. -->
@@ -18,6 +18,12 @@
                 </p>
             </div>
 
+            <div ng-show="!allowed()" class="alert sticky warning">
+              <p translate="BULK_ACTIONS.DELETE.SERIES.CANNOT_DELETE">
+                <!-- The highlighted series cannot be deleted as they still contain events -->
+              </p>
+            </div>
+
             <div class="full-col">
                 <div class="obj">
                     <header translate="EVENTS.SERIES.TABLE.CAPTION"><!-- Series --></header>
@@ -25,15 +31,19 @@
                         <table class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged()" class="select-all-cbox"></th>
+                                    <th class="small">
+                                      <input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged()" class="select-all-cbox">
+                                    </th>
                                     <th translate="EVENTS.SERIES.TABLE.TITLE"><!-- Series --></th>
                                     <th translate="EVENTS.SERIES.TABLE.CREATORS"><!-- Organizer(s) --></th>
                                     <th translate="EVENTS.SERIES.TABLE.HAS_EVENTS"><!-- Has events --></th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="row in rows">
-                                    <td><input type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
+                                <tr ng-repeat="row in rows" ng-class="{error: !deleteSeriesWithEventsAllowed && row.selected && row.hasEvents}">
+                                    <td>
+                                      <input type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox">
+                                    </td>
                                     <td>{{ row.title }}</td>
                                     <td>{{ row.creator }}</td>
                                     <td ng-class="row.hasEvents == true ? 'fa fa-check' : ''"></td>
