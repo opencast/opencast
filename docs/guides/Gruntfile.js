@@ -17,6 +17,8 @@ module.exports = function(grunt) {
             MD007: { // unordered list indentation
               indent: 4 // python-markdown requires 4 spaces of indentation. see https://python-markdown.github.io/#differences
             },
+            MD009: true, // prevent trailing spaces
+            MD010: true, // prevent the usage of tabs
             MD013: { // line-length
               line_length: 120,
               code_blocks: false,

@@ -27,7 +27,7 @@ Configuration
 ### prop.player.matomo.server
 
 The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
-Before you disable the notification, make sure that you do not violate any local regulations. 
+Before you disable the notification, make sure that you do not violate any local regulations.
 
 ### prop.player.matomo.server
 

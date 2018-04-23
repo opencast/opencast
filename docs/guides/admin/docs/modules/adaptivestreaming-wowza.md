@@ -150,7 +150,7 @@ All this can be configured in the "Options" section of the Wowza application:
 3. Click the "Edit" button
 4. Add the following Properties
 
-    |Path                           |Name	                                    |Type    |Value |
+    |Path                           |Name                                     |Type    |Value |
     |-------------------------------|-----------------------------------------|--------|------|
     |/Root/Application/HTTPStreamer |cupertinoUserHTTPHeaders                 |String  | \*\* |
     |/Root/Application/HTTPStreamer |mpegdashUserHTTPHeaders                  |String  | \*\* |

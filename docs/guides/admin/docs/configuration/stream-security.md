@@ -95,7 +95,7 @@ provider to have one key for any URL that begins with one scheme, such as http, 
 signed with a single key. Or it could be configured so that each different scheme and hostname pair would have a
 different keys protecting each host’s URLs separately etc. Having the timing configurations separate from the key
 configuration allows the different types of URLs to be signed differently depending on the needs of the users without
-needing to configure this timing for all of the different keys. 
+needing to configure this timing for all of the different keys.
 
 ### Signing for Opencast-internal access
 

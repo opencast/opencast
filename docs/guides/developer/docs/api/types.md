@@ -123,7 +123,7 @@ The following sections define data types that are used to manage metadata catalo
 
 ### fields
 
-Each metadata catalogs has a list of metadata fields that is described as array of JSON objects with the following 
+Each metadata catalogs has a list of metadata fields that is described as array of JSON objects with the following
 fields:
 
 Field          | Optional | Type                | Description
@@ -310,7 +310,7 @@ ACE field  | Required | Type                | Description
 
 __Example__
 
-``` 
+```
   {
     "allow": true,
     "action": "write",

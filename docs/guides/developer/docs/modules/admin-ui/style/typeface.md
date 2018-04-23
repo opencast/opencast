@@ -47,7 +47,7 @@ Please see [References - Open Sans](/modules/admin-ui/style/references/#open-san
           <span class="hljs-value"> italic</span>
         </span>;
       </code>
-    </pre>    
+    </pre>
   </div>
 
   <div>
@@ -132,7 +132,7 @@ Please see [References - Open Sans](/modules/admin-ui/style/references/#open-san
         </span>;
       </code>
     </pre>
-  </div>     
+  </div>
 
   <div class="bold">
     <div class="header">Bold</div>
@@ -174,7 +174,7 @@ Please see [References - Open Sans](/modules/admin-ui/style/references/#open-san
         </span>;
       </code>
     </pre>
-  </div>     
+  </div>
 
   <div class="extrabold"><!-- style="height: 150px;" -->
     <div class="header">Extrabold</div>
@@ -216,7 +216,7 @@ Please see [References - Open Sans](/modules/admin-ui/style/references/#open-san
       </span>;
     </code>
     </pre>
-  </div>  
+  </div>
 </div>
 <br/>
 

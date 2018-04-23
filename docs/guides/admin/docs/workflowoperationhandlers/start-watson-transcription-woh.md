@@ -1,7 +1,7 @@
 # Start Watson Transcription
 ## Description
 
-The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to 
+The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to
 text.
 
 ## Parameter Table

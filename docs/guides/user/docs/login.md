@@ -16,4 +16,4 @@ other languages, you can find more information here in the [i18n section](i18n.m
 > Note:  There is no self-registration functionality in the Opencast administrative interface. However, if you just
 > finished the initial setup of your Opencast instance, you will have noticed the administrative username and password
 > in the configuration section. This user can be used to log in with administrator rights and create less privileged
-> users.  
+> users.

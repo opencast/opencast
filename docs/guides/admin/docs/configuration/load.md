@@ -45,13 +45,13 @@ management system, and be applied on a cluster level to ensure consistency acros
 Step 2: Setting the load values for system jobs
 -----------------------------------------------
 
-Each Opencast instance has its own maximum load.  By default this is set to the number of CPU cores present in the 
-system.  If you wish to change this, set the `org.opencastproject.server.maxload` key in config.properties to the 
+Each Opencast instance has its own maximum load.  By default this is set to the number of CPU cores present in the
+system.  If you wish to change this, set the `org.opencastproject.server.maxload` key in config.properties to the
 maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
 not recommended.
 
-The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix 
-`job.load`.  These configuration keys control the load for each job type.  For example, the 
+The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix
+`job.load`.  These configuration keys control the load for each job type.  For example, the
 `job.load.download.distribute` configuration key controls the load placed on the system when a download distribution job
 is running.  The current files with relevant configuration keys are:
 

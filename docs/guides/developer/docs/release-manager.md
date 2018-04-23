@@ -134,7 +134,7 @@ Please create a single post on the Opencast Users list:
     Your Opencast <VERSION> Release Manager
 
     [1] Opencast project on Crowdin, https://crowdin.com/project/opencast-community
-    [2] Inclusion and Exclusion of Translations, https://docs.opencast.org/develop/developer/... 
+    [2] Inclusion and Exclusion of Translations, https://docs.opencast.org/develop/developer/...
 
 In case endangered languages have been identified, this needs to be communicated immediately to the Opencast community.
 Please create a post for each endangered translation on the Opencast Users list:
@@ -165,7 +165,7 @@ Please create a post for each endangered translation on the Opencast Users list:
 
 The [Opencast pull request filter](http://pullrequests.opencast.org) links the versions currently in development. The
 merge ticket identifier needs to be added to that filter. To do this, create a ticket with a title in the format of
-`Merge the result of the current peer review to <VERSION>`. The ticket will be automatically detected by the pull 
+`Merge the result of the current peer review to <VERSION>`. The ticket will be automatically detected by the pull
 request filter and will appear shortly.
 
 

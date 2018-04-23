@@ -34,7 +34,7 @@ Example
     <configuration key="target-tag">archive</configuration>
     <!-- Caption generated will have the default flavor based on the target-caption-format and language e.g. captions/vtt+en -->
     <configuration key="target-caption-format">vtt</configuration>
-    <configuration key="target-tag">engage-download</configuration>    
+    <configuration key="target-tag">engage-download</configuration>
   </configurations>
 </operation>
 

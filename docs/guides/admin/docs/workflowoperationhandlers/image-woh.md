@@ -7,14 +7,14 @@ Both absolute and relative positions can be used.
 ## Parameter Table
 
 |configuration keys|example|description|
-|------------------|-------|-----------| 
+|------------------|-------|-----------|
 |source-flavor|presenter/source|Specifies which media should be processed.|
 |source-flavors|presenter/source, presentation/source|Specifies a list of media which should be processed. In case a flavor has been specified in *source-flavor*, it will be added to this list.|
-|source-tags	|engage	|Specifies which media should be processed.|
+|source-tags    |engage    |Specifies which media should be processed.|
 |target-flavor|presenter/work|Specifies the flavor the new files will get.|
-|target-tags	|engage	|Specifies the tags the new files will get.	 |
-|encoding-profile	|search-cover.http	|Comma-separated list of encoding profiles to use.	 |
-|time	|1	|Comma-separated list of time (in seconds or relative to source track duration) where the image should be taken.	 |
+|target-tags    |engage    |Specifies the tags the new files will get.     |
+|encoding-profile    |search-cover.http    |Comma-separated list of encoding profiles to use.     |
+|time    |1    |Comma-separated list of time (in seconds or relative to source track duration) where the image should be taken.     |
 |target-base-name-format-second|thumbnail_%.0f%s|Used to control the target filenames for images extracted at absolute times. Mainly helpful when integrating third-party applications that prefer to use filename to distinguish individual images|
 |target-base-name-format-percent|thumbnail_%.3f%s|Used to control the target filenames for images extracted at relative times. Mainly helpful when integrating third-party applications that prefer to use filename to distinguish individual images|
 |end-margin|500|Safety margin at the end of the track. Sometimes, image extraction is critical at the end of the file. Using *end-margin* ensures, that no images are being extracted near the end of the video file to avoid problems with defective inputs.</br>(Default: 100)|

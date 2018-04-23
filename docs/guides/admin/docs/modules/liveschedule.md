@@ -32,7 +32,7 @@ Configuration
 Edit  _etc/org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.cfg_.
 
 If your capture agent does not register a _capture.device.live.resolution.WIDTHxHEIGHT_ property, it's mandatory to
-configure the _live.streamingUrl_. 
+configure the _live.streamingUrl_.
 
 The _live.streamingUrl_ should be set to your streaming server url (or the subscriber url specified by your CDN).
 
@@ -78,12 +78,12 @@ live.distributionService=download
 
 ### Step 2: Configure the capture agent
 
-#### Capture agent does not register the _capture.device.live.resolution.WIDTHxHEIGHT_ property 
+#### Capture agent does not register the _capture.device.live.resolution.WIDTHxHEIGHT_ property
 
 Configure the capture agent to stream to your streaming server (or the publisher url specified by your CDN), using the
 same stream name specified in live.streamName.
 
-#### Capture agent registers the _capture.device.live.resolution.WIDTHxHEIGHT_ property 
+#### Capture agent registers the _capture.device.live.resolution.WIDTHxHEIGHT_ property
 
 If your capture agent supports configuring custom capture agent properties, instead of configuring the
 live.streamingUrl, live.resolution, live.streamName, you can update the capture agent firmware to pass the following
@@ -98,7 +98,7 @@ urls, using 'presenter/delivery' (or the flavor configured, but only one flavor 
 If a property capture.device.live.resolution.WIDTHxHEIGHT was registered, it will take precedence over the
 LiveScheduleService configuration.
 
-#### Example 1: 
+#### Example 1:
 
 #### Capture agent does not register with capture.device.live.resolution.WIDTHxHEIGHT
 
@@ -117,7 +117,7 @@ _live.streamingUrl_ may be very different from the url the capture agent streams
 used by the player will be something like live.streamingUrl=rtmp://xyz.live.edgefcs.net/live/ and the capture agent's
 publish url something like rtmp://a.bcd.e.akamaientrypoint.net/EntryPoint. The stream name should always match.
 
-#### Example 2: 
+#### Example 2:
 
 #### Capture agent registers with capture.device.live.resolution.WIDTHxHEIGHT
 
@@ -152,7 +152,7 @@ If not using the sample Opencast workflows, add to the `<configuration_panel>`:
               <label for="publishLive">Add live event to Opencast Media Module</label>
             </li>
           </ul>
-        </fieldset>        
+        </fieldset>
 ```
 
 And to the _defaults_ operation:
@@ -166,7 +166,7 @@ And to the _defaults_ operation:
         <configuration key="publishToMediaModule">true</configuration>
         <configuration key="publishToOaiPmh">true</configuration>
         <configuration key="uploadedSearchPreview">false</configuration>
-        <configuration key="publishLive">false</configuration>        
+        <configuration key="publishLive">false</configuration>
       </configurations>
     </operation>
 ```

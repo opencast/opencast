@@ -8,15 +8,15 @@ Architecture
 
 The AssetManager consists of the following modules:
 
-* `asset-manager-api`  
+* `asset-manager-api`
 An API module defining the core AssetManager functions, properties and the query language.
-* `asset-manager-impl`  
+* `asset-manager-impl`
 The default implementation of the AssetManager as an OSGi service, containing the storage API for pluggable asset stores.
-* `asset-manager-storage-fs`  
+* `asset-manager-storage-fs`
 The default  implementation of the AssetStore. Depends on asset-manager-impl.
-* `asset-manager-util`  
+* `asset-manager-util`
 Additional functionality for the AssetManager providing utilities such as starting workflows on archived snapshots, etc.
-* `asset-manager-workflowoperation`  
+* `asset-manager-workflowoperation`
 A workflow operation handler to take media package snapshots of a media package from inside a running workflow.
 
 ### High Level View
@@ -46,14 +46,14 @@ Assets are stored in the following directory structure.
 
 The asset manager uses four tables
 
-* `mh_assets_snapshot`  
+* `mh_assets_snapshot`
   Manages snapshots. Each snapshot may be linked to zero or more assets.
-* `mh_assets_asset`  
+* `mh_assets_asset`
   Manages the assets of a snapshot.
-* `mh_assets_properties`  
-  Manages the properties. This table is indirectly linked to the snapshot table via column `mediapackage_id`. 
-* `mh_assets_version_claim`  
-  Manages the next free version number per episode. 
+* `mh_assets_properties`
+  Manages the properties. This table is indirectly linked to the snapshot table via column `mediapackage_id`.
+* `mh_assets_version_claim`
+  Manages the next free version number per episode.
 
 ### Security
 
@@ -86,7 +86,7 @@ am referring to the AssetManager and mp the media package id of type String of t
     am.setProperty(Property.mk(PropertyId.mk(
       mp, "org.opencastproject.approval", "approval"),
       Value.mk(true)));
-      
+
 It is recommended to use namespace names after the service's package name, in the example:
 `org.opencastproject.approval`. This code looks overly verbose. Also you need to deal with namespace names and property
 names directly. That's cumbersome and error prone even though you might intoduce constants for them. To help remedy this
@@ -97,20 +97,20 @@ it goes.
      public ApprovalProps(AQueryBuilder q) {
        super(q, "org.opencastproject.approval");
      }
-    
+
      public PropertyField<Boolean> approved() {
        return booleanProp("approved");
      }
-    
+
      public PropertyField<String> comment() {
        return stringProp("comment");
      }
-    
+
      public PropertyField<Date> date() {
        return dateProp("date");
      }
     }
-    
+
 Now you can set properties like this.
 
     am.setProperty(p.approved().mk(mp, false));
@@ -136,7 +136,7 @@ properties need to be selected in order to fetch them.
 
     q.select(q.snapshot(), q.properties())
       .where(p.approved().eq(true).and(q.version().isLatest())
-      .run(); 
+      .run();
 
 Here we go. Now we can access all properties stored with the returned snapshots. Now, let's assume other services make
 heavy use of properties too. This may cause serious database IO if we always select all properties like we did using the
@@ -144,7 +144,7 @@ q.properties() target. Let's do better.
 
     q.select(q.snapshot(), q.propertiesOf("org.opencastproject.approval"))
       .where(p.approved().eq(true).and(q.version().isLatest())
-      .run(); 
+      .run();
 
 This will return only the properties of our service's namespace. But do we have to deal with namespace strings again?
 No.
@@ -192,11 +192,11 @@ The following type are available for properties:
 * String
 * Date
 * Boolean
-* Version  
+* Version
   Version is the AssetManager type that abstracts a snapshot version.
 
 #### Decomposing properties
-Since properties are type safe they cannot be accessed directly. 
+Since properties are type safe they cannot be accessed directly.
 If you know the type of the property you can access its value using a type evidence constant.
 
     String string = p.getValue().get(Value.STRING);
@@ -215,7 +215,7 @@ type `Fn` taking the raw value as input and returning a String.
         handleDateFn,
         handleLongFn,
         handleBooleanFn,
-        handleVersionFn);		
+        handleVersionFn);
       System.out.println(f);
     }
 
@@ -280,7 +280,7 @@ the result in an enrichment.
 
 ### Deleting Snapshots
 
-This works exactly like deleting properties, except that you need to specify snapshots instead of properties. 
+This works exactly like deleting properties, except that you need to specify snapshots instead of properties.
 Please note that it's also possible to specify snapshots and properties simultanously.
 
     q.delete("owner", q.snapshot()).where(q.version().isLatest().not()).run();

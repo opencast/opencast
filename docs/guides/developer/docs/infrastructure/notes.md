@@ -20,7 +20,7 @@ Harvard DCE
 ETH
 ---
 
-### opencast-nexus.ethz.ch 
+### opencast-nexus.ethz.ch
 
 - Unattended upgrade
 - RHEL 7.x
@@ -40,7 +40,7 @@ SWITCH
 - Rebuilt weekly via cron + shell, manual branch selection
 
 
-University of Osnabrück 
+University of Osnabrück
 -----------------------
 
 ### Common Configuration Choices
