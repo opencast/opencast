@@ -73,16 +73,16 @@ Per the discussion in the meeting today, we need to set a policy regarding what
 is expected of our Crowdin translators prior to joining the translation team.
 My proposal is that they must write a brief, understandable sentence regarding
 why they want to help translate Opencast via the Crowdin UI.  This is an
-optional field in the workflow where they request to be a translator (ie, no
-new tools or fields) which is sometimes filled in, but mostly left blank.
-Something like
+optional field in the workflow where they request to be a translator (ie, no new
+tools or fields) which is sometimes filled in, but mostly left blank.  Something
+like
 
 'I want to help translate $project into [language]'
 
 would be sufficient.  This filters out the bots, yet is simple enough that
-someone with Google translate ought to be able to work something out.  Once
-this passes I will update the Crowdin and Opencast docs regarding the
-requirements, and then we should be good to go.
+someone with Google translate ought to be able to work something out.  Once this
+passes I will update the Crowdin and Opencast docs regarding the requirements,
+and then we should be good to go.
 
 Proposal closes EOD 2017-11-17.
 ```
