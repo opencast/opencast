@@ -1,17 +1,10 @@
 Opencast Proposals
 ==================
 
-All important decisions for Opencast have to be made on list. To do that committers may send proposals (marked with
-`#proposal`) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no response
-signals agreement. Apart from that committers may vote with:
+All important decisions for Opencast have to be made on list. For more details, please have a look at out [documentation
+about decision making](decision-making/index.md).
 
- - `+1` yes, agree - also willing to help bring about the proposed action
- - `+0` yes, agree - not willing or able to help bring about the proposed action
- - `-0` no, disagree - but will not oppose the action going forward
- - `-1` veto, disagree - opposes the action going forward and must propose an alternate action to address the issue or a
-   justification for not addressing the issue
-
-A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being sent to list.
+The following list contains a list of passed proposals for reference.
 
 Passed Proposals
 ----------------
