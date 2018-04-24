@@ -16,45 +16,45 @@
   </properties>
   <dependencies>
     <dependency>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>opencast-common</artifactId>
-        <version>${project.version}</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>opencast-workspace-api</artifactId>
-        <version>${project.version}</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workspace-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>crop-api</artifactId>
-        <version>${project.version}</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>crop-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-        <groupId>org.opencastproject</groupId>
-        <artifactId>opencast-workflow-service-api</artifactId>
-        <version>${project.version}</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workflow-service-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
     <plugins>
-        <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-                <instructions>
-                    <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                    <Build-Number>${buildNumber}</Build-Number>
-                    <Export-Package>
-                        org.opencastproject.workflow.handler.crop;version=${project.version}
-                    </Export-Package>
-                    <Service-Component>
-                        OSGI-INF/operations/crop-video.xml
-                    </Service-Component>
-                </instructions>
-            </configuration>
-        </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Build-Number>${buildNumber}</Build-Number>
+            <Export-Package>
+              org.opencastproject.workflow.handler.crop;version=${project.version
+            </Export-Package>
+            <Service-Component>
+              OSGI-INF/operations/crop-video.xml
+            </Service-Component>
+          </instructions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

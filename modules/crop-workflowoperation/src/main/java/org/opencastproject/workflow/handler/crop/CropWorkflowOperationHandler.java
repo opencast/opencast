@@ -133,16 +133,15 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     }
 
     // all canidates are cropped in the following loop, but I'm not sure if I'm doing this in the right way
-    Job job = null;
-    for (int i = 0; i < candidates.size(); i++) {
-      Track track = candidates.get(0);
-
+    long totalTimeInQueue = 0;
+    for (Track candidate: candidates) {
+      Job job;
       Track croppedTrack = null;
 
       try {
-        job = cropService.crop(track);
+        job = cropService.crop(candidate);
         if (!waitForStatus(job).isSuccess()) {
-          throw new WorkflowOperationException("Video cropping of " + track + " failed");
+          throw new WorkflowOperationException("Video cropping of " + candidate + " failed");
         }
 
         croppedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
@@ -151,7 +150,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
         croppedTrack.setURI(workspace
                 .moveTo(croppedTrack.getURI(), mediaPackage.getIdentifier().toString(), croppedTrack.getIdentifier(),
                         croppedTrack.getIdentifier() + "corpped"));
-        croppedTrack.setMimeType(track.getMimeType());
 
         // Add target tags
         for (String tag : targetTags) {
@@ -160,9 +158,11 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       } catch (Exception e) {
         throw new WorkflowOperationException(e);
       }
+      long timeInQueue = job.getQueueTime() == null ? 0 : job.getQueueTime();
+      totalTimeInQueue += timeInQueue;
     }
     logger.info("Video cropping completed");
-    return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, job.getQueueTime());
+    return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, totalTimeInQueue);
   }
 
   /**

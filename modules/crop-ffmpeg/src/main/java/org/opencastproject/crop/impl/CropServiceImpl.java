@@ -40,14 +40,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.google.common.io.LineReader;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +69,7 @@ import java.util.List;
  * <p>
  * This plugin runs
  * <pre>
- *     ffmpeg -i input.file -vf cropdetect=24:16:0 -max_muxing_qurue_size 2000 -y output.file
+ *     ffmpeg -i input.file -vf cropdetect=24:16:0 -max_muxing_qurue_size 2000 -f null -
  *
  *     ffmpeg -i input.file -vf crop=wi-2*x:hi:x:0 -max_muxing_queue_size 2000 -y output.file
  * </pre>
@@ -108,7 +104,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   /**
    * The key to look for in the service configuration file to override the DEFAULT_CROP_JOB_LOAD
    */
-  public static final String CROP_JOB_LOAD_KEY = "job.load.cropping";
+  public static final String CROP_JOB_LOAD_KEY = "org.opencastproject.job.load.cropping";
 
   /**
    * The load introduced on the system by creating a cropping job
@@ -204,10 +200,8 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   }
 
   protected Track cropFfmpeg(File mediafile, Track track) throws IOException, CropException {
-    String outputPath = FilenameUtils.removeExtension(mediafile.getAbsolutePath()).concat(RandomStringUtils
-            .randomAlphanumeric(8) + ".mp4");
-    String[] command = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf",
-            "cropdetect=24:16:240", "-max_muxing_queue_size", "2000", "-y", outputPath };
+    String[] command = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf", "cropdetect=24:16:240",
+            "-max_muxing_queue_size", "2000", "-f", "null", "-"};
     String commandline = StringUtils.join(command, " ");
 
     logger.info("Running {}", commandline);
@@ -242,16 +236,6 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       logger.error("Error executing ffmeg: {}", e.getMessage());
     } catch (InterruptedException e) {
       logger.error("Waiting for encoder process exited was interrupted unexpected: {}", e.getMessage());
-    } finally {
-      IoSupport.closeQuietly(process);
-      IoSupport.closeQuietly(errStream);
-      if (exitCode != 0) {
-        try {
-          FileUtils.forceDelete(new File(outputPath));
-        } catch (IOException e) {
-
-        }
-      }
     }
 
     if (exitCode != 0) {
@@ -270,25 +254,22 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
 
     logger.info("running {}", cropCommandline);
 
-    ProcessBuilder pbuilder1 = new ProcessBuilder(cropCommand);
-    Process process1 = pbuilder1.start();
-    BufferedReader reader = new BufferedReader(new InputStreamReader(process1.getErrorStream()));
     try {
-      LineReader lr = new LineReader(reader);
-      String line = lr.readLine();
-      while (null != line) {
-        line = lr.readLine();
+      pbuilder = new ProcessBuilder(cropCommand);
+      process = pbuilder.start();
+      //wait until the task is finished
+      process.waitFor();
+      int eCode = process.exitValue();
+      if (eCode != 0) {
+        throw new CropException("Ffmpeg exited abnormally with status " + eCode);
       }
-    } catch (IOException e) {
+
+    } catch (Exception e) {
       logger.error("Error executing ffmeg: {}", e.getMessage());
-    } finally {
-      reader.close();
     }
     // put output file into workspace
-    FileInputStream outputFileStream = null;
     URI outputFileUri = null;
-    try {
-      outputFileStream = new FileInputStream(croppedOutputPath);
+    try (FileInputStream outputFileStream = new FileInputStream(croppedOutputPath)) {
       outputFileUri = workspace
               .putInCollection(COLLECTION_ID, FilenameUtils.getName(croppedOutputPath), outputFileStream);
       logger.info("Copied the created outputfile to the workspace {}", outputFileUri.toString());
@@ -298,8 +279,6 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       throw new CropException("Can't write output file " + croppedOutputPath + " to workspace", e);
     } catch (IllegalArgumentException e) {
       throw new CropException(e);
-    } finally {
-      IoSupport.closeQuietly(outputFileStream);
     }
 
     // create media package element
