@@ -32,7 +32,7 @@ mvn\:org.graylog2/gelfj/X.X.X = 7
 We use startlevel `7` here, because it's need to be loaded before the `pax-logging`.
 
 Add this custom logging configuration example to the org.ops4j.pax.logging.cfg file
- 
+
 ```
 # Async wrapper for send queue in case of GELF destination is unavailable
 log4j.appender.gelfasync=org.apache.log4j.AsyncAppender
