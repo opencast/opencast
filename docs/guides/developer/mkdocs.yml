@@ -74,7 +74,7 @@ pages:
    - Overview: 'infrastructure/index.md'
    - Notes: 'infrastructure/notes.md'
    - Maven Repository: 'infrastructure/maven-repository.md'
-- API:
+- External API:
    - Introduction: 'api/index.md'
    - Usage: 'api/usage.md'
    - Authentication: 'api/authentication.md'

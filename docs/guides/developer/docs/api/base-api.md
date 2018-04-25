@@ -2,12 +2,12 @@
 
 # Information
 
-In order to assess key characteristics of the API and to test general connectivity, the API’s root url is not protected
-through authentication:
+In order to assess key characteristics of the External API and to test general connectivity, the External API’s root
+url is not protected through authentication:
 
 ### GET /api
 
-Returns key characteristics of the API such as the Application API base URL and the default version.
+Returns key characteristics of the External API such as the API base URL and the default version.
 
 __Response__
 
