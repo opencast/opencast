@@ -38,7 +38,10 @@
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr ng-repeat="row in seriesCatalog.fields">
-                                <td translate="{{ row.label }}"></td>
+                                <td>
+                                   <span translate="{{ row.label }}"></span>
+                                   <i ng-show="row.required" class="required">*</i>
+                                </td>
                                 <td admin-ng-editable
                                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
                                     params="row" save="getSaveFunction(seriesCatalog.flavor)"></td>
@@ -59,7 +62,10 @@
                     <div class="obj-container">
                         <table class="main-tbl">
                             <tr ng-repeat="row in catalog.fields">
-                                <td translate="{{ row.label }}"></td>
+                                <td>
+                                   <span translate="{{ row.label }}"></span>
+                                   <i ng-show="row.required" class="required">*</i>
+                                </td>
                                 <td admin-ng-editable
                                     required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
                                     params="row" save="getSaveFunction(catalog.flavor)"></td>
