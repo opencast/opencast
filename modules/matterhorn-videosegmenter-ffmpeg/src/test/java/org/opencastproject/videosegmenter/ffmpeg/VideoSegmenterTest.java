@@ -256,7 +256,6 @@ public class VideoSegmenterTest {
 
     // Is there multimedia content in the mpeg7?
     assertTrue("Audiovisual content was expected", mpeg7.hasVideoContent());
-    assertNotNull("Audiovisual content expected", mpeg7.multimediaContent().next().elements().hasNext());
 
     MultimediaContentType contentType = mpeg7.multimediaContent().next().elements().next();
 
