@@ -680,17 +680,23 @@ VideoSegmenterService, ManagedService {
       Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
       for (String seginfo : segmentsStrings) {
         Matcher matcher = pattern.matcher(seginfo);
-        String time = "0";
+        String time = "";
         while (matcher.find()) {
           time = matcher.group().substring(9);
         }
-        endtime = (long)(Float.parseFloat(time) * 1000);
+        if ("".equals(time)) {
+          // continue if the showinfo does not contain any time information. This may happen since the FFmpeg showinfo
+          // filter is used for multiple purposes.
+          continue;
+        }
+        endtime = Long.parseLong(time) * 1000;
         long segmentLength = endtime - starttime;
         if (1000 * stabilityThresholdPrefilter < segmentLength) {
           Segment segment = videoContent.getTemporalDecomposition()
               .createSegment("segment-" + segmentcount);
           segment.setMediaTime(new MediaRelTimeImpl(starttime,
               endtime - starttime));
+          logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime, endtime);
           segments.add(segment);
           segmentcount++;
           starttime = endtime;
@@ -699,8 +705,9 @@ VideoSegmenterService, ManagedService {
       // Add last segment
       Segment s = videoContent.getTemporalDecomposition()
           .createSegment("segment-" + segmentcount);
-      s.setMediaTime(new MediaRelTimeImpl(endtime, track
-          .getDuration() - endtime));
+      s.setMediaTime(new MediaRelTimeImpl(starttime, track.getDuration() - starttime));
+      logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime,
+              track.getDuration() - endtime);
       segments.add(s);
     }
 
