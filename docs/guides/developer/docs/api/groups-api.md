@@ -8,22 +8,23 @@ Returns a list of groups.
 
 The following query string parameters can be used to filter, sort and paginate the returned list:
 
-Query String Parameter | Required | Type       | Description
-:----------------------|:---------|:-----------|:-----------
-`filter`               | no       | [`string`](types.md#basic) | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                 | no       | [`string`](types.md#basic) | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                | no       | [`integer`](types.md#basic) | The maximum number of results to return for a single request.
-`offset`               | no       | [`integer`](types.md#basic) | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
+`sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
+`offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
+
 
 The following filters are available:
 
 Filter Name | Description
 :-----------|:-----------
-`name`      | Groups where the name specified in the metadata field match.
+`name`      | Groups where the name specified in the metadata field match
 
-The list can be sorted by the following fields:
+The list can be sorted by the following criteria:
 
-Sort Name     | Description
+Sort Criteria | Description
 :-------------|:-----------
 `name`        | By the group name
 `description` | By the group description

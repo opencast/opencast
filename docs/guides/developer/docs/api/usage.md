@@ -126,54 +126,47 @@ Arrays   | []       | Non-existing list of literals or objects
 Sorting of result sets is supported by a set of well-defined fields per request, one at a time. Each API request
 explicitly defines the fields that support sorting.
 
-## Sort field
+Multiple sort criteria can be specified as a comma-separated list of pairs such as: `Sort Name`:`ASC` or
+`Sort Name`:`DESC`. Adding the suffix `ASC` or `DESC` sets the order as ascending or descending order and is mandatory.
 
 Parameter | Description
 :---------|:-----------
-`sort`    | Takes the name of the field that defines the sort criteria.
+`sort`    | Comma-separated list of sort critera
 
 __Example__
 
 Ordering the list of events by title:
 
 ```xml
-GET /api/events?sort=title
-```
-
-## Sort order
-
-Parameter | Encoding      | Description
-:---------|:--------------|:-----------
-`order`   | `asc`, `desc` | The sort order. Default value is `asc`.
-
-__Example__
-
-Ordering the list of events by title in ascending order:
-
-```xml
-GET /api/events?sort=title&order=asc
+GET /api/events?sort=title:ASC,start_date:DESC
 ```
 
 # Filtering
 
 Filtering of result sets is supported by a set of well-defined fields per request. Multiple filter criteria can be
-defined by specifying the `filter` parameter more than once. In this case, the criteria are applied using logical `and`.
+defined by specifying a comma-separated list of filters. In this case, the criteria are applied using logical
+`and`.
+
+A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form
+`Filter Name`:`Value to Filter With`.
 
 Each API request explicitly defines the fields that support filtering.
 
 Parameter | Description
 :---------|:-----------
-`filter`  | The filter. Filter conditions must be URL encoded
+`filter`  | A comma seperated list of filters to limit the results with
+
+Note that filter conditions must be URL encoded.
 
 __Example__
 
 Filter the list of events by status and by series.
 
 ```xml
-GET /api/events?filter=status%3dpublished&filter=series%3dmath
+GET /api/events?filter=status%3dpublished,series%3dmath
 ```
 
-# Paging
+# Pagination
 
 When loading large result sets, being able to address and access the data in well-defined chunks using a limit and
 offset is essential. Paging is enabled for all requests that return lists of items.
@@ -181,7 +174,7 @@ offset is essential. Paging is enabled for all requests that return lists of ite
 Paramter | Description
 :--------|:-----------
 `limit`  | The maximum number of records to return per request
-`offset` | The index of the first record to return
+`offset` | The index of the first record to return (counting starts on zero)
 
 __Example__
 
