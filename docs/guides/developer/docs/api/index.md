@@ -65,7 +65,7 @@ underlying system in the URL space that are then accessible using the HTTP proto
 `DELETE`.
 
 Since as part of the communication, the External API is used to transfer potentially sensitive data between the client
-and the server including the username and password as part of the Basic Authentication protocol, the API will usually 
+and the server including the username and password as part of the Basic Authentication protocol, the API will usually
 only be available over a secure HTTPS connection only.
 
 
