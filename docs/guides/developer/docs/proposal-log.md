@@ -1,18 +1,10 @@
 Opencast Proposals
 ==================
 
-All important decisions for Opencast have to be made on list. To do that committers may send proposals (marked with
-`#proposal`) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no response
-signals agreement. Apart from that committers may vote with:
+All important decisions for Opencast have to be made on list. For more details, please have a look at out [documentation
+about decision making](decision-making/index.md).
 
-* `+1` yes, agree - also willing to help bring about the proposed action
-* `+0` yes, agree - not willing or able to help bring about the proposed action
-* `-0` no, disagree - but will not oppose the action going forward
-* `-1` veto, disagree - opposes the action going forward and must propose an alternate action to address the issue or a
-  justification for not addressing the issue
-
-A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being
-sent to list.
+The following list contains a list of passed proposals for reference.
 
 Passed Proposals
 ----------------
@@ -283,7 +275,7 @@ draft [1] into account, although I still dared to include the two last
 items but this time, hopefully with a convincing reason for why they
 should be removed.
 
-1. Old Administrative User Interface (admin-ui)
+1. Old Administrative User Interface (matterhorn-admin-ui)
    The reason for this should be obvious: We got a new one. The old one
    has not been tested for the last three releases, is not linked
    anywhere anymore and is partly buggy due to changes to Opencast. To
@@ -356,7 +348,7 @@ should be removed.
     except by components to be removed.
 
 
-20. search-service-feeds
+20. matterhorn-search-service-feeds
     Broken implementation for RSS/Atom feeds
 
 21. matterhorn-caption-* and embed operation
@@ -394,7 +386,7 @@ Hi,
 we discussed this on today's technical meeting and I'm slightly
 changing the proposal:
 
-20. Let's remove search-service-feeds only after September
+20. Let's remove matterhorn-search-service-feeds only after September
     1st which is a realistic time to get things into the next Opencast
     release. If someone has fixed the issue by them, we will, of
     course, keep it.
@@ -418,8 +410,8 @@ a patch adding exactly this functionality. The holdstate operations are
 definitely broken due to their UI.
 
 My suggestion for a compromise here:
-* Remove them if that patch for archiving the options is released
-* Remove them if no one fixes them in time (September 1st) for 2.3
+ - Remove them if that patch for archiving the options is released
+ - Remove them if no one fixes them in time (September 1st) for 2.3
 
 If you want to bring them back later, we always keep the code in our
 history.
@@ -485,9 +477,9 @@ Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 14 Apr 2016 00:00:00 UT
 Hi everyone,
 traditionally, we have the three mailing lists:
 
-* matterhorn@opencast.org (development list)
-* matterhorn-users@opencast.org (user list)
-* community@opencast.org (more or less announcements)
+ - matterhorn@opencast.org (development list)
+ - matterhorn-users@opencast.org (user list)
+ - community@opencast.org (more or less announcements)
 
 Recently, though, we have seen especially the last two list being used
 for user questions and problems. That is not surprising as we dropped
@@ -496,9 +488,10 @@ matterhorn-users is meant for questions about Opencast.
 
 That is why I would like to rename these lists to
 
-* dev@opencast.org or development@opencast.org (I prefer the short name but don't have very strong feelings about that)
-* users@opencast.org
-* announcements@opencast.org
+ - dev@opencast.org or development@opencast.org (I prefer the short
+   name but don't have very strong feelings about that)
+ - users@opencast.org
+ - announcements@opencast.org
 
 Together with the already existing security-notices list, this gives
 these lists a very clear meaning. It would also have the benefit that
@@ -537,11 +530,13 @@ reviewing and merging [1] in the following way:
 
 [old]
 
-* Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and merged out of order.
+ - Pull requests for bug fixes (t/MH-XXXXX-...) may be reviewed and
+   merged out of order.
 
 [new]
 
-* Pull requests for bug fixes or documentation may be reviewed and merged out of order.
+ - Pull requests for bug fixes or documentation may be reviewed and
+   merged out of order.
 
 Regards,
 Lars

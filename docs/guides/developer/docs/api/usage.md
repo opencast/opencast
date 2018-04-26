@@ -5,8 +5,8 @@
 
 # Version
 
-Since the API is versioned, it supports specification of a version identifier as part of the standard `Accept` HTTP
-request header:
+Since the External API is versioned, it supports specification of a version identifier as part of the standard `Accept`
+HTTP request header:
 
 
 Header   | Type                       | Description
@@ -15,7 +15,7 @@ Header   | Type                       | Description
 
 Notes:
 
-- The API currently only supports the format [JSON][3]
+- The External API currently only supports the format [JSON][3]
 
 __Example__
 
@@ -35,8 +35,8 @@ Versions should be specified as obtained from the [Base API](base-api.md#version
 
 ## Authentication
 
-The API is using basic authentication. In order to make calls to the API, the following standard request headers need to
-be sent with every request:
+The External API is using basic authentication. In order to make calls to the API, the following standard request
+headers need to be sent with every request:
 
 Header          | Type                       | Description
 :---------------|:---------------------------|:-----------
@@ -46,7 +46,7 @@ Header          | Type                       | Description
 # Authorization
 
 There are multiple ways to authorize a request - see the [authorization section](authorization.md) for more details. In
-short, the Application API either supports specifying the execution user, the execution user’s roles or a combination of
+short, the External API either supports specifying the execution user, the execution user’s roles or a combination of
 the two in which case the execution roles will be added to the execution user’s existing roles.
 
 If no user is specified, Opencast’s `anonymous` user is used to execute the request, potentially enriched by the roles
@@ -62,7 +62,7 @@ Header            | Type                       | Description
 
 ## Content Type
 
-The Application API currently supports [JSON][3] format only.
+The External API currently supports [JSON][3] format only.
 
 Header   | Type                       | Description
 :--------|:---------------------------|:-----------
@@ -70,7 +70,7 @@ Header   | Type                       | Description
 
 If that header is not specified, the `Content-Type` will be `application/<version>+json`.
 
-> Note that the same header should be used to specify the version of the api that is expected to return the response. In
+> Note that the same header should be used to specify the version of the API that is expected to return the response. In
 > this case, the header looks like this: `application/v1+json`. See the [versioning chapter of the general
 > section](index.md#versioning) for more details.
 
@@ -123,7 +123,7 @@ Arrays   | []       | Non-existing list of literals or objects
 
 # Sorting
 
-Sorting of result sets is supported by a set of well-defined fields per request, one at a time. Each api request
+Sorting of result sets is supported by a set of well-defined fields per request, one at a time. Each API request
 explicitly defines the fields that support sorting.
 
 ## Sort field
@@ -159,7 +159,7 @@ GET /api/events?sort=title&order=asc
 Filtering of result sets is supported by a set of well-defined fields per request. Multiple filter criteria can be
 defined by specifying the `filter` parameter more than once. In this case, the criteria are applied using logical `and`.
 
-Each api request explicitly defines the fields that support filtering.
+Each API request explicitly defines the fields that support filtering.
 
 Parameter | Description
 :---------|:-----------

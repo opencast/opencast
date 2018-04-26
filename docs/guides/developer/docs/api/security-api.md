@@ -9,14 +9,14 @@ representations - only authorized users are able to consume it.
 This is achieved by handing signed URLs to end users which are validated by the distribution servers and become invalid
 after a given period of time (usually 1 hour, depending on the server configuration).
 
-As a consequence, users of the API who are presenting URLs to distributed media for playback will need to make sure that
-those urls are signed, otherwise the distribution servers will refuse to deliver the content and respond with a `401 NOT
-AUTHORIZED` status.
+As a consequence, users of the External API who are presenting URLs to distributed media for playback will need to make
+sure that those urls are signed, otherwise the distribution servers will refuse to deliver the content and respond with
+a `401 NOT AUTHORIZED` status.
 
 ### Best practices
 
-The use of signed URLs requires a set of best practices to be followed when clients interact with the API, most notably
-in the area of performance and caching.
+The use of signed URLs requires a set of best practices to be followed when clients interact with the External API,
+most notably in the area of performance and caching.
 
 #### Performance
 

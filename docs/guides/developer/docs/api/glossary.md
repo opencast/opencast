@@ -4,7 +4,7 @@
 
 ### Client
 
-A system that is using this API, making requests and consuming responses.
+A system that is using the External API, making requests and consuming responses.
 
 
 ## Data
@@ -12,7 +12,8 @@ A system that is using this API, making requests and consuming responses.
 ### Event
 
 A recording that is either going to take place, has been recorded using Opencast scheduling or has been uploaded either
-using this API or the Opencast administrative user interface. A collection of events may be grouped using a series.
+using the External API or the Opencast administrative user interface. A collection of events may be grouped using a
+series.
 
 ### Series
 
@@ -22,12 +23,12 @@ A collection of events.
 
 ### User
 
-A person accessing data provided by the API.
+A person accessing data provided by the External API.
 
 ### Producer
 
-A user that is managing individual recordings or groups of recordings. The producer uses the API to create, curate,
-publish, retract recordings.
+A user that is managing individual recordings or groups of recordings. The producer uses the External API to create,
+curate, publish, retract recordings.
 
 ### Spectator
 

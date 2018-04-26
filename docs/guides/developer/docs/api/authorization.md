@@ -1,9 +1,9 @@
 
-# Application API
+# External API
 
 ## Introduction
 
-The Application API can be accessed in two different ways: Either using a single dedicated user with access to
+The External API can be accessed in two different ways: Either using a single dedicated user with access to
 everything (“super user”) or by implementing more fine grained access through user and role switching upon every request
 (“user switching” or “sudo” execution mode), where the request is executed in the name and using the roles of the
 specified user.
@@ -15,10 +15,10 @@ to implement but leads a much improved control and assessment of security.
 
 ## Delegation of Authorization
 
-In situations where the provider of the API offers a super user who is allowed “sudo” requests that are executed on
-behalf of another user, the API is actually delegating authorization to the client application. In this cause
-authorization is performed upon login of the super user, but then the super user can switch to any other user or any set
-of roles (with a few exceptions for security reasons).
+In situations where the provider of the External API offers a super user who is allowed “sudo” requests that are
+executed on behalf of another user, the External API is actually delegating authorization to the client application. In
+this cause authorization is performed upon login of the super user, but then the super user can switch to any other user
+or any set of roles (with a few exceptions for security reasons).
 
 Note that in order to allow for user switching, a specific role needs to be assigned to the super user, and that role
 cannot be obtained by manipulating the role set (see [Role switching](#role-switching)).
@@ -53,9 +53,9 @@ Response code             | Comment
 ### Role switching
 
 Rather than specifying an execution user, the client might choose to specify a set of roles that should be used when
-executing the request. This technique is recommended in cases where the users are not managed by the API. By specifying
-a set of roles, the corresponding request will be executed using the API’s anonymous user but equipped with the
-specified set of roles.
+executing the request. This technique is recommended in cases where the users are not managed by the External API. By
+specifying a set of roles, the corresponding request will be executed using the API’s anonymous user but equipped
+with the specified set of roles.
 
 The execution user’s roles can be specified by setting the `X-RUN-WITH-ROLES` request header with the set of roles as
 its value and with individual roles separated by comma, as seen in this sample request:
@@ -78,15 +78,15 @@ Response code             | Comment
 
 ### One user per external application
 
-As a best practice, the API provider should create one super user per external application and tenant, so that access
-through that super user can be controlled, limited and turned off individually for each external application and tenant.
-
+As a best practice, the External API provider should create one super user per external application and tenant, so that
+access through that super user can be controlled, limited and turned off individually for each external application and
+tenant.
 
 ### Preference for user and role switching
 
-Client implementations accessing the API through a super user are urged to implement and enforce user and role switching
-as much as possible, since it allows for auditing of user activity on the API and introduces less risk by running
-requests with a limited set of privileges.
+Client implementations accessing the External API through a super user are urged to implement and enforce user and role
+switching as much as possible, since it allows for auditing of user activity on the External API and introduces less
+risk by running requests with a limited set of privileges.
 
 Obviously, if all requests are executed using the super user directly, it is not possible to track which user initiated
 a given action.
