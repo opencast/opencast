@@ -3,18 +3,18 @@
 
 # Introduction
 
-The Application API’s security layer is designed to support a multitude of mechanisms for authentication such as api
+The External API’s security layer is designed to support a multitude of mechanisms for authentication such as API
 keys, digest authentication and others. While the current implementation only supports basic authentication, further
 authentication mechanisms may be added in the future.
 
 # Basic Authentication
-The Application API is protected by basic authentication, requiring a user and a password be sent in the form of the
+The External API is protected by basic authentication, requiring a user and a password be sent in the form of the
 standard HTTP `Authorization` header. (see [Figure 2](#figure_2)). In the header, the username and password are sent
 encoded in Base64 format. The incoming requests are matched against an existing user whose password needs to match with
 the one that is found in the Authorization request header.
 
 NOTE: Basic authentication is not activated by default, please activate it in the security settings
-(`etc/security/mh_default_org.xml`) before using the Application API.
+(`etc/security/mh_default_org.xml`) before using the External API.
 
 <center>
 ![][figure_2]
@@ -23,10 +23,10 @@ NOTE: Basic authentication is not activated by default, please activate it in th
 
 ## Protection of authentication data
 Since Base64 is by no means regarded as encryption in the sense of security, it is strongly recommended to only offer
-access to the Application API over HTTPS rather than over HTTP in order to avoid unprotected transmission of the
+access to the External API over HTTPS rather than over HTTP in order to avoid unprotected transmission of the
 username and password via the Authorization header.
 
 
 ## Validation criteria
-When initiating the connection, the Application API analyzes the header and extracts the username to match against an
+When initiating the connection, the External API analyzes the header and extracts the username to match against an
 existing API user. If that user is found, the connection is authenticated, otherwise it’s rejected.
