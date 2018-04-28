@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XML-instance" xsi:Location="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
@@ -9,9 +9,6 @@
   <description>Opencast is a media capture, processing, management and distribution system</description>
   <url>http://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
-  <prerequisites>
-    <maven>3.1</maven>
-  </prerequisites>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
@@ -265,6 +262,26 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <version>3.0.0-M1</version>
+        <executions>
+          <execution>
+            <id>enforce-maven</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <requireMavenVersion>
+                  <version>3.1.1</version>
+                </requireMavenVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
         <version>1.4</version>
@@ -348,6 +365,7 @@
         <configuration>
           <format>html</format>
           <aggregate>true</aggregate>
+          <check/>
         </configuration>
       </plugin>
     </plugins>
@@ -1198,7 +1216,7 @@
   <!-- All non-build related project data below here -->
   <organization>
     <name>Opencast Project</name>
-    <url>http://www.opencastproject.org/</url>
+    <url>http://www.opencast.org/</url>
   </organization>
   <!-- Active contributors to Opencast -->
   <developers>
@@ -1559,9 +1577,9 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://bitbucket.org/opencast-community/opencast.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:opencast-community/opencast.git</developerConnection>
-    <url>https://bitbucket.org/opencast-community</url>
+    <connection>scm:git:https://github.com/opencast/opencast.git</connection>
+    <developerConnection>scm:git:https://github.com/opencast/opencast.git</developerConnection>
+    <url>https://github.com/opencast/opencast/</url>
   </scm>
   <issueManagement>
     <system>jira</system>
