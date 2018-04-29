@@ -76,25 +76,16 @@ public final class Util {
   }
 
   /**
-   * Giving a start time and end time with a recurrence rule and a timezone, all periods of the recurrence rule are
+   * Given a start time and end time with a recurrence rule and a timezone, all periods of the recurrence rule are
    * calculated taken daylight saving time into account.
    *
-   *TODO
-   * NOTE: Do not modify this without making the same modifications to the copy of this method in IndexServiceImplTest I
-   * would have moved this to the scheduler-api bundle, but that would introduce a circular dependency :(
-   *
-   * @param start
-   *          the start Calendar date time of the recurrence in the timezone of the scheduled CA
-   * @param end
-   *          the end Calendar date time of the recurrence in the timezone of the scheduled CA
-   * @param duration
-   *          the duration
-   * @param rRule
-   *          the recurrence rule (based on the Start time zone, including start hour and days of week)
-   * @param tz
-   *          of the timeZone where this event will be scheduled, i.e. the timeZone of the capture agent
-   * @return a list of scheduling periods (in the TZ were the event will be scheduled)
-   * @throws ParseException if the rRule string cannot be read
+   * @param startCalTz, Calendar date time of the recurrence in the timezone of the scheduled CA
+   * @param endCalTz, Calendar date time of the recurrence in the timezone of the scheduled CA
+   * @param duration, the length of each event
+   * @param rRuleTzStr, the recurrence rule (based on the Start time zone, including start hour and days of week)
+   * @param tz, the timezone of the scheduled CA
+   * @return a list of event Periods that match the rule and start and end times
+   * @throws ParseException
    */
   public static List<Period> calculatePeriods(Calendar startCalTz, Calendar endCalTz, long duration, String rRuleTzStr, TimeZone tz) throws ParseException {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
