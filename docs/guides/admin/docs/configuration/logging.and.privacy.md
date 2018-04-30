@@ -23,9 +23,9 @@ have no effect if logging is turned off.
 
 Key                                           | Data to be logged    | Default value
 ----------------------------------------------|----------------------|--------------
-`org.opencastproject.usertracking.log.ip`     | IP addresses         | `true`
-`org.opencastproject.usertracking.log.user`   | login names of users | `true`
-`org.opencastproject.usertracking.log.session`| Browser session-IDs  | `true`
+`org.opencastproject.usertracking.log.ip`     | IP addresses         | `false`
+`org.opencastproject.usertracking.log.user`   | login names of users | `false`
+`org.opencastproject.usertracking.log.session`| Browser session-IDs  | `false`
 
 If you want to use the footprint feature but do not want to store any user specific data you can turn the logging of IP
 addresses, usernames and session-IDs off.
