@@ -304,7 +304,7 @@
                 </td>
                 <#elseif item.type == "boolean">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
+                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
@@ -316,7 +316,7 @@
                 <td class="form_field_description">${item.description!}</td>
                 <#elseif item.type == "file">
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
+                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
@@ -328,7 +328,7 @@
                 <td class="form_field_description">${item.description!}</td>
                 <#else>
                 <td class="form_label">
-                  <#if item.required>* </#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
+                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
                   <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
