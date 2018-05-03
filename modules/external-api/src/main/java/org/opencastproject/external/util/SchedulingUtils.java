@@ -25,6 +25,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.time.ZoneOffset.UTC;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -70,6 +71,7 @@ public final class SchedulingUtils {
   private static final String JSON_KEY_AGENT_ID = "agent_id";
   private static final String JSON_KEY_START_DATE = "start";
   private static final String JSON_KEY_END_DATE = "end";
+  private static final String JSON_KEY_DURATION = "duration";
   private static final String JSON_KEY_INPUTS = "inputs";
   private static final String JSON_KEY_RRULE = "rrule";
 
@@ -80,6 +82,7 @@ public final class SchedulingUtils {
   public static class SchedulingInfo {
     private Opt<Date> startDate = Opt.none();
     private Opt<Date> endDate = Opt.none();
+    private Opt<Long> duration = Opt.none();
     private Opt<String> agentId = Opt.none();
     private Opt<String> inputs = Opt.none();
     private Opt<RRule> rrule = Opt.none();
@@ -96,6 +99,7 @@ public final class SchedulingUtils {
     public SchedulingInfo(SchedulingInfo other) {
       this.startDate = other.startDate;
       this.endDate = other.endDate;
+      this.duration = other.duration;
       this.agentId = other.agentId;
       this.inputs = other.inputs;
       this.rrule = other.rrule;
@@ -110,11 +114,31 @@ public final class SchedulingUtils {
     }
 
     public Opt<Date> getEndDate() {
-      return endDate;
+      if (endDate.isSome()) {
+        return endDate;
+      } else if (startDate.isSome() && duration.isSome()) {
+        return Opt.some(Date.from(startDate.get().toInstant().plusMillis(duration.get())));
+      } else {
+        return Opt.none();
+      }
     }
 
     public void setEndDate(Opt<Date> endDate) {
       this.endDate = endDate;
+    }
+
+    public Opt<Long> getDuration() {
+      if (duration.isSome()) {
+        return duration;
+      } else if (startDate.isSome() && endDate.isSome()) {
+        return Opt.some(endDate.get().getTime() - startDate.get().getTime());
+      } else {
+        return Opt.none();
+      }
+    }
+
+    public void setDuration(Opt<Long> duration) {
+      this.duration = duration;
     }
 
     public Opt<String> getAgentId() {
@@ -139,14 +163,6 @@ public final class SchedulingUtils {
 
     public void setRrule(Opt<RRule> rrule) {
       this.rrule = rrule;
-    }
-
-    /**
-     * @return The duration between start and end date or an empty result if start or end date are not present.
-     */
-    public Opt<Long> getDuration() {
-      if (startDate.isNone() || endDate.isNone()) return Opt.none();
-      return Opt.some(endDate.get().getTime() - startDate.get().getTime());
     }
 
     /**
@@ -240,6 +256,7 @@ public final class SchedulingUtils {
       final SchedulingInfo schedulingInfo = new SchedulingInfo();
       final String startDate = (String) json.get(JSON_KEY_START_DATE);
       final String endDate = (String) json.get(JSON_KEY_END_DATE);
+      final String durationString = (String) json.get(JSON_KEY_DURATION);
       final String agentId = (String) json.get(JSON_KEY_AGENT_ID);
       final JSONArray inputs = (JSONArray) json.get(JSON_KEY_INPUTS);
       final String rrule = (String) json.get(JSON_KEY_RRULE);
@@ -252,6 +269,18 @@ public final class SchedulingUtils {
       if (isNotBlank(agentId)) {
         schedulingInfo.agentId = Opt.some(agentId);
       }
+      if (isNotBlank(durationString)) {
+        try {
+          schedulingInfo.duration = Opt.some(Long.parseLong(durationString));
+        } catch (Exception e) {
+          throw new IllegalArgumentException("Invalid format of field 'duration'");
+        }
+      }
+
+      if (isBlank(endDate) && isBlank(durationString)) {
+        throw new IllegalArgumentException("Either 'end' or 'duration' must be specified");
+      }
+
       if (inputs != null) {
         schedulingInfo.inputs = Opt.some(String.join(",", inputs));
       }

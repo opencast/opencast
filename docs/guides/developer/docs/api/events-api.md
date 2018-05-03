@@ -159,7 +159,7 @@ __Example__
 
 Creates an event by sending metadata, access control list, processing instructions and files in a [multipart request](http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html).
 
-Multipart Form Parameters  |Type                             | Description
+Multipart Form Parameters  | Type                            | Description
 :--------------------------|:--------------------------------|:-----------
 `acl`                      | [`acl`](types.md#acl)           | A collection of roles with their possible action
 `metadata`                 | [`catalogs`](types.md#catalogs) | Event metadata as Form param
@@ -168,6 +168,38 @@ Multipart Form Parameters  |Type                             | Description
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
 `scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
+
+__Scheduling__
+
+Field      | Required | Type                                 | Description
+:----------|:---------|:-------------------------------------|:-----------
+`agent_id` | Yes      | [`string`](types.md#basic)           | The technical identifier of the capture agent
+`start`    | Yes      | [`datetime`](types.md#date-and-time) | The date and time when the recording shall start
+`end`      | Yes\*    | [`datetime`](types.md#date-and-time) | The date and time when the recording shall end
+`duration` | Yes\*    | [`integer`](types.md#basic)          | The duration of the recording in milliseconds
+`rrule`    | No       | [`string`](types.md#string)          | The optional recurrence rule used to create multiple scheduled events
+
+\* Both `end` and `duration` must be specified for creating multiple scheduled events, either `end` or `duration` must
+be specified for creating a single scheduled event
+
+To create a single scheduled event, omit the field `rrule`. The start date and time of the recording is determined by
+field `start`. The end date and time of the recording is determined by either the field `end` or `duration`.
+
+The create multiple scheduled events, the field `rrule` is used. This field contains the recurrence rule used to
+determine the dates and times the scheduled events shall be created within the time period specified by the fields
+`start` and `end` + `duration`.
+Note that `duration` is a mandatory field when creating multiple scheduled events.
+
+For more details about the reccurrence rule, please refer to the
+[Internet Calendaring and Scheduling Core Object Specification (iCalendar)](https://tools.ietf.org/html/rfc5545).
+
+Example rrule:
+
+```
+"rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
+```
+
+Please note that `BYHOUR` is specified in UTC.
 
 __Sample__
 
