@@ -8,36 +8,36 @@ Returns a list of series.
 
 The following query string parameters are supported to filter, sort and pagingate the returned list:
 
-Query String Parameter | Required | Type      | Description
-:----------------------|:---------|:----------|:-----------
-`filter`               | no       | [`string`](types.md#basic) | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                 | no       | [`string`](types.md#basic) | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                | no       | [`string`](types.md#basic) | The maximum number of results to return for a single request.
-`offset`               | no       | [`string`](types.md#basic) | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
+`sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
+`offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
 
 The following filters are available:
 
 Filter Name    | Description
 :--------------|:-----------
-`contributors` | Series where the contributors specified in the metadata field match.
-`creator`      | Series where the creator specified in the metadata field match.
+`contributors` | Series where the contributors specified in the metadata field match
+`creator`      | Series where the creator specified in the metadata field match
 `creationDate` | Series that were created between two dates. The two dates are in UTC format to the second i.e. yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z. They are seperated by a forward slash (url encoded or not) so an example of the full filter would be CreationDate:2015-05-08T00:00:00.000Z/2015-05-10T00:00:00.000Z
-`language`     | Series based upon the language specified.
-`license`      | Series based upon the license specified.
-`organizers`   | Series where the organizers specified in the metadata field match.
-`managedAcl`   | Series who have the same managed acl name.
-`subject`      | By the subject they are a part of.
-`textFilter`   | Filters series where any part of the series' metadata fields match this value.
-`title`        | By the title of the series.
+`language`     | Series based upon the language specified
+`license`      | Series based upon the license specified
+`organizers`   | Series where the organizers specified in the metadata field match
+`managedAcl`   | Series who have the same managed acl name
+`subject`      | By the subject they are a part of
+`textFilter`   | Filters series where any part of the series' metadata fields match this value
+`title`        | By the title of the series
 
-The list can be sorted using the following fields:
+The list can be sorted by the following criteria:
 
-Sort Name      | Description
+Sort Criteria  | Description
 :--------------|:-----------
-`contributors` | By the series contributors.
-`created`      | By when the series was created.
-`creator`      | By who created the series.
-`title`        | By the title of the series.
+`contributors` | By the series contributors
+`created`      | By when the series was created
+`creator`      | By who created the series
+`title`        | By the title of the series
 
 __Sample request__
 ```xml

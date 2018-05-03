@@ -12,7 +12,7 @@ General Configuration
 * [Database Configuration](database.md)
 * [Encoding Profile Configuration](encoding.md)
 * [Load Configuration](load.md)
-* [Logging and Privacy Configuration](logging.and.privacy.md)
+* [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)
 * [Message Broker Configuration](message-broker.md)
 * [Metadata Configuration](metadata.md)
 * [Manual Asset Upload Configuration](asset-upload-ui/index.md)

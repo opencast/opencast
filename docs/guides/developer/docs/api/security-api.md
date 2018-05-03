@@ -59,7 +59,7 @@ __Response__
 `200 (OK)`: A JSON object containing the signed URL or an error message is returned:
 
 Field         | Type                                 | Description
-:-------------|:--------------------------------'----|:-----------
+:-------------|:-------------------------------------|:-----------
 `url`         | [`string`](types.md#basic)           | The signed URL
 `valid-until` | [`datetime`](types.md#date-and-time) | The date and time until when the signed URL is valid
 

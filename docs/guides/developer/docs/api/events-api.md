@@ -5,40 +5,52 @@
 
 Returns a list of events.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
-in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
-response.
+The following query string parameters are supported to filter, sort and pagingate the returned list:
 
-Query String Parameter     |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
-`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
-`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
-`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
-`filter`                   | [`string`](types.md#basic)  | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                     | [`string`](types.md#basic)  | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                    | [`string`](types.md#basic)  | The maximum number of results to return for a single request.
-`offset`                   | [`string`](types.md#basic)  | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
+`sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
+`offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
 
-Filter Name     | Description
-:---------------|:------------------
-`contributors`  | Events where the contributors match.
-`location`      | Events based upon the location it is scheduled in.
-`series`        | Events based upon which series they are a part of.
-`subject`       | Filters events based upon which subject they are a part of.
-`textFilter`    | Filters events where any part of the event's metadata fields match this value.
+The following filters are available:
 
-Sort Name           | Description
-:-------------------|:---------------
-`title`             | By the title of the event.
-`presenter`         | By the presenter of the event.
-`start_date`        | By the start date of the event.
-`end_date`          | By the end date of the event.
-`review_status`     | By whether the event has been reviewed and approved or not.
-`workflow_state`    | By the current processing state of the event. Is it scheduled to be recorded (INSTANTIATED), currently processing (RUNNING), paused waiting for a resource or user paused (PAUSED), cancelled (STOPPED), currently failing (FAILING), already failed (FAILED), or finally SUCCEEDED.
-`scheduling_status` | By the current scheduling status of the event.
-`series_name`       | By the series name of the event.
-`location`          | By the location (capture agent) that the event will be or has been recorded on.
+Filter Name    | Description
+:--------------|:-----------
+`contributors` | Events where the contributors match
+`location`     | Events based upon the location it is scheduled in
+`series`       | Events based upon which series they are a part of
+`subject`      | Filters events based upon which subject they are a part of
+`textFilter`   | Filters events where any part of the event's metadata fields match this value
+
+The list can be sorted by the following criteria:
+
+Sort Criteria       | Description
+:-------------------|:-----------
+`title`             | By the title of the event
+`presenter`         | By the presenter of the event
+`start_date`        | By the start date of the event
+`end_date`          | By the end date of the event
+`review_status`     | By whether the event has been reviewed and approved or not
+`workflow_state`    | By the current processing state of the event. Is it scheduled to be recorded (INSTANTIATED), currently processing (RUNNING), paused waiting for a resource or user paused (PAUSED), cancelled (STOPPED), currently failing (FAILING), already failed (FAILED), or finally SUCCEEDED
+`scheduling_status` | By the current scheduling status of the event
+`series_name`       | By the series name of the event
+`location`          | By the location (capture agent) that the event will be or has been recorded on
+
+This request additionally supports the following query string parameters to include additional information directly in
+the response:
+
+Query String Parameter     |Type                         | Description
+:--------------------------|:----------------------------|:-----------
+`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response
+`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response
+`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response
+
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
+on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching
+this response.
 
 
 __Sample request__

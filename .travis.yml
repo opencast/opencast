@@ -4,16 +4,32 @@ language: java
 
 jdk: oraclejdk8
 
-env:
-  - T=docs
-  - T=build
-  - T=site
+# Cache maven artifacts, pip downloads and the node modules for markdownlint
+cache:
+  directories:
+  - ~/.m2
+  - ~/.cache/pip
+  - docs/guides/node_modules/
 
+# Do not cache the opencast artifacts to detect dependency problems
+before_cache:
+  - rm -rf ~/.m2/repository/org/opencastproject
+
+# Shorten some commands
+# - A simple download command for synfig packages
+# - A maven command with logging settings and multithreading.
+#
+# The number of threads are intentionally set to two times the number of CPU cores since Opencast spends a lot of time
+# waiting with no CPU usage.
 before_install:
-  - . .travisrc
-  - _nt docs sudo apt-get -qq update
+  - shopt -s expand_aliases
+  - alias get_synfig='wget -q -O ~/.m2/synfigstudio-1.0.2.deb'
+  - alias mvn='mvn --batch-mode -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn'
+
+# Default dependency installation
+install:
+  - sudo apt-get -qq update
   - >
-     _nt docs
      sudo apt-get install -y
      bzip2
      gzip
@@ -25,30 +41,63 @@ before_install:
      tesseract-ocr
      tesseract-ocr-deu
      unzip
-  - _nt docs wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
-  - _nt docs tar xf ffmpeg-release-64bit-static.tar.xz
-  - _nt docs sudo mv ffmpeg-*/ff* /usr/bin/
+  - mkdir -p ~/.m2 ~/bin
+  - wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+  - tar xf ffmpeg-release-64bit-static.tar.xz
+  - mv ffmpeg-*/ff* ~/bin/
   - >
-     _nt docs
-     wget https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-     wget https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
-     wget -O synfigstudio-1.0.2.deb https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
-  - _nt docs sudo dpkg -i synfigstudio-1.0.2.deb
-  - _t docs sudo pip install mkdocs
-  - _t docs sh -c "cd docs/guides && npm install"
+     test -f ~/.m2/synfigstudio-1.0.2.deb ||
+     get_synfig https://mvncache.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     get_synfig https://nexus.opencast.org/nexus/content/repositories/thirdparty/org/synfig/synfigstudio/1.0.2/synfigstudio-1.0.2.deb ||
+     get_synfig https://netix.dl.sourceforge.net/project/synfig/releases/1.0.2/linux/synfigstudio_1.0.2_amd64.deb
+  - sudo dpkg -i ~/.m2/synfigstudio-1.0.2.deb
 
-install:
-  - true
+jobs:
+  include:
+    # Test documentation in Python environment (Travis docker container)
+    # - Ensure no tabs are used
+    # - Ensure there are no trailing spaces
+    # - Run markdownlint
+    - stage: test documentation
+      sudo: false
+      language: python
+      python: "3.6"
+      install:
+        - pip install mkdocs
+        - (cd docs/guides && npm install)
+      script:
+        - (! grep -rn '	' modules assemblies pom.xml --include=pom.xml)
+        - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
+        - (! grep -rn '	' etc)
+        - (! grep -rn ' $' etc)
+        - (cd docs/guides/admin && mkdocs build)
+        - (cd docs/guides/developer && mkdocs build)
+        - (cd docs/guides/user && mkdocs build)
+        - (cd docs/guides && grunt)
 
-script:
-  - _t docs sh -c "! grep -rn '	' modules assemblies pom.xml --include=pom.xml"
-  - _t docs sh -c "! grep -rn ' $' modules assemblies pom.xml --include=pom.xml"
-  - _t docs sh -c "! grep -rn '	' etc"
-  - _t docs sh -c "! grep -rn ' $' etc"
-  - _t docs sh -c "cd docs/guides/admin && mkdocs build"
-  - _t docs sh -c "cd docs/guides/developer && mkdocs build"
-  - _t docs sh -c "cd docs/guides/user && mkdocs build"
-  - _t docs sh -c "cd docs/guides && grunt"
-  - _t build mvn --batch-mode clean install -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-  - _t site  mvn --batch-mode install -DskipTests=true -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-  - _t site  mvn --batch-mode site -Pnone -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
+    # Make a build excluding the assembly steps
+    - stage: build
+      env: name=build
+      script:
+        - mvn clean install -Pnone
+
+    # Make a simple build to generate all Opencast artifacts while excluding as many checks as possible since we do a
+    # proper test in parallel anyway. Then run `mvn site` to generate Javadocs.
+    - stage: build
+      env: name=site
+      before_script:
+        - mvn install -DskipTests=true -Dcheckstyle.skip=true -Pnone
+      script:
+        - mvn site -Pnone -Dcheckstyle.skip=true
+
+    # Deploy translation keys to Crowdin if we are on develop or one of the release branches
+    - stage: deployment
+      env: name=crowdin
+      install: skip
+      script: skip
+      deploy:
+        provider: script
+        script: bash .upload-crowdin.sh
+        on:
+          all_branches: true
+          condition: $TRAVIS_BRANCH =~ ^develop|r/

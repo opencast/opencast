@@ -672,7 +672,7 @@ public class IndexServiceImpl implements IndexService {
         }
       }
       // 2. Save the snapshot
-      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      assetManager.takeSnapshot(mediaPackage);
 
       // 3. start the new workflow on the snapshot
       // Workflow params are assumed to be String (not mixed with Number)
@@ -1196,7 +1196,7 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1271,7 +1271,7 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1333,7 +1333,7 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
       case ARCHIVE:
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
@@ -1966,7 +1966,7 @@ public class IndexServiceImpl implements IndexService {
                   break;
                 case ARCHIVE:
                   logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+                  assetManager.takeSnapshot(mediaPackage);
                   break;
                 case SCHEDULE:
                   logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());

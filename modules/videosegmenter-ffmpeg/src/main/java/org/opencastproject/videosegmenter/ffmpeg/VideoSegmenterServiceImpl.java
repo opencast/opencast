@@ -629,9 +629,10 @@ VideoSegmenterService, ManagedService {
    * @param changesThreshold the changesThreshold that is used as option for the FFmpeg call
    * @return a list of the resulting segments
    * @throws IOException
+   * @throws VideoSegmenterException
    */
   protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
-          float changesThreshold) throws IOException {
+          float changesThreshold) throws IOException, VideoSegmenterException {
 
     String[] command = new String[] { binary, "-nostats", "-i",
       mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
@@ -689,7 +690,12 @@ VideoSegmenterService, ManagedService {
           // filter is used for multiple purposes.
           continue;
         }
-        endtime = Long.parseLong(time) * 1000;
+        try {
+          endtime = Math.round(Float.parseFloat(time) * 1000);
+        } catch (NumberFormatException e) {
+          logger.error("Unable to parse FFmpeg output, likely FFmpeg version mismatch!", e);
+          throw new VideoSegmenterException(e);
+        }
         long segmentLength = endtime - starttime;
         if (1000 * stabilityThresholdPrefilter < segmentLength) {
           Segment segment = videoContent.getTemporalDecomposition()
