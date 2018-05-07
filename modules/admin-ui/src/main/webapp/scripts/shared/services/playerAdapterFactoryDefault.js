@@ -225,6 +225,13 @@ angular.module('adminNg.services')
             };
 
             /**
+             * Get the URI of the currently displayed source
+             */
+            this.getCurrentSource = function () {
+                return targetElement.currentSrc;
+            };
+
+            /**
              * Get the video duration
              */
             this.getDuration = function () {
@@ -281,6 +288,7 @@ angular.module('adminNg.services')
                 target.play = me.play;
                 target.canPlay = me.canPlay;
                 target.pause = me.pause;
+                target.getCurrentSource = me.getCurrentSource;
                 target.setCurrentTime = me.setCurrentTime;
                 target.getCurrentTime = me.getCurrentTime;
                 target.getFramerate = me.getFramerate;

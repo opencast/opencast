@@ -5,6 +5,7 @@ window.playerAdapterDefaultTests = function (PlayerAdapterFactory) {
                 id: "heinz-das-video",
                 observers: {},
                 duration: 300,
+                currentSrc: 'http://example.com/video.mp4',
                 play: function () {},
                 pause: function () {},
                 getCurrentTime: function () {},
@@ -197,6 +198,10 @@ window.playerAdapterDefaultTests = function (PlayerAdapterFactory) {
             it('#getCurrentTime', function () {
                 playerAdapter.setCurrentTime(88);
                 expect(playerAdapter.getCurrentTime()).toEqual(88);
+            });
+
+            it('#getCurrentSource', function () {
+                expect(playerAdapter.getCurrentSource()).toEqual('');
             });
         });
 
