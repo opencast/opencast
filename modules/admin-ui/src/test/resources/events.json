@@ -24,7 +24,7 @@
       "publications": [
         {
           "id": "rest",
-          "name": "EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM",
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
           "url": "engage.html?e=p-1"
         }
       ],
@@ -57,7 +57,7 @@
       "publications": [
         {
           "id": "rest",
-          "name": "EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM",
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
           "url": "engage.html?e=p-1"
         }
       ],
@@ -90,7 +90,7 @@
       "publications": [
         {
           "id": "rest",
-          "name": "EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM",
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
           "url": "engage.html?e=p-1"
         }
       ],

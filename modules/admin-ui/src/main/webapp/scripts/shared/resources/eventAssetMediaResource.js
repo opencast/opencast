@@ -21,7 +21,7 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('EventMediaResource', ['$resource', function ($resource) {
+.factory('EventAssetMediaResource', ['$resource', function ($resource) {
     var transform = function (data) {
         var media = [];
         try {

@@ -505,17 +505,17 @@
        "DETAILS": {
          "HEADER": "Event details - {{resourceId}}",
          "TABS": {
-           "GENERAL":     "General",
            "METADATA":    "Metadata",
            "EXTENDED-METADATA":    "Metadata II",
            "ASSETS": "Assets",
+           "PUBLICATIONS":     "Publications",
            "SCHEDULING": "Scheduling",
            "WORKFLOWS":   "Workflows",
            "ACCESS":      "Access policy",
            "COMMENTS":    "Comments"
          },
-         "GENERAL": {
-           "PUBLICATION_STATUS":         "Publications",
+         "PUBLICATIONS": {
+           "CAPTION":                    "Publications",
            "NO_PUBLICATIONS_AVAILABLE":  "This event has not been published",
            "PUBLICATION_DESCRIPTION":    "This event has been published to the following publication channels:",
            "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",

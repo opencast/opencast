@@ -1,12 +1,12 @@
-describe('Event Media API Resource', function () {
-    var EventMediaResource, $httpBackend;
+describe('Event Asset Media API Resource', function () {
+    var EventAssetMediaResource, $httpBackend;
 
     beforeEach(module('adminNg.resources'));
     beforeEach(module('ngResource'));
 
-    beforeEach(inject(function (_$httpBackend_, _EventMediaResource_) {
+    beforeEach(inject(function (_$httpBackend_, _EventAssetMediaResource_) {
         $httpBackend  = _$httpBackend_;
-        EventMediaResource = _EventMediaResource_;
+        EventAssetMediaResource = _EventAssetMediaResource_;
     }));
 
     describe('#get', function () {
@@ -17,7 +17,7 @@ describe('Event Media API Resource', function () {
                 id: 'series'
             }];
             $httpBackend.expectGET('/admin-ng/event/40518/asset/media/media.json').respond(JSON.stringify(mediaResponse));
-            result = EventMediaResource.get({ id0: 40518 });
+            result = EventAssetMediaResource.get({ id0: 40518 });
             $httpBackend.flush();
             expect(result.length).toBe(2);
         });

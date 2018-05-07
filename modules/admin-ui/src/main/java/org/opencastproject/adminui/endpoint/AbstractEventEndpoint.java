@@ -400,18 +400,18 @@ public abstract class AbstractEventEndpoint {
   }
 
   @GET
-  @Path("{eventId}/general.json")
+  @Path("{eventId}/publications.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventgeneral", description = "Returns all the data related to the general tab in the event details modal as JSON", returnDescription = "All the data related to the event general tab as JSON", pathParameters = {
+  @RestQuery(name = "geteventpublications", description = "Returns all the data related to the publications tab in the event details modal as JSON", returnDescription = "All the data related to the event publications tab as JSON", pathParameters = {
           @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
-                  @RestResponse(description = "Returns all the data related to the event general tab as JSON", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "Returns all the data related to the event publications tab as JSON", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEventGeneralTab(@PathParam("eventId") String id) throws Exception {
+  public Response getEventPublicationsTab(@PathParam("eventId") String id) throws Exception {
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);
 
-    // Quick actions have been temporally removed from the general tab
+    // Quick actions have been temporally removed from the publications tab
     // ---------------------------------------------------------------
     // List<JValue> actions = new ArrayList<JValue>();
     // List<WorkflowDefinition> workflowsDefinitions = getWorkflowService().listAvailableWorkflowDefinitions();
@@ -2291,7 +2291,7 @@ public abstract class AbstractEventEndpoint {
       final Opt<String> channel = Opt.nul(EventUtils.PUBLICATION_CHANNELS.get(publication.getChannel()));
       String url = publication.getURI() == null ? "" : signUrl(publication.getURI()).toString();
       return obj(f("id", v(publication.getChannel())),
-              f("name", v(channel.getOr("EVENTS.EVENTS.DETAILS.GENERAL.CUSTOM"))), f("url", v(url, NULL)));
+              f("name", v(channel.getOr("EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM"))), f("url", v(url, NULL)));
     }
   };
 

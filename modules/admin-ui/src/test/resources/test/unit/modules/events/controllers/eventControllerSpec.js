@@ -31,7 +31,7 @@ describe('Event controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
         $httpBackend.whenGET('/admin-ng/event/40518/metadata.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/metadata.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/publications.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/media/media.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/attachment/attachments.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond('{}');
