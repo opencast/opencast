@@ -1,8 +1,11 @@
 # Mattermost Notification
 ## Description
-The MattermostNotificationOperationHander sends an notification to a channel of Mattermost or similar applications, like Slack, with the chosen parameters provided. It is useful to send such notifications when some operation(s) have been completed or some error has occurred in a workflow.
+The MattermostNotificationOperationHander sends an notification to a channel of Mattermost or similar applications, 
+like Slack, with the chosen parameters provided. It is useful to send such notifications when some operation(s) have
+been completed or some error has occurred in a workflow.
 
-The notification message can be freely chosen. You can use different parameters which will be replaced with the corresponding meta-data of the current workflow instance (see List of parameters).
+The notification message can be freely chosen. You can use different parameters which will be replaced with the
+corresponding meta-data of the current workflow instance (see List of parameters).
 
 ## List of configuration options
 
@@ -36,7 +39,7 @@ timeout | Maximum time to wait for client to excecute a request | 10 * 1000
 ## List of parameters
 All parameters (%<letter>) will be substituted with corresponding meta-data of current workflow instance.
 
-Parameter | Meta-Data  
+Parameter | Meta-Data
 --- | :---:
 %t | Title of workflow
 %i | ID of workflow
