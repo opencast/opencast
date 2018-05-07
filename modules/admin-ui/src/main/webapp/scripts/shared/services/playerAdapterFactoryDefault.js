@@ -23,14 +23,14 @@ angular.module('adminNg.services')
 .factory('PlayerAdapterFactoryDefault', ['PlayerAdapter', function (PlayerAdapter) {
     var Factory = function () {
         /**
-        * A default implementation of an adapter. Its purpose is to
-        * track the state and delegate events from / to specific adapter
-        * implementations.
-        *
-        * Usage: Instantiate an instance of this DefaultAdapter and copy
-        * its capabilities to your adapter implementation by calling
-        * #extend(this).
-        */
+         * A default implementation of an adapter. Its purpose is to
+         * track the state and delegate events from / to specific adapter
+         * implementations.
+         *
+         * Usage: Instantiate an instance of this DefaultAdapter and copy
+         * its capabilities to your adapter implementation by calling
+         * #extend(this).
+         */
         var DefaultAdapter = function (targetElement) {
             // keep a reference to this, for callbacks.
             var me = this;
@@ -152,9 +152,9 @@ angular.module('adminNg.services')
              */
             this.setCurrentTime = function (time) {
                 if (time < 0) {
-                  time = 0;
+                    time = 0;
                 } else if (time > me.getDuration()) {
-                  time = me.getDuration();
+                    time = me.getDuration();
                 }
                 targetElement.currentTime = time;
             };
@@ -252,7 +252,7 @@ angular.module('adminNg.services')
 
             this.toggleMute = function () {
               me.muted(! me.muted());
-            }
+            };
 
             /**
              * Turns audio on or off and returns current status
@@ -261,10 +261,10 @@ angular.module('adminNg.services')
              */
             this.muted = function (status) {
                 if (status !== undefined) {
-                  targetElement.muted = status;
+                    targetElement.muted = status;
                 }
                 return targetElement.muted;
-            }
+            };
 
             /**
              * Set and get the volume of the player
@@ -274,15 +274,15 @@ angular.module('adminNg.services')
              */
             this.volume = function (volume) {
                 if (volume !== undefined) {
-                  if (volume === 0) {
-                    me.muted(true);
-                  } else {
-                    me.muted(false);
-                  }
-                  targetElement.volume = volume / 100.0;
+                    if (volume === 0) {
+                        me.muted(true);
+                    } else {
+                        me.muted(false);
+                    }
+                    targetElement.volume = volume / 100.0;
                 }
                 return parseInt(targetElement.volume * 100);
-            }
+            };
 
             /**
              * Copies the API's default implementation methods to the target.
