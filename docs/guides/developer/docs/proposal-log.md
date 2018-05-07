@@ -1,17 +1,10 @@
 Opencast Proposals
 ==================
 
-All important decisions for Opencast have to be made on list. To do that committers may send proposals (marked with
-`#proposal`) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no response
-signals agreement. Apart from that committers may vote with:
+All important decisions for Opencast have to be made on list. For more details, please have a look at out [documentation
+about decision making](decision-making/index.md).
 
- - `+1` yes, agree - also willing to help bring about the proposed action
- - `+0` yes, agree - not willing or able to help bring about the proposed action
- - `-0` no, disagree - but will not oppose the action going forward
- - `-1` veto, disagree - opposes the action going forward and must propose an alternate action to address the issue or a
-   justification for not addressing the issue
-
-A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being sent to list.
+The following list contains a list of passed proposals for reference.
 
 Passed Proposals
 ----------------
@@ -72,16 +65,16 @@ Per the discussion in the meeting today, we need to set a policy regarding what
 is expected of our Crowdin translators prior to joining the translation team.
 My proposal is that they must write a brief, understandable sentence regarding
 why they want to help translate Opencast via the Crowdin UI.  This is an
-optional field in the workflow where they request to be a translator (ie, no
-new tools or fields) which is sometimes filled in, but mostly left blank.
-Something like
+optional field in the workflow where they request to be a translator (ie, no new
+tools or fields) which is sometimes filled in, but mostly left blank.  Something
+like
 
 'I want to help translate $project into [language]'
 
 would be sufficient.  This filters out the bots, yet is simple enough that
-someone with Google translate ought to be able to work something out.  Once
-this passes I will update the Crowdin and Opencast docs regarding the
-requirements, and then we should be good to go.
+someone with Google translate ought to be able to work something out.  Once this
+passes I will update the Crowdin and Opencast docs regarding the requirements,
+and then we should be good to go.
 
 Proposal closes EOD 2017-11-17.
 ```
@@ -282,7 +275,7 @@ draft [1] into account, although I still dared to include the two last
 items but this time, hopefully with a convincing reason for why they
 should be removed.
 
-1. Old Administrative User Interface (admin-ui)
+1. Old Administrative User Interface (matterhorn-admin-ui)
    The reason for this should be obvious: We got a new one. The old one
    has not been tested for the last three releases, is not linked
    anywhere anymore and is partly buggy due to changes to Opencast. To
@@ -355,7 +348,7 @@ should be removed.
     except by components to be removed.
 
 
-20. search-service-feeds
+20. matterhorn-search-service-feeds
     Broken implementation for RSS/Atom feeds
 
 21. matterhorn-caption-* and embed operation
@@ -393,7 +386,7 @@ Hi,
 we discussed this on today's technical meeting and I'm slightly
 changing the proposal:
 
-20. Let's remove search-service-feeds only after September
+20. Let's remove matterhorn-search-service-feeds only after September
     1st which is a realistic time to get things into the next Opencast
     release. If someone has fixed the issue by them, we will, of
     course, keep it.

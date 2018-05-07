@@ -2,7 +2,8 @@
 
 ## Description
 
-The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
+The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH
+aware applications.
 
 ## Parameter Table
 
@@ -18,7 +19,8 @@ The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PM
 |external-channel   |The optional channel name for the OAI-PMH publication element                                 |
 |external-mime-type |The optional mime type for the OAI-PMH publication element                                    |
 
-Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to be set.
+Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to
+be set.
 
 ## Customizing the OAI-PMH Publication Element
 

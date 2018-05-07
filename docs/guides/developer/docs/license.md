@@ -13,9 +13,9 @@ All libraries that are used in Opencast need to be compatible with the Education
 
 In short, if the license is on:
 
- - the Apereo or Apache Category-A list, it is fine to use the library.
- - the Apereo or Apache Category-B list, we may use it unmodified. Please avoid Category-B if possible.
- - the Apereo or Apache Category-X list, we cannot use it.
+* the Apereo or Apache Category-A list, it is fine to use the library.
+* the Apereo or Apache Category-B list, we may use it unmodified. Please avoid Category-B if possible.
+* the Apereo or Apache Category-X list, we cannot use it.
 
 Everything else needs to go to the Apereo foundation for approval.
 

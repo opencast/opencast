@@ -3,9 +3,10 @@ Opencast Infrastructure
 
 List of Opencast project infrastructure and administrators.  For detailed notes go [here](notes.md)
 
+Infrastructure
+--------------
 
-Test Servers
-------------
+### Test Servers
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
 ---------------------------|-------------------------------|------------------|--------------------
@@ -14,8 +15,7 @@ ETH Zürich                 | stable.opencast.org           | Lars Kiesow      |
 Jan Koppe                  | legacy.opencast.org           | Greg Logan       | Jan Koppe
 
 
-Maven Repository
-----------------
+### Maven Repository
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
 ---------------------------|-------------------------------|------------------|---------------------|---------------
@@ -24,13 +24,12 @@ University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      |
 
 Nexus administration:
 
-- Greg Logan
-- Lars Kiesow
-- Michael Stypa
+* Greg Logan
+* Lars Kiesow
+* Michael Stypa
 
 
-Other Hosted Services
----------------------
+### Other Hosted Services
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
 ---------------------------|-------------------------------|------------------|-------------------------
@@ -42,59 +41,55 @@ University of Osnabrück    | opencast.org                  | Rüdiger Rolf     
 
 
 Administrators
-==============
+--------------
 
-What is an administractor, and how does that differ from a committer?
------------------------------------------------------------------
+### What is an administractor, and how does that differ from a committer?
 
 An administrator is someone within the Opencast community who has administrative access to one or more of our major
 tools.  These tools are
 
- - JIRA
- - GitHub
- - Google Groups
- - Crowdin
+* JIRA
+* GitHub
+* Google Groups
+* Crowdin
 
 While many of our administrators are committers, an administrator is _not_ a committer by necessity.  Administrators
 have important responsibilities within the community, but mainly work behind the scenes.  These responsibilities
 include:
 
- - Adding new committers to the relevant group(s)
- - Removing old committers from the relevant group(s)
- - Contacting support when required for hosted projects (Atlassian, Crowdin, Google)
+* Adding new committers to the relevant group(s)
+* Removing old committers from the relevant group(s)
+* Contacting support when required for hosted projects (Atlassian, Crowdin, Google)
 
-Adding or removing Committers
------------------------------
+### Adding or removing Committers
 
 While the committer body manages its own membership, it does not directly have the power to add or remove users
 from the appropriate groups across all of our hosted products.  Administrators are required to modify the various
 groups in multiple places when a change is necessary.  These changes are
 
- - Modifying the [JIRA committers group](https://opencast.jira.com/admin/groups/view?groupname=committers-matterhorn)
- - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
- - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
- - Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
- - Modifying the list of committers on the [Opencast website](http://www.opencast.org/community)
+* Modifying the [JIRA committers group](https://opencast.jira.com/admin/groups/view?groupname=committers-matterhorn)
+* Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
+* Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
+* Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
+* Modifying the list of committers on the [Opencast website](http://www.opencast.org/community)
 
-Current Administrators
-----------------------
+### Current Administrators
 
 Administrators may not have complete access to all services, however we will coordinate to handle requests in a timely
-manner.  If you need to contact an administrator for access to one of the services above, please contact them in this
+manner. If you need to contact an administrator for access to one of the services above, please contact them in this
 order:
 
- - Greg Logan
- - Lars Kiesow
- - Olaf Schulte
+* Greg Logan
+* Lars Kiesow
+* Olaf Schulte
 
-Video Conferencing
-------------------
+### Video Conferencing
 
-- BigBlueButton
-    - [Conference rooms](http://opencast.blindsidenetworks.net/opencast/)
-        - Password: welcome
-    - [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
-    - Flash based
-- AppearIn
-    - [Conference room](https://appear.in/opencast)
-    - WebRTC based; Max. 4 users
+* BigBlueButton
+    * [Conference rooms](http://opencast.blindsidenetworks.net/opencast/)
+        * Password: welcome
+    * [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
+    * Flash based
+* AppearIn
+    * [Conference room](https://appear.in/opencast)
+    * WebRTC based; Max. 4 users

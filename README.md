@@ -20,16 +20,20 @@ Installation instructions can be found locally at
 
     docs/guides/admin/docs
 
-or on our documentation server at:
+or in our [online documentation](https://docs.opencast.org).
 
- * [Opencast Documentation](http://docs.opencast.org)
+
+Issue Tracker
+-------------
+
+You have found a bug, please file a ticket in our [issue tracker](https://opencast.jira.com).
 
 
 Community
 ---------
 
-More information about the community can be found at:
+More information about the community:
 
-* [Opencast Website](http://opencast.org/)
-* [Mailing lists, IRC, …](http://opencast.org/community)
-* [Issue Tracker](http://opencast.jira.com/)
+- [Opencast Website](http://opencast.org/)
+- [Twitter](https://twitter.com/openmatter)
+- [Facebook](https://facebook.com/opencast)

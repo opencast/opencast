@@ -354,9 +354,11 @@ __Response__
 
 # Access Policy
 
-Most events in Opencast come with an access control list (ACL), containing entries that map actions to roles, either allowing or denying that action.
+Most events in Opencast come with an access control list (ACL), containing entries that map actions to roles, either
+allowing or denying that action.
 
-The section on roles in the chapter on [Authorization](authorization.md#AccessControl) will help shed some light on what kind of roles are available and how they are assigned to the current user.
+The section on roles in the chapter on [Authorization](authorization.md#AccessControl) will help shed some light on what
+kind of roles are available and how they are assigned to the current user.
 
 For more information about access control lists, please refer to [Access Control Lists](types.md#access-control-lists).
 
@@ -464,16 +466,16 @@ __Response__
 
 # Metadata
 
-This section describes how to use the Application API to work with metadata catalogs associated to events.
+This section describes how to use the External API to work with metadata catalogs associated to events.
 
 Opencast manages the bibliographic metadata of series using metadata catalogs which are identified by flavors.
 The default metadata catalog for Opencast events has the flavor `dublincore/episode`. Opencast additionally supports
 extended metadata catalogs for series that can be configured.
 
-The Application API supports both the default event metadata catalog and events extended metadata catalogs.
+The External API supports both the default event metadata catalog and events extended metadata catalogs.
 For the default event metadata catalog, the metadata is directly returned in the responses.
 
-Since the metadata catalogs can be configured, the Application API provides a facility to retrieve the catalog
+Since the metadata catalogs can be configured, the External API provides a facility to retrieve the catalog
 configuration of series metadata catalogs. For more details about this mechanism, please refer to
 ["Metadata Catalogs"](types.md#metadata-catalogs).
 

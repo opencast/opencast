@@ -1,9 +1,10 @@
 Install from Repository (Debian, Ubuntu)
 ===========================================================================
 
-There is a Debian software repository (DEB) available for Debian-based Linux distributions provided by Greg Logan, and hosted
-at University of Osnabrück. This repository provides prebuilt Opencast installations, including all 3rd-Party-Tools.
-Using this method, you do not have to compile the software by yourself, but you still need to configure it.
+There is a Debian software repository (DEB) available for Debian-based Linux distributions provided by Greg Logan, and
+hosted at University of Osnabrück. This repository provides prebuilt Opencast installations, including all
+3rd-Party-Tools. Using this method, you do not have to compile the software by yourself, but you still need to configure
+it.
 
 It may also be interesting for developers as all dependencies for Opencast usage, testing and development are provided
 by the Debian repository.
@@ -19,21 +20,21 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
- - Debian 8/9 amd64
- - Ubuntu 16.04 amd64
+* Debian 8/9 amd64
+* Ubuntu 16.04 amd64
 
 
 **Debian 8 requires a manual OpenJDK install**
 
- - Add jessie-backports to your sources, replacing the mirror URL with your local mirror:
+* Add jessie-backports to your sources, replacing the mirror URL with your local mirror:
 
         echo "deb http://[YOUR_MIRROR]/debian jessie-backports main" | sudo tee /etc/apt/sources.list.d/jessie-backports.list
 
- - Update your package listing
+* Update your package listing
 
         apt-get update
 
- - Install OpenJDK 8 from the backports
+* Install OpenJDK 8 from the backports
 
         apt-get install -t jessie-backports openjdk-8-jre
 
@@ -55,11 +56,11 @@ Activate Repository
 
 First you have to install the necessary repositories so that your package manager can access them:
 
- - Ensure https repositories are supported:
+* Ensure https repositories are supported:
 
         apt-get install apt-transport-https ca-certificates sudo
 
- - Add Opencast repository:
+* Add Opencast repository:
 
         cd /etc/apt/sources.list.d/
         echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org/debian stable/" | sudo tee opencast.list
@@ -71,11 +72,11 @@ First you have to install the necessary repositories so that your package manage
         cd /etc/apt/sources.list.d/
         echo "deb https://[YOUR_USERNAME]:[YOUR_PASSWORD]@pkg.opencast.org/debian testing/" | sudo tee opencast.list
 
- - Add the repository key to your apt keyring:
+* Add the repository key to your apt keyring:
 
         wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | sudo apt-key add -
 
- - Update your package listing
+* Update your package listing
 
         apt-get update
 
@@ -117,18 +118,19 @@ For a basic installation (All-In-One) just run:
 
     apt-get install opencast-3-allinone
 
-This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note that
-while the repository provides a packaged version of ffmpeg, your distribution may have a version which is pre-installed or
-otherwise takes precedence.  This version may work, however Opencast only formally supports the version(s) in the repository.
+This will install the default distribution of Opencast and all its dependencies, including the 3rd-Party-Tools.  Note
+that while the repository provides a packaged version of ffmpeg, your distribution may have a version which is
+pre-installed or otherwise takes precedence.  This version may work, however Opencast only formally supports the
+version(s) in the repository.
 
-At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the [Basic Configuration
-guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
+At this point Opencast is installed and will work locally, but it is not completely configured.  Please follow the
+[Basic Configuration guide](../configuration/basic.md) from here.  Once you are ready, start Opencast:
 
- - On a SysV-init based system
+* On a SysV-init based system
 
         service opencast start
 
- - On a Systemd based system
+* On a Systemd based system
 
         systemctl start opencast.service
 
@@ -146,10 +148,10 @@ This will list all available Opencast distributions in the form `opencast-<versi
 
 Some available distributions are:
 
- - opencast-X-allinone
- - opencast-X-admin
- - opencast-X-presentation
- - opencast-X-worker
+* opencast-X-allinone
+* opencast-X-admin
+* opencast-X-presentation
+* opencast-X-worker
 
 …where `X` stands for a specific Opencast version. These packages will install the latest release for a given version,
 so opencast-3-admin will install the admin profile for Opencast 3.x (currently 3.3). Once Opencast 3.4 has been packaged
@@ -186,11 +188,11 @@ While these packages will automatically upgrade you to the latest point version 
 automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
 latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
 
- - On a SysV-init based system
+* On a SysV-init based system
 
         service opencast stop
 
- - On a Systemd based system
+* On a Systemd based system
 
         systemctl stop opencast.service
 

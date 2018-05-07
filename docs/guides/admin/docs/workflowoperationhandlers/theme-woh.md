@@ -1,7 +1,7 @@
 # ThemeWorkflowOperationHandler
 
 ## Description
-The ThemeWorkflowOperation loads workflow properties and adds elements to the media package if available. 
+The ThemeWorkflowOperation loads workflow properties and adds elements to the media package if available.
 This information can be used within workflow definitions to actually implement themes.
 
 **Bumpers**

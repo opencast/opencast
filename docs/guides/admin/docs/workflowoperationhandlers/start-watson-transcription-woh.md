@@ -1,7 +1,7 @@
 # Start Watson Transcription
 ## Description
 
-The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to 
+The Start Watson Transcription invokes the IBM Watson Speech-to-Text service, passing an audio file to be translated to
 text.
 
 ## Parameter Table
@@ -14,7 +14,7 @@ text.
 
 **One of source-flavor or source-tag must be specified.**
 
-##Example
+## Example
 ```xml
 <!-- Extract audio from video in ogg/opus format -->
 
@@ -49,7 +49,7 @@ text.
 </operation>
 ```
 
-####Encoding profile used in example above
+#### Encoding profile used in example above
 ```
 profile.audio-opus.name = audio-opus
 profile.audio-opus.input = stream

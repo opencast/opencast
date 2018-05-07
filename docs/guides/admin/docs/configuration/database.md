@@ -26,8 +26,8 @@ Setting up MariaDB/MySQL
 
 Before following this guide, you should have:
 
- - Installed the Opencast Core System
- - Followed the [Basic Configuration instructions](basic.md)
+* Installed the Opencast Core System
+* Followed the [Basic Configuration instructions](basic.md)
 
 
 ### Step 0: Set-up MariaDB/MySQL
@@ -54,7 +54,7 @@ following commands:
     service mariadb start
     chkconfig --level 345 mariadb on
 
-Now you have a MariaDB server running, but without a properly configured root account (no password, etc.) which might 
+Now you have a MariaDB server running, but without a properly configured root account (no password, etc.) which might
 pose a security risk. MariaDB includes a useful tool to secure your database server (it is also included in MySQL).
 You can launch this tool by executing (yes, it is still called mysql_…):
 
@@ -104,11 +104,11 @@ or, if you have a systemd based system:
 
 ### Step 2: Set up the Database Structure
 
-To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find them in the 
+To set up the database structure you can (and should!) use the Opencast ddl scripts. You can find them in the
 installation document folder `.../docs/scripts/ddl/mysql5.sql`. You can also download the script from GitHub.
 
-To import the database structure using the MariaDB/MySQL client, switch to the directory that contains the `mysql5.sql` 
-file and run the MariaDB/MySQL client with the user you created in the previous step (`-u opencast`) and switch to 
+To import the database structure using the MariaDB/MySQL client, switch to the directory that contains the `mysql5.sql`
+file and run the MariaDB/MySQL client with the user you created in the previous step (`-u opencast`) and switch to
 the database you want to use (`opencast`):
 
     mysql -u opencast -p opencast
@@ -121,7 +121,7 @@ Alternatively, you can import the script directly from the command line:
 
     mysql -u opencast -p opencast < .../docs/scripts/ddl/mysql5.sql
 
-Instead of using the MariaDB/MySQL Client, you can also use other methods for executing SQL code like phpMyAdmin or 
+Instead of using the MariaDB/MySQL Client, you can also use other methods for executing SQL code like phpMyAdmin or
 MySQL-Workbench.
 
 ### Step 3: Configure Opencast
