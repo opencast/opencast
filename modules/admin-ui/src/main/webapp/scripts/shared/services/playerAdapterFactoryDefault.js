@@ -139,6 +139,13 @@ angular.module('adminNg.services')
             };
 
             /**
+             * Query whether the adapter is ready to play
+             */
+            this.ready = function () {
+                return me.state.initialized;
+            };
+
+            /**
              * Play the video
              */
             this.play = function () {
@@ -270,6 +277,7 @@ angular.module('adminNg.services')
              */
             this.extend = function (target) {
                 target.addListener = me.addListener;
+                target.ready = me.ready;
                 target.play = me.play;
                 target.canPlay = me.canPlay;
                 target.pause = me.pause;

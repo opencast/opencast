@@ -6,6 +6,8 @@ describe('adminNg.directives.playerDirective', function () {
         pause: function () {
         },
         addListener: function () {
+        },
+        ready: function () {
         }
     };
 

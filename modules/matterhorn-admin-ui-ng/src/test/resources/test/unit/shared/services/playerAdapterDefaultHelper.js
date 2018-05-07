@@ -120,6 +120,19 @@ window.playerAdapterDefaultTests = function (PlayerAdapterFactory) {
                 playerAdapter.registerDefaultListeners();
             });
 
+            describe('#ready()', function () {
+                it('is only ready after complete initialization', function () {
+                    expect(playerAdapter.ready()).toBeFalsy();
+                    targetElement.duration = 300;
+                    targetElement.readyState = 3;
+                    playerAdapter.addListener(PlayerAdapter.EVENTS.CAN_PLAY, function () {
+                        expect(playerAdapter.ready()).toBeTruthy();
+                    });
+                    targetElement.executeCallback("canplay");
+                    expect(playerAdapter.ready()).toBeTruthy();
+                });
+            });
+
             describe('#play()', function () {
                 it('does not play if still loading', function () {
                     playerAdapter.state.status = PlayerAdapter.STATUS.LOADING;
