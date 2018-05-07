@@ -55,6 +55,22 @@ angular.module('adminNg.directives')
                     milliseconds: 0
                 };
 
+                // Get the frame rate of the currently displayed preview
+                // and store it in the scope for frame-by-frame scrubbing.
+                function findFrameRate() {
+                    for (var i = 0; i < scope.video.previews.length; ++i) {
+                        if (scope.video.previews[i].uri === scope.player.adapter.getCurrentSource()) {
+                            scope.frameRate = scope.video.previews[i].frameRate;
+                            return;
+                        }
+                    }
+                }
+                if (scope.player.adapter.ready()) {
+                    findFrameRate();
+                } else {
+                    scope.player.adapter.addListener(PlayerAdapter.EVENTS.CAN_PLAY, findFrameRate);
+                }
+
                 scope.player.adapter.addListener(PlayerAdapter.EVENTS.PAUSE, function () {
                     scope.$apply(function () {
                         scope.playing = false;
@@ -131,17 +147,20 @@ angular.module('adminNg.directives')
             });
 
             scope.previousFrame = function () {
-                var playerAdapter = scope.player.adapter;
-                playerAdapter.setCurrentTime(playerAdapter.getCurrentTime() - 1 / scope.getFrameRate());
+                if (!scope.frameRate) return;
+                scope.player.adapter.setCurrentTime(
+                    scope.player.adapter.getCurrentTime() - 1 / scope.frameRate
+                );
             };
 
+            // TODO Is this shortcut "double booked"?
+            //   I get a strange error message in the console when I hit it,
+            //   which does not seem to have anything to do with this code.
             scope.nextFrame = function () {
-                var playerAdapter = scope.player.adapter;
-                playerAdapter.setCurrentTime(playerAdapter.getCurrentTime() + 1 / scope.getFrameRate());
-            };
-
-            scope.getFrameRate = function () {
-                return 30;
+                if (!scope.frameRate) return;
+                scope.player.adapter.setCurrentTime(
+                    scope.player.adapter.getCurrentTime() + 1 / scope.frameRate
+                );
             };
 
             scope.previousSegment = function () {
