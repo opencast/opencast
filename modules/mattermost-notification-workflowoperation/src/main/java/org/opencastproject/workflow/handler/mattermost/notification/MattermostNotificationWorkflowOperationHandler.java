@@ -207,10 +207,12 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     s = s.replace("%l", checkIfNull(workflowInstance.getMediaPackage().getLanguage(), "Language"));
     s = s.replace("%L", checkIfNull(workflowInstance.getMediaPackage().getLicense(), "License"));
     s = s.replace("%S", checkIfNull(workflowInstance.getMediaPackage().getSeriesTitle(), "Series-Title"));
+
+    JsonObject json = new JsonObject();
+    json.addProperty("text", s);
     GsonBuilder builder = new GsonBuilder();
     Gson gson = builder.create();
-    String json = gson.toJson(s);
-    return json;
+    return gson.toJson(s);
   }
 
   /**
