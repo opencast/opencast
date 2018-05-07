@@ -89,7 +89,7 @@ public final class ApiResponses {
      * @return The new {@link Response}
      */
     public static Response ok(String acceptHeader, String body) {
-      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
       return ok(version, body);
     }
 
@@ -116,7 +116,7 @@ public final class ApiResponses {
      * @return The new {@link Response}
      */
     public static Response ok(String acceptHeader, JValue json) {
-      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
       return ok(version, json);
     }
 
@@ -132,7 +132,7 @@ public final class ApiResponses {
      * @return The new {@link Response}
      */
     public static Response created(String acceptHeader, URI location, JValue json) {
-      final ApiVersion version = ApiMediaType.parse(acceptHeader).getResponseVersion();
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
       return created(version, location, json);
     }
 

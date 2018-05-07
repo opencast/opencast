@@ -20,53 +20,26 @@
  */
 package org.opencastproject.external.common;
 
-import static org.opencastproject.external.common.ApiMediaType.VERSION_REG_EX_PATTERN;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-/** The existing versions */
+/** The existing External API versions */
 public enum ApiVersion {
 
-  VERSION_UNDEFINED("v*.*.*"),
+  VERSION_1_0_0(1, 0, 0),
+  VERSION_1_1_0(1, 1, 0);
 
-  VERSION_1_0_0("v1.0.0"),
-
-  VERSION_1_1_0("v1.1.0");
-
+  /** The most recent version of the External API */
   public static final ApiVersion CURRENT_VERSION = VERSION_1_1_0;
 
-  private String versionString;
   private int major;
   private int minor;
   private int patch;
 
-  ApiVersion(String versionString) {
-    this.versionString = versionString;
-    if ("v*.*.*".equals(versionString)) {
-      major = Integer.MAX_VALUE;
-      minor = Integer.MAX_VALUE;
-      patch = Integer.MAX_VALUE;
-    } else {
-      Matcher matcher = Pattern.compile(VERSION_REG_EX_PATTERN).matcher(versionString);
-      if (!matcher.matches() || matcher.groupCount() != 3) {
-        throw new IllegalArgumentException("'" + versionString + "' is not a valid version");
-      }
-      major = Integer.parseInt(matcher.group(1));
-      minor = Integer.parseInt(matcher.group(2));
-      patch = Integer.parseInt(matcher.group(3));
-    }
-  }
+  private String versionString;
 
-  public static ApiVersion of(String version) {
-    switch (version) {
-      case "v1.0.0":
-        return VERSION_1_0_0;
-      case "v1.1.0":
-        return VERSION_1_1_0;
-      default:
-        throw new IllegalArgumentException("'" + version + "' is not a valid version");
-    }
+  ApiVersion(int major, int minor, int patch) {
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
+    versionString = "v" + major + "." + minor + "." + patch;
   }
 
   public boolean isSmallerThan(ApiVersion other) {

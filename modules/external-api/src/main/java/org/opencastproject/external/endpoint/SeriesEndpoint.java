@@ -188,7 +188,7 @@ public class SeriesEndpoint {
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
           @QueryParam("limit") int limit) throws UnauthorizedException {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
@@ -331,7 +331,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     for (final Series s : indexService.getSeries(id, externalIndex)) {
       JValue subjects;
       if (s.getSubject() == null) {
@@ -395,7 +395,7 @@ public class SeriesEndpoint {
                           @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (StringUtils.trimToNull(type) == null) {
       return getAllMetadata(id, requestedVersion);
     } else {
@@ -706,7 +706,7 @@ public class SeriesEndpoint {
                   @RestResponse(description = "The series' access policy is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
     for (final Series series : indexService.getSeries(id, externalIndex)) {
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.

@@ -345,7 +345,7 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
           @QueryParam("withpublications") Boolean withPublications)
           throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
       withScheduling = false;
@@ -443,7 +443,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventMetadata(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request,
           @PathParam("eventId") String eventId) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
       Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
       Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
@@ -506,7 +506,7 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The event could not be created due to a scheduling conflict.", responseCode = HttpServletResponse.SC_CONFLICT),
                   @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     try {
       Opt<String> startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : Opt.none();
       Opt<String> startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : Opt.none();
@@ -591,7 +591,7 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("limit") Integer limit, @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
           @QueryParam("withpublications") Boolean withPublications) {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
       // withscheduling was added for version 1.1.0 and should be ignored for smaller versions.
       withScheduling = false;
@@ -998,7 +998,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getAllEventMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (StringUtils.trimToNull(type) == null) {
       Opt<MetadataList> metadataList = getEventMetadataById(id);
       if (metadataList.isSome()) {
@@ -1677,7 +1677,7 @@ public class EventsEndpoint implements ManagedService {
       @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
                                  @FormParam("scheduling") String scheduling) throws Exception {
-    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getResponseVersion();
+    final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     final Opt<Event> event = indexService.getEvent(id, externalIndex);
 
     if (event.isNone()) {
