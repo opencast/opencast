@@ -25,9 +25,7 @@
 angular.module('adminNg.services')
 .factory('JsHelper', [
     function () {
-        return {
-            getWeekDays: function () {
-                return [
+        var weekdaysArray = [
                     { key: 'MO', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO' },
                     { key: 'TU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU' },
                     { key: 'WE', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE' },
@@ -35,7 +33,60 @@ angular.module('adminNg.services')
                     { key: 'FR', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR' },
                     { key: 'SA', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA' },
                     { key: 'SU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU' }
-                ];
+        ];
+        return {
+            getWeekDays: function () {
+                return weekdaysArray;
+            },
+
+            weekdayTranslation: function(d) {
+                for (var i = 0; i < weekdaysArray.length; i++) {
+                    if (weekdaysArray[i].key === d) {
+                        return weekdaysArray[i].translation;
+                    }
+                }
+                return null;
+            },
+
+            filter: function(array, callback) {
+                var result = [];
+                angular.forEach(array, function(v) {
+                    if (callback(v)) {
+                        result.push(v);
+                    }
+                });
+                return result;
+            },
+
+            removeNulls: function(obj) {
+                var propNames = Object.getOwnPropertyNames(obj);
+                for (var i = 0; i < propNames.length; i++) {
+                    var propName = propNames[i];
+                    if (obj[propName] === null || obj[propName] === undefined) {
+                        delete obj[propName];
+                    }
+                }
+            },
+
+            arrayContains: function(array, v) {
+                for(var i = 0; i < array.length; i++) {
+                    if (array[i] === v) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+
+            getTimeZoneName: function() {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone;
+            },
+
+            mapFunction: function(array, callback) {
+                var result = [];
+                angular.forEach(array, function(v) {
+                    result.push(callback(v));
+                });
+                return result;
             },
 
             map: function (array, key) {

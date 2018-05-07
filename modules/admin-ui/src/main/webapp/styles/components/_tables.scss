@@ -196,6 +196,10 @@
         }
     }
 
+    td.highlighted-cell {
+        font-weight: bold;
+    }
+
     td {
         padding: $col-padding;
         color: $medium-prim-color;

@@ -63,6 +63,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -271,6 +272,26 @@ public class AbstractEventEndpointTest {
             .get(rt.host("{eventId}/scheduling.json")).asString();
 
     assertThat(eventSchedulingString, SameJSONAs.sameJSONAs(result));
+  }
+
+  @Test
+  public void testGetEventSchedulingBulk() throws Exception {
+    final String eventSchedulingBulkString = IOUtils
+      .toString(getClass().getResource("/eventSchedulingBulk.json"), StandardCharsets.UTF_8);
+
+    // Event that does not exist, and we are not ignoring that fact.
+    given().formParam("eventIds", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+      .post(rt.host("scheduling.json"));
+
+    // Event that does not exist, and we are ignoring that.
+    given().formParam("eventIds", "notExists").formParam("ignoreNonScheduled", "true").expect().statusCode(HttpStatus.SC_OK).when()
+      .post(rt.host("scheduling.json"));
+
+    // Check if the actual result is what we expect.
+    final String result = given().formParam("eventIds", "exists").expect().statusCode(HttpStatus.SC_OK).when()
+      .post(rt.host("scheduling.json")).asString();
+
+    assertThat(eventSchedulingBulkString, SameJSONAs.sameJSONAs(result));
   }
 
   @Test

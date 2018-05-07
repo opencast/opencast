@@ -1,0 +1,10 @@
+{
+  "flavor": "dublincore/episode",
+  "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+  "fields": [
+    {
+      "id": "duration",
+      "value": "01:09:50"
+    }
+  ]
+}
