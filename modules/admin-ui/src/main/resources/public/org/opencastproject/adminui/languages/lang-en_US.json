@@ -1605,7 +1605,6 @@
        "ADD_COMMENT": "Add Comment"
      },
      "TABS": {
-       "PLAY":        "Playback",
        "EDIT":        "Editor",
        "CAPTIONS":    "Captions",
        "ANNOTATIONS": "Annotations"
