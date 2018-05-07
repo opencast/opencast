@@ -3,7 +3,6 @@
 The MattermostNotificationOperationHander sends an notification to a channel of Mattermost or similar applications, 
 like Slack, with the chosen parameters provided. It is useful to send such notifications when some operation(s) have
 been completed or some error has occurred in a workflow.
-
 The notification message can be freely chosen. You can use different parameters which will be replaced with the
 corresponding meta-data of the current workflow instance (see List of parameters).
 
