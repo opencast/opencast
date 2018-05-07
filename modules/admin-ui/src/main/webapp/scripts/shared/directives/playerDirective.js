@@ -131,11 +131,17 @@ angular.module('adminNg.directives')
             });
 
             scope.previousFrame = function () {
-                scope.player.adapter.previousFrame();
+                var playerAdapter = scope.player.adapter;
+                playerAdapter.setCurrentTime(playerAdapter.getCurrentTime() - 1 / scope.getFrameRate());
             };
 
             scope.nextFrame = function () {
-                scope.player.adapter.nextFrame();
+                var playerAdapter = scope.player.adapter;
+                playerAdapter.setCurrentTime(playerAdapter.getCurrentTime() + 1 / scope.getFrameRate());
+            };
+
+            scope.getFrameRate = function () {
+                return 30;
             };
 
             scope.previousSegment = function () {

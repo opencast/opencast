@@ -167,57 +167,6 @@ angular.module('adminNg.services')
             };
 
             /**
-             * Takes the player to the next frame. The step is calculated by 1/framerate.
-             * @throws Error if called at end of player
-             * @throws Error if called in status PLAYING
-             */
-            this.nextFrame = function () {
-
-                var currentTime = me.getCurrentTime();
-
-                if (me.state.status === PlayerAdapter.STATUS.PLAYING) {
-                    throw new Error('In state playing calls to previousFrame() are not possible.');
-                }
-
-                if (currentTime >= me.getDuration()) {
-                    throw new Error('At end of video calls to nextFrame() are not possible.');
-                }
-
-                me.setCurrentTime(currentTime + 1 / me.getFramerate());
-            };
-
-            /**
-             * Takes the player to the previous frame. The step is calculated by 1/framerate.
-             * @throws Error if called at start of player
-             * @throws Error if called in status PLAYING
-             */
-            this.previousFrame = function () {
-
-                var currentTime = me.getCurrentTime();
-
-                if (me.state.status === PlayerAdapter.STATUS.PLAYING) {
-                    throw new Error('In state playing calls to previousFrame() are not possible.');
-                }
-
-                if (currentTime === 0) {
-                    throw new Error('At start of video calls to previosFrame() are not possible.');
-                }
-
-                me.setCurrentTime(currentTime - 1 / me.getFramerate());
-            };
-
-
-            /**
-             * TODO find a way to find out framerate
-             *
-             * @returns {number}
-             */
-            this.getFramerate = function () {
-                return 30;
-            };
-
-
-            /**
              * Returns the current time as an object containing hours, minutes, seconds and milliseconds.
              * @returns {{hours: number, minutes: number, seconds: number, milliseconds: number}}
              */
@@ -293,8 +242,6 @@ angular.module('adminNg.services')
                 target.pause = me.pause;
                 target.setCurrentTime = me.setCurrentTime;
                 target.getCurrentTime = me.getCurrentTime;
-                target.nextFrame = me.nextFrame;
-                target.previousFrame = me.previousFrame;
                 target.getFramerate = me.getFramerate;
                 target.getCurrentTimeObject  = me.getCurrentTimeObject;
                 target.getDuration = me.getDuration;

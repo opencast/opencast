@@ -181,65 +181,6 @@ describe('DefaultAdapter', function () {
             defaultAdapter.setCurrentTime(88);
             expect(defaultAdapter.getCurrentTime()).toEqual(88);
         });
-
-        describe('#nextFrame', function () {
-            // We have to wrap the calling of nextFrame into a function, so that jasmine can check that
-            // the Error is actually being thrown.
-            var callNextFrameFunction = function () {
-                defaultAdapter.nextFrame();
-            };
-            it('goes to the next frame', function () {
-                defaultAdapter.setCurrentTime(100);
-                spyOn(defaultAdapter, 'getFramerate').and.callFake(function () {
-                    return 1;
-                });
-                defaultAdapter.nextFrame();
-                expect(defaultAdapter.getFramerate).toHaveBeenCalled();
-                expect(defaultAdapter.getCurrentTime()).toEqual(101);
-            });
-
-            it('throws error if playing already', function () {
-                defaultAdapter.state.status = PlayerAdapter.STATUS.PLAYING;
-                expect(callNextFrameFunction).toThrow(new Error('In state playing calls to previousFrame() are not possible.'));
-            });
-
-            it('throws error if at end of video', function () {
-                spyOn(defaultAdapter, 'getDuration').and.callFake(function () {
-                    return 100;
-                });
-                targetElement.currentTime = defaultAdapter.getDuration() + 99;
-                expect(callNextFrameFunction).toThrow(new Error('At end of video calls to nextFrame() are not possible.'));
-            });
-        });
-
-        describe('#previousFrame', function () {
-            var callPreviousFrameFunction = function () {
-                defaultAdapter.previousFrame();
-            };
-
-            it('goes to the previous frame', function () {
-                defaultAdapter.setCurrentTime(100);
-                spyOn(defaultAdapter, 'getFramerate').and.callFake(function () {
-                    return 1;
-                });
-                defaultAdapter.previousFrame();
-                expect(defaultAdapter.getFramerate).toHaveBeenCalled();
-                expect(defaultAdapter.getCurrentTime()).toEqual(99);
-            });
-
-            it('throws error if playing already', function () {
-                defaultAdapter.state.status = PlayerAdapter.STATUS.PLAYING;
-                expect(callPreviousFrameFunction).toThrow(new Error('In state playing calls to previousFrame() are not possible.'));
-            });
-
-            it('throws error if at beginning of video', function () {
-                spyOn(defaultAdapter, 'getCurrentTime').and.callFake(function () {
-                    return 0;
-                });
-                targetElement.currentTime = defaultAdapter.getDuration() + 99;
-                expect(callPreviousFrameFunction).toThrow(new Error('At start of video calls to previosFrame() are not possible.'));
-            });
-        });
     });
 
     it('extends target object', function () {
@@ -250,9 +191,6 @@ describe('DefaultAdapter', function () {
         expect(target.pause).toBeDefined();
         expect(target.setCurrentTime).toBeDefined();
         expect(target.getCurrentTime).toBeDefined();
-        expect(target.nextFrame).toBeDefined();
-        expect(target.previousFrame).toBeDefined();
-        expect(target.getFramerate).toBeDefined();
         expect(target.getCurrentTimeObject).toBeDefined();
         expect(target.getDuration).toBeDefined();
         expect(target.getStatus).toBeDefined();
