@@ -14,7 +14,7 @@ Freemarker templates can be used in the following fields to allow replacement wi
 media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker template
 file located in `<config_dir>/etc/email` to generate the email body.
 
-User names can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched 
+User names can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched
 and that user's email address is used (see Example 5).
 
 
@@ -283,7 +283,7 @@ Logged incident of the error looks like this:
 
 ### Example 5
 
-The user name is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email 
+The user name is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email
 `jharvard@harvard.edu` defined in the system. The message will be sent to `jharvard@harvard.edu`:
 
 ```xml
