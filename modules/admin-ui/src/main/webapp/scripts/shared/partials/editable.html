@@ -1,31 +1,31 @@
-<span ng-if="mode === 'readOnly'">{{ params.value | presentValue }}</span>
+<span ng-if="readOnly">{{ getDisplayableValue() }}</span>
 
-<div ng-if="mode === 'singleValue'"
+<div ng-if="!readOnly && (mode === 'singleValue')"
     admin-ng-editable-single-value
     save="save" params="params">
 </div>
 
-<div ng-if="mode === 'booleanValue'"
+<div ng-if="!readOnly && (mode === 'booleanValue')"
      admin-ng-editable-boolean-value
      save="save" params="params">
 </div>
 
-<div ng-if="mode === 'dateValue'"
+<div ng-if="!readOnly && (mode === 'dateValue')"
      admin-ng-editable-date-value
      save="save" params="params">
 </div>
 
-<div ng-if="mode === 'multiValue'"
+<div ng-if="!readOnly && (mode === 'multiValue')"
     admin-ng-editable-multi-value
     save="save" params="params">
 </div>
 
-<div ng-if="mode === 'singleSelect'"
+<div ng-if="!readOnly && (mode === 'singleSelect')"
     admin-ng-editable-single-select
     collection="collection" save="save" params="params" ordered="ordered">
 </div>
 
-<div ng-if="mode === 'multiSelect'"
+<div ng-if="!readOnly && (mode === 'multiSelect')"
     admin-ng-editable-multi-select
     collection="collection" save="save" params="params" mixed="mixed">
 </div>

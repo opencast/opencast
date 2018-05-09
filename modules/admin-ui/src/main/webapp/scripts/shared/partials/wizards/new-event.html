@@ -13,11 +13,11 @@
                                     <span translate="{{ row.label }}"></span>
                                     <i ng-show="row.required" class="required">*</i>
                                 </td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id"
                                     target="dublincore/episode"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
@@ -38,10 +38,10 @@
                         <table class="main-tbl">
                             <tr ng-repeat="row in block.fields">
                                 <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id" target="{{name}}"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
@@ -136,11 +136,11 @@
                                     <span translate="{{ row.label }}"></span>
                                     <i ng-show="row.required" class="required">*</i>
                                 </td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id"
                                     target="dublincore/episode"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
