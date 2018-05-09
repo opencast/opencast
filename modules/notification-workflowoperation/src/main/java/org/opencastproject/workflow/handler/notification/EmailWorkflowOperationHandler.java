@@ -132,7 +132,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private String processDestination(WorkflowInstance workflowInstance, WorkflowOperationInstance operation,
-          String configName) {
+          String configName) throws WorkflowOperationException {
     // First apply the template if there's one
     String templateApplied = applyTemplateIfNecessary(workflowInstance, operation, configName);
     if (templateApplied == null)
@@ -142,19 +142,22 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     StringBuffer result = new StringBuffer();
     for (String part : templateApplied.split(",|\\s")) {
       result.append(result.length() > 0 ? "," : "");
-      try {
-        InternetAddress emailAddr = new InternetAddress(part);
-        emailAddr.validate();
-        // If email address valid, put it in value to be returned
-        result.append(part);
-      } catch (AddressException ex) {
-        // Otherwise, assume this is a user name and look for the user
-        User user = userDirectoryService.loadUser(part);
-        if (user != null && StringUtils.isNotEmpty(user.getEmail()))
-          result.append(user.getEmail());
-        else {
-          logger.info("Didn't find user or user email for {}", part);
+      // Is this a user name? Look for that user via user directory service.
+      User user = userDirectoryService.loadUser(part);
+      if (user != null && StringUtils.isNotEmpty(user.getEmail())) {
+        // Yes, this is a user name and the user has an email registered. Use it.
+        result.append(user.getEmail());
+      } else {
+        // Either not a user name or user doesn't have an email registered.
+        try {
+          // Validate it as an email address
+          InternetAddress emailAddr = new InternetAddress(part);
+          emailAddr.validate();
           result.append(part);
+        } catch (AddressException e) {
+          // Otherwise, log an error
+          throw new WorkflowOperationException(
+                  String.format("Email address invalid or user doesn't have an email: %s.", part), e);
         }
       }
     }
