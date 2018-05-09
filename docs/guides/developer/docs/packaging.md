@@ -21,9 +21,9 @@ are searching for a system-wide configuration file for any software on Linux eve
 
 If you want to package Opencast use the following documentations to decide where to place files:
 
- - Distribution guidelines like the [Fedora Packaging Guidelines](http://fedoraproject.org/wiki/Packaging:Guidelines)
- - [Filesystem Hierarchy Standard](http://www.pathname.com/fhs/pub/fhs-2.3.html)
- - This Guide
+* Distribution guidelines like the [Fedora Packaging Guidelines](http://fedoraproject.org/wiki/Packaging:Guidelines)
+* [Filesystem Hierarchy Standard](http://www.pathname.com/fhs/pub/fhs-2.3.html)
+* This Guide
 
 
 Locations To Use
@@ -31,22 +31,22 @@ Locations To Use
 
 The following locations should be used for Opencast and its related data:
 
- - `/usr/share/opencast`:
-   Software and data not modified by Opencast. This includes felix, the Opencast modules and external libraries.
- - `/etc/opencast`:
-   Opencast related configuration files (Felix and service configuration, workflows, encoding profiles, etc.)
- - `/var/log/opencast`:
-   The Opencast logfiles. Consider to enable logrotate for this directory.
- - `/srv/opencast` or `/var/lib/opencast`:
-   Opencast storage, including the recordings, the archive, the Solr indexes, etc. You may use one of these
-   directories or both. For more details have a look at the explanation below and the discussion in the comments.
- - `/tmp/opencast`:
-   Temporary data which are not necessarily preserved between reboots. This includes the felix-cache and other temporary
-   data.
- - `/usr/sbin/opencast`:
-   Opencast startscript
- - `/etc/init.d/opencast`
-   SysV-Initscript (if necessary)
+* `/usr/share/opencast`:
+  Software and data not modified by Opencast. This includes felix, the Opencast modules and external libraries.
+* `/etc/opencast`:
+  Opencast related configuration files (Felix and service configuration, workflows, encoding profiles, etc.)
+* `/var/log/opencast`:
+  The Opencast logfiles. Consider to enable logrotate for this directory.
+* `/srv/opencast` or `/var/lib/opencast`: Opencast storage, including the recordings, the archive, the Solr indexes,
+  etc. You may use one of these directories or both. For more details have a look at the explanation below and the
+  discussion in the comments.
+* `/tmp/opencast`:
+  Temporary data which are not necessarily preserved between reboots. This includes the felix-cache and other temporary
+  data.
+* `/usr/sbin/opencast`:
+  Opencast startscript
+* `/etc/init.d/opencast`
+  SysV-Initscript (if necessary)
 
 
 Reasoning for these Locations

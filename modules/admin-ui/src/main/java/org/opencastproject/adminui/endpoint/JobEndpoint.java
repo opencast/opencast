@@ -113,7 +113,7 @@ public class JobEndpoint {
   public static final Response SERVER_ERROR = Response.serverError().build();
 
   private enum JobSort {
-    CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED, TYPE,
+    CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED, TYPE, ID
   }
 
   private static final String NEGATE_PREFIX = "-";
@@ -706,6 +706,10 @@ public class JobEndpoint {
         case TYPE:
           value1 = job1.getJobType();
           value2 = job2.getJobType();
+          break;
+        case ID:
+          value1 = job1.getId();
+          value2 = job2.getId();
           break;
         default:
       }

@@ -45,13 +45,13 @@ management system, and be applied on a cluster level to ensure consistency acros
 Step 2: Setting the load values for system jobs
 -----------------------------------------------
 
-Each Opencast instance has its own maximum load.  By default this is set to the number of CPU cores present in the 
-system.  If you wish to change this, set the `org.opencastproject.server.maxload` key in config.properties to the 
+Each Opencast instance has its own maximum load.  By default this is set to the number of CPU cores present in the
+system.  If you wish to change this, set the `org.opencastproject.server.maxload` key in config.properties to the
 maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
 not recommended.
 
-The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix 
-`job.load`.  These configuration keys control the load for each job type.  For example, the 
+The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix
+`job.load`.  These configuration keys control the load for each job type.  For example, the
 `job.load.download.distribute` configuration key controls the load placed on the system when a download distribution job
 is running.  The current files with relevant configuration keys are:
 
@@ -91,10 +91,10 @@ Step 4: Restart Opencast
 Many of these configuration files are only read on startup, so restarting Opencast is strongly recommended.
 
 Troubleshooting
-===============
+---------------
 
-Help, my system has deadlocked, or there are jobs which are always queued even if the system is otherwise idle
---------------------------------------------------------------------------------------------------------------
+### Help, my system has deadlocked, or there are jobs which are always queued even if the system is otherwise idle
+
 
 This can be caused by setting a job weight that exceeds the maximum load for *all* services of a given type.  For
 example, if you have a single worker with 8 cores and set an encoding job to have a jobload of 9.  Fortunately, there is
@@ -103,12 +103,12 @@ restarting Opencast.  To resolve a deadlock caused by job loads follow these ins
 job's ID from the admin UI.  This will be an integer greater than zero.  We will call this $jobid.  Once you have the
 job ID, follow these steps:
 
-- Stop Opencast
-- Log into your database
-- Make sure you are using the right schema.  Currently the default is called `opencast`
-- Update the job's load
-    - This will look something like `UPDATE mh_job SET job\_load=0.0 WHERE id=$jobid`
-- Log out of your database
-- Change the load specified in the configuration file to an appropriate value
-    - This may need to happen across all nodes!
-- Restart Opencast
+* Stop Opencast
+* Log into your database
+* Make sure you are using the right schema. Currently the default is called `opencast`
+* Update the job's load
+    * This will look something like `UPDATE mh_job SET job\_load=0.0 WHERE id=$jobid`
+* Log out of your database
+* Change the load specified in the configuration file to an appropriate value
+    * This may need to happen across all nodes!
+* Restart Opencast

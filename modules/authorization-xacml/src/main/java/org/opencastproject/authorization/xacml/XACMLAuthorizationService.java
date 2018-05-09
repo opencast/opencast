@@ -53,6 +53,7 @@ import org.opencastproject.util.data.Option.Match;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
@@ -202,14 +203,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
         // add attachment
         final String elementId = toElementId(scope);
         URI uri;
-        InputStream in = null;
-        try {
-          in = IOUtils.toInputStream(xacmlContent, "UTF-8");
+        try (InputStream in = IOUtils.toInputStream(xacmlContent, "UTF-8")) {
           uri = workspace.put(mp.getIdentifier().toString(), elementId, XACML_FILENAME, in);
         } catch (IOException e) {
           throw new MediaPackageException("Error storing xacml for mediapackage " + mp.getIdentifier());
-        } finally {
-          IOUtils.closeQuietly(in);
         }
 
         if (attachment == null) {
@@ -359,7 +356,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
    */
   private File fromWorkspace(URI uri) {
     try {
-      return workspace.get(uri);
+      return workspace.get(uri, true);
     } catch (NotFoundException e) {
       logger.warn("XACML policy file not found '{}'.", uri);
       return null;
@@ -488,6 +485,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
             }
 
             PolicyDecisionPoint pdp = getPolicyDecisionPoint(xacmlPolicyFile);
+            FileUtils.deleteQuietly(xacmlPolicyFile);
 
             return pdp.evaluate(requestCtx).getDecision() == XACMLConstants.DECISION_PERMIT;
           }
@@ -506,15 +504,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
     sb.append("</ns:Location></ns:Policy></ns:Policies><ns:Locators>");
     sb.append("<ns:Locator Name=\"org.jboss.security.xacml.locators.JBossPolicyLocator\">");
     sb.append("</ns:Locator></ns:Locators></ns:jbosspdp>");
-    InputStream is = null;
-    try {
-      is = IOUtils.toInputStream(sb.toString(), "UTF-8");
+    try (InputStream is = IOUtils.toInputStream(sb.toString(), "UTF-8")) {
       return new JBossPDP(is);
     } catch (IOException e) {
       // Only happens if 'UTF-8' is an invalid encoding, which it isn't
       throw new IllegalStateException("Unable to transform a string into a stream");
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 

@@ -33,6 +33,7 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -101,7 +102,12 @@ public class XACMLSecurityTest {
         IOUtils.closeQuietly(in.getValue());
         return file.toURI();
       }).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.capture(uri))).andAnswer(() -> new File(uri.getValue())).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.capture(uri), EasyMock.captureBoolean(EasyMock.newCapture())))
+            .andAnswer(() -> {
+              File dest = testFolder.newFile();
+              FileUtils.copyFile(new File(uri.getValue()), dest);
+              return dest;
+            }).anyTimes();
     EasyMock.expect(workspace.read(EasyMock.capture(uri))).andAnswer(
             () -> new FileInputStream(uri.getValue().getPath())).anyTimes();
     workspace.delete(EasyMock.anyObject(URI.class));

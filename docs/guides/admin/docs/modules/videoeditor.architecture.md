@@ -5,26 +5,26 @@
 The Videoeditor consists of the following moduls. Additional to this there is a Workflow Operation Handler within the
 Conductor module that provides the UI elements for the Video Editor.
 
-- silencedetection-api
-    - API for the silence detection
-- silencedetection-impl
-    - Implementation of the silence detection service
-    - Provides a SMIL file that can be used by the Video Editor UI or the Video Editor service to create a new cutted
+* silencedetection-api
+    * API for the silence detection
+* silencedetection-impl
+    * Implementation of the silence detection service
+    * Provides a SMIL file that can be used by the Video Editor UI or the Video Editor service to create a new cutted
       file.
-- silencedetection-remote
-    - Remote implementation of the silence detection service to enable load balancing in a distributed setup.
-- smil-api
-    - API for the SMIL service
-- smil-impl
-    - The SMIL service allows creation and manipulation of SMIL files. This is more or less a helper class to create
+* silencedetection-remote
+    * Remote implementation of the silence detection service to enable load balancing in a distributed setup.
+* smil-api
+    * API for the SMIL service
+* smil-impl
+    * The SMIL service allows creation and manipulation of SMIL files. This is more or less a helper class to create
       consistent SMIL files.
-- videoeditor-api
-    - The API for the Video Editor which takes a SMIL file as an input to create a cutted version of the media files.
-- videoeditor-ffmpeg-impl
-    - The Video Editor service creates new media files that will be cutted based on the information provided in a SMIL
+* videoeditor-api
+    * The API for the Video Editor which takes a SMIL file as an input to create a cutted version of the media files.
+* videoeditor-ffmpeg-impl
+    * The Video Editor service creates new media files that will be cutted based on the information provided in a SMIL
       file. In the current implementation GStreamer with the gnonlin module is used to process the files.
-- videoeditor-remote
-    - Remote implementation of the video editor service to enable load balancing in a distributed setup.
+* videoeditor-remote
+    * Remote implementation of the video editor service to enable load balancing in a distributed setup.
 
 Several other changes have been made on other Opencast modules to provide a better user experience for the video
 editor (i.e. byte-range request on the working-file-repository).
@@ -34,15 +34,15 @@ editor (i.e. byte-range request on the working-file-repository).
 The video editor uses SMIL 3.0 as a standardized Data format for the edit lists (cutting information). Some conventions
 and namespace extensions have been made to make sure that Opencast is able to find the files.
 
- - As we usually have two (or more) parallel media files, these files are grouped in a `<par>`-element which forms a
-   segment that should be included in the resulting video.  This means the included `<video>`-files will be played in
-   parallel.
- - The clipBegin and clipEnd attributes a provided as milliseconds. Usually these should be identical for all `<videos>`
-   within a `<par>`.  For each segment a `<par>` is created.
- - In the result of the silence detection segments with silence are omitted within the SMIL files, so only segments
-   within the SMIL doc will be in the resulting video.
- - The segments within the SMIL file will be in the order they are written down. If the sequence of the segments is
-   changed, the sequence within the resulting video is changed too.
+* As we usually have two (or more) parallel media files, these files are grouped in a `<par>`-element which forms a
+  segment that should be included in the resulting video.  This means the included `<video>`-files will be played in
+  parallel.
+* The clipBegin and clipEnd attributes a provided as milliseconds. Usually these should be identical for all `<videos>`
+  within a `<par>`.  For each segment a `<par>` is created.
+* In the result of the silence detection segments with silence are omitted within the SMIL files, so only segments
+  within the SMIL doc will be in the resulting video.
+* The segments within the SMIL file will be in the order they are written down. If the sequence of the segments is
+  changed, the sequence within the resulting video is changed too.
 
 **Example SMIL file**
 
@@ -136,20 +136,20 @@ needs the videoeditor API and impl (or remote on distributed systems) to be inst
 
 The input parameters are:
 
- - source-flavors: the subtype of all media files in the best available quality and in a codec that can be processed by
+* source-flavors: the subtype of all media files in the best available quality and in a codec that can be processed by
    the videoeditor modules. The *-should usually not be changed, as tracks can be excluded in the editor UI too, only
    the subtype is important. All needed videos should be available within this flavor.
- - preview-flavours: the subtype of the media files that should be used for the preview player. This is an HTML5 player
+* preview-flavours: the subtype of the media files that should be used for the preview player. This is an HTML5 player
    so the coded can be H.264 or WebM based on the browser. The main flavor should be the same as in source-flavors.
- - smil-flavors: the smil file(s) that should be used as a proposal within the editor UI. If * is used presenter/smil
+* smil-flavors: the smil file(s) that should be used as a proposal within the editor UI. If * is used presenter/smil
    will be favored, if this is not available the first in the list will be used.
- - skipped-flavors: the flavor of the files that should be used if this workflow-operation is skipped.
+* skipped-flavors: the flavor of the files that should be used if this workflow-operation is skipped.
 
 The output parameters are:
 
- - target-smil-flavor: only a unique flavor is allowed here, as this is the file that the editor UI writes and that will
+* target-smil-flavor: only a unique flavor is allowed here, as this is the file that the editor UI writes and that will
    be taken for processing the edited files afterwards.
- - target-flavor-subtype: the flavor-subtype that will be used for all media files created in this operation.
+* target-flavor-subtype: the flavor-subtype that will be used for all media files created in this operation.
 
 **Editor Operation Template**
 
@@ -220,9 +220,12 @@ ${trimHold} variable like in the current workflow definitions with trimming.
           </configurations>
         </operation>
 
-4. The waveform operation should be included. See above for the XML-code for this operation. The audio-only file should already be available.
-5. The silence detection should be done. See above for the XML-code for this operation. The audio-only file should already be available.
-6. After all previous operations have been done the editor can be included. See above for the XML-code for this operation.
+4. The waveform operation should be included. See above for the XML-code for this operation. The audio-only file should
+   already be available.
+5. The silence detection should be done. See above for the XML-code for this operation. The audio-only file should
+   already be available.
+6. After all previous operations have been done the editor can be included. See above for the XML-code for this
+   operation.
 7. You may consider to tag the trimmed files for archiving. Then you should include this operation after the editor:
 
    **Tagging trimmed files for the archive**
@@ -236,7 +239,8 @@ ${trimHold} variable like in the current workflow definitions with trimming.
           </configurations>
         </operation>
 
-    You could check, if you want to archive the source media too, or remove the source-flavors from the previous tagging operations.
+    You could check, if you want to archive the source media too, or remove the source-flavors from the previous tagging
+    operations.
 
 8. The rest of the workflow definition can be kept as it is, the input flavor subtype for the trimmed files in other
    operations is "/trimmed" if you follow the naming in this example.

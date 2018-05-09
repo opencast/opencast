@@ -2,7 +2,9 @@
 
 ## Description
 
-This Workflow Operation Handler can be used to send a POST request containing an XML/JSON representation of the Mediapackage processed by the workflow to an external webservice. The service supports HTTP Basic and Digest Authentication.
+This Workflow Operation Handler can be used to send a POST request containing an XML/JSON representation of the
+Mediapackage processed by the workflow to an external webservice. The service supports HTTP Basic and Digest
+Authentication.
 
 ## Parameter Table
 

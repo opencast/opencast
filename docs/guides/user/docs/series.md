@@ -6,7 +6,8 @@
 
 # Overview
 
-A Series in Opencast is the equivalent of a course which typically contains multiple [Events](events.md) that occur across a defined period of time. Here is an example of a Series which consists of four (4) events:
+A Series in Opencast is the equivalent of a course which typically contains multiple [Events](events.md) that occur
+across a defined period of time. Here is an example of a Series which consists of four (4) events:
 
 * Series Name: Better Development Through the Use of Scrum Techniques
     * Event 1: Introduction to Scrum
@@ -17,7 +18,7 @@ A Series in Opencast is the equivalent of a course which typically contains mult
 You can access the Series page from the **Main Menu > Recordings > Series**
 
 ## How to create a Series
-A Series contains multiple events that occur across a defined period of time.  
+A Series contains multiple events that occur across a defined period of time.
 
 1. Click the Add Series button and a Create New Series wizard will be displayed
 1. At minimum you must enter a Title for the creation of a Series. All other fields on the Metadata screen are optional.
@@ -25,13 +26,17 @@ A Series contains multiple events that occur across a defined period of time.
 1. Select the Access Policy you would like to apply to all Events in this Series.
 1. Click the create button and you should receive confirmation that the Series was created
 
-See also the [Access Policies section](accesspolicies.md#apply-access-policies-to-series) to find out more about applying Access Policies to Series
+See also the [Access Policies section](accesspolicies.md#apply-access-policies-to-series) to find out more about
+applying Access Policies to Series
 
 ## How to edit a Series
-Use the edit icon ( ![icon_hamburger][] ) on the Actions column to edit a Series.
-Metadata, Access Policies and Themes are being saved automatically when the cursor leaves the field or an option is selected.
+Use the edit icon ( ![icon_hamburger][] ) on the Actions column to edit a Series. Metadata, Access Policies and Themes
+are being saved automatically when the cursor leaves the field or an option is selected.
 
 ## How to delete a Series
-Use the ( ![icon_delete][] ) icon in the actions column of each row to delete individual series. To delete series in bulk, select the items to be deleted and then from the Actions menu, select Delete Series. Confirm the action in the modal.
+Use the ( ![icon_delete][] ) icon in the actions column of each row to delete individual series. To delete series in
+bulk, select the items to be deleted and then from the Actions menu, select Delete Series. Confirm the action in the
+modal.
 
->Note: Deleting a series does **not** delete the Events that are part of it. In order to delete all events as well, refer to the [How to delete events](events.md#how-to-delete-events) section.
+>Note: Deleting a series does **not** delete the Events that are part of it. In order to delete all events as well,
+>refer to the [How to delete events](events.md#how-to-delete-events) section.

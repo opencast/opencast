@@ -16,8 +16,8 @@ be modified in the code repository - all other translation files are downloaded 
 Modifications to the translation files in the Opencast code repository will be regularly overwritten and
 therefore will be lost!*
 
-Note that Crowdin managers take care of uploading the English sources (and possibly translations) to Crowdin and download the
-others translations from Crowdin.
+Note that Crowdin managers take care of uploading the English sources (and possibly translations) to Crowdin and
+download the others translations from Crowdin.
 
 I would like Opencast to support my language. Is this possible?
 ---------------------------------------------------------------
@@ -61,7 +61,7 @@ language translations in Opencast releases below:
 5.  An endangered translation may be saved by reaching at least 90% translated until at least two weeks before the
     release date of the next major release and a reviewer is found
 
-Note that [Crowdin](https://crowdin.com/project/opencast-community) is displaying the percentage translated for 
+Note that [Crowdin](https://crowdin.com/project/opencast-community) is displaying the percentage translated for
 each language. It is the percentages shown on that page that act as reference.
 Considering the dates when releases branch are cut, the respective releases schedules act as reference.
 
@@ -76,28 +76,32 @@ Accepting Translators
 ---------------------
 
 We ask that Crowdin users who wish to help translate Opencast send a brief, understandable sentence regarding why they
-wish to help translate Opencast. Users who do not send this in should be asked via the Crowdin messaging system. Something
-as simple as 'I want to help translate $project into [language]' would more than suffice.
+wish to help translate Opencast. Users who do not send this in should be asked via the Crowdin messaging system.
+Something as simple as 'I want to help translate $project into [language]' would more than suffice.
 
 ### Versioning
 
 Crowdin supports versions management by allowing the management of multiple branches. The relation of
 Opencast code repository branches to Crowdin branches follows the following convention:
 
-The Opencast branch `r/a.b.x` corresponds to Crowdin branch `a.b.x`.
+The Opencast branch `r/a.x` corresponds to Crowdin branch `a.x`.
 
 Crowdin does automatically detect equal strings across branches so there is no need to configure anything when
 a new branch is created.
 
-When releasing a new version `a.b.c` of Opencast, the following actions must be performed to keep the Opencast code
-repository in sync with Crowdin:
+Right after a cut of a new Opencast release branch `r/a.x` (from `develop`), the following actions must be performed:
 
-1. Download the translations from Crowdin branch `a.b.x`
-2. Commit the downloaded translations into the Opencast branch `r/a.b.x`
-3. Release Opencast `a.b.c`
-4. Merge Opencast branch `r/a.b.x` into Opencast branch `develop`
-5. Upload sources of Opencast branch `develop` to Crowdin branch `develop`
-6. Upload translations of Opencast branch `develop` to Crodwin branch `develop`
+1. Download the translations from Crowdin branch `develop`
+2. Commit the downloaded translations into the Opencast branch `r/a.x`
+    * Respect the rules described in the section [Inclusion and Exclusion of Translations](#inclusion-and-exclusion-of-translations)
+3. Upload translation sources of Opencast branch `r/a.x` to Crowdin branch `a.x`
+    * Crowdin will find duplicate strings (added in previous versions) and add the translations to these
+    * Only new strings will be shown to translators
+
+**Important:** Do not upload translations to Crowdin!
+
+To keep the Opencast code repository in sync with Crowdin, the translation sources should be uploaded to Crowdin as soon
+as possible.
 
 ### Working with Crowdin CLI
 
@@ -108,8 +112,8 @@ The Crowdin CLI configuration can be found in `/.crowdin.yaml`
 
 Please perform the following steps to get the tool running on your local host:
 
-1. Download the [Crowdin CLI tool](https://crowdin.com/page/cli-tool)
-2. [Get the API key for the project Opencast 
+1. Install [Crowdin CLI tool](https://support.crowdin.com/cli-tool)
+2. [Get the API key for the project Opencast
   ](https://crowdin.com/project/opencast-community/settings#integration)
 3. Add the following line to your local Crowdin configuration file (`~/.crowdin.yaml`):
 the first line:
@@ -118,25 +122,26 @@ the first line:
 
 Now you can use the Crowdin CLI command line tool to upload source language files and download translations.
 
-To upload the sources from the Opencast code repository to Crowdin, use the following command:
+To upload the translation sources from the Opencast code repository to Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml upload sources -b <branch>
-
-In case you need to upload the translations from the Opencast code repository branch `<branch>`, use the command:
-
-    java -jar crowdin-cli.jar --config .crowdin.yaml upload translations -b <branch>
+    crowdin --config .crowdin.yaml upload sources -b <branch>
 
 Note that the branch `<branch>` will be automatically created if it is not yet existing.
 
 To download the translations from Crowdin, use the following command:
 
-    java -jar crowdin-cli.jar --config .crowdin.yaml download -b <branch>
+    crowdin --config .crowdin.yaml download -b <branch>
 
+To show a list of files in the current project, use the following command:
+
+    crowdin --config .crowdin.yaml list project -b <branch>
+
+Note: Do not upload translations to Crowdin. Our current subscription plan will exceeded otherwise.
 
 Further Information
 -------------------
 
- - [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
- - [Crowdin CLI Documentation](https://crowdin.com/page/cli-tool)
- - [Crowdin Versions Management Documentation](https://support.crowdin.com/articles/versions-management/)
- - [Crowdin Language Codes](https://crowdin.com/page/api/language-codes)
+* [Crowdin Opencast Project](https://crowdin.com/project/opencast-community)
+* [Crowdin CLI Documentation](https://support.crowdin.com/cli-tool/#usage)
+* [Crowdin Versions Management Documentation](https://support.crowdin.com/versions-management/)
+* [Crowdin Language Codes](https://support.crowdin.com/api/language-codes/)

@@ -112,7 +112,7 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
 
     <bean id="preauthAuthProvider"
           class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-  	  <property name="preAuthenticatedUserDetailsService">
+      <property name="preAuthenticatedUserDetailsService">
         <bean id="userDetailsServiceWrapper"
               class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
           <property name="userDetailsService" ref="userDetailsService"/>

@@ -6,9 +6,9 @@ contributed, how they are merged and how releases are done.
 
 *If this document does not answer all of your questions, here is how you can get further help:*
 
- - *Ask on the [Opencast Development List](https://groups.google.com/a/opencast.org/forum/#!forum/dev)*
- - *Chat with developers on [IRC (#opencast on Freenode)](http://webchat.freenode.net/?channels=opencast)*
- - *Join our weekly technical meeting (see lists or IRC)*
+* *Ask on the [Opencast Development List](https://groups.google.com/a/opencast.org/forum/#!forum/dev)*
+* *Chat with developers on [IRC (#opencast on Freenode)](http://webchat.freenode.net/?channels=opencast)*
+* *Join our weekly technical meeting (see lists or IRC)*
 
 
 Contributing Code
@@ -21,30 +21,29 @@ of this repository are explained later in this guide.
 
 ### Jira and GitHub
 
- - Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a
-   ticket in Jira. The issue identifier should also be used in the title of the pull request and the commits. E.g.:
-   `MH-12345, Fixing Something Somewhere`. Creating a Jira ticket is usually the first step when fixing something.
+* Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a
+  ticket in Jira. The issue identifier should also be used in the title of the pull request and the commits. E.g.:
+  `MH-12345, Fixing Something Somewhere`. Creating a Jira ticket is usually the first step when fixing something.
 
- - Opencast uses [GitHub](https://github.com/opencast) for code hosting.
-   Please [fork](https://help.github.com/articles/fork-a-repo/)
-   the [official repository](https://github.com/opencast/opencast) on GitHub
-   to [create pull requests](https://help.github.com/articles/creating-a-pull-request/) from your repository
-   which will show up on the project's list of open pull requests.
+* Opencast uses [GitHub](https://github.com/opencast) for code hosting. Please
+  [fork](https://help.github.com/articles/fork-a-repo/) the [official repository](https://github.com/opencast/opencast)
+  on GitHub to [create pull requests](https://help.github.com/articles/creating-a-pull-request/) from your repository
+  which will show up on the project's list of open pull requests.
 
- - All open pull requests are listed on the [Opencast Pull Request Filter](http://pullrequests.opencast.org). It might
-   take a couple of minutes for a new pull request to show up.
+* All open pull requests are listed on the [Opencast Pull Request Filter](http://pullrequests.opencast.org). It
+  mighttake a couple of minutes for a new pull request to show up.
 
 ### Bugfix vs Feature
 
 Opencast distinguishes between bug fix and feature pull requests.
 
- - Features are *only* allowed to be merged into `develop`, which will let them automatically become part of the next
-   major/minor release, given that the release branch for the next release has not been cut yet. If possible, please
-   name branches containing features according to the pattern `f/MH-XXXXX-short-description`, where MH-XXXXX is the
-   relevant Jira ticket.
+* Features are *only* allowed to be merged into `develop`, which will let them automatically become part of the next
+  major/minor release, given that the release branch for the next release has not been cut yet. If possible, please name
+  branches containing features according to the pattern `f/MH-XXXXX-short-description`, where MH-XXXXX is the relevant
+  Jira ticket.
 
- - Bug fixes can be merged both into `develop` and into release branches. If possible, please name branches containing
-   bug fixes according to the pattern `t/MH-XXXXX-short-description`, where MH-XXXXX is the relevant Jira ticket.
+* Bug fixes can be merged both into `develop` and into release branches. If possible, please name branches containing
+  bug fixes according to the pattern `t/MH-XXXXX-short-description`, where MH-XXXXX is the relevant Jira ticket.
 
 ### Reviews
 
@@ -62,21 +61,21 @@ Requests](reviewing-and-merging.md).
 When reviewing a pull request, it is always easier if the reviewer knows what the ticket is about, and has a rough idea
 of what work has been done.  To this end, there are a few expectations for all pull requests:
 
- - For each pull request a JIRA ticket should be created
- - The JIRA ticket and JIRA ticket title should be the pull request title
- - The pull request description should contain a summary of the work done, along with reasoning for any major change
-   - The JIRA ticket should contain the same information
- - For feature pull requests, accompanying documentation should be included
- - It is encouraged, but not required that the pull request have a clean commit history
- - In the case of major user interface changes, it is good practice to include screenshots of the affect sections of
-   the interface
- - If you add or modify any external libraries ensure that those additions and modifications are also applied to the
-   NOTICES file
- - Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
-   docs/guides/admin/docs/upgrade.md
- - The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
- - The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
-   in terms of the license itself as well as its listing in NOTICES
+* For each pull request a JIRA ticket should be created
+* The JIRA ticket and JIRA ticket title should be the pull request title
+* The pull request description should contain a summary of the work done, along with reasoning for any major change
+    * The JIRA ticket should contain the same information
+* For feature pull requests, accompanying documentation should be included
+* It is encouraged, but not required that the pull request have a clean commit history
+* In the case of major user interface changes, it is good practice to include screenshots of the affect sections of
+  the interface
+* If you add or modify any external libraries ensure that those additions and modifications are also applied to the
+  NOTICES file
+* Any actions that would be required for a version upgrade (e.g: from 3.x to 4.x) must be documented in
+  docs/guides/admin/docs/upgrade.md
+* The commands `mvn clean install`, `mvn javadoc:javadoc javadoc:aggregate`, and `mvn site` should all succeed
+* The licenses of any external libraries used in the pull request comply with the [licensing rules](license.md) both
+  in terms of the license itself as well as its listing in NOTICES
 
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.
@@ -92,19 +91,19 @@ maintenance releases.
 
 Swift overview:
 
- - The `develop` branch represents the latest state of development. Features may be merged into this branch and into
-   this branch only. Release branches are branched off from `develop`. It is basically the preparation for the next big
-   release at all times.
- - The release branches are named `r/<a>.<b>.x` (e.g. `r/1.6.x`). They are the latest state of development for a
-   specific release. Only bug fixes and no features may be added to these branches. All beta versions, release
-   candidates and final releases are made from these branches. The branch lives on as long as there may be additional
-   maintenance releases for a given version.
- - Git tags are created to indicate official releases. These may be:
-    - `x.y.z-betaX` marks a beta release. This is usually a version which may still have bugs but is good enough for
+* The `develop` branch represents the latest state of development. Features may be merged into this branch and into
+  this branch only. Release branches are branched off from `develop`. It is basically the preparation for the next big
+  release at all times.
+* The release branches are named `r/<a>.<b>.x` (e.g. `r/1.6.x`). They are the latest state of development for a
+  specific release. Only bug fixes and no features may be added to these branches. All beta versions, release
+  candidates and final releases are made from these branches. The branch lives on as long as there may be additional
+  maintenance releases for a given version.
+* Git tags are created to indicate official releases. These may be:
+    * `x.y.z-betaX` marks a beta release. This is usually a version which may still have bugs but is good enough for
       testing, so that further issues or bugs can be identified before an actual release.
-    - `x.y.z-rcX` marks a release candidate. This is a version that seems to be ready to be released as a final
+    * `x.y.z-rcX` marks a release candidate. This is a version that seems to be ready to be released as a final
       version. It will become the final version if testing does not reveal any severe issues.
-    - `x.y.z` marks a final release.
+    * `x.y.z` marks a final release.
 
 
 To get a closer look at the branching model, let us consider a simple example with a single release:

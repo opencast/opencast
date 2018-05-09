@@ -43,13 +43,13 @@ This structure always follows the same pattern:
 , where:
 
 * `${org.opencastproject.streaming.directory}` is this module's root directory, as configured in Opencast's
-    configuration (see below)
+  configuration (see below)
 * `<organization-id>` is the identifier for the current organization (by default `mh-default-org`)
 * `<channel-id>` is the channel identifier. Normally, the Workflow Operation determines the value of this parameter;
-    for instance, the operation `publish-engage` calls the Streaming Service with a hardcoded value for this property
-    of `engage-player`
+  for instance, the operation `publish-engage` calls the Streaming Service with a hardcoded value for this property
+  of `engage-player`
 * `<mediapackage-id>`, `<element-id>` and `<filename>` are different for each MediaPackageElement that this module
-    distributes.
+  distributes.
 
 The organization ID is automatically assigned based on the server's DNS name
 ([more info](../configuration/multi.tenancy)). Each organization (or *tenant*) is
@@ -150,7 +150,7 @@ All this can be configured in the "Options" section of the Wowza application:
 3. Click the "Edit" button
 4. Add the following Properties
 
-    |Path                           |Name	                                    |Type    |Value |
+    |Path                           |Name                                     |Type    |Value |
     |-------------------------------|-----------------------------------------|--------|------|
     |/Root/Application/HTTPStreamer |cupertinoUserHTTPHeaders                 |String  | \*\* |
     |/Root/Application/HTTPStreamer |mpegdashUserHTTPHeaders                  |String  | \*\* |

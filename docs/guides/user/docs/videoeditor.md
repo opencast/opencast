@@ -13,16 +13,19 @@
 
 
 # Overview
-The video editor section contains the tools that allow a producer to visualize and edit videos.
-To access the video editor, go to the [Events list](events.md) and press the video editor icon ( ![icon_video_preview][] ) in the Actions column.
+The video editor section contains the tools that allow a producer to visualize and edit videos. To access the video
+editor, go to the [Events list](events.md) and press the video editor icon ( ![icon_video_preview][] ) in the Actions
+column.
 
 [![Playback mode][img_videoeditor_preview]][img_videoeditor_preview]
 
-> Note that if no preview file is available the icon will not be displayed. Make sure that the workflow you are using are generating a preview.
+> Note that if no preview file is available the icon will not be displayed. Make sure that the workflow you are using
+> are generating a preview.
 
 
 ## Video editor
-Click on "Editor" below the player controls to activate the editing tools. The editing tool allows for cutting part of a video clip. The main components of the tool are described below.
+Click on "Editor" below the player controls to activate the editing tools. The editing tool allows for cutting part of a
+video clip. The main components of the tool are described below.
 
 ### The player
 [![Video player][img_videoeditor_player]][img_videoeditor_player]
@@ -48,7 +51,9 @@ The toolbar features all the actions that are available in the tool.
 
 #### The timeline
 
-The timeline displays the video trak as well as the [waveform](http://en.wikipedia.org/wiki/Waveform) of the audio track. The position marker (red vertical line) can be moved by dragging it with the mouse or by using the Next / Previous buttons in the [player controls](#player-controls).
+The timeline displays the video trak as well as the [waveform](http://en.wikipedia.org/wiki/Waveform) of the audio
+track. The position marker (red vertical line) can be moved by dragging it with the mouse or by using the Next /
+Previous buttons in the [player controls](#player-controls).
 
 The zoom control allows for a more precise positioning of the marker.
 
@@ -58,10 +63,13 @@ The zoom control allows for a more precise positioning of the marker.
 #### The actions bar
 The actions bar allows for saving and starting a processing cycle on a video.
 
-* When no workflow is selected, pressing the Save button will save the segments that have been created and the user will be redirected to the events page.
-* When a workflow has been selected, the Save & Process will save the cutting information and immediately start the processing task on the video.
+* When no workflow is selected, pressing the Save button will save the segments that have been created and the user will
+  be redirected to the events page.
+* When a workflow has been selected, the Save & Process will save the cutting information and immediately start the
+  processing task on the video.
 
 [![Video editor actions][img_videoeditor_actions]][img_videoeditor_actions]
 
 
-> Note: by pressing close, the user will be redirected to the events page and the segments that have been created will **not** be saved.
+> Note: by pressing close, the user will be redirected to the events page and the segments that have been created will
+> **not** be saved.

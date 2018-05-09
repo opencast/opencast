@@ -11,7 +11,7 @@ This document provides an overview over Opencast's metadata capabilities and its
 ## Standard Metadata
 
 For both events and series, a common set of metadata is supported by Opencast out-of-the box. Since metadata catalogs
-are referenced from within media package, flavors can be used to identify a specific metadata catalog. The following 
+are referenced from within media package, flavors can be used to identify a specific metadata catalog. The following
 flavors are treated by Opencast as standard metadata in means of Opencast expects them to be present:
 
 * `dublincore/episode` holds the standard metadata of an event
@@ -20,7 +20,9 @@ flavors are treated by Opencast as standard metadata in means of Opencast expect
 Opencast assumes specific metadata fields to be present in the standard metadata in means of defining hard-coded
 filters, table columns and search indices.
 
-To adjust the standard metadata to your specific needs, you can configure them in `/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` and `/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg`.
+To adjust the standard metadata to your specific needs, you can configure them in
+`/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg` and
+`/opt/opencast/etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg`.
 
 For details on how to configure metadata catalogs, see section Configuring Metadata Catalogs.
 
@@ -30,9 +32,10 @@ described in the next section.
 
 ## Extended Metadata
 
-For both events and series, Opencast support an arbitrary number of customized metadata catalogs. 
+For both events and series, Opencast support an arbitrary number of customized metadata catalogs.
 
-To add extended metadata catalogs, create a configuration file with a valid filename of the form `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-<name>.cfg` in `/opt/opencast/etc.` on the admin node.
+To add extended metadata catalogs, create a configuration file with a valid filename of the form
+`org.opencastproject.ui.metadata.CatalogUIAdapterFactory-<name>.cfg` in `/opt/opencast/etc.` on the admin node.
 
 For details on how to configure metadata catalogs, see section Configuring Metadata Catalogs.
 
@@ -53,10 +56,11 @@ The metadata configuration file format can be logically split up into different 
 |organization     |mh_default_org           |A custom catalog definition is mapped 1:1 to an organization and is available to this one organization only.|
 |flavor           |mycompany/episode        |The catalog must be of a certain flavor. For a events catalog, the flavor consists of the form type/subtype whereas for series you only need to define the subtype. Attention: For series catalogs, the type (the part before the slash '/') is used as element type.|
 |title            |My Personal Catalog Name |This is the title that is displayed in the UI. It should be something that is readable by humans.|
- 
+
 ### Part 2: XML serialization information
 
-The only supported serialization of catalogs is currently the XML file format. The file follows the recommendation of the Dublin Core Metadata Initiative.
+The only supported serialization of catalogs is currently the XML file format. The file follows the recommendation of
+the Dublin Core Metadata Initiative.
 
 |Configuration key             |Example                           |Description                                         |
 |------------------------------|----------------------------------|----------------------------------------------------|
@@ -65,7 +69,8 @@ The only supported serialization of catalogs is currently the XML file format. T
 
 **Namespace bindings**
 
-To properly serialize to XML each prefix has to be bound to an XML namespace. Multiple namespace bindings can be configured, each identified by its unique name.
+To properly serialize to XML each prefix has to be bound to an XML namespace. Multiple namespace bindings can be
+configured, each identified by its unique name.
 
 |Configuration key                  |Example                         |Description                                      |
 |-----------------------------------|--------------------------------|-------------------------------------------------|
@@ -74,7 +79,8 @@ To properly serialize to XML each prefix has to be bound to an XML namespace. Mu
 
 ### Part 3: Catalog fields configuration
 
-`{field-id}` must be a unique identifier for each property for a given catalog and can be the same as the input or output id to make it easy to find.
+`{field-id}` must be a unique identifier for each property for a given catalog and can be the same as the input or
+output id to make it easy to find.
 
 |Configuration key |Example |Description |
 |------------------|--------|------------|
@@ -93,7 +99,7 @@ To properly serialize to XML each prefix has to be bound to an XML namespace. Mu
 \* Mandatory field attribute
 
 \** See https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
- 
+
 **Field types**
 
 |Type          |Description                     |Example value in catalog  |Example value in UI  |JSON response example|
@@ -106,13 +112,13 @@ To properly serialize to XML each prefix has to be bound to an XML namespace. Mu
 |start_date   |The start date portion of a Dublin Core Catalog Period. |start=2014-11-04T19:00:00Z; end=2014-11-05T20:00:00Z; scheme=W3C-DTF; |2014-11-04| |
 |start_time   |The start time portion of a Dublin Core Catalog Period. |start=2014-11-04T19:00:00Z; end=2014-11-05T20:00:00Z; scheme=W3C-DTF; |19:00:00 | |
 |duration     |The duration of the event portion of a Dublin Core Catalog Period.|start=2014-11-04T19:00:00Z; end=2014-11-05T20:00:00Z; scheme=W3C-DTF; |01:00:00 | |
- 
+
 **Workflow Configuration**
 
 Since the extended metadata don't have the `dublincore/*` flavor, a tagging operation for the archive has to be added
-for the extended catalogs. 
+for the extended catalogs.
 In our examples below, we use ext/episode as a flavor, so the following operation should be added to the workflows
- 
+
     <!-- Tag the extended metadata catalogs for publishing -->
     <operation
         id="tag"
@@ -122,10 +128,11 @@ In our examples below, we use ext/episode as a flavor, so the following operatio
             <configuration key="target-tags">+archive</configuration>
         </configurations>
     </operation>
- 
- 
-If you want the extended metadata to be published the same way as the standard metadata, you can update the existing tagging operation for dublincore metadata the following way
- 
+
+
+If you want the extended metadata to be published the same way as the standard metadata, you can update the existing
+tagging operation for dublincore metadata the following way
+
     <!-- Tag the incoming metadata catalogs for publishing -->
     <operation
       id="tag"

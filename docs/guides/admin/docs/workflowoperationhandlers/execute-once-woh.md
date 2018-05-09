@@ -6,7 +6,7 @@ may be used to create a new mediapackage element, or to add configuration proper
 
 To run a command for each element in a MediaPackage, use the [Execute Many](execute-many-woh.md) operation.
 
-Commands run by this operation handler must first be included in the `commands.allowed` list in the 
+Commands run by this operation handler must first be included in the `commands.allowed` list in the
 [Execute Service](../modules/execute.md#service-configuration) configuration.
 
 ### Parameter table
@@ -25,7 +25,9 @@ in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-sub
 |target-flavor     |presentation/processed|Specifies the flavor of the resulting Mediapackage element created by the command. If no new element is created, this parameter is ignored.|Required if output- filename is present|
 |target-tags       |execservice, -trim|List of tags that will be applied to the resulting Mediapackage element. Tags starting with "-" will be deleted from the element instead, if present. The resulting element may be the same as the input element.|No|
 
-If `set-workflow-properties` is true, the command should write a plain-text properties file to the location specified by #{out} in the key-value format supported by the [Java Properties](http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#load-java.io.Reader-) class, for example:
+If `set-workflow-properties` is true, the command should write a plain-text properties file to the location specified by
+`#{out}` in the key-value format supported by the [Java
+Properties](http://docs.oracle.com/javase/8/docs/api/java/util/Properties.html#load-java.io.Reader-) class, for example:
 
 ````
 key1=value1
@@ -53,7 +55,8 @@ Run a command which combines two tracks into a new track:
 </operation>
 ````
 
-Run a command which inspects a mediapackage and adds new configuration properties to the running workflow, leaving the mediapackage unchanged:
+Run a command which inspects a mediapackage and adds new configuration properties to the running workflow, leaving the
+mediapackage unchanged:
 
 ````
 <operation

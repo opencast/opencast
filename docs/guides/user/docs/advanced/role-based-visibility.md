@@ -13,7 +13,7 @@ roles that allow the users to access specific parts of the UI.
 
 Please consult the [Groups section](../groups.md) for information about adding new groups.
 
-There is a set of so-called user interface roles, each of them providing access to a specific part of the 
+There is a set of so-called user interface roles, each of them providing access to a specific part of the
 administrative user interface. Those roles can be easily identified by their name prefix *ROLE_UI*.
 
 **Important** *ROLE_ADMIN* implicitly provides full access to the user interface. When working with role-based
