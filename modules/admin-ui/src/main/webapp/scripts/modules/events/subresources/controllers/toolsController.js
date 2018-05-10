@@ -25,10 +25,6 @@ angular.module('adminNg.controllers')
 .controller('ToolsCtrl', ['$scope', '$interval', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
     function ($scope, $interval, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
-        $scope.navigateTo = function (path) {
-            $location.path(path).replace();
-        };
-
         $scope.event    = EventHelperService;
         $scope.resource = $route.current.params.resource;
         $scope.tab      = $route.current.params.tab;
@@ -42,6 +38,11 @@ angular.module('adminNg.controllers')
         $scope.event.eventId = $scope.id;
 
         $scope.unsavedChanges = false;
+
+        $scope.navigateTo = function (path) {
+            ToolsResource.release({id: $scope.id, tool: 'lock'});
+            $location.path(path).replace();
+        };
 
         $scope.setChanges = function(changed) {
             $scope.unsavedChanges = changed;
@@ -120,7 +121,13 @@ angular.module('adminNg.controllers')
             });
         };
         $window.onbeforeunload = function () {
-            ToolsResource.release({id: $scope.id, tool: 'lock'});
+          // Have to delete lock with synch call
+          var request = new XMLHttpRequest();
+          request.open('DELETE', 'tools/' + $scope.id + '/lock.json', false);
+          request.send(null);
+          if (request.status === 200) {
+            console.log('lock freed');
+          }
         };
     }
 ]);
