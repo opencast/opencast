@@ -138,13 +138,15 @@ public interface IndexService {
    *
    * @param request
    *          The request containing the data to create the event.
+   * @param checkAgentAccess
+   *          In case of scheduling, whether to check if the current user has access to the desired agent.
    * @return The event's id (or a comma seperated list of event ids if it was a group of events)
    * @throws IndexServiceException
    *           Thrown if there was an internal server error while creating the event.
    * @throws IllegalArgumentException
    *           Thrown if the provided request was inappropriate.
    */
-  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException;
+  String createEvent(HttpServletRequest request, boolean checkAgentAccess) throws IndexServiceException, IllegalArgumentException;
 
   /**
    * Creates a new event based on a json string and a media package.

@@ -1,4 +1,4 @@
-<section class="modal wizard active modal-open" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
+<section class="modal wizard active modal-open" ng-form="bulkDeleteForm" id="delete-events-status-modal" style="display: block;" ng-controller="BulkDeleteCtrl">
     <header>
         <a ng-click="close()" class="fa fa-times close-modal"></a>
         <h2 translate="BULK_ACTIONS.DELETE.EVENTS.CAPTION"><!-- Delete Events --></h2>
@@ -27,6 +27,12 @@
                             <!-- By pressing delete you understand that these files are unrecoverable. -->
                         </p>
                     </div>
+                    <div ng-show="bulkDeleteForm.deleteForm.$error.schedulingAuthorized" class="alert sticky warning">
+                        <p translate="BULK_ACTIONS.DELETE.EVENTS.UNAUTHORIZED">
+                            <!-- Unauthorized -->
+                        </p>
+                    </div>
+
 
                     <div class="full-col" ng-if="events.unpublished.has">
                         <div class="obj">
@@ -42,8 +48,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="row in unpublished.rows">
-                                        <td><input type="checkbox" ng-model="row.selected" ng-change="unpublished.rowSelectionChanged($index)" class="child-cbox"/></td>
+                                    <tr ng-repeat="row in unpublished.rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.schedulingAuthorized}">
+                                        <td><input name="selection" type="checkbox" ng-model="row.selected" scheduling-authorized="{{row}}" ng-change="unpublished.rowSelectionChanged($index)" class="child-cbox"/></td>
                                         <td>{{ row.title }}</td>
                                         <td>{{ row.presenters }}</td>
                                     </tr>
@@ -67,7 +73,7 @@
     <footer ng-if="currentForm === 'deleteForm'">
         <a ng-click="navigateTo('retractForm', currentForm, [])"
             data-modal-tab="next" class="submit"
-            ng-class="{active: deleteForm.$valid, disabled: deleteForm.$invalid}">
+            ng-class="{active: bulkDeleteForm.deleteForm.$valid, disabled: bulkDeleteForm.deleteForm.$invalid}">
             {{ 'WIZARD.NEXT_STEP' | translate }}
         </a>
         <a ng-click="navigateTo('deleteForm', currentForm, [])"
@@ -204,7 +210,7 @@
     <footer ng-if="currentForm === 'summaryForm'">
         <a ng-click="submit()"
             data-modal-tab="next" class="submit"
-            ng-class="{active: summaryForm.$valid, inactive: summaryForm.$invalid, disabled: submitButton}">
+            ng-class="{active: bulkDeleteForm.summaryForm.$valid, inactive: bulkDeleteForm.summaryForm.$invalid, disabled: submitButton}">
             {{ 'WIZARD.RETRACT' | translate }}
         </a>
         <a ng-click="navigateTo('retractForm', currentForm, [])"

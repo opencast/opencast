@@ -482,7 +482,7 @@ angular.module('adminNg.services')
         };
 
         this.setDefaultsIfNeeded = function() {
-                if (self.defaultsSet) {
+                if (self.defaultsSet || !self.hasAgents()) {
                   return;
                 }
 
@@ -550,6 +550,19 @@ angular.module('adminNg.services')
             SchedulingHelperService.applyTemporalValueChange(self.ud[getType()], type, self.isScheduleSingle() );
             self.checkConflicts();
         }
+
+        this.hasAgentAccess = function(agent, index, array) {
+            return SchedulingHelperService.hasAgentAccess(agent.id);
+        };
+
+        this.hasAgents = function() {
+            return angular.isDefined(self.captureAgents)
+                && self.captureAgents.filter(
+                       function(agent) {
+                           return self.hasAgentAccess(agent, undefined, undefined)
+                       }).length > 0;
+        };
+
     };
     return new Source();
 }]);

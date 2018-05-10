@@ -21,7 +21,7 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('SchedulingHelperService', [function () {
+.factory('SchedulingHelperService', ['AuthService', function (AuthService) {
     var SchedulingHelperService = function () {
 
         var me = this;
@@ -62,6 +62,12 @@ angular.module('adminNg.services')
             if (single) {
                 temporalValues.end.date = me.getUpdatedEndDateSingle(temporalValues.start, temporalValues.end);
             }
+        };
+
+        this.hasAgentAccess = function(agentId) {
+            if (AuthService.isOrganizationAdmin()) return true;
+            var role = "ROLE_CAPTURE_AGENT_" + agentId.replace("[^a-zA-Z0-9_]", "").toUpperCase();
+            return AuthService.userIsAuthorizedAs(role);
         };
     };
     return new SchedulingHelperService();

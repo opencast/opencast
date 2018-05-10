@@ -503,5 +503,27 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
             EventBulkEditResource.update(payload, onSuccess, onFailure);
         }
     };
+
+    $scope.hasAgentAccess = function (agent, index, array) {
+        return SchedulingHelperService.hasAgentAccess(agent.id);
+    };
+
+    $scope.noAgentAccess = function (row) {
+        return !$scope.nonSchedule(row) && !SchedulingHelperService.hasAgentAccess(row.agent_id);
+    };
+
+    $scope.hasAllAgentsAccess = function () {
+        for (var i = 0; i < $scope.rows.length; i++) {
+            var row = $scope.rows[i];
+            if (!row.selected || $scope.nonSchedule(row)) {
+                continue;
+            }
+            if (!SchedulingHelperService.hasAgentAccess(row.agent_id)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     decorateWithTableRowSelection($scope);
 }]);

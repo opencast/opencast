@@ -14,6 +14,11 @@
                                 <!-- Cannot start -->
                             </p>
                         </div>
+                        <div ng-show="!hasAllAgentsAccess()" class="alert sticky info">
+                          <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE">
+                            <!-- Cannot update scheduling -->
+                          </p>
+                        </div>
                     </div>
                     <div class="full-col">
                         <div class="obj tbl-list">
@@ -35,7 +40,7 @@
                                     </tr>
                                     </thead>
                                     <tbody >
-                                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row)}">
+                                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
                                         <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
                                         <td>{{ row.title }}</td>
                                         <td class="nowrap">{{ row.series_name}}</td>
@@ -109,7 +114,7 @@
 
                         </div><!--list-obj -->
 
-                        <div class="obj tbl-details">
+                        <div class="obj tbl-details" ng-if="hasAllAgentsAccess() && $root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                             <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"><!-- Edit scheduling --></header>
                             <div class="obj-container">
 
@@ -176,7 +181,7 @@
                                             ng-change="roomChanged(); checkConflicts()"
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.location"
-                                            ng-options="value.name for (id, value) in captureAgents"
+                                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
                                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                                             />
                                   </td>

@@ -154,8 +154,12 @@ angular.module('adminNg.controllers')
             EventsResource.delete({id: row.id}, function () {
                 Table.fetch();
                 Notifications.add('success', 'EVENTS_DELETED');
-            }, function () {
-                Notifications.add('error', 'EVENTS_NOT_DELETED');
+            }, function (error) {
+                if (error.status === 401) {
+                  Notifications.add('error', 'EVENTS_NOT_DELETED_NOT_AUTHORIZED');
+                } else {
+                  Notifications.add('error', 'EVENTS_NOT_DELETED');
+                }
             });
         };
 

@@ -31,6 +31,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-userdirectory</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
@@ -151,7 +156,8 @@
             <Export-Package> org.opencastproject.capture.admin.*;version=${project.version} </Export-Package>
             <Service-Component>
               OSGI-INF/capture-admin-service.xml,
-              OSGI-INF/capture-admin-service-rest.xml
+              OSGI-INF/capture-admin-service-rest.xml,
+              OSGI-INF/capture-agent-admin-role-provider.xml
             </Service-Component>
             <Meta-Persistence>
               META-INF/persistence.xml

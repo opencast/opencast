@@ -99,6 +99,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
@@ -461,7 +462,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createEvent(HttpServletRequest request) throws IndexServiceException {
+  public String createEvent(HttpServletRequest request, boolean checkAgentAccess) throws IndexServiceException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     // regex for form field name matching an attachment or a catalog
@@ -482,6 +483,16 @@ public class IndexServiceImpl implements IndexService {
               String metadata = Streams.asString(item.openStream());
               try {
                 metadataJson = (JSONObject) new JSONParser().parse(metadata);
+                // in case of scheduling: Check if user has access to the CA
+                if (checkAgentAccess && metadataJson.containsKey("source")) {
+                  final JSONObject sourceJson = (JSONObject) metadataJson.get("source");
+                  if (sourceJson.containsKey("metadata")) {
+                    final JSONObject sourceMetadataJson = (JSONObject) sourceJson.get("metadata");
+                    if (sourceMetadataJson.containsKey("device")) {
+                      SecurityUtil.checkAgentAccess(securityService, (String) sourceMetadataJson.get("device"));
+                    }
+                  }
+                }
               } catch (Exception e) {
                 logger.warn("Unable to parse metadata {}", metadata);
                 throw new IllegalArgumentException("Unable to parse metadata");
