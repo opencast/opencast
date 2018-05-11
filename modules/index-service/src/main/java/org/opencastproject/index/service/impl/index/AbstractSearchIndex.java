@@ -470,7 +470,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
 
-    if (event.getWorkflowId() == workflowId) {
+    if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
       logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
       event.setWorkflowId(null);
       event.setWorkflowDefinitionId(null);
