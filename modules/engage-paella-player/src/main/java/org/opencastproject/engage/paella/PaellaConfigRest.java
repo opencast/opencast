@@ -85,11 +85,6 @@ public class PaellaConfigRest {
     logger.debug("Paella configuration folder is {}", paellaConfigFolder);
   }
 
-  public void deactivate() {
-    // Nothing to do
-    logger.debug("deactivate()");
-  }
-
   @GET
   @Path("config.json")
   @Produces(MediaType.APPLICATION_JSON)
