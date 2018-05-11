@@ -24,13 +24,14 @@ package org.opencastproject.engage.paella;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,8 +63,11 @@ public class PaellaConfigRest {
 
   private static final Logger logger = LoggerFactory.getLogger(PaellaConfigRest.class);
 
-  /** Configuration properties id */
+  /** Configuration Key for Paella's config folder */
   private static final String PAELLA_CONFIG_FOLDER_PROPERTY = "org.opencastproject.engage.paella.config.folder";
+
+  /** Default configuration location (relative to ${karaf.etc}) */
+  private static final String PAELLA_CONFIG_FOLDER_DEFAULT = "paella";
 
   /**
    * The rest publisher looks for any non-servlet with the 'opencast.service.path' property
@@ -79,9 +83,16 @@ public class PaellaConfigRest {
   }
 
   public void activate(ComponentContext cc) {
-    logger.debug("activate()");
-
     paellaConfigFolder = cc.getBundleContext().getProperty(PAELLA_CONFIG_FOLDER_PROPERTY);
+
+    // Fall back to default location if necessary
+    if (StringUtils.isBlank(paellaConfigFolder)) {
+      paellaConfigFolder = cc.getBundleContext().getProperty("karaf.etc");
+      if (StringUtils.isBlank(paellaConfigFolder)) {
+        throw new ConfigurationException("Paella configuration not set and unable to fall back to default location");
+      }
+      paellaConfigFolder += "/paella";
+    }
     logger.debug("Paella configuration folder is {}", paellaConfigFolder);
   }
 
