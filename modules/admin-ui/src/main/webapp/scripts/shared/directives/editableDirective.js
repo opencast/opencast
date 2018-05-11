@@ -56,8 +56,8 @@ angular.module('adminNg.directives')
                     if ((scope.params.type === 'ordered_text') && angular.isDefined(result)) {
                         try {
                             result = JSON.parse(result)['label'];
-                        } catch {
-                            // ignore
+                        } catch (e) {
+                            console.warn("Could not find displayable value for " + result);
                         }
                     }
                 } else if ((scope.mode === 'multiSelect') || (scope.mode === 'multiValue')) {
