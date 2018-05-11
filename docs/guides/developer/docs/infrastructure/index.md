@@ -17,27 +17,27 @@ Jan Koppe                  | legacy.opencast.org           | Greg Logan       | 
 
 ### Maven Repository
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)    | Notes
----------------------------|-------------------------------|------------------|---------------------|---------------
-Harvard DCE                | mvncache.opencast.org         | Lars Kiesow      | DCE Devel group     | Amazon Cloud
-University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      | Lars Kiesow         |
+Institution                | Hostname                      | Admin (Software) | Admin (Hardware)  | Notes
+---------------------------|-------------------------------|------------------|-------------------|-----------------
+Harvard DCE                | mvncache.opencast.org         | Lars Kiesow      | DCE Devel group   | Nginx cache, AWS
+University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      | Lars Kiesow       | nexus-oss
 
 Nexus administration:
 
-* Greg Logan
-* Lars Kiesow
-* Michael Stypa
+- Greg Logan
+- Lars Kiesow
+- Michael Stypa
 
 
 ### Other Hosted Services
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
----------------------------|-------------------------------|------------------|-------------------------
-University of Osnabrück    | pkg.opencast.org              | Lars Kiesow      | Lars Kiesow
-University of Osnabrück    | pullrequests.opencast.org     | Lars Kiesow      | Lars Kiesow
-University of Osnabrück    | build.opencast.org            | Greg Logan       | Lars Kiesow
-University of Osnabrück    | docs.opencast.org             | Lars Kiesow      | Lars Kiesow
-University of Osnabrück    | opencast.org                  | Rüdiger Rolf     | UOS RZ
+Institution                | Hostname                        | Admin (Software) | Admin (Hardware)
+---------------------------|---------------------------------|------------------|-------------------------
+University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
+University of Osnabrück    | build.opencast.org              | Greg Logan       | Lars Kiesow
+University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
+University of Osnabrück    | opencast.org                    | Rüdiger Rolf     | UOS RZ
+University of Stuttgart    | testrailoc.tik.uni-stuttgart.de | Release managers | Per Pascal Grube
 
 
 Administrators
