@@ -450,7 +450,7 @@
               *
             </Import-Package>
             <Private-Package>
-			  webapp.*,
+              webapp.*,
               org.opencastproject.adminui.util,
               org.opencastproject.adminui.exception
             </Private-Package>
