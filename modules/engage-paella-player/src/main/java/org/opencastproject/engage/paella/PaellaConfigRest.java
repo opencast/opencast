@@ -94,15 +94,10 @@ public class PaellaConfigRest {
   @Path("config.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "config.json", description = "Paella configuration file", reponses = { @RestResponse(description = "Returns the paella configuration file", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  @SuppressWarnings("unchecked")
   public String getMyInfo() throws IOException {
     // Add the current user's organizational information
     Organization org = securityService.getOrganization();
-
     File configFile = new File(PathSupport.concat(new String[] { paellaConfigFolder, org.getId(), "config.json" }));
-    String configContent = FileUtils.readFileToString(configFile);
-
-
-    return configContent;
+    return FileUtils.readFileToString(configFile, "UTF-8");
   }
 }
