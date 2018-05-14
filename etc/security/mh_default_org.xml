@@ -240,8 +240,8 @@
     <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Paella player -->
-    <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/engage/paella/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/engage/paella/ui/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -254,7 +254,7 @@
     <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
-    <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
 
@@ -269,10 +269,16 @@
     <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Secure the system management URLs for admins only -->
-    <sec:intercept-url pattern="/services/*" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/services/available.*" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
+    <sec:intercept-url pattern="/services/**" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/signing/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/config/**" access="ROLE_ADMIN" />
+
+    <!-- Enable capture agent updates and ingest -->
+    <sec:intercept-url pattern="/capture-admin/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
+    <sec:intercept-url pattern="/recordings/**" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
+    <sec:intercept-url pattern="/ingest/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
 
     <!-- Secure the user management URLs for admins only -->
     <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />

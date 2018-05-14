@@ -4,7 +4,7 @@ Administrative User Interface: Style Guide
 - [Color Palette](color-palette.md)
 - [Typeface](typeface.md)
 - [View Structure](view-structure.md)
-- [Logo](spacing.md)        
+- [Logo](spacing.md)
 - [Navigation](navigation.md)
 - [Modals](modals.md)
 - [Forms](forms.md)

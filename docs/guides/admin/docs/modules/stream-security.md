@@ -20,8 +20,8 @@ the mix?
 Looking more closely at what it means to serve recordings to a viewer reveals that a distinction needs to be made
 between:
 
-- the presentation of the video player, the recording metadata
-- the serving of the video streams, preview images etc. to that player.
+* the presentation of the video player, the recording metadata
+* the serving of the video streams, preview images etc. to that player.
 
 The former is protected by the engage part of Opencast. The latter may be served by download and streaming servers.
 Those distribution servers are independent of Opencast and have no knowledge about the current user and its permissions
@@ -163,7 +163,7 @@ signature is obtained.
 
 Out of the box, Opencast provides the following implementation:
 
-- *Generic Signing Provider*: This provider may be used in combination with HTTP servers. It appends the necessary
+* *Generic Signing Provider*: This provider may be used in combination with HTTP servers. It appends the necessary
   information (policy, signature and key id) to the URL.
 
 The URL signing service makes it straightforward to provide additional implementations to handle third party

@@ -90,12 +90,12 @@ possible:
 
 |Plugin Type|Description|Characteristics|Module Name|JS Plugin Type Name|Maven Plugin Type Name|
 |-----------|-----------|---------------|-----------|-------------------|----------------------|
-|Controls	|Implements the main controls of the top of the player	|Only one plugin per player possible.	|engage-theodul-plugin-controls	|engage_controls	|controls|
-|Timeline	|Timeline information below the main controls.|Good for processing time-based data like user tracking, slide previews or annotations.|Optional plugin, more than one possible.	engage-theodul-plugin-timeline-<pluginName>	|engage_timeline	|timeline|
-|Videodisplay	|Implementation of the video display.	|Currently only one plugin per player possible, but in the future more video displays should be possible.|engage-theodul-plugin-video-<pluginName>	|engage_video	|video|
-|Description/Label	|A plugin below the video display, good to show simple information about the video, like a title and the creator.	|Only one plugin per player possible.	|engage-theodul-plugin-description	|engage_description	|description|
-|Tab	|Shows a tab in the tab view at the bottom of the player.	|Optional plugin, more than one possible.	|engage-theodul-plugin-tab-<pluginName>	|engage_tab	|tab|
-|Custom	|A custom plugin without a relationship to an UI element.|Good for a custom REST endpoint, global data representation or to load custom JS code or libraries.|Optional plugin, more than one possible.|No connection to a preserved UI element.|engage-theodul-plugin-custom-<pluginName>	|engage_custom	|custom|
+|Controls    |Implements the main controls of the top of the player    |Only one plugin per player possible.    |engage-theodul-plugin-controls    |engage_controls    |controls|
+|Timeline    |Timeline information below the main controls.|Good for processing time-based data like user tracking, slide previews or annotations.|Optional plugin, more than one possible.    engage-theodul-plugin-timeline-<pluginName>    |engage_timeline    |timeline|
+|Videodisplay    |Implementation of the video display.    |Currently only one plugin per player possible, but in the future more video displays should be possible.|engage-theodul-plugin-video-<pluginName>    |engage_video    |video|
+|Description/Label    |A plugin below the video display, good to show simple information about the video, like a title and the creator.    |Only one plugin per player possible.    |engage-theodul-plugin-description    |engage_description    |description|
+|Tab    |Shows a tab in the tab view at the bottom of the player.    |Optional plugin, more than one possible.    |engage-theodul-plugin-tab-<pluginName>    |engage_tab    |tab|
+|Custom    |A custom plugin without a relationship to an UI element.|Good for a custom REST endpoint, global data representation or to load custom JS code or libraries.|Optional plugin, more than one possible.|No connection to a preserved UI element.|engage-theodul-plugin-custom-<pluginName>    |engage_custom    |custom|
 
 The following listing shows the directory structure of a plugin module:
 
@@ -133,7 +133,7 @@ plugin. The Core Reference describes the plugin object, before and after it is b
 
 Have a look to the code of a plugin to get an impression about the plugin implementation.
 
-##Model View Controller Support
+## Model View Controller Support
 
 The Theodul player supports MVC design patterns for each plugin based on methods and objects of the BackboneJS library.
 It is not necessary to design a plugin in MVC style but it is highly recommended. An overview of the methods and objects

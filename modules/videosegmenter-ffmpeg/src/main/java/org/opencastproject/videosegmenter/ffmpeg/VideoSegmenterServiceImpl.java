@@ -629,9 +629,10 @@ VideoSegmenterService, ManagedService {
    * @param changesThreshold the changesThreshold that is used as option for the FFmpeg call
    * @return a list of the resulting segments
    * @throws IOException
+   * @throws VideoSegmenterException
    */
   protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
-          float changesThreshold) throws IOException {
+          float changesThreshold) throws IOException, VideoSegmenterException {
 
     String[] command = new String[] { binary, "-nostats", "-i",
       mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
@@ -680,17 +681,28 @@ VideoSegmenterService, ManagedService {
       Pattern pattern = Pattern.compile("pts_time\\:\\d+(\\.\\d+)?");
       for (String seginfo : segmentsStrings) {
         Matcher matcher = pattern.matcher(seginfo);
-        String time = "0";
+        String time = "";
         while (matcher.find()) {
           time = matcher.group().substring(9);
         }
-        endtime = (long)(Float.parseFloat(time) * 1000);
+        if ("".equals(time)) {
+          // continue if the showinfo does not contain any time information. This may happen since the FFmpeg showinfo
+          // filter is used for multiple purposes.
+          continue;
+        }
+        try {
+          endtime = Math.round(Float.parseFloat(time) * 1000);
+        } catch (NumberFormatException e) {
+          logger.error("Unable to parse FFmpeg output, likely FFmpeg version mismatch!", e);
+          throw new VideoSegmenterException(e);
+        }
         long segmentLength = endtime - starttime;
         if (1000 * stabilityThresholdPrefilter < segmentLength) {
           Segment segment = videoContent.getTemporalDecomposition()
               .createSegment("segment-" + segmentcount);
           segment.setMediaTime(new MediaRelTimeImpl(starttime,
               endtime - starttime));
+          logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime, endtime);
           segments.add(segment);
           segmentcount++;
           starttime = endtime;
@@ -699,8 +711,9 @@ VideoSegmenterService, ManagedService {
       // Add last segment
       Segment s = videoContent.getTemporalDecomposition()
           .createSegment("segment-" + segmentcount);
-      s.setMediaTime(new MediaRelTimeImpl(endtime, track
-          .getDuration() - endtime));
+      s.setMediaTime(new MediaRelTimeImpl(starttime, track.getDuration() - starttime));
+      logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime,
+              track.getDuration() - endtime);
       segments.add(s);
     }
 

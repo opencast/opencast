@@ -144,7 +144,7 @@ public class SilenceDetectorTest {
     final URI trackUri = getResource("/silent.mp4");
     FFmpegSilenceDetector sd = init(trackUri);
     assertNotNull(sd.getMediaSegments());
-    assertEquals(sd.getMediaSegments().getMediaSegments().size(), 0);
+    assertEquals(0, sd.getMediaSegments().getMediaSegments().size());
   }
 
 

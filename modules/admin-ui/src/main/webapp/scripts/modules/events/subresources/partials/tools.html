@@ -93,10 +93,10 @@
                                   <table class="main-tbl">
                                       <tr ng-repeat="row in episodeCatalog.fields track by $index">
                                           <td translate="{{ row.label }}"></td>
-                                          <td ng-if="row.id === 'created' ">{{ row.value  | localizeDate : 'dateTime' : 'medium' }}</td>
-                                          <td ng-if="row.id !== 'created' "  admin-ng-editable
+                                          <td admin-ng-editable
                                               required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                                              params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>
+                                              params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                                          </td>
                                       </tr>
                                   </table>
                               </div>

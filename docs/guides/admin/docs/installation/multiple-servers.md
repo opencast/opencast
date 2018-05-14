@@ -138,10 +138,10 @@ ActiveMQ 5.10 or above should work. ActiveMQ 5.6 will not work. Versions in betw
 
 ### Installation
 
- - If you use the Opencast RPM repository, simply install the `activemq-dist` package.
- - If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM repository
-   ](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
- - You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
+* If you use the Opencast RPM repository, simply install the `activemq-dist` package.
+* If you are running RHEL, CentOS or Fedora you can use the [ActiveMQ-dist Copr RPM
+  repository](https://copr.fedoraproject.org/coprs/lkiesow/apache-activemq-dist/)
+* You can download binary distributions from the [Apache ActiveMQ website](http://activemq.apache.org/download.html)
 
 
 ### Configuration

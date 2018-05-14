@@ -29,12 +29,12 @@ it automatically in the Opencast OSGi infrastructure. This can be done through t
 [bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The workflow would
 be as follows:
 
- - Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
-   bundles you want to watch.
- - Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
- - Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
- - Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
-   everything went smoothly by checking the log with `log:tail`.
+* Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
+  bundles you want to watch.
+* Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
+* Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
+* Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
+  everything went smoothly by checking the log with `log:tail`.
 
 The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that has
 this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current

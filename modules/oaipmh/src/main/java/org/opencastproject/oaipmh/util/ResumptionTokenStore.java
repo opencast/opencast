@@ -26,13 +26,13 @@ import org.opencastproject.oaipmh.server.ResumableQuery;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.collections.map.LRUMap;
+import org.apache.commons.collections4.map.LRUMap;
 
 import java.util.Collections;
 import java.util.Map;
 
 /**
- * Strategy to store resumption tokens. Uses a {@link org.apache.commons.collections.map.LRUMap}.
+ * Strategy to store resumption tokens. Uses a {@link org.apache.commons.collections4.map.LRUMap}.
  * <p>
  * Use in {@link org.opencastproject.oaipmh.server.OaiPmhRepository#saveQuery(org.opencastproject.oaipmh.server.ResumableQuery)}
  * and {@link org.opencastproject.oaipmh.server.OaiPmhRepository#getSavedQuery(String)}.

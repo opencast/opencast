@@ -23,26 +23,26 @@ Tags and flavors can be used in combination.
 The type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
 
 ### dcterm
-The name of the Dublin Core term to look for in the `dccatalog`. This could be one of the terms set by Opencast or an 
+The name of the Dublin Core term to look for in the `dccatalog`. This could be one of the terms set by Opencast or an
 additional term adding to the catalog.
- 
+
 ### match-value
 The value of the `dcterm` which to match against. The comparison is case sensitive.
 
 ### default-value
-If `default-value` is used when the `dcterm` is not found in the catalog. If not specified the operation will treat the 
-match as false and not configure anything. If `default-value` is specified the operation will compare the `match-value` 
-to the `default-value` and set the workflow property if they match. This allows an implied value to be explicitly and 
-clearly defined. For example if you have mediapackages that were created before additional metadata was added to the 
+If `default-value` is used when the `dcterm` is not found in the catalog. If not specified the operation will treat the
+match as false and not configure anything. If `default-value` is specified the operation will compare the `match-value`
+to the `default-value` and set the workflow property if they match. This allows an implied value to be explicitly and
+clearly defined. For example if you have mediapackages that were created before additional metadata was added to the
 episode catalog you may want to imply that the `audience` term has a value of `all-enrolled`.
 
 ### "configProperty"
-Specifies as the key the name of a new workflow configuration property and the boolean value to which it will be set if 
-the Dublin Core term matches the specified value. 
+Specifies as the key the name of a new workflow configuration property and the boolean value to which it will be set if
+the Dublin Core term matches the specified value.
 
-Due to the way a workflow evaluates operation `if` conditions as configuration properties are created, only new 
-configuration properties can be used to modify the execution of subsequent operations. Also since an undefined property 
-will be evaluted as `false` in practice the only useful value which can set is `true`.  However operation `if` 
+Due to the way a workflow evaluates operation `if` conditions as configuration properties are created, only new
+configuration properties can be used to modify the execution of subsequent operations. Also since an undefined property
+will be evaluted as `false` in practice the only useful value which can set is `true`.  However operation `if`
 conditions can be negated though so it is possible to skip subsequent operations on matched `dcterm`  value.
 
 ## Operation Example
@@ -64,7 +64,7 @@ conditions can be negated though so it is possible to skip subsequent operations
        id="publish-engage"
        if="${publishPrivate}"
        description="Publish to internal audience only">
-       ... 
+       ...
     </operation>
 
 
@@ -72,5 +72,5 @@ conditions can be negated though so it is possible to skip subsequent operations
        id="publish-youtube"
        if="NOT ${publishPrivate}"
        description="Publish to global audience">
-       ... 
+       ...
     </operation>

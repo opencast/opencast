@@ -17,7 +17,7 @@ module.exports = function (grunt) {
   // Automatically load required Grunt tasks
   require('jit-grunt')(grunt, {
     useminPrepare: 'grunt-usemin',
-    ngtemplates: 'grunt-angular-templates'
+    setupProxies: 'grunt-middleware-proxy'
   });
 
   // Configurable paths for the application
@@ -85,43 +85,39 @@ module.exports = function (grunt) {
         }
       },
       proxy: {
-          options: {
-              keepalive: true,
-              livereload: true,
-              debug: false,
-              proxyPort: '<%= proxyPort %>',
-              middleware: proxyMiddleware(grunt, appConfig.app)
-          },
-          proxies: [ {
-              context: '/admin-ng',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-           },
-           {
-              context: '/acl-manager',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/i18n',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/broker',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          },
-          {
-              context: '/services',
-              host: 'localhost',
-              port: '<%= proxyPort %>',
-              https: false,
-          }]
+        options: {
+          keepalive: true,
+          livereload: true,
+          debug: false,
+          proxyPort: '<%= proxyPort %>',
+          middleware: proxyMiddleware(grunt, appConfig.app)
+        },
+        proxies: [{
+          context: '/admin-ng',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/acl-manager',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/i18n',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/broker',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }, {
+          context: '/services',
+          host: 'localhost',
+          port: '<%= proxyPort %>',
+          https: false
+        }]
       },
       test: {
         options: {
@@ -229,17 +225,17 @@ module.exports = function (grunt) {
         devDependencies: true,
         src: '<%= karma.options.configFile %>',
         ignorePath:  /\.\.\//,
-        fileTypes:{
+        fileTypes: {
           js: {
             block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
-              detect: {
-                js: /'(.*\.js)'/gi
-              },
-              replace: {
-                js: '\'../{{filePath}}\','
-              }
+            detect: {
+              js: /'(.*\.js)'/gi
+            },
+            replace: {
+              js: '\'../{{filePath}}\','
             }
           }
+        }
       },
       sass: {
         src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
@@ -249,29 +245,29 @@ module.exports = function (grunt) {
 
     // Compiles Sass to CSS and generates necessary files if requested
     sass: {
-        options: {
-            includePaths: [
-                'bower_components'
-            ]
-        },
-        dist: {
-            files: [{
-                expand: true,
-                cwd: '<%= yeoman.app %>/styles',
-                src: ['*.scss'],
-                dest: '.tmp/styles',
-                ext: '.css'
-            }]
-        },
-        server: {
-            files: [{
-                expand: true,
-                cwd: '<%= yeoman.app %>/styles',
-                src: ['*.scss'],
-                dest: '.tmp/styles',
-                ext: '.css'
-            }]
-        }
+      options: {
+        includePaths: [
+          'bower_components'
+        ]
+      },
+      dist: {
+        files: [{
+          expand: true,
+          cwd: '<%= yeoman.app %>/styles',
+          src: ['*.scss'],
+          dest: '.tmp/styles',
+          ext: '.css'
+        }]
+      },
+      server: {
+        files: [{
+          expand: true,
+          cwd: '<%= yeoman.app %>/styles',
+          src: ['*.scss'],
+          dest: '.tmp/styles',
+          ext: '.css'
+        }]
+      }
     },
 
     // Renames files for browser caching purposes
@@ -339,9 +335,19 @@ module.exports = function (grunt) {
       }
     },
 
+    concat: {
+      options: {
+        sourceMap: true,
+        sourceMapStyle: 'inline'
+      }
+    },
+
     // ng-annotate tries to make the code safe for minification automatically
     // by using the Angular long form for dependency injection.
     ngAnnotate: {
+      options: {
+        sourceMap: true
+      },
       dist: {
         files: [{
           expand: true,
@@ -349,6 +355,43 @@ module.exports = function (grunt) {
           src: '*.js',
           dest: '.tmp/concat/scripts'
         }]
+      }
+    },
+
+    // The sourcemaps embedded by ngAnnotate are sometimes missing
+    // a trailing newline, which is expected by extract_sourcemap
+    endline: {
+      ngAnnotate: {
+        files: [{
+          src: '.tmp/concat/scripts/*.js',
+          dest: '.'
+        }]
+      }
+    },
+
+    // Uglify generate bogus sourcemaps when trying to take into account
+    // a preexisting inline sourcemap, so we extract the inline sourcemaps
+    // that ngAnnotate generates into their own files.
+    // Note that ngAnnotate **can** actually output external source maps, too,
+    // but in that mode, it does not in turn take into account any preexisting sourcemap.
+
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+    extract_sourcemap: {
+    // jscs:disable requireCamelCaseOrUpperCaseIdentifiers
+      ngAnnotate: {
+        files: [{
+            src: '.tmp/concat/scripts/*.js',
+            dest: '.tmp/concat/scripts'
+        }]
+      }
+    },
+
+    uglify: {
+      options: {
+        sourceMap: true,
+        sourceMapIn: function (file) {
+          return file + '.map';
+        }
       }
     },
 
@@ -436,7 +479,8 @@ module.exports = function (grunt) {
 
   grunt.registerTask('serve', 'Compile then start a connect web server', function (target) {
     if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
+      grunt.task.run(['build', 'connect:dist:keepalive']);
+      return;
     }
 
     grunt.task.run([
@@ -478,6 +522,8 @@ module.exports = function (grunt) {
       'postcss',
       'concat',
       'ngAnnotate',
+      'endline',
+      'extract_sourcemap',
       'copy:dist',
       'cssmin',
       'uglify',
@@ -490,12 +536,6 @@ module.exports = function (grunt) {
   grunt.registerTask('default', [
     'serve'
   ]);
-
-  grunt.loadNpmTasks('grunt-middleware-proxy');
-  grunt.loadNpmTasks('grunt-sass');
-  grunt.loadNpmTasks('grunt-postcss');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-reload');
 
   // Base task for the development with proxy to a real backend
   grunt.registerTask('proxy', [
