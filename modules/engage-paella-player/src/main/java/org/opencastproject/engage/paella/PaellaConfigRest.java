@@ -91,7 +91,7 @@ public class PaellaConfigRest {
       if (StringUtils.isBlank(paellaConfigFolder)) {
         throw new ConfigurationException("Paella configuration not set and unable to fall back to default location");
       }
-      paellaConfigFolder += "/paella";
+      paellaConfigFolder = new File(paellaConfigFolder, "paella").getAbsolutePath();
     }
     logger.debug("Paella configuration folder is {}", paellaConfigFolder);
   }
