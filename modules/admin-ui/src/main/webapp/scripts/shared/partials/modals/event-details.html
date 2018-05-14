@@ -8,19 +8,23 @@
     </header>
 
     <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="EVENTS.EVENTS.DETAILS.TABS.GENERAL" with-role="ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW">
-            <!-- General -->
-        </a>
+
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
             <!-- Metadata -->
         </a>
         <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.EVENTS.DETAILS.TABS.EXTENDED-METADATA" with-role="ROLE_UI_EVENTS_DETAILS_METADATA_VIEW">
             <!-- Ext-Metadata -->
         </a>
-<!--         <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a> -->
+
+        <a ng-click="openTab('publications')" data-modal-tab="publications" ng-class="{ active: tab == 'publications' }" translate="EVENTS.EVENTS.DETAILS.TABS.PUBLICATIONS" with-role="ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW">
+          <!-- Publications -->
+        </a>
+
+        <!--         <a ng-click="openTab('media')" data-modal-tab="media" ng-class="{ active: tab == 'media' }" translate="EVENTS.EVENTS.DETAILS.TABS.MEDIA" with-role="ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW">Media</a> -->
         <a ng-click="openTab('assets')" data-modal-tab="assets" ng-class="{ active: tab == 'assets' }" translate="EVENTS.EVENTS.DETAILS.TABS.ASSETS" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW">
             <!-- Assets -->
         </a>
+
         <a ng-click="openTab('scheduling')" data-modal-tab="scheduling" ng-class="{ active: tab == 'scheduling' }" translate="EVENTS.EVENTS.DETAILS.TABS.SCHEDULING" with-role="ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" ng-if="scheduling.hasProperties">
             <!-- Scheduling -->
         </a>
@@ -40,20 +44,20 @@
     <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
     <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
 
-    <div class="modal-content" data-modal-tab-content="general">
+    <div class="modal-content" data-modal-tab-content="publications">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
                 <div class="obj list-obj">
-                    <header translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_STATUS">
+                    <header translate="EVENTS.EVENTS.DETAILS.PUBLICATIONS.CAPTION">
                         <!-- Publication Status -->
                     </header>
-                    <div class="obj-container" ng-if="general">
-                        <p translate="EVENTS.EVENTS.DETAILS.GENERAL.PUBLICATION_DESCRIPTION" ng-show="general.publications.length">
+                    <div class="obj-container" ng-if="publications">
+                        <p translate="EVENTS.EVENTS.DETAILS.PUBLICATIONS.PUBLICATION_DESCRIPTION" ng-show="publications.publications.length">
                           <!-- This event has been published to the following publication channels: -->
                         </p>
                         <ul>
-                            <li ng-repeat="publication in general.publications | orderBy:'order' track by $index" ng-if="!publication.hide">
+                            <li ng-repeat="publication in publications.publications | orderBy:'order' track by $index" ng-if="!publication.hide">
                                 <div class="v-container">
                                     <span class="icon-container"><i custom-icon="{{ publication.icon }}" class="video-icon"></i></span>
                                     <div>
@@ -61,12 +65,12 @@
                                       <p class="description" translate="{{ publication.description }}" ng-if="publication.description">{{ publication.description }}</p>
                                     </div>
                                     <a data-ng-show="publication.enabled" href="{{ publication.url }}" class="play"></a>
-                                    <span data-ng-hide="publication.enabled" translate="EVENTS.EVENTS.DETAILS.GENERAL.LIVE_EVENT_NOT_IN_PROGRESS" style="display: inline-block;float: right;margin-left: auto;" >
+                                    <span data-ng-hide="publication.enabled" translate="EVENTS.EVENTS.DETAILS.PUBLICATIONS.LIVE_EVENT_NOT_IN_PROGRESS" style="display: inline-block;float: right;margin-left: auto;" >
                                     </span>
                                 </div>
                             </li>
                         </ul>
-                        <p ng-hide="general.publications.length" translate="EVENTS.EVENTS.DETAILS.GENERAL.NO_PUBLICATIONS_AVAILABLE">
+                        <p ng-hide="publications.publications.length" translate="EVENTS.EVENTS.DETAILS.PUBLICATIONS.NO_PUBLICATIONS_AVAILABLE">
                         </p>
                     </div>
                 </div>
@@ -139,7 +143,7 @@
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
                                     <th class="medium">
-                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAttachmentsResource', 'newassetupload', false, true)" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
+                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
                                       </a>
                                     </th>
                                 </tr>
@@ -151,7 +155,7 @@
                                     </td>
                                     <td>{{ assets.attachments }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAttachmentsResource', 'attachment')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAssetAttachmentsResource', 'attachment')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -162,7 +166,7 @@
                                     </td>
                                     <td>{{ assets.catalogs }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventCatalogsResource', 'catalog')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventAssetCatalogsResource', 'catalog')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -171,7 +175,7 @@
                                     <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></td>
                                     <td>{{ assets.media }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventMediaResource', 'media')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventAssetMediaResource', 'media')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -182,7 +186,7 @@
                                     </td>
                                     <td>{{ assets.publications }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventPublicationsResource', 'publication')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventAssetPublicationsResource', 'publication')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -911,7 +915,7 @@
       </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">
+    <div class="modal-content" data-modal-tab-content="asset-attachments" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.ATTACHMENTS.TITLE">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
@@ -950,7 +954,7 @@
         </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="catalogs" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TITLE">
+    <div class="modal-content" data-modal-tab-content="asset-catalogs" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.CATALOGS.TITLE">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
@@ -989,7 +993,7 @@
         </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="media" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TITLE">
+    <div class="modal-content" data-modal-tab-content="asset-media" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.TITLE">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">
@@ -1026,7 +1030,7 @@
         </div>
     </div>
 
-    <div class="modal-content" data-modal-tab-content="publications" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TITLE">
+    <div class="modal-content" data-modal-tab-content="asset-publications" data-parent="assets" data-level="2" data-label="EVENTS.EVENTS.DETAILS.ASSETS.PUBLICATIONS.TITLE">
         <div class="modal-body">
             <div data-admin-ng-notifications="" context="events-access"></div>
             <div class="full-col">

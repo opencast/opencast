@@ -44,7 +44,7 @@ describe('event details', function () {
             });
 
             it('is able to navigate back', function () {
-                page.modal.generalTab.click();
+                page.modal.publicationsTab.click();
                 expect(page.modal.content.getText()).toContain('Publication Status');
                 expect(page.modal.content.getText()).not.toContain('Event Details');
             });

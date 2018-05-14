@@ -27,7 +27,7 @@ exports.EventsPage = function () {
     this.modal.metadataTab      = element(by.linkText('Metadata'));
     this.modal.mediaTab         = element(by.linkText('Media'));
     this.modal.attachmentsTab   = element(by.linkText('Attachments'));
-    this.modal.generalTab       = element(by.linkText('General'));
+    this.modal.publicationsTab  = element(by.linkText('Publications'));
     this.modal.workflowsTab     = element(by.linkText('Workflows'));
     this.modal.commentsTab      = element(by.linkText('Comments'));
     this.modal.closeButton      = element(by.css('a.close-modal'));
@@ -47,8 +47,8 @@ exports.EventsPage = function () {
     this.attachments = {};
     this.attachments.firstAttachmentTd = element(by.css('.modal-content.active td:nth-of-type(1)'));
 
-    this.general = {};
-    this.general.publications   = element.all(by.css('div[data-modal-tab-content="general"] ul li'));
+    this.publications = {};
+    this.publications.publications   = element.all(by.css('div[data-modal-tab-content="publications"] ul li'));
 
     this.media = {};
     this.media.firstRow         = element(by.css('div[data-modal-tab-content="media"] table tbody tr'));

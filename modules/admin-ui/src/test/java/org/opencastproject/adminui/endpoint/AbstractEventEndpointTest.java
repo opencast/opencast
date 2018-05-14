@@ -90,14 +90,14 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
-  public void testGetEventGeneralTab() throws Exception {
+  public void testGetEventPublicationsTab() throws Exception {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
-            .get(rt.host("{eventId}/general.json"));
+            .get(rt.host("{eventId}/publications.json"));
 
-    String eventString = IOUtils.toString(getClass().getResource("/eventGeneral.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/eventPublications.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-            .get(rt.host("{eventId}/general.json")).asString();
+            .get(rt.host("{eventId}/publications.json")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
