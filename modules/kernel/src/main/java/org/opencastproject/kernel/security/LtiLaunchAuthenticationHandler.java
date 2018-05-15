@@ -68,9 +68,6 @@ public class LtiLaunchAuthenticationHandler
   /** The LTI field containing the context_id */
   public static final String CONTEXT_ID = "context_id";
 
-  /** The LTI field containing the name of a custom context id */
-  public static final String CUSTOM_CONTEXT_ID_PARAM = "custom_context_id_param";
-
   /** The prefix for LTI user ids */
   public static final String LTI_USER_ID_PREFIX = "lti";
 
@@ -95,6 +92,9 @@ public class LtiLaunchAuthenticationHandler
   /** list of keys that will be highly */
   protected List<String> highlyTrustedKeys = new ArrayList<String>();
 
+  /** Name of the (optional) custom context id parameter */
+  protected String customContextIdParam = null;
+
   /**
    * Constructs a new LTI authentication handler, using the supplied user details service for performing user lookups.
    *
@@ -109,6 +109,7 @@ public class LtiLaunchAuthenticationHandler
    * Full constructor for a LTI authentication handler that includes a list of highly trusted keys
    *
    * @param userDetailsService
+   * @param securityService
    * @param highlyTrustedkeys
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
@@ -116,6 +117,28 @@ public class LtiLaunchAuthenticationHandler
     this.userDetailsService = userDetailsService;
     this.securityService = securityService;
     this.highlyTrustedKeys = highlyTrustedkeys;
+  }
+
+/**
+   * Full constructor for a LTI authentication handler that includes a list of highly trusted keys and a custom
+   * context id parameter to allow overriding the context id with the value of an alternative LTI parameter
+   *
+   * @param userDetailsService
+   * @param securityService
+   * @param highlyTrustedkeys
+   * @param customContextIdParam
+   */
+  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
+          List<String> highlyTrustedkeys, String customContextIdParam) {
+    this(userDetailsService, securityService, highlyTrustedkeys);
+    // The value of customContextIdParam will refer to the name of another parameter to use as the context id
+    // For example
+    //   context_label=Foo
+    //   custom_param=Bar
+    // The customContextIdParam value can be set to context_label, in which case 'Foo' will be used as the context id.
+    // To allow for an arbitrary value, customContextIdParam can be set to the name of another custom parameter, such
+    // as custom_param, in which case the context id that will be used would be 'Bar'
+    this.customContextIdParam = customContextIdParam;
   }
 
   /**
@@ -169,14 +192,16 @@ public class LtiLaunchAuthenticationHandler
     Collection<GrantedAuthority> userAuthorities = null;
     String roles = request.getParameter(ROLES);
     String context = request.getParameter(CONTEXT_ID);
-    // Override the context_id if custom_context_id_param is set, allowing a more friendly value to be used
-    String customContextParam = request.getParameter(CUSTOM_CONTEXT_ID_PARAM);
-    String customContext = request.getParameter(customContextParam);
-    if (StringUtils.isNotBlank(customContext)) {
-      logger.debug("Setting context_id to value of parameter specified as custom_context_id_param: {}", customContextParam);
-      context = request.getParameter(customContextParam);
+    if (this.customContextIdParam != null) {
+      // Override the context_id if this.custom_context_id_param is set, allowing a more friendly value to be used
+      String customContextParam = request.getParameter(this.customContextIdParam);
+      String customContext = request.getParameter(customContextParam);
+      if (StringUtils.isNotBlank(customContext)) {
+        logger.debug("Setting context_id to value of parameter specified as custom_context_id_param: {}", customContextParam);
+        context = request.getParameter(customContextParam);
+      }
+      logger.debug("Context id: {}", context);
     }
-    logger.debug("Context id: {}", context);
     try {
       userDetails = userDetailsService.loadUserByUsername(userIdFromConsumer);
 
