@@ -284,6 +284,10 @@
             }
         }
 
+        &.nowrap {
+            white-space: nowrap;
+        }
+
         // For action row that only has one button
         &.single-btn > a {
             margin-left: 10px;
