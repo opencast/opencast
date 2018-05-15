@@ -357,4 +357,39 @@ public class ServiceRegistryJpaImplTest {
     }
   }
 
+  @Test
+  public void testUpdateJobFailed() throws Exception {
+    serviceRegistryJpaImpl.activate(null);
+    registerTestHostAndService();
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
+    job.setStatus(Job.Status.FAILED);
+    Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
+    Assert.assertNotNull(updatedJob.getDateCompleted());
+  }
+
+  @Test
+  public void testUpdateJobFinished() throws Exception {
+    serviceRegistryJpaImpl.activate(null);
+    registerTestHostAndService();
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
+    job.setStatus(Job.Status.FINISHED);
+    Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
+    Assert.assertNotNull(updatedJob.getDateCompleted());
+    Assert.assertNotNull(updatedJob.getRunTime());
+  }
+
+  @Test
+  public void testCompletedRuntimeDoNotChange() throws Exception {
+    serviceRegistryJpaImpl.activate(null);
+    registerTestHostAndService();
+    Job job = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE, TEST_PATH, null, null, true, null, 1.0f);
+    job.setStatus(Job.Status.FINISHED);
+    Job updatedJob = serviceRegistryJpaImpl.updateJob(job);
+    Date dateCompleted = updatedJob.getDateCompleted();
+    Long runTime = updatedJob.getRunTime();
+    updatedJob = serviceRegistryJpaImpl.updateJob(updatedJob);
+    Assert.assertEquals(dateCompleted, updatedJob.getDateCompleted());
+    Assert.assertEquals(runTime, updatedJob.getRunTime());
+  }
+
 }

@@ -1106,13 +1106,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
     } else if (Status.FAILED.equals(status)) {
       // failed jobs may not have even started properly
-      fromDb.setDateCompleted(now);
-      jpaJob.setDateCompleted(now);
-      job.setDateCompleted(now);
-      if (job.getDateStarted() != null) {
-        jpaJob.setRunTime(now.getTime() - job.getDateStarted().getTime());
-        fromDb.setRunTime(now.getTime() - job.getDateStarted().getTime());
-        job.setRunTime(now.getTime() - job.getDateStarted().getTime());
+      if (job.getDateCompleted() == null) {
+        fromDb.setDateCompleted(now);
+        jpaJob.setDateCompleted(now);
+        job.setDateCompleted(now);
+        if (job.getDateStarted() != null) {
+          jpaJob.setRunTime(now.getTime() - job.getDateStarted().getTime());
+          fromDb.setRunTime(now.getTime() - job.getDateStarted().getTime());
+          job.setRunTime(now.getTime() - job.getDateStarted().getTime());
+        }
       }
     } else if (Status.FINISHED.equals(status)) {
       if (job.getDateStarted() == null) {
@@ -1121,12 +1123,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         jpaJob.setDateStarted(job.getDateCreated());
         job.setDateStarted(job.getDateCreated());
       }
-      jpaJob.setDateCompleted(now);
-      jpaJob.setRunTime(now.getTime() - job.getDateStarted().getTime());
-      fromDb.setDateCompleted(now);
-      fromDb.setRunTime(now.getTime() - job.getDateStarted().getTime());
-      job.setDateCompleted(now);
-      job.setRunTime(now.getTime() - job.getDateStarted().getTime());
+      if (job.getDateCompleted() == null) {
+        jpaJob.setDateCompleted(now);
+        jpaJob.setRunTime(now.getTime() - job.getDateStarted().getTime());
+        fromDb.setDateCompleted(now);
+        fromDb.setRunTime(now.getTime() - job.getDateStarted().getTime());
+        job.setDateCompleted(now);
+        job.setRunTime(now.getTime() - job.getDateStarted().getTime());
+      }
     }
   }
 
