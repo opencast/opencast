@@ -176,7 +176,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
     long totalTimeInQueue = 0;
     Map<Job, Track> encodingJobs = new HashMap<>();
     for (Track track : sourceTracks) {
-      logger.info("Encoding track {} using encoding profile '{}'", track, profile);
+      logger.info("Demuxing track {} using encoding profile '{}'", track, profile);
       // Start encoding and wait for the result
       encodingJobs.put(composerService.demux(track, profile.getIdentifier()), track);
     }
@@ -211,19 +211,19 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
 
       // Flavor each track in the order read
-      int i = 0;
-      int j = 0;
+      int flavorIndex = 0;
+      int tagsIndex = 0;
       for (Track composedTrack : composedTracks) {
         // set flavor to the matching flavor in the order listed
-        composedTrack.setFlavor(newFlavor(sourceTrack, targetFlavors.get(i)));
+        composedTrack.setFlavor(newFlavor(sourceTrack, targetFlavors.get(flavorIndex)));
         if (targetFlavors.size() > 1) {
-          i++;
+          flavorIndex++;
         }
         if (targetTags.length > 0) {
-          asList(targetTags[j]).forEach(composedTrack::addTag);
-          logger.trace("Tagging composed track with '{}'", targetTags[j]);
+          asList(targetTags[tagsIndex]).forEach(composedTrack::addTag);
+          logger.trace("Tagging composed track with '{}'", targetTags[tagsIndex]);
           if (targetTags.length > 1) {
-            j++;
+            tagsIndex++;
           }
         }
         // store new tracks to mediaPackage
@@ -234,9 +234,8 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
       }
     }
 
-    WorkflowOperationResult result = createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
     logger.debug("Demux operation completed");
-    return result;
+    return createResult(mediaPackage, Action.CONTINUE, totalTimeInQueue);
   }
 
   private MediaPackageElementFlavor newFlavor(Track track, String flavor) throws WorkflowOperationException {
@@ -253,7 +252,7 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
         flavorSubtype = track.getFlavor().getSubtype();
       return (new MediaPackageElementFlavor(flavorType, flavorSubtype));
     } catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException("Target flavor '" + flavor + "' is malformed");
+      throw new WorkflowOperationException(String.format("Target flavor '%s' is malformed", flavor));
     }
   }
 

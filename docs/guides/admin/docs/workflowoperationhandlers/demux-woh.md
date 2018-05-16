@@ -11,12 +11,12 @@ order listed in the encoding profile output.
 Parameter Table
 ---------------
 
-|configuration keys | example                     | description                                                         |
-|-------------------|-----------------------------|----------------------------------------|
-|source-flavors     |`multitrack/source`          | Which media should be encoded          |
-|target-tags        |`archive,rss;rss`            | Specifies the tags of the new media    |
-|target-flavors     |`presenter/*,presentation/*` | Specifies the flavors of the new media |
-|encoding-profile   |`demux`                      | Specifies the encoding profile         |
+|Configuration Key |Example                      |Description                            |
+|------------------|-----------------------------|---------------------------------------|
+|source-flavors    |`multitrack/source`          |Which media should be encoded          |
+|target-tags       |`archive,rss;rss`            |Specifies the tags of the new media    |
+|target-flavors    |`presenter/*,presentation/*` |Specifies the flavors of the new media |
+|encoding-profile  |`demux`                      |Specifies the encoding profile         |
 
 Note that `target-tags` can hold multiple sets of tags separated by `;`. Each set is applied to the matching set of
 output files (same order). Target flavors are separated by `,` as usual. They are applied in order as well.
