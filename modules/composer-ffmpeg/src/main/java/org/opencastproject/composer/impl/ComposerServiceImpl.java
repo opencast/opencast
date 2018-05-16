@@ -54,6 +54,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -73,8 +74,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -705,13 +708,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+  public Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException {
-    return concat(profileId, outputDimension, -1.0f, tracks);
+    return concat(profileId, outputDimension, -1.0f, sameCodec, tracks);
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException {
     ArrayList<String> arguments = new ArrayList<String>();
     arguments.add(0, profileId);
@@ -721,8 +724,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       arguments.add(1, "");
     }
     arguments.add(2, String.format(Locale.US, "%f", outputFrameRate));
+    arguments.add(3, Boolean.toString(sameCodec));
     for (int i = 0; i < tracks.length; i++) {
-      arguments.add(i + 3, MediaPackageElementParser.getAsXml(tracks[i]));
+      arguments.add(i + 4, MediaPackageElementParser.getAsXml(tracks[i]));
     }
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
@@ -733,7 +737,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   private Option<Track> concat(Job job, List<Track> tracks, String profileId, Dimension outputDimension,
-          float outputFrameRate)
+          float outputFrameRate, boolean sameCodec)
           throws EncoderException, MediaPackageException {
 
     if (tracks.size() < 2) {
@@ -752,7 +756,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
     }
 
-    if (!onlyAudio && outputDimension == null) {
+    if (!sameCodec && !onlyAudio && outputDimension == null) {
       Map<String, String> params = new HashMap<>();
       params.put("tracks", StringUtils.join(tracks, ","));
       incident().recordFailure(job, CONCAT_NO_DIMENSION, params);
@@ -785,9 +789,26 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     // Get the encoding profile
     EncodingProfile profile = getProfile(job, profileId);
-
+    String concatCommand;
+    File fileList = null;
     // Creating video filter command for concat
-    final String concatCommand = buildConcatCommand(onlyAudio, outputDimension, outputFrameRate, trackFiles, tracks);
+    if (sameCodec) {
+      // create file list to use Concat demuxer - lossless - pack contents into a single container
+      fileList = new File(workspace.rootDirectory(), "concat_tracklist_" + job.getId() + ".txt");
+      fileList.deleteOnExit();
+      try (PrintWriter printer = new PrintWriter(new FileWriter(fileList, true))) {
+        for (Track track : tracks) {
+          printer.append("file '").append(workspace.get(track.getURI()).getAbsolutePath()).append("'\n");
+        }
+      } catch (IOException e) {
+        throw new EncoderException("Cannot create file list for concat", e);
+      } catch (NotFoundException e) {
+        throw new EncoderException("Cannot find track filename in workspace for concat", e);
+      }
+      concatCommand = "-f concat -safe 0 -i " + fileList.getAbsolutePath();
+    } else {
+      concatCommand = buildConcatCommand(onlyAudio, outputDimension, outputFrameRate, trackFiles, tracks);
+    }
 
     Map<String, String> properties = new HashMap<>();
     properties.put(EncoderEngine.CMD_SUFFIX + ".concatCommand", concatCommand);
@@ -808,6 +829,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw e;
     } finally {
       activeEncoder.remove(encoderEngine);
+      if (fileList != null) {
+        FileSupport.deleteQuietly(fileList);
+      }
     }
 
     // concat did not return a file
@@ -1298,12 +1322,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           if (StringUtils.isNotBlank(dimensionString))
             outputDimension = Serializer.dimension(JsonObj.jsonObj(dimensionString));
           float outputFrameRate = NumberUtils.toFloat(frameRateString, -1.0f);
+          boolean sameCodec = Boolean.parseBoolean(arguments.get(3));
           List<Track> tracks = new ArrayList<>();
-          for (int i = 3; i < arguments.size(); i++) {
-            tracks.add(i - 3, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
+          for (int i = 4; i < arguments.size(); i++) {
+            tracks.add(i - 4, (Track) MediaPackageElementParser.getFromXml(arguments.get(i)));
           }
-          serialized = concat(job, tracks, encodingProfile, outputDimension, outputFrameRate).map(
-                  MediaPackageElementParser.getAsXml()).getOrElse("");
+          serialized = concat(job, tracks, encodingProfile, outputDimension, outputFrameRate, sameCodec).map(
+              MediaPackageElementParser.getAsXml()).getOrElse("");
           break;
         case ImageToVideo:
           Attachment image = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(1));
