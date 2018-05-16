@@ -482,7 +482,7 @@ function (AuthService, PlayerAdapter, $document, VideoService, $timeout) {
             /**
              * Removes the given segment.
              *
-             * The previous or, failing that, the next segment will take up
+             * The next or, failing that, the previous segment will take up
              * the space of the given segment.
              *
              * @param {Event} event that triggered the merge action
@@ -500,11 +500,11 @@ function (AuthService, PlayerAdapter, $document, VideoService, $timeout) {
 
                 var index = scope.video.segments.indexOf(segment);
 
-                if (scope.video.segments[index - 1]) {
-                    scope.video.segments[index - 1].end = segment.end;
-                    scope.video.segments.splice(index, 1);
-                } else if (scope.video.segments[index + 1]) {
+                if (scope.video.segments[index + 1]) {
                     scope.video.segments[index + 1].start = segment.start;
+                    scope.video.segments.splice(index, 1);
+                } else if (scope.video.segments[index - 1]) {
+                    scope.video.segments[index - 1].end = segment.end;
                     scope.video.segments.splice(index, 1);
                 }
 
