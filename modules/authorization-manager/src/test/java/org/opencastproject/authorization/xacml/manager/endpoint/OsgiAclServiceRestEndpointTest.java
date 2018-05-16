@@ -21,7 +21,7 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -625,12 +625,12 @@ public class OsgiAclServiceRestEndpointTest {
     }
   }
 
-  public static Long extractTransitionId(com.jayway.restassured.response.Response r) throws Exception {
+  public static Long extractTransitionId(io.restassured.response.Response r) throws Exception {
     JSONObject json = (JSONObject) new JSONParser().parse(r.asString());
     return (Long) json.get("transitionId");
   }
 
-  public static Long extractAclId(com.jayway.restassured.response.Response r) throws Exception {
+  public static Long extractAclId(io.restassured.response.Response r) throws Exception {
     JSONObject json = (JSONObject) new JSONParser().parse(r.asString());
     return (Long) json.get("id");
   }

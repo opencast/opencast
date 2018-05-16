@@ -12,9 +12,9 @@ not be possible.
 
 On a high level, to use Stream security, these steps are required:
 
-- Install and configure the URL signing service and signing providers
-- Configure Opencast services (and, optionally, 3rd party services) that use the signing infrastructure to sign requests
-- Install and configure verification components
+* Install and configure the URL signing service and signing providers
+* Configure Opencast services (and, optionally, 3rd party services) that use the signing infrastructure to sign requests
+* Install and configure verification components
 
 URL Signing Service Installation
 --------------------------------
@@ -22,9 +22,9 @@ URL Signing Service Installation
 There are three modules that are built by default and need to be present on each Opencast node in order to initiate URL
 signing:
 
-- urlsigning-common
-- urlsigning-service-api
-- urlsigning-service-impl
+* urlsigning-common
+* urlsigning-service-api
+* urlsigning-service-impl
 
 If these modules are present, the URL signing service will be available, to which the URL signing providers can then
 register themselves.
@@ -41,10 +41,10 @@ settings for separate distributions (i.e. download or streaming servers, service
 
 Each configuration block consists of the following items:
 
-- **Key ID:** Key identifier, e.g. `demoKeyOne`
-- **Key secret:** Key value, e.g. `25DA2BA549CB62EF297977845259A`. The key-length is not predefined, but a key length of
+* **Key ID:** Key identifier, e.g. `demoKeyOne`
+* **Key secret:** Key value, e.g. `25DA2BA549CB62EF297977845259A`. The key-length is not predefined, but a key length of
   at least 128 bit is recommended. Any larger value will not increase security of the underlying algorithm.
-- **URL prefix:** The URL signing provider will only sign URLs that start with this value. This allows to support
+* **URL prefix:** The URL signing provider will only sign URLs that start with this value. This allows to support
   multiple distributions and different key pairs.
 
 A typical configuration looks like this:
@@ -95,7 +95,7 @@ provider to have one key for any URL that begins with one scheme, such as http, 
 signed with a single key. Or it could be configured so that each different scheme and hostname pair would have a
 different keys protecting each host’s URLs separately etc. Having the timing configurations separate from the key
 configuration allows the different types of URLs to be signed differently depending on the needs of the users without
-needing to configure this timing for all of the different keys. 
+needing to configure this timing for all of the different keys.
 
 ### Signing for Opencast-internal access
 
@@ -117,7 +117,7 @@ which are not properly signed or have expired will be rejected.
 
 Out of the box, Opencast provides an internal verification component:
 
-- Opencast internal UrlSigningFilter
+* Opencast internal UrlSigningFilter
 
 The following section is dedicated to the installation and configuration of the Opencast internal UrlSigningFilter. The
 stream security architecture allows the implementation for URL verification for third-party applications which are not
@@ -127,8 +127,8 @@ covered in this documentation.
 
 The Servlet filter providing the verification of requests to Opencast internal resources is implemented in the bundles:
 
-- urlsigning-verifier-service-api
-- urlsigning-verifier-service-impl
+* urlsigning-verifier-service-api
+* urlsigning-verifier-service-impl
 
 The filter uses a set of regular expressions to determine which requests to an Opencast instance need to be verified.
 
@@ -141,8 +141,8 @@ enabled.
 
 Two things need to be configured for the Opencast verification filter:
 
-- key pairs used to verify the signatures
-- paths and endpoints that need to be protected
+* key pairs used to verify the signatures
+* paths and endpoints that need to be protected
 
 The configuration is located at:
 
@@ -216,10 +216,10 @@ or *false* (refused).
 On the same documentation page URLs can be signed using the `/signing/sign` endpoint, and the access policy may be
 specified in that form as well. With this, several scenarios can be tested. Examples are:
 
-- URLs that have already expired or will expire at a known date
-- URLs that are not yet valid (if you provided a validFrom data in the access policy)
-- URLs that are missing some or all of the signing parameters (policy, keyId or signature)
-- URLs that are attempting to use signing parameters (policy and signature) from a different signed URL
+* URLs that have already expired or will expire at a known date
+* URLs that are not yet valid (if you provided a validFrom data in the access policy)
+* URLs that are missing some or all of the signing parameters (policy, keyId or signature)
+* URLs that are attempting to use signing parameters (policy and signature) from a different signed URL
 
 ### Verifying the URL
 
@@ -267,8 +267,8 @@ Decoding this Base64 encoded policy
 
 Inspecting and modifying the policy is useful for advanced testing, such as:
 
-- URLs where the policy was modified after signing
-- URLs where the policy was modified and resigned with a different key
+* URLs where the policy was modified after signing
+* URLs where the policy was modified and resigned with a different key
 
 ## Further information
 

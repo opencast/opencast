@@ -63,7 +63,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
    */
   @Override
@@ -73,7 +73,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * OSGi declarative service configuration callback.
-   * 
+   *
    * @param publicationService
    *          the publication service
    */
@@ -83,7 +83,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(ComponentContext)
    */
   @Override
@@ -93,7 +93,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(WorkflowInstance, JobContext)
    */
   @Override
@@ -106,7 +106,7 @@ public class RetractOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new IllegalArgumentException("No repository has been specified");
 
     try {
-      logger.info("Retracting media package {} from OAI-PMH publication repository", mediaPackage);
+      logger.info("Retracting media package {} publication from OAI-PMH repository {}", mediaPackage, repository);
 
       // Wait for OAI-PMH retraction to finish
       Job retractJob = publicationService.retract(mediaPackage, repository);

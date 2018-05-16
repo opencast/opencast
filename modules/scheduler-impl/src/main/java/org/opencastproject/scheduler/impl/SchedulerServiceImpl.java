@@ -113,6 +113,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -2747,82 +2748,94 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(indexName, "indexName");
 
     final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                int current = 1;
+    final Organization organization = new DefaultOrganization();
+    final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+    SecurityUtil.runAs(securityService, organization, user, new Effect0() {
+      @Override
+      protected void run() {
+        int current = 0;
 
-                AQueryBuilder query = assetManager.createQuery();
-                Props p = new Props(query);
-                AResult result = query
-                        .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-                                p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
-                                p.reviewStatus().target(), p.recordingStatus().target(),
-                                p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
-                        .where(withOrganization(query).and(query.hasPropertiesOf(p.namespace()))
-                                .and(withVersion(query)))
-                        .run();
-                final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
-                logger.info(
-                        "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
-                        indexName, total);
-                final int responseInterval = (total < 100) ? 1 : (total / 100);
-                try {
-                  for (ARecord record : result.getRecords()) {
-                    String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
-                    boolean optOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
-                    Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-                    Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-                    Set<String> presenters = getPresenters(
-                        record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-                    boolean blacklisted = isBlacklisted(record.getMediaPackageId(), start, end, agentId, presenters);
-                    Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
-                            .group(toKey, toValue);
-                    ReviewStatus reviewStatus = record.getProperties()
-                        .apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
-                    Date reviewDate = record.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG)).orNull();
-                    Opt<String> recordingStatus = record.getProperties()
-                            .apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
-                    Opt<Long> lastHeard = record.getProperties()
-                            .apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
+        AQueryBuilder query = assetManager.createQuery();
+        Props p = new Props(query);
+        AResult result = query
+                .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
+                        p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
+                        p.reviewStatus().target(), p.recordingStatus().target(),
+                        p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
+                .where(query.hasPropertiesOf(p.namespace()).and(withVersion(query)))
+                .run();
+        final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
+        logger.info(
+                "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
+                indexName, total);
+        final int responseInterval = (total < 100) ? 1 : (total / 100);
+        try {
+          for (ARecord record : result.getRecords()) {
+            current++;
+            if (record.getSnapshot().isNone()) {
+              logger.warn("Doesn't found a media package for an scheuled event {}", record.getMediaPackageId());
+              continue;
+            }
+            try {
+              Snapshot snapshot = record.getSnapshot().get();
+              Organization org = orgDirectoryService.getOrganization(snapshot.getOrganizationId());
+              User orgSystemUser = SecurityUtil.createSystemUser(systemUserName, org);
+              securityService.setOrganization(org);
+              securityService.setUser(orgSystemUser);
 
-                    Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.getSnapshot().get());
-                    Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.getSnapshot().get());
+              String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
+              boolean optOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
+              Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+              Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+              Set<String> presenters = getPresenters(
+                  record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
+              boolean blacklisted = isBlacklisted(record.getMediaPackageId(), start, end, agentId, presenters);
+              Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
+                      .group(toKey, toValue);
+              ReviewStatus reviewStatus = record.getProperties()
+                  .apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
+              Date reviewDate = record.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG)).orNull();
+              Opt<String> recordingStatus = record.getProperties()
+                      .apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
+              Opt<Long> lastHeard = record.getProperties()
+                      .apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
 
-                    sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
-                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
+              Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
+              Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
-                    if (((current % responseInterval) == 0) || (current == total)) {
-                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                              IndexRecreateObject
-                                      .update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
-                    }
-                    if (recordingStatus.isSome() && lastHeard.isSome())
-                      sendRecordingUpdate(
-                              new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
-                    current++;
-                  }
-                } catch (Exception e) {
-                  logger.warn("Unable to index scheduled instances:", e);
-                  throw new ServiceException(e.getMessage());
-                }
-              }
-            });
+              sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
+                      Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
 
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                        IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
-              }
-            });
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                      SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                      SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
+              if (recordingStatus.isSome() && lastHeard.isSome())
+                sendRecordingUpdate(
+                        new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
+            } finally {
+              securityService.setOrganization(organization);
+              securityService.setUser(user);
+            }
+            if (((current % responseInterval) == 0) || (current == total)) {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                      IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
+            }
+          }
+        } catch (Exception e) {
+          logger.warn("Unable to index scheduled instances:", e);
+          throw new ServiceException(e.getMessage());
+        }
+      }
+    });
+
+    SecurityUtil.runAs(securityService, organization, user, new Effect0() {
+      @Override
+      protected void run() {
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
+      }
+    });
   }
 
   @Override

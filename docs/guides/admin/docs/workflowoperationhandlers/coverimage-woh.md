@@ -95,7 +95,7 @@ Later on, you can use methods of those classes as shown in the following example
       <xsl:value-of select="opencast:XsltHelper.split(metadata/title, 30, 1, false())" />
     </tspan>
 
-Note: In XSLT, use `true()` and `false()` for boolean literals (`true` and `false` won't work since those are not 
+Note: In XSLT, use `true()` and `false()` for boolean literals (`true` and `false` won't work since those are not
 keywords in XSLT)
 
 The following classes are provided by the org.opencastproject.coverimage.impl.xsl package:

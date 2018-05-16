@@ -1,8 +1,9 @@
 Opencast Player - Matomo Tracking Plugin
 =======================================
 
-This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo please follow the instructions
-on the Matomo website: https://matomo.org/docs/installation/#the-5-minute-matomo-installation
+This plugin allows to use Matomo (https://matomo.org/), formerly known as Piwik, to track usage data. To setup Matomo
+please follow the instructions on the Matomo website:
+https://matomo.org/docs/installation/#the-5-minute-matomo-installation
 
 The plugin respects the [Do-Not-Track](https://en.wikipedia.org/wiki/Do_Not_Track) settings of a browser. You might also
 need to consider the legal requirements of your country when you setup Matomo.
@@ -26,7 +27,7 @@ Configuration
 ### prop.player.matomo.server
 
 The plugin shows a notification about the tracking to the user. This can be disabled with this option. (Default: true)
-Before you disable the notification, make sure that you do not violate any local regulations. 
+Before you disable the notification, make sure that you do not violate any local regulations.
 
 ### prop.player.matomo.server
 
@@ -49,17 +50,17 @@ property to prevent event tracking.
 
 Events that can be tracked:
 
-- play: play has been pressed (will also be called if after seeking).
-- pause: pause has been pressend (will also be called if before seeking).
-- seek: user jumps to a different time. Time in seconds will be stored
-- ended: video has reached the end
-- playbackrate: user changes the playback speed (values 0.75 to 3.00)
-- volume: Volume change by the user value 0.0 to 1.0
-- quality: manual change of video quality (quality tag is stored)
-- fullscreen: user presses fullscreen button
-- focus: user selects one video to be enlarged (flavor of selected video is stored)
-- layout_reset: user switches back to default layout
-- zoom: user changes the zoom of the video
+* play: play has been pressed (will also be called if after seeking).
+* pause: pause has been pressend (will also be called if before seeking).
+* seek: user jumps to a different time. Time in seconds will be stored
+* ended: video has reached the end
+* playbackrate: user changes the playback speed (values 0.75 to 3.00)
+* volume: Volume change by the user value 0.0 to 1.0
+* quality: manual change of video quality (quality tag is stored)
+* fullscreen: user presses fullscreen button
+* focus: user selects one video to be enlarged (flavor of selected video is stored)
+* layout_reset: user switches back to default layout
+* zoom: user changes the zoom of the video
 
 Tracked Data
 ------------
@@ -67,12 +68,12 @@ Tracked Data
 Additional to the event data that can be turned on for each event (see above), this Opencast specific data is tracked
 if tracking is allowed:
 
-- Page name as "<title of the event> - <lecturer name>"
-- Custom Matomo variables:
-  - "event" as "<title of the event> (<event id>)"
-  - "series" as "<title of the series> (<series id>)"
-  - "presenter"
-  - "view_mode" which can be "desktop", "mobile" or "embed"
+* Page name as "<title of the event> - <lecturer name>"
+* Custom Matomo variables:
+    * "event" as "<title of the event> (<event id>)"
+    * "series" as "<title of the series> (<series id>)"
+    * "presenter"
+    * "view_mode" which can be "desktop", "mobile" or "embed"
 
 Heartbeat data does not show how long a video has been played but how long a viewer remained on the page, while the page
 was in the foreground.

@@ -740,7 +740,7 @@ public class SeriesEndpoint {
   @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "createseries", description = "Creates a series.", returnDescription = "", restParameters = {
           @RestParameter(name = "metadata", isRequired = true, description = "Series metadata", type = STRING),
-          @RestParameter(name = "acl", description = "A collection of roles with their possible action", isRequired = false, type = STRING),
+          @RestParameter(name = "acl", description = "A collection of roles with their possible action", isRequired = true, type = STRING),
           @RestParameter(name = "theme", description = "The theme ID to be applied to the series", isRequired = false, type = STRING) }, reponses = {
                   @RestResponse(description = "A new series is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
                   @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST),
@@ -750,6 +750,9 @@ public class SeriesEndpoint {
           @FormParam("theme") String themeIdParam) throws UnauthorizedException, NotFoundException {
     if (isBlank(metadataParam))
       return R.badRequest("Required parameter 'metadata' is missing or invalid");
+
+    if (isBlank(aclParam))
+      return R.badRequest("Required parameter 'acl' is missing or invalid");
 
     MetadataList metadataList;
     try {

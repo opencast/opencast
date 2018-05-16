@@ -35,7 +35,7 @@ Provided the archetype is installed maven will now ask you for the properties co
     Define value for property 'version': 1.0-SNAPSHOT: : 1.5-SNAPSHOT
     Define value for property 'package': org.opencastproject: : org.opencastproject.engage.theodul.plugin.custom.test
     Define value for property 'plugin_description': : A test plugin
-    Define value for property 'plugin_name': : testName 
+    Define value for property 'plugin_name': : testName
     Define value for property 'plugin_type': : custom
     Define value for property 'plugin_version': : 0.1
     Define value for property 'plugin_rest': : false

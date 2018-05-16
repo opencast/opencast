@@ -7,12 +7,15 @@ Description
 The EmailWorkflowOperationHandler invokes the SMTP Service to send an email with the parameters provided. It is useful
 to send email notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
 
-The email body, if not specified by body or body-template-file, will consist of a single line of the form: `<Recording
-Title> (<Mediapackage ID>)`.
+The email body, if not specified by body or body-template-file, will consist of a single line of the form:
+`<Recording Title> (<Mediapackage ID>)`.
 
 Freemarker templates can be used in the following fields to allow replacement with values obtained from the workflow or
-media package: to, subject, and body. If body-template-file is specified, the operation will use a Freemarker template
+media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker template
 file located in `<config_dir>/etc/email` to generate the email body.
+
+User names can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched
+and that user's email address is used (see Example 5).
 
 
 Parameter Table
@@ -20,12 +23,12 @@ Parameter Table
 
 |configuration keys|description|default value|example|
 |------------------|-------|-----------|-------------|
-|body|Email body content.<br>Takes precedence over body-template-file.|```<Recording Title> (<Mediapackage ID>)```|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
+|body|Email body content.<br>Takes precedence over body-template-file.|`<Recording Title> (<Mediapackage ID>)`|Lecture 1 (4bf316fc-ea78-4903-b00e-9976b0912e4d)|
 |body-template-file|Name of file that will be used as a template for the content of the email body.|EMPTY|templateName|
-|subject|Specifies the email subject.|EMPTY|Operation has been completed|
-|to|It specifies the field to of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|cc|It specifies the field cc of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
-|bcc|It specifies the field bcc of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|subject|Email subject.|EMPTY|Operation has been completed|
+|to|The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|cc|The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|bcc|The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 
@@ -86,7 +89,7 @@ In your email template:
 
 ### Catalog fields
 
-Use ```${catalogs['SUBTYPE']['FIELD']}`
+Use `${catalogs['SUBTYPE']['FIELD']}`
 
 #### Examples
 
@@ -276,4 +279,39 @@ Logged incident of the error looks like this:
     <#list inc.details as dets>${dets.b} </#list>
   </#list>
 </#if>
+```
+
+### Example 5
+
+The user name is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email
+`jharvard@harvard.edu` defined in the system. The message will be sent to `jharvard@harvard.edu`:
+
+```xml
+   <operation
+      id="send-email"
+      fail-on-error="false"
+      description="Notify user associated to this recording that it is ready to be trimmed">
+      <configurations>
+        <configuration key="to">${(catalogs['episode']['contributor'])}</configuration>
+        <configuration key="subject">Recording is ready for EDIT</configuration>
+        <configuration key="body-template-file">eventDetails</configuration>
+      </configurations>
+    </operation>
+```
+
+#### Episode Dublin Core
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+    xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dcterms:contributor>jharvard</dcterms:contributor>
+    <dcterms:created>2018-05-01T16:14:00Z</dcterms:created>
+    <dcterms:extent xsi:type="dcterms:ISO8601">PT17M1.933S</dcterms:extent>
+    <dcterms:isPartOf>20180229999</dcterms:isPartOf>
+    <dcterms:spatial>classroom-20</dcterms:spatial>
+    <dcterms:temporal>start=2018-05-01T16:14:00Z; end=2018-05-01T16:31:00Z;
+        scheme=W3C-DTF;</dcterms:temporal>
+    <dcterms:title>Test Lecture</dcterms:title>
+</dublincore>
 ```

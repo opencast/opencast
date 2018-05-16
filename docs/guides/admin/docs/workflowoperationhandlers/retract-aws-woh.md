@@ -9,7 +9,7 @@ There are no configuration keys at this time.
 
 ## Operation Examples
 
-####Retract
+#### Retract
     <!-- Retract from AWS -->
 
     <operation

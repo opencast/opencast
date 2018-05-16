@@ -33,7 +33,6 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
@@ -543,11 +542,9 @@ public class ToolsEndpoint implements ManagedService {
     catalog.setChecksum(null);
 
     try {
-      // FIXME SWITCHP-333: Start in new thread
-      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      assetManager.takeSnapshot(mediaPackage);
     } catch (AssetManagerException e) {
-      logger.error("Error while adding the updated media package ({}) to the archive: {}", mediaPackage.getIdentifier(),
-              e.getMessage());
+      logger.error("Error while adding the updated media package ({}) to the archive", mediaPackage.getIdentifier(), e);
       throw new IOException(e);
     }
 

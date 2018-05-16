@@ -63,7 +63,7 @@ import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.Fn;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.delete.DeleteRequestBuilder;
 import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.search.SearchRequestBuilder;
@@ -470,7 +470,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     if (event == null)
       throw new NotFoundException("No event with id " + uid + " found.");
 
-    if (event.getWorkflowId() == workflowId) {
+    if (event.getWorkflowId() != null && event.getWorkflowId().equals(workflowId)) {
       logger.debug("Workflow {} is the current workflow of event {}. Removing it from event.", uid, workflowId);
       event.setWorkflowId(null);
       event.setWorkflowDefinitionId(null);

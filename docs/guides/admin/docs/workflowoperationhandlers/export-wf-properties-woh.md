@@ -15,7 +15,7 @@ properties can later be imported using the [ImportWfPropertiesWorkflowOperation]
 
 \* mandatory configuration key
 
-##Operation Example
+## Operation Example
 
     <operation
       id="export-wf-properties"

@@ -30,9 +30,9 @@ convention, they are written as:
 
 Some examples of expanded names are:
 
-- `{http://purl.org/dc/terms/}title`
-- `{http://mediapackage.opencastproject.org}mediapackage`
-- `{}term-with-an-empty-namespace`
+* `{http://purl.org/dc/terms/}title`
+* `{http://mediapackage.opencastproject.org}mediapackage`
+* `{}term-with-an-empty-namespace`
 
 The value of the `copy-metadata` may contain expanded and non-expanded names. In the latter case, the names will be
 expanded using the provided namespace, if any, or the DublinCore namespace by default.

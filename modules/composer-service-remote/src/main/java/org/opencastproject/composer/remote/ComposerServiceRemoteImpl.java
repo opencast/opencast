@@ -424,13 +424,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, Track... tracks)
+  public Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks)
           throws EncoderException, MediaPackageException {
-    return concat(profileId, outputDimension, -1.0f, tracks);
+    return concat(profileId, outputDimension, -1.0f, sameCodec, tracks);
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks)
+  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec,
+          Track... tracks)
           throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/concat");
     try {
@@ -440,6 +441,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
         params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
       params.add(new BasicNameValuePair("outputFrameRate", String.format(Locale.US, "%f", outputFrameRate)));
       params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
+      if (sameCodec)
+        params.add(new BasicNameValuePair("sameCodec", "true"));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);

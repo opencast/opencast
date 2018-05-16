@@ -46,11 +46,11 @@ For example, if you want OCR for German content, you want to run something like 
 
     tesseract in.tif out.txt -l deu -psm 3
 
-- The arguments `in.tif` and `out.txt` are automatically set by Opencast.
-- The argument `-l` specifies the language files used by Tesseract. `deu` specifies the German language. Multiple
+* The arguments `in.tif` and `out.txt` are automatically set by Opencast.
+* The argument `-l` specifies the language files used by Tesseract. `deu` specifies the German language. Multiple
   languages may be specified, separated by plus characters. Please make sure that you have installed the language packs
   you want to use on every worker (E.g. `yum install tesseract-langpack-deu`).
-- Finally `-psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
+* Finally `-psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
   but no orientation and script detection* which is actually the default. Hence in this case, the argument could simply
   be omitted. If you know more about your input videos, you might want to use different options here (not likely).
 
@@ -79,7 +79,7 @@ For this, edit the `/etc/opencast/encoding/opencast-images.properties` and modif
 extraction:
 
     profile.text-analysis.http.ffmpeg.command = -ss #{time} -i #{in.video.path} \
-	    -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
+      -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
       -frames:v 1 -pix_fmt:v gray -r 1 #{out.dir}/#{out.name}#{out.suffix}
 
 This profile will create a gray, high contrast image. The additional light blur will reduce or remove noise and thicken
@@ -99,9 +99,9 @@ errors, for testing and debugging, you want no filtering at all.
 Starting with version 1.6, Opencast provides three different kinds of implementation for filtering which can be just
 swapped out at any time:
 
- - dictionary-none
- - dictionary-regexp (default)
- - dictionary-hunspell
+* dictionary-none
+* dictionary-regexp (default)
+* dictionary-hunspell
 
 
 #### No Filtering (dictionary-none)

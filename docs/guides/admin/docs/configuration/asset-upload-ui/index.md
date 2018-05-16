@@ -132,7 +132,7 @@ Tasks:
 The following steps describe how to change the properties configuration.
 
 
-###Step 1. Determine your new option type and processing needs
+### Step 1. Determine your new option type and processing needs
 
 There are 3 asset upload types:
 
@@ -146,7 +146,7 @@ update or create  workflows to work with your new track flavor.
 Attachments and Catalogs, such as smil files, can also be used for processing. If you only need to publish manually
 uploaded assets with a unique flavor, this is already built into the default workflows.
 
-###Step 2. Add your new option to the list configuration
+### Step 2. Add your new option to the list configuration
 
 You add your new asset upload configuration as a row to this file:
 
@@ -161,17 +161,24 @@ Underbars are allowed. CONFIGURATION values are in JSON object format.
 Attribute    | Example         | Description
 -------------| ----------------| -----------
 id           | track_presenter | One of "attachment" or "catalog" or "track", underbar (_), unique text (no spaces)
-type         | track           | One of "attachment" or "catalog" or "track" to designate asset type
+type         | track           | One of "attachment" or "catalog" or "track" to designate asset type (must match id prefix)
 flavorType   | presentation    | The primary flavor type. Used to reference asset in workflows, player, and media module
 flavorSubType| source          | The sub flavor type. Used to identify the sub flavor of this flavor type
 multiple     | false           | true or false, used by the admin UI to enable single or multiple file input selection
 displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI
+displayOverride | 'My New Catalog'    | A short asset title which overrides all translations
+displayFallback | 'My New Catalog'    | A short asset title which displays when no translation is found
+displayOverride.SHORT | 'Video of a Presenter'    | A short source title which overrides all translations
+displayFallback.SHORT | 'Video of a Presenter'    | A short source title which displays when no translation is found
+displayOverride.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which overrides all translation
+displayFallback.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which displays when no translation is found
+
 
 The parameter key is internationalized as the display text in the admin UI
 ref: modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
 
 
-###Step 3. Add translation for the new option
+### Step 3. Add translation for the new option
 
 The option property key is internationalized for display in the Admin UI.
 Add a translation for the option property when adding new option, otherwise the Admin UI will display the raw key.
