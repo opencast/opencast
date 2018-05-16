@@ -42,7 +42,7 @@ install:
      tesseract-ocr-deu
      unzip
   - mkdir -p ~/.m2 ~/bin
-  - wget -q https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-64bit-static.tar.xz
+  - wget -q https://pkg.opencast.org/bin/ffmpeg-release-64bit-static.tar.xz
   - tar xf ffmpeg-release-64bit-static.tar.xz
   - mv ffmpeg-*/ff* ~/bin/
   - >
