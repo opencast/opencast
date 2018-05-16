@@ -1091,7 +1091,7 @@ public class SchedulerRestService {
                   @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "A detailed stack track of the internal issue.")})
   public Response getConflictingEventsJson(@QueryParam("agent") String device, @QueryParam("rrule") String rrule,
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
-          @QueryParam("timezone") String timezone) {
+          @QueryParam("timezone") String timezone) throws UnauthorizedException {
     try {
       List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
       if (!events.isEmpty()) {
@@ -1103,7 +1103,7 @@ public class SchedulerRestService {
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
-      return Response.status(Status.UNAUTHORIZED).build();
+      throw e;
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
               device, rrule, startDate, endDate, duration, getStackTrace(e));
@@ -1129,7 +1129,7 @@ public class SchedulerRestService {
 
   public Response getConflictingEventsXml(@QueryParam("agent") String device, @QueryParam("rrule") String rrule,
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
-          @QueryParam("timezone") String timezone) {
+          @QueryParam("timezone") String timezone) throws UnauthorizedException {
     try {
       List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
       if (!events.isEmpty()) {
@@ -1140,7 +1140,7 @@ public class SchedulerRestService {
     } catch (IllegalArgumentException e) {
       return Response.status(Status.BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
-      return Response.status(Status.UNAUTHORIZED).build();
+      throw e;
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
               device, rrule, startDate, endDate, duration, getStackTrace(e));
