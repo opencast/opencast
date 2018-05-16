@@ -471,7 +471,7 @@ angular.module('adminNg.controllers')
           $scope.conflicts = [];
           if (me.notificationConflict) {
               Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
-              me.notifictationConflict = undefined;
+              me.notificationConflict = undefined;
           }
         }
 
