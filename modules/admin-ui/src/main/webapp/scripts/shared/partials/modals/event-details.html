@@ -143,7 +143,10 @@
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.TYPE"><!-- Type --></th>
                                     <th translate="EVENTS.EVENTS.DETAILS.ASSETS.SIZE"><!-- Size --></th>
                                     <th class="medium">
-                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link" ng-show="(uploadAssetOptions && !transactions.read_only)" ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)" with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
+                                      <a translate="EVENTS.EVENTS.NEW.UPLOAD_ASSET.ADD" class="details-link"
+                                         ng-show="(uploadAssetOptions && !transactions.read_only)"
+                                         ng-click="openSubTab('newAssetUpload', 'EventAssetAttachmentsResource', 'newassetupload', false, true)"
+                                         with-role="ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT">
                                       </a>
                                     </th>
                                 </tr>
@@ -155,7 +158,9 @@
                                     </td>
                                     <td>{{ assets.attachments }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.attachments > 0" ng-click="openSubTab('attachments', 'EventAssetAttachmentsResource', 'attachment')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"
+                                           ng-show="assets.attachments > 0"
+                                           ng-click="openSubTab('asset-attachments', 'EventAssetAttachmentsResource', 'attachment')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -166,7 +171,9 @@
                                     </td>
                                     <td>{{ assets.catalogs }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.catalogs > 0" ng-click="openSubTab('catalogs', 'EventAssetCatalogsResource', 'catalog')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"
+                                           ng-show="assets.catalogs > 0"
+                                           ng-click="openSubTab('asset-catalogs', 'EventAssetCatalogsResource', 'catalog')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -175,7 +182,9 @@
                                     <td translate="EVENTS.EVENTS.DETAILS.ASSETS.MEDIA.CAPTION"><!-- Media --></td>
                                     <td>{{ assets.media }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.media > 0" ng-click="openSubTab('media', 'EventAssetMediaResource', 'media')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"
+                                           ng-show="assets.media > 0"
+                                           ng-click="openSubTab('asset-media', 'EventAssetMediaResource', 'media')">
                                             <!-- Details -->
                                         </a>
                                     </td>
@@ -186,7 +195,9 @@
                                     </td>
                                     <td>{{ assets.publications }}</td>
                                     <td>
-                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link" ng-show="assets.publications > 0" ng-click="openSubTab('publications', 'EventAssetPublicationsResource', 'publication')">
+                                        <a translate="EVENTS.EVENTS.DETAILS.ASSETS.DETAILS" class="details-link"
+                                           ng-show="assets.publications > 0"
+                                           ng-click="openSubTab('asset-publications', 'EventAssetPublicationsResource', 'publication')">
                                             <!-- Details -->
                                         </a>
                                     </td>
