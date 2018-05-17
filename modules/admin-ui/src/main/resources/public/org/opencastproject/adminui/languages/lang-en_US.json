@@ -502,8 +502,8 @@
            "LOCATION": "Filter for this location",
            "DETAILS": "Open event details",
            "DELETE": "Delete event",
-           "PREVIEW": "Open preview player",
            "EDITOR": "Open video Editor",
+           "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",
            "PAUSED_WORKFLOW": "View paused workflow"
          }
@@ -1631,7 +1631,6 @@
        "ADD_COMMENT": "Add Comment"
      },
      "TABS": {
-       "PLAY":        "Playback",
        "EDIT":        "Editor",
        "CAPTIONS":    "Captions",
        "ANNOTATIONS": "Annotations"
