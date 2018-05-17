@@ -513,6 +513,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
             new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), false, userIds,
             wfProperties, caProperties, Opt.<Recording> none());
+    expect(schedulerService.getTechnicalMetadata("notExists")).andThrow(new NotFoundException()).anyTimes();
     expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
 
     EasyMock.replay(schedulerService);
