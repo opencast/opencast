@@ -476,7 +476,6 @@
            "LOCATION": "Filter for this location",
            "DETAILS": "Open event details",
            "DELETE": "Delete event",
-           "PREVIEW": "Open preview player",
            "EDITOR": "Open video Editor",
            "COMMENTS": "View comments",
            "PAUSED_WORKFLOW": "View paused workflow"
