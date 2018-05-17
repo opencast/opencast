@@ -246,5 +246,16 @@ public interface ComposerService {
    */
   Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
+  /**
+   * Demux a multi-track source into 2 media as defined by the encoding profile, the results are flavored and tagged
+   * positionally. eg: One ffmpeg operation to produce presenter/work and presentation/work
+   *
+   * @param sourceTrack
+   * @param profileId
+   * @return Receipt for this demux based on the profile
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+  Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
 }

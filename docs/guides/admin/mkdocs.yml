@@ -99,6 +99,7 @@ pages:
    - Clone: 'workflowoperationhandlers/clone-woh.md'
    - Cover Image: 'workflowoperationhandlers/coverimage-woh.md'
    - Defaults: 'workflowoperationhandlers/defaults-woh.md'
+   - Demux: 'workflowoperationhandlers/demux-woh.md'
    - Duplicate Event: 'workflowoperationhandlers/duplicate-event-woh.md'
    - Editor: 'workflowoperationhandlers/editor-woh.md'
    - Encode: 'workflowoperationhandlers/encode-woh.md'

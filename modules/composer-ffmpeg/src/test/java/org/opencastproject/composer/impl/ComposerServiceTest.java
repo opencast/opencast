@@ -38,7 +38,6 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -189,15 +188,8 @@ public class ComposerServiceTest {
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
       @Override
-      protected Job inspect(Job job, URI workspaceURI) throws EncoderException {
-        Job inspectionJob = EasyMock.createNiceMock(Job.class);
-        try {
-          EasyMock.expect(inspectionJob.getPayload()).andReturn(MediaPackageElementParser.getAsXml(inspectedTrack));
-        } catch (MediaPackageException e) {
-          throw new RuntimeException(e);
-        }
-        EasyMock.replay(inspectionJob);
-        return inspectionJob;
+      protected Track inspect(Job job, URI workspaceURI) throws EncoderException {
+        return inspectedTrack;
       }
     };
 
