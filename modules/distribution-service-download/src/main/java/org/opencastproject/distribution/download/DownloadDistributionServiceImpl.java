@@ -100,10 +100,10 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   private static final long TIMEOUT = 60000L;
 
   /** The load on the system introduced by creating a distribute job */
-  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.2f;
 
   /** The load on the system introduced by creating a retract job */
-  public static final float DEFAULT_RETRACT_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_RETRACT_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_DISTRIBUTE_JOB_LOAD} */
   public static final String DISTRIBUTE_JOB_LOAD_KEY = "job.load.download.distribute";
