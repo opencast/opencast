@@ -191,6 +191,12 @@ class OpencastToPaellaConverter {
         else if (currentAttachment.type == "presenter/player+preview") {
           presenter.preview = currentAttachment.url;
         }
+        else if (currentAttachment.type == "presenter/trackhd") {
+          presenter.trackhd = currentAttachment.url;
+        }
+        else if (currentAttachment.type == "presentation/trackhd") {
+          presentation.trackhd = currentAttachment.url;
+        }
       }
       catch (err) {}
     });

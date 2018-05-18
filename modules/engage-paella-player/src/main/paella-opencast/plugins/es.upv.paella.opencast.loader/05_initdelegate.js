@@ -8,6 +8,7 @@ function loadOpencastPaella(containerId) {
   paella.dataDelegates.MHAnnotationServiceVideoExportDelegate = MHAnnotationServiceVideoExportDelegate;
   paella.dataDelegates.UserDataDelegate = UserDataDelegate;
   paella.dataDelegates.MHFootPrintsDataDelegate = MHFootPrintsDataDelegate;
+  paella.dataDelegates.OpencastTrackCameraDataDelegate = OpencastTrackCameraDataDelegate;
 	return paella.opencast.getEpisode()
 	.then(
 		function(episode) {

@@ -295,4 +295,39 @@ class MHFootPrintsDataDelegate extends paella.DataDelegate {
   }
 }
 
+class OpencastTrackCameraDataDelegate extends paella.DataDelegate {
 
+  getName() { return "es.upv.paella.opencast.OpencastTrackCameraDataDelegate"; }
+
+  read(context,params,onSuccess) {
+    let attachments = paella.opencast._episode.mediapackage.attachments.attachment;
+    let trackhdUrl;
+    if (attachments === undefined) {
+      return;
+    }
+    for (let i = 0; i < attachments.length; i++) {
+      if (attachments[i].type.indexOf("trackhd") > 0) {
+        trackhdUrl = attachments[i].url;
+      }
+    }
+    if (trackhdUrl) {
+      paella.utils.ajax.get({ url:trackhdUrl },
+        (data) => {
+          if (typeof(data)=="string") {
+            try {
+              data = JSON.parse(data);
+            }
+            catch(err) {}
+          }
+          data.positions.sort((a,b) => {
+            return a.time-b.time;
+          })
+          onSuccess(data)
+        },
+        () => onSuccess(null) );
+    }
+    else {
+      onSuccess(null);
+    }
+  }
+};
