@@ -1,12 +1,20 @@
 
 function loadOpencastPaella(containerId) {
+  if (! paella.opencast) {
+    paella.opencast = new Opencast();
+  }
+  paella.dataDelegates.MHAnnotationServiceDefaultDataDelegate = MHAnnotationServiceDefaultDataDelegate;
+  paella.dataDelegates.MHAnnotationServiceTrimmingDataDelegate = MHAnnotationServiceTrimmingDataDelegate;
+  paella.dataDelegates.MHAnnotationServiceVideoExportDelegate = MHAnnotationServiceVideoExportDelegate;
+  paella.dataDelegates.UserDataDelegate = UserDataDelegate;
+  paella.dataDelegates.MHFootPrintsDataDelegate = MHFootPrintsDataDelegate;
 	return paella.opencast.getEpisode()
 	.then(
 		function(episode) {
 			var converter = new OpencastToPaellaConverter();
 			var data = converter.convertToDataJson(episode);
 			if (data.streams.length < 1) {
-				paella.messageBox.showError("Error loading video! No video traks found");
+				paella.messageBox.showError("Error loading video! No video tracks found");
 			}
 			paella.load(containerId, {data:data, configUrl:'/engage/paella/config/config.json'});
 		},
