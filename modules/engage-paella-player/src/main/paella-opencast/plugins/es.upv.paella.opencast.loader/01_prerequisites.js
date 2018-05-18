@@ -161,3 +161,4 @@ base.ajax.send = function(type,params,onSuccess,onFail) {
 	}
 };
 
+
