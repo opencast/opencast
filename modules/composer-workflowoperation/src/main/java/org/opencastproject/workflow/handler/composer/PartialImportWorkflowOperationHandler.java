@@ -561,9 +561,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
           throws MediaPackageException, EncoderException {
     final Dimension dim = determineDimension(tracks, forceDivisible);
     if (outputFramerate > 0.0) {
-      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, outputFramerate, false, Collections.toArray(Track.class, tracks));
     } else {
-      return composerService.concat(profile.getIdentifier(), dim, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, false, Collections.toArray(Track.class, tracks));
     }
   }
 

@@ -424,13 +424,14 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, Track... tracks)
+  public Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks)
           throws EncoderException, MediaPackageException {
-    return concat(profileId, outputDimension, -1.0f, tracks);
+    return concat(profileId, outputDimension, -1.0f, sameCodec, tracks);
   }
 
   @Override
-  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks)
+  public Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec,
+          Track... tracks)
           throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/concat");
     try {
@@ -440,6 +441,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
         params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
       params.add(new BasicNameValuePair("outputFrameRate", String.format(Locale.US, "%f", outputFrameRate)));
       params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
+      if (sameCodec)
+        params.add(new BasicNameValuePair("sameCodec", "true"));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
@@ -489,6 +492,34 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     }
     throw new EncoderException("Unable to convert an image to a video from attachment " + sourceImageAttachment
             + " using the remote composer service proxy");
+  }
+
+  @Override
+  public Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/demux");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException("Unable to assemble a remote demux request for track " + sourceTrack, e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        String content = EntityUtils.toString(response.getEntity());
+        Job r = JobParser.parseJob(content);
+        logger.info("Demuxing job {} started on a remote service ", r.getId());
+        return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException("Unable to demux track " + sourceTrack + " using a remote composer service", e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to demux track " + sourceTrack + " using a remote composer service");
   }
 
   /**

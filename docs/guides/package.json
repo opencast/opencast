@@ -10,7 +10,7 @@
   "license": "ISC",
   "devDependencies": {
     "grunt": "^1.0.2",
-    "grunt-markdownlint": "^1.1.0",
+    "grunt-markdownlint": "^1.1.5",
     "load-grunt-tasks": "^3.5.2"
   }
 }

@@ -103,6 +103,18 @@ public final class RestUtils {
   }
 
   /**
+   * Create a NOT FOUND (404) response with the given JSON as body
+   *
+   * @param json
+   *          the JSON string to add to the response body.
+   * @return a NOT FOUND response
+   */
+  public static Response notFoundJson(JValue json) {
+    return Response.status(Status.NOT_FOUND).entity(stream(serializer.fn.toJson(json)))
+        .type(MediaType.APPLICATION_JSON_TYPE).build();
+  }
+
+  /**
    * Create a INTERNAL SERVER ERROR (500) response with the given messages and arguments
    *
    * @param msg
@@ -112,6 +124,18 @@ public final class RestUtils {
   public static Response serverError(String msg, Object... args) {
     return Response.status(Status.INTERNAL_SERVER_ERROR).entity(format(msg, args)).type(MediaType.TEXT_PLAIN_TYPE)
             .build();
+  }
+
+  /**
+   * Create an INTERNAL SERVER ERROR (500) response with the given JSON as body
+   *
+   * @param json
+   *          the JSON string to add to the response body.
+   * @return an INTERNAL SERVER ERROR response
+   */
+  public static Response serverErrorJson(JValue json) {
+    return Response.status(Status.INTERNAL_SERVER_ERROR).entity(stream(serializer.fn.toJson(json)))
+        .type(MediaType.APPLICATION_JSON_TYPE).build();
   }
 
   /**

@@ -196,6 +196,10 @@
         }
     }
 
+    td.highlighted-cell {
+        font-weight: bold;
+    }
+
     td {
         padding: $col-padding;
         color: $medium-prim-color;
@@ -245,8 +249,19 @@
                 margin-right: 15px;
             }
 
-            &.preview {
-                @include build-icon(auto, auto, preview-icon, 18px, 13px);
+            &.cut {
+                @include fa-icon($fa-var-scissors, before, inline-block, 0, 0, inherit, 18px, normal, inherit);
+                
+                .badge {
+                  position: relative;
+                  left: -8px;
+                  bottom: 8px;
+                  width: 6px;
+                  height: 6px;
+                  display: inline-block;
+                  border-radius:100%;
+                  background-color: $red;
+                }
             }
 
             &.edit {
@@ -278,6 +293,10 @@
                 width: 10px;
                 height: 10px;
             }
+        }
+
+        &.nowrap {
+            white-space: nowrap;
         }
 
         // For action row that only has one button

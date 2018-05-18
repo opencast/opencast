@@ -146,6 +146,7 @@
      "EMAIL_SENT": "The message has been sent",
      "EMAIL_NOT_SENT": "The message could not be sent",
      "CONFLICT_DETECTED":   "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+     "CONFLICT_BULK_DETECTED":   "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
      "CONFLICT_ALREADY_ENDED":   "Scheduling error: The event has already ended.",
      "CONFLICT_END_BEFORE_START":   "Scheduling error: Schedule end has to be later than the start.",
      "INVALID_ACL_RULES":   "Rules have to contain a valid role and read or/and write right(s).",
@@ -237,6 +238,29 @@
              "EVENTS_SUMMARY": "You have selected {{numberOfEvents}} events",
              "CONFIGURATION": "Configuration",
              "WORKFLOW": "Task"
+          }
+      },
+      "EDIT_EVENTS": {
+          "CAPTION": "Edit scheduled events",
+          "GENERAL": {
+              "CAPTION": "General",
+              "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+              "NOCHANGES": "No changes to the events detected!"
+          },
+          "METADATA": {
+              "EDIT": "Edit metadata"
+          },
+          "SUMMARY": {
+              "CAPTION": "Summary",
+              "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+              "TYPE": "Type",
+              "PREVIOUS": "Old value",
+              "NEXT": "New value"
+          },
+          "EDIT": {
+              "CAPTION": "Edit",
+              "METADATA": "Metadata",
+              "SCHEDULING": "Scheduling"
           }
       }
    },
@@ -455,6 +479,7 @@
          "SERIES":   "Series",
          "DATE":     "Date",
          "START":    "Start",
+         "END":      "End",
          "STOP":     "Stop",
          "STATUS":   "Status",
          "LOCATION": "Location",
@@ -469,6 +494,7 @@
          "PREVIOUS": "Previous",
          "NOCONTENT": "No data available",
          "PUBLISHED": "Published",
+         "WEEKDAY": "Weekday",
          "TOOLTIP": {
            "START": "Filter for this start date",
            "SERIES": "Filter for this series",
@@ -476,8 +502,8 @@
            "LOCATION": "Filter for this location",
            "DETAILS": "Open event details",
            "DELETE": "Delete event",
-           "PREVIEW": "Open preview player",
            "EDITOR": "Open video Editor",
+           "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",
            "PAUSED_WORKFLOW": "View paused workflow"
          }
@@ -1605,7 +1631,6 @@
        "ADD_COMMENT": "Add Comment"
      },
      "TABS": {
-       "PLAY":        "Playback",
        "EDIT":        "Editor",
        "CAPTIONS":    "Captions",
        "ANNOTATIONS": "Annotations"

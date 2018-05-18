@@ -95,12 +95,13 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
-   * Concat multiple tracks to a single track. Required ffmpeg version 1.1
+   * Concat multiple tracks to a single track.
    *
    * @param profileId
    *          The encoding profile to use
    * @param outputDimension
    *          The output dimensions
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks
    *          an array of track to concat in order of the array
    * @return The receipt for this concat job
@@ -109,7 +110,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -118,12 +119,13 @@ public interface ComposerService {
    * @param profileId The encoding profile to use
    * @param outputDimension The output dimensions
    * @param outputFrameRate The output frame rate
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks an array of track to concat in order of the array
    * @return The receipt for this concat job
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -244,5 +246,16 @@ public interface ComposerService {
    */
   Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
+  /**
+   * Demux a multi-track source into 2 media as defined by the encoding profile, the results are flavored and tagged
+   * positionally. eg: One ffmpeg operation to produce presenter/work and presentation/work
+   *
+   * @param sourceTrack
+   * @param profileId
+   * @return Receipt for this demux based on the profile
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+  Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
 }
