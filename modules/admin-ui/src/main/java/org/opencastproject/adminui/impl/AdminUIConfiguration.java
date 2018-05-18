@@ -43,12 +43,16 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
+  public static final String OPT_EDIT_COMPETITIVE = "competitiveEditing";
+  public static final String OPT_EDIT_LOCK_TIMEOUT = "minimumLockTimeout";
 
   private String previewSubtype = "preview";
   private String waveformSubtype = "waveform";
   private Set<String> smilCatalogTagSet = new HashSet<String>();
   private MediaPackageElementFlavor smilCatalogFlavor = new MediaPackageElementFlavor("smil", "cutting");
   private MediaPackageElementFlavor smilSilenceFlavor = new MediaPackageElementFlavor("*", "silence");
+  private boolean competitiveEdit = false;
+  private int lockTimeout = 30;
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -68,6 +72,14 @@ public class AdminUIConfiguration implements ManagedService {
 
   public MediaPackageElementFlavor getSmilSilenceFlavor() {
     return smilSilenceFlavor;
+  }
+
+  public boolean isCompetitiveEdits() {
+    return competitiveEdit;
+  }
+
+  public int getLockTimeout() {
+    return lockTimeout;
   }
 
   @Override
@@ -120,6 +132,22 @@ public class AdminUIConfiguration implements ManagedService {
     } else {
       logger.warn("No smil silence flavor configured, using '{}'", smilSilenceFlavor);
     }
+
+    // Waveform subtype
+    String optCompetitive = StringUtils.trimToNull((String) properties.get(OPT_EDIT_COMPETITIVE));
+    if (optCompetitive != null) {
+      competitiveEdit = Boolean.valueOf(optCompetitive);
+    }
+    // Waveform subtype
+    String optTimeout = StringUtils.trimToNull((String) properties.get(OPT_EDIT_LOCK_TIMEOUT));
+    if (optTimeout != null) {
+      try {
+        lockTimeout = Integer.valueOf(optTimeout);
+      } catch (NumberFormatException e) {
+        logger.info("Invalid value for minimumLockTimeout using {} min", lockTimeout);
+      }
+    }
+
   }
 
 }

@@ -177,7 +177,11 @@
      "TASK_NOT_CREATED": "The task could not be created",
      "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
      "VIDEO_CUT_SAVED": "The editing information has been saved",
+     "VIDEO_CUT_SAVED_AUTO":"The editing information has been saved automatically",
      "VIDEO_CUT_PROCESSING": "The video is being processed…",
+     "VIDEO_LOCKED_NO_PREVIEW":"This mediapackage cannot be edited as it has no priews.",
+     "VIDEO_EDIT_LOCKED_MINS":"This video is locked as it is currently being edited by '{{ user }}'. It will be available in {{ minutes }} minutes.",
+     "VIDEO_CURRENTLY_EDITED_BY":"This video is currently being edited by '{{ user }}'. If you continue to edit you might loose your data.",
      "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
      "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
      "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction."

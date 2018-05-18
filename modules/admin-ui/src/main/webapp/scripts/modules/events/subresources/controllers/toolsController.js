@@ -22,12 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('ToolsCtrl', ['$scope', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
-    function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
-
-        $scope.navigateTo = function (path) {
-            $location.path(path).replace();
-        };
+.controller('ToolsCtrl', ['$scope', '$interval', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
+    function ($scope, $interval, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.event    = EventHelperService;
         $scope.resource = $route.current.params.resource;
@@ -40,6 +36,11 @@ angular.module('adminNg.controllers')
         $scope.event.eventId = $scope.id;
 
         $scope.unsavedChanges = false;
+
+        $scope.navigateTo = function (path) {
+            ToolsResource.release({id: $scope.id, tool: 'lock'});
+            $location.path(path).replace();
+        };
 
         $scope.setChanges = function(changed) {
             $scope.unsavedChanges = changed;
@@ -69,10 +70,36 @@ angular.module('adminNg.controllers')
 
         // TODO Move the following to a VideoCtrl
         $scope.player = {};
-        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
+        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' }, function () {
+          if ($scope.video.status === 'locked' ) {
+            $scope.video.user = $scope.video.lockingUser.name + " (" + $scope.video.lockingUser.email + ")";
+            if ($scope.video.editWhenLocked) {
+              Notifications.addWithParams('warning', 'VIDEO_CURRENTLY_EDITED_BY', {user: $scope.video.user}, 'global', -1);
+            } else {
+              Notifications.addWithParams('error', 'VIDEO_EDIT_LOCKED_MINS', {user: $scope.video.user, minutes: $scope.video.lockedTime}, 'global', 10000);
+              $location.url('/events/' + $scope.resource);
+            }
+          }
+          if ($scope.video.status === 'no preview' ) {
+            Notifications.add('error', 'VIDEO_LOCKED_NO_PREVIEW', 'global', 10000);
+            $location.url('/events/' + $scope.resource);
+          }
+        });
+
+        $scope.autosave = function () {
+            $scope.video.autosave = true;
+            $scope.video.$save({id: $scope.id, tool: $scope.tab}, function () {
+                Notifications.add('success', 'VIDEO_CUT_SAVED_AUTO');
+            });
+        };
+        $scope.stopTime = $interval($scope.autosave, 1740000);
 
         $scope.submitButton = false;
+        $scope.release = function() {
+          ToolsResource.release({id: $scope.id, tool: 'lock'});
+        };
         $scope.submit = function () {
+            $scope.video.autosave = false;
             $scope.submitButton = true;
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
                 $scope.submitButton = false;
@@ -80,6 +107,7 @@ angular.module('adminNg.controllers')
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
                     $location.url('/events/' + $scope.resource);
                 } else {
+                    $scope.video.autosave = true;
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
                 $scope.unsavedChanges = false;
@@ -87,6 +115,15 @@ angular.module('adminNg.controllers')
                 $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
             });
+        };
+        $window.onbeforeunload = function () {
+          // Have to delete lock with synch call
+          var request = new XMLHttpRequest();
+          request.open('DELETE', 'tools/' + $scope.id + '/lock.json', false);
+          request.send(null);
+          if (request.status === 200) {
+            console.log('lock freed');
+          }
         };
     }
 ]);

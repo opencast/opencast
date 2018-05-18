@@ -1,6 +1,12 @@
 {
   "date": "2016-12-02T13:30:05Z",
   "title": "Opencast Community",
+  "lockedTime": 0,
+  "lockingUser":{
+    "name": "Joe Blogs",
+    "username": "joe",
+    "email": "joe.blogs@university.org"
+  },
   "series":{
     "id":"fa987fd2-5719-459d-b066-adc5bb253721",
     "title":"zwei"

@@ -1,10 +1,10 @@
 <section class="action-nav-bar">
     <admin-ng-nav></admin-ng-nav>
     <nav>
-        <a href="#/events/events" ng-class="{active: resource == 'events'}" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">
+        <a href="#/events/events" ng-class="{active: resource == 'events'}" ng-click="release()" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">
             <!-- Events -->
         </a>
-        <a href="#/events/series" ng-class="{active: resource == 'series'}" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">
+        <a href="#/events/series" ng-class="{active: resource == 'series'}" ng-click="release()" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">
             <!-- Series -->
         </a>
     </nav>
@@ -15,6 +15,29 @@
 
     <div class="main-view" ng-controller="ToolsCtrl">
       <div ng-controller="VideoEditCtrl">
+      <div ng-if="video.status === 'no preview'" >
+        <div class="video-timeline">
+          <div class="timeline-control">
+            <header>
+              <span class="ng-scope">This video has been edited before.</span>
+            </header>
+            <br/>
+            <p>This video has already been published and cannot be edited.</p>
+          </div>
+        </div>
+      </div>
+      <div ng-if="video.status === 'locked' && video.lockedTime > '0' && !video.editWhenLocked" >
+        <div class="video-timeline">
+          <div class="timeline-control">
+            <header>
+              <span class="ng-scope">This video is currently locked.</span>
+            </header>
+            <br/>
+            <p>This video is currently being edited by '{{video.user}}' else. It will be available in {{video.lockedTime}} minutes</p>
+          </div>
+        </div>
+      </div>
+      <div ng-if="video.status === 'editable' || video.editWhenLocked || video.lockedTime <= '0'" >
         <div class="video-header">
             <div class="main-video-details">
                 <h1 class="video-title">{{ video.title }}</h1>

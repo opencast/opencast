@@ -20,5 +20,6 @@
     ],
     "tracks":["6ec443e7-b097-4470-a618-5e0d848f5252"]
   },
-  "workflow": "cut-workflow"
+  "workflow": "cut-workflow",
+  "autosave": false
 }

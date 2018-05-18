@@ -36,6 +36,8 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
+import org.opencastproject.adminui.impl.MediaPackageLockService;
+import org.opencastproject.adminui.impl.MediaPackageLockService.LockInfo;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
@@ -57,6 +59,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
@@ -116,6 +119,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -160,12 +164,16 @@ public class ToolsEndpoint implements ManagedService {
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
 
+  /** The Json key for the autosave option. */
+  private static final String AUTOSAVE_KEY = "autosave";
+
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
 
   // service references
   private AdminUIConfiguration adminUIConfiguration;
+  private MediaPackageLockService mediaPackageLockService;
   private AdminUISearchIndex searchIndex;
   private AssetManager assetManager;
   private IndexService index;
@@ -178,6 +186,11 @@ public class ToolsEndpoint implements ManagedService {
   /** OSGi DI. */
   void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
+  }
+
+  /** OSGi DI. */
+  void setMediaPackageLockService(MediaPackageLockService mediaPackageLockService) {
+    this.mediaPackageLockService = mediaPackageLockService;
   }
 
   /** OSGi DI */
@@ -280,13 +293,30 @@ public class ToolsEndpoint implements ManagedService {
           @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
                   @RestResponse(description = "Media package found", responseCode = SC_OK),
                   @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
-  public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId)
+  public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId, @Context HttpServletRequest request)
           throws IndexServiceException, NotFoundException {
     if (!isEditorAvailable(mediaPackageId))
       return R.notFound();
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
+    LockInfo lInfo = mediaPackageLockService.getMediaPackageLock(event, request.getRequestedSessionId(), adminUIConfiguration.getLockTimeout(), securityService.getUser());
+    long lockedTime = Math.round(lInfo.getDuration() / 60000);
+    if (lockedTime > 0) {
+      User user = lInfo.getUser();
+      if (!adminUIConfiguration.isCompetitiveEdits()) {
+        return RestUtils.okJson(obj(
+            f("status", v("locked")),
+            f("lockedTime", v(lockedTime)),
+            f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+            f("lockingUser", obj(
+              f("name", v(user.getName(), Jsons.BLANK)),
+              f("username", v(user.getUsername(), Jsons.BLANK)),
+              f("email", v(user.getEmail(), Jsons.BLANK))
+            ))
+        ));
+      }
+    }
     final MediaPackage mp = index.getEventMediapackage(event);
     List<MediaPackageElement> previewPublications = getPreviewElementsFromPublication(getInternalPublication(mp));
 
@@ -343,6 +373,9 @@ public class ToolsEndpoint implements ManagedService {
 
     }
 
+    if (jPreviews.isEmpty()) {
+      return RestUtils.okJson(obj(f("status", v("no preview"))));
+    }
     // Get existing segments
     List<JValue> jSegments = new ArrayList<>();
     for (Tuple<Long, Long> segment : getSegments(mp)) {
@@ -354,13 +387,87 @@ public class ToolsEndpoint implements ManagedService {
     for (WorkflowDefinition workflow : getEditingWorkflows()) {
       jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK))));
     }
+    if (lockedTime > 0) {
+      User user = lInfo.getUser();
+      return RestUtils.okJson(obj(
+              f("title", v(mp.getTitle(), Jsons.BLANK)),
+              f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+              f("status", v("locked")),
+              f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+              f("lockedTime", v(lockedTime)),
+              f("lockingUser", obj(
+                f("name", v(user.getName(), Jsons.BLANK)),
+                f("username", v(user.getUsername(), Jsons.BLANK)),
+                f("email", v(user.getEmail(), Jsons.BLANK))
+              )),
+              f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+              f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
+              f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+              f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))
+      ));
+    }
+    return RestUtils.okJson(obj(
+           f("title", v(mp.getTitle(), Jsons.BLANK)),
+           f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
+           f("status", v("editable")),
+           f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
+           f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
+           f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
+           f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))
+   ));
+ }
 
-    return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
-            f("date", v(event.getRecordingStartDate(), Jsons.BLANK)),
-            f("series", obj(f("id", v(event.getSeriesId(), Jsons.BLANK)), f("title", v(event.getSeriesName(), Jsons.BLANK)))),
-            f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
-            f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
-            f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))));
+  @POST
+  @Path("{mediapackageid}/lock.json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "editVideo", description = "Locks a mediapackage for editing", returnDescription = "", pathParameters = {
+    @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING)}, reponses = {
+    @RestResponse(description = "Editing information saved and processed", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND),
+    @RestResponse(description = "The editing information cannot be parsed", responseCode = HttpServletResponse.SC_BAD_REQUEST)})
+  public Response lockVideo(@PathParam("mediapackageid") final String mediaPackageId,
+          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException, WorkflowDatabaseException {
+    final Opt<Event> optEvent = getEvent(mediaPackageId);
+    if (optEvent.isNone()) {
+      return R.notFound();
+    }
+    LockInfo lockInfo = mediaPackageLockService.getMediaPackageLock(optEvent.get(),request.getRequestedSessionId(), adminUIConfiguration.getLockTimeout(), securityService.getUser());
+    User user = lockInfo.getUser();
+    return RestUtils.okJson(obj(
+            f("lockedTime", v(lockInfo.getDuration())),
+            f("status", v("locked")),
+            f("editWhenLocked", v(adminUIConfiguration.isCompetitiveEdits())),
+            f("lockingUser", obj(
+              f("name", v(user.getName(), Jsons.BLANK)),
+              f("username", v(user.getUsername(), Jsons.BLANK)),
+              f("email", v(user.getEmail(), Jsons.BLANK))
+            ))));
+  }
+
+  @DELETE
+  @Path("lock.json")
+  @RestQuery(name = "cleanUpLocks", description = "Cleans up mediaPackage Locks", returnDescription = "", reponses = {
+    @RestResponse(description = "MediaPackage lock has been freed", responseCode = HttpServletResponse.SC_OK)})
+  public Response cleanUpLocks(@Context HttpServletRequest request) throws IndexServiceException, NotFoundException, WorkflowDatabaseException {
+    mediaPackageLockService.cleanUp();
+    return R.ok();
+  }
+
+  @DELETE
+  @Path("{mediapackageid}/lock.json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "unlockVideo", description = "Frees the mediapackage lock for a video", returnDescription = "", pathParameters = {
+    @RestParameter(name = "mediapackageid", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING)}, reponses = {
+    @RestResponse(description = "MediaPackage lock has been freed", responseCode = HttpServletResponse.SC_OK),
+    @RestResponse(description = "Media package not found", responseCode = HttpServletResponse.SC_NOT_FOUND)})
+  public Response unlockVideo(@PathParam("mediapackageid") final String mediaPackageId,
+          @Context HttpServletRequest request) throws IndexServiceException, NotFoundException, WorkflowDatabaseException {
+    final Opt<Event> optEvent = getEvent(mediaPackageId);
+    if (optEvent.isNone()) {
+      return R.notFound();
+    }
+    mediaPackageLockService.releaseMediaPackageLock(optEvent.get(), request.getRequestedSessionId());
+    return R.ok();
   }
 
   @POST
@@ -431,7 +538,9 @@ public class ToolsEndpoint implements ManagedService {
       }
 
     }
-
+    if (!editingInfo.isAutosave()) {
+      mediaPackageLockService.releaseMediaPackageLock(optEvent.get(), request.getRequestedSessionId());
+    }
     return R.ok();
   }
 
@@ -771,11 +880,13 @@ public class ToolsEndpoint implements ManagedService {
     private final List<Tuple<Long, Long>> segments;
     private final List<String> tracks;
     private final Opt<String> workflow;
+    private final Opt<Boolean> autosave;
 
-    private EditingInfo(List<Tuple<Long, Long>> segments, List<String> tracks, Opt<String> workflow) {
+    private EditingInfo(List<Tuple<Long, Long>> segments, List<String> tracks, Opt<String> workflow, Opt<Boolean> autosave) {
       this.segments = segments;
       this.tracks = tracks;
       this.workflow = workflow;
+      this.autosave = autosave;
     }
 
     /**
@@ -805,8 +916,7 @@ public class ToolsEndpoint implements ManagedService {
       for (Object track : jsonTracks) {
         tracks.add((String) track);
       }
-
-      return new EditingInfo(segments, tracks, Opt.nul((String) obj.get("workflow")));
+      return new EditingInfo(segments, tracks, Opt.nul((String) obj.get("workflow")), Opt.nul((Boolean) obj.get(AUTOSAVE_KEY)));
     }
 
     /**
@@ -825,6 +935,11 @@ public class ToolsEndpoint implements ManagedService {
     /** Returns the optional workflow to start */
     Opt<String> getPostProcessingWorkflow() {
       return workflow;
+    }
+
+    /** Returns the state of the autosave flag */
+    Boolean isAutosave() {
+      return autosave.getOr(false);
     }
   }
 

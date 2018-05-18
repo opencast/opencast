@@ -30,6 +30,11 @@
              interface="org.opencastproject.index.service.api.IndexService"
              name="IndexService"
              policy="static" />
+  <reference bind="setMediaPackageLockService"
+             cardinality="1..1"
+             interface="org.opencastproject.adminui.impl.MediaPackageLockService"
+             name="MediaPackageLockService"
+             policy="static" />
   <reference bind="setSmilService"
              cardinality="1..1"
              interface="org.opencastproject.smil.api.SmilService"

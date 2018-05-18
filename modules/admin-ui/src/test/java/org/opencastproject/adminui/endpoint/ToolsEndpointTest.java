@@ -265,6 +265,7 @@ public class ToolsEndpointTest {
     assertEquals(1, tracks.size());
 
     assertEquals(some("cut-workflow"), editingInfo.getPostProcessingWorkflow());
+    assertEquals(false, editingInfo.isAutosave());
   }
 
   /** Test method for {@link ToolsEndpoint#addSmilToArchive(org.opencastproject.mediapackage.MediaPackage, Smil)} */
