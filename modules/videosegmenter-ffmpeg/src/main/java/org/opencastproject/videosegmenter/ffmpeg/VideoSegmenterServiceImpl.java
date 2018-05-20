@@ -52,7 +52,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.io.LineReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -634,14 +633,10 @@ VideoSegmenterService, ManagedService {
   protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
           float changesThreshold) throws IOException, VideoSegmenterException {
 
-    String[] command = new String[] { binary, "-nostats", "-i",
-      mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-      "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo",
-      "-f", "null", "-"
-    };
-    String commandline = StringUtils.join(command, " ");
+    String[] command = new String[] { binary, "-nostats", "-i", mediaFile.getAbsolutePath(),
+      "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo", "-f", "null", "-"};
 
-    logger.info("Running {}", commandline);
+    logger.info("Detecting video segments using command: {}", command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
     List<String> segmentsStrings = new LinkedList<String>();
