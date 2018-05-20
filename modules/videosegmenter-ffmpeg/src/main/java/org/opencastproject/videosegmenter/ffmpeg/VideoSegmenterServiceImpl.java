@@ -148,8 +148,8 @@ VideoSegmenterService, ManagedService {
   /** Default value for the option whether segments numbers depend on track duration */
   public static final boolean DEFAULT_DURATION_DEPENDENT = false;
 
-  /** The load introduced on the system by creating a caption job */
-  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
+  /** The load introduced on the system by a segmentation job */
+  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 0.6f;
 
   /** The key to look for in the service configuration file to override the DEFAULT_CAPTION_JOB_LOAD */
   public static final String SEGMENTER_JOB_LOAD_KEY = "job.load.videosegmenter";
