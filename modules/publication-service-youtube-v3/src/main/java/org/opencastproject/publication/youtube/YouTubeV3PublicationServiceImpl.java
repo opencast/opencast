@@ -71,10 +71,10 @@ import java.util.UUID;
 public class YouTubeV3PublicationServiceImpl extends AbstractJobProducer implements YouTubePublicationService, ManagedService {
 
   /** The load on the system introduced by creating a publish job */
-  public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD = 0.4f;
 
   /** The load on the system introduced by creating a retract job */
-  public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
   public static final String YOUTUBE_PUBLISH_LOAD_KEY = "job.load.youtube.publish";
