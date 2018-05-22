@@ -74,7 +74,7 @@ public class AclEndpointTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
 
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(2)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(2)).when().get(rt.host("/acls.json")).asString());
 
@@ -86,21 +86,21 @@ public class AclEndpointTest {
     int limit = 100;
     int offset = 1;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(2)).body("offset", equalTo(offset))
             .body("limit", equalTo(limit)).body("results", hasSize(1)).when().get(rt.host("/acls.json"));
 
     offset = 0;
     limit = 1;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(2)).body("offset", equalTo(offset))
             .body("limit", equalTo(limit)).body("results", hasSize(1)).when().get(rt.host("/acls.json"));
 
     offset = 2;
     limit = 0;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(2)).body("offset", equalTo(offset))
             .body("limit", equalTo(100)).body("results", hasSize(0)).when().get(rt.host("/acls.json"));
   }

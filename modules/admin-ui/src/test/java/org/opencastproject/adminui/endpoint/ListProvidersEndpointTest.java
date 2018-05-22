@@ -50,19 +50,19 @@ public class ListProvidersEndpointTest {
 
   @Test
   public void testGetGeneric() throws ParseException {
-    JSONObject all = (JSONObject) parser.parse(given().log().all()
+    JSONObject all = (JSONObject) parser.parse(given()
             .pathParam("id", TestListProvidersEndpoint.PROVIDER_NAME).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("2", containsString(TestListProvidersEndpoint.PROVIDER_VALUES[2]))
             .body("", hasValue("z")).when().get(rt.host("/{id}.json")).asString());
 
     assertEquals(TestListProvidersEndpoint.PROVIDER_VALUES.length, all.entrySet().size());
 
-    given().log().all().pathParam("id", "missingprovider").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
+    given().pathParam("id", "missingprovider").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("/{id}.json"));
 
     int limit = 2;
     int offset = 2;
-    JSONObject limited = (JSONObject) parser.parse(given().log().all()
+    JSONObject limited = (JSONObject) parser.parse(given()
             .pathParam("id", TestListProvidersEndpoint.PROVIDER_NAME).queryParam("limit", limit)
             .queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("/{id}.json"))
             .asString());
@@ -79,7 +79,7 @@ public class ListProvidersEndpointTest {
 
   @Test
   public void testGetWithFilters() throws ParseException {
-    Response response = given().log().all().pathParam("id", "SERVERS").param("filter", "name=non existing name")
+    Response response = given().pathParam("id", "SERVERS").param("filter", "name=non existing name")
       .when().get(rt.host("/{id}.json"))
       .then().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
       .extract().response();
