@@ -371,9 +371,8 @@ public class EncoderEngine implements AutoCloseable {
       logger.debug(message);
       Matcher matcher = outputPattern.matcher(message);
       if (matcher.find()) {
-        String outputPath = StringUtils.trimToNull(matcher.group(1));
-        if (outputPath != null && !StringUtils.equalsIgnoreCase("null", outputPath)
-                && !StringUtils.equals("NUL", outputPath)
+        String outputPath = matcher.group(1);
+        if (!StringUtils.equals("NUL", outputPath)
                 && !StringUtils.equals("/dev/null", outputPath)
                 && !StringUtils.startsWith("pipe:", outputPath)) {
           File outputFile = new File(outputPath);
