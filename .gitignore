@@ -39,9 +39,6 @@ docs/guides/*/site
 Makefile
 /modules/matterhorn-admin-ui-ng/bower_components/
 
-# Ignore package-lock.json
-/modules/matterhorn-admin-ui-ng/package-lock.json
-
 # Ignore OS artifacts
 .DS_Store
 

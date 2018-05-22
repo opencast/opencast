@@ -80,7 +80,7 @@ module.exports = function (config) {
 
         coverageReporter: {
             type : 'html',
-            dir : '../../../coverage/'
+            dir : '../../../target/coverage/'
         },
 
         ngHtml2JsPreprocessor: {
