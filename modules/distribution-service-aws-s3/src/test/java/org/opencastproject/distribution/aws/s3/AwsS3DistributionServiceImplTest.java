@@ -115,7 +115,7 @@ public class AwsS3DistributionServiceImplTest {
             serviceRegistry.createJob(
                     AwsS3DistributionServiceImpl.JOB_TYPE,
                     AwsS3DistributionServiceImpl.Operation.Distribute.toString(),
-                    args
+                    args, AwsS3DistributionServiceImpl.DEFAULT_DISTRIBUTE_JOB_LOAD
             )).andReturn(null).once();
     EasyMock.replay(serviceRegistry);
 
@@ -141,7 +141,7 @@ public class AwsS3DistributionServiceImplTest {
             serviceRegistry.createJob(
                     AwsS3DistributionServiceImpl.JOB_TYPE,
                     AwsS3DistributionServiceImpl.Operation.Distribute.toString(),
-                    args
+                    args, AwsS3DistributionServiceImpl.DEFAULT_DISTRIBUTE_JOB_LOAD
                     )).andReturn(null).once();
     EasyMock.replay(serviceRegistry);
 
@@ -167,7 +167,7 @@ public class AwsS3DistributionServiceImplTest {
             serviceRegistry.createJob(
                     AwsS3DistributionServiceImpl.JOB_TYPE,
                     AwsS3DistributionServiceImpl.Operation.Retract.toString(),
-                    args
+                    args, AwsS3DistributionServiceImpl.DEFAULT_RETRACT_JOB_LOAD
             )).andReturn(null).once();
     EasyMock.replay(serviceRegistry);
 
@@ -191,7 +191,7 @@ public class AwsS3DistributionServiceImplTest {
             serviceRegistry.createJob(
                     AwsS3DistributionServiceImpl.JOB_TYPE,
                     AwsS3DistributionServiceImpl.Operation.Retract.toString(),
-                    args
+                    args, AwsS3DistributionServiceImpl.DEFAULT_RETRACT_JOB_LOAD
             )).andReturn(null).once();
     EasyMock.replay(serviceRegistry);
 

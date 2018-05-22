@@ -1,6 +1,5 @@
 /node_modules
 /dist
-/.tmp
 /.sass-cache
 www
 .jshintrc
@@ -8,7 +7,6 @@ deploy.sh
 proxy.sh
 *.swo
 bin
-coverage
 src/test/resources/*.jar
 src/test/resources/chromedriver
 .agignore

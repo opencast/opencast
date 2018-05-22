@@ -42,9 +42,6 @@ docs/guides/*/site
 Makefile
 /modules/admin-ui/bower_components/
 
-# Ignore package-lock.json
-/modules/admin-ui/package-lock.json
-
 # Ignore OS artifacts
 .DS_Store
 
