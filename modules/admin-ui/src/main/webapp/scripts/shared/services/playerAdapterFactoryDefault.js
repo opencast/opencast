@@ -33,7 +33,28 @@ angular.module('adminNg.services')
          */
         var DefaultAdapter = function (targetElement) {
             // keep a reference to this, for callbacks.
-            var me = this;
+            var me = this, eventMapping = PlayerAdapter.eventMapping();
+
+            eventMapping
+                .map(PlayerAdapter.EVENTS.PAUSE, 'pause')
+                .map(PlayerAdapter.EVENTS.PLAY, 'play')
+                .map(PlayerAdapter.EVENTS.READY, 'ready')
+                .map(PlayerAdapter.EVENTS.TIMEUPDATE, 'timeupdate')
+                .map(PlayerAdapter.EVENTS.DURATION_CHANGE, 'durationchange')
+                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay')
+                .map(PlayerAdapter.EVENTS.VOLUMECHANGE, 'volumechange');
+
+            // Check if the given target Element is valid
+            if (typeof targetElement === 'undefined' || targetElement === null) {
+                throw 'The given target element must not be null and have to be a valid HTMLElement!';
+            }
+
+            /**
+             * Id of the player adapter
+             * @inner
+             * @type {String}
+             */
+            this.id = 'PlayerAdapter' + targetElement.id;
 
             // The state of adapter implementations must be delegated here.
             this.state = {
@@ -105,6 +126,17 @@ angular.module('adminNg.services')
             // =========================
             // ADAPTER API
             // =========================
+
+            /**
+             * Register a listener listening to events of type. The event name will be translated from
+             * API event (@see PlayerAdapter) to native events of the player implementation.
+             *
+             * @param type
+             * @param listener
+             */
+            this.addListener = function (type, listener) {
+                targetElement.addEventListener(eventMapping.resolveNativeName(type), listener);
+            };
 
             /**
              * Play the video
@@ -237,6 +269,7 @@ angular.module('adminNg.services')
              * Copies the API's default implementation methods to the target.
              */
             this.extend = function (target) {
+                target.addListener = me.addListener;
                 target.play = me.play;
                 target.canPlay = me.canPlay;
                 target.pause = me.pause;
