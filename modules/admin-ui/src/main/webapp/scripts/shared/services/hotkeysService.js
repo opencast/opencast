@@ -39,7 +39,7 @@ angular.module('adminNg.services')
               var properties = info.org.properties;
               angular.forEach(Object.keys(properties), function (key) {
                 if (key.indexOf("admin.shortcut.") >= 0) {
-                  var keyIdentifier = key.substring(15),
+                  var keyIdentifier = key.substring("admin.shortcut.".length),
                       value = properties[key];
                   me.keyBindings[keyIdentifier] = value;
                 }
@@ -63,7 +63,7 @@ angular.module('adminNg.services')
             });
           }
         });
-      }
+      };
 
       this.activateUniversalHotkey = function (keyIdentifier, description, callback) {
         me.loading.then(function () {
@@ -76,7 +76,7 @@ angular.module('adminNg.services')
             });
           }
         });
-      }
+      };
       this.loading = this.loadHotkeys();
     };
 

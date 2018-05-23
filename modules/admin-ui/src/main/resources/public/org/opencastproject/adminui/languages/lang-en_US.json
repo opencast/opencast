@@ -1922,7 +1922,7 @@
        }
      }
    },
-   "DASHBOARD":{
+   "DASHBOARD": {
        "RUNNING":   "Running",
        "FINISHED":  "Finished",
        "PAUSED" :   "Paused",

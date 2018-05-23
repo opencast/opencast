@@ -30,7 +30,7 @@ describe('Tools Edit controller', function () {
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
 
-        $controller('ToolsCtrl', {$scope: $scope});
+        $controller('ToolsCtrl', { $scope: $scope });
     }));
 
     beforeEach(function () {
