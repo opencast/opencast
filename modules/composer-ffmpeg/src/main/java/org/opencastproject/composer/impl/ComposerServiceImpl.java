@@ -1074,9 +1074,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
 
       // Put the file in the workspace
-      InputStream in = null;
-      try {
-        in = new FileInputStream(output);
+
+      try (InputStream in = new FileInputStream(output)) {
         URI returnURL = workspace.putInCollection(COLLECTION,
                 job.getId() + "_" + i++ + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
         logger.debug("Copied image file to the workspace at {}", returnURL);
@@ -1087,8 +1086,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         incident().recordFailure(job, WORKSPACE_PUT_COLLECTION_IO_EXCEPTION, e,
                 getWorkspaceCollectionParams("extracted image file", COLLECTION, output.toURI()), NO_DETAILS);
         throw new EncoderException("Unable to put image file into the workspace", e);
-      } finally {
-        IOUtils.closeQuietly(in);
       }
     }
 
@@ -1590,9 +1587,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   private URI putToCollection(Job job, File output, String description) throws EncoderException {
     URI returnURL = null;
-    InputStream in = null;
-    try {
-      in = new FileInputStream(output);
+    try (InputStream in = new FileInputStream(output)) {
       returnURL = workspace.putInCollection(COLLECTION,
               job.getId() + "." + FilenameUtils.getExtension(output.getAbsolutePath()), in);
       logger.info("Copied the {} to the workspace at {}", description, returnURL);
@@ -1604,7 +1599,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new EncoderException("Unable to put the " + description + " into the workspace", e);
     } finally {
       cleanup(output);
-      IOUtils.closeQuietly(in);
     }
   }
 
@@ -1619,17 +1613,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   private Map<String, String> parseProperties(String serializedProperties) throws IOException {
     Properties properties = new Properties();
-    InputStream in = null;
-    try {
-      in = IOUtils.toInputStream(serializedProperties, "UTF-8");
+    try (InputStream in = IOUtils.toInputStream(serializedProperties, "UTF-8")) {
       properties.load(in);
       Map<String, String> map = new HashMap<>();
       for (Entry<Object, Object> e : properties.entrySet()) {
         map.put((String) e.getKey(), (String) e.getValue());
       }
       return map;
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 
