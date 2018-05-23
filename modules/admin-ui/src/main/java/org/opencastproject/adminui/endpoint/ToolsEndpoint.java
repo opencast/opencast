@@ -375,7 +375,7 @@ public class ToolsEndpoint implements ManagedService {
           @Context HttpServletRequest request) throws IndexServiceException, NotFoundException {
     String details;
     try (InputStream is = request.getInputStream()) {
-      details = IOUtils.toString(is);
+      details = IOUtils.toString(is, request.getCharacterEncoding());
     } catch (IOException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));
       return R.serverError();
