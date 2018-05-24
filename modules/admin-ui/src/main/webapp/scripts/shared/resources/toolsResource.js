@@ -58,9 +58,9 @@ angular.module('adminNg.resources')
                 }
                 // Fill gaps between segments
                 //dont use angular.forEach here see MH-11169
-                for (var index=0;index<data.segments.length;index++) {
+                for (var index = 0; index < data.segments.length; index++) {
                     var previous = data.segments[index - 1];
-                    var segmentStart=data.segments[index].start-1;
+                    var segmentStart = data.segments[index].start - 1;
                     if (previous && previous.end < segmentStart) {
                         data.segments.splice(index, 0, {
                             start: previous.end,
