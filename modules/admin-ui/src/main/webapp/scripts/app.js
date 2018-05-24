@@ -107,7 +107,7 @@ angular.module('adminNg', [
     }]);
 }])
 .config(['hotkeysProvider', function (hotkeysProvider) {
-    hotkeysProvider.includeCheatSheet = false;
+    hotkeysProvider.includeCheatSheet = true;
 }])
 .config(['chosenProvider', function (chosenProvider) {
     chosenProvider.setOption({
