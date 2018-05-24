@@ -52,23 +52,10 @@ angular.module('adminNg.services')
         });
       };
 
-      this.activateHotkey = function (scope, keyIdentifier, description, callback) {
+      function activateHotkey(hotkeys, keyIdentifier, description, callback) {
         me.loading.then(function () {
           var key = me.keyBindings[keyIdentifier];
-          if (key !== undefined) {
-            hotkeys.bindTo(scope).add({
-              combo: key,
-              description: description,
-              callback: callback
-            });
-          }
-        });
-      };
-
-      this.activateUniversalHotkey = function (keyIdentifier, description, callback) {
-        me.loading.then(function () {
-          var key = me.keyBindings[keyIdentifier];
-          if (key !== undefined) {
+          if (key) {
             hotkeys.add({
               combo: key,
               description: description,
@@ -77,6 +64,15 @@ angular.module('adminNg.services')
           }
         });
       };
+
+      this.activateHotkey = function (scope, keyIdentifier, description, callback) {
+        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, description, callback);
+      };
+
+      this.activateUniversalHotkey = function (keyIdentifier, description, callback) {
+        activateHotkey(hotkeys, keyIdentifier, description, callback);
+      };
+
       this.loading = this.loadHotkeys();
     };
 
