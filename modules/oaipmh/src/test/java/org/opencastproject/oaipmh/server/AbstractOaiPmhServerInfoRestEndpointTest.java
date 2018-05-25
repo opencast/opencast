@@ -37,15 +37,13 @@ public class AbstractOaiPmhServerInfoRestEndpointTest {
 
   @Test
   public void testHasRepo() throws Exception {
-    given().log().all()
-            .pathParam("repoId", "UNKNOWN")
-            .expect().log().all()
+    given().pathParam("repoId", "UNKNOWN")
+            .expect()
             .statusCode(HttpStatus.SC_OK)
             .body(equalTo("false"))
             .when().get(env.host("/hasrepo/{repoId}"));
-    given().log().all()
-            .pathParam("repoId", "default")
-            .expect().log().all()
+    given().pathParam("repoId", "default")
+            .expect()
             .statusCode(HttpStatus.SC_OK)
             .body(equalTo("true"))
             .when().get(env.host("/hasrepo/{repoId}"));
@@ -53,8 +51,7 @@ public class AbstractOaiPmhServerInfoRestEndpointTest {
 
   @Test
   public void testGetMountPoint() throws Exception {
-    given().log().all()
-            .expect().log().all()
+    given().expect()
             .body(equalTo("/oaipmh"))
             .when().get(env.host("/mountpoint"));
   }
