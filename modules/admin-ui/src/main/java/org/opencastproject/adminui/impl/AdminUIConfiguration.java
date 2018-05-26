@@ -46,7 +46,7 @@ public class AdminUIConfiguration implements ManagedService {
 
   private String previewSubtype = "preview";
   private String waveformSubtype = "waveform";
-  private Set<String> smilCatalogTagSet = new HashSet<String>();
+  private Set<String> smilCatalogTagSet = new HashSet<>();
   private MediaPackageElementFlavor smilCatalogFlavor = new MediaPackageElementFlavor("smil", "cutting");
   private MediaPackageElementFlavor smilSilenceFlavor = new MediaPackageElementFlavor("*", "silence");
 
@@ -79,27 +79,27 @@ public class AdminUIConfiguration implements ManagedService {
     String preview = StringUtils.trimToNull((String) properties.get(OPT_PREVIEW_SUBTYPE));
     if (preview != null) {
       previewSubtype = preview;
-      logger.info("Preview subtype is '{}'", previewSubtype);
+      logger.debug("Preview subtype is '{}'", previewSubtype);
     } else {
-      logger.warn("No preview subtype configured, using '{}'", previewSubtype);
+      logger.debug("No preview subtype configured, using '{}'", previewSubtype);
     }
 
     // Waveform subtype
     String waveform = StringUtils.trimToNull((String) properties.get(OPT_WAVEFORM_SUBTYPE));
     if (waveform != null) {
       waveformSubtype = waveform;
-      logger.info("Waveform subtype is '{}'", waveformSubtype);
+      logger.debug("Waveform subtype is '{}'", waveformSubtype);
     } else {
-      logger.warn("No waveform subtype configured, using '{}'", waveformSubtype);
+      logger.debug("No waveform subtype configured, using '{}'", waveformSubtype);
     }
 
     // SMIL catalog flavor
     String smilCatalog = StringUtils.trimToNull((String) properties.get(OPT_SMIL_CATALOG_FLAVOR));
     if (smilCatalog != null) {
       smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(smilCatalog);
-      logger.info("Smil catalg flavor is '{}'", smilCatalogFlavor);
+      logger.debug("Smil catalg flavor is '{}'", smilCatalogFlavor);
     } else {
-      logger.warn("No smil catalog flavor configured, using '{}'", smilCatalogFlavor);
+      logger.debug("No smil catalog flavor configured, using '{}'", smilCatalogFlavor);
     }
 
     // SMIL catalog tags
@@ -107,18 +107,20 @@ public class AdminUIConfiguration implements ManagedService {
     if (smilCatalogTags != null) {
       smilCatalogTagSet.clear();
       smilCatalogTagSet.addAll(Arrays.asList(smilCatalogTags));
-      logger.info("Smil catalg tags are '{}'", StringUtils.join(smilCatalogTagSet, ","));
+      logger.debug("Smil catalg tags are '{}'", smilCatalogTagSet);
     } else {
-      logger.warn("No smil catalog tags configured");
+      smilCatalogTagSet.clear();
+      smilCatalogTagSet.add("archive");
+      logger.debug("Using default smil catalg tags '{}'", smilCatalogTagSet);
     }
 
     // SMIL silence flavor
     String smilSilence = StringUtils.trimToNull((String) properties.get(OPT_SMIL_SILENCE_FLAVOR));
     if (smilSilence != null) {
       smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(smilSilence);
-      logger.info("Smil silence flavor is '{}'", smilSilenceFlavor);
+      logger.debug("Smil silence flavor is '{}'", smilSilenceFlavor);
     } else {
-      logger.warn("No smil silence flavor configured, using '{}'", smilSilenceFlavor);
+      logger.debug("No smil silence flavor configured, using '{}'", smilSilenceFlavor);
     }
   }
 

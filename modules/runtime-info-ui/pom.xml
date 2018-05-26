@@ -32,26 +32,7 @@
                 <resource>
                   <directory>../runtime-info-ui-ng/src/main/resources/ui/</directory>
                   <includes>
-                    <include>rest_docs.html</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-logos</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/img/logo</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/img/logo/</directory>
-                  <includes>
-                    <include> **/* </include>
+                    <include>**/*</include>
                   </includes>
                   <filtering>false</filtering>
                 </resource>

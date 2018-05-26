@@ -119,9 +119,10 @@ public class CaptureAgentsEndpointTest {
 
   @Test
   public void testGetAllCaptureAgents() throws Exception {
-    String expectedWithInputs = IOUtils.toString(CaptureAgentsEndpointTest.class.getResource("/capture_agents.json"));
+    String expectedWithInputs = IOUtils.toString(CaptureAgentsEndpointTest.class.getResource("/capture_agents.json"),
+      "utf-8");
     String expectedWithoutInputs = IOUtils.toString(CaptureAgentsEndpointTest.class
-            .getResource("/capture_agents_noinputs.json"));
+            .getResource("/capture_agents_noinputs.json"), "utf-8");
 
     String result = given().queryParam("inputs", true).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(4)).body("offset", equalTo(0))
@@ -144,7 +145,7 @@ public class CaptureAgentsEndpointTest {
 
     given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
-            .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
+            .body("limit", equalTo(limit)).body("results", hasSize(total - offset)).when()
             .get(rt.host("/agents.json"));
 
     offset = 0;
@@ -152,7 +153,7 @@ public class CaptureAgentsEndpointTest {
 
     given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
-            .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
+            .body("limit", equalTo(limit)).body("results", hasSize(limit)).when()
             .get(rt.host("/agents.json"));
 
     offset = 2;
@@ -160,7 +161,7 @@ public class CaptureAgentsEndpointTest {
 
     given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
-            .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
+            .body("limit", equalTo(limit)).body("results", hasSize(limit)).when()
             .get(rt.host("/agents.json"));
   }
 

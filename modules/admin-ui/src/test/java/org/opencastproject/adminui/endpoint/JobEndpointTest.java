@@ -68,143 +68,144 @@ public class JobEndpointTest {
 
   @Test
   public void testJobsRequest() throws Exception {
-    String eventString = IOUtils.toString(getClass().getResource("/jobs.json"));
+    String eventString = IOUtils.toString(getClass().getResource("/jobs.json"), "utf-8");
 
     String actual = given().expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).when()
             .get(rt.host("/jobs.json")).asString();
 
-    eventString = IOUtils.toString(getClass().getResource("/jobsLimitOffset.json"));
+    assertThat(eventString, SameJSONAs.sameJSONAs(actual));
 
-    actual = given().queryParam("offset", 1).queryParam("limit", 1).expect().log().all().statusCode(HttpStatus.SC_OK)
+    eventString = IOUtils.toString(getClass().getResource("/jobsLimitOffset.json"), "utf-8");
+
+    actual = given().queryParam("offset", 1).queryParam("limit", 1).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/jobs.json")).asString();
-    logger.info(actual);
 
     assertThat(eventString, SameJSONAs.sameJSONAs(actual));
   }
 
   @Test
   public void testSortCreator() {
-    given().param("sort", "creator:ASC").log().all().expect()
+    given().param("sort", "creator:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].creator", equalTo("testuser1"))
-            .content("results[1].creator", equalTo("testuser1"))
-            .content("results[2].creator", equalTo("testuser2"))
-            .content("results[3].creator", equalTo("testuser3"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].creator", equalTo("testuser1"))
+            .body("results[1].creator", equalTo("testuser1"))
+            .body("results[2].creator", equalTo("testuser2"))
+            .body("results[3].creator", equalTo("testuser3"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "creator:DESC").log().all().expect()
+    given().param("sort", "creator:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].creator", equalTo("testuser3"))
-            .content("results[1].creator", equalTo("testuser2"))
-            .content("results[2].creator", equalTo("testuser1"))
-            .content("results[3].creator", equalTo("testuser1"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].creator", equalTo("testuser3"))
+            .body("results[1].creator", equalTo("testuser2"))
+            .body("results[2].creator", equalTo("testuser1"))
+            .body("results[3].creator", equalTo("testuser1"))
             .when().get(rt.host("/jobs.json"));
   }
 
   @Test
   public void testSortOperation() {
-    given().param("sort", "operation:ASC").log().all().expect()
+    given().param("sort", "operation:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].operation", equalTo("Encode"))
-            .content("results[1].operation", equalTo("Inspect"))
-            .content("results[2].operation", equalTo("RESUME"))
-            .content("results[3].operation", equalTo("test"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].operation", equalTo("Encode"))
+            .body("results[1].operation", equalTo("Inspect"))
+            .body("results[2].operation", equalTo("RESUME"))
+            .body("results[3].operation", equalTo("test"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "operation:DESC").log().all().expect()
+    given().param("sort", "operation:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].operation", equalTo("test"))
-            .content("results[1].operation", equalTo("RESUME"))
-            .content("results[2].operation", equalTo("Inspect"))
-            .content("results[3].operation", equalTo("Encode"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].operation", equalTo("test"))
+            .body("results[1].operation", equalTo("RESUME"))
+            .body("results[2].operation", equalTo("Inspect"))
+            .body("results[3].operation", equalTo("Encode"))
             .when().get(rt.host("/jobs.json"));
   }
 
   @Test
   public void testSortProcessingHost() {
-    given().param("sort", "processingHost:ASC").log().all().expect()
+    given().param("sort", "processingHost:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].processingHost", equalTo("host1"))
-            .content("results[1].processingHost", equalTo("host1"))
-            .content("results[2].processingHost", equalTo("host2"))
-            .content("results[3].processingHost", equalTo("host3"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].processingHost", equalTo("host1"))
+            .body("results[1].processingHost", equalTo("host1"))
+            .body("results[2].processingHost", equalTo("host2"))
+            .body("results[3].processingHost", equalTo("host3"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "processingHost:DESC").log().all().expect()
+    given().param("sort", "processingHost:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].processingHost", equalTo("host3"))
-            .content("results[1].processingHost", equalTo("host2"))
-            .content("results[2].processingHost", equalTo("host1"))
-            .content("results[3].processingHost", equalTo("host1"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].processingHost", equalTo("host3"))
+            .body("results[1].processingHost", equalTo("host2"))
+            .body("results[2].processingHost", equalTo("host1"))
+            .body("results[3].processingHost", equalTo("host1"))
             .when().get(rt.host("/jobs.json"));
   }
 
   @Test
   public void testSortStarted() {
-    given().param("sort", "started:ASC").log().all().expect()
+    given().param("sort", "started:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].started", equalTo("2014-06-05T09:05:00Z"))
-            .content("results[1].started", equalTo("2014-06-05T09:10:00Z"))
-            .content("results[2].started", equalTo("2014-06-05T09:11:11Z"))
-            .content("results[3].started", equalTo("2014-06-05T09:16:00Z"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].started", equalTo("2014-06-05T09:05:00Z"))
+            .body("results[1].started", equalTo("2014-06-05T09:10:00Z"))
+            .body("results[2].started", equalTo("2014-06-05T09:11:11Z"))
+            .body("results[3].started", equalTo("2014-06-05T09:16:00Z"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "started:DESC").log().all().expect()
+    given().param("sort", "started:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].started", equalTo("2014-06-05T09:16:00Z"))
-            .content("results[1].started", equalTo("2014-06-05T09:11:11Z"))
-            .content("results[2].started", equalTo("2014-06-05T09:10:00Z"))
-            .content("results[3].started", equalTo("2014-06-05T09:05:00Z"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].started", equalTo("2014-06-05T09:16:00Z"))
+            .body("results[1].started", equalTo("2014-06-05T09:11:11Z"))
+            .body("results[2].started", equalTo("2014-06-05T09:10:00Z"))
+            .body("results[3].started", equalTo("2014-06-05T09:05:00Z"))
             .when().get(rt.host("/jobs.json"));
   }
 
   @Test
   public void testSortSubmitted() {
-    given().param("sort", "submitted:ASC").log().all().expect()
+    given().param("sort", "submitted:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].submitted", equalTo("2014-06-05T09:05:00Z"))
-            .content("results[1].submitted", equalTo("2014-06-05T09:10:00Z"))
-            .content("results[2].submitted", equalTo("2014-06-05T09:11:11Z"))
-            .content("results[3].submitted", equalTo("2014-06-05T09:16:00Z"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].submitted", equalTo("2014-06-05T09:05:00Z"))
+            .body("results[1].submitted", equalTo("2014-06-05T09:10:00Z"))
+            .body("results[2].submitted", equalTo("2014-06-05T09:11:11Z"))
+            .body("results[3].submitted", equalTo("2014-06-05T09:16:00Z"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "started:DESC").log().all().expect()
+    given().param("sort", "started:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].submitted", equalTo("2014-06-05T09:16:00Z"))
-            .content("results[1].submitted", equalTo("2014-06-05T09:11:11Z"))
-            .content("results[2].submitted", equalTo("2014-06-05T09:10:00Z"))
-            .content("results[3].submitted", equalTo("2014-06-05T09:05:00Z"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].submitted", equalTo("2014-06-05T09:16:00Z"))
+            .body("results[1].submitted", equalTo("2014-06-05T09:11:11Z"))
+            .body("results[2].submitted", equalTo("2014-06-05T09:10:00Z"))
+            .body("results[3].submitted", equalTo("2014-06-05T09:05:00Z"))
             .when().get(rt.host("/jobs.json"));
   }
 
   @Test
   public void testSortType() {
-    given().param("sort", "type:ASC").log().all().expect()
+    given().param("sort", "type:ASC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].type", equalTo("org.opencastproject.composer"))
-            .content("results[1].type", equalTo("org.opencastproject.composer"))
-            .content("results[2].type", equalTo("org.opencastproject.inspection"))
-            .content("results[3].type", equalTo("org.opencastproject.workflow"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].type", equalTo("org.opencastproject.composer"))
+            .body("results[1].type", equalTo("org.opencastproject.composer"))
+            .body("results[2].type", equalTo("org.opencastproject.inspection"))
+            .body("results[3].type", equalTo("org.opencastproject.workflow"))
             .when().get(rt.host("/jobs.json"));
 
-    given().param("sort", "type:DESC").log().all().expect()
+    given().param("sort", "type:DESC").expect()
             .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
-            .content("count", equalTo(4)).content("total", equalTo(4))
-            .content("results[0].type", equalTo("org.opencastproject.workflow"))
-            .content("results[1].type", equalTo("org.opencastproject.inspection"))
-            .content("results[2].type", equalTo("org.opencastproject.composer"))
-            .content("results[3].type", equalTo("org.opencastproject.composer"))
+            .body("count", equalTo(4)).body("total", equalTo(4))
+            .body("results[0].type", equalTo("org.opencastproject.workflow"))
+            .body("results[1].type", equalTo("org.opencastproject.inspection"))
+            .body("results[2].type", equalTo("org.opencastproject.composer"))
+            .body("results[3].type", equalTo("org.opencastproject.composer"))
             .when().get(rt.host("/jobs.json"));
   }
 

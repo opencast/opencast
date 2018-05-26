@@ -20,7 +20,6 @@
  */
 'use strict';
 
-// Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('VideoEditCtrl', ['$scope', '$translate', 'PlayerAdapter', 'VideoService', 'HotkeysService', 'Notifications',
     function ($scope, $translate, PlayerAdapter, VideoService, HotkeysService, Notifications) {
@@ -57,10 +56,10 @@ angular.module('adminNg.controllers')
         };
 
         $scope.clearSelectedSegment = function () {
-            
+
             angular.forEach($scope.video.segments, function (segment) {
                 if (segment.selected) {
-                    
+
                     var index = $scope.video.segments.indexOf(segment);
 
                     if ($scope.video.segments[index - 1]) {
@@ -116,50 +115,74 @@ angular.module('adminNg.controllers')
             }
         };
 
-        HotkeysService.activateHotkey($scope, "editor.split_at_current_time",
-          "split the video at current time", function(event) {
-              event.preventDefault();
-              $scope.split();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.split_at_current_time",
+            "split the video at current time",
+            function (event) {
+                event.preventDefault();
+                $scope.split();
+            }
+        );
 
-        HotkeysService.activateHotkey($scope, "editor.cut_selected_segment",
-          "remove current segment", function(event) {
-              event.preventDefault();
-              $scope.cut();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.cut_selected_segment",
+            "remove current segment",
+            function (event) {
+                event.preventDefault();
+                $scope.cut();
+            }
+        );
 
-        HotkeysService.activateHotkey($scope, "editor.play_current_segment",
-          "play current segment", function(event) {
-              event.preventDefault();
-              $scope.replay();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.play_current_segment",
+            "play current segment",
+            function (event) {
+                event.preventDefault();
+                $scope.replay();
+            }
+        );
 
-        HotkeysService.activateHotkey($scope, "editor.clear_list",
-          "clear segment list", function(event) {
-              event.preventDefault();
-              $scope.clearSegments();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.clear_list",
+            "clear segment list",
+            function (event) {
+                event.preventDefault();
+                $scope.clearSegments();
+            }
+        );
 
-        HotkeysService.activateHotkey($scope, "editor.play_current_segment_with_pre-roll",
-          "Play current segment with pre-roll", function(event) {
-              event.preventDefault();
-              $scope.replayPreRoll();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.play_current_segment_with_pre-roll",
+            "Play current segment with pre-roll",
+            function (event) {
+                event.preventDefault();
+                $scope.replayPreRoll();
+            }
+        );
 
-        HotkeysService.activateHotkey($scope, "editor.play_ending_of_current_segment",
-          "Play end of segment", function(event) {
-              event.preventDefault();
-              $scope.replayEndOfSegment();
-        });
+        HotkeysService.activateHotkey(
+            $scope,
+            "editor.play_ending_of_current_segment",
+            "Play end of segment",
+            function (event) {
+                event.preventDefault();
+                $scope.replayEndOfSegment();
+            }
+        );
 
-        $scope.$on('ACTIVE_TRANSACTION', function() {
+        $scope.$on('ACTIVE_TRANSACTION', function () {
             if (!$scope.submitButton) {
                 $scope.submitButton = true;
                 notificationId = Notifications.add('warning', 'ACTIVE_TRANSACTION', NOTIFICATION_CONTEXT, -1);
             }
         });
 
-        $scope.$on('NO_ACTIVE_TRANSACTION', function() {
+        $scope.$on('NO_ACTIVE_TRANSACTION', function () {
             if ($scope.submitButton) {
                 $scope.submitButton = false;
                 if (notificationId) {
@@ -170,7 +193,7 @@ angular.module('adminNg.controllers')
         });
 
         // This shows a confirmation dialog when the user leaves the editor while he has unsaved changes
-        $scope.onUnload = function(event) {
+        $scope.onUnload = function (event) {
             if (!$scope.unsavedChanges) return undefined;
             var answer = confirm(window.unloadConfirmMsg);
             if (!answer) {
@@ -182,14 +205,12 @@ angular.module('adminNg.controllers')
 
         // register listeners to show confirmation dialog when user leaves editor with unsaved changes
         window.addEventListener('beforeunload', $scope.onUnload);
-        $scope.$on('$locationChangeStart', function(event) {
-            $scope.onUnload(event)
-        });
-        $scope.$on('$destroy', function() {
+        $scope.$on('$locationChangeStart', $scope.onUnload);
+        $scope.$on('$destroy', function () {
             window.removeEventListener('beforeunload', $scope.onUnload);
         });
 
-        $translate('VIDEO_TOOL.WARNING_UNSAVED').then(function(translation) {
+        $translate('VIDEO_TOOL.WARNING_UNSAVED').then(function (translation) {
             window.unloadConfirmMsg = translation;
         });
     }

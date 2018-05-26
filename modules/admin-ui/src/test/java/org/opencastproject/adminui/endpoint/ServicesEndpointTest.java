@@ -77,7 +77,7 @@ public class ServicesEndpointTest {
     InputStream stream = ServicesEndpointTest.class.getResourceAsStream(TEST_DATA_JSON);
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host(TEST_DATA_JSON)).asString());
 
     ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
@@ -85,327 +85,327 @@ public class ServicesEndpointTest {
 
   @Test
   public void testLimitAndOffset() {
-    given().param("limit", 10).param("offset", 2).log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("limit", 10).param("offset", 2).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("limit", equalTo(10))
-            .content("count", equalTo(4))
-            .content("total", equalTo(6))
-            .content("results[0].name", equalTo("service3"))
-            .content("results[3].name", equalTo("service6"))
+            .body("limit", equalTo(10))
+            .body("count", equalTo(4))
+            .body("total", equalTo(6))
+            .body("results[0].name", equalTo("service3"))
+            .body("results[3].name", equalTo("service6"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("limit", 2).param("offset", 3).log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("limit", 2).param("offset", 3).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("limit", equalTo(2))
-            .content("count", equalTo(2))
-            .content("total", equalTo(6))
-            .content("results[0].name", equalTo("service4"))
-            .content("results[1].name", equalTo("service5"))
+            .body("limit", equalTo(2))
+            .body("count", equalTo(2))
+            .body("total", equalTo(6))
+            .body("results[0].name", equalTo("service4"))
+            .body("results[1].name", equalTo("service5"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("limit", 0).param("offset", 10).log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("limit", 0).param("offset", 10).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("limit", equalTo(0))
-            .content("count", equalTo(0))
-            .content("total", equalTo(6))
+            .body("limit", equalTo(0))
+            .body("count", equalTo(0))
+            .body("total", equalTo(6))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testNameFilter() {
-    given().param("filter", "name:service2").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "name:service2").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(1))
-            .content("total", equalTo(1))
-            .content("results[0].name", equalTo("service2"))
+            .body("count", equalTo(1))
+            .body("total", equalTo(1))
+            .body("results[0].name", equalTo("service2"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "name:service").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "name:service").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(0))
-            .content("total", equalTo(0))
+            .body("count", equalTo(0))
+            .body("total", equalTo(0))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", " name:service2 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", " name:service2 ").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(1))
-            .content("total", equalTo(1))
-            .content("results[0].name", equalTo("service2"))
+            .body("count", equalTo(1))
+            .body("total", equalTo(1))
+            .body("results[0].name", equalTo("service2"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testHostnameFilter() {
-    given().param("filter", "hostname:host1").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "hostname:host1").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(2))
-            .content("total", equalTo(2))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[1].hostname", equalTo("host1"))
+            .body("count", equalTo(2))
+            .body("total", equalTo(2))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[1].hostname", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "hostname:host").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "hostname:host").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(0))
-            .content("total", equalTo(0))
+            .body("count", equalTo(0))
+            .body("total", equalTo(0))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", " hostname:host1 ").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", " hostname:host1 ").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(2))
-            .content("total", equalTo(2))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[1].hostname", equalTo("host1"))
+            .body("count", equalTo(2))
+            .body("total", equalTo(2))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[1].hostname", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testActionsFilter() {
-    given().param("filter", "actions:true").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "actions:true").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(2))
-            .content("total", equalTo(2))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[0].name", equalTo("service2"))
-            .content("results[1].hostname", equalTo("host3"))
-            .content("results[1].name", equalTo("service4"))
+            .body("count", equalTo(2))
+            .body("total", equalTo(2))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[0].name", equalTo("service2"))
+            .body("results[1].hostname", equalTo("host3"))
+            .body("results[1].name", equalTo("service4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "actions:false").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "actions:false").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(4))
-            .content("total", equalTo(4))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[0].name", equalTo("service1"))
-            .content("results[1].hostname", equalTo("host2"))
-            .content("results[1].name", equalTo("service3"))
-            .content("results[2].hostname", equalTo("host2"))
-            .content("results[2].name", equalTo("service5"))
-            .content("results[3].hostname", equalTo("host4"))
-            .content("results[3].name", equalTo("service6"))
+            .body("count", equalTo(4))
+            .body("total", equalTo(4))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[0].name", equalTo("service1"))
+            .body("results[1].hostname", equalTo("host2"))
+            .body("results[1].name", equalTo("service3"))
+            .body("results[2].hostname", equalTo("host2"))
+            .body("results[2].name", equalTo("service5"))
+            .body("results[3].hostname", equalTo("host4"))
+            .body("results[3].name", equalTo("service6"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testFreeTextFilter() {
-    given().param("filter", "textFilter:host1").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:host1").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(2))
-            .content("total", equalTo(2))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[1].hostname", equalTo("host1"))
+            .body("count", equalTo(2))
+            .body("total", equalTo(2))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[1].hostname", equalTo("host1"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "textFilter:service4").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:service4").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(1))
-            .content("total", equalTo(1))
-            .content("results[0].name", equalTo("service4"))
+            .body("count", equalTo(1))
+            .body("total", equalTo(1))
+            .body("results[0].name", equalTo("service4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("filter", "textFilter:2").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("filter", "textFilter:2").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(3))
-            .content("total", equalTo(3))
-            .content("results[0].name", equalTo("service2"))
-            .content("results[1].hostname", equalTo("host2"))
-            .content("results[2].hostname", equalTo("host2"))
+            .body("count", equalTo(3))
+            .body("total", equalTo(3))
+            .body("results[0].name", equalTo("service2"))
+            .body("results[1].hostname", equalTo("host2"))
+            .body("results[2].hostname", equalTo("host2"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testHostSort() {
-    given().param("sort", "hostname:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "hostname:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].hostname", equalTo("host1"))
-            .content("results[1].hostname", equalTo("host1"))
-            .content("results[2].hostname", equalTo("host2"))
-            .content("results[3].hostname", equalTo("host2"))
-            .content("results[4].hostname", equalTo("host3"))
-            .content("results[5].hostname", equalTo("host4"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[0].hostname", equalTo("host1"))
+            .body("results[1].hostname", equalTo("host1"))
+            .body("results[2].hostname", equalTo("host2"))
+            .body("results[3].hostname", equalTo("host2"))
+            .body("results[4].hostname", equalTo("host3"))
+            .body("results[5].hostname", equalTo("host4"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "hostname:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "hostname:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[5].hostname", equalTo("host1"))
-            .content("results[4].hostname", equalTo("host1"))
-            .content("results[3].hostname", equalTo("host2"))
-            .content("results[2].hostname", equalTo("host2"))
-            .content("results[1].hostname", equalTo("host3"))
-            .content("results[0].hostname", equalTo("host4"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[5].hostname", equalTo("host1"))
+            .body("results[4].hostname", equalTo("host1"))
+            .body("results[3].hostname", equalTo("host2"))
+            .body("results[2].hostname", equalTo("host2"))
+            .body("results[1].hostname", equalTo("host3"))
+            .body("results[0].hostname", equalTo("host4"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testNameSort() {
-    given().param("sort", "name:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "name:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].name", equalTo("service1"))
-            .content("results[1].name", equalTo("service2"))
-            .content("results[2].name", equalTo("service3"))
-            .content("results[3].name", equalTo("service4"))
-            .content("results[4].name", equalTo("service5"))
-            .content("results[5].name", equalTo("service6"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[0].name", equalTo("service1"))
+            .body("results[1].name", equalTo("service2"))
+            .body("results[2].name", equalTo("service3"))
+            .body("results[3].name", equalTo("service4"))
+            .body("results[4].name", equalTo("service5"))
+            .body("results[5].name", equalTo("service6"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "name:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "name:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[5].name", equalTo("service1"))
-            .content("results[4].name", equalTo("service2"))
-            .content("results[3].name", equalTo("service3"))
-            .content("results[2].name", equalTo("service4"))
-            .content("results[1].name", equalTo("service5"))
-            .content("results[0].name", equalTo("service6"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[5].name", equalTo("service1"))
+            .body("results[4].name", equalTo("service2"))
+            .body("results[3].name", equalTo("service3"))
+            .body("results[2].name", equalTo("service4"))
+            .body("results[1].name", equalTo("service5"))
+            .body("results[0].name", equalTo("service6"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testRunningJobsSort() {
-    given().param("sort", "running:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "running:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[3].running", equalTo(0))
-            .content("results[4].running", equalTo(1))
-            .content("results[5].running", equalTo(2))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[3].running", equalTo(0))
+            .body("results[4].running", equalTo(1))
+            .body("results[5].running", equalTo(2))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "running:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "running:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].running", equalTo(2))
-            .content("results[1].running", equalTo(1))
-            .content("results[2].running", equalTo(0))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[0].running", equalTo(2))
+            .body("results[1].running", equalTo(1))
+            .body("results[2].running", equalTo(0))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testQueuedJobsSort() {
-    given().param("sort", "queued:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "queued:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[1].queued", equalTo(0))
-            .content("results[2].queued", equalTo(1))
-            .content("results[3].queued", equalTo(1))
-            .content("results[4].queued", equalTo(3))
-            .content("results[5].queued", equalTo(5))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[1].queued", equalTo(0))
+            .body("results[2].queued", equalTo(1))
+            .body("results[3].queued", equalTo(1))
+            .body("results[4].queued", equalTo(3))
+            .body("results[5].queued", equalTo(5))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "queued:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "queued:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[4].queued", equalTo(0))
-            .content("results[3].queued", equalTo(1))
-            .content("results[2].queued", equalTo(1))
-            .content("results[1].queued", equalTo(3))
-            .content("results[0].queued", equalTo(5))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[4].queued", equalTo(0))
+            .body("results[3].queued", equalTo(1))
+            .body("results[2].queued", equalTo(1))
+            .body("results[1].queued", equalTo(3))
+            .body("results[0].queued", equalTo(5))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testCompletedJobsSort() {
-    given().param("sort", "completed:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "completed:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[2].completed", equalTo(0))
-            .content("results[3].completed", equalTo(5))
-            .content("results[4].completed", equalTo(10))
-            .content("results[5].completed", equalTo(20))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[2].completed", equalTo(0))
+            .body("results[3].completed", equalTo(5))
+            .body("results[4].completed", equalTo(10))
+            .body("results[5].completed", equalTo(20))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "completed:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "completed:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[3].completed", equalTo(0))
-            .content("results[2].completed", equalTo(5))
-            .content("results[1].completed", equalTo(10))
-            .content("results[0].completed", equalTo(20))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[3].completed", equalTo(0))
+            .body("results[2].completed", equalTo(5))
+            .body("results[1].completed", equalTo(10))
+            .body("results[0].completed", equalTo(20))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testMeanRunTimeSort() {
-    given().param("sort", "meanRunTime:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "meanRunTime:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[2].meanRunTime", equalTo(0))
-            .content("results[3].meanRunTime", equalTo(10))
-            .content("results[4].meanRunTime", equalTo(30))
-            .content("results[5].meanRunTime", equalTo(123))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[2].meanRunTime", equalTo(0))
+            .body("results[3].meanRunTime", equalTo(10))
+            .body("results[4].meanRunTime", equalTo(30))
+            .body("results[5].meanRunTime", equalTo(123))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "meanRunTime:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "meanRunTime:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[3].meanRunTime", equalTo(0))
-            .content("results[2].meanRunTime", equalTo(10))
-            .content("results[1].meanRunTime", equalTo(30))
-            .content("results[0].meanRunTime", equalTo(123))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[3].meanRunTime", equalTo(0))
+            .body("results[2].meanRunTime", equalTo(10))
+            .body("results[1].meanRunTime", equalTo(30))
+            .body("results[0].meanRunTime", equalTo(123))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testMeanQueuedTimeSort() {
-    given().param("sort", "meanQueueTime:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "meanQueueTime:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].meanQueueTime", equalTo(0))
-            .content("results[1].meanQueueTime", equalTo(0))
-            .content("results[2].meanQueueTime", equalTo(10))
-            .content("results[3].meanQueueTime", equalTo(30))
-            .content("results[4].meanQueueTime", equalTo(60))
-            .content("results[5].meanQueueTime", equalTo(456))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[0].meanQueueTime", equalTo(0))
+            .body("results[1].meanQueueTime", equalTo(0))
+            .body("results[2].meanQueueTime", equalTo(10))
+            .body("results[3].meanQueueTime", equalTo(30))
+            .body("results[4].meanQueueTime", equalTo(60))
+            .body("results[5].meanQueueTime", equalTo(456))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "meanQueueTime:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "meanQueueTime:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[5].meanQueueTime", equalTo(0))
-            .content("results[4].meanQueueTime", equalTo(0))
-            .content("results[3].meanQueueTime", equalTo(10))
-            .content("results[2].meanQueueTime", equalTo(30))
-            .content("results[1].meanQueueTime", equalTo(60))
-            .content("results[0].meanQueueTime", equalTo(456))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[5].meanQueueTime", equalTo(0))
+            .body("results[4].meanQueueTime", equalTo(0))
+            .body("results[3].meanQueueTime", equalTo(10))
+            .body("results[2].meanQueueTime", equalTo(30))
+            .body("results[1].meanQueueTime", equalTo(60))
+            .body("results[0].meanQueueTime", equalTo(456))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 
   @Test
   public void testStatusSort() {
-    given().param("sort", "status:asc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "status:asc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[0].status", equalTo("NORMAL"))
-            .content("results[1].status", equalTo("NORMAL"))
-            .content("results[4].status", equalTo("WARNING"))
-            .content("results[5].status", equalTo("ERROR"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[0].status", equalTo("NORMAL"))
+            .body("results[1].status", equalTo("NORMAL"))
+            .body("results[4].status", equalTo("WARNING"))
+            .body("results[5].status", equalTo("ERROR"))
             .when().get(rt.host(TEST_DATA_JSON));
 
-    given().param("sort", "status:desc").log().all().expect().statusCode(HttpStatus.SC_OK)
+    given().param("sort", "status:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
-            .content("count", equalTo(6))
-            .content("total", equalTo(6))
-            .content("results[5].status", equalTo("NORMAL"))
-            .content("results[4].status", equalTo("NORMAL"))
-            .content("results[1].status", equalTo("WARNING"))
-            .content("results[0].status", equalTo("ERROR"))
+            .body("count", equalTo(6))
+            .body("total", equalTo(6))
+            .body("results[5].status", equalTo("NORMAL"))
+            .body("results[4].status", equalTo("NORMAL"))
+            .body("results[1].status", equalTo("WARNING"))
+            .body("results[0].status", equalTo("ERROR"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 }

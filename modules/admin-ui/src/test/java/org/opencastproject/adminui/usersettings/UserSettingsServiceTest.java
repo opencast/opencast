@@ -194,7 +194,7 @@ public class UserSettingsServiceTest {
   public void addUserSettingInputNormalValuesExpectsSavedSetting() throws UserSettingsServiceException {
     String key = "newKey";
     String value = "newValue";
-    Capture<UserSettingDto> userSettingDto = new Capture<UserSettingDto>();
+    Capture<UserSettingDto> userSettingDto = EasyMock.newCapture();
     EntityTransaction tx = EasyMock.createNiceMock(EntityTransaction.class);
     EasyMock.replay(tx);
 
