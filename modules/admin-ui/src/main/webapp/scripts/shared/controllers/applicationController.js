@@ -126,14 +126,5 @@ angular.module('adminNg.controllers')
             event.preventDefault();
             ResourceModal.show("new-series-modal");
         });
-
-        HotkeysService.activateUniversalHotkey("general.help", "Show Help", function(event) {
-            event.preventDefault();
-            if(angular.element('#help-dd').hasClass('active')) {
-              angular.element('#help-dd').removeClass('active');
-            } else {
-              angular.element('#help-dd').addClass('active');
-            }
-        })
     }
 ]);
