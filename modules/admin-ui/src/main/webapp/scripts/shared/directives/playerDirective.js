@@ -153,9 +153,6 @@ angular.module('adminNg.directives')
                 );
             };
 
-            // TODO Is this shortcut "double booked"?
-            //   I get a strange error message in the console when I hit it,
-            //   which does not seem to have anything to do with this code.
             scope.nextFrame = function () {
                 if (!scope.frameRate) return;
                 scope.player.adapter.setCurrentTime(
