@@ -108,6 +108,8 @@ angular.module('adminNg', [
 }])
 .config(['hotkeysProvider', function (hotkeysProvider) {
     hotkeysProvider.includeCheatSheet = true;
+    hotkeysProvider.cheatSheetDescription = 'general.cheat_sheet';
+    hotkeysProvider.template = '<ng-include src="\'shared/partials/hotkeyCheatSheet.html\'" />';
 }])
 .config(['chosenProvider', function (chosenProvider) {
     chosenProvider.setOption({

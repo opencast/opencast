@@ -52,25 +52,29 @@ angular.module('adminNg.services')
         });
       };
 
-      function activateHotkey(hotkeys, keyIdentifier, description, callback) {
+      function activateHotkey(hotkeys, keyIdentifier, callback) {
         me.loading.then(function () {
           var key = me.keyBindings[keyIdentifier];
           if (key) {
             hotkeys.add({
               combo: key,
-              description: description,
+              // We abuse the `description` argument of `angular-hotkeys` a bit here,
+              // since it is the only place it offers to store custom hotkey identifying
+              // information, which we need in our custom cheat sheet template
+              // to translate and group the keys.
+              description: keyIdentifier,
               callback: callback
             });
           }
         });
       };
 
-      this.activateHotkey = function (scope, keyIdentifier, description, callback) {
-        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, description, callback);
+      this.activateHotkey = function (scope, keyIdentifier, callback) {
+        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, callback);
       };
 
-      this.activateUniversalHotkey = function (keyIdentifier, description, callback) {
-        activateHotkey(hotkeys, keyIdentifier, description, callback);
+      this.activateUniversalHotkey = function (keyIdentifier, callback) {
+        activateHotkey(hotkeys, keyIdentifier, callback);
       };
 
       this.loading = this.loadHotkeys();

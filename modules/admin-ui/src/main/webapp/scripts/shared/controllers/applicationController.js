@@ -107,22 +107,22 @@ angular.module('adminNg.controllers')
             });
         }
 
-        HotkeysService.activateUniversalHotkey("general.event_view", "Open Events Table", function(event) {
+        HotkeysService.activateUniversalHotkey('general.event_view', function (event) {
             event.preventDefault();
             $location.path('/events/events').replace();
         });
 
-        HotkeysService.activateUniversalHotkey("general.series_view", "Open Series Table", function(event) {
+        HotkeysService.activateUniversalHotkey('general.series_view', function (event) {
             event.preventDefault();
             $location.path('/events/series').replace();
         });
 
-        HotkeysService.activateUniversalHotkey("general.new_event", "Create New Event", function(event) {
+        HotkeysService.activateUniversalHotkey('general.new_event', function (event) {
             event.preventDefault();
             ResourceModal.show("new-event-modal");
         });
 
-        HotkeysService.activateUniversalHotkey("general.new_series", "Create New Series", function(event) {
+        HotkeysService.activateUniversalHotkey('general.new_series', function (event) {
             event.preventDefault();
             ResourceModal.show("new-series-modal");
         });

@@ -76,7 +76,7 @@ angular.module('adminNg.directives')
                 Storage.replace(filters, 'filter');
             };
 
-            HotkeysService.activateHotkey(scope, "general.select_next_dashboard_filter", "Select Next Dashboard Filter", function(event) {
+            HotkeysService.activateHotkey(scope, 'general.select_next_dashboard_filter', function (event) {
                 event.preventDefault();
                 if (scope.statsFilterNumber >= scope.stats.stats.length - 1) {
                   scope.statsFilterNumber = -1;
@@ -84,7 +84,7 @@ angular.module('adminNg.directives')
                 scope.showStatsFilter(scope.statsFilterNumber + 1);
             });
 
-            HotkeysService.activateHotkey(scope, "general.select_previous_dashboard_filter", "Select Previous Dashboard Filter", function(event) {
+            HotkeysService.activateHotkey(scope, 'general.select_previous_dashboard_filter', function (event) {
                 event.preventDefault();
                 if (scope.statsFilterNumber <= 0) {
                   scope.statsFilterNumber = scope.stats.stats.length;
@@ -92,7 +92,7 @@ angular.module('adminNg.directives')
                 scope.showStatsFilter(scope.statsFilterNumber - 1);
             });
 
-            HotkeysService.activateHotkey(scope, "general.remove_filters", "Remove Filters", function(event) {
+            HotkeysService.activateHotkey(scope, 'general.remove_filters', function (event) {
                 event.preventDefault();
                 Storage.remove('filter');
                 scope.statsFilterNumber = -1;
