@@ -214,6 +214,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
 
+  /** Default job load when not passed by service creating the job * */
+  static final float DEFAULT_JOB_LOAD = 0.1f;
+
   /** This host's base URL */
   protected String hostName;
 
@@ -394,7 +397,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -415,7 +418,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -439,7 +442,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -463,7 +466,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(),
+            DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -486,7 +490,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
           Job parentJob) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -506,7 +510,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob) throws ServiceRegistryException {
-    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, 1.0f);
+    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
   }
 
   /**

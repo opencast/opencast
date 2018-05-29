@@ -88,7 +88,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
   public static final String COLLECTION_ID = "ocrtext";
 
   /** The approximate load placed on the system by creating a text analysis job */
-  public static final float DEFAULT_ANALYSIS_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_ANALYSIS_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_ANALYSIS_JOB_LOAD} */
   public static final String ANALYSIS_JOB_LOAD_KEY = "job.load.analysis";

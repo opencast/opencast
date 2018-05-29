@@ -110,7 +110,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String OPENCAST_DOWNLOAD_URL = "org.opencastproject.download.url";
 
   /** The load on the system introduced by creating a distribute job */
-  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.2f;
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
 
   /** The load on the system introduced by creating a retract job */
   public static final float DEFAULT_RETRACT_JOB_LOAD = 0.1f;

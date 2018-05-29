@@ -37,10 +37,10 @@ job.
 
 Note: These job loads are specific for each *node* in the cluster.  This means that for any given job, each node can
 have a different load value associated.  For instance, if worker A has no job load specified for its encoding profiles,
-and worker B has job loads specified then any encoding jobs dispatched to A will have a load of 1.0, and jobs dispatched
-to B will have a different, presumably higher load.  There are edge cases where this may be useful, but is most cases
-this will only cause confusion.  It is therefore highly recommended that these settings be put into your configuration
-management system, and be applied on a cluster level to ensure consistency across all nodes.
+and worker B has job loads specified then any encoding jobs created by A will have the default load (0.6), and jobs
+created by B will have a different, presumably higher load.  There are edge cases where this may be useful, but in
+most cases this will only cause confusion.  It is therefore highly recommended that these settings be put into your
+configuration management system, and be applied on a cluster level to ensure consistency across all nodes.
 
 Step 2: Setting the load values for system jobs
 -----------------------------------------------
@@ -57,21 +57,25 @@ is running.  The current files with relevant configuration keys are:
 
 | File                                                                                     | Controls                           |
 |------------------------------------------------------------------------------------------|------------------------------------|
+| org.opencastproject.animate.impl.AnimateServiceImpl.cfg                                  | Animate service                    |
 | org.opencastproject.caption.impl.CaptionServiceImpl.cfg                                  | Caption convertion services        |
-| org.opencastproject.composer.impl.ComposerServiceImpl.cfg                                | Caption embedding services         |
-| org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.cfg | Streaming distribution             |
+| org.opencastproject.distribution.aws.s3.AwsS3DistributionServiceImpl.cfg                 | AWS S3 distribution service        |
 | org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
+| org.opencastproject.distribution.distribution.streaming.<br/>StreamingDistributionService.cfg | Streaming distribution             |
+| org.opencastproject.distribution.streaming.wowza.<br/>WowzaAdaptiveStreamingDistributionService.cfg | Adaptive streaming distribution |
 | org.opencastproject.execute.impl.ExecuteServiceImpl.cfg                                  | Execute service                    |
 | org.opencastproject.ingest.impl.IngestServiceImpl.cfg                                    | Ingest services                    |
 | org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg                     | Media inspection using ffmpeg      |
-| org.opencastproject.inspection.impl.MediaInspectionServiceImpl.cfg                       | Media inspection using mediainfo   |
-| org.opencastproject.publication.youtube.YouTubePublicationServiceImpl.cfg                | Youtube distribution               |
 | org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg              | Youtube distribution               |
 | org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Opencast engage index jobs         |
 | org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.cfg                | Silence detection                  |
+| org.opencastproject.sox.impl.SoxServiceImpl.cfg                                          | Sox service                        |
 | org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg                        | Text analysis, including slide OCR |
+| org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl.cfg              | Timeline previews service          |
+| org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg            | IBM Watson start transcription job |
 | org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg                          | Video editor                       |
 | org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.cfg                  | Video segmentation                 |
+| org.opencastproject.waveform.ffmpeg.WaveformServiceImpl.cfg                              | Waveform generation for video editing |
 
 Note: Ingest jobs are a special case in Opencast.  Because of their immediate nature there is no way to limit the number
 of running jobs.  However, these jobs will block other jobs from running on the ingest/admin nodes if enough ingests
@@ -81,9 +85,9 @@ Step 3: Setting the load values for encoding profiles
 -----------------------------------------------------
 
 Each encoding profile can have a load value associated with it.  By default, we have not set any, which means that the
-default value of 1.0 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
+default value of 0.6 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
 For example, the composite encoding profile is prefixed with `profile.composite.http`.  If we want to set a different
-job load than 1.0, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
+job load than the default, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
 
 Step 4: Restart Opencast
 --------------------------
