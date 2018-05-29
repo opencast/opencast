@@ -123,6 +123,7 @@ pages:
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'
    - Prepare A/V: 'workflowoperationhandlers/prepareav-woh.md'
    - Probe Resolution: 'workflowoperationhandlers/probe-resolution-woh.md'
+   - Process Smil: 'workflowoperationhandlers/process-smil-woh.md'
    - Publish AWS: 'workflowoperationhandlers/publish-aws-woh.md'
    - Publish Configure: 'workflowoperationhandlers/publish-configure-woh.md'
    - Publish Engage: 'workflowoperationhandlers/publish-engage-woh.md'

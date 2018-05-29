@@ -10,45 +10,52 @@ It will concatenate all the clips from the source tracks according to the in/out
 multiple target videos using a list of encoding profiles.
 In addition, the target videos are optionally tagged with the name of the encoding profiles.
 
-The Video editor produces a smil file and by default will also encode one set of edited videos
-targets to be used to do segmentation and then used as source to generate multiple delivery formats.
-This workflow is used to bypass the temporary targets and generate the delivery formats directly.
-Subsequent workflow operations can select the highest quality by tag and flavors as source.
-To bypass the video editor encoding, add the following to the "editor" workflow operation.
+The Video editor produces a SMIL file and by default will also encode one set of edited videos
+targets as an intermediate format to be used to do segmentation and then used as source to generate multiple delivery formats.
+This workflow operation is used to bypass the generation of the temporary targets and generate the delivery formats directly.
+Subsequent workflow operations can select the highest quality source medium by tags and flavors.
+This operation saves the encoding time of one set of full length video and allows concurrent
+processing of multiple independent ffmpeg operations.
+
+To use this operation with the editor, the following must be added to the [editor](editor-woh.md) workflow operation
+to bypass the video editor encoding,
 ```
 <configuration key="create-smil-skip-processing">true</configuration>
 ```
 
 ## Configuration details
 
-There is only one transition type, which is "fade to black".
+Currently, there is only one transition type, which is "fade to black".
 The edited video will fade in from black with a fade-out/fade-in for each clip transition and a fade out at the end.
 The transition duration is a 2 second fade, configured in org.opencastproject.composer.impl.ComposerServiceImpl.cfg.
-The plan is to make it configurable for each transition in the future.
+In the future, each transition can be configurable as a SMIL element.
 
-The smil file can use more than one source video, but the caller has to take care that the dimension of
+The SMIL file can use more than one source video, but the caller has to take care that the dimension of
 all the source videos are the same.
-This workflow will create one ffmpeg operation per smil paramgroup (based on source) regardless of the number of target outputs.
+This workflow will generate one independent ffmpeg operation per SMIL paramgroup (based on source) regardless of the number of target outputs.
 
 This workflow can handle each source flavor selector independently.
-
 eg: Each source selector can have its own set of encoding profiles, target tags and flavors.
 The parameters for each configuration, such as flavor are separated into sections by "**;**".
 Each source media selector can have its own sets of encoding profile ids (one for each target recording) and target tags,
 as well as its own set of target tags and flavors, defined as a comma delimited list.
 
 
+As an example, using presenter/source and presentation/source as uploaded media.
 eg:
 ```
  <configuration key="source-flavors">*/source</configuration>
-   One source selector means that all the matching recording will be processed the same way.
-
- <configuration key="source-flavors">presenter/source;presentation/source</configuration>
-   Two different source selectors separated by semicolons means that all the matching recordings in the
-   first selector will be processed according to the parameters in the first section and the all the
-   matching recordings in the second selector will be processed according to the parameters in next section
-   of the other configuration values such as encoding profiles.
 ```
+>One source selector means that all the matching recording will be processed the same way.
+
+```
+ <configuration key="source-flavors">presenter/source;presentation/source</configuration>
+```
+>Two different source selectors separated by semicolons means that all the matching recordings in the
+>first selector will be processed according to the parameters in the first 
+>section and the all the
+>matching recordings in the second selector will be processed according to the parameters in next section
+>of the other configuration values such as encoding profiles.
 
 Each source selector can have only one corresponding section in each set of values.
 The use of the semi-colon is optional. If it is absent, there is only one section.
@@ -61,42 +68,30 @@ into one and they will apply to all the source flavors in the source selector.
 eg:
 ```
 <configuration key="target-flavors">*/preview</configuration>
-   All targets are flavored the same way,
-     using the example above,
-     targets are flavored presenter/preview and presentation/preview
+<configuration key="encoding-profiles">mp4-low.http;mp4-vga-medium</configuration>
+```
+>All targets are flavored the same way.
+>Using the example above,
+>all media are encoded with "mp4-low.http" and "mp4-vga-medium" and
+>targets are flavored as "presenter/preview" and "presentation/preview"
 
+```
  <configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
-     Each section is tagged individually,
-     using the example above,
-     presenter/preview is tagged with engage-streaming,rss,atom.,
-     presentation/preview is tagged with engage-download,rss,atom.
+ <configuration key="encoding-profiles">mp4-medium.http;mp4-vga-medium</configuration>
 ```
 
-
-In other words, if there is only one section, then the same configuration is applied to all the sources.
-Otherwise, if a configuration has the same number of sections as the source, then the configurations for the operation
-are taken from the corresponding sections.
-
-Operations on each source section can run on different servers concurrently.
-Each source section will run one ffmpeg process.
-
-### Note:(Very Important)
-Each source flavor generates all the target formats in one ffmpeg call by incorporating relevant parts
-of the encoding profile command.
-1.  Care must be taken that **no complex filters** are used in the encoding profiles used for this workflow,
-as it can cause a conflict and ffmpeg will fail.
-2.  Encoded target recording are distinguished by the suffix, it is important that **all the encoding profiles
-used have distinct suffixes** or the target video tagging can be wrong.
-3.  If using this with the editor, be sure to set the "create-smil-skip-processing" key in the editor to true.
+>Each section is tagged individually. Using the example above,
+>presenter/preview is encoded with "mp4-medium.http" and tagged with "engage-streaming" ,"rss" and "atom",
+>presentation/preview is encoded with "mp4-vga-medium" and tagged with "engage-download","rss" and "atom".
 
 
 ## Example:
 
 
 If presenter/work is to be encoded with "mp4-low.http,mp4-medium.http" and
-presentation/work is to be encoded with "mp4-vga-medium,mp4-medium.http".
-And the target media are flavored "presenter/delivery" and "presentation/delivery" respectively.
-And all taggaed  are tagged "engage, archive" in addition to the names of the encoding profiles.
+presentation/work is to be encoded with "mp4-vga-medium,mp4-medium.http",
+and the target media are flavored as "presenter/delivery" and "presentation/delivery" respectively.
+and all targets are tagged with "engage" and "archive" in addition to the names of the encoding profiles used.
 
 It will look like the following.
 
@@ -114,6 +109,7 @@ It will look like the following.
 
 
 ### Operation Example
+The parameters in the table above will look like this as a workflow operation.
 
     <operation
         id="process-smil"
@@ -129,3 +125,22 @@ It will look like the following.
             <configuration key="tag-with-profile">true</configuration>
         </configurations>
     </operation>
+
+
+## Note:(Very Important)
+
+Each encoding section generates all the target media in one ffmpeg call by incorporating relevant parts
+of each encoding profile command using complex filters.
+
+*  Care must be taken that **no complex filters** are used in the encoding profiles used for this workflow,
+as it can cause a conflict and ffmpeg will fail. 
+Simple filters (i.e.: -vf, -af , -filter:v, -filter:a) can be used.
+
+*  Encoded target recording are distinguished by the suffix, it is important that **all the encoding profiles
+used have distinct suffixes** or the target video tagging can be wrong, for example:
+```
+profile.mp4-vga-medium.http.suffix = -vga-medium.mp4  
+profile.mp4-medium.http.suffix = -medium.mp4  
+```
+*  If using this to process SMIL files generated by the editor in the same workflow,
+be sure to set the "create-smil-skip-processing" key in the editor to true.
