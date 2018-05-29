@@ -74,7 +74,8 @@
      "HELP": "Help",
      "USERS_GUIDE": "User's Guide",
      "DOCUMENTATION": "Documentation",
-     "REST_DOC": "REST API Docs"
+     "REST_DOC": "REST API Docs",
+     "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
      "ACL_ADDED":           "The access policy has been created",
