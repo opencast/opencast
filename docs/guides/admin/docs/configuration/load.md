@@ -50,8 +50,8 @@ system.  If you wish to change this, set the `org.opencastproject.server.maxload
 maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
 not recommended.
 
-The load values for the non-encoding jobs are set in the configuration files in the `etc` directory.  Search the
-this directory for files that contain the string `job.load` to find the relevant configuration keys.  These
+The load values for the non-encoding jobs are set in the configuration files in the `etc` directory.  Search this
+directory for files that contain the string `job.load` to find the relevant configuration keys.  These
 configuration keys control the load for each job type.  For example, the `job.load.download.distribute` configuration
 key controls the load placed on the system when a download distribution job is running.
 
