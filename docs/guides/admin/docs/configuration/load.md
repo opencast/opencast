@@ -50,32 +50,10 @@ system.  If you wish to change this, set the `org.opencastproject.server.maxload
 maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
 not recommended.
 
-The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix
-`job.load`.  These configuration keys control the load for each job type.  For example, the
-`job.load.download.distribute` configuration key controls the load placed on the system when a download distribution job
-is running.  The current files with relevant configuration keys are:
-
-| File                                                                                     | Controls                           |
-|------------------------------------------------------------------------------------------|------------------------------------|
-| org.opencastproject.animate.impl.AnimateServiceImpl.cfg                                  | Animate service                    |
-| org.opencastproject.caption.impl.CaptionServiceImpl.cfg                                  | Caption convertion services        |
-| org.opencastproject.distribution.aws.s3.AwsS3DistributionServiceImpl.cfg                 | AWS S3 distribution service        |
-| org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
-| org.opencastproject.distribution.distribution.streaming.<br/>StreamingDistributionService.cfg | Streaming distribution             |
-| org.opencastproject.distribution.streaming.wowza.<br/>WowzaAdaptiveStreamingDistributionService.cfg | Adaptive streaming distribution |
-| org.opencastproject.execute.impl.ExecuteServiceImpl.cfg                                  | Execute service                    |
-| org.opencastproject.ingest.impl.IngestServiceImpl.cfg                                    | Ingest services                    |
-| org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg                     | Media inspection using ffmpeg      |
-| org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg              | Youtube distribution               |
-| org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Opencast engage index jobs         |
-| org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.cfg                | Silence detection                  |
-| org.opencastproject.sox.impl.SoxServiceImpl.cfg                                          | Sox service                        |
-| org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg                        | Text analysis, including slide OCR |
-| org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl.cfg              | Timeline previews service          |
-| org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg            | IBM Watson start transcription job |
-| org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg                          | Video editor                       |
-| org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.cfg                  | Video segmentation                 |
-| org.opencastproject.waveform.ffmpeg.WaveformServiceImpl.cfg                              | Waveform generation for video editing |
+The load values for the non-encoding jobs are set in the configuration files in the `etc` directory.  Search the
+this directory for files that contain the string `job.load` to find the relevant configuration keys.  These
+configuration keys control the load for each job type.  For example, the `job.load.download.distribute` configuration
+key controls the load placed on the system when a download distribution job is running.
 
 Note: Ingest jobs are a special case in Opencast.  Because of their immediate nature there is no way to limit the number
 of running jobs.  However, these jobs will block other jobs from running on the ingest/admin nodes if enough ingests
