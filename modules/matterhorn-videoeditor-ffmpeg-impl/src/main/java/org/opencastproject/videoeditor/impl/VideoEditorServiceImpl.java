@@ -45,6 +45,7 @@ import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
+import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.videoeditor.api.ProcessFailedException;
@@ -156,25 +157,28 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   protected Track processSmil(Job job, Smil smil, String trackParamGroupId) throws ProcessFailedException {
 
     SmilMediaParamGroup trackParamGroup;
-    ArrayList<String> inputfile = new ArrayList<>();
-    ArrayList<VideoClip> videoclips = new ArrayList<>();
+    ArrayList<String> inputfile = new ArrayList<String>();
+    ArrayList<VideoClip> videoclips = new ArrayList<VideoClip>();
     try {
       trackParamGroup = (SmilMediaParamGroup) smil.get(trackParamGroupId);
     } catch (SmilException ex) {
       // can't be thrown, because we found the Id in processSmil(Smil)
       throw new ProcessFailedException("Smil does not contain a paramGroup element with Id " + trackParamGroupId);
     }
+    String sourceTrackId = null;
     MediaPackageElementFlavor sourceTrackFlavor = null;
     String sourceTrackUri = null;
     // get source track metadata
     for (SmilMediaParam param : trackParamGroup.getParams()) {
-      if (SmilMediaParam.PARAM_NAME_TRACK_SRC.equals(param.getName())) {
+      if (SmilMediaParam.PARAM_NAME_TRACK_ID.equals(param.getName())) {
+        sourceTrackId = param.getValue();
+      } else if (SmilMediaParam.PARAM_NAME_TRACK_SRC.equals(param.getName())) {
         sourceTrackUri = param.getValue();
       } else if (SmilMediaParam.PARAM_NAME_TRACK_FLAVOR.equals(param.getName())) {
         sourceTrackFlavor = MediaPackageElementFlavor.parseFlavor(param.getValue());
       }
     }
-    File sourceFile;
+    File sourceFile = null;
     try {
       sourceFile = workspace.get(new URI(sourceTrackUri));
     } catch (IOException ex) {
@@ -185,8 +189,8 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       throw new ProcessFailedException("Source URI " + sourceTrackUri + " is not valid.");
     }
     // inspect input file to retrieve media information
-    Job inspectionJob;
-    Track sourceTrack;
+    Job inspectionJob = null;
+    Track sourceTrack = null;
     try {
       inspectionJob = inspect(job, new URI(sourceTrackUri));
       sourceTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
@@ -207,15 +211,13 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
 
     // create working directory
-    File tempDirectory = new File(new File(workspace.rootDirectory()), "editor");
-    tempDirectory = new File(tempDirectory, Long.toString(job.getId()));
-    String filename = String.format("%s-%s%s", sourceTrackFlavor, sourceFile.getName(), outputFileExtension);
-    File outputPath = new File(tempDirectory, filename);
+    File tempDirectory = FileSupport.getTempDirectory(Long.toString(job.getId()));
+    File outputPath = new File(tempDirectory, sourceTrackFlavor + "_" + sourceFile.getName() + outputFileExtension);
 
     if (!outputPath.getParentFile().exists()) {
       outputPath.getParentFile().mkdirs();
     }
-    URI newTrackURI;
+    URI newTrackURI = null;
     inputfile.add(sourceFile.getAbsolutePath()); // default source - add to source table as 0
     int srcIndex = inputfile.indexOf(sourceFile.getAbsolutePath()); // index = 0
     logger.info("Start processing srcfile {}", sourceFile.getAbsolutePath());
@@ -244,7 +246,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
                       throw new ProcessFailedException("Workspace does not contain a track " + clipTrackURI);
                     }
                   }
-                  int index;
+                  int index = -1;
 
                   if (clipSourceFile != null) {      // clip has different source
                     index = inputfile.indexOf(clipSourceFile.getAbsolutePath()); // Look for known tracks

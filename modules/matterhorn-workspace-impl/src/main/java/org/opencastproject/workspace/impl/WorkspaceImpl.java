@@ -907,9 +907,4 @@ public final class WorkspaceImpl implements Workspace {
     }
     logger.info("Finished cleanup of workspace");
   }
-
-  @Override
-  public String rootDirectory() {
-    return wsRoot;
-  }
 }

@@ -305,10 +305,5 @@ public class XacmlSecurityTest {
       // TODO Auto-generated method stub
     }
 
-    @Override
-    public String rootDirectory() {
-      return workspaceBase.getAbsolutePath();
-    }
   }
-
 }

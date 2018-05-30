@@ -270,11 +270,4 @@ public interface Workspace extends StorageUsage {
    */
   void cleanup(int maxAge);
 
-  /**
-   * Returns the workspace's root directory
-   *
-   * @return Path to the workspace root directory
-   */
-  String rootDirectory();
-
 }
