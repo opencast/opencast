@@ -1,6 +1,18 @@
 Opencast 3.x
 ============
 
+Opencast 3.6
+------------
+*Released on May 30, 2018*
+
+- [[MH-12910]](https://opencast.jira.com/browse/MH-12910) - When switching between branches with different module naming schemes, the git tree is left unclean sometimes
+- [[MH-12860]](https://opencast.jira.com/browse/MH-12860) - Opencast does not build at DEBUG logging level
+- [[MH-12830]](https://opencast.jira.com/browse/MH-12830) - Fix mvn site generation
+- [[MH-12743]](https://opencast.jira.com/browse/MH-12743) - OAIPMH-Republish-Operation tries to republish to ASW3
+- [[MH-12441]](https://opencast.jira.com/browse/MH-12441) - Fix multi-server configuration docs and config details
+- [[MH-12091]](https://opencast.jira.com/browse/MH-12091) - Create a Capture Agent digest user with its own role
+
+
 Opencast 3.5
 ------------
 *Released on February 6, 2018*
