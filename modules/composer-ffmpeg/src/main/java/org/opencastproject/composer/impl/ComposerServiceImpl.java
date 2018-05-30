@@ -170,21 +170,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** default transition duration for process_smil in seconds */
   public static final float DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION = 2.0f;
 
-  /** The base load introduced on the system by creating a process smil job */
-  public static final float DEFAULT_PROCESS_SMIL_JOB_LOAD = 2.0f;
-  public static final float DEFAULT_PROCESS_SMIL_JOB_LOAD_MAX = 4.0f;
-  public static final float DEFAULT_PER_ENCODING_PROFILE_JOB_LOAD = 0.5f;
+  /** The maximum job load allowed for operations that use multiple profile (ProcessSmil, MultiEncode) */
+  public static final float DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES = 0.8f;
+  /** The default factor used to multiply the sum of encoding profiles load job for ProcessSmil */
+  public static final float DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR = 0.5f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_PROCESSSMIL_JOB_LOAD} */
-  public static final String PROCESS_SMIL_JOB_LOAD_KEY = "job.load.process_smil";
-  public static final String PROCESS_SMIL_JOB_LOAD_MAX = "job.load.process_smil.max";
-  public static final String PER_ENCODING_PROFILE_JOB_LOAD_KEY = "job.load.process_smil.per_encoding_profile";
+  public static final String JOB_LOAD_MAX_MULTIPLE_PROFILES = "job.load.max.multiple.profiles";
+  public static final String JOB_LOAD_FACTOR_PROCESS_SMIL = "job.load.factor.process.smil";
 
-  /** The base load introduced on the system by creating a process smil job */
-  /** The actual load adds the number of target encoding profiles * load per_encoding_profile */
-  private float processSmilJobLoad = DEFAULT_PROCESS_SMIL_JOB_LOAD;
-  private float perEncodingProfileJobLoad = DEFAULT_PER_ENCODING_PROFILE_JOB_LOAD;
-  private float processSmilJobLoadMax = DEFAULT_PROCESS_SMIL_JOB_LOAD_MAX;
+  private float maxMultipleProfilesJobLoad = DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES;
+  private float processSmilJobLoadFactor = DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR;
 
   /** default transition */
   private int transitionDuration = (int) (DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION * 1000);
@@ -1947,12 +1942,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       return;
     }
 
-    processSmilJobLoad = LoadUtil.getConfiguredLoadValue(properties, PROCESS_SMIL_JOB_LOAD_KEY,
-            DEFAULT_PROCESS_SMIL_JOB_LOAD, serviceRegistry);
-    processSmilJobLoadMax = LoadUtil.getConfiguredLoadValue(properties, PROCESS_SMIL_JOB_LOAD_MAX,
-            DEFAULT_PROCESS_SMIL_JOB_LOAD, serviceRegistry);
-    perEncodingProfileJobLoad = LoadUtil.getConfiguredLoadValue(properties, PER_ENCODING_PROFILE_JOB_LOAD_KEY,
-            DEFAULT_PER_ENCODING_PROFILE_JOB_LOAD, serviceRegistry);
+    maxMultipleProfilesJobLoad = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_MAX_MULTIPLE_PROFILES,
+            DEFAULT_JOB_LOAD_MAX_MULTIPLE_PROFILES, serviceRegistry);
+    processSmilJobLoadFactor = LoadUtil.getConfiguredLoadValue(properties, JOB_LOAD_FACTOR_PROCESS_SMIL,
+            DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR, serviceRegistry);
+    if (processSmilJobLoadFactor == 0) {
+      processSmilJobLoadFactor = DEFAULT_PROCESS_SMIL_JOB_LOAD_FACTOR;
+    }
     transitionDuration = 1000 * (int) LoadUtil.getConfiguredLoadValue(properties, PROCESS_SMIL_CLIP_TRANSITION_DURATION,
             DEFAULT_PROCESS_SMIL_CLIP_TRANSITION_DURATION, serviceRegistry);
   }
@@ -1986,9 +1982,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       for (String i : profileIds) {
         al.add(i);
       }
-      float load = processSmilJobLoad + profileIds.size() * perEncodingProfileJobLoad;
-      if (load > processSmilJobLoadMax)
-        load = processSmilJobLoadMax; // so that a larger load will still be scheduled to a worker
+      float load = calculateJobLoadForMultipleProfiles(profileIds, processSmilJobLoadFactor);
       try {
         for (SmilMediaParamGroup paramGroup : smil.getHead().getParamGroups()) {
           for (SmilMediaParam param : paramGroup.getParams()) {
@@ -2199,5 +2193,25 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     } catch (Exception e) { // clean up all the stored files
       throw new EncoderException("ProcessSmil operation failed to run ", e);
     }
+  }
+
+  private float calculateJobLoadForMultipleProfiles(List<String> profileIds, float adjustmentFactor)
+          throws EncoderException {
+    // Job load is calculated based on the encoding profiles. They are summed up and multiplied by a factor.
+    // The factor represents the adjustment that should be made assuming each profile job load was specified
+    // based on it running with 1 input -> 1 output so normally will be a number 0 < n < 1.
+    float load = 0.0f;
+    for (String profileId : profileIds) {
+      EncodingProfile profile = profileScanner.getProfile(profileId);
+      if (profile == null) {
+        throw new EncoderException("Encoding profile not found: " + profileId);
+      }
+      load += profile.getJobLoad();
+    }
+    load *= adjustmentFactor;
+    if (load > maxMultipleProfilesJobLoad) {
+      load = maxMultipleProfilesJobLoad;
+    }
+    return load;
   }
 }
