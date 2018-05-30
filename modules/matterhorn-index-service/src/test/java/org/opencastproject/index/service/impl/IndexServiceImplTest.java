@@ -63,6 +63,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
@@ -175,7 +176,6 @@ public class IndexServiceImplTest {
           throws org.osgi.service.cm.ConfigurationException {
     // Create Common Event Catalog UI Adapter
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
-
     Properties episodeCatalogProperties = new Properties();
     InputStream in = null;
     try {
@@ -496,8 +496,17 @@ public class IndexServiceImplTest {
             EasyMock.capture(filenameResult), EasyMock.capture(catalogResult))).andReturn(new URI("catalog.xml"));
     EasyMock.replay(workspace);
 
+    DublinCoreCatalog seriesResult = EasyMock.createMock(DublinCoreCatalog.class);
+    SeriesService seriesService = EasyMock.createMock(SeriesService.class);
+    EasyMock.expect(seriesService.getSeries(EasyMock.anyString())).andReturn(seriesResult);
+    EasyMock.replay(seriesService);
+
+    EasyMock.expect(seriesResult.getFirst(DublinCore.PROPERTY_TITLE)).andReturn("Test Series A");
+    EasyMock.replay(seriesResult);
+
     // Create Common Event Catalog UI Adapter
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = setupCommonCatalogUIAdapter(workspace);
+    commonEventCatalogUIAdapter.setSeriesService(seriesService);
 
     // Setup mediapackage.
     MediaPackage mediapackage = EasyMock.createMock(MediaPackage.class);
@@ -516,6 +525,7 @@ public class IndexServiceImplTest {
             .andReturn(new Catalog[] {}).anyTimes();
     EasyMock.expect(mediapackage.getSeries()).andReturn(null).anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
+    mediapackage.setSeriesTitle(EasyMock.anyString());
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
@@ -841,7 +851,9 @@ public class IndexServiceImplTest {
     EasyMock.replay(userDirectoryService);
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    SeriesService seriesService = EasyMock.createMock(SeriesService.class);
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter();
+    commonEventCatalogUIAdapter.setSeriesService(seriesService);
     commonEventCatalogUIAdapter.updated(eventProperties);
     indexServiceImpl.setCommonEventCatalogUIAdapter(commonEventCatalogUIAdapter);
     indexServiceImpl.setUserDirectoryService(userDirectoryService);
