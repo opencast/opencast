@@ -489,7 +489,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
             return pdp.evaluate(requestCtx).getDecision() == XACMLConstants.DECISION_PERMIT;
           }
-        }).getOrElse(true);
+        }).getOrElse(false);
       }
     });
   }
