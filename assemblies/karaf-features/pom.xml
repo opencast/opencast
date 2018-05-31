@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>4.4</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>opencast-karaf-features</artifactId>
