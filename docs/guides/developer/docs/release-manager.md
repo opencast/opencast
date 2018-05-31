@@ -315,83 +315,56 @@ assume the final release should be based on `3.0-rc2`.
 
         git checkout -b r/3.0
 
-4. Add release notes, and update the changelog, then commit them:
+4. Ensure the fix versions of the relevant tickets are correct.  Search GitHub's pull request list with a query like
+   this, modifying the dates and base to match the start date of the current release, and the current date
+
+        is:pr base:r/3.x is:closed merged:2018-03-29..2018-05-31
+
+   For each of these tickets, make sure the fix version is set to the new release in JIRA, then use the
+   `create-changelog` [helper script](https://github.com/opencast/helper-scripts/tree/master/create-changelog) to
+   easily format the list.
+
+5. Add release notes, and update the changelog, then commit them:
 
         vim docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md
         git commit docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md -sS
 
-5. Update the [localization translations](localization.md).
+6. Update the [localization translations](localization.md).
 
-6. Merge release notes into release branch:
+7. Merge release notes into release branch:
 
         git checkout r/3.x
         git merge r/3.0
         git checkout r/3.0
 
-7. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
+8. Make version changes for release. You can use `sed` to make things easier. Please make sure, the changes are correct:
 
         for i in `find . -name pom.xml`; do \
           sed -i 's/<version>3.0-SNAPSHOT</<version>3.0</' $i; done
 
-8. Commit changes and create release tag:
+9. Commit changes and create release tag:
 
         git commit -asS -m 'Opencast 3.0'
         git tag -s 3.0
 
-9. Switch back to release branch, push release notes and tags:
+10. Switch back to release branch, push release notes and tags:
 
         git checkout r/3.x
         git push <remote> 3.0:3.0
         git push <remote> r/3.x
 
-10. You can remove the new branch afterwards:
+11. You can remove the new branch afterwards:
 
         git branch -D r/3.0
 
-11. Release the branch in JIRA. Talk to your JIRA administrators to have this done.
+12. Release the branch in JIRA, and create the next one. Talk to your JIRA administrators to have this done.
 
-12. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
+13. Push the built artifacts to Maven. Bug the QA Coordinator to do this so that he remembers to set this up from the CI
     servers.
 
-13. Push the built artifacts back to GitHub. Please review the following commands carefully before executing them. If
-    in doubt, use the [graphical user interface](https://github.com/opencast/opencast/releases) to upload
-    the distribution tarballs manually.
-
-        # Get Opencast version, BitBucket username and password
-        read VERSION
-        read BITBUCKET_USER
-        read bitbucketpass
-
-        mvn -e clean install
-        cd build
-
-        # Download and create the source archive
-        curl -O https://bitbucket.org/opencast-community/opencast/get/$VERSION.tar.gz
-        tar xzf $VERSION.tar.gz
-        mv opencast-community-opencast-* opencast-$VERSION-source
-        tar cfJ opencast-$VERSION-source.tar.xz opencast-$VERSION-source
-
-        # Recompress the distribution tarballs
-        for i in opencast-dist-*.tar.gz
-        do
-          tar xf $i
-          tar cfJ "${i%.*}.xz" $i
-        done
-
-        # Checksum and sign the files
-        sha512sum *.xz > opencast-$VERSION-sha512sum.txt
-        gpg --clearsign -a opencast-$VERSION-sha512sum.txt
-
-        # Push the files to BitBucket
-        for i in *.tar.xz
-        do
-          echo "Pushing $i"
-          curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@$i \
-            https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
-        done
-        curl -u "$BITBUCKET_USER:${bitbucketpass}" -X POST -F files=@opencast-$VERSION-sha512sum.txt.asc \
-          https://api.bitbucket.org/2.0/repositories/opencast-community/opencast/downloads
-
+14. Push the built artifacts back to GitHub. Create a new release using the
+    [graphical user interface](https://github.com/opencast/opencast/releases) to upload the distribution tarballs
+    manually.
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
 who need access to avoid general discussions on that list. In case you do not already have permissions to post on this
