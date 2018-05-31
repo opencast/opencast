@@ -43,6 +43,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -84,13 +86,16 @@ public class LtiLaunchAuthenticationHandler
   private static final String DEFAULT_LEARNER = "USER";
 
   /** The user details service */
-  protected UserDetailsService userDetailsService = null;
+  protected UserDetailsService userDetailsService;
 
   /** the Security Service **/
   protected SecurityService securityService;
 
   /** list of keys that will be highly */
-  protected List<String> highlyTrustedKeys = new ArrayList<String>();
+  protected List<String> highlyTrustedKeys;
+
+  /** Pattern that matches user names, which should not be trusted from LTI */
+  protected Pattern untrustedUsersPattern;
 
   /**
    * Constructs a new LTI authentication handler, using the supplied user details service for performing user lookups.
@@ -99,20 +104,40 @@ public class LtiLaunchAuthenticationHandler
    *          the user details service used to map user identifiers to more detailed information
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService) {
-    this.userDetailsService = userDetailsService;
+    this(userDetailsService, null, new ArrayList<String>());
   }
 
   /**
-   * Full constructor for a LTI authentication handler that includes a list of highly trusted keys
+   * Constructor for a LTI authentication handler that includes a list of highly trusted keys
    *
    * @param userDetailsService
    * @param highlyTrustedkeys
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
           List<String> highlyTrustedkeys) {
+    this(userDetailsService, null, new ArrayList<String>(), null);
+  }
+
+  /**
+   * Full constructor for a LTI authentication handler that includes a list of highly trusted keys with exceptions.
+   *
+   * @param userDetailsService
+   * @param highlyTrustedkeys
+   * @param untrustedUsersPattern
+   */
+  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
+          List<String> highlyTrustedkeys, String untrustedUsersPattern) {
     this.userDetailsService = userDetailsService;
     this.securityService = securityService;
     this.highlyTrustedKeys = highlyTrustedkeys;
+
+    if (StringUtils.isNotBlank(untrustedUsersPattern)) {
+      try {
+        this.untrustedUsersPattern = Pattern.compile(untrustedUsersPattern);
+      } catch (PatternSyntaxException e) {
+        logger.warn("The configured untrusted users pattern is invalid - disabling checks:", e);
+      }
+    }
   }
 
   /**
@@ -141,31 +166,38 @@ public class LtiLaunchAuthenticationHandler
     }
 
     // We need to construct a complex ID to avoid confusion
-    userIdFromConsumer = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
+    String username = LTI_USER_ID_PREFIX + LTI_ID_DELIMITER + consumerGUID + LTI_ID_DELIMITER + userIdFromConsumer;
 
     // if this is a trusted consumer we trust their details
     String oaAuthKey = request.getParameter("oauth_consumer_key");
     if (highlyTrustedKeys.contains(oaAuthKey)) {
       logger.debug("{} is a trusted key", oaAuthKey);
+
       // If supplied we use the human readable name
-      String suppliedEid = request.getParameter("lis_person_sourcedid");
+      String ltiUsername = request.getParameter("ext_user_username");
       // This is an optional field it could be null
-      if (StringUtils.isNotBlank(suppliedEid)) {
-        userIdFromConsumer = suppliedEid;
-      } else {
+      if (StringUtils.isBlank(ltiUsername)) {
         // if no eid is set we use the supplied ID
-        userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
+        ltiUsername = userIdFromConsumer;
+      }
+
+      // Check if the provided username should be trusted
+      if (untrustedUsersPattern != null && untrustedUsersPattern.matcher(ltiUsername).matches()) {
+        // Do not trust the username
+        logger.debug("{} is an untrusted username", ltiUsername);
+      } else {
+        username = ltiUsername;
       }
     }
 
     if (logger.isDebugEnabled()) {
-      logger.debug("LTI user id is : {}", userIdFromConsumer);
+      logger.debug("LTI user id is : {}", username);
     }
 
     UserDetails userDetails = null;
     Collection<GrantedAuthority> userAuthorities = null;
     try {
-      userDetails = userDetailsService.loadUserByUsername(userIdFromConsumer);
+      userDetails = userDetailsService.loadUserByUsername(username);
 
       // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
       // Collection<GrantedAuthority>.
@@ -188,7 +220,7 @@ public class LtiLaunchAuthenticationHandler
 
       logger.info("Returning user with {} authorities", userAuthorities.size());
 
-      userDetails = new User(userIdFromConsumer, "oauth", true, true, true, true, userAuthorities);
+      userDetails = new User(username, "oauth", true, true, true, true, userAuthorities);
     }
 
     // All users need the OAUTH, USER and ANONYMOUS roles
@@ -207,7 +239,7 @@ public class LtiLaunchAuthenticationHandler
    *
    * @param roles
    * @param context
-   * @param userGrants
+   * @param userAuthorities
    */
   private void enrichRoleGrants(String roles, String context, Collection<GrantedAuthority> userAuthorities) {
     // Roles could be a list
