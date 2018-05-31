@@ -1,6 +1,15 @@
 Opencast 4.x
 ============
 
+Opencast 4.4
+------------
+
+*Released on May 31, 2018*
+
+- [[MH-12923]](https://opencast.jira.com/browse/MH-12923) - ServiceRegistry does not close db connction
+- [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+
 Opencast 4.3
 ------------
 
