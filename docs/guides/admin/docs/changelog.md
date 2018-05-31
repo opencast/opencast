@@ -304,10 +304,12 @@ Opencast 3.x
 
 *Released on May 31, 2018*
 
-- [[MH-12910]](https://opencast.jira.com/browse/MH-12910) - When switching between branches with different module naming schemes, the git tree is left unclean sometimes
+- [[MH-12910]](https://opencast.jira.com/browse/MH-12910) - When switching between branches with different module
+  naming schemes, the git tree is left unclean sometimes
 - [[MH-12860]](https://opencast.jira.com/browse/MH-12860) - Opencast does not build at DEBUG logging level
 - [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
-- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast
+  admins
 - [[MH-12830]](https://opencast.jira.com/browse/MH-12830) - Fix mvn site generation
 - [[MH-12743]](https://opencast.jira.com/browse/MH-12743) - OAIPMH-Republish-Operation tries to republish to ASW3
 - [[MH-12441]](https://opencast.jira.com/browse/MH-12441) - Fix multi-server configuration docs and config details
