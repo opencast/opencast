@@ -1639,6 +1639,9 @@
          "CREATOR": {
             "LABEL": "יוצר"
          },
+         "CREATED_BY": {
+            "LABEL": "נוצר על-ידי"
+         },
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
          },

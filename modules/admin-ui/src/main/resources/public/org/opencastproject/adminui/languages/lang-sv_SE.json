@@ -1639,6 +1639,9 @@
          "CREATOR": {
             "LABEL": "Skapare"
          },
+         "CREATED_BY": {
+            "LABEL": "Skapad av"
+         },
          "HOSTNAME": {
             "LABEL": "Hostnamn"
          },

@@ -1639,6 +1639,9 @@
          "CREATOR": {
             "LABEL": "Auteur"
          },
+         "CREATED_BY": {
+            "LABEL": "Aangemaakt door"
+         },
          "HOSTNAME": {
             "LABEL": "Hostnaam"
          },

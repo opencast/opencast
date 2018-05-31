@@ -1639,6 +1639,9 @@
          "CREATOR": {
             "LABEL": "Creador"
          },
+         "CREATED_BY": {
+            "LABEL": "Creado por"
+         },
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
          },

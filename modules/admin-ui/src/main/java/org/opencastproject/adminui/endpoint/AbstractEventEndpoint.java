@@ -105,6 +105,7 @@ import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.Recording;
@@ -238,6 +239,8 @@ public abstract class AbstractEventEndpoint {
 
   /** The default time before a piece of signed content expires. 2 Hours. */
   protected static final long DEFAULT_URL_SIGNING_EXPIRE_DURATION = 2 * 60 * 60;
+
+  private static final int CREATED_BY_UI_ORDER = 16;
 
   public abstract WorkflowService getWorkflowService();
 
@@ -1938,6 +1941,14 @@ public abstract class AbstractEventEndpoint {
         collection.removeField(collection.getOutputFields().get("startTime"));
       if (collection.getOutputFields().containsKey("location"))
         collection.removeField(collection.getOutputFields().get("location"));
+
+      // Admin UI only field
+      MetadataField<String> creator = MetadataField.createTextMetadataField("createdBy", Opt.<String> none(),
+              "EVENTS.EVENTS.DETAILS.METADATA.CREATED_BY", true, false, Opt.<Boolean> none(),
+              Opt.<Map<String, String>> none(), Opt.<String> none(), Opt.some(CREATED_BY_UI_ORDER), Opt.<String> none());
+      creator.setValue(getSecurityService().getUser().getName());
+      collection.addField(creator);
+
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());
@@ -2164,6 +2175,8 @@ public abstract class AbstractEventEndpoint {
         query.withOptedOut(Boolean.parseBoolean(filters.get(name)));
       if (EventListQuery.FILTER_REVIEW_STATUS_NAME.equals(name))
         query.withReviewStatus(filters.get(name));
+      if (EventListQuery.FILTER_CREATOR_NAME.equals(name))
+        query.withCreator(filters.get(name));
       if (EventListQuery.FILTER_COMMENTS_NAME.equals(name)) {
         switch (Comments.valueOf(filters.get(name))) {
           case NONE:

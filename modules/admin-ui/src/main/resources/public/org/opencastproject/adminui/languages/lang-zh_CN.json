@@ -1639,6 +1639,9 @@
       "CREATOR":{
         "LABEL":"创建者"
       },
+      "CREATED_BY": {
+        "LABEL": "创建者"
+      },
       "HOSTNAME":{
         "LABEL":"主机名"
       },

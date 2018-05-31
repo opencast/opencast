@@ -50,13 +50,14 @@ public class EventsListProvider implements ResourceListProvider {
   public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
   public static final String REVIEW_STATUS = PROVIDER_PREFIX + ".REVIEW_STATUS";
   public static final String COMMENTS = PROVIDER_PREFIX + ".COMMENTS";
+  public static final String CREATORS = PROVIDER_PREFIX + ".CREATORS";
 
   public enum Comments {
     NONE, OPEN, RESOLVED;
   }
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS_BIBLIOGRAPHIC, PRESENTERS_TECHNICAL,
-          SUBJECT, LOCATION, PROGRESS, STATUS, REVIEW_STATUS, COMMENTS };
+          SUBJECT, LOCATION, PROGRESS, STATUS, REVIEW_STATUS, COMMENTS, CREATORS };
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
@@ -118,6 +119,9 @@ public class EventsListProvider implements ResourceListProvider {
     } else if (COMMENTS.equals(listName)) {
       for (Comments comments : Comments.values())
         list.put(comments.toString(), comments.toString());
+    } else if (CREATORS.equals(listName)) {
+      for (String creator : index.getEventCreators())
+        list.put(creator, creator);
     }
 
     return list;

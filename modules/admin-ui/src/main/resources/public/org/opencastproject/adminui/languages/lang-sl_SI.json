@@ -1639,6 +1639,9 @@
          "CREATOR": {
             "LABEL": "Avtor"
          },
+         "CREATED_BY": {
+            "LABEL": "Ustvaril"
+         },
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"
          },

@@ -90,6 +90,9 @@ public class EventListQuery extends ResourceListQueryImpl {
 
   public static final String FILTER_TEXT_NAME = "textFilter";
 
+  public static final String FILTER_CREATOR_NAME = "creator";
+  private static final String FILTER_CREATOR_LABEL = "FILTERS.EVENTS.CREATED_BY.LABEL";
+
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Option.<String> none()));
@@ -101,6 +104,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
+    this.availableFilters.add(createCreatorsFilter(Option.<String> none()));
 //    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
 //    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
@@ -334,6 +338,25 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Add a {@link ResourceListFilter} filter to the query with the given creators
+   *
+   * @param creators
+   *          the creators to filter for
+   */
+  public void withCreators(String creators) {
+    this.addFilter(createCreatorsFilter(Option.option(creators)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the creators used to filter if set
+   *
+   * @return an {@link Option} containing the creators or none.
+   */
+  public Option<String> getCreators() {
+    return this.getFilterValue(FILTER_CREATOR_NAME);
+  }
+
+  /**
    * Create a new {@link ResourceListFilter} based on the Series id
    *
    * @param seriesId
@@ -451,6 +474,18 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createCommentsFilter(Option<String> comments) {
     return FiltersUtils.generateFilter(comments, FILTER_COMMENTS_NAME, FILTER_COMMENTS_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.COMMENTS));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on creators
+   *
+   * @param creators
+   *          the creators to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for progress based query
+   */
+  public static ResourceListFilter<String> createCreatorsFilter(Option<String> creators) {
+    return FiltersUtils.generateFilter(creators, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
+            Option.some(EventsListProvider.CREATORS));
   }
 
   /**

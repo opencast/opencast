@@ -1665,6 +1665,9 @@
          "CREATOR": {
             "LABEL": "Author"
          },
+         "CREATED_BY": {
+            "LABEL": "Erstellt von"
+         },
          "HOSTNAME": {
             "LABEL": "Hostname"
          },
