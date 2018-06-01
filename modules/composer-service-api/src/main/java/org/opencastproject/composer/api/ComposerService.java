@@ -39,6 +39,10 @@ public interface ComposerService {
 
   String JOB_TYPE = "org.opencastproject.composer";
 
+  /** Used as mediaType to mark the source to omit processing of audio or video stream for process smil */
+  String AUDIO_ONLY = "a";
+  String VIDEO_ONLY = "v";
+
   /**
    * Encode one track, using that track's audio and video streams.
    *
@@ -265,15 +269,15 @@ public interface ComposerService {
    * by "trackParamGroupId" which is the paramGroup in the smil The multiple delivery formats are determined by a list
    * of encoding profiles by name. The resultant tracks will be tagged by profile name. The smil file can contain more
    * than one source track but they must have the same dimension. This is used mainly on smil.xml from the editor. There
-   * is a 2s fadein/fadeout between each clip.
+   * is a configurable fadein/fadeout between each clip (default is 2s).
    *
    * @param smil
-   *          - Describes one media (can contain multiple source in ws) and editing instructions (in out points) for
-   *          conte
+   *          - Describes one media (can contain multiple source in ws) and editing instructions (in out points of video
+   *          clips) for concatenation into one video with transitions
    * @param trackParamGroupId
    *          - track group id to process, if missing, will process first track found in smil
    * @param mediaType
-   *          - v for VideoOnly, a for audioOnly, o or anything else is AV
+   *          - v for videoOnly, a for audioOnly, anything else is AudioVisual
    * @param profileIds
    *          - Encoding profiles for each output from this media
    * @return Receipt for this processing based on the smil file and the list of profiles

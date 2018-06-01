@@ -118,11 +118,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
       this.paramGroupId = id;
     }
 
-    @SuppressWarnings("unused")
-    public String getParamGroupId() {
-      return paramGroupId;
-    }
-
     public List<Track> getSourceTracks() {
       return sourceTracks;
     }
@@ -143,10 +138,12 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
         if (!track.hasAudio())
           hasAudio = false;
       }
-      if (!hasVideo)
-        mediaType = "a";
-      if (!hasAudio)
-        mediaType = "v";
+      if (!hasVideo) {
+        mediaType = ComposerService.AUDIO_ONLY;
+      }
+      if (!hasAudio) {
+        mediaType = ComposerService.VIDEO_ONLY;
+      }
     }
 
     public String getFlavor() {
@@ -385,9 +382,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    *          - profiles to use, if ant of them does not fit the source tracks, they will be omitted
    * @param smilFlavor
    *          - the smil flavor for the input smil
-   * @param tagWithProfile
+   * @param tagWithProfile - tag target with profile name
    * @throws WorkflowOperationException
+   *           if flavors/tags/etc are malformed or missing
    * @throws EncoderException
+   *           if encoding command cannot be constructed
    * @throws MediaPackageException
    * @throws IllegalArgumentException
    * @throws NotFoundException
@@ -484,8 +483,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    * try to clean up
    *
    * @param encodingJobs
+   *          - queued jobs to do the encodings, this is parsed for payload
    * @param mediaPackage
-   * @return mediaPackage with all the new tracks added
+   *          - to hold the target tracks
+   * @return a structure with time in queue plus a mediaPackage with all the new tracks added if all the encoding jobs
+   *         passed, if any of them fail, just fail the whole thing and try to clean up
    * @throws IllegalArgumentException
    * @throws NotFoundException
    * @throws IOException
@@ -553,11 +555,9 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   }
 
   /**
-   * return true if trackFlavor matches sourceFlavor
-   *
    * @param trackFlavor
    * @param sourceFlavor
-   * @return
+   * @return true if trackFlavor matches sourceFlavor
    */
   private boolean trackMatchesFlavor(MediaPackageElementFlavor trackFlavor, MediaPackageElementFlavor sourceFlavor) {
     return ((trackFlavor.getType().equals(sourceFlavor.getType()) && trackFlavor.getSubtype() // exact match
@@ -569,13 +569,13 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   }
 
   /**
-   * Given a mediaPackage, a smil and a srcFlavor with wild card, this will return a structure of smil groups, each with
-   * a single flavor and mp tracks for that flavor only
-   *
    * @param mediaPackage
+   *          - mp obj contains tracks
    * @param smil
+   *          - smil obj contains description of clips
    * @param srcFlavors
-   * @return
+   *          - source flavor string (may contain wild cards)
+   * @return a structure of smil groups, each with a single flavor and mp tracks for that flavor only
    * @throws WorkflowOperationException
    * @throws URISyntaxException
    */
@@ -634,7 +634,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     Smil smil = null;
     try {
       File smilFile = workspace.get(catalogs[0].getURI());
-      // #DCE break up chained method for junit smil service mockup
+      // break up chained method for junit smil service mockup
       SmilResponse response = smilService.fromXml(FileUtils.readFileToString(smilFile, "UTF-8"));
       smil = response.getSmil();
       return smil;

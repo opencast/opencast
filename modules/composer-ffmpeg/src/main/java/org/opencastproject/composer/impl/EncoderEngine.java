@@ -271,7 +271,7 @@ public class EncoderEngine implements AutoCloseable {
     BufferedReader in = null;
     List<File> outFiles = new ArrayList<>();
     try {
-      List<String> command = new ArrayList<String>();
+      List<String> command = new ArrayList<>();
       command.add(binary);
       command.addAll(commandopts);
       logger.info("Executing encoding command: {}", StringUtils.join(command, " "));
@@ -295,7 +295,6 @@ public class EncoderEngine implements AutoCloseable {
               new Object[] { StringUtils.join(commandopts, " ") });
       return outFiles; // return output as a list of files
     } catch (Exception e) {
-      StringBuffer sb = new StringBuffer();
       logger.warn("Error while encoding video tracks using '{}': {}",
               new Object[] {  StringUtils.join(commandopts, " "), e.getMessage() });
       // Ensure temporary data are removed
@@ -468,8 +467,8 @@ public class EncoderEngine implements AutoCloseable {
    */
   protected class OutputAggregate {
     private final List<EncodingProfile> pf;
-    private final ArrayList<String> outputs = new ArrayList<String>();
-    private final ArrayList<String> outputFiles = new ArrayList<String>();
+    private final ArrayList<String> outputs = new ArrayList<>();
+    private final ArrayList<String> outputFiles = new ArrayList<>();
     private final ArrayList<String> vpads; // output pads for each segment
     private final ArrayList<String> apads;
     private final ArrayList<String> vfilter; // filters for each output format
@@ -522,6 +521,10 @@ public class EncoderEngine implements AutoCloseable {
       return outputFiles;
     }
 
+    /**
+     *
+     * @return output pads - the "-map xyz" clauses
+     */
     public List<String> getOutput() {
       return outputs;
     }
@@ -610,11 +613,11 @@ public class EncoderEngine implements AutoCloseable {
       IdBuilder idbuilder = IdBuilderFactory.newInstance().newIdBuilder();
       int size = profiles.size();
       // Init
-      vfilter = new ArrayList<String>(java.util.Collections.nCopies(size, null));
-      afilter = new ArrayList<String>(java.util.Collections.nCopies(size, null));
+      vfilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      afilter = new ArrayList<>(java.util.Collections.nCopies(size, null));
       // name of output pads to map to files
-      apads = new ArrayList<String>(java.util.Collections.nCopies(size, null));
-      vpads = new ArrayList<String>(java.util.Collections.nCopies(size, null));
+      apads = new ArrayList<>(java.util.Collections.nCopies(size, null));
+      vpads = new ArrayList<>(java.util.Collections.nCopies(size, null));
 
       vsplit = (size > 1) ? (vInputPad + "split=" + size) : null; // number of splits
       asplit = (size > 1) ? (aInputPad + "asplit=" + size) : null;
@@ -635,26 +638,26 @@ public class EncoderEngine implements AutoCloseable {
           throw new EncoderException("Missing Encoding Profiles");
         }
         // substitute the output file name
-        String r = profile.getExtension(CMD_SUFFIX); // Get ffmpeg command
-        if (r == null)
+        String ffmpgCmd = profile.getExtension(CMD_SUFFIX); // Get ffmpeg command from profile
+        if (ffmpgCmd == null)
           throw new EncoderException("Missing Encoding Profile " + profile.getIdentifier() + " ffmpeg command");
         for (Map.Entry<String, String> e : params.entrySet()) { // replace output filenames
-          r = r.replace("#{" + e.getKey() + "}", e.getValue());
+          ffmpgCmd = ffmpgCmd.replace("#{" + e.getKey() + "}", e.getValue());
         }
-        r = r.replace("#{space}", " ");
+        ffmpgCmd = ffmpgCmd.replace("#{space}", " ");
         String[] arguments;
         try {
-          arguments = CommandLineUtils.translateCommandline(r);
+          arguments = CommandLineUtils.translateCommandline(ffmpgCmd);
         } catch (Exception e) {
           throw new EncoderException("Could not parse encoding profile command line", e);
         }
-        List<String> sl = Arrays.asList(arguments);
-        // Find and remove input and filters
+        List<String> cmdToken = Arrays.asList(arguments);
+        // Find and remove input and filters from ffmpeg command from the profile
         int i = 0;
-        while (i < sl.size()) {
-          String opt = sl.get(i);
+        while (i < cmdToken.size()) {
+          String opt = cmdToken.get(i);
           if (opt.startsWith("-vf") || opt.startsWith("-filter:v")) { // video filters
-            vfilter.set(indx, sl.get(i + 1).replace("\"", "")); // store without quotes
+            vfilter.set(indx, cmdToken.get(i + 1).replace("\"", "")); // store without quotes
             i++;
           } else if (opt.startsWith("-filter_complex") || opt.startsWith("-lavfi")) { // safer to quit now than to
             // baffle users with strange errors later
@@ -663,13 +666,13 @@ public class EncoderEngine implements AutoCloseable {
             throw new EncoderException(
                     "Cannot parse complex filters in" + profile.getIdentifier() + " for this operation");
           } else if (opt.startsWith("-af") || opt.startsWith("-filter:a")) { // audio filter
-            afilter.set(indx, sl.get(i + 1).replace("\"", "")); // store without quotes
+            afilter.set(indx, cmdToken.get(i + 1).replace("\"", "")); // store without quotes
             i++;
           } else if ("-i".equals(opt)) {
             i++; // inputs are now mapped, remove from command
           } else if (opt.startsWith("-c:") || opt.startsWith("-codec:") || opt.contains("-vcodec")
-                  || opt.contains("-acodec")) { // cannot copy codec im complex filter
-            String str = sl.get(i + 1);
+                  || opt.contains("-acodec")) { // cannot copy codec in complex filter
+            String str = cmdToken.get(i + 1);
             if (str.contains("copy")) // c
               i++;
             else
@@ -696,11 +699,9 @@ public class EncoderEngine implements AutoCloseable {
           vpads.set(indx, "[ov" + indx + "]"); // name the output pads from split -> input to final format
           apads.set(indx, "[oa" + indx + "]"); // name the output audio pads
         }
-        cmd = StringUtils.trimToNull(cmd); // remove all leading/trailing whitespaces
-        if (cmd != null) { // What is more unsafe?
-          outputFiles.add(sl.get(sl.size() - 1)); // unsafe, (like above in getOutputFilen)
-          // alternative is also unsafe - #{out.dir}/#{out.name}#{out.suffix}
-          // outputFiles.add(outDir + outFileName + outSuffix);
+        cmd = StringUtils.trimToNull(cmd); // remove all leading/trailing white spaces
+        if (cmd != null) {
+          outputFiles.add(cmdToken.get(cmdToken.size() - 1));
           if (vInputPad != null) {
             outputs.add("-map " + vpads.get(indx));
           }
@@ -724,10 +725,9 @@ public class EncoderEngine implements AutoCloseable {
    *          - clips to be stitched together
    * @param gap
    *          = transitionDuration / 1000; default gap size - same as fade
-   * @return
+   * @return a list of sanitized video clips
    */
   private static List<VideoClip> sortSegments(List<VideoClip> edits, double gap) {
-    // TODO: add transition to each edited clip in place of transitionDuration
     LinkedList<VideoClip> ll = new LinkedList<VideoClip>();
     Iterator<VideoClip> it = edits.iterator();
     VideoClip clip;
@@ -768,22 +768,19 @@ public class EncoderEngine implements AutoCloseable {
     return clips;
   }
 
-  // TODO: add transition to each edited clip in place of transitionDuration
   /**
-   * Create the trim part of the complex filter and return the clauses for the complex filter.
-   * The transition is fade to black then fade from black.
-   * The outputs are mapped to [ov] and [oa]
+   * Create the trim part of the complex filter and return the clauses for the complex filter. The transition is fade to
+   * black then fade from black. The outputs are mapped to [ov] and [oa]
    *
    * @param clips
    *          - video segments as indices into the media files by time
    * @param transitionDuration
-   *          - length of transition in MS between each segment, TODO: transitionDuration to be replaced by transIn and
-   *          transOut for each segment
+   *          - length of transition in MS between each segment
    * @param hasVideo
    *          - has video, from inspection
    * @param hasAudio
    *          - has audio
-   * @return complex filter clauses for ffmpeg
+   * @return complex filter clauses to do editing for ffmpeg
    * @throws Exception
    *           - if it fails
    */
@@ -792,9 +789,9 @@ public class EncoderEngine implements AutoCloseable {
     double vfade = transitionDuration / 1000; // video and audio have the same transition duration
     double afade = vfade;
     DecimalFormat f = new DecimalFormat("0.00");
-    List<String> vpads = new ArrayList<String>();
-    List<String> apads = new ArrayList<String>();
-    List<String> clauses = new ArrayList<String>(); // The clauses are ordered
+    List<String> vpads = new ArrayList<>();
+    List<String> apads = new ArrayList<>();
+    List<String> clauses = new ArrayList<>(); // The clauses are ordered
     int n = 0;
     if (clips != null)
       n = clips.size();
@@ -871,7 +868,7 @@ public class EncoderEngine implements AutoCloseable {
   }
 
   private Map<String, String> getParamsFromFile(File parentFile) {
-    Map<String, String> params = new HashMap<String, String>();
+    Map<String, String> params = new HashMap<>();
     String videoInput = FilenameUtils.normalize(parentFile.getAbsolutePath());
     params.put("in.video.path", videoInput);
     params.put("in.video.name", FilenameUtils.getBaseName(videoInput));
@@ -890,8 +887,6 @@ public class EncoderEngine implements AutoCloseable {
   /**
    * Concatenate segments of one or more input tracks specified by trim points into the track the edits are passed in as
    * double so that it is generic. The tracks are assumed to have the same resolution.
-   *
-   * TODO: Add transition - as part of edits definition - transIn and transOut, it will define type and duration
    *
    * @param inputs
    *          - input tracks as a list of files
@@ -952,7 +947,7 @@ public class EncoderEngine implements AutoCloseable {
       throw new EncoderException("Missing encoding profile(s)");
     }
     try {
-      List<String> command = new ArrayList<String>();
+      List<String> command = new ArrayList<>();
       List<String> clauses = makeEdits(clips, transitionDuration, hasVideo, hasAudio); // map inputs into [ov]
                                                                                                // and [oa]
       // Entry point for multiencode here, if edits is empty, then use raw channels instead of output from edits

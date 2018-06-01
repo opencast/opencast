@@ -164,7 +164,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** The formatter for load values */
   private static final DecimalFormat df = new DecimalFormat("#.#");
 
-  /** Configuration for process-smil transition duration - TODO: use smil transition element */
+  /** Configuration for process-smil transition duration */
   public static final String PROCESS_SMIL_CLIP_TRANSITION_DURATION = "org.composer.process_smil.edit.transition.duration";
 
   /** default transition duration for process_smil in seconds */
@@ -1962,7 +1962,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param trackparamId
    *          - group id
    * @param mediaType
-   *          - v = video only, a = audio only, av otherwise
+   *          - VIDEO_ONLY, AUDIO_ONLY, or "" if neither is true
    * @param profileIds
    *          - list of encoding profile Ids
    * @return Compose Job
@@ -2011,10 +2011,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     for (String profileId1 : encodingProfiles) { // Check for mismatched profiles/media types
       EncodingProfile profile = profileScanner.getProfile(profileId1);
       // warn about bad encoding profiles, but encode anyway, the profile type is not enforced
-      if ("a".equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Audio) {
+      if (VIDEO_ONLY.equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Audio) {
         logger.warn("Profile '" + profileId1 + "' supports " + profile.getApplicableMediaType()
         + " but media is Video Only");
-      } else if ("v".equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Visual) {
+      } else if (AUDIO_ONLY.equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Visual) {
         logger.warn("Profile '" + profileId1 + "' supports " + profile.getApplicableMediaType()
         + " but media is Audio Only");
       }
@@ -2027,8 +2027,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * Fetch specified or first SmilMediaParamGroup from smil
    *
    * @param smil
+   *          - smil object
    * @param trackParamGroupId
-   * @return
+   *          - id for a particular param group or null
+   * @return a named track group by id, if id is not specified, get first param group
    * @throws EncoderException
    */
   private SmilMediaParamGroup getSmilMediaParamGroup(Smil smil, String trackParamGroupId) throws EncoderException {
@@ -2059,7 +2061,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @param trackParamGroupId
    *          source track group
    * @param mediaType
-   *          v for video, a for audio only, av is anything else
+   *          VIDEO_ONLY or AUDIO_ONLY or "" if it has both
    * @param encodingProfiles
    *          - profiles
    * @return serialized array of processed tracks
@@ -2169,9 +2171,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       }
       EncoderEngine encoderEngine = getEncoderEngine();
       try {
-        outputs = encoderEngine.multiTrimConcat(inputs, edits, profiles, transitionDuration, !"a".equals(mediaType),
-                !"v".equals(mediaType));
-        // TODO: transitionDuration per transition from editor
+        outputs = encoderEngine.multiTrimConcat(inputs, edits, profiles, transitionDuration,
+                !AUDIO_ONLY.equals(mediaType), !VIDEO_ONLY.equals(mediaType));
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<>();
         List<String> profileList = new ArrayList<>();

@@ -22,7 +22,7 @@ package org.opencastproject.composer.api;
 
 import java.util.Comparator;
 
-/* #DCE OPC-29
+/*
  * This is used to drive processEdit/processSmil after editing
  */
 
@@ -31,7 +31,6 @@ import java.util.Comparator;
  * srcId is a bit redundant, but needed for convenience.
  * By default, it is all video
  */
-// #DCE added natural ordering by start time
 public class VideoClip  implements Comparable<VideoClip>, Comparator<VideoClip> {
   private final int srcId;
   private final long start;
@@ -92,7 +91,7 @@ public class VideoClip  implements Comparable<VideoClip>, Comparator<VideoClip> 
     return "VideoClip [srcId=" + srcId + ", start=" + start + ", end=" + end + "]";
   }
 
-  // [MATT-2095-stat-s-139-lecture-2-error-res] #DCE - Natural order of the clips is by start time
+  // Order the clips by start time
   @Override
   public int compareTo(VideoClip other) {
     return (int) (start - other.getStartMS());

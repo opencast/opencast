@@ -25,6 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
@@ -504,7 +505,7 @@ public class ProcessSmilTest {
     EasyMock.replay(smilService);
     composerService.setSmilService(smilService);
     List<String> encodingProfiles = Arrays.asList("h264-low.http");
-    Job job = composerService.processSmil(smil, paramGroupId1, "v", encodingProfiles);
+    Job job = composerService.processSmil(smil, paramGroupId1, ComposerService.VIDEO_ONLY, encodingProfiles);
     List<Track> outputs = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
     // Video Only - video.mp4 has no audio track
     assertNotNull(outputs);
@@ -601,7 +602,7 @@ public class ProcessSmilTest {
       composerService.setSmilService(smilService);
       List<String> encodingProfiles = Arrays.asList("mp3audio.http");
       // Let processSmil know that there is no video
-      Job job = composerService.processSmil(smil, paramGroupId1, "a", encodingProfiles);
+      Job job = composerService.processSmil(smil, paramGroupId1, ComposerService.AUDIO_ONLY, encodingProfiles);
       List<Track> outputs = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
       // Audio Only - video.mp4 has no audio track
       assertNotNull(outputs);
@@ -793,7 +794,7 @@ public class ProcessSmilTest {
     EasyMock.replay(smilService);
     composerService.setSmilService(smilService);
 
-    Job job = composerService.processSmil(smil, paramGroupId1, "", encodingProfiles);
+    Job job = composerService.processSmil(smil, paramGroupId1, null, encodingProfiles);
     Assert.assertNotNull(job.getPayload());
     assertEquals(3, MediaPackageElementParser.getArrayFromXml(job.getPayload()).size());
   }
