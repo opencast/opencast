@@ -1295,7 +1295,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       Operation op = Operation.valueOf(operation);
       Track firstTrack;
       Track secondTrack;
-      String encodingProfile = arguments.get(0); // rewrite for ProcessSmil
+      String encodingProfile = arguments.get(0);
       final String serialized;
 
       switch (op) {

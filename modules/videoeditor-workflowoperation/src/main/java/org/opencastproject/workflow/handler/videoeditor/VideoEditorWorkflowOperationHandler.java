@@ -91,7 +91,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
   private static final String PREVIEW_FLAVORS_PROPERTY = "preview-flavors";
 
   /** Bypasses Videoeditor's encoding operation but keep the raw smil for later processing */
-  private static final String SKIP_PROCESSING_PROPERTY = "create-smil-skip-processing";
+  private static final String SKIP_PROCESSING_PROPERTY = "skip-processing";
 
   /** Name of the configuration option that provides the source flavors on skipped videoeditor operation. */
   private static final String SKIPPED_FLAVORS_PROPERTY = "skipped-flavors";
