@@ -1975,7 +1975,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   public Job processSmil(Smil smil, String trackparamId, String mediaType, List<String> profileIds)
           throws EncoderException, MediaPackageException {
     try {
-      ArrayList<String> al = new ArrayList<String>();
+      ArrayList<String> al = new ArrayList<>();
       al.add(smil.toXML());
       al.add(trackparamId); // place holder for param ID
       al.add(mediaType); // audio, video or av
@@ -2007,7 +2007,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   private List<EncodingProfile> findSuitableProfiles(List<String> encodingProfiles, String mediaType) {
-    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    List<EncodingProfile> profiles = new ArrayList<>();
     for (String profileId1 : encodingProfiles) { // Check for mismatched profiles/media types
       EncodingProfile profile = profileScanner.getProfile(profileId1);
       // warn about bad encoding profiles, but encode anyway, the profile type is not enforced
@@ -2081,10 +2081,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               "ProcessSmil - Media is not supported by the assigned encoding Profiles '" + encodingProfiles + "'");
 
     SmilMediaParamGroup trackParamGroup;
-    ArrayList<String> inputfile = new ArrayList<String>();
-    Map<String, String> props = new HashMap<String, String>();
+    ArrayList<String> inputfile = new ArrayList<>();
+    Map<String, String> props = new HashMap<>();
 
-    ArrayList<VideoClip> videoclips = new ArrayList<VideoClip>();
+    ArrayList<VideoClip> videoclips = new ArrayList<>();
     trackParamGroup = getSmilMediaParamGroup(smil, trackParamGroupId);
 
     String sourceTrackId = null;
@@ -2159,13 +2159,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           }
         }
       }
-      List<Long> edits = new ArrayList<Long>(); // collect edit points
+      List<Long> edits = new ArrayList<>(); // collect edit points
       for (VideoClip clip : videoclips) {
         edits.add((long) clip.getSrc());
         edits.add(clip.getStartMS());
         edits.add(clip.getEndMS());
       }
-      List<File> inputs = new ArrayList<File>(); // collect input source tracks
+      List<File> inputs = new ArrayList<>(); // collect input source tracks
       for (String f : inputfile) {
         inputs.add(new File(f));
       }

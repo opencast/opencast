@@ -156,12 +156,12 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     File video2 = new File("fooVideo2.flv");
     smilfile = new File("src/test/resources/smil.smil");
 
-    List<SmilMediaParam> params1 = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params1 = new ArrayList<>();
     params1.add(mockSmilMediaParam("track-id", "b7c4f480-dd22-4f82-bb58-c4f218051059",
             "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params1.add(mockSmilMediaParam("track-src", "fooVideo1.flv", "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
     params1.add(mockSmilMediaParam("track-flavor", "presenter/work", "param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9"));
-    List<SmilMediaParam> params2 = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params2 = new ArrayList<>();
     params2.add(mockSmilMediaParam("track-id", "144b489b-c498-4d11-9a63-1ab96a7ec0b1",
             "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params2.add(mockSmilMediaParam("track-src", "fooVideo2.flv", "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -176,7 +176,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(group2.getId()).andReturn(paramGroupId1).anyTimes();
     EasyMock.replay(group2);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
     paramGroups.add(group2);
 
@@ -184,7 +184,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     objects.add(mockSmilMediaElement(video1.toURI(), 0L, 3000L, paramGroupId1));
     objects.add(mockSmilMediaElement(video2.toURI(), 0L, 3000L, paramGroupId2));
     objects.add(mockSmilMediaElement(video1.toURI(), 4000L, 7000L, paramGroupId1));
@@ -196,7 +196,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -373,7 +373,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   public void testProcessSmilOneTrackOneSection() throws Exception {
     // operation configuration
     String targetTags = "engage,rss";
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presenter/*");
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("target-tags", targetTags);
@@ -398,7 +398,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   @Test
   public void testProcessSmilOneTrackOneSectionNoTagsNoTargetFlavor() throws Exception {
     // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presenter/*");
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("target-flavors", "presenter/deli");
@@ -422,7 +422,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   @Test
   public void testProcessSmilTwoSectionsNoTagsNoTargetFlavor() throws Exception {
     // operation configuration
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presenter/work;presentation/work");
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("encoding-profiles", PROFILE_ID); // 2 jobs for the 2 sources
@@ -445,7 +445,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   public void testProcessSmilTwoTrackAllSections() throws Exception {
     // operation configuration
     String targetTags = "engage," + PROFILE_ID + ",rss";
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "*/work"); // should do 2 flavors as 2 jobs
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("target-tags", "engage;rss"); // should collapse the tags
@@ -484,7 +484,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   public void testProcessSmilOneTrackVideoOnly() throws Exception {
     // operation configuration
     String targetTags = "engage,rss";
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presenter/*");
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("target-tags", targetTags);
@@ -514,7 +514,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     // operation configuration
     String targetTags = "preview,rss";
     String targetTags2 = "archive,engage";
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     configurations.put("source-flavors", "presenter/*;presentation/*"); // 2 sections
     configurations.put("smil-flavor", "smil/smil");
     configurations.put("target-tags", targetTags + ";" + targetTags2); // different tags
@@ -581,7 +581,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.replay(composerService);
     operationHandler.setComposerService(composerService);
     operationHandler.setSmilService(smilService);
-    Map<String, String> configurations = new HashMap<String, String>();
+    Map<String, String> configurations = new HashMap<>();
     try {
       // no encoding profile
       configurations.put("source-flavors", "presenter/work");
@@ -609,7 +609,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
       operation.setConfiguration(key, configurations.get(key));
     }
 
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
+    List<WorkflowOperationInstance> operationsList = new ArrayList<>();
     operationsList.add(operation);
     workflowInstance.setOperations(operationsList);
 

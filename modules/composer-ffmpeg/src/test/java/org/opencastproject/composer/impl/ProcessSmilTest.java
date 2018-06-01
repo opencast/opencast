@@ -175,7 +175,7 @@ public class ProcessSmilTest {
     EasyMock.replay(job);
 
     JaxbOrganization org = new DefaultOrganization();
-    HashSet<JaxbRole> roles = new HashSet<JaxbRole>();
+    HashSet<JaxbRole> roles = new HashSet<>();
     roles.add(new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, org, ""));
     User user = new JaxbUser("admin", "test", org, roles);
     OrganizationDirectoryService orgDirectory = EasyMock.createNiceMock(OrganizationDirectoryService.class);
@@ -359,7 +359,7 @@ public class ProcessSmilTest {
     try {
       String paramGroupId = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
 
-      List<SmilMediaParam> params1 = new ArrayList<SmilMediaParam>();
+      List<SmilMediaParam> params1 = new ArrayList<>();
       params1.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
       params1.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
               "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -370,7 +370,7 @@ public class ProcessSmilTest {
       EasyMock.expect(group1.getId()).andReturn(paramGroupId).anyTimes();
       EasyMock.replay(group1);
 
-      List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+      List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
       paramGroups.add(group1);
 
       SmilHead head = EasyMock.createNiceMock(SmilHead.class);
@@ -381,7 +381,7 @@ public class ProcessSmilTest {
       SmilMediaElement sme2 = mockSmilMediaElement(sourceAudioVideo1.toURI(), 1000L, 5000L,
               "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a");
 
-      List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+      List<SmilMediaObject> objects = new ArrayList<>();
       objects.add(sme1);
       objects.add(sme2);
 
@@ -391,7 +391,7 @@ public class ProcessSmilTest {
       EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
       EasyMock.replay(objectContainer);
 
-      List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+      List<SmilMediaObject> containerObjects = new ArrayList<>();
       containerObjects.add(objectContainer);
 
       SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -450,7 +450,7 @@ public class ProcessSmilTest {
     // build a single media package to test with
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
     String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params.add(mockSmilMediaParam("track-src", "file:" + videoOnly.getPath(),
             "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -461,7 +461,7 @@ public class ProcessSmilTest {
     EasyMock.expect(group1.getId()).andReturn(paramGroupId1).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
@@ -471,7 +471,7 @@ public class ProcessSmilTest {
     SmilMediaElement sme1 = mockSmilMediaElement(videoOnly.toURI(), 1000L, 5000L, paramGroupId1); // Only doing group1
     SmilMediaElement sme2 = mockSmilMediaElement(audioOnly.toURI(), 1000L, 5000L, paramGroupId2);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     objects.add(sme1);
     objects.add(sme2);
 
@@ -481,7 +481,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -539,8 +539,8 @@ public class ProcessSmilTest {
     try {
       String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
       String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";
-      List<SmilMediaParam> params1 = new ArrayList<SmilMediaParam>();
-      List<SmilMediaParam> params2 = new ArrayList<SmilMediaParam>();
+      List<SmilMediaParam> params1 = new ArrayList<>();
+      List<SmilMediaParam> params2 = new ArrayList<>();
       params1.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
       params1.add(mockSmilMediaParam("track-src", "file:" + audioOnly.getPath(),
               "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -557,7 +557,7 @@ public class ProcessSmilTest {
       EasyMock.expect(group1.getId()).andReturn(paramGroupId1).anyTimes();
       EasyMock.replay(group1);
 
-      List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+      List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
       paramGroups.add(group1);
 
       SmilHead head = EasyMock.createNiceMock(SmilHead.class);
@@ -567,7 +567,7 @@ public class ProcessSmilTest {
       SmilMediaElement sme1 = mockSmilMediaElement(audioOnly.toURI(), 1000L, 5000L, paramGroupId1);
       SmilMediaElement sme2 = mockSmilMediaElement(audioOnly.toURI(), 1000L, 5000L, paramGroupId2);
 
-      List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+      List<SmilMediaObject> objects = new ArrayList<>();
       objects.add(sme1);
       objects.add(sme2);
 
@@ -577,7 +577,7 @@ public class ProcessSmilTest {
       EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
       EasyMock.replay(objectContainer);
 
-      List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+      List<SmilMediaObject> containerObjects = new ArrayList<>();
       containerObjects.add(objectContainer);
 
       SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -638,7 +638,7 @@ public class ProcessSmilTest {
     // Encoding profile must support visual or audiovisual
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
     String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
             "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -649,14 +649,14 @@ public class ProcessSmilTest {
     EasyMock.expect(group1.getId()).andReturn(paramGroupId1).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     objects.add(mockSmilMediaElement(videoOnly.toURI(), 1000L, 5000L, paramGroupId1));
     objects.add(mockSmilMediaElement(videoOnly.toURI(), 1000L, 5000L, paramGroupId2));
 
@@ -666,7 +666,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -729,8 +729,8 @@ public class ProcessSmilTest {
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
     String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";
 
-    List<SmilMediaParam> params1 = new ArrayList<SmilMediaParam>();
-    List<SmilMediaParam> params2 = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params1 = new ArrayList<>();
+    List<SmilMediaParam> params2 = new ArrayList<>();
     params1.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params1.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
             "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -749,7 +749,7 @@ public class ProcessSmilTest {
     EasyMock.expect(group2.getId()).andReturn(paramGroupId2).anyTimes();
     EasyMock.replay(group2);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
     paramGroups.add(group2);
 
@@ -757,7 +757,7 @@ public class ProcessSmilTest {
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     // Second track is listed in different paramGroup
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 0L, 1000L, paramGroupId1));
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 2000L, 3500L, paramGroupId1));
@@ -769,7 +769,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -839,7 +839,7 @@ public class ProcessSmilTest {
             + "</par></body></smil>";
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
     // 2 tracks in the same group
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
             "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -854,14 +854,14 @@ public class ProcessSmilTest {
     EasyMock.expect(group1.getId()).andReturn(paramGroupId1).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     // Second track is listed in same paramGroup
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 0L, 3000L, paramGroupId1));
     objects.add(mockSmilMediaElement(sourceAudioVideo2.toURI(), 5000L, 7500L, paramGroupId1));
@@ -872,7 +872,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -938,7 +938,7 @@ public class ProcessSmilTest {
     // SmilResponse smilResponse = smilService.fromXml(prodsmil);
     String paramGroupId = "pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1"; // Pick the presenter flavor
 
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(mockSmilMediaParam("track-id", "track-1", "param-31a5a322-18ae-4659-b696-b3772d99651d"));
     params.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
             "param-aed3f3db-7d68-4a76-9229-557940fb44be"));
@@ -949,14 +949,14 @@ public class ProcessSmilTest {
     EasyMock.expect(group1.getId()).andReturn(paramGroupId).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     // Second track is not listed in paramGroup
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 0L, 3000L, paramGroupId));
     objects.add(mockSmilMediaElement(sourceAudioVideo2.toURI(), 5000L, 7500L, paramGroupId));
@@ -967,7 +967,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
@@ -1005,7 +1005,7 @@ public class ProcessSmilTest {
   @Test
   public void testProcessSmilJob() throws Exception {
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
-    List<SmilMediaParam> params = new ArrayList<SmilMediaParam>();
+    List<SmilMediaParam> params = new ArrayList<>();
     params.add(mockSmilMediaParam("track-id", "track-1", "param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9"));
     params.add(mockSmilMediaParam("track-src", "file:" + sourceAudioVideo1.getPath(),
             "param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318"));
@@ -1016,14 +1016,14 @@ public class ProcessSmilTest {
     EasyMock.expect(group1.getId()).andReturn(paramGroupId1).anyTimes();
     EasyMock.replay(group1);
 
-    List<SmilMediaParamGroup> paramGroups = new ArrayList<SmilMediaParamGroup>();
+    List<SmilMediaParamGroup> paramGroups = new ArrayList<>();
     paramGroups.add(group1);
 
     SmilHead head = EasyMock.createNiceMock(SmilHead.class);
     EasyMock.expect(head.getParamGroups()).andReturn(paramGroups).anyTimes();
     EasyMock.replay(head);
 
-    List<SmilMediaObject> objects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> objects = new ArrayList<>();
     // Second track is listed in same paramGroup
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 0L, 3000L, paramGroupId1));
     objects.add(mockSmilMediaElement(sourceAudioVideo1.toURI(), 5000L, 8300L, paramGroupId1));
@@ -1034,7 +1034,7 @@ public class ProcessSmilTest {
     EasyMock.expect(objectContainer.getElements()).andReturn(objects).anyTimes();
     EasyMock.replay(objectContainer);
 
-    List<SmilMediaObject> containerObjects = new ArrayList<SmilMediaObject>();
+    List<SmilMediaObject> containerObjects = new ArrayList<>();
     containerObjects.add(objectContainer);
 
     SmilBody body = EasyMock.createNiceMock(SmilBody.class);
