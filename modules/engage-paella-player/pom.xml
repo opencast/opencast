@@ -199,7 +199,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>ui.*</Private-Package>
-            <Http-Alias>/engage/paella/ui</Http-Alias>
+            <Http-Alias>/paella/ui</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
             <Http-Welcome>watch.html</Http-Welcome>
             <Import-Package>

@@ -4,6 +4,14 @@ Changelog
 Opencast 4.x
 ------------
 
+### Opencast 4.4
+
+*Released on May 31, 2018*
+
+- [[MH-12923]](https://opencast.jira.com/browse/MH-12923) - ServiceRegistry does not close db connction
+- [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+
 ### Opencast 4.3
 
 *Released on March 28, 2018*
@@ -291,6 +299,22 @@ Opencast 4.x
 
 Opencast 3.x
 ------------
+
+### Opencast 3.6
+
+*Released on May 31, 2018*
+
+- [[MH-12910]](https://opencast.jira.com/browse/MH-12910) - When switching between branches with different module
+  naming schemes, the git tree is left unclean sometimes
+- [[MH-12860]](https://opencast.jira.com/browse/MH-12860) - Opencast does not build at DEBUG logging level
+- [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast
+  admins
+- [[MH-12830]](https://opencast.jira.com/browse/MH-12830) - Fix mvn site generation
+- [[MH-12743]](https://opencast.jira.com/browse/MH-12743) - OAIPMH-Republish-Operation tries to republish to ASW3
+- [[MH-12441]](https://opencast.jira.com/browse/MH-12441) - Fix multi-server configuration docs and config details
+- [[MH-12091]](https://opencast.jira.com/browse/MH-12091) - Create a Capture Agent digest user with its own role
+
 
 ### Opencast 3.5
 

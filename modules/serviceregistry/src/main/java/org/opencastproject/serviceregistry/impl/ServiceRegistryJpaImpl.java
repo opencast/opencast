@@ -888,7 +888,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // All WorkflowService Jobs will be ignored
       if (oldJob.getStatus() != job.getStatus() && !TYPE_WORKFLOW.equals(job.getJobType())) {
-        updateServiceForFailover(job);
+        updateServiceForFailover(em, job);
       }
 
       return jpaJob;
@@ -2419,12 +2419,15 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * Update the jobs failure history and the service status with the given information. All these data are then use for
    * the jobs failover strategy. Only the terminated job (with FAILED or FINISHED status) are taken into account.
    *
+   * @param em
+   *          the current entity manager
    * @param job
    *          the current job that failed/succeeded
    * @throws ServiceRegistryException
    * @throws IllegalArgumentException
    */
-  private void updateServiceForFailover(JpaJob job) throws IllegalArgumentException, ServiceRegistryException {
+  private void updateServiceForFailover(EntityManager em, JpaJob job)
+          throws IllegalArgumentException, ServiceRegistryException {
     if (job.getStatus() != Status.FAILED && job.getStatus() != Status.FINISHED)
       return;
 
@@ -2436,94 +2439,84 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (currentService == null)
       return;
 
-    EntityManager em = emf.createEntityManager();
-    try {
-      em = emf.createEntityManager();
+    // Job is finished with a failure
+    if (job.getStatus() == FAILED && !DATA.equals(job.getFailureReason())) {
 
-      // Job is finished with a failure
-      if (job.getStatus() == FAILED && !DATA.equals(job.getFailureReason())) {
+      // Services in WARNING or ERROR state triggered by current job
+      List<ServiceRegistrationJpaImpl> relatedWarningOrErrorServices = getRelatedWarningErrorServices(job);
 
-        // Services in WARNING or ERROR state triggered by current job
-        List<ServiceRegistrationJpaImpl> relatedWarningOrErrorServices = getRelatedWarningErrorServices(job);
+      // Before this job failed there was at least one job failed with this job signature on any service
+      if (relatedWarningOrErrorServices.size() > 0) {
 
-        // Before this job failed there was at least one job failed with this job signature on any service
-        if (relatedWarningOrErrorServices.size() > 0) {
+        for (ServiceRegistrationJpaImpl relatedService : relatedWarningOrErrorServices) {
+          // Skip current service from the list
+          if (currentService.equals(relatedService))
+            continue;
 
-          for (ServiceRegistrationJpaImpl relatedService : relatedWarningOrErrorServices) {
-            // Skip current service from the list
-            if (currentService.equals(relatedService))
-              continue;
-
-            // Reset the WARNING job to NORMAL
-            if (relatedService.getServiceState() == WARNING) {
-              logger.info("State reset to NORMAL for related service {} on host {}", relatedService.getServiceType(),
-                      relatedService.getHost());
-              relatedService.setServiceState(NORMAL, job.toJob().getSignature());
-            }
-
-            // Reset the ERROR job to WARNING
-            else if (relatedService.getServiceState() == ERROR) {
-              logger.info("State reset to WARNING for related service {} on host {}", relatedService.getServiceType(),
-                      relatedService.getHost());
-              relatedService.setServiceState(WARNING, relatedService.getWarningStateTrigger());
-            }
-
-            updateServiceState(em, relatedService);
+          // Reset the WARNING job to NORMAL
+          if (relatedService.getServiceState() == WARNING) {
+            logger.info("State reset to NORMAL for related service {} on host {}", relatedService.getServiceType(),
+                    relatedService.getHost());
+            relatedService.setServiceState(NORMAL, job.toJob().getSignature());
           }
 
-        }
-
-        // This is the first job with this signature failing on any service
-        else {
-
-          // Set the current service to WARNING state
-          if (currentService.getServiceState() == NORMAL) {
-            logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
-                    currentService.getHost());
-            currentService.setServiceState(WARNING, job.toJob().getSignature());
-            updateServiceState(em, currentService);
+          // Reset the ERROR job to WARNING
+          else if (relatedService.getServiceState() == ERROR) {
+            logger.info("State reset to WARNING for related service {} on host {}", relatedService.getServiceType(),
+                    relatedService.getHost());
+            relatedService.setServiceState(WARNING, relatedService.getWarningStateTrigger());
           }
 
-          // The current service already is in WARNING state and max attempts is reached
-          else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
-            logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
-                    currentService.getHost());
-            currentService.setServiceState(ERROR, job.toJob().getSignature());
-            updateServiceState(em, currentService);
-          }
-        }
-
-      }
-
-      // Job is finished without failure
-      else if (job.getStatus() == Status.FINISHED) {
-
-        // If the service was in warning state reset to normal state
-        if (currentService.getServiceState() == WARNING) {
-          logger.info("State reset to NORMAL for current service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          currentService.setServiceState(NORMAL);
-          updateServiceState(em, currentService);
-        }
-
-        // Services in WARNING state triggered by current job
-        List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(job);
-
-        // Sets all related services to error state
-        for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
-          logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          relatedService.setServiceState(ERROR, job.toJob().getSignature());
           updateServiceState(em, relatedService);
         }
 
       }
 
-    } finally {
-      if (em != null)
-        em.close();
+      // This is the first job with this signature failing on any service
+      else {
+
+        // Set the current service to WARNING state
+        if (currentService.getServiceState() == NORMAL) {
+          logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
+                  currentService.getHost());
+          currentService.setServiceState(WARNING, job.toJob().getSignature());
+          updateServiceState(em, currentService);
+        }
+
+        // The current service already is in WARNING state and max attempts is reached
+        else if (getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
+          logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
+                  currentService.getHost());
+          currentService.setServiceState(ERROR, job.toJob().getSignature());
+          updateServiceState(em, currentService);
+        }
+      }
+
     }
 
+    // Job is finished without failure
+    else if (job.getStatus() == Status.FINISHED) {
+
+      // If the service was in warning state reset to normal state
+      if (currentService.getServiceState() == WARNING) {
+        logger.info("State reset to NORMAL for current service {} on host {}", currentService.getServiceType(),
+                currentService.getHost());
+        currentService.setServiceState(NORMAL);
+        updateServiceState(em, currentService);
+      }
+
+      // Services in WARNING state triggered by current job
+      List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(job);
+
+      // Sets all related services to error state
+      for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
+        logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
+                currentService.getHost());
+        relatedService.setServiceState(ERROR, job.toJob().getSignature());
+        updateServiceState(em, relatedService);
+      }
+
+    }
   }
 
   /**
