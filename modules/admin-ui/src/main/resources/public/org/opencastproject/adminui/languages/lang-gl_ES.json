@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "Módulo Multimedia",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP": {
       "HELP": "Axuda",
       "USERS_GUIDE": "Guía do Usuario",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Non se puido retomar o procesamento.",
       "EVENTS_PROCESSING_ACTION_NONE": "Cancelando o procesamento...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Non se puido cancelar o procesamento.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "{{ number }} series foron actualizadas correctamente",
       "SERIES_UPDATED_ALL": "Todas as series foron actualizadas correctamente",
       "SERIES_NOT_UPDATED": "Non se puido gardar a serie",
@@ -381,6 +387,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Data de fin",
+                  "END_TIME": "End time",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "Estado de revisión",
             "PREVIOUS": "Anterior",
             "NOCONTENT": "Non hai información dispoñible",
-            "PUBLISHED": "Publicado"
+            "PUBLISHED": "Publicado",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Preparado para gravar",
@@ -495,13 +514,16 @@
                "COMMENTS": "Comentarios"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "Estado de publicación",
+               "PUBLICATION_STATUS": "Publicacións",
                "NO_PUBLICATIONS_AVAILABLE": "Este evento non ten publicacións",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "SCHEDULING_STATUS": "Estado",
                "READY_FOR_RECORDING": "Preparado para gravar",
                "OPTED_OUT": "Non se gravará",
                "CUSTOM": "Personalizado",
                "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "Publicación na API Externa",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -559,6 +581,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Data de fin",
+                  "END_TIME": "End time",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -566,7 +589,7 @@
                },
                "SCHEDULE_MULTIPLE": {
                   "CAPTION": "Programar múltiples eventos",
-                  "REPEATS": "Repeticións",
+                  "REPEATS": "Repetir",
                   "REPEAT_ON": "Repetir",
                   "WEEKDAYS": "Días da semana"
                }
@@ -581,7 +604,7 @@
                   "CAPTION": "Adxuntos",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -589,7 +612,7 @@
                      "CAPTION": "Detalles do adxunto",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -602,7 +625,7 @@
                   "CAPTION": "Catálogos",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -610,7 +633,7 @@
                      "CAPTION": "Detalles do catálogo",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -623,14 +646,14 @@
                   "CAPTION": "Arquivos multimedia",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
                      "TITLE": "Detalles dos arquivos multimedia",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "URL": "URL",
                      "RECORDING_DATE": "Data de gravación",
                      "FLAVOR": "Sabor",
@@ -659,7 +682,7 @@
                   "CHANNEL": "Canle",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -667,7 +690,7 @@
                      "CAPTION": "Detalles de publicación",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -735,7 +758,7 @@
                "CAPTION": "Detalles do evento",
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "RECORDING_DATE": "Data de gravación",
                "SUBJECT": "Tema",
                "DESCRIPTION": "Descrición",
@@ -788,13 +811,19 @@
                "TITLE": "Título",
                "STATE": "Estado",
                "STARTED": "Iniciado",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "SUBMITTED": "Enviado",
-               "MIMETYPE": "Tipo MIME",
+               "MIMETYPE": "Tipo Mime",
                "URL": "URL",
                "CONFIGURATION": "Configuración",
                "NO_CONFIGURATION": "Non existen parámetros de configuración para o fluxo de traballo seleccionado.",
-               "WORKFLOW": "Fluxo de traballo"
+               "WORKFLOW": "Fluxo de traballo",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Detalles do fluxo de traballo",
@@ -813,7 +842,7 @@
                "TITLE": "Detalles dos arquivos multimedia",
                "ID": "Id.",
                "TYPE": "Tipo",
-               "MIMETYPE": "Tipo MIME",
+               "MIMETYPE": "Tipo Mime",
                "URL": "URL",
                "RECORDING_DATE": "Data de gravación",
                "TAGS": "Etiquetas",
@@ -889,7 +918,9 @@
             },
             "THEME": {
                "CAPTION": "Estilo",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
                "TITLE": "Estilo",
                "LABEL": "Sen estilo",
                "EMPTY": "Non hai estilos dispoñibles"
@@ -900,13 +931,18 @@
          },
          "TABLE": {
             "CAPTION": "Series",
-            "TITLE": "Serie",
+            "TITLE": "Series",
             "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Creado",
             "MANAGED_ACL": "Política de acceso",
             "EVENTS": "Eventos",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
          },
          "DETAILS": {
             "HEADER": "Detalles da serie - {{resourceId}}",
@@ -945,7 +981,7 @@
             "METADATA": {
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "PUBLISHERS": "Editor(es)",
                "ORGANIZERS": "Organizador(es)",
                "CONTRIBUTORS": "Colaborador(es)",
@@ -972,7 +1008,7 @@
                   "CAPTION": "Mensaxes",
                   "CREATION_DATE": "Data de Creación",
                   "SENDER": "Remitente",
-                  "SUBJECT": "Asunto"
+                  "SUBJECT": "Tema"
                }
             },
             "EVENTS": {
@@ -1010,7 +1046,12 @@
             "VERSION": "Versión",
             "BLACKLIST_FROM": "Na lista negra dende",
             "BLACKLIST_TO": "Na lista negra ata",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
          },
          "DETAILS": {
             "HEADER": "Detalles da ubicación - {{resourceId}}",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "Fornecedor",
             "BLACKLIST_FROM": "Na lista negra dende",
             "BLACKLIST_TO": "Na lista negra ata",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear usuario",
@@ -1141,7 +1186,11 @@
             "NAME": "Nome",
             "DESCRIPTION": "Descrición",
             "ROLE": "Rol",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear grupo",
@@ -1181,7 +1230,11 @@
             "CREATED": "Creado",
             "CREATOR": "Creador",
             "IN_USE": "En uso",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
          },
          "NEW": {
             "CAPTION": "Nova Política de Acceso",
@@ -1313,7 +1366,7 @@
                "BUMPER": "Secuencia de apertura",
                "TRAILER": "Secuencia de peche",
                "TITLE": "Título",
-               "LICENSE": "Licenza",
+               "LICENSE": "Licencia",
                "WATERMARK": "Marca de auga",
                "USAGE": "Uso"
             },
@@ -1380,7 +1433,7 @@
             },
             "MESSAGE": {
                "NAME": "Nome",
-               "SUBJECT": "Asunto",
+               "SUBJECT": "Tema",
                "MESSAGE": "Mensaxe"
             },
             "SUMMARY": {
@@ -1397,7 +1450,11 @@
             "CREATED": "Creado",
             "DEFAULT": "Por defecto",
             "USAGE": "Uso",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear estilo",
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "Tempo medio de execución",
             "MEAN_QUEUE_TIME": "Tempo medio de espera na cola",
             "SANITIZE": "Limpar estado de error",
-            "ACTION": "Accións"
+            "ACTION": "Accións",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Liña de tempo",
       "ZOOMLEVEL": "Nivel de zoom",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
       "ZOOM": "Zoom",
       "BUTTONS": {
          "CLOSE": "Pechar",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "Procurar…",
       "PROFILES": {
          "FILTERS_HEADER": "Grupos de filtros gardados",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
          "EMPTY": "Aínda non se gardou ningún filtro",
          "SAVE_FILTERS": "Gardar",
          "FILTER_HEADER": "Gardar grupo de filtros",
@@ -1834,7 +1899,7 @@
    "DASHBOARD": {
       "RUNNING": "Procesando",
       "FINISHED": "Finalizado",
-      "PAUSED": "En pausa",
+      "PAUSED": "Pausado",
       "FAILED": "Errado",
       "FINISHED_WITH_COMMENTS": "Pendente",
       "SCHEDULED": "Programado",

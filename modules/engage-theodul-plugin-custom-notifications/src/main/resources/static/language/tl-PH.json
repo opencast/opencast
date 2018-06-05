@@ -1,0 +1,13 @@
+{
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "error_videoLoading": "Ang video ay nag-loload. Mangyaring maghintay ng sandali.",
+    "error_audioLoading": "Ang audio ay nag-loload. Mangyaring maghintay ng sandali.",
+    "msg_videoLoadedSuccessfully": "Ang video ay na-iload ng matagumpay.",
+    "msg_audioLoadedSuccessfully": "Ang audio ay na-iload ng matagumpay.",
+    "msg_videoBuffering": "Ang video ay kasalukuyang nag-buffer. Mangyaring maghintay ng sandali.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Ang video ay na-buffer nang matagumpay at ngayon ay nag-autoplay.",
+    "msg_videoBufferedSuccessfully": "Ang video ay na-buffer ng matagumpay.",
+    "error": "Error",
+    "error_AudioCodecNotSupported": "Error: Ang code ng audio ay hindi supportado ng browser na ito"
+}
