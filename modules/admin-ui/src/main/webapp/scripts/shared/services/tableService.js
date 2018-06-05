@@ -142,7 +142,11 @@ angular.module('adminNg.services')
             var p = me.pagination, oldPageSize = p.limit;
 
             p.limit = pageSize;
-            p.offset = 0;
+            if (!p.resume) {
+                p.offset = 0;
+            }
+            p.resume = false;
+            Storage.put('pagination', me.resource, 'resume', p.resume);
 
             me.updatePagination();
 
@@ -190,6 +194,10 @@ angular.module('adminNg.services')
 
                 if (angular.isDefined(pagination.offset)) {
                     me.pagination.offset = pagination.offset;
+                }
+
+                if (angular.isDefined(pagination.resume)) {
+                    me.pagination.resume = pagination.resume;
                 }
             }
 
