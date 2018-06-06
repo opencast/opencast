@@ -35,5 +35,7 @@
   "no_data": "Inga data tillgängliga.",
   "login_success": "Inloggad.",
   "login_failed": "Inloggningen misslyckades.",
-  "not_logged_in": "Ej inloggad."
+  "not_logged_in": "Ej inloggad.",
+  "live_in_progress": "Live (in progress)",
+  "live_not_in_progress": "Live (not in progress)"
 }
