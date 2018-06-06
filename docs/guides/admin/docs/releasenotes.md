@@ -19,6 +19,7 @@ like the author's name or the event's title. This is useful, for example, to aut
     * **clone** - The [clone](workflowoperationhandlers/clone-woh.md) workflow operation can be used to clone media package elements.
     * **duplicate-event** - The [duplicate-event](workflowoperationhandlers/duplicate-event-woh.md) operation can be used to duplicate an event by copying an existing one.
     * **log** - The [log](workflowoperationhandlers/log-woh.md) workflow operation can be used to log the current state of of a workflow and/or its media package for testing and debugging purposes.
+    * **animate** - The [animate](workflowoperationhandlers/animate-woh.md) workflow operation handler is the entry point to the Animate Service.
 
 Improvements
 ------------
@@ -60,14 +61,15 @@ Improvements
     * AngularJS 1.5.11
     * …many other
 
-
-
-
 Configuration changes
 ---------------------
 
-- HTTP Basic authentication is enabled by default
-- ng- prefix was removed from the workflow IDs (also workflow filenames)
+* HTTP Basic authentication is enabled by default
+    * Make sure you've enabled HTTPS support in Opencast or your prefered termination proxy (see [documentation](configuration/security.https.md))
+* Paella Player URL has changed to `/paella/ui/watch.html`
+    * Make sure to update your organization and security configuration on upgrade to Opencast 5
+* `ng-` prefix was removed from the workflow IDs (also workflow filenames)
+* Workflow control URLs are added to the security configuration
 
 
 Release Schedule
@@ -87,5 +89,5 @@ Release Schedule
 Release Managers
 ----------------
 
-- Waldemar Smirnow (ELAN e.V.)
-- Tobias Schiebeck (University of Manchester)
+* Waldemar Smirnow (ELAN e.V.)
+* Tobias Schiebeck (University of Manchester)
