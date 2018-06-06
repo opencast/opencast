@@ -53,8 +53,12 @@ angular.module('adminNg.directives')
                            result = value;
                        }
                     });
-                    if (scope.params.type === 'ordered_text') {
-                        result = JSON.parse(result)['label'];
+                    if ((scope.params.type === 'ordered_text') && angular.isDefined(result)) {
+                        try {
+                            result = JSON.parse(result)['label'];
+                        } catch (e) {
+                            console.warn("Could not find displayable value for " + result);
+                        }
                     }
                 } else if ((scope.mode === 'multiSelect') || (scope.mode === 'multiValue')) {
                     result = scope.params.value.join(',');
