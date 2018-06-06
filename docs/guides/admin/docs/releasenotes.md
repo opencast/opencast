@@ -10,18 +10,18 @@ New Features
   configuration with no need to rebuild the player. Additional improvements include more translations as well as caption
   support.
 
-* **Animate Service** - The Animate Opencast service can be used to generate custom animated video sequences which can
-  use Opencast metadata like the author's name or the event's title. This is useful, for example, to automatically
-  generate animated intro sequences to ensure having a homogeneous corporate design for all video recordings.
+* **Animate Service** - The animate service can be used to generate custom animated video sequences which can use
+  Opencast's metadata like the author's name or the event's title. This is useful, for example, to automatically generate
+  animated intro sequences to ensure having a homogeneous corporate design for all video recordings.
 
-* **Live Scheduler Service** - With the Live Scheduler Service you will be able to schedule live events. The students
-  can then watch the live stream during the recording is happen.
+* **Live Scheduler Service** - With the live scheduler service you are able to schedule and publish live events. The
+  students can then watch the stream while the recording is happening.
 
-* **OAI-PMH Publication Service** - OAI-PMH Publication Service was created to simplify and unify the publishing process
-  to the OAI-PMH repository. The metadata update handling was also improved in speed and robustness.
+* **OAI-PMH Publication Service** - OAI-PMH publication service was created to simplify and unify the publishing process
+  to OAI-PMH repositories. The metadata update handling was also improved in speed and robustness.
 
-* **Moodle User/Role Provider** - The Moodle user/role provider allows to query Moodle users and their roles. The
-  [Opencast tool](https://github.com/unirz-tu-ilmenau/moodle-tool_opencast) must be installed on the Moodle side.
+* **Moodle User/Role Provider** - The Moodle user/role provider allows to query Moodle users and their roles. The Moodle
+  [Opencast tool](https://github.com/unirz-tu-ilmenau/moodle-tool_opencast) needs to be installed for this to work.
 
 * **New Workflow Operation Handlers**
     * **clone** - The [clone](workflowoperationhandlers/clone-woh.md) workflow operation can be used to clone media
@@ -31,57 +31,58 @@ New Features
     * **log** - The [log](workflowoperationhandlers/log-woh.md) workflow operation can be used to log the current state
       of of a workflow and/or its media package for testing and debugging purposes.
     * **animate** - The [animate](workflowoperationhandlers/animate-woh.md) workflow operation handler is the entry
-      point to the Animate Service.
+      point to the new animate service.
+
 
 Improvements
 ------------
-* Java 8 support
+
+* Support for Java 8 runtime features
 * Removed unused hard-coded list providers
-* Configurable License List Provider
+* Configurable license list provider
 * Series catalog will be updated if the series of an event has changed
 * Allow customization of the username-to-user-role mapping
-* FFmpeg Composer implementation improved
-* Matomo (formerly Piwik) theodul plugin updated
+* Improved FFmpeg composer implementation
+* Matomo (formerly Piwik) Theodul plugin updated
 * Performance
     * Series index rebuild performance increased
     * Workflow index rebuild performance increased
     * XACML parser performance increased
 * User Interface
-    * Cross-link column date in events table to enable the start date filter
-    * Workflow controls added
+    * Cross-link column date in events table to enable the start date filter ???
+    * Additional workflow controls added
     * Description added to the series dialog theme tab
     * Less technical representation of the Opencast version
     * Event can be scheduled by specifying the end time
-    * Save button in the video editor do not close the page any more
+    * Save button in the video editor does not close the page anymore
     * Video editor can optionally play deleted segments
     * Event publications dialog tab and popup improved
-    * Languages drop-down menu
-    * Workflow drop-down menu
+    * Languages drop-down menu ???
+    * Workflow drop-down menu ???
     * Default workflow is preselected in event create dialog
 * Improved workflow operation handlers
-    * WOH analyze-tracks
+    * analyze-tracks ???
 * Minor database fixes
 * Documentation improvements
-* Continious integration implemented
+* Continuous integration implemented
     * Travis build on each pull request
-    * Travis Badge inicates the status of the build
+    * Travis Badge indicates the status of the build
 * All mentions of Matterhorn are removed from the codebase
 * Database tables renamed
-* Workflow IDs renamed
+* Workflow definitions renamed
 * Several libraries updated
     * Karaf 4.0.10
     * AngularJS 1.5.11
     * …many other
 
+
 Configuration changes
 ---------------------
 
 * HTTP Basic authentication is enabled by default
-    * Make sure you've enabled HTTPS support in Opencast or your prefered termination proxy (see
+    * Make sure you've enabled HTTPS support in Opencast or your preferred HTTP proxy (see
       [documentation](configuration/security.https.md))
-* Paella Player URL has changed to `/paella/ui/watch.html`
-    * Make sure to update your organization and security configuration on upgrade to Opencast 5
-* `ng-` prefix was removed from the workflow IDs (also workflow filenames)
+* `ng-` prefix was removed from the workflow definition IDs (also workflow filenames)
 * Workflow control URLs are added to the security configuration
 
 
