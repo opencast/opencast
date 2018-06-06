@@ -1,6 +1,6 @@
 # Development Environment with Docker
 
-Setting up and maintaining a proper Opencast build environment can be challenging. The `opencast/build` Docker image,
+Setting up and maintaining a proper Opencast build environment can be challenging. The `quay.io/opencast/build` Docker image,
 developed by the University of Münster, provides such a build environment already configured and ready to use. In fact,
 because of Docker's isolation functionality, multiple environments can be operated side by side on a single machine.
 
