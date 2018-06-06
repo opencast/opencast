@@ -2270,7 +2270,7 @@ public abstract class AbstractEventEndpoint {
   private List<Field> getEventMediaPackageElementFields(MediaPackageElement element) {
     List<Field> fields = new ArrayList<>();
     fields.add(f("id", v(element.getIdentifier(), BLANK)));
-    fields.add(f("type", v(element.getFlavor().toString(), BLANK)));
+    fields.add(f("type", v(element.getFlavor(), BLANK)));
     fields.add(f("mimetype", v(element.getMimeType(), BLANK)));
     List<JValue> tags = Stream.$(element.getTags()).map(toStringJValue).toList();
     fields.add(f("tags", arr(tags)));
