@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "Predstavnostni modul",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP": {
       "HELP": "Pomoč",
       "USERS_GUIDE": "Uporabniški priročnik",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Obdelave ni bilo mogoče nadaljevati.",
       "EVENTS_PROCESSING_ACTION_NONE": "Opustitev obdelave ...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Obdelave ni bilo mogoče opustiti.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "Toliko serij je uspešno posodobljenih: {{ number }}",
       "SERIES_UPDATED_ALL": "Vse serije so uspešno posodobljene",
       "SERIES_NOT_UPDATED": "Serije ni bilo mogoče shraniti",
@@ -381,6 +387,7 @@
                   "START_TIME": "Ura začetka",
                   "TIMEZONE": "Časovni pas",
                   "END_DATE": "Končni datum",
+                  "END_TIME": "End time",
                   "DURATION": "Trajanje"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "Stanje pregleda",
             "PREVIOUS": "Nazaj",
             "NOCONTENT": "Ni podatkov",
-            "PUBLISHED": "Objavljeno"
+            "PUBLISHED": "Objavljeno",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Pripravljeno za snemanje",
@@ -495,13 +514,16 @@
                "COMMENTS": "Komentarji"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "Stanje objave",
+               "PUBLICATION_STATUS": "Objave",
                "NO_PUBLICATIONS_AVAILABLE": "Ta dogodek nima objav",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "SCHEDULING_STATUS": "Stanje",
                "READY_FOR_RECORDING": "Pripravljeno za snemanje",
                "OPTED_OUT": "Onemogočeno",
                "CUSTOM": "Po meri",
                "ENGAGE": "Vključevanje",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "Objava zunanjega API-ja",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -559,6 +581,7 @@
                   "START_TIME": "Ura začetka",
                   "TIMEZONE": "Časovni pas",
                   "END_DATE": "Končni datum",
+                  "END_TIME": "End time",
                   "DURATION": "Trajanje"
                },
                "SCHEDULE_SINGLE": {
@@ -794,7 +817,13 @@
                "URL": "URL",
                "CONFIGURATION": "Konfiguracija",
                "NO_CONFIGURATION": "Ni obstoječih konfiguracijskih parametrov za izbrano definicijo poteka dela.",
-               "WORKFLOW": "Potek dela"
+               "WORKFLOW": "Potek dela",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Podrobnosti poteka dela",
@@ -889,7 +918,9 @@
             },
             "THEME": {
                "CAPTION": "Tema",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
                "TITLE": "Tema",
                "LABEL": "Ni teme",
                "EMPTY": "Ni najdene teme"
@@ -906,7 +937,12 @@
             "CREATED": "Ustvarjeno",
             "MANAGED_ACL": "Pravilnik o dostopu",
             "EVENTS": "Dogodki",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
          },
          "DETAILS": {
             "HEADER": "Podrobnosti serije – {{resourceId}}",
@@ -948,7 +984,7 @@
                "SERIES": "Serije",
                "PUBLISHERS": "Izdajatelj(-i)",
                "ORGANIZERS": "Organizator(-ji)",
-               "CONTRIBUTORS": "Sodelavec(-ci)",
+               "CONTRIBUTORS": "Sodelavec (-ci)",
                "RECORDING_DATE": "Datum posnetka",
                "CREATED_BY": "Ustvaril",
                "RIGHTS": "Pravice",
@@ -1010,7 +1046,12 @@
             "VERSION": "Različica",
             "BLACKLIST_FROM": "Na seznamu prepovedanih od",
             "BLACKLIST_TO": "Na seznamu prepovedanih do",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
          },
          "DETAILS": {
             "HEADER": "Podrobnosti lokacije – {{resourceId}}",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "Ponudnik",
             "BLACKLIST_FROM": "Na seznamu prepovedanih od",
             "BLACKLIST_TO": "Na seznamu prepovedanih do",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari uporabnika",
@@ -1141,7 +1186,11 @@
             "NAME": "Ime",
             "DESCRIPTION": "Opis",
             "ROLE": "Vloga",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari skupino",
@@ -1181,7 +1230,11 @@
             "CREATED": "Ustvarjeno",
             "CREATOR": "Avtor",
             "IN_USE": "V uporabi",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
          },
          "NEW": {
             "CAPTION": "Nov pravilnik o dostopu",
@@ -1397,7 +1450,11 @@
             "CREATED": "Ustvarjeno",
             "DEFAULT": "Privzeto",
             "USAGE": "Uporaba",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari predlogo",
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "Povprečen čas izvajanja",
             "MEAN_QUEUE_TIME": "Povprečen čas v čakalni vrsti",
             "SANITIZE": "Počisti neuspelo storitev",
-            "ACTION": "Dejanja"
+            "ACTION": "Dejanja",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Časovnica",
       "ZOOMLEVEL": "Stopnja povečave",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
       "ZOOM": "Povečava/pomanjšava",
       "BUTTONS": {
          "CLOSE": "Zapri",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "Iskanje ...",
       "PROFILES": {
          "FILTERS_HEADER": "Shranjeni kompleti filtrov",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
          "EMPTY": "Shranjenih filtrov še ni",
          "SAVE_FILTERS": "Shrani",
          "FILTER_HEADER": "Shrani komplet filtrov",

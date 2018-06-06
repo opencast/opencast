@@ -1,0 +1,13 @@
+{
+    "value_locale": "en",
+    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "title": "Pamagat",
+    "noTitle": "Walang Pamagat",
+    "creator": "Gumawa",
+    "presenter": "Nag-aambag",
+    "views": "Mga tinatanaw",
+    "series": "Serye",
+    "recordingDate": "Petsa ng pag-record",
+    "description": "Paglalarawan",
+    "noDescriptionAvailable": "Walang paglalarawan ang magagamit."
+}

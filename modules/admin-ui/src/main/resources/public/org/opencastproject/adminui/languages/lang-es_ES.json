@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "Módulo Multimedia",
+   "SYSTEM_NOTIFICATIONS": "Notificaciones y avisos de sistema",
+   "LANGUAGE": "Seleccione el idioma",
    "HELP": {
       "HELP": "Ayuda",
       "USERS_GUIDE": "Guía del usuario",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "El proceso no ha podido ser reiniciado.",
       "EVENTS_PROCESSING_ACTION_NONE": "El proceso está siendo interrumpido...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "El proceso no ha podido interrumpirse.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Procesamiento interrumpido.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "El proceso no ha podido interrumpirse.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Workflow eliminado.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "No se pudo eliminar el Workflow.",
       "SERIES_UPDATED_NB": "{{ number }} series se han actualizado correctamente",
       "SERIES_UPDATED_ALL": "Todas las series se han actualizado correctamente",
       "SERIES_NOT_UPDATED": "No se ha podido guardar la serie",
@@ -381,6 +387,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Fecha de finalización",
+                  "END_TIME": "Hora de fin",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "Estado de revisión",
             "PREVIOUS": "Anterior",
             "NOCONTENT": "No hay información disponible",
-            "PUBLISHED": "Publicado"
+            "PUBLISHED": "Publicado",
+            "TOOLTIP": {
+               "START": "Filtrar para esta fecha de inicio",
+               "SERIES": "Filtrar para esta serie",
+               "STATUS": "Filtrar para este estado de evento",
+               "LOCATION": "Filtrar para esta ubicación",
+               "DETAILS": "Abrir detalles de evento",
+               "DELETE": "Borrar evento",
+               "PREVIEW": "Abrir player para previsualización",
+               "EDITOR": "Abrir en el editor",
+               "COMMENTS": "Ver comentarios",
+               "PAUSED_WORKFLOW": "Ver Workflows pausados"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Preparado para grabar",
@@ -495,13 +514,16 @@
                "COMMENTS": "Comentarios"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "Estado de publicación",
-               "NO_PUBLICATIONS_AVAILABLE": "Este evento no tiene publicaciones",
+               "PUBLICATION_STATUS": "Publicaciones",
+               "NO_PUBLICATIONS_AVAILABLE": "Este evento no ha sido publicado",
+               "PUBLICATION_DESCRIPTION": "Este evento ha sido publicado en los siguientes canales de publicación:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento no está actualmente en progreso",
                "SCHEDULING_STATUS": "Estado",
                "READY_FOR_RECORDING": "Preparado para grabar",
                "OPTED_OUT": "No se grabará",
                "CUSTOM": "Personalizado",
                "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "Publicación en la API Externa",
                "YOUTUBE": "Youtube",
                "OAIPMH": "OAI-PMH",
@@ -511,7 +533,7 @@
             "MEDIA": {
                "TRIM_MEDIA": "Cortar vídeos",
                "MEDIA": "Archivos multimedia",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -538,7 +560,7 @@
                   "END_DATE": "aaaa-mm-dd"
                },
                "UPLOAD": {
-                  "CAPTION": "Subir",
+                  "CAPTION": "Subida",
                   "RECORDING_ELEMENTS": "Elementos de la grabación",
                   "SEGMENTABLE": {
                      "SHORT": "Diapositivas",
@@ -559,6 +581,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Fecha de finalización",
+                  "END_TIME": "Hora de fin",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -628,7 +651,7 @@
                   "LINK": "Enlace",
                   "DETAILS": {
                      "TITLE": "Detalles de los archivos multimedia",
-                     "ID": "Identificador",
+                     "ID": "ID",
                      "TYPE": "Tipo",
                      "MIMETYPE": "Tipo MIME",
                      "URL": "URL",
@@ -708,7 +731,7 @@
                "REPLY": "Responder",
                "REPLY_TO": "Responder a",
                "CANCEL_REPLY": "Cancelar",
-               "DELETE": "Eliminar",
+               "DELETE": "Suprimir",
                "REASON": "Motivo",
                "REASONS": {
                   "CUTTING": "Pendiente de cortar",
@@ -735,7 +758,7 @@
                "CAPTION": "Detalles del evento",
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "RECORDING_DATE": "Fecha de grabación",
                "SUBJECT": "Tema",
                "DESCRIPTION": "Descripción",
@@ -783,18 +806,24 @@
                "ACTIONS": "Acciones",
                "DETAILS": "Detalles",
                "DESCRIPTION": "",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "TITLE": "Título",
                "STATE": "Estado",
                "STARTED": "Iniciado",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "SUBMITTED": "Enviado",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
                "CONFIGURATION": "Configuración",
                "NO_CONFIGURATION": "No existen parámetros de configuración para el flujo de trabajo seleccionado.",
-               "WORKFLOW": "Flujo de trabajo"
+               "WORKFLOW": "Flujo de trabajo",
+               "TOOLTIP": {
+                  "STOP": "Detener la ejecución de la instancia de Workflow",
+                  "ABORT": "Abortar la ejecución de la instancia de Workflow (no reintentar la operación fallida otra vez)",
+                  "RETRY": "Reintentar la ejecución de la instancia de Workflow",
+                  "DELETE": "Eliminar la instancia de Workflow"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Detalles del flujo de trabajo",
@@ -811,7 +840,7 @@
             },
             "MEDIA_DETAILS": {
                "TITLE": "Detalles de los archivos multimedia",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -889,9 +918,11 @@
             },
             "THEME": {
                "CAPTION": "Estilo",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "Opcionalmente se pueden utilizar temas para personalizar los vídeos. Los temas pueden incluir videos de inicio y fin, marcas de agua y diapositivas de título que pueden obtenerse de los metadatos."
+               },
                "TITLE": "Estilo",
-               "LABEL": "Sin estilo",
+               "LABEL": "Seleccione tema",
                "EMPTY": "No  hay estilos disponibles"
             },
             "SUMMARY": {
@@ -900,13 +931,18 @@
          },
          "TABLE": {
             "CAPTION": "Series",
-            "TITLE": "Serie",
+            "TITLE": "Series",
             "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Fecha de creación",
             "MANAGED_ACL": "Política de acceso",
             "EVENTS": "Eventos",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "SERIES": "Filtrar para esta serie",
+               "DETAILS": "Detalles de la serie",
+               "DELETE": "Eliminar serie"
+            }
          },
          "DETAILS": {
             "HEADER": "Detalles de la serie - {{resourceId}}",
@@ -945,7 +981,7 @@
             "METADATA": {
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "PUBLISHERS": "Editor(es)",
                "ORGANIZERS": "Organizador(es)",
                "CONTRIBUTORS": "Colaborador(es)",
@@ -972,7 +1008,7 @@
                   "CAPTION": "Mensajes",
                   "CREATION_DATE": "Fecha de creación",
                   "SENDER": "Remitente",
-                  "SUBJECT": "Asunto"
+                  "SUBJECT": "Tema"
                }
             },
             "EVENTS": {
@@ -1010,7 +1046,12 @@
             "VERSION": "Versión",
             "BLACKLIST_FROM": "En la lista negra desde",
             "BLACKLIST_TO": "En la lista negra hasta",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "NAME": "Filtrar para esta ubicación",
+               "DETAILS": "Detalles de la ubicación",
+               "DELETE": "Eliminar ubicación (Eliminar registro de agente de captura)"
+            }
          },
          "DETAILS": {
             "HEADER": "Detalles del evento - {{resourceId}}",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "Proveedor",
             "BLACKLIST_FROM": "En la lista negra desde",
             "BLACKLIST_TO": "En la lista negra hasta",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar usuario",
+               "DETAILS": "Detalles de usuario"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear usuario",
@@ -1141,7 +1186,11 @@
             "NAME": "Nombre",
             "DESCRIPTION": "Descripción",
             "ROLE": "Rol",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DETAILS": "Detalles de grupo",
+               "DELETE": "Eliminar grupo"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear grupo",
@@ -1181,7 +1230,11 @@
             "CREATED": "Fecha de creación",
             "CREATOR": "Creador",
             "IN_USE": "En uso",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar política de acceso",
+               "DETAILS": "Detalles de política de acceso"
+            }
          },
          "NEW": {
             "CAPTION": "Nueva política de acceso",
@@ -1344,7 +1397,7 @@
             "WATERMARK": {
                "CAPTION": "Marca de agua",
                "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
-               "ACTIVE": "Activada"
+               "ACTIVE": "Activado"
             },
             "USAGE": {
                "CAPTION": "Uso",
@@ -1380,7 +1433,7 @@
             },
             "MESSAGE": {
                "NAME": "Nombre",
-               "SUBJECT": "Asunto",
+               "SUBJECT": "Tema",
                "MESSAGE": "Mensaje"
             },
             "SUMMARY": {
@@ -1397,7 +1450,11 @@
             "CREATED": "Fecha de creación",
             "DEFAULT": "Por defecto",
             "USAGE": "Uso",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "DELETE": "Eliminar tema",
+               "DETAILS": "Detalles de tema"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Crear estilo",
@@ -1414,48 +1471,48 @@
                "CAPTION": "Cortinilla (principio)",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Vídeo predefinido que se anexa al principio de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar cortinilla",
                "SELECT": "Seleccionar",
                "UPLOAD_LABEL": "Subir vídeo",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "TRAILER": {
                "CAPTION": "Cortinilla (final)",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Vídeo predefinido que se anexa al final de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar cortinilla",
                "UPLOAD_LABEL": "Subir vídeo",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "TITLE": {
                "CAPTION": "Título",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Diapositiva predefinida que se adjunta al principio o al final de la grabación y contiene metadatos descriptivos.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar la diapositiva de título",
                "BACKGROUND": "Fondo",
                "EXTRACT": "Extraer fondo",
-               "UPLOAD": "Subir",
+               "UPLOAD": "Subida",
                "UPLOAD_LABEL": "Subir imagen",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "WATERMARK": {
                "CAPTION": "Marca de agua",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar marca de agua",
                "TOP_LEFT": "Esquina superior izquierda",
                "TOP_RIGHT": "Esquina superior derecha",
                "BOTTOM_LEFT": "Esquina inferior izquierda",
                "BOTTOM_RIGHT": "Esquina inferior derecha",
-               "UPLOAD": "Subir",
+               "UPLOAD": "Subida",
                "POSITION": "Posición y vista previa de la marca de agua",
                "FILEUPLOAD_DESCRIPTION": "El archivo debería tener un canal alfa (fondo transparente). Los tipos de archivo soportados son: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Subir imagen",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "SUMMARY": {
                "CAPTION": "Resumen"
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "Tiempo medio de ejecución",
             "MEAN_QUEUE_TIME": "Tiempo medio de espera en cola",
             "SANITIZE": "Limpiar estado de error",
-            "ACTION": "Acciones"
+            "ACTION": "Acciones",
+            "TOOLTIP": {
+               "SANITIZE": "Reiniciar servicio (Devolver el servicio al estado normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "ADVERTENCIA: Algunos de los cambios no se han guardado. Si deja el editor de vídeo, estos cambios se perderán ¿Desea continuar?",
       "TIMELINE": "Línea de tiempo",
       "ZOOMLEVEL": "Nivel de Zoom",
+      "PREVIEW_MODE": "Modo vista previa",
+      "PREVIEW_MODE_TOOLTIP": "Reproducir los segmentos seleccionados",
       "ZOOM": "Zoom",
       "BUTTONS": {
          "CLOSE": "Cerrar",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "Buscar…",
       "PROFILES": {
          "FILTERS_HEADER": "Grupos de filtros guardados",
+         "EDIT": "Editar filtros",
+         "REMOVE": "Quitar filtro",
          "EMPTY": "Aún no se ha guardado ningún filtro",
          "SAVE_FILTERS": "Guardar",
          "FILTER_HEADER": "Guardar grupo de filtros",
