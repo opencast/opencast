@@ -104,7 +104,7 @@
       "admin.shortcut.editor.play_current_segment_with_pre-roll": "C",
       "admin.shortcut.editor.play_current_segment": "c",
       "admin.shortcut.editor.cut_selected_segment": "backspace",
-      "admin.shortcut.player.volume_up": "+",
+      "admin.shortcut.player.volume_up": "plus",
       "admin.shortcut.player.previous_frame": "left",
       "admin.shortcut.player.play_pause": "space",
       "admin.shortcut.player.volume_down": "-",
