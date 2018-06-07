@@ -78,12 +78,7 @@ Improvements
 
 Configuration changes
 ---------------------
-
-* HTTP Basic authentication is enabled by default
-    * Make sure you've enabled HTTPS support in Opencast or your preferred HTTP proxy (see
-      [documentation](configuration/security.https.md))
-* `ng-` prefix was removed from the workflow definition IDs (also workflow filenames)
-* Workflow control URLs are added to the security configuration
+Please check the [configuration changes](upgrade.md#configuration-changes) section in the upgrade notes.
 
 
 Release Schedule
