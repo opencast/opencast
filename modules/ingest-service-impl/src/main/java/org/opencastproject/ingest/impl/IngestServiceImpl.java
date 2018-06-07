@@ -1335,18 +1335,19 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       mergeMediaPackageMetadata(mp, scheduledMp);
       return mp;
     } catch (NotFoundException e) {
-      logger.debug("No scheduler mediapackage found with id {}, skip merging", mp.getIdentifier().compact());
+      logger.debug("No scheduler mediapackage found with id {}, skip merging", mp.getIdentifier());
       return mp;
     } catch (Exception e) {
-      logger.error("Unable to get event mediapackage from scheduler event {}", mp.getIdentifier().compact(), e);
-      throw new IngestException(e);
+      throw new IngestException(String.format("Unable to get event media package from scheduler event %s",
+              mp.getIdentifier()), e);
     }
   }
 
   private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
     for (MediaPackageElement element : scheduledMp.getElements()) {
       // Asset manager media package may have a publication element (for live) if retract live has not run yet
-      if (!MediaPackageElement.Type.Publication.equals(element.getElementType())
+      if (element.getFlavor() != null
+              && !MediaPackageElement.Type.Publication.equals(element.getElementType())
               && mp.getElementsByFlavor(element.getFlavor()).length > 0) {
         logger.info("Ignore scheduled element '{}', there is already an ingested element with flavor '{}'", element,
                 element.getFlavor());
