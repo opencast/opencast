@@ -117,7 +117,7 @@ public class OrganizationFilter implements Filter {
 
       // If an organization was found, move on. Otherwise return a 404
       if (org == null) {
-        logger.warn("No organization is mapped to handle {}", url);
+        logger.debug("No organization is mapped to handle {}", url);
         httpResponse.sendError(HttpServletResponse.SC_NOT_FOUND, "No organization is mapped to handle " + url);
         return;
       }

@@ -37,10 +37,10 @@ job.
 
 Note: These job loads are specific for each *node* in the cluster.  This means that for any given job, each node can
 have a different load value associated.  For instance, if worker A has no job load specified for its encoding profiles,
-and worker B has job loads specified then any encoding jobs dispatched to A will have a load of 1.0, and jobs dispatched
-to B will have a different, presumably higher load.  There are edge cases where this may be useful, but is most cases
-this will only cause confusion.  It is therefore highly recommended that these settings be put into your configuration
-management system, and be applied on a cluster level to ensure consistency across all nodes.
+and worker B has job loads specified then any encoding jobs created by A will have the default load (0.8), and jobs
+created by B will have a different, presumably higher load.  There are edge cases where this may be useful, but in
+most cases this will only cause confusion.  It is therefore highly recommended that these settings be put into your
+configuration management system, and be applied on a cluster level to ensure consistency across all nodes.
 
 Step 2: Setting the load values for system jobs
 -----------------------------------------------
@@ -50,28 +50,10 @@ system.  If you wish to change this, set the `org.opencastproject.server.maxload
 maximum load you want this node to accept.  Keep in mind that exceeding the number of CPU cores present in the system is
 not recommended.
 
-The load values for the non-encoding jobs are set in the etc/services files.  Look for files containing the prefix
-`job.load`.  These configuration keys control the load for each job type.  For example, the
-`job.load.download.distribute` configuration key controls the load placed on the system when a download distribution job
-is running.  The current files with relevant configuration keys are:
-
-| File                                                                                     | Controls                           |
-|------------------------------------------------------------------------------------------|------------------------------------|
-| org.opencastproject.caption.impl.CaptionServiceImpl.cfg                                  | Caption convertion services        |
-| org.opencastproject.composer.impl.ComposerServiceImpl.cfg                                | Caption embedding services         |
-| org.opencastproject.distribution.distribution.streaming.StreamingDistributionService.cfg | Streaming distribution             |
-| org.opencastproject.distribution.download.DownloadDistributionServiceImpl.cfg            | Download distribution              |
-| org.opencastproject.execute.impl.ExecuteServiceImpl.cfg                                  | Execute service                    |
-| org.opencastproject.ingest.impl.IngestServiceImpl.cfg                                    | Ingest services                    |
-| org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl.cfg                     | Media inspection using ffmpeg      |
-| org.opencastproject.inspection.impl.MediaInspectionServiceImpl.cfg                       | Media inspection using mediainfo   |
-| org.opencastproject.publication.youtube.YouTubePublicationServiceImpl.cfg                | Youtube distribution               |
-| org.opencastproject.publication.youtube.YouTubeV3PublicationServiceImpl.cfg              | Youtube distribution               |
-| org.opencastproject.search.impl.SearchServiceImpl.cfg                                    | Opencast engage index jobs         |
-| org.opencastproject.silencedetection.impl.SilenceDetectionServiceImpl.cfg                | Silence detection                  |
-| org.opencastproject.textanalyzer.impl.TextAnalyzerServiceImpl.cfg                        | Text analysis, including slide OCR |
-| org.opencastproject.videoeditor.impl.VideoEditorServiceImpl.cfg                          | Video editor                       |
-| org.opencastproject.videosegmenter.ffmpeg.VideoSegmenterServiceImpl.cfg                  | Video segmentation                 |
+The load values for the non-encoding jobs are set in the configuration files in the `etc` directory.  Search this
+directory for files that contain the string `job.load` to find the relevant configuration keys.  These
+configuration keys control the load for each job type.  For example, the `job.load.download.distribute` configuration
+key controls the load placed on the system when a download distribution job is running.
 
 Note: Ingest jobs are a special case in Opencast.  Because of their immediate nature there is no way to limit the number
 of running jobs.  However, these jobs will block other jobs from running on the ingest/admin nodes if enough ingests
@@ -81,9 +63,9 @@ Step 3: Setting the load values for encoding profiles
 -----------------------------------------------------
 
 Each encoding profile can have a load value associated with it.  By default, we have not set any, which means that the
-default value of 1.0 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
+default value of 0.8 is used.  To set the load associated with a profile, you simply add a .jobload key to the profile.
 For example, the composite encoding profile is prefixed with `profile.composite.http`.  If we want to set a different
-job load than 1.0, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
+job load than the default, we would create the `profile.composite.http.jobload` key, and set it to an appropriate job value.
 
 Step 4: Restart Opencast
 --------------------------

@@ -184,10 +184,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public static final String INGEST_CATALOG_FROM_URI = "uri-catalog";
 
   /** The approximate load placed on the system by ingesting a file */
-  public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 0.2f;
 
   /** The approximate load placed on the system by ingesting a zip file */
-  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_FILE_JOB_LOAD} */
   public static final String FILE_JOB_LOAD_KEY = "job.load.ingest.file";
@@ -1335,18 +1335,19 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       mergeMediaPackageMetadata(mp, scheduledMp);
       return mp;
     } catch (NotFoundException e) {
-      logger.debug("No scheduler mediapackage found with id {}, skip merging", mp.getIdentifier().compact());
+      logger.debug("No scheduler mediapackage found with id {}, skip merging", mp.getIdentifier());
       return mp;
     } catch (Exception e) {
-      logger.error("Unable to get event mediapackage from scheduler event {}", mp.getIdentifier().compact(), e);
-      throw new IngestException(e);
+      throw new IngestException(String.format("Unable to get event media package from scheduler event %s",
+              mp.getIdentifier()), e);
     }
   }
 
   private void mergeMediaPackageElements(MediaPackage mp, MediaPackage scheduledMp) {
     for (MediaPackageElement element : scheduledMp.getElements()) {
       // Asset manager media package may have a publication element (for live) if retract live has not run yet
-      if (!MediaPackageElement.Type.Publication.equals(element.getElementType())
+      if (element.getFlavor() != null
+              && !MediaPackageElement.Type.Publication.equals(element.getElementType())
               && mp.getElementsByFlavor(element.getFlavor()).length > 0) {
         logger.info("Ignore scheduled element '{}', there is already an ingested element with flavor '{}'", element,
                 element.getFlavor());

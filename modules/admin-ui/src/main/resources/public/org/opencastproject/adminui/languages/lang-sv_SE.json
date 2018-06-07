@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "Mediemodul",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP": {
       "HELP": "Hjälp",
       "USERS_GUIDE": "Användarhandbok",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Bearbetning kunde inte fortsättas.",
       "EVENTS_PROCESSING_ACTION_NONE": "Bearbetning avbryts...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Bearbetning kunde inte avbrytas.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "{{ number }} serier har uppdaterats",
       "SERIES_UPDATED_ALL": "Alla serier har uppdaterats",
       "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
@@ -381,6 +387,7 @@
                   "START_TIME": "Starttid",
                   "TIMEZONE": "Tidszon",
                   "END_DATE": "Slutdatum",
+                  "END_TIME": "End time",
                   "DURATION": "Längd"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "Granskningsstatus",
             "PREVIOUS": "Föregående",
             "NOCONTENT": "Inga data tillgängliga",
-            "PUBLISHED": "Publicerad"
+            "PUBLISHED": "Publicerad",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Redo för inspelning",
@@ -495,13 +514,16 @@
                "COMMENTS": "Kommentarer"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "Publiceringsstatus",
+               "PUBLICATION_STATUS": "Publikationer",
                "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "SCHEDULING_STATUS": "Status",
                "READY_FOR_RECORDING": "Redo för inspelning",
                "OPTED_OUT": "Avhoppad",
                "CUSTOM": "Anpassad",
                "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "External API publikation",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -559,6 +581,7 @@
                   "START_TIME": "Starttid",
                   "TIMEZONE": "Tidszon",
                   "END_DATE": "Slutdatum",
+                  "END_TIME": "End time",
                   "DURATION": "Längd"
                },
                "SCHEDULE_SINGLE": {
@@ -631,7 +654,7 @@
                      "ID": "ID",
                      "TYPE": "Typ",
                      "MIMETYPE": "MimeType",
-                     "URL": "URL",
+                     "URL": "URI",
                      "RECORDING_DATE": "Inspelningsdatum",
                      "FLAVOR": "Smak",
                      "TAGS": "Taggar",
@@ -669,7 +692,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "MimeType",
                      "TAGS": "Taggar",
-                     "URL": "URL",
+                     "URL": "URI",
                      "SIZE": "Storlek",
                      "CHANNEL": "Kanal",
                      "REFERENCE": "Referens"
@@ -780,7 +803,7 @@
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Aktioner",
+               "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
                "DESCRIPTION": "",
                "ID": "ID",
@@ -791,10 +814,16 @@
                "SERIES": "Serie",
                "SUBMITTED": "Skickad",
                "MIMETYPE": "MimeType",
-               "URL": "URL",
+               "URL": "URI",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
-               "WORKFLOW": "Workflow"
+               "WORKFLOW": "Workflow",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflowdetaljer",
@@ -814,7 +843,7 @@
                "ID": "ID",
                "TYPE": "Typ",
                "MIMETYPE": "MimeType",
-               "URL": "URL",
+               "URL": "URI",
                "RECORDING_DATE": "Inspelningsdatum",
                "TAGS": "Taggar",
                "DURATION": "Längd",
@@ -889,7 +918,9 @@
             },
             "THEME": {
                "CAPTION": "Tema",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
                "TITLE": "Tema",
                "LABEL": "Inget tema",
                "EMPTY": "Inget tema hittades"
@@ -906,7 +937,12 @@
             "CREATED": "Skapad",
             "MANAGED_ACL": "Åtkomstpolicy",
             "EVENTS": "Händelser",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
          },
          "DETAILS": {
             "HEADER": "Seriedetaljer - {{resourceId}}",
@@ -1010,7 +1046,12 @@
             "VERSION": "Version",
             "BLACKLIST_FROM": "Svartlistad från",
             "BLACKLIST_TO": "Svartlistad tills",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
          },
          "DETAILS": {
             "HEADER": "Händelsedetaljer - {{resourceId}}",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "Leverantör",
             "BLACKLIST_FROM": "Svartlistad från",
             "BLACKLIST_TO": "Svartlistad tills",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa användare",
@@ -1141,7 +1186,11 @@
             "NAME": "Namn",
             "DESCRIPTION": "Beskrivning",
             "ROLE": "Roll",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa grupp",
@@ -1181,7 +1230,11 @@
             "CREATED": "Skapad",
             "CREATOR": "Skapare",
             "IN_USE": "Används",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
          },
          "NEW": {
             "CAPTION": "Ny åtkomstpolicy",
@@ -1397,7 +1450,11 @@
             "CREATED": "Skapad",
             "DEFAULT": "Standard",
             "USAGE": "Användning",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa tema",
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "Genomsnittlig körtid",
             "MEAN_QUEUE_TIME": "Genomsnittlig kötid",
             "SANITIZE": "Rensa misslyckad tjänst",
-            "ACTION": "Åtgärder"
+            "ACTION": "Åtgärder",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomnivå",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
       "ZOOM": "Zooma",
       "BUTTONS": {
          "CLOSE": "Stäng",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "Sök…",
       "PROFILES": {
          "FILTERS_HEADER": "Sparade filter-set",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
          "EMPTY": "Inga sparade filter än",
          "SAVE_FILTERS": "Spara",
          "FILTER_HEADER": "Spara filter-set",

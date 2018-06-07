@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "媒體模組",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP": {
       "HELP": "幫助",
       "USERS_GUIDE": "使用說明",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "無法恢復處理。",
       "EVENTS_PROCESSING_ACTION_NONE": "正在中止處理..。",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "無法中止處理。",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "{{ number }} 系列已成功更新",
       "SERIES_UPDATED_ALL": "已成功更新所有系列",
       "SERIES_NOT_UPDATED": "該系列無法儲存",
@@ -381,6 +387,7 @@
                   "START_TIME": "開始時間",
                   "TIMEZONE": "時區",
                   "END_DATE": "結束日期",
+                  "END_TIME": "End time",
                   "DURATION": "持續時間"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "檢視狀態",
             "PREVIOUS": "前一項",
             "NOCONTENT": "無可用數據",
-            "PUBLISHED": "已發佈"
+            "PUBLISHED": "已發佈",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "準備錄製",
@@ -485,7 +504,7 @@
          "DETAILS": {
             "HEADER": "事件的細節 - {{resourceId}}",
             "TABS": {
-               "GENERAL": "一般",
+               "GENERAL": "常規",
                "METADATA": "後設資料",
                "EXTENDED-METADATA": "後設資料II",
                "ASSETS": "媒體資源",
@@ -495,13 +514,16 @@
                "COMMENTS": "意見"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "發佈狀態",
+               "PUBLICATION_STATUS": "出版",
                "NO_PUBLICATIONS_AVAILABLE": "此事件沒有發佈",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "SCHEDULING_STATUS": "狀態",
                "READY_FOR_RECORDING": "準備錄製",
                "OPTED_OUT": "選擇退出",
                "CUSTOM": "自定義",
                "ENGAGE": "播放",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "外部 API 出版物",
                "YOUTUBE": "YouTube 的影音視訊",
                "OAIPMH": "OAI-PMH",
@@ -538,7 +560,7 @@
                   "END_DATE": "年-月-日"
                },
                "UPLOAD": {
-                  "CAPTION": "上傳",
+                  "CAPTION": "上載",
                   "RECORDING_ELEMENTS": "錄製內容",
                   "SEGMENTABLE": {
                      "SHORT": "投影片",
@@ -559,6 +581,7 @@
                   "START_TIME": "開始時間",
                   "TIMEZONE": "時區",
                   "END_DATE": "結束日期",
+                  "END_TIME": "End time",
                   "DURATION": "持續時間"
                },
                "SCHEDULE_SINGLE": {
@@ -661,7 +684,7 @@
                   "TYPE": "類型",
                   "MIMETYPE": "Mime 型態",
                   "TAGS": "標籤",
-                  "LINK": "連結",
+                  "LINK": "鏈接",
                   "DETAILS": {
                      "TITLE": "出版物的詳細資訊",
                      "CAPTION": "出版物的詳細資訊",
@@ -794,7 +817,13 @@
                "URL": "網址",
                "CONFIGURATION": "配置",
                "NO_CONFIGURATION": "選定的工作流程，不存在設定參數。",
-               "WORKFLOW": "工作流程"
+               "WORKFLOW": "工作流程",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "工作流程細節",
@@ -889,7 +918,9 @@
             },
             "THEME": {
                "CAPTION": "主題",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
                "TITLE": "主題",
                "LABEL": "無主題",
                "EMPTY": "沒有找到主題"
@@ -906,7 +937,12 @@
             "CREATED": "建立於",
             "MANAGED_ACL": "存取權限",
             "EVENTS": "事件",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
          },
          "DETAILS": {
             "HEADER": "系列 {{resourceId}} 詳細資訊",
@@ -982,7 +1018,7 @@
                "MODIFIED": "修改於",
                "STATUS": "狀態",
                "LOCATION": "位置",
-               "LINK": "連結"
+               "LINK": "鏈接"
             }
          }
       }
@@ -1001,7 +1037,7 @@
          "TABLE": {
             "CAPTION": "位置",
             "TITLE": "UID",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "LOCATION": "位置",
             "UPDATED": "最近更新",
             "NEXT_DATE": "下一個事件",
@@ -1010,7 +1046,12 @@
             "VERSION": "版本",
             "BLACKLIST_FROM": "從黑名單",
             "BLACKLIST_TO": "直到黑名單",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
          },
          "DETAILS": {
             "HEADER": "擷取位置明細",
@@ -1039,7 +1080,7 @@
       "BLACKLISTS": {
          "TABLE": {
             "CAPTION": "位置黑名單",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "ACTIONS": "操作"
          },
          "DETAILS": {
@@ -1064,7 +1105,7 @@
             "REASON": {
                "SELECT_REASON": "選擇",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             },
             "SUMMARY": {
                "SUMMARY": "摘要",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "提供者",
             "BLACKLIST_FROM": "從黑名單",
             "BLACKLIST_TO": "直到黑名單",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "建立使用者",
@@ -1138,10 +1183,14 @@
          },
          "TABLE": {
             "CAPTION": "群組",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "DESCRIPTION": "說明",
             "ROLE": "角色",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "建立群組",
@@ -1177,11 +1226,15 @@
       "ACLS": {
          "TABLE": {
             "CAPTION": "存取權限",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "CREATED": "建立於",
             "CREATOR": "建立者",
             "IN_USE": "使用中",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
          },
          "NEW": {
             "CAPTION": "新的權限策略",
@@ -1193,7 +1246,7 @@
             "METADATA": {
                "TITLE": "後設資料",
                "NAME": {
-                  "CAPTION": "名稱",
+                  "CAPTION": "姓名",
                   "PLACEHOLDER": "名稱..."
                }
             },
@@ -1205,7 +1258,7 @@
                "ACCESS_POLICY": {
                   "TITLE": "存取權限",
                   "LABEL": "選擇樣板",
-                  "EMPTY": "沒有在樣板中找到",
+                  "EMPTY": "沒有找到樣板",
                   "ROLE": "角色",
                   "WRITE": "寫",
                   "READ": "讀",
@@ -1231,7 +1284,7 @@
             "METADATA": {
                "TITLE": "後設資料",
                "NAME": {
-                  "CAPTION": "名稱",
+                  "CAPTION": "姓名",
                   "PLACEHOLDER": "名稱..."
                }
             },
@@ -1243,7 +1296,7 @@
                "ACCESS_POLICY": {
                   "TITLE": "存取權限",
                   "LABEL": "選擇樣板",
-                  "EMPTY": "沒有在樣板中找到",
+                  "EMPTY": "沒有找到樣板",
                   "ROLE": "角色",
                   "WRITE": "寫",
                   "READ": "讀",
@@ -1291,7 +1344,7 @@
             "REASON": {
                "SELECT_REASON": "選擇",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             },
             "SUMMARY": {
                "SUMMARY": "摘要",
@@ -1299,7 +1352,7 @@
                "DATE_FROM": "從",
                "DATE_TO": "直到",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             }
          }
       }
@@ -1318,8 +1371,8 @@
                "USAGE": "用法"
             },
             "GENERAL": {
-               "CAPTION": "一般",
-               "NAME": "名稱",
+               "CAPTION": "常規",
+               "NAME": "姓名",
                "DESCRIPTION": "說明",
                "DEFAULT": "預設值",
                "SET_DEFAULT_INFO": "設置為所有系列和事件的預設主題",
@@ -1379,7 +1432,7 @@
                "SUMMARY": "摘要"
             },
             "MESSAGE": {
-               "NAME": "名稱",
+               "NAME": "姓名",
                "SUBJECT": "主題",
                "MESSAGE": "信息"
             },
@@ -1391,20 +1444,24 @@
       "THEMES": {
          "TABLE": {
             "CAPTION": "主題",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "DESCRIPTION": "說明",
             "CREATOR": "建立者",
             "CREATED": "建立於",
             "DEFAULT": "預設值",
             "USAGE": "用法",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "創建主題",
             "EDITCAPTION": "編輯主題",
             "GENERAL": {
-               "CAPTION": "一般",
-               "NAME": "名稱",
+               "CAPTION": "常規",
+               "NAME": "姓名",
                "DESCRIPTION": "說明",
                "DEFAULT": "預設值",
                "SET_DEFAULT_INFO": "設置為預設主題的所有系列活動",
@@ -1418,7 +1475,7 @@
                "ENABLE": "啟用BUMPER",
                "SELECT": "選擇",
                "UPLOAD_LABEL": "上傳視頻",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "TRAILER": {
                "CAPTION": "Bumper（結束）",
@@ -1427,19 +1484,19 @@
                "ACTIVE": "啟動",
                "ENABLE": "啟用BUMPER",
                "UPLOAD_LABEL": "上傳視頻",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "TITLE": {
                "CAPTION": "標題",
-               "FILE_UPLOADED": "文件上傳: ",
+               "FILE_UPLOADED": "文件上傳 ",
                "DESCRIPTION": "預定義的投影片包括附加到一個記錄的開始或結束的說明性後設資料。",
                "ACTIVE": "啟動",
                "ENABLE": "啟用標題投影片",
                "BACKGROUND": "背景",
                "EXTRACT": "提取背景",
-               "UPLOAD": "上傳",
+               "UPLOAD": "上載",
                "UPLOAD_LABEL": "上傳圖片",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "WATERMARK": {
                "CAPTION": "浮水印",
@@ -1455,7 +1512,7 @@
                "POSITION": "浮水印位置和預覽",
                "FILEUPLOAD_DESCRIPTION": "文件應該有一個alpha通道（透明背景）可接受的文件類型有：.PNG,.GIF,.SVG,.WEBP",
                "UPLOAD_LABEL": "上傳圖片",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "SUMMARY": {
                "CAPTION": "摘要"
@@ -1491,7 +1548,7 @@
          "DETAILS": {
             "HEADER": "工作信息 {{resourceId}}",
             "TABS": {
-               "GENERAL": "一般",
+               "GENERAL": "常規",
                "OPERATIONS": "操作",
                "INCIDENTS": "事故"
             }
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "平均運行時間",
             "MEAN_QUEUE_TIME": "平均排序時間",
             "SANITIZE": "清除失敗的服務",
-            "ACTION": "操作"
+            "ACTION": "操作",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "時間軸",
       "ZOOMLEVEL": "縮放級別",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
       "ZOOM": "縮放",
       "BUTTONS": {
          "CLOSE": "關閉",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "搜索...",
       "PROFILES": {
          "FILTERS_HEADER": "儲存的過濾器設定",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
          "EMPTY": "還沒有儲存的過濾器設定",
          "SAVE_FILTERS": "儲存",
          "FILTER_HEADER": "儲存過濾器設定",

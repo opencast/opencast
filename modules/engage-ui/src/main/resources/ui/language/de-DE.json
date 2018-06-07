@@ -35,5 +35,7 @@
   "no_data": "Keine Daten verfügbar.",
   "login_success": "Anmeldung erfolgreich.",
   "login_failed": "Anmeldung fehlgeschlagen.",
-  "not_logged_in": "Nicht angemeldet."
+  "not_logged_in": "Nicht angemeldet.",
+  "live_in_progress": "Live",
+  "live_not_in_progress": "Live (momentan nicht verfügbar)"
 }

@@ -1,3 +1,3 @@
 {
-    "piwik_tracking": "Podatke o uporabi bo zbiral Piwik. To lahko preprečite z nastavitvijo »Ne sledi« v brskalniku."
+    "matomo_tracking": "Usage data will be collected with matomo. You can use the Do-Not-Track settings of your browser to prevent this."
 }
