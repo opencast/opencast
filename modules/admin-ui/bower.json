@@ -13,7 +13,8 @@
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
-    "ng-file-upload": "2.0.5"
+    "ng-file-upload": "2.0.5",
+    "sugar-date": "^2.0.4"
   },
   "devDependencies": {
     "angular-mocks": "1.5.11"
@@ -21,6 +22,9 @@
   "overrides": {
     "angular-wizard": {
       "main": "dist/angular-wizard.js"
+    },
+    "sugar-date": {
+      "main": ["dist/sugar-date.js", "dist/locales/*"]
     }
   },
   "appPath": "src/main/webapp",
