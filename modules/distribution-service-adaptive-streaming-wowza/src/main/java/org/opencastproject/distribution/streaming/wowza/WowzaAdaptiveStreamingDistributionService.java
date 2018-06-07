@@ -178,7 +178,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
   };
 
   /** The load on the system introduced by creating a distribute job */
-  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_DISTRIBUTE_JOB_LOAD = 0.1f;
 
   /** The load on the system introduced by creating a retract job */
   public static final float DEFAULT_RETRACT_JOB_LOAD = 0.1f;

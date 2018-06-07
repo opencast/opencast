@@ -184,10 +184,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   public static final String INGEST_CATALOG_FROM_URI = "uri-catalog";
 
   /** The approximate load placed on the system by ingesting a file */
-  public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_INGEST_FILE_JOB_LOAD = 0.2f;
 
   /** The approximate load placed on the system by ingesting a zip file */
-  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_INGEST_ZIP_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_FILE_JOB_LOAD} */
   public static final String FILE_JOB_LOAD_KEY = "job.load.ingest.file";
