@@ -62,7 +62,7 @@ The workflow control functionality includes some new REST endpoints.  Therefore 
 the tenant's security configuration (e.g. `etc/security/mh_default_org.xml`.)
 
 As Piwik has been renamed to Matomo, Opencast changed the name for the plugin and configuration keys too.
-So if you already configured a piwik Server please adapt the following keys in
+So if you already configured a Piwik server please adapt the following keys in
 `etc/org.opencastproject.organization-mh_default_org.cfg`:
 
 * `prop.player.piwik.server` → `prop.player.matomo.server`
