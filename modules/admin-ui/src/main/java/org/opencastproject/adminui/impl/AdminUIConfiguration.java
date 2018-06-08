@@ -44,11 +44,17 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
 
-  private String previewSubtype = "preview";
-  private String waveformSubtype = "waveform";
+  private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
+  private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
+  private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
+  private static final String DEFAULT_SMIL_CATALOG_TAGS = "archive";
+  private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
+
+  private String previewSubtype = DEFAULT_PREVIEW_SUBTYPE;
+  private String waveformSubtype = DEFAULT_WAVEFORM_SUBTYPE;
   private Set<String> smilCatalogTagSet = new HashSet<>();
-  private MediaPackageElementFlavor smilCatalogFlavor = new MediaPackageElementFlavor("smil", "cutting");
-  private MediaPackageElementFlavor smilSilenceFlavor = new MediaPackageElementFlavor("*", "silence");
+  private MediaPackageElementFlavor smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_CATALOG_FLAVOR);
+  private MediaPackageElementFlavor smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_SILENCE_FLAVOR);
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -71,57 +77,36 @@ public class AdminUIConfiguration implements ManagedService {
   }
 
   @Override
-  public void updated(Dictionary properties) throws ConfigurationException {
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties == null)
       return;
 
     // Preview subtype
-    String preview = StringUtils.trimToNull((String) properties.get(OPT_PREVIEW_SUBTYPE));
-    if (preview != null) {
-      previewSubtype = preview;
-      logger.debug("Preview subtype is '{}'", previewSubtype);
-    } else {
-      logger.debug("No preview subtype configured, using '{}'", previewSubtype);
-    }
+    previewSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    logger.debug("Preview subtype configuration set to '{}'", previewSubtype);
 
     // Waveform subtype
-    String waveform = StringUtils.trimToNull((String) properties.get(OPT_WAVEFORM_SUBTYPE));
-    if (waveform != null) {
-      waveformSubtype = waveform;
-      logger.debug("Waveform subtype is '{}'", waveformSubtype);
-    } else {
-      logger.debug("No waveform subtype configured, using '{}'", waveformSubtype);
-    }
+    waveformSubtype = StringUtils.defaultString((String) properties.get(OPT_WAVEFORM_SUBTYPE), DEFAULT_WAVEFORM_SUBTYPE);
+    logger.debug("Waveform subtype configuration set to '{}'", waveformSubtype);
 
     // SMIL catalog flavor
-    String smilCatalog = StringUtils.trimToNull((String) properties.get(OPT_SMIL_CATALOG_FLAVOR));
-    if (smilCatalog != null) {
-      smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(smilCatalog);
-      logger.debug("Smil catalg flavor is '{}'", smilCatalogFlavor);
-    } else {
-      logger.debug("No smil catalog flavor configured, using '{}'", smilCatalogFlavor);
-    }
+    smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(
+      StringUtils.defaultString((String) properties.get(OPT_SMIL_CATALOG_FLAVOR), DEFAULT_SMIL_CATALOG_FLAVOR));
+    logger.debug("Smil catalog flavor configuration set to '{}'", smilCatalogFlavor);
 
     // SMIL catalog tags
-    String[] smilCatalogTags = StringUtils.split((String) properties.get(OPT_SMIL_CATALOG_TAGS), ",");
+    String tags = StringUtils.defaultString((String) properties.get(OPT_SMIL_CATALOG_TAGS), DEFAULT_SMIL_CATALOG_TAGS);
+    String[] smilCatalogTags = StringUtils.split(tags, ",");
+    smilCatalogTagSet.clear();
     if (smilCatalogTags != null) {
-      smilCatalogTagSet.clear();
       smilCatalogTagSet.addAll(Arrays.asList(smilCatalogTags));
-      logger.debug("Smil catalg tags are '{}'", smilCatalogTagSet);
-    } else {
-      smilCatalogTagSet.clear();
-      smilCatalogTagSet.add("archive");
-      logger.debug("Using default smil catalg tags '{}'", smilCatalogTagSet);
     }
+    logger.debug("Smil catalog target tags configuration set to '{}'", smilCatalogTagSet);
 
     // SMIL silence flavor
-    String smilSilence = StringUtils.trimToNull((String) properties.get(OPT_SMIL_SILENCE_FLAVOR));
-    if (smilSilence != null) {
-      smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(smilSilence);
-      logger.debug("Smil silence flavor is '{}'", smilSilenceFlavor);
-    } else {
-      logger.debug("No smil silence flavor configured, using '{}'", smilSilenceFlavor);
-    }
+    smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(
+      StringUtils.defaultString((String) properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
+    logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
   }
 
 }
