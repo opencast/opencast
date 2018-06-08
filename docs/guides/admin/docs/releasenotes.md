@@ -49,16 +49,16 @@ Improvements
     * Workflow index rebuild performance increased
     * XACML parser performance increased
 * User Interface
-    * Cross-link column date in events table to enable the start date filter ???
+    * Cross-link column date in events table so the start date filter can be used
     * Additional workflow controls added
     * Description added to the series dialog theme tab
     * Less technical representation of the Opencast version
     * Event can be scheduled by specifying the end time
     * Save button in the video editor does not close the page anymore
     * Video editor can optionally play deleted segments
-    * Event publications dialog tab and popup improved
-    * Languages drop-down menu ???
-    * Workflow drop-down menu ???
+    * Event publications dialog tab and pop-up improved
+    * Languages drop-down menu is now sorted and allows to define a default language
+    * Workflow drop-down menu is now sorted by workflow titles, workflow filtering is only enabled if are enough workflows available
     * Default workflow is preselected in event create dialog
 * Improved workflow operation handlers
     * analyze-tracks ???
