@@ -101,7 +101,6 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +214,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
 
+  /** Default job load when not passed by service creating the job * */
+  static final float DEFAULT_JOB_LOAD = 0.1f;
+
   /** This host's base URL */
   protected String hostName;
 
@@ -250,11 +252,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** A static list of statuses that influence how load balancing is calculated */
   protected static final List<Status> JOB_STATUSES_INFLUENCING_LOAD_BALANCING;
 
-  protected static Set<Long> jobs = new LinkedHashSet<>();
+  protected static HashMap<Long, Float> jobCache = new HashMap<Long, Float>();
 
   static {
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING = new ArrayList<Status>();
-    JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.QUEUED);
     JOB_STATUSES_INFLUENCING_LOAD_BALANCING.add(Status.RUNNING);
   }
 
@@ -264,8 +265,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Whether to accept a job whose load exceeds the host’s max load */
   protected Boolean acceptJobLoadsExeedingMaxLoad = true;
 
-  //Get the current system load
-  protected SystemLoad systemLoad = null;
+  // Current system load
+  protected float systemLoad = 0.0f;
 
   /** OSGi DI */
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -318,7 +319,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       if (cc != null && StringUtils.isNotBlank(cc.getBundleContext().getProperty(OPT_MAXLOAD))) {
         try {
           maxLoad = Float.parseFloat(cc.getBundleContext().getProperty(OPT_MAXLOAD));
-          logger.info("Max load has been manually to {}", maxLoad);
+          logger.info("Max load has been set manually to {}", maxLoad);
         } catch (NumberFormatException e) {
           logger.warn("Configuration key '{}' is not an integer. Falling back to the number of cores ({})",
                   OPT_MAXLOAD, maxLoad);
@@ -353,12 +354,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    systemLoad = getHostLoads(emf.createEntityManager());
+    systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
+    logger.info("Current system load: {}", systemLoad);
   }
 
   @Override
   public float getOwnLoad() {
-    return systemLoad.get(getRegistryHostname()).getLoadFactor();
+    return systemLoad;
   }
 
   @Override
@@ -395,7 +397,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, null, null, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -416,7 +418,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   @Override
   public Job createJob(String type, String operation, List<String> arguments) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, null, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -440,7 +442,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, true, getCurrentJob(), DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -464,7 +466,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable)
           throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(), 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, getCurrentJob(),
+            DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -487,7 +490,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
           Job parentJob) throws ServiceRegistryException {
-    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, 1.0f);
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -507,7 +510,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob) throws ServiceRegistryException {
-    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, 1.0f);
+    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
   }
 
   /**
@@ -556,6 +559,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           jpaParentJob = getJpaJob(parentJob.getId());
         } catch (NotFoundException e) {
           logger.error("{} not found in the persistence context", parentJob);
+          // We don't want to leave the deleted job in the cache if there
+          removeFromLoadCache(parentJob.getId());
           throw new ServiceRegistryException(e);
         }
 
@@ -568,6 +573,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
             jpaRootJob = getJpaJob(parentJob.getRootJobId());
           } catch (NotFoundException e) {
             logger.error("job with id {} not found in the persistence context", parentJob.getRootJobId());
+            // We don't want to leave the deleted job in the cache if there
+            removeFromLoadCache(parentJob.getId());
             throw new ServiceRegistryException(e);
           }
         }
@@ -620,10 +627,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         if (job == null) {
           logger.error("Job with Id {} cannot be deleted: Not found.", jobId);
           tx.rollback();
+          removeFromLoadCache(jobId);
           throw new NotFoundException("Job with ID '" + jobId + "' not found");
         }
         deleteChildJobs(em, tx, jobId);
         em.remove(job);
+        removeFromLoadCache(jobId);
       }
 
       tx.commit();
@@ -648,6 +657,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         Job job = childJobs.get(i);
         JpaJob jobToDelete = em.find(JpaJob.class, job.getId());
         em.remove(jobToDelete);
+        removeFromLoadCache(job.getId());
         logger.debug("Job '{}' deleted", job.getId());
       }
       logger.debug("Deleted all child jobs of job '{}'", jobId);
@@ -882,7 +892,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       Job oldJob = getJob(job.getId());
       JpaJob jpaJob = updateInternal(em, job);
       if (!TYPE_WORKFLOW.equals(job.getJobType()) && job.getJobLoad() > 0.0f
-              && job.getProcessorServiceRegistration() != null && job.getProcessorServiceRegistration().equals(getRegistryHostname())) {
+              && job.getProcessorServiceRegistration() != null
+              && job.getProcessorServiceRegistration().getHost().equals(getRegistryHostname())) {
         processCachedLoadChange(job);
       }
 
@@ -895,6 +906,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     } catch (PersistenceException e) {
       throw new ServiceRegistryException(e);
     } catch (NotFoundException e) {
+      // Just in case, remove from cache if there
+      removeFromLoadCache(job.getId());
       throw new ServiceRegistryException(e);
     } finally {
       if (em != null)
@@ -916,21 +929,30 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    * @param job
    *   The job to apply to the load cache
    */
-  private void processCachedLoadChange(JpaJob job) {
-    try {
-      if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && !jobs.contains(job.getId())) {
-        logger.trace("Adding to load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
-        systemLoad.updateNodeLoad(getRegistryHostname(), job.getJobLoad());
-        jobs.add(job.getId());
-      } else if (Status.FINISHED.equals(job.getStatus()) || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
-        logger.trace("Removing from load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
-        systemLoad.updateNodeLoad(getRegistryHostname(), -job.getJobLoad());
-        jobs.remove(job.getId());
-      } else {
-        logger.trace("Ignoring for load cache: Job {}, type {}, status {}", job.getId(), job.getJobType(), job.getStatus());
-      }
-    } catch (NotFoundException e) {
-      logger.error("NotFoundException when searching for node {}, this is a bug", getRegistryHostname());
+  private synchronized void processCachedLoadChange(JpaJob job) {
+    if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && jobCache.get(job.getId()) == null) {
+      logger.debug("{} Adding to load cache: Job {}, type {}, status {}", Thread.currentThread().getId(), job.getId(),
+              job.getJobType(), job.getStatus());
+      systemLoad += job.getJobLoad();
+      jobCache.put(job.getId(), job.getJobLoad());
+    } else if (jobCache.get(job.getId()) != null && Status.FINISHED.equals(job.getStatus())
+            || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
+      logger.debug("{} Removing from load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
+              job.getId(), job.getJobType(), job.getStatus());
+      systemLoad -= job.getJobLoad();
+      jobCache.remove(job.getId());
+    } else {
+      logger.debug("{} Ignoring for load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
+              job.getId(), job.getJobType(), job.getStatus());
+    }
+    logger.debug("{} Current host load: {}", Thread.currentThread().getId(), systemLoad);
+  }
+
+  private synchronized void removeFromLoadCache(Long jobId) {
+    if (jobCache.get(jobId) != null) {
+      logger.debug("{} Removing deleted job from load cache: Job {}", Thread.currentThread().getId(), jobId);
+      systemLoad -= jobCache.get(jobId);
+      jobCache.remove(jobId);
     }
   }
 

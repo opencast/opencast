@@ -60,12 +60,12 @@ always used:
 $ mkdir assets
 
 $ docker run -it --rm \
-    opencast/allinone:<version> \
+    quay.io/opencast/allinone:<version> \
     app:print:activemq.xml > assets/activemq.xml
 
 $ docker run -it --rm \
     -e ORG_OPENCASTPROJECT_DB_VENDOR=MySQL \
-    opencast/allinone:<version> \
+    quay.io/opencast/allinone:<version> \
     app:print:ddl > assets/opencast-ddl.sql
 ```
 

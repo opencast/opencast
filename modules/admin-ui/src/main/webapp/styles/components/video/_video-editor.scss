@@ -32,9 +32,9 @@ $track-label-width: (100% - $right-margin) - $track-options-width;
 
 // Colour
 $segment-normal: #71b1f3;
-$segment-selected: darken($segment-normal, 18%);
+$segment-selected: saturate(darken($segment-normal, 25%), 5%);
 $segment-deleted: #f35952;
-$segment-deleted-selected: darken($segment-deleted, 18%);
+$segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
 
 .video-timeline {
     background: #fff;

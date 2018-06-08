@@ -1,7 +1,324 @@
 Changelog
 ========
 
-Opencast 4.x
+Opencast 5
+------------
+
+### Opencast 5.0
+
+- [[MH-12941](https://opencast.jira.com/browse/MH-12941)][[#284](https://github.com/opencast/opencast/pull/284)] -
+  Gracefully handle empty flavors
+- [[MH-12936](https://opencast.jira.com/browse/MH-12936)][[#279](https://github.com/opencast/opencast/pull/279)] -
+  Handle invalid flavors
+- [[MH-12935](https://opencast.jira.com/browse/MH-12935)][[#278](https://github.com/opencast/opencast/pull/278)] -
+  Update Docker image repository documentation
+- [[MH-12934](https://opencast.jira.com/browse/MH-12934)][[#277](https://github.com/opencast/opencast/pull/277)] -
+  Update translations
+- [[MH-12933](https://opencast.jira.com/browse/MH-12933)][[#276](https://github.com/opencast/opencast/pull/276)] -
+  Link documentation from Systemd unit
+- [[MH-12932](https://opencast.jira.com/browse/MH-12932)][[#275](https://github.com/opencast/opencast/pull/275)] -
+  Kernel Build Failure
+- [[MH-12922](https://opencast.jira.com/browse/MH-12922)][[#272](https://github.com/opencast/opencast/pull/272)] -
+  Job load fixes
+- [Change paella URL to /paella/ui
+  ](https://github.com/opencast/opencast/pull/271)
+- [[MH-12928](https://opencast.jira.com/browse/MH-12928)][[#270](https://github.com/opencast/opencast/pull/270)] -
+  Mitigation for KARAF-5526
+- [[MH-12926](https://opencast.jira.com/browse/MH-12926)][[#269](https://github.com/opencast/opencast/pull/269)] -
+  Prevent cluttering of logs by invalid access
+- [[MH-12924](https://opencast.jira.com/browse/MH-12924)][[#268](https://github.com/opencast/opencast/pull/268)] -
+  fix missing dropdown arrow
+- [[MH-12919](https://opencast.jira.com/browse/MH-12919)][[#262](https://github.com/opencast/opencast/pull/262)] -
+  REST Docs Dependencies
+- [[MH-12917](https://opencast.jira.com/browse/MH-12917)][[#260](https://github.com/opencast/opencast/pull/260)] -
+  Remove debug logging
+- [[MH-12916](https://opencast.jira.com/browse/MH-12916)][[#259](https://github.com/opencast/opencast/pull/259)] -
+  Admin Interface Configuration Defaults
+- [[MH-12914](https://opencast.jira.com/browse/MH-12914)][[#258](https://github.com/opencast/opencast/pull/258)] -
+  Remove deprecated IOUtils.closeQuietly
+- [[MH-12913](https://opencast.jira.com/browse/MH-12913)][[#257](https://github.com/opencast/opencast/pull/257)] -
+  Fix Admin Interface Deprecation Warnings
+- [[MH-12868](https://opencast.jira.com/browse/MH-12868)][[#255](https://github.com/opencast/opencast/pull/255)] -
+  Make frame-by-frame skipping function in the editor use the "actual" framerate
+- [[MH-12908](https://opencast.jira.com/browse/MH-12908)][[#251](https://github.com/opencast/opencast/pull/251)] -
+  Fix escaping of spaces
+- [[MH-12907](https://opencast.jira.com/browse/MH-12907)][[#250](https://github.com/opencast/opencast/pull/250)] -
+  Fix segmentation default job load
+- [[MH-12906](https://opencast.jira.com/browse/MH-12906)][[#249](https://github.com/opencast/opencast/pull/249)] -
+  Composoer should ignore system specific output pathes like /dev/null
+- [ MH-12902 closing videoeditor should continue in events list
+  ](https://github.com/opencast/opencast/pull/248)
+- [[MH-12901](https://opencast.jira.com/browse/MH-12901)][[#247](https://github.com/opencast/opencast/pull/247)] -
+  Fix YouTube publication job loads
+- [[MH-12900](https://opencast.jira.com/browse/MH-12900)][[#246](https://github.com/opencast/opencast/pull/246)] -
+  Fix search service job loads
+- [[MH-12899](https://opencast.jira.com/browse/MH-12899)][[#245](https://github.com/opencast/opencast/pull/245)] -
+  Fix streaming distribution job load defaults
+- [[MH-12898](https://opencast.jira.com/browse/MH-12898)][[#244](https://github.com/opencast/opencast/pull/244)] -
+  Fix download distribution job load defaults
+- [[MH-12896](https://opencast.jira.com/browse/MH-12896)][[#242](https://github.com/opencast/opencast/pull/242)] -
+  Clarify default player configuration
+- [[MH-12894](https://opencast.jira.com/browse/MH-12894)][[#240](https://github.com/opencast/opencast/pull/240)] -
+  Update markdownlint
+- [[MH-12893](https://opencast.jira.com/browse/MH-12893)][[#239](https://github.com/opencast/opencast/pull/239)] -
+  Added ability to configure the job load for the aws s3 distribution service.
+- [[MH-12892](https://opencast.jira.com/browse/MH-12892)][[#238](https://github.com/opencast/opencast/pull/238)] -
+  Added ability to configure the job load for the transcription service.
+- [[MH-12888](https://opencast.jira.com/browse/MH-12888)][[#235](https://github.com/opencast/opencast/pull/235)] -
+  Missing FFmpeg on Travis CI
+- [[MH-12887](https://opencast.jira.com/browse/MH-12887)][[#234](https://github.com/opencast/opencast/pull/234)] -
+  Only set job date completed and runtime once.
+- [[MH-12883](https://opencast.jira.com/browse/MH-12883)][[#230](https://github.com/opencast/opencast/pull/230)] -
+  Maven build of admin-ui module without frontend profile
+- [[MH-12882](https://opencast.jira.com/browse/MH-12882)][[#229](https://github.com/opencast/opencast/pull/229)] -
+  Fix org.w3c.dom.smil version
+- [[MH-12881](https://opencast.jira.com/browse/MH-12881)][[#228](https://github.com/opencast/opencast/pull/228)] -
+  Remove deprecated method
+- [[MH-12880](https://opencast.jira.com/browse/MH-12880)][[#227](https://github.com/opencast/opencast/pull/227)] -
+  Remove redundant OSGI declarations
+- [[MH-12879](https://opencast.jira.com/browse/MH-12879)][[#226](https://github.com/opencast/opencast/pull/226)] -
+  Default location of paella configuration
+- [[MH-12878](https://opencast.jira.com/browse/MH-12878)][[#224](https://github.com/opencast/opencast/pull/224)] -
+  Don't verify NPM cache to speed up build process
+- [[MH-12874](https://opencast.jira.com/browse/MH-12874)][[#223](https://github.com/opencast/opencast/pull/223)] -
+  NotFoundException handling for OAI-PMH retract operation with non published event
+- [[MH-12872](https://opencast.jira.com/browse/MH-12872)][[#222](https://github.com/opencast/opencast/pull/222)] -
+  event can not be deleted
+- [[MH-12873](https://opencast.jira.com/browse/MH-12873)][[#221](https://github.com/opencast/opencast/pull/221)] -
+  Speed up test builds
+- [[MH-12864](https://opencast.jira.com/browse/MH-12864)][[#215](https://github.com/opencast/opencast/pull/215)] -
+  Readonly mode of fields not working correctly in property sheets
+- [[MH-12807](https://opencast.jira.com/browse/MH-12807)][[#213](https://github.com/opencast/opencast/pull/213)] -
+  Do not overwrite owner
+- [[MH-12863](https://opencast.jira.com/browse/MH-12863)][[#212](https://github.com/opencast/opencast/pull/212)] -
+  Fix default owner in SMIL endpoint
+- [[MH-12862](https://opencast.jira.com/browse/MH-12862)][[#211](https://github.com/opencast/opencast/pull/211)] -
+  Line break after required marker in REST docs
+- [[MH-12834](https://opencast.jira.com/browse/MH-12834)][[#207](https://github.com/opencast/opencast/pull/207)] -
+  Central documentation for filtering, sorting and pagination
+- [[MH-12833](https://opencast.jira.com/browse/MH-12833)][[#204](https://github.com/opencast/opencast/pull/204)] -
+  Consistently use External API as name
+- [[MH-12852](https://opencast.jira.com/browse/MH-12852)][[#203](https://github.com/opencast/opencast/pull/203)] -
+  Required fields not indicated in the event details and series details modals
+- [[MH-12843](https://opencast.jira.com/browse/MH-12843)][[#200](https://github.com/opencast/opencast/pull/200)] -
+  Fix “Add Event” Tab Index
+- [Update main readme
+  ](https://github.com/opencast/opencast/pull/199)
+- [Fix tabs and trailing spaces in docs
+  ](https://github.com/opencast/opencast/pull/198)
+- [[MH-12839](https://opencast.jira.com/browse/MH-12839)][[#196](https://github.com/opencast/opencast/pull/196)] -
+  fix all pom.xml
+- [[MH-12837](https://opencast.jira.com/browse/MH-12837)][[#194](https://github.com/opencast/opencast/pull/194)] -
+  external series API ACL is required
+- [[MH-12832](https://opencast.jira.com/browse/MH-12832)][[#192](https://github.com/opencast/opencast/pull/192)] -
+  Update to commons-collection4
+- [[MH-12836](https://opencast.jira.com/browse/MH-12836)][[#191](https://github.com/opencast/opencast/pull/191)] -
+  Fix event-comment dependencies not correctly specified
+- [[MH-12831](https://opencast.jira.com/browse/MH-12831)][[#190](https://github.com/opencast/opencast/pull/190)] -
+  Fixing dependencies
+- [NOJIRA fix engage paella url security rules
+  ](https://github.com/opencast/opencast/pull/187)
+- [NOJIRA Localization developer guide updated
+  ](https://github.com/opencast/opencast/pull/186)
+- [[MH-12780](https://opencast.jira.com/browse/MH-12780)][[#184](https://github.com/opencast/opencast/pull/184)] -
+  Fix sorting jobs by identifier in Systems->Jobs
+- [[MH-12824](https://opencast.jira.com/browse/MH-12824)][[#183](https://github.com/opencast/opencast/pull/183)] -
+  Speed up mvn site
+- [T/clarify wording of user tracking in documentation
+  ](https://github.com/opencast/opencast/pull/180)
+- [[MH-12818](https://opencast.jira.com/browse/MH-12818)][[#177](https://github.com/opencast/opencast/pull/177)] -
+  Improve Sox service tests
+- [NOJIRA Crowdin project configuration updated
+  ](https://github.com/opencast/opencast/pull/175)
+- [NOJIRA Crowdin documentation updated
+  ](https://github.com/opencast/opencast/pull/174)
+- [[MH-12771](https://opencast.jira.com/browse/MH-12771)][[#173](https://github.com/opencast/opencast/pull/173)] -
+  Document fields of External API 1.0.0
+- [[MH-12795](https://opencast.jira.com/browse/MH-12795)][[#163](https://github.com/opencast/opencast/pull/163)] -
+  REST docs don't respect @Produces annotation on class level
+- [[MH-12788](https://opencast.jira.com/browse/MH-12788)][[#157](https://github.com/opencast/opencast/pull/157)] -
+  UTF-8 encoding settings in OAI-PMH publication service remote
+- [[MH-12616](https://opencast.jira.com/browse/MH-12616)][[#152](https://github.com/opencast/opencast/pull/152)] -
+  Admin UI Flexible Asset Upload override or fallback display text
+- [Add JavaScript source map generation
+  ](https://github.com/opencast/opencast/pull/146)
+- [[MH-12768](https://opencast.jira.com/browse/MH-12768)][[#142](https://github.com/opencast/opencast/pull/142)] -
+  Minor XACMLAuthorizationService fixes
+- [[MH-12825](https://opencast.jira.com/browse/MH-12825)][[#139](https://github.com/opencast/opencast/pull/139)] -
+  Add markdownlint to Travis CI
+
+- [[MH-12760](https://opencast.jira.com/browse/MH-12760)][[#160](https://github.com/opencast/opencast/pull/160)] -
+  Cross-link column date in events table to enable the start date filter
+- [[MH-12789](https://opencast.jira.com/browse/MH-12789)][[#158](https://github.com/opencast/opencast/pull/158)] -
+  Remove tabs and trailing spaces in LTI tools
+- [[MH-12509](https://opencast.jira.com/browse/MH-12509)][[#151](https://github.com/opencast/opencast/pull/151)] -
+  Enable HTTP basic auth in default config
+- [[MH-12759](https://opencast.jira.com/browse/MH-12759)][[#149](https://github.com/opencast/opencast/pull/149)] -
+  More Control Over Workflows
+- [[MH-12779](https://opencast.jira.com/browse/MH-12779)][[#147](https://github.com/opencast/opencast/pull/147)] -
+  Support X-Forwarded-Proto header
+- [[MH-12649](https://opencast.jira.com/browse/MH-12649)][[#138](https://github.com/opencast/opencast/pull/138)] -
+  clone workflow operation handler
+- [[MH-12764](https://opencast.jira.com/browse/MH-12764)][[#137](https://github.com/opencast/opencast/pull/137)] -
+  update license information for admin-ui
+- [[MH-12763](https://opencast.jira.com/browse/MH-12763)][[#136](https://github.com/opencast/opencast/pull/136)] -
+  Minor Composer Fixes
+- [[MH-12762](https://opencast.jira.com/browse/MH-12762)][[#135](https://github.com/opencast/opencast/pull/135)] -
+  Fix Spaces In Configuration
+- [Fallback For Synfig Install
+  ](https://github.com/opencast/opencast/pull/134)
+- [clean up woh documentation
+  ](https://github.com/opencast/opencast/pull/133)
+- [Make Travis check for tabs in pom.xml files
+  ](https://github.com/opencast/opencast/pull/132)
+- [Add Mkdocs To Travis Builds
+  ](https://github.com/opencast/opencast/pull/131)
+- [[MH-12757](https://opencast.jira.com/browse/MH-12757)][[#128](https://github.com/opencast/opencast/pull/128)] -
+  Fix ClassCastException
+- [[MH-12755](https://opencast.jira.com/browse/MH-12755)][[#127](https://github.com/opencast/opencast/pull/127)] -
+  Fix workflow-workflowoperation dependencies
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#126](https://github.com/opencast/opencast/pull/126)] -
+  Update Checkstyle
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#125](https://github.com/opencast/opencast/pull/125)] -
+  Update Apache HTTPComponents
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#124](https://github.com/opencast/opencast/pull/124)] -
+  Update Mina
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#123](https://github.com/opencast/opencast/pull/123)] -
+  Remove commons-logging
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#122](https://github.com/opencast/opencast/pull/122)] -
+  Update Jackson
+- [[MH-12752](https://opencast.jira.com/browse/MH-12752)][[#121](https://github.com/opencast/opencast/pull/121)] -
+  Ignore VSCode project data
+- [[MH-12751](https://opencast.jira.com/browse/MH-12751)][[#120](https://github.com/opencast/opencast/pull/120)] -
+  Add Travis Badge
+- [[MH-12735](https://opencast.jira.com/browse/MH-12735)][[#119](https://github.com/opencast/opencast/pull/119)] -
+  Remove Undocumented Operations
+- [[MH-12746](https://opencast.jira.com/browse/MH-12746)][[#115](https://github.com/opencast/opencast/pull/115)] -
+  Library Update
+- [[MH-12742](https://opencast.jira.com/browse/MH-12742)][[#113](https://github.com/opencast/opencast/pull/113)] -
+  Update to Karaf 4.0.10
+- [[MH-12744](https://opencast.jira.com/browse/MH-12744)][[#111](https://github.com/opencast/opencast/pull/111)] -
+  Fix migration bundle dependencies
+- [[MH-12739](https://opencast.jira.com/browse/MH-12739)][[#109](https://github.com/opencast/opencast/pull/109)] -
+  Transcription Service updated to support Paella
+- [[MH-12737](https://opencast.jira.com/browse/MH-12737)][[#108](https://github.com/opencast/opencast/pull/108)] -
+  OAI-PMH publication service
+- [[MH-12732](https://opencast.jira.com/browse/MH-12732)][[#106](https://github.com/opencast/opencast/pull/106)] -
+  Remove Unused Remote Service Registry
+- [[MH-12731](https://opencast.jira.com/browse/MH-12731)][[#105](https://github.com/opencast/opencast/pull/105)] -
+  Improve Recreating Series Index
+- [[MH-12730](https://opencast.jira.com/browse/MH-12730)][[#104](https://github.com/opencast/opencast/pull/104)] -
+  Workflow Index Rebuild Performance
+- [[MH-12711](https://opencast.jira.com/browse/MH-12711)][[#100](https://github.com/opencast/opencast/pull/100)] -
+  improve xacml parser
+- [[MH-12726](https://opencast.jira.com/browse/MH-12726)][[#99](https://github.com/opencast/opencast/pull/99)] -
+  Add description to theme
+- [[MH-12704](https://opencast.jira.com/browse/MH-12704)][[#98](https://github.com/opencast/opencast/pull/98)] -
+  Captions support for paella
+- [[MH-12718](https://opencast.jira.com/browse/MH-12718)][[#97](https://github.com/opencast/opencast/pull/97)] -
+  Animate Service
+- [[MH-12713](https://opencast.jira.com/browse/MH-12713)][[#95](https://github.com/opencast/opencast/pull/95)] -
+  Series cannot be created
+- [[MH-12705](https://opencast.jira.com/browse/MH-12705)][[#87](https://github.com/opencast/opencast/pull/87)] -
+  Fix scheduler hot-deployment
+- [[MH-12701](https://opencast.jira.com/browse/MH-12701)][[#84](https://github.com/opencast/opencast/pull/84)] -
+  Paella: Localization files + crowdin config file
+- [[MH-12692](https://opencast.jira.com/browse/MH-12692)][[#83](https://github.com/opencast/opencast/pull/83)] -
+  update maven bundle plugin for java8
+- [[MH-12663](https://opencast.jira.com/browse/MH-12663)][[#81](https://github.com/opencast/opencast/pull/81)] -
+  Don't search for non-existing WFR files
+- [[MH-12694](https://opencast.jira.com/browse/MH-12694)][[#80](https://github.com/opencast/opencast/pull/80)] -
+  Save" button in the editor now stays on the same page.
+- [[MH-12693](https://opencast.jira.com/browse/MH-12693)][[#77](https://github.com/opencast/opencast/pull/77)] -
+  Notes on how to enable, upgrade to HTTPS
+- [[MH-12675](https://opencast.jira.com/browse/MH-12675)][[#76](https://github.com/opencast/opencast/pull/76)] -
+  Send default startdate to backend also if it hasn't been changed.
+- [[MH-12656](https://opencast.jira.com/browse/MH-12656)][[#75](https://github.com/opencast/opencast/pull/75)] -
+  Updates to Theodul Matomo (formerly Piwik) Plugin
+- [[MH-12684](https://opencast.jira.com/browse/MH-12684)][[#69](https://github.com/opencast/opencast/pull/69)] -
+  Make License List Provider More Flexible
+- [[MH-12683](https://opencast.jira.com/browse/MH-12683)][[#68](https://github.com/opencast/opencast/pull/68)] -
+  Improve Video Editor Tests
+- [[MH-12681](https://opencast.jira.com/browse/MH-12681)][[#66](https://github.com/opencast/opencast/pull/66)] -
+  update media package series catalogs on event metadata update
+- [[MH-12677](https://opencast.jira.com/browse/MH-12677)][[#65](https://github.com/opencast/opencast/pull/65)] -
+  Be less technical about displaying the version number
+- [[MH-12674](https://opencast.jira.com/browse/MH-12674)][[#63](https://github.com/opencast/opencast/pull/63)] -
+  Remove unused hard-coded list providers
+- [[MH-12665](https://opencast.jira.com/browse/MH-12665)][[#62](https://github.com/opencast/opencast/pull/62)] -
+  Sort table on startup
+- [[MH-12649](https://opencast.jira.com/browse/MH-12649)][[#59](https://github.com/opencast/opencast/pull/59)] -
+  clone workflow operation handler
+- [[MH-12668](https://opencast.jira.com/browse/MH-12668)][[#58](https://github.com/opencast/opencast/pull/58)] -
+  Update packages of admin ui build pipeline
+- [Use $timeout instead of $interval to resolve MH-12667
+  ](https://github.com/opencast/opencast/pull/57)
+- [[MH-12661](https://opencast.jira.com/browse/MH-12661)][[#52](https://github.com/opencast/opencast/pull/52)] -
+  Update angular-translate to 2.17.0
+- [[MH-12660](https://opencast.jira.com/browse/MH-12660)][[#51](https://github.com/opencast/opencast/pull/51)] -
+  Scheduling Events by Specifying End Time
+- [[MH-12658](https://opencast.jira.com/browse/MH-12658)][[#50](https://github.com/opencast/opencast/pull/50)] -
+  Disable Jasmine for Theodul
+- [[MH-12653](https://opencast.jira.com/browse/MH-12653)][[#46](https://github.com/opencast/opencast/pull/46)] -
+  Authorization service should use workspace#read() wherever possible
+- [[MH-12600](https://opencast.jira.com/browse/MH-12600)][[#45](https://github.com/opencast/opencast/pull/45)] -
+  Move userdirectory stuff from bundle `kernel` to `userdirectory`
+- [[MH-12648](https://opencast.jira.com/browse/MH-12648)][[#42](https://github.com/opencast/opencast/pull/42)] -
+  As a system administrator, I want to use different encoding …
+- [[MH-12645](https://opencast.jira.com/browse/MH-12645)][[#39](https://github.com/opencast/opencast/pull/39)] -
+  Created an option to rebuild index for an specific service
+- [[MH-12644](https://opencast.jira.com/browse/MH-12644)][[#37](https://github.com/opencast/opencast/pull/37)] -
+  External API index schema fixes
+- [[MH-12538](https://opencast.jira.com/browse/MH-12538)][[#36](https://github.com/opencast/opencast/pull/36)] -
+  Remove obsolete ACL distribution service and WOH distribute-acl
+- [[MH-12639](https://opencast.jira.com/browse/MH-12639)][[#35](https://github.com/opencast/opencast/pull/35)] -
+  update angular-chosen to 1.8.0
+- [[MH-11984](https://opencast.jira.com/browse/MH-11984)][[#32](https://github.com/opencast/opencast/pull/32)] -
+  Allow customization of the username-to-user-role mapping
+- [[MH-12367](https://opencast.jira.com/browse/MH-12367)][[#30](https://github.com/opencast/opencast/pull/30)] -
+  Renaming all database tables
+- [[MH-12633](https://opencast.jira.com/browse/MH-12633)][[#29](https://github.com/opencast/opencast/pull/29)] -
+  Fix version of maven-dependency-plugin
+- [[MH-12544](https://opencast.jira.com/browse/MH-12544)][[#26](https://github.com/opencast/opencast/pull/26)] -
+  Play Deleted Segments in Video Editor
+- [[MH-12575](https://opencast.jira.com/browse/MH-12575)][[#25](https://github.com/opencast/opencast/pull/25)] -
+  Upgrade to AngularJS 1.5.11
+- [[MH-12595](https://opencast.jira.com/browse/MH-12595)][[#24](https://github.com/opencast/opencast/pull/24)] -
+  Improve Publications Usability
+- [[MH-12613](https://opencast.jira.com/browse/MH-12613)][[#23](https://github.com/opencast/opencast/pull/23)] -
+  New WorkflowOperationHandler 'create-event'
+- [[MH-12628](https://opencast.jira.com/browse/MH-12628)][[#20](https://github.com/opencast/opencast/pull/20)] -
+  MH-12629, MH-12630, Minor database fixes
+- [[MH-10560](https://opencast.jira.com/browse/MH-10560)][[#19](https://github.com/opencast/opencast/pull/19)] -
+  Live Scheduler Service
+- [[MH-12615](https://opencast.jira.com/browse/MH-12615)][[#17](https://github.com/opencast/opencast/pull/17)] -
+  Improve the languages drop-down menu
+- [[MH-12623](https://opencast.jira.com/browse/MH-12623)][[#16](https://github.com/opencast/opencast/pull/16)] -
+  Improve workflow dropdown menu
+- [[MH-12621](https://opencast.jira.com/browse/MH-12621)][[#15](https://github.com/opencast/opencast/pull/15)] -
+  submit paella player
+- [[MH-12624](https://opencast.jira.com/browse/MH-12624)][[#11](https://github.com/opencast/opencast/pull/11)] -
+  Fix link to Karaf remote debugging documentation
+- [Update debs.md
+  ](https://github.com/opencast/opencast/pull/10)
+- [[MH-12472](https://opencast.jira.com/browse/MH-12472)][[#8](https://github.com/opencast/opencast/pull/8)] -
+  FFmpeg Composer Implementation
+- [[MH-12502](https://opencast.jira.com/browse/MH-12502)][[#7](https://github.com/opencast/opencast/pull/7)] -
+  Do Not Leave Files In Workspace
+- [[MH-12477](https://opencast.jira.com/browse/MH-12477)][[#6](https://github.com/opencast/opencast/pull/6)] -
+  Operation To Log Workflow State
+- [[MH-12555](https://opencast.jira.com/browse/MH-12555)][[#5](https://github.com/opencast/opencast/pull/5)] -
+  Add support for Piwik Media Analytics
+- [[MH-10016](https://opencast.jira.com/browse/MH-10016)][[#4](https://github.com/opencast/opencast/pull/4)] -
+  Default Workflow
+- [[MH-12603](https://opencast.jira.com/browse/MH-12603)][[#2](https://github.com/opencast/opencast/pull/2)] -
+  Consistent Workflow IDs
+- [[MH-12622](https://opencast.jira.com/browse/MH-12622)][[#1](https://github.com/opencast/opencast/pull/1)] -
+  Surefire Versions Should Not Diverge
+
+
+
+Opencast 4
 ------------
 
 ### Opencast 4.4

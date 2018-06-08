@@ -110,7 +110,7 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   private Dictionary properties = null;
 
   /** The approximate load placed on the system by running an execute operation */
-  public static final float DEFAULT_EXECUTE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_EXECUTE_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_EXECUTE_JOB_LOAD} */
   public static final String EXECUTE_JOB_LOAD_KEY = "job.load.execute";

@@ -472,7 +472,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             String flavorString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("flavor: {}", flavorString);
             if (flavorString != null) {
-              flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
+              try {
+                flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
+              } catch (IllegalArgumentException e) {
+                String error = String.format("Could not parse flavor '%s'", flavorString);
+                logger.debug(error, e);
+                return Response.status(Status.BAD_REQUEST).entity(error).build();
+              }
             }
           } else if ("tags".equals(fieldName)) {
             String tagsString = Streams.asString(item.openStream(), "UTF-8");
@@ -717,8 +723,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
             /* “Remember” the flavor for the next media. */
             if ("flavor".equals(fieldName)) {
-              flavor = MediaPackageElementFlavor.parseFlavor(value);
-
+              try {
+                flavor = MediaPackageElementFlavor.parseFlavor(value);
+              } catch (IllegalArgumentException e) {
+                String error = String.format("Could not parse flavor '%s'", value);
+                logger.debug(error, e);
+                return Response.status(Status.BAD_REQUEST).entity(error).build();
+              }
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
               if ("identifier".equals(fieldName)) {

@@ -79,7 +79,7 @@ public class AnimateServiceImpl extends AbstractJobProducer implements AnimateSe
   private static final String JOB_LOAD_CONFIG = "job.load.animate";
 
   /** The load introduced on the system by creating an inspect job */
-  private static final float JOB_LOAD_DEFAULT = 1.0f;
+  private static final float JOB_LOAD_DEFAULT = 0.8f;
 
   /** The load introduced on the system by creating an inspect job */
   private float jobLoad = JOB_LOAD_DEFAULT;

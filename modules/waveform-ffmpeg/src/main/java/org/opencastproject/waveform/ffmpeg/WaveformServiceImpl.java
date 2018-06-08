@@ -81,7 +81,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   public static final String WAVEFORM_JOB_LOAD_CONFIG_KEY = "job.load.waveform";
 
   /** The default job load of a waveform job */
-  public static final float DEFAULT_WAVEFORM_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_WAVEFORM_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
   public static final String FFMPEG_BINARY_CONFIG_KEY = "org.opencastproject.composer.ffmpeg.path";

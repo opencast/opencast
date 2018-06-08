@@ -54,10 +54,10 @@ import java.util.Map;
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService, ManagedService {
 
   /** The load introduced on the system by creating an inspect job */
-  public static final float DEFAULT_INSPECT_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_INSPECT_JOB_LOAD = 0.2f;
 
   /** The load introduced on the system by creating an enrich job */
-  public static final float DEFAULT_ENRICH_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_ENRICH_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INSPECT_JOB_LOAD} */
   public static final String INSPECT_JOB_LOAD_KEY = "job.load.inspect";
