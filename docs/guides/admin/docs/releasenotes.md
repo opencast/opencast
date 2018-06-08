@@ -61,7 +61,7 @@ Improvements
     * Workflow drop-down menu is now sorted by workflow titles, workflow filtering is only enabled if are enough workflows available
     * Default workflow is preselected in event create dialog
 * Improved workflow operation handlers
-    * analyze-tracks ???
+    * [analyze-tracks](workflowoperationhandlers/analyze-tracks-woh.md) workflow operation handler set the video framerate as the workflow instance property too
 * Minor database fixes
 * Documentation improvements
 * Continuous integration implemented
