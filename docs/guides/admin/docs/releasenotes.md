@@ -58,10 +58,12 @@ Improvements
     * Video editor can optionally play deleted segments
     * Event publications dialog tab and pop-up improved
     * Languages drop-down menu is now sorted and allows to define a default language
-    * Workflow drop-down menu is now sorted by workflow titles, workflow filtering is only enabled if are enough workflows available
+    * Workflow drop-down menu is now sorted by workflow titles, workflow filtering is only enabled if are enough
+      workflows available
     * Default workflow is preselected in event create dialog
 * Improved workflow operation handlers
-    * [analyze-tracks](workflowoperationhandlers/analyze-tracks-woh.md) workflow operation handler set the video framerate as the workflow instance property too
+    * [analyze-tracks](workflowoperationhandlers/analyze-tracks-woh.md) workflow operation handler set the video
+      framerate as the workflow instance property too
 * Minor database fixes
 * Documentation improvements
 * Continuous integration implemented
