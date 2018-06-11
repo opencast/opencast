@@ -53,7 +53,7 @@ angular.module('adminNg.directives')
                            result = value;
                        }
                     });
-                    if (scope.params.type === 'ordered_text') {
+                    if ((scope.params.type === 'ordered_text') && angular.isDefined(result)) {
                         result = JSON.parse(result)['label'];
                     }
                 } else if ((scope.mode === 'multiSelect') || (scope.mode === 'multiValue')) {
