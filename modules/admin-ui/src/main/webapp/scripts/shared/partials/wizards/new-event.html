@@ -255,7 +255,7 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>
                             <td>
                             <select chosen
-                                data-width="'200px'"
+                                data-width="'203px'"
                                 tabindex="11"
                                 ng-disabled="wizard.step.checkingConflicts"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
@@ -410,7 +410,7 @@
                             <td>
                             <select chosen
                                 ng-disabled="wizard.step.checkingConflicts"
-                                data-width="'100%'"
+                                data-width="'203px'"
                                 tabindex="19"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
@@ -425,11 +425,9 @@
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
                             <td>
-                                <label ng-repeat-start="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
+                                <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
                                     <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20">{{ inputMethod.id | translate }}</input>
-                                     <br>
                                 </label>
-                                <br ng-repeat-end>
                             </td>
                         </tr>
                     </table>
@@ -675,37 +673,50 @@
                     </table>
                   <!-- scheduled items -->
                     <table class="main-tbl">
+
+                        <!-- Start date upload -->
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start">
+                          <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
+                          <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start.value | localizeDate:'dateTime' }}</td>
+                        </tr>
+
+                        <!-- Start date schedule -->
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date }}</td>
                         </tr>
+
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.hour !== undefined">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME"><!-- Start Time --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getFormatedStartTime() }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getFormattedStartTime() }}</td>
                         </tr>
-                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end">
+                        <tr ng-if="(wizard.step.ud.type === 'SCHEDULE_MULTIPLE') && wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE"><!-- End Date --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end.date }}</td>
                         </tr>
-                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.repetitionOption">
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.hour !== undefined">
+                          <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME"><!-- End Time --></td>
+                          <td>{{ wizard.getStateControllerByName('source').getFormattedEndTime() }}</td>
+                        </tr>
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].repetitionOption">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON"><!-- Repeat On --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.repetitionOption }}</td>
                         </tr>
-                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.weekdays)">
+                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].weekdays)">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS"><!-- Weekdays --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.presentableWeekdays }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].duration.hour !== undefined">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION"><!-- Duration --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getFormatedDuration() }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getFormattedDuration() }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION"><!-- Location --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name }}</td>
                         </tr>
-                        <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].SCHEDULE_SINGLE.device.inputs">
-                            <td>Input {{ key}}</td>
-                            <td>{{ value.value }}</td>
+                        <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.inputMethods">
+                            <td>{{ key }}</td>
+                            <td>{{ value }}</td>
                         </tr>
                     </table>
                 </div>
