@@ -20,6 +20,7 @@
  */
 package org.opencastproject.workflow.handler.crop;
 
+import org.opencastproject.crop.api.CropException;
 import org.opencastproject.crop.api.CropService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -27,13 +28,14 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
-import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
@@ -42,9 +44,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -85,16 +88,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
   /**
    * {@inheritDoc}
    *
-   * @see WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
@@ -102,7 +95,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
           throws WorkflowOperationException {
     logger.debug("Running cropping on workflow {}", workflowInstance.getId());
 
-    final String targetTrackId = idBuilder.createNew().toString();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
@@ -115,13 +107,14 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElements.PRESENTATION_SOURCE)));
     }
 
-    Iterator<Track> ti = candidates.iterator();
+    /*Iterator<Track> ti = candidates.iterator();
     while (ti.hasNext()) {
       Track t = ti.next();
       if (!t.hasVideo()) {
         ti.remove();
       }
-    }
+    }*/
+    candidates.removeIf(t -> !t.hasVideo());
 
     if (candidates.size() == 0) {
       logger.info("No matching tracks available for cropping in workflow {}", workflowInstance);
@@ -132,34 +125,53 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       logger.info("Found more than one track to crop");
     }
 
-    // all canidates are cropped in the following loop, but I'm not sure if I'm doing this in the right way
-    long totalTimeInQueue = 0;
+    // start cropping all candidates in parallel
+    List<Job> jobs = new ArrayList<>();
     for (Track candidate: candidates) {
-      Job job;
-      Track croppedTrack = null;
-
       try {
-        job = cropService.crop(candidate);
-        if (!waitForStatus(job).isSuccess()) {
-          throw new WorkflowOperationException("Video cropping of " + candidate + " failed");
-        }
-
-        croppedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
-        mediaPackage.add(croppedTrack);
-        croppedTrack.setIdentifier(targetTrackId);
-        croppedTrack.setURI(workspace
-                .moveTo(croppedTrack.getURI(), mediaPackage.getIdentifier().toString(), croppedTrack.getIdentifier(),
-                        croppedTrack.getIdentifier() + "corpped"));
-
-        // Add target tags
-        for (String tag : targetTags) {
-          croppedTrack.addTag(tag);
-        }
-      } catch (Exception e) {
-        throw new WorkflowOperationException(e);
+        jobs.add(cropService.crop(candidate));
+      } catch (MediaPackageException | CropException e) {
+        throw new WorkflowOperationException("Failed starting crop job", e);
       }
-      long timeInQueue = job.getQueueTime() == null ? 0 : job.getQueueTime();
-      totalTimeInQueue += timeInQueue;
+    }
+
+    // wait for all crop jobs to be finished
+    if (!waitForStatus(jobs.toArray(new Job[0])).isSuccess()) {
+      throw new WorkflowOperationException("Crop operation failed");
+    }
+
+    long totalTimeInQueue = 0;
+
+    // add new tracks to media package
+    for (Job job: jobs) {
+      // deserialize track
+      Track croppedTrack;
+      try {
+        croppedTrack = (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException(String.format("Crop service yielded invalid track: %s", job.getPayload()));
+      }
+
+      // update identifier
+      croppedTrack.setIdentifier(idBuilder.createNew().toString());
+
+      // move into space for media package in ws/wfr
+      try {
+        String filename = "cropped_" + new File(croppedTrack.getURI()).getName();
+        croppedTrack.setURI(workspace.moveTo(croppedTrack.getURI(), mediaPackage.getIdentifier().toString(),
+                croppedTrack.getIdentifier(), filename));
+      } catch (NotFoundException | IOException e) {
+        throw new WorkflowOperationException(String.format("Could not move %s to media package %s",
+                croppedTrack.getURI(), mediaPackage.getIdentifier()));
+      }
+
+      // Add target tags
+      targetTags.forEach(croppedTrack::addTag);
+
+      // add new track to mediapackage
+      mediaPackage.add(croppedTrack);
+
+      totalTimeInQueue += job.getQueueTime() == null ? 0 : job.getQueueTime();
     }
     logger.info("Video cropping completed");
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, totalTimeInQueue);

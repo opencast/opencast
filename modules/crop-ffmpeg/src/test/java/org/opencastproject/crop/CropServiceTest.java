@@ -118,15 +118,13 @@ public class CropServiceTest {
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andReturn(new File(track.getURI()));
     tempFile = testFolder.newFile(getClass().getName() + ".xml");
-    EasyMock.expect(workspace.putInCollection((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
-            (InputStream) EasyMock.anyObject())).andAnswer(new IAnswer<URI>() {
-      @Override
-      public URI answer() throws Throwable {
-        InputStream in = (InputStream) EasyMock.getCurrentArguments()[2];
-        IOUtils.copy(in, new FileOutputStream(tempFile));
-        return tempFile.toURI();
-      }
-    });
+    EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject(InputStream.class))).andAnswer(() -> {
+              InputStream in = (InputStream) EasyMock
+                      .getCurrentArguments()[2];
+              IOUtils.copy(in, new FileOutputStream(tempFile));
+              return tempFile.toURI();
+            });
     EasyMock.replay(workspace);
 
     mpeg7Service1 = new Mpeg7CatalogService();

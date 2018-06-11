@@ -150,7 +150,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     super.activate(cc);
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
     this.binary = StringUtils.defaultIfBlank(path, FFMEG_BINARY_DEFAULT);
-    logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, FFMEG_BINARY_DEFAULT);
+    logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, binary);
   }
 
   protected Track crop(Job job, Track track) throws CropException, MediaPackageException {
@@ -180,7 +180,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       try {
         uri = croppedTrack.getURI();
       } catch (Exception e) {
-        throw new CropException("Unable to put the mpeg7 catalog into the workspace", e);
+        throw new CropException("Unable to get URI of cropped track", e);
       }
       cropTrack.setURI(uri);
 
@@ -188,13 +188,9 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
 
       return cropTrack;
 
-    } catch (Exception e) {
+    } catch (IOException e) {
       logger.warn("Error cropping video", e);
-      if (e instanceof CropException) {
-        throw (CropException) e;
-      } else {
-        throw new CropException(e);
-      }
+      throw new CropException(e);
     }
 
   }
@@ -213,8 +209,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     pbuilder.redirectErrorStream(true);
     int exitCode = 1;
     Process process = pbuilder.start();
-    BufferedReader errStream = new BufferedReader(new InputStreamReader(process.getInputStream()));
-    try {
+    try (BufferedReader errStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
       String line = errStream.readLine();
       while (null != line) {
         if (line.startsWith("[Parsed_cropdetect")) {
@@ -233,9 +228,9 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       exitCode = process.waitFor();
 
     } catch (IOException e) {
-      logger.error("Error executing ffmeg: {}", e.getMessage());
+      logger.error("Error executing ffmeg: {}", e);
     } catch (InterruptedException e) {
-      logger.error("Waiting for encoder process exited was interrupted unexpected: {}", e.getMessage());
+      logger.error("Waiting for encoder process exited was interrupted unexpected: {}", e);
     }
 
     if (exitCode != 0) {
@@ -265,7 +260,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       }
 
     } catch (Exception e) {
-      logger.error("Error executing ffmeg: {}", e.getMessage());
+      logger.error("Error executing ffmeg: {}", e);
     }
     // put output file into workspace
     URI outputFileUri = null;

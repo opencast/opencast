@@ -390,8 +390,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/crop-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/crop-workflowoperation/${project.version}</bundle>
   </feature>
 
@@ -522,8 +521,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/crop-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/crop-workflowoperation/${project.version}</bundle>
   </feature>
 
@@ -581,8 +579,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-waveform-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/crop-ffmpeg/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-adminworker" version="${project.version}">
