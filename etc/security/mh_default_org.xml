@@ -242,6 +242,7 @@
     <!-- Paella player -->
     <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
     <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/paella/config/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
