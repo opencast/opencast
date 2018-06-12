@@ -49,6 +49,7 @@ Improvements
     * Workflow index rebuild performance increased
     * XACML parser performance increased
 * User Interface
+    * New translations added: Filipino, Tagalog and Turkish
     * Cross-link column date in events table so the start date filter can be used
     * Additional workflow controls added
     * Description added to the series dialog theme tab
