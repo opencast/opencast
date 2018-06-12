@@ -405,7 +405,7 @@ angular.module('adminNg.services')
             });
         };
 
-        this.getFormatedStartTime = function () {
+        this.getFormattedStartTime = function () {
             var time;
 
             if (!self.isUpload()) {
@@ -419,7 +419,21 @@ angular.module('adminNg.services')
             return time;
         };
 
-        this.getFormatedDuration = function () {
+        this.getFormattedEndTime = function () {
+            var time;
+
+            if (!self.isUpload()) {
+                var hour = self.ud[getType()].end.hour;
+                var minute = self.ud[getType()].end.minute;
+                if (angular.isDefined(hour) && angular.isDefined(minute)) {
+                    time = JsHelper.humanizeTime(hour, minute);
+                }
+            }
+
+            return time;
+        };
+
+        this.getFormattedDuration = function () {
             var time;
 
             if (!self.isUpload()) {
