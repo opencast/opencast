@@ -157,7 +157,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
       // move into space for media package in ws/wfr
       try {
-        String filename = "cropped_" + new File(croppedTrack.getURI()).getName();
+        String filename = "cropped_" + croppedTrack.getURI().toString();
         croppedTrack.setURI(workspace.moveTo(croppedTrack.getURI(), mediaPackage.getIdentifier().toString(),
                 croppedTrack.getIdentifier(), filename));
       } catch (NotFoundException | IOException e) {
