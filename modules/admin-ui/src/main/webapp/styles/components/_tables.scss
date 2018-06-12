@@ -216,13 +216,11 @@
 
             &.remove {
                 @include build-icon(auto, auto, remove-icon, 17px, 17px);
-                //@include fa-icon($fa-var-play-circle-o, before, block, 0, 0, inherit, 22px, normal, inherit);
             }
 
             &.play {
                 color: $color-silver;
                 @include build-icon(auto, auto, play-icon, 17px, 17px);
-                //@include fa-icon($fa-var-play-circle-o, before, block, 0, 0, inherit, 22px, normal, inherit);
 
                 &.on {
                    color: $primary-color-green;
@@ -249,11 +247,21 @@
                 margin-right: 15px;
             }
 
+            &.comments {
+                @include fa-icon($fa-var-comment-o, before, block, -3px 0 0 0, 0, inherit, 20px, normal,
+                                 inherit);
+            }
+
+            &.comments-open {
+                @include fa-icon($fa-var-comment, before, block, -3px 0 0 0, 0, inherit, 20px, normal, inherit);
+            }
+
             &.cut {
-                @include fa-icon($fa-var-scissors, before, inline-block, 0, 0, inherit, 18px, normal, inherit);
-                
+                @include fa-icon($fa-var-scissors, before, inline-block, 2px 0 0 0, 0, inherit, 18px, normal, inherit);
+
                 .badge {
                   position: relative;
+                  margin-right: -9px;
                   left: -8px;
                   bottom: 8px;
                   width: 6px;
