@@ -106,7 +106,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     } else {
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElements.PRESENTATION_SOURCE)));
     }
-    
     candidates.removeIf(t -> !t.hasVideo());
 
     if (candidates.size() == 0) {
