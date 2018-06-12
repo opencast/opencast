@@ -6,6 +6,14 @@ Opencast 5
 
 ### Opencast 5.0
 
+*Released on June 12, 2018*
+
+- [[MH-12952](https://opencast.jira.com/browse/MH-12952)][[#295](https://github.com/opencast/opencast/pull/295)] -
+  animate WOH dependency version fixed
+- [[MH-12946](https://opencast.jira.com/browse/MH-12946)][[#290](https://github.com/opencast/opencast/pull/290)] -
+  Fix summary of add-event-dialog
+- [[MH-12944](https://opencast.jira.com/browse/MH-12944)][[#288](https://github.com/opencast/opencast/pull/288)] -
+  Remove bashism from start script
 - [[MH-12905](https://opencast.jira.com/browse/MH-12905)][[#287](https://github.com/opencast/opencast/pull/287)] -
   TEMPORARY Karaf config assembly workaround (KARAF-5693)
 - [[MH-12943](https://opencast.jira.com/browse/MH-12943)][[#286](https://github.com/opencast/opencast/pull/286)] -
