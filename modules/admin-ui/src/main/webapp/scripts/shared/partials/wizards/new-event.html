@@ -715,7 +715,7 @@
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name }}</td>
                         </tr>
                         <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.inputMethods">
-                            <td>{{ key }}</td>
+                            <td>{{ 'EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT' | translate }} {{ key }}</td>
                             <td>{{ value }}</td>
                         </tr>
                     </table>

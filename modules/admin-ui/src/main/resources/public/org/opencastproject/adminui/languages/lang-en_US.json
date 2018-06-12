@@ -451,7 +451,10 @@
            "ACL": "Access policy"
          },
          "SUMMARY": {
-           "CAPTION": "Summary"
+           "CAPTION": "Summary",
+           "SOURCE": {
+             "INPUT": "Input"
+           }
          },
          "WEEKDAYS": {
            "MO": "Mo",
