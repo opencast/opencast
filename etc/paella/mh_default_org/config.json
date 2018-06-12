@@ -52,7 +52,7 @@
       "captions": "MHCaptionsDataDelegate",
       "SingleVideoExport": "MHAnnotationServiceVideoExportDelegate",
       "MultipleVideoExport": "MHAnnotationServiceVideoExportDelegate",
-      "cameraTrack":"TrackCameraDataDelegate"
+      "cameraTrack":"OpencastTrackCameraDataDelegate"
     }
   },
   "folders": {
