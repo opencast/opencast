@@ -2000,7 +2000,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         throw new EncoderException("Unable to create a job - Exception in Parsing Smil", e);
       }
     } catch (Exception e) {
-      e.printStackTrace();
       throw new EncoderException("Unable to create a job - Exception processing XML in ProcessSmil", e);
     }
     throw new EncoderException("Unable to create a job - Cannot find paramGroup");
@@ -2012,11 +2011,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       EncodingProfile profile = profileScanner.getProfile(profileId1);
       // warn about bad encoding profiles, but encode anyway, the profile type is not enforced
       if (VIDEO_ONLY.equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Audio) {
-        logger.warn("Profile '" + profileId1 + "' supports " + profile.getApplicableMediaType()
-        + " but media is Video Only");
+        logger.warn("Profile '{}' supports {} but media is Video Only", profileId1, profile.getApplicableMediaType());
       } else if (AUDIO_ONLY.equals(mediaType) && profile.getApplicableMediaType() == EncodingProfile.MediaType.Visual) {
-        logger.warn("Profile '" + profileId1 + "' supports " + profile.getApplicableMediaType()
-        + " but media is Audio Only");
+        logger.warn("Profile '{}' supports {} but media is Audio Only", profileId1, profile.getApplicableMediaType());
       }
       profiles.add(profile);
     }
@@ -2139,7 +2136,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
                       inputfile.add(clipSourceFile.getAbsolutePath()); // add track
                       props.put("in.video.path" + index, sourceFile.getAbsolutePath());
                       index = inputfile.indexOf(clipSourceFile.getAbsolutePath());
-                      logger.info("Adding file {} " + index, inputfile);
                     }
                   } else {
                     index = srcIndex; // default source track

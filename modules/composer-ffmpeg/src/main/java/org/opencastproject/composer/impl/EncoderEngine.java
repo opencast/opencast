@@ -51,6 +51,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -564,8 +565,7 @@ public class EncoderEngine implements AutoCloseable {
       final Pattern outpad = Pattern.compile("\\[(\\d+:[av\\d{1,2}])\\]");
       try {
         Matcher matcher = outpad.matcher(pad); // throws exception if pad is null
-        if (matcher != null && matcher.matches()) {
-          logger.info(pad + matcher.toString());
+        if (matcher.matches()) {
           return matcher.group(1);
         }
       } catch (Exception e) {
@@ -909,7 +909,6 @@ public class EncoderEngine implements AutoCloseable {
   public List<File> multiTrimConcat(List<File> inputs, List<Long> edits, List<EncodingProfile> profiles,
           int transitionDuration, boolean hasVideo, boolean hasAudio)
           throws EncoderException, IllegalArgumentException {
-    logger.trace("MultiTrimConcat called with {} ", inputs, edits);
     if (inputs == null || inputs.size() < 1) {
       throw new IllegalArgumentException("At least one track must be specified.");
     }
@@ -963,8 +962,7 @@ public class EncoderEngine implements AutoCloseable {
         clauses.add(outmaps.getVsplit());
         clauses.add(outmaps.getVideoFilter());
       }
-      while (clauses.remove(null)) {
-      } // remove all empty filters
+      clauses.removeIf(Objects::isNull); // remove all empty filters
       command.add("-y"); // overwrite old files
       command.add("-nostats"); // no progress report
       for (File o : inputs) {
@@ -978,7 +976,7 @@ public class EncoderEngine implements AutoCloseable {
       }
       return process(command); // Run the ffmpeg command
     } catch (Exception e) {
-      //logger.error("MultiTrimConcat failed to run command {} ", e.getMessage());
+      logger.error("MultiTrimConcat failed to run command {} ", e.getMessage());
       throw new EncoderException("Cannot encode the inputs",e);
     }
   }
