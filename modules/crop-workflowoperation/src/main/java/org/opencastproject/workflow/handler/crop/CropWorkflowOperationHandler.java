@@ -44,7 +44,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,14 +106,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     } else {
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElements.PRESENTATION_SOURCE)));
     }
-
-    /*Iterator<Track> ti = candidates.iterator();
-    while (ti.hasNext()) {
-      Track t = ti.next();
-      if (!t.hasVideo()) {
-        ti.remove();
-      }
-    }*/
+    
     candidates.removeIf(t -> !t.hasVideo());
 
     if (candidates.size() == 0) {
