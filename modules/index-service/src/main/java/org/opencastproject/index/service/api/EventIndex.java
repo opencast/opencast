@@ -67,4 +67,11 @@ public interface EventIndex {
    */
   List<String> getThemeNames();
 
+  /**
+   * Returns all the known events publishers' usernames
+   *
+   * @return a list of events publishers' usernames
+   */
+  List<String> getEventPublishers();
+
 }

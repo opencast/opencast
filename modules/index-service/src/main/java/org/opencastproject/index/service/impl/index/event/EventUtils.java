@@ -201,6 +201,14 @@ public final class EventUtils {
       metadata.addField(newUID);
     }
 
+    if (metadata.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
+      MetadataField<?> publisher = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+      metadata.removeField(publisher);
+      MetadataField<String> newPublisher = MetadataUtils.copyMetadataField(publisher);
+      newPublisher.setValue(event.getPublisher());
+      metadata.addField(newPublisher);
+    }
+
     return metadata;
   }
 
