@@ -47,7 +47,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Set;
 
 import io.restassured.http.ContentType;
@@ -66,16 +65,14 @@ public class UsersSettingsEndpointTest {
     JSONObject exObject;
     JSONObject acObject;
     int actualId;
-    for (int i = 0; i < actualArray.size(); i++) {
-      acObject = (JSONObject) actualArray.get(i);
+    for (Object anActualArray : actualArray) {
+      acObject = (JSONObject) anActualArray;
       actualId = Integer.parseInt(acObject.get("id").toString()) - 1;
       exObject = (JSONObject) expectedArray.get(actualId);
-      Set<String> exEntrySet = exObject.keySet();
+      Set exEntrySet = exObject.keySet();
       Assert.assertEquals(exEntrySet.size(), acObject.size());
-      Iterator<String> exIter = exEntrySet.iterator();
 
-      while (exIter.hasNext()) {
-        String item = exIter.next();
+      for (Object item : exEntrySet) {
         Object exValue = exObject.get(item);
         Object acValue = acObject.get(item);
         Assert.assertEquals(exValue, acValue);
@@ -89,7 +86,7 @@ public class UsersSettingsEndpointTest {
     InputStream stream = UsersSettingsEndpointTest.class.getResourceAsStream("/usersettings.json");
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(10)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(10)).when().get(rt.host("/settings.json")).asString());
 
@@ -104,7 +101,7 @@ public class UsersSettingsEndpointTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
 
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(10)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(10)).when()
             .get(rt.host("/settings.json?limit=100&offset=0")).asString());
@@ -116,7 +113,7 @@ public class UsersSettingsEndpointTest {
   @Ignore
   @Test
   public void testGetSignatureExpectsOK() throws ParseException, IOException {
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).when().get(rt.host("/signature")).asString());
     logger.info(actual.toJSONString());
   }
@@ -147,7 +144,7 @@ public class UsersSettingsEndpointTest {
 
     JSONObject actual = (JSONObject) parser.parse(given().formParam(nameKey, nameValue)
             .formParam(fromNameKey, fromNameValue).formParam(fromAddressKey, fromAddressValue)
-            .formParam(textKey, textValue).log().all().expect().statusCode(HttpStatus.SC_OK)
+            .formParam(textKey, textValue).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body(nameKey, equalTo(nameValue)).body("creator", equalTo(creator))
             .body("signature", equalTo(textValue)).when().post(rt.host("/signature")).asString());
     logger.info(actual.toJSONString());
@@ -158,7 +155,7 @@ public class UsersSettingsEndpointTest {
     String key = "example_key";
     String value = "example_value";
 
-    JSONObject actual = (JSONObject) parser.parse(given().formParam("key", key).formParam("value", value).log().all()
+    JSONObject actual = (JSONObject) parser.parse(given().formParam("key", key).formParam("value", value)
             .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("key", equalTo(key))
             .body("value", equalTo(value)).when().post(rt.host("setting")).asString());
     logger.info(actual.toJSONString());
@@ -167,12 +164,12 @@ public class UsersSettingsEndpointTest {
   @Ignore
   @Test
   public void testDeleteSignatureExpectsOK() throws ParseException, IOException {
-    given().log().all().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/signature/19"));
+    given().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/signature/19"));
   }
 
   @Test
   public void testDeleteUserSettingExpectsOK() throws ParseException, IOException {
-    given().log().all().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/setting/18"));
+    given().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/setting/18"));
   }
 
   // FIXME
@@ -204,7 +201,7 @@ public class UsersSettingsEndpointTest {
     String key = TestUserSettingsEndpoint.EXAMPLE_KEY;
     String value = TestUserSettingsEndpoint.EXAMPLE_VALUE;
 
-    given().pathParam("settingId", Long.toString(18)).formParam("key", key).formParam("value", value).log().all()
+    given().pathParam("settingId", Long.toString(18)).formParam("key", key).formParam("value", value)
             .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("key", equalTo(key))
             .body("value", equalTo(value)).when().put(rt.host("/setting/{settingId}")).asString();
   }

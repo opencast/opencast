@@ -80,7 +80,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
   public static final String CONFIG_SOX_PATH = "org.opencastproject.sox.path";
 
   /** The load introduced on the system by creating a analyze job */
-  public static final float DEFAULT_ANALYZE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_ANALYZE_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_ANALYZE_JOB_LOAD} */
   public static final String ANALYZE_JOB_LOAD_KEY = "job.load.analyze";
@@ -89,7 +89,7 @@ public class SoxServiceImpl extends AbstractJobProducer implements SoxService, M
   private float analyzeJobLoad = DEFAULT_ANALYZE_JOB_LOAD;
 
   /** The load introduced on the system by creating a normalize job */
-  public static final float DEFAULT_NORMALIZE_JOB_LOAD = 2.0f;
+  public static final float DEFAULT_NORMALIZE_JOB_LOAD = 0.2f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_NORMALIZE_JOB_LOAD} */
   public static final String NORMALIZE_JOB_LOAD_KEY = "job.load.normalize";

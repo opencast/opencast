@@ -33,7 +33,6 @@ import org.opencastproject.matterhorn.search.impl.SearchResultImpl;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
@@ -49,7 +48,6 @@ import org.opencastproject.util.data.Option;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Ignore;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
@@ -87,8 +85,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private void setupServices() throws Exception {
-    user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(),
-            new HashSet<JaxbRole>());
+    user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(), new HashSet<>());
 
     UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(user).anyTimes();
@@ -110,24 +107,12 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     // Create AdminUI Search Index
     AdminUISearchIndex adminUISearchIndex = EasyMock.createMock(AdminUISearchIndex.class);
-    final Capture<ThemeSearchQuery> themeQueryCapture = new Capture<ThemeSearchQuery>();
+    final Capture<ThemeSearchQuery> themeQueryCapture = EasyMock.newCapture();
     EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(themeQueryCapture)))
-            .andAnswer(new IAnswer<SearchResult<org.opencastproject.index.service.impl.index.theme.Theme>>() {
-
-              @Override
-              public SearchResult<org.opencastproject.index.service.impl.index.theme.Theme> answer() throws Throwable {
-                return createThemeCaptureResult(themeQueryCapture);
-              }
-            });
-    final Capture<SeriesSearchQuery> seriesQueryCapture = new Capture<SeriesSearchQuery>();
+            .andAnswer(() -> createThemeCaptureResult(themeQueryCapture));
+    final Capture<SeriesSearchQuery> seriesQueryCapture = EasyMock.newCapture();
     EasyMock.expect(adminUISearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture)))
-            .andAnswer(new IAnswer<SearchResult<Series>>() {
-
-              @Override
-              public SearchResult<Series> answer() throws Throwable {
-                return createSeriesCaptureResult(seriesQueryCapture);
-              }
-            });
+            .andAnswer(() -> createSeriesCaptureResult(seriesQueryCapture));
     EasyMock.replay(adminUISearchIndex);
 
     themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
@@ -151,7 +136,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     ComponentContext componentContext = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
-    EasyMock.expect(componentContext.getProperties()).andReturn(new Hashtable<String, Object>()).anyTimes();
+    EasyMock.expect(componentContext.getProperties()).andReturn(new Hashtable<>()).anyTimes();
     EasyMock.replay(componentContext);
 
     StaticFileRestService staticFileRestService = new StaticFileRestService();

@@ -69,7 +69,7 @@ public class SilenceDetectionServiceImpl extends AbstractJobProducer implements 
 
   public static final String JOB_LOAD_KEY = "job.load.videoeditor.silencedetection";
 
-  private static final float DEFAULT_JOB_LOAD = 2.0f;
+  private static final float DEFAULT_JOB_LOAD = 0.2f;
 
   private float jobload = DEFAULT_JOB_LOAD;
 

@@ -1,103 +1,79 @@
-Upgrading Opencast
-==================
+Upgrading Opencast from 4.x to 5.0
+==================================
 
-Upgrading Opencast from 4.0 to 5.0
-----------------------------------
-
-### Configuration Changes
-
-
-As Piwik has been renamed to Matomo Opencast changed the name for the plugin and configuration keys too.
-So if you already configured an Piwik Server please adapt in `etc/org.opencastproject.organization-mh_default_org.cfg`
-the following keys:
-
-* `prop.player.piwik.server` -> `prop.player.matomo.server`
-* `prop.player.piwik.site_id` -> `prop.player.matomo.site_id`
-* `prop.player.piwik.heartbeat` -> `prop.player.matomo.heartbeat`
-* `prop.player.piwik.track_events` -> `prop.player.matomo.track_events`
-
-
-Upgrading Opencast 3.0 To 4.0
------------------------------
-
-This guide describes how to upgrade Opencast 3.0.x to 4.0.x. In case you need information about how to upgrade older
+This guide describes how to upgrade Opencast 4.x to 5.0. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
-
-### How to Upgrade
-
+How to Upgrade
+--------------
 
 1. Stop your current Opencast instance
-2. Back-up Opencast files and database (optional)
-3. [Upgrade the database](#database-migration)
-4. Replace Opencast 3.0 with 4.0
-6. Review the [configuration changes](releasenotes#working-file-repository-configuration) and adjust your configuration accordingly
-7. [Upgrade the ActiveMQ configuration](#activemq-migration)
-8. [Migrate the scheduler service](#scheduler-migration)
-9. [Re-build ElasticSearch index](#re-build-elasticsearch-index)
-10. Drop the old scheduler database table: `DROP TABLE mh_scheduled_event;`
-11. Delete the old scheduler Solr data directory (`data/solr-indexes/scheduler`)
+2. Replace Opencast 4.x with 5.0
+3. Back-up Opencast files and database (optional)
+4. [Upgrade the database](#database-migration)
+5. [Upgrade the ActiveMQ configuration](#activemq-migration)
+6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 
 
-### Database Migration
+Database Migration
+------------------
 
-Opencast 4.0 includes database changes for the new asset manager and scheduler.  As with all database migrations, we
-recommend to make a database backup before attempting the upgrade.
+As part of removing mentions of the old name Matterhorn, all database table names have been changed and are now prefixed
+with `oc_`.  This requires an database schema update. As with all database migrations, we recommend to make a database
+backup before attempting the upgrade.
 
-You can find the database upgrade script at `…/docs/upgrade/3.0_to_4.0/mysql5.sql`.
-
-Additionally, you need to ensure your Opencast user is granted all necessary rights. Additional to previous
-versions, `GRANT CREATE TEMPORARY TABLES` is required as well. You can simply re-set your users following the user
-set-up step from the [database configuration guide](configuration/database/#step-1-create-an-opencast-database)
+You can find the database upgrade script at `docs/upgrade/4_to_5/mysql5.sql`.
 
 
-### ActiveMQ Migration
+ActiveMQ Migration
+------------------
 
-Opencast 4.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
+Opencast 5.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
 configuration guide](configuration/message-broker/) to deploy a new configuration. No data migration is required for
-this since the message broker only contains temporary data.
+this since the message broker contains only temporary data.
 
 
-### Scheduler Migration
+Configuration Changes
+---------------------
 
-The new scheduler service adds support for extended metadata and is bound to the new asset manager. Data from the old
-scheduler need to be migrated if Opencast contains upcoming, scheduled events. If you do not have any upcoming,
-scheduled events in your system, you can safely skip this step.
+HTTP Basic authentication is enabled by default (see `etc/security/mh_default_org.xml`). Make sure you've enabled
+HTTPS support in Opencast or your preferred HTTP proxy (see [documentation](configuration/security.https.md)) if you
+plan to use it.
 
-The migration of the scheduler service uses the data of the old scheduling database table which therefore is not deleted
-by the database migration script.
+Paella Player has been included in Opencast 5.0. So you can choose between the Theodul and Paella player.
+This can be done by setting the `prop.player` property in the tennant's configuration file (for example
+`etc/org.opencastproject.organization-mh_default_org.cfg`).  Additionally, the path to the Paella player configuration
+folder is added in `etc/custom.properties` as `org.opencastproject.engage.paella.config.folder` with the default value
+of `${karaf.etc}/paella`. There you will find the default configuration. The Paella URL pattern was also added to the
+default security configuration `etc/security/mh_default_org.xml`.
 
-To start the migration follow these steps:
+Workflow definition IDs have been changed and are no longer prefixed with `ng-` anymore. If you are using the default
+workflows or include them as part of your custom workflow, please adapt the changes. You can find the workflow
+definitions in `etc/workflows/*.xml`. You may also want to adapt the workflow ID changes in the following configuration
+files:
 
-1. Delete the existing indexes in `data/index` and `data/solr-indexes/scheduler`
-2. Configure the destination organization for the migration by configuring the organizational context in the
-   `custom.properties`. Do that by adding a configuration key like:
-   `org.opencastproject.migration.organization=mh_default_org`.
-3. Start Opencast
-4. Check the logs for errors!
-5. After the migration is done, remove `org.opencastproject.migration.organization` again from `custom.properties´ to
-   avoid further migration attempts.
+Configuration file name | Property name
+------------------------|-------------------
+custom.properties                                 | org.opencastproject.workflow.default.definition
+org.opencastproject.ingest.scanner.InboxScannerService-inbox.cfg              | workflow.definition
+org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg | workflow
 
+The workflow control functionality includes some new REST endpoints.  Therefore the new URL patterns has been added to
+the tenant's security configuration (e.g. `etc/security/mh_default_org.xml`.)
 
-### Re-Build ElasticSearch Index
+As Piwik has been renamed to Matomo, Opencast changed the name for the plugin and configuration keys too.
+So if you already configured a Piwik server please adapt the following keys in
+`etc/org.opencastproject.organization-mh_default_org.cfg`:
 
-The introduction of the new scheduler service requires an update to the ElasticSearch index:
+* `prop.player.piwik.server` → `prop.player.matomo.server`
+* `prop.player.piwik.site_id` → `prop.player.matomo.site_id`
+* `prop.player.piwik.heartbeat` → `prop.player.matomo.heartbeat`
+* `prop.player.piwik.track_events` → `prop.player.matomo.track_events`
 
-1. If you did not do that during the scheduler migration, delete the index directory at `data/index`
-2. Start Opencast if you have not already, waiting until it has started completely.
-3. Use one of the following methods to recreate the index:
+The publication channel's listprovider configurations `etc/listproviders/publication.channel.labels.properties` and
+`etc/listproviders/publication.channel.icons.properties` have been merged into
+`etc/listproviders/publication.channels.properties`.
 
-    * Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
-    * Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
-      symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
-      `/recreateIndex`.
-
-    In both cases, the resulting page is empty but should return a HTTP status 200.
-
-4. If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
-
-    * Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
-    * Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
-      symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
-      `/recreateIndex`.
-
+Several service job load values were updated. You can find these configuration files by running the command
+`grep job.load etc/org.opencastproject.*` on the command line or by searching for `job.load` string in Opencast's
+service configuration files.

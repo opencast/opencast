@@ -55,7 +55,9 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
@@ -312,7 +314,19 @@ public class ToolsEndpoint implements ManagedService {
       } else {
         elementUri = element.getURI();
       }
-      jPreviews.add(obj(f("uri", v(elementUri.toString())), f("flavor", v(element.getFlavor().getType()))));
+      JObject jPreview = obj(f("uri", v(elementUri.toString())));
+      // Get the elements frame rate for frame by frame skipping in the editor
+      // Note that this assumes that the resulting video will have the same frame rate as the preview
+      // and also that there is only one video stream for any preview element.
+      if (element instanceof Track) {
+        for (Stream stream: ((Track) element).getStreams()) {
+          if (stream instanceof VideoStream) {
+            jPreview = jPreview.merge(obj(f("frameRate", v(((VideoStream) stream).getFrameRate()))));
+            break;
+          }
+        }
+      }
+      jPreviews.add(jPreview);
 
       if (!Type.Track.equals(element.getElementType()))
         continue;
@@ -375,7 +389,7 @@ public class ToolsEndpoint implements ManagedService {
           @Context HttpServletRequest request) throws IndexServiceException, NotFoundException {
     String details;
     try (InputStream is = request.getInputStream()) {
-      details = IOUtils.toString(is);
+      details = IOUtils.toString(is, request.getCharacterEncoding());
     } catch (IOException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));
       return R.serverError();

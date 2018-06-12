@@ -1,0 +1,1908 @@
+{
+   "MATTERHORN": "Opencast",
+   "NAV_HOME": "Magsimula",
+   "NAV_ABOUT": "Tungkol sa",
+   "NO": "Hindi",
+   "SUBMIT": "Ipasa",
+   "UPDATE": "Update",
+   "CANCEL": "Kansela",
+   "CONFIRM": "Kumpirmahin",
+   "SAVE": "I-save",
+   "LOGOUT": "Logout",
+   "RESET": "I-reset",
+   "SELECT_NO_OPTIONS": "Walang pagpipilian",
+   "YES": "Oo",
+   "LANGUAGES": {
+      "ARABIC": "Arabic",
+      "DANISH": "Danish",
+      "GERMAN": "German",
+      "GERMAN_CH": "Swiss German",
+      "FINNISH": "Finnish",
+      "HINDI": "Hindi",
+      "ITALIAN": "Italian",
+      "JAPANESE": "Japanese",
+      "DUTCH": "Dutch",
+      "NORWEGIAN": "Norwegian",
+      "FRENCH": "French",
+      "ENGLISH": "Ingles",
+      "SPANISH": "Espanyol",
+      "ROMANSH": "Romansh",
+      "POLISH": "Polish",
+      "PORTUGESE": "Portuguese",
+      "SLOVENIAN": "Slovenian",
+      "SWEDISH": "Swedish",
+      "RUSSIAN": "Russian",
+      "TURKISH": "Turkish",
+      "UKRAINIAN": "Ukrainian",
+      "CHINESE": "Chinese"
+   },
+   "PREFERENCES": {
+      "TABLE": {
+         "CAPTION": "I-edit ang Pagtanaw sa Talahanayan",
+         "SUBHEADING": "Piliin ang default na data na gusto mong i-display sa {{ tableName }} na view",
+         "AVAILABLE_COLUMNS": "Mga column na magagamit",
+         "SELECTED_COLUMNS": "Mga piniling column",
+         "FOOTER_TEXT": "Ang ayos at mga pagpili ay awtomatikong maisasalba. Pindutin ang \"{{resetTranslation}}\" para ibalik ang default na view."
+      }
+   },
+   "CONFIRMATIONS": {
+      "CONTINUE_ACTION": "Sigurado ka ba na gusto mong tumuloy?",
+      "METADATA": {
+         "NOTICE": {
+            "UNKNOWN": "Ang susunod na elemento ay buburahin",
+            "EVENT": "Ang susunod na kaganapan ay buburahin",
+            "SERIES": "Ang susunod na serye ay buburahin",
+            "ACL": "Ang susunod na ACL ay buburahin",
+            "GROUP": "Ang susunod na grupo ay buburahin",
+            "USER": "Ang susunod na gumagamit ay buburahin",
+            "USER_BLACKLIST": "Ang susunod na gumagamit na na-blacklist ay buburahin",
+            "THEME": "Ang susunod na tema ay buburahin",
+            "EMAIL": "Ang susunod na template ng e-mail ay buburahin",
+            "LOCATION": "Ang susunod na lokasyon ay buburahin",
+            "LOCATION_BLACKLIST": "Ang susunod na lokasyon na na-blacklist ay buburahin"
+         },
+         "NAME": "Pangalan"
+      },
+      "ACTIONS": {
+         "CONFIRMATION": "Kailangan ang kumpirmasyon"
+      }
+   },
+   "MEDIAMODULE": "Module ng media",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
+   "HELP": {
+      "HELP": "Tulong",
+      "USERS_GUIDE": "Gabay sa gumagamit",
+      "DOCUMENTATION": "Dokumentasyon",
+      "REST_DOC": "REST API Docs"
+   },
+   "NOTIFICATIONS": {
+      "ACL_ADDED": "Ang polisiya sa pag-access ay nagawa na",
+      "ACL_NOT_SAVED": "Ang polisiya sa pag-access ay hindi masalba",
+      "ACL_UPDATED": "Ang polisiya sa pag-access ay na-update na",
+      "ACL_DELETED": "Ang polisiya sa pag-access ay natanggal na",
+      "ACL_NOT_DELETED": "Ang polisiya sa pag-access ay hindi matanggal",
+      "USER_ADDED": "Ang user ay nagawa na",
+      "USER_UPDATED": "Ang user ay na-update na",
+      "USER_NOT_SAVED": "Ang user ay hindi maisalba",
+      "USER_DELETED": "Ang user ay natanggal na",
+      "USER_NOT_DELETED": "Ang user ay hindi matanggal",
+      "USER_NOT_MANAGEABLE": "Ang user ay hindi mapamahalaan",
+      "GROUP_ADDED": "Ang grupo ay nagawa na",
+      "GROUP_CONFLICT": "May umiiral na na pangalan ng ginawang grupo",
+      "GROUP_UPDATED": "Ang grupo ay na-update na",
+      "GROUP_NOT_SAVED": "Ang grupo ay hindi maisalba",
+      "GROUP_DELETED": "Ang grupo ay natanggal na",
+      "GROUP_NOT_DELETED": "Ang grupo ay hindi matanggal",
+      "ACCESS_DENIED": "Tinanggihan ang access. Hindi ka pinapayagan na i-view ang pahinang ito",
+      "SERIES_ADDED": "Ang serye ay nagawa na",
+      "SERIES_NOT_SAVED": "Ang serye ay hindi maisalba",
+      "EVENTS_CREATED": "Ang kaganapan ay nagawa na",
+      "EVENTS_UPLOAD_STARTED": "Ang kaganapan ay inu-upload…",
+      "EVENTS_NOT_CREATED": "Ang kaganapan ay hindi magawa",
+      "EVENTS_UPDATED_NB": "{{ number }} Ang mga kaganapan ay tagumpay na na-update",
+      "EVENTS_UPDATED_ALL": "Ang lahat ng mga kaganapan ay tagumpay na na-update",
+      "EVENTS_NOT_UPDATED": "Ang kaganapan ay hindi maaaring ma-save",
+      "EVENTS_NOT_UPDATED_ID": "Ang kaganapan {{ id }} ay hindi maaaring ma-save",
+      "EVENTS_NOT_UPDATED_ALL": "Wala sa mga event ang maaring ma-save",
+      "EVENTS_PROCESSING_ACTION_RETRY": "Ang pagproseso ay itutoloy...",
+      "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Ang pagproseso ay hindi maituloy.",
+      "EVENTS_PROCESSING_ACTION_NONE": "Tinitigil ang pagproseso...",
+      "EVENTS_PROCESSING_ACTION_NOT_NONE": "Ang pagproseso ay hindi pwedeng matigil.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "SERIES_UPDATED_NB": "{{ number }} serye ang matagumpay na na-update",
+      "SERIES_UPDATED_ALL": "Ang lahat ng serye ay matagumpay na na-update",
+      "SERIES_NOT_UPDATED": "Ang serye ay hindi maisalba",
+      "SERIES_NOT_UPDATED_ID": "Ang serye na {{ id }} ay hindi maisalba",
+      "SERIES_NOT_UPDATED_ALL": "Wala sa mga serye ang maaring isalba",
+      "EVENTS_DELETED": "Ang kaganapan ay natanggal na",
+      "EVENTS_NOT_DELETED": "Ang (mga) kaganapan ay hindi matanggal",
+      "SERIES_DELETED": "Ang serye ay natanggal na",
+      "SERIES_NOT_DELETED": "Ang serye ay hindi matanggal",
+      "USER_BLACKLIST_CREATED": "Ang itim na listahan ay nagawa",
+      "USER_BLACKLIST_NOT_CREATED": "Ang itim na listahan ay hindi magawa",
+      "USER_BLACKLIST_SAVED": "Ang itim na listahan ay naisalba",
+      "USER_BLACKLIST_NOT_SAVED": "Ang itim na listahan ay hindi maisalba",
+      "USER_BLACKLIST_DELETED": "Ang itim na listahan ay tinanggal na",
+      "USER_BLACKLIST_NOT_DELETED": "Ang itim na listahan ay hindi matanggal",
+      "LOCATION_DELETED": "Ang lokasyon ay natanggal na",
+      "LOCATION_NOT_DELETED": "Ang lokasyon ay hindi matanggal",
+      "LOCATION_BLACKLIST_CREATED": "Ang itim na listahan ay nagawa",
+      "LOCATION_BLACKLIST_NOT_CREATED": "Ang itim na listahan ay hindi magawa",
+      "LOCATION_BLACKLIST_SAVED": "Ang itim na listahan ay naisalba",
+      "LOCATION_BLACKLIST_NOT_SAVED": "Ang itim na listahan ay hindi maisalba",
+      "LOCATION_BLACKLIST_DELETED": "Ang itim na listahan ay tinanggal na",
+      "LOCATION_BLACKLIST_NOT_DELETED": "Ang itim na listahan ay hindi matanggal",
+      "EMAIL_TEMPLATE_CREATED": "Ang template ay nagawa na",
+      "EMAIL_TEMPLATE_NOT_CREATED": "Ang template ay hindi magawa",
+      "EMAIL_TEMPLATE_SAVED": "Ang template ay naisalba na",
+      "EMAIL_TEMPLATE_NOT_SAVED": "Ang template ay hindi maisalba",
+      "EMAIL_TEMPLATE_DELETED": "Ang template ay natanggal na",
+      "EMAIL_TEMPLATE_NOT_DELETED": "Ang template ay hindi matanggal",
+      "EMAIL_TEMPLATE_NAME_TAKEN": "Ang pangalang ito ay nagamit na",
+      "EMAIL_SENT": "Ang mensahe ay naipadala na",
+      "EMAIL_NOT_SENT": "Ang mensahe ay hindi maipadala",
+      "CONFLICT_DETECTED": "Salungatan sa pag-iskedyul: itong bagong kaganapan ay nagkasabay sa isang umiiral na kaganapan. Mangyaring baguhin ang lokasyon, mga petsa, o oras.",
+      "CONFLICT_ALREADY_ENDED": "Error sa pag-iskedyul: Ang kaganapan ay natapos na.",
+      "CONFLICT_END_BEFORE_START": "Error sa pag-iskedyul: Ang wakas ng pag-iskedyul ay dapat mas huli kaysa sa simula.",
+      "INVALID_ACL_RULES": "Ang mga patakaran ay dapat naglalaman ng balidong tungkulin at pagbasa o/at pagsulat ng (mga) karapatan.",
+      "MISSING_ACL_RULES": "Isa o higit pang mga tungkulin na may pahintulot sa Pagbasa at Pagsulat ang kailangan!",
+      "SAVED_ACL_RULES": "Ang mga patakaran sa pag-access ay naisalba.",
+      "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "Ang mga umiiral na kaganapan sa serye na ito ay kailangang iproseso muli",
+      "SERIES_ACL_LOCKED": "Ang mga polisiya sa pag-edit ng access ay hindi pinapayagan habang tumatakbo ang mga proseso sa isang kaganapan na parte ng serye",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "Ang Polisiya sa Pag-access ay nangangailangan ng isa o higit pang tungkulin na may mga pahintulot sa Pagbasa at Pagsulat.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "Ang Polisiya sa Pag-access ay nangangailangan ng isa o higit pang tungkuli na may mga pahintulot sa Pagbasa at Pagsulat.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Ang kaganapan sa istado ng mga piniling palabasin ay matagumpay na na-update.",
+      "EVENT_PARTICIPATION_STATUS_UPDATE_ERROR": "Nagkaroon ng error habang inu-update ang istado ng piniling palabasin na kaganapan.",
+      "EVENT_PARTICIPATION_STATUS_READONLY": "Ang istado ng paglahok ay hindi ma-update sapagkat ang simula ng pag-iskedyul ay nasa nakaraan.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS": "Ang istado ng mga piniling palabasin na serye ay matagumpay na na-update.",
+      "SERIES_PARTICIPATION_STATUS_UPDATE_ERROR": "Nagkaroon ng error habang inu-update ang serye ng istado ng mga piniling palabasin.",
+      "THEME_NAME_ALREADY_TAKEN": "Ang pangalan na ito ay nagamit na",
+      "THEME_NAME_EMPTY": "Ang pangalan ay hindi pwedeng walang laman",
+      "BUMPER_UPLOAD_ERROR": "Nagkaroon ng error habang inu-upload ang media",
+      "TRAILER_UPLOAD_ERROR": "Nagkaroon ng error hapang inu-upload ang media",
+      "TITLE_UPLOAD_ERROR": "Nagkaroon ng error habang inu-upload ang media",
+      "LICENSE_UPLOAD_ERROR": "Nagkaroon ng error habang inu-upload ang media",
+      "WATERMARK_UPLOAD_ERROR": "Nagkaroon ng error habang inu-upload ang media",
+      "THEME_UPLOAD_STARTED": "Ang media ay inu-upload…",
+      "THEME_CREATED": "Ang tema ay nagawa na",
+      "THEME_NOT_CREATED": "Ang tema ay hindi magawa",
+      "THEME_DELETED": "Ang tema ay natanggal na",
+      "THEME_NOT_DELETED": "Ang tema ay hindi matanggal",
+      "TASK_CREATED": "Ang gawain ay nagawa na",
+      "TASK_NOT_CREATED": "Ang gawain ay hindi magawa",
+      "VIDEO_CUT_NOT_SAVED": "Ang impormasyon tungkol sa pag-edit ay hindi maisalba",
+      "VIDEO_CUT_SAVED": "Ang impormasyon tungkol sa pag-edit ay naisalba na",
+      "VIDEO_CUT_PROCESSING": "Ang video ay pinoproseso…",
+      "SERVER_UNRESPONSIVE": "Oops! Ang server ay tila hindi tumutugon. Mangyaring subukan muli mamaya.",
+      "SERVICE_UNAVAILABLE": "Oops! Ang server ay tila hindi tumutugon. Mangyaring subukan muli mamaya.",
+      "ACTIVE_TRANSACTION": "Ang kaganapan ay hindi pwedeng i-edit habang mayroon pang aktibong daloy ng trabaho o transaksyon."
+   },
+   "BULK_ACTIONS": {
+      "CAPTION": "Mga aksyon",
+      "SEND_MESSAGE": "Ipadala ang mensahe",
+      "WARNING": "Babala",
+      "EDIT_STATUS": {
+         "CAPTION": "Pag-edit ng istado",
+         "READY_FOR_RECORDING": "Handa para sa pagrecord",
+         "OPTED_OUT": "Piniling palabasin"
+      },
+      "DELETE": {
+         "SERIES": {
+            "CAPTION": "I-delete",
+            "BUTTON": "I-delete"
+         },
+         "EVENTS": {
+            "CAPTION": "I-delete",
+            "DELETE_EVENTS": "I-delete ang mga Kaganapan",
+            "PUBLISHED": {
+               "NONE": "Wala sa mga piniling kaganapan ang kailangang bawiin bago ito ma-delete.",
+               "WARNING": "Ang mga kaganapan sa ilalim ay hindi maaaring mabura dahil sila ay nai-publish na at pagbura sa kanila ay magiging rason upang hindi mabura ang mga nailathalang file. Sa halip pumilli ng workflow sa ibaba upang bawiin ang mga kaganapan at pagkatapos burahin sila."
+            },
+            "RETRACT_EVENTS": "Bawiin ang mga kaganapan",
+            "SELECT_RETRACT_TASK": "Pumili ng gawain sa pagbawi",
+            "SUMMARY": {
+               "EVENTS_DELETED": "Mga kaganapan na buburahin",
+               "EVENTS_RETRACTED": "Mga kaganapan na babawiin",
+               "RETRACT_WORKFLOW": "Workflow nang mga kaganapan sa pagbawi"
+            },
+            "UNPUBLISHED": {
+               "NONE": "Wala sa piniling mga kaganapan ang mabubura nang hindi nag-iiwang ng mga ulila na file."
+            },
+            "BUTTON": "Burahin"
+         }
+      },
+      "DELETE_EVENTS_WARNING_LINE1": "Kapag binura na, ang lahat na kaganapan sa metadata, mga file ng audio at ng video ay mabubura at hindi na mababawi.",
+      "DELETE_EVENTS_WARNING_LINE2": "",
+      "DELETE_SERIES_WARNING_LINE1": "Kapag binura na, ang lahat na serye ng metadata ay hindi na mababawi. Ang mga kaganapan sa serye ay hindi na mabubura.",
+      "DELETE_SERIES_WARNING_LINE2": "",
+      "SCHEDULE_TASK": {
+         "CAPTION": "Umpisahan ang gawain",
+         "GENERAL": {
+            "CAPTION": "Pangkalahatan",
+            "SUMMARY": "({{ count }} mga kaganapan na pinili)",
+            "CANNOTSTART": "Ang naka-highlight na (mga) kaganapan ay hindi naproseso sa sandaling ito. Alisin sa pagpili nito/nila o ulitin muli sa susunod."
+         },
+         "TASKS": {
+            "CAPTION": "Mga gawain",
+            "SELECT": "Piniling mga gawain"
+         },
+         "SUMMARY": {
+            "CAPTION": "Buod",
+            "EVENTS": "Mga kaganapan",
+            "EVENTS_SUMMARY": "Ikaw ay pumili ng {{numberOfEvents}} na mga kaganapan",
+            "CONFIGURATION": "Konpigurasyon",
+            "WORKFLOW": "Gawain"
+         }
+      }
+   },
+   "DATES": {
+      "TODAY": "Ngayon",
+      "TOMORROW": "Bukas",
+      "YESTERDAY": "Kahapon"
+   },
+   "DATETIMES": {
+      "TODAY": "Ngayon sa {{ time }}",
+      "TOMORROW": "Bukas sa {{ time }}",
+      "YESTERDAY": "Kahapon nang {{ time }}"
+   },
+   "WIZARD": {
+      "NEXT_STEP": "Sunod",
+      "BACK": "Nakaraan",
+      "CREATE": "Gumawa",
+      "RETRACT": "Bawiin",
+      "UPDATE": "I-update",
+      "DURATION": {
+         "HOURS": "Mga oras",
+         "MINUTES": "Mga minuto"
+      }
+   },
+   "CAPTURE_AGENT": {
+      "DEVICE": {
+         "MICROPHONE": "Microphone",
+         "CAMERA": "Kamera",
+         "PRESENTATION": "Presentasyon"
+      }
+   },
+   "NAV": {
+      "DASHBOARD": {
+         "TITLE": "Dashboard"
+      },
+      "EVENTS": {
+         "TITLE": "Mga ni-record"
+      },
+      "SYSTEMS": {
+         "TITLE": "Mga sistema"
+      },
+      "CAPTUREAGENTS": {
+         "TITLE": "Nadakip"
+      },
+      "USERS": {
+         "TITLE": "Organisasyon"
+      },
+      "INTEGRATIONS": {
+         "TITLE": "Mga interogasyon"
+      },
+      "CONFIGURATION": {
+         "TITLE": "Konpigurasyon"
+      }
+   },
+   "EVENTS": {
+      "RETRACT": {
+         "CAPTION": "Bawiin ang kaganapan",
+         "ID": "ID",
+         "SELECT_TASK": "Piniling gawain",
+         "SUMMARY": "Buod",
+         "WARNING": "Ang kaganapan na ito ay nailathala sa isa o higit pang chanel ng paglalathala kaya kailangan itong bawiin bago ito tuluyang mabura. Pumili sa mga gawain sa ilalim upang bawiin ang mga paglalathala."
+      },
+      "LICENSE": {
+         "ALLRIGHTS": "Lahat ng mga karapatan ay nakareserba",
+         "CCBY": "CC BY",
+         "CCBYSA": "CC BY-SA",
+         "CCBYND": "CC BY-ND",
+         "CCBYNC": "CC BY-NC",
+         "CCBYNCSA": "CC BY-NC-SA",
+         "CCBYNCND": "CC BY-NC-ND",
+         "CC0": "CC0",
+         "BSD": "BSD",
+         "CCND": "CCND",
+         "GPL": "GPL"
+      },
+      "SEND_MESSAGE": {
+         "CAPTION": "Ipadala ang mensahe",
+         "TABS": {
+            "RECIPIENTS": "Mga tatanggap",
+            "MESSAGE": "Mensahe",
+            "SUMMARY": "Buod"
+         },
+         "RECIPIENTS": {
+            "AUDIT_TRAIL_CAPTION": "Idagdag sa trail ng audit",
+            "AUDIT_TRAIL_DESCRIPTION": "I-tsek upang idagdag ang mensahe sa audit trail",
+            "AUDIT_TRAIL_LABEL": ""
+         },
+         "MESSAGE": {
+            "EMAIL_TEMPLATE": "Pumili ng template ng email",
+            "SUBJECT": "Paksa",
+            "MESSAGE": "Mensahe",
+            "INCLUDE_SIGNATURE": "Isama ang aking lagda sa email"
+         },
+         "SUMMARY": {
+            "MESSAGE_SUMMARY": "Buod"
+         }
+      },
+      "EVENTS": {
+         "NEW": {
+            "CAPTION": "Gumawa ng kaganapan",
+            "METADATA": {
+               "CAPTION": "Metadata"
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Pinalawig na metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Pinalawig na metadata"
+               }
+            },
+            "SOURCE": {
+               "CAPTION": "Pinagmulan",
+               "SELECT_SOURCE": "Pumili ng pinagmulan",
+               "PLACEHOLDER": {
+                  "LOCATION": "Lokasyon",
+                  "INPUTS": "Mga input",
+                  "HOUR": "Oras",
+                  "MINUTE": "Minuto",
+                  "REPEATS": "Mga pag-uulit",
+                  "START_DATE": "yyyy-mm-dd",
+                  "START_DATE_FORMAT": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd",
+                  "END_DATE_FORMAT": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "I-upload",
+                  "RECORDING_ELEMENTS": "Mga elemento ng pag-record",
+                  "RECORDING_METADATA": "Metadata ng pag-record",
+                  "SEGMENTABLE": {
+                     "SHORT": "Mga slide",
+                     "DETAIL": "Ang file ay naglalaman ng isang recording ng presentasyon ng slide (Keynote, Powerpoint, atbp)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Taga-presenta",
+                     "DETAIL": "Ang file ay naglalaman ng recording ng isang tao na nagtatalumpati sa madla."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Audio lamang",
+                     "DETAIL": "Itong file ay naglalaman ng audio lamang."
+                  },
+                  "MULTIPLE_PARTS": {
+                     "SHORT": "Maraming parte",
+                     "DETAIL": "Pangkat ng mga dile na naglalaman ng ibat-ibang parte ng kaganapan."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Iskedyul",
+                  "START_DATE": "Umpisa ng petsa",
+                  "START_TIME": "Umpisa ng oras",
+                  "TIMEZONE": "Lugar ng oras",
+                  "END_DATE": "Katapusang petsa",
+                  "END_TIME": "End time",
+                  "DURATION": "Tagal"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Iskedyul ng solong kaganapan"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Iskedyul ang maramihang mga kaganapan",
+                  "REPEATS": "Mga pag-uulit",
+                  "REPEAT_ON": "Ulitin sa",
+                  "WEEKDAYS": "Weekdays"
+               },
+               "NO_SOURCE_AVAILABLE": "Walang nakuha na mga ahente na magagamit sa pag-iiskedyul"
+            },
+            "PROCESSING": {
+               "CAPTION": "Pinoproseso",
+               "SELECT_WORKFLOW": "Pumili ng daloy ng trabaho",
+               "SELECT_WORKFLOW_EMPTY": "Walang daloy ng trabaho ang nakita",
+               "WORKFLOW": "Daloy ng trabaho"
+            },
+            "UPLOAD_ASSET": {
+               "CAPTION": "I-upload ang asset",
+               "SELECT_TYPE": "Pumili ng uri ng asset",
+               "ADD": "Idagdag ang asset",
+               "OPTION": {
+                  "CLASS_HANDOUT_NOTES": "Klase ng handout ng mga tala",
+                  "CAPTIONS_DFXP": "Mga caption ng DFXP",
+                  "CAPTIONS_WEBVTT": "Mga caption ng WebVTT",
+                  "PREVIEW_IMAGE": "Nakaraang mga larawan",
+                  "SMIL": "Smil catalog",
+                  "TRACK_PARTS": "Sundan ang mga bahagi"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran sa pag-access",
+               "POLICY": "Patakaran sa pag-access",
+               "ACL": "Patakaran sa pag-access"
+            },
+            "SUMMARY": {
+               "CAPTION": "Buod"
+            },
+            "WEEKDAYS": {
+               "MO": "Mo",
+               "TU": "Tu",
+               "WE": "We",
+               "TH": "Th",
+               "FR": "Fr",
+               "SA": "Sa",
+               "SU": "Su"
+            }
+         },
+         "NAVIGATION": {
+            "EVENTS": "Mga kaganapan",
+            "SERIES": "Mga serye",
+            "OVERVIEW": "Pangkalahatang-ideya"
+         },
+         "UPLOAD": "Upload",
+         "ADD_SERIES": "Dumagdag ng mga serye",
+         "ADD_EVENT": "Dumagdag ng kaganapan",
+         "TABLE": {
+            "CAPTION": "Mga kaganapan",
+            "CREATORS": "Mga gumawa",
+            "TITLE": "Pamagat",
+            "PRESENTERS": "(mga) Taga-presenta",
+            "SERIES": "Mga serye",
+            "DATE": "Petsa",
+            "START": "Simulan",
+            "STOP": "Ihinto",
+            "STATUS": "Istado",
+            "LOCATION": "Lokasyon",
+            "ACTION": "Mga aksyon",
+            "FIRST": "Simula",
+            "LAST": "Wakas",
+            "NEXT": "Sunod",
+            "MANAGED_ACL": "Polisiya ng pag-access",
+            "SCHEDULING_STATUS": "Istado",
+            "WORKFLOW_STATE": "Progreso",
+            "REVIEW_STATUS": "Istado ng review",
+            "PREVIOUS": "Nakaraan",
+            "NOCONTENT": "Walang data na maaring magamit",
+            "PUBLISHED": "Nai-publish",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
+         },
+         "SCHEDULING_STATUS": {
+            "READY_FOR_RECORDING": "Handa para sa pagrecord",
+            "BLACKLISTED": "Naka-blacklist",
+            "OPTED_OUT": "Piniling palabasin"
+         },
+         "STATUS": {
+            "SCHEDULED": "Iskedyul",
+            "OPTEDOUT": "Piniling palabasin",
+            "BLACKLISTED": "Naka-blacklist",
+            "RECORDING": "Nagrerecord",
+            "UPLOADING": "Nag-uupload",
+            "INGESTING": "Kinukuha",
+            "PENDING": "Nakabinbin",
+            "PROCESSING": "Tumatakbo",
+            "PAUSED": "Naka-pause",
+            "PROCESSED": "Natapos",
+            "RECORDING_FAILURE": "Kabiguan sa pagrecord",
+            "PROCESSING_FAILURE": "Kabiguan sa pagproseso",
+            "PROCESSING_CANCELED": "Nakansela ang pagproseso"
+         },
+         "DETAILS": {
+            "HEADER": "Mga detalye ng kaganapan - {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Pangkalahatan",
+               "METADATA": "Metadata",
+               "EXTENDED-METADATA": "Metadata II",
+               "ASSETS": "Mga asset",
+               "SCHEDULING": "Pag-iskedyul",
+               "WORKFLOWS": "Mga daloy ng trabaho",
+               "ACCESS": "Patakaran sa pag-access",
+               "COMMENTS": "Mga komento"
+            },
+            "GENERAL": {
+               "PUBLICATION_STATUS": "Mga paglalathala",
+               "NO_PUBLICATIONS_AVAILABLE": "Itong kaganapan ay walang mga paglalathala",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "SCHEDULING_STATUS": "Istado",
+               "READY_FOR_RECORDING": "Handa para sa pagrecord",
+               "OPTED_OUT": "Piniling palabasin",
+               "CUSTOM": "Pasadya",
+               "ENGAGE": "Makisali",
+               "ENGAGE_LIVE": "Engage Live",
+               "EXTERNAL_API": "Panlabas na Paglathala ng API",
+               "YOUTUBE": "YouTube",
+               "OAIPMH": "OAI-PMH",
+               "SELECT_WORKFLOW": "Pumili ng daloy ng trabaho",
+               "SELECT_WORKFLOW_EMPTY": "Walang daloy ng trabaho na pwedeng magamit"
+            },
+            "MEDIA": {
+               "TRIM_MEDIA": "Putulin ang media",
+               "MEDIA": "Media",
+               "ID": "ID",
+               "TYPE": "Uri",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "DETAILS": "Mga detalye"
+            },
+            "ATTACHMENTS": {
+               "CAPTION": "Mga nakalakip",
+               "ID": "Id",
+               "TYPE": "Uri",
+               "MIMETYPE": "Mimetype",
+               "TAGS": "Mga tag",
+               "LINK": "Link"
+            },
+            "SOURCE": {
+               "CAPTION": "Pinagmulan",
+               "SELECT_SOURCE": "Pumili ng pinagmulan",
+               "PLACEHOLDER": {
+                  "LOCATION": "Lokasyon",
+                  "INPUTS": "Mga input",
+                  "HOUR": "Oras",
+                  "MINUTE": "Minuto",
+                  "REPEATS": "Mga pag-uulit",
+                  "START_DATE": "yyyy-mm-dd",
+                  "END_DATE": "yyyy-mm-dd"
+               },
+               "UPLOAD": {
+                  "CAPTION": "I-upload",
+                  "RECORDING_ELEMENTS": "Mga elemento ng pag-record",
+                  "SEGMENTABLE": {
+                     "SHORT": "Mga slide",
+                     "DETAIL": "Ang file na mga naglalaman ng pag-record ng isang presentasyon ng slide (Keynote, Powerpoint, etc)."
+                  },
+                  "NON_SEGMENTABLE": {
+                     "SHORT": "Taga-presenta",
+                     "DETAIL": "Ang file ay naglalaman ng pag-record ng taong nagsasalita sa madla."
+                  },
+                  "AUDIO_ONLY": {
+                     "SHORT": "Audio lamang",
+                     "DETAIL": "Ang file ay naglalaman ng audio lamang."
+                  }
+               },
+               "DATE_TIME": {
+                  "CAPTION": "Iskedyul",
+                  "START_DATE": "Umpisa ng petsa",
+                  "START_TIME": "Umpisa ng oras",
+                  "TIMEZONE": "Lugar ng oras",
+                  "END_DATE": "Katapusang petsa",
+                  "END_TIME": "End time",
+                  "DURATION": "Tagal"
+               },
+               "SCHEDULE_SINGLE": {
+                  "CAPTION": "Iskedyul ang solong kaganapan"
+               },
+               "SCHEDULE_MULTIPLE": {
+                  "CAPTION": "Iskedyul ang maramihang mga kaganapan",
+                  "REPEATS": "Mga pag-uulit",
+                  "REPEAT_ON": "Ulitin sa",
+                  "WEEKDAYS": "Weekdays"
+               }
+            },
+            "ASSETS": {
+               "CAPTION": "Mga asset",
+               "TYPE": "Uri",
+               "SIZE": "Laki",
+               "DETAILS": "Mga detalye",
+               "ATTACHMENTS": {
+                  "TITLE": "Mga nakalakip",
+                  "CAPTION": "Mga nakalakip",
+                  "ID": "Id",
+                  "TYPE": "Uri",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Mga tag",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Mga detalye ng inilakip",
+                     "CAPTION": "Mga detalye ng inilakip",
+                     "ID": "Id",
+                     "TYPE": "Uri",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Mga tag",
+                     "URL": "URL",
+                     "SIZE": "Laki",
+                     "CHECKSUM": "Checksum",
+                     "REFERENCE": "Reperensiya"
+                  }
+               },
+               "CATALOGS": {
+                  "TITLE": "Mga katalogo",
+                  "CAPTION": "Mga katalogo",
+                  "ID": "Id",
+                  "TYPE": "Uri",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Mga tag",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Mga detalye ng katalogo",
+                     "CAPTION": "Mga detalye ng katalogo",
+                     "ID": "Id",
+                     "TYPE": "Uri",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Mga tag",
+                     "URL": "URL",
+                     "SIZE": "Laki",
+                     "CHECKSUM": "Checksum",
+                     "REFERENCE": "Reperensiya"
+                  }
+               },
+               "MEDIA": {
+                  "TITLE": "Media",
+                  "CAPTION": "Media",
+                  "ID": "ID",
+                  "TYPE": "Uri",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Mga tag",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Mga detalye ng media",
+                     "ID": "ID",
+                     "TYPE": "Uri",
+                     "MIMETYPE": "Mimetype",
+                     "URL": "URL",
+                     "RECORDING_DATE": "Petsa ng pag-record",
+                     "FLAVOR": "Lasa",
+                     "TAGS": "Mga tag",
+                     "DURATION": "Tagal",
+                     "STREAM_AUDIO": "Mga stream ng audio",
+                     "STREAM_VIDEO": "Mga stream ng video",
+                     "CHANNELS": "Mga channel",
+                     "BITRATE": "Rate ng bit",
+                     "BITDEPTH": "Lalim ng bit",
+                     "SAMPLINGRATE": "Rate ng sampol",
+                     "FRAMECOUNT": "Bilang ng frame",
+                     "PEAKLEVELDB": "Nasa tugatog na antas (dB)",
+                     "RMSLEVELDB": "Antas ng RMS (dB)",
+                     "RMSPEAKDB": "Tugatog ng RMS (dB)",
+                     "FRAMERATE": "Rate ng frame",
+                     "RESOLUTION": "Resolusyon",
+                     "SIZE": "Laki",
+                     "SCANTYPE": "Uri ng scan",
+                     "SCANORDER": "I-scan ang order"
+                  }
+               },
+               "PUBLICATIONS": {
+                  "TITLE": "Mga paglalathala",
+                  "CAPTION": "Mga paglalathala",
+                  "CHANNEL": "Channel",
+                  "ID": "Id",
+                  "TYPE": "Uri",
+                  "MIMETYPE": "Mimetype",
+                  "TAGS": "Mga tag",
+                  "LINK": "Link",
+                  "DETAILS": {
+                     "TITLE": "Detalye ng paglathala",
+                     "CAPTION": "Detalye ng paglathala",
+                     "ID": "Id",
+                     "TYPE": "Uri",
+                     "MIMETYPE": "Mimetype",
+                     "TAGS": "Mga tag",
+                     "URL": "URL",
+                     "SIZE": "Laki",
+                     "CHANNEL": "Channel",
+                     "REFERENCE": "Reperensiya"
+                  }
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran ng pag-access",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mga template"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Patakaran sa pag-access",
+                  "DESCRIPTION": "",
+                  "LABEL": "Pumili ng template",
+                  "EMPTY": "Walang template na nakita",
+                  "ROLE": "Tungkulin",
+                  "WRITE": "Sumulat",
+                  "READ": "Basahin",
+                  "ADDITIONAL_ACTIONS": "Karagdagang mga Aksyon",
+                  "ACTION": "Mga aksyon",
+                  "NEW": "Bagong patakaran",
+                  "DETAILS": "Mga detalye"
+               },
+               "ROLES": {
+                  "LABEL": "Pumili ng papel",
+                  "EMPTY": "Walang papel na nakita"
+               }
+            },
+            "COMMENTS": {
+               "CAPTION": "Mga komento",
+               "PLACEHOLDER": "Komento…",
+               "SELECTPLACEHOLDER": "Pumili ng mga rason",
+               "RESOLVED": "Malutas",
+               "REPLY": "Tugon",
+               "REPLY_TO": "Tugon sa",
+               "CANCEL_REPLY": "Kanselahin",
+               "DELETE": "I-delete",
+               "REASON": "Dahilan",
+               "REASONS": {
+                  "CUTTING": "Kinakailangan ang pagputol",
+                  "REVIEW": "Kinakailangang suriin",
+                  "ASYNC": "A/V mga track ng asynchronous",
+                  "AUDIO_ISSUE": "Nawawala o may sira na audio track",
+                  "CANCELED": "Kinanselang kaganapan",
+                  "CONFLICTING_METADATA": "Magkasalungat na metadata",
+                  "IMPROPER_POINT": "Hindi wasto sa loob o labas ng punto",
+                  "MISSING_AGREEMENT": "Nawawalang kasunduan",
+                  "OTHER": "Iba",
+                  "PRIVACY": "Pag-aalala sa privacy",
+                  "SEGMENTATION": "Hindi tumpak na segment",
+                  "UNKNOWN_CREATOR": "Hindi kilala ang gumawa",
+                  "VIDEO_ISSUE": "Ang video ay magulo o maigsi",
+                  "WRONG_INPUT_FORMAT": "Ang format ng input na file ay hindi suportado",
+                  "WRONG_METADATA": "Ang metadata ay nangangailangan ng pagwasto",
+                  "WRONG_SERIES_PUBLICATION": "Maling serye o channel ng publikasyon",
+                  "WRONG_WORKFLOW": "Maling daloy ng trabaho",
+                  "PROCESSING_FAILURE": "Bigong pagproseso"
+               }
+            },
+            "METADATA": {
+               "CAPTION": "Mga detalye ng kaganapan",
+               "TITLE": "Pamagat",
+               "ID": "UID",
+               "SERIES": "Mga serye",
+               "RECORDING_DATE": "Petsa ng pag-record",
+               "SUBJECT": "Paksa",
+               "DESCRIPTION": "Paglalarawan",
+               "START_DATE": "Simula ng petsa",
+               "START_TIME": "Simula ng oras",
+               "DURATION": "Tagal",
+               "LOCATION": "Lokasyon",
+               "SOURCE": "Pinagmulan",
+               "CREATED": "Gumawa",
+               "CREATED_BY": "Ginawa ni",
+               "LICENSE": "Lisensya",
+               "CONTRIBUTORS": "(mga) Taga-ambag",
+               "RIGHTS": "Mga karapatan",
+               "PRESENTERS": "(mga) Taga-presenta",
+               "LANGUAGE": "Lengguwahe",
+               "COPYRIGHT": "Copyright",
+               "VISIBILITY": "Bisibilidad",
+               "PUBLIC": "Publikong target",
+               "OS": "Sistema ng pagpoproseso ng pag-operate",
+               "LOCKED": {
+                  "RUNNING": "Ang pag-edit ng metadata ay hindi pinapayagan kung ang mga operasyon ay tumatakbo sa isang kaganapan"
+               }
+            },
+            "SCHEDULING": {
+               "CAPTION": "Pag-iiskedyul ng configurasyon",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Suriin ang istado"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Istado ng Opted-out",
+                  "READY": "Handa sa pag-record",
+                  "OPTEDOUT": "Opted out"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Mga mensahe",
+                  "CREATION_DATE": "Petsa ng paggawa",
+                  "SENDER": "Nagpadala",
+                  "SUBJECT": "Paksa"
+               },
+               "PLACEHOLDER": {
+                  "PRESENTERS": "(mga) Taga-presenta"
+               }
+            },
+            "WORKFLOWS": {
+               "ACTIONS": "Mga aksyon",
+               "DETAILS": "Mga detalye",
+               "DESCRIPTION": "",
+               "ID": "ID",
+               "TYPE": "Uri",
+               "TITLE": "Pamagat",
+               "STATE": "Istado",
+               "STARTED": "Nagsimula",
+               "SERIES": "Series",
+               "SUBMITTED": "Isinumite",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "CONFIGURATION": "Konpigurasyon",
+               "NO_CONFIGURATION": "Walang umiiral na mga parametro sa konpigurasyon para sa kahulugan ng piniling daloy ng trabaho.",
+               "WORKFLOW": "Daloy ng trabaho",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
+            },
+            "WORKFLOW_DETAILS": {
+               "TITLE": "Mga detalye ng daloy ng trabaho",
+               "CONFIGURATION": "Konpigurasyon ng daloy ng trabaho"
+            },
+            "WORKFLOW_OPERATIONS": {
+               "TITLE": "Mga operasyon ng daloy ng trabaho"
+            },
+            "OPERATION_DETAILS": {
+               "TITLE": "Mga detalye ng operasyon"
+            },
+            "QUICKACTION_WORKFLOW_DETAILS": {
+               "TITLE": "Mga detalye ng daloy ng trabaho"
+            },
+            "MEDIA_DETAILS": {
+               "TITLE": "Mga detalye ng media",
+               "ID": "ID",
+               "TYPE": "Type",
+               "MIMETYPE": "Mimetype",
+               "URL": "URL",
+               "RECORDING_DATE": "Petsa ng pag-record",
+               "TAGS": "Mga tag",
+               "DURATION": "Tagal",
+               "STREAM_AUDIO": "Mga stream ng audio",
+               "STREAM_VIDEO": "Mga stream ng video",
+               "CHANNELS": "Mga channel",
+               "BITRATE": "Rate ng bit",
+               "FRAMERATE": "Rate ng frame",
+               "RESOLUTION": "Resolusyon"
+            },
+            "ERRORS_AND_WARNINGS": {
+               "HEADER": "Mga error at mga babala",
+               "TITLE": "Mga error at mga babala",
+               "DATE": "Petsa",
+               "HOST": "Host",
+               "TYPE": "Uri",
+               "EMPTY": "Walang error",
+               "DETAILS": {
+                  "HEADER": "Mga detalye ng error",
+                  "SEVERITY": "Kalubhaan",
+                  "TITLE": "Pamagat",
+                  "DESCRIPTION": "Paglalarawan",
+                  "JOB_ID": "ID ng trabaho",
+                  "DATE": "Petsa",
+                  "HOST": "Host sa pagproseso",
+                  "TYPE": "Uri ng serbisyo",
+                  "TECHNICAL_DETAILS": "Mga detalyeng technical"
+               }
+            }
+         }
+      },
+      "SERIES": {
+         "NEW": {
+            "CAPTION": "Gumawa ng serye",
+            "METADATA": {
+               "CAPTION": "Metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Metadata"
+               }
+            },
+            "METADATA_EXTENDED": {
+               "CAPTION": "Pinalawig na metadata",
+               "DESCRIPTION": "",
+               "METADATA": {
+                  "TITLE": "Pinalawig na metadata"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran sa pag-access",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mga template"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Patakaran sa pag-access",
+                  "DESCRIPTION": "Kahit isang tungkulin na may mga pahintulot sa Pagbasa at Pagsulat ay kailangan.",
+                  "LABEL": "Pumili ng template",
+                  "EMPTY": "Walang template ang nakita",
+                  "ROLE": "Tungkulin",
+                  "WRITE": "Sumulat",
+                  "READ": "Basahin",
+                  "ADDITIONAL_ACTIONS": "Karagdagan na mga Aksyon",
+                  "ACTION": "Mga aksyon",
+                  "NEW": "Bagong patakaran",
+                  "DETAILS": "Mga detalye"
+               },
+               "ROLES": {
+                  "LABEL": "Pumili ng papel",
+                  "EMPTY": "Walang papel ang nakita"
+               }
+            },
+            "THEME": {
+               "CAPTION": "Tema",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
+               "TITLE": "Tema",
+               "LABEL": "Walang tema",
+               "EMPTY": "Walang papel ang nakita"
+            },
+            "SUMMARY": {
+               "CAPTION": "Buod"
+            }
+         },
+         "TABLE": {
+            "CAPTION": "Mga serye",
+            "TITLE": "Mga serye",
+            "CREATORS": "(mga) Organizer",
+            "CONTRIBUTORS": "Mga nag-aambag(s)",
+            "CREATED": "Ginawa",
+            "MANAGED_ACL": "Patakaran sa pag-access",
+            "EVENTS": "Mga kaganapan",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Mga serye ng mga detalye - {{resourceId}}",
+            "TABS": {
+               "METADATA": "Metadata",
+               "EXTENDED_METADATA": "Metadata II",
+               "PARTICIPATION": "Paglahok",
+               "EVENTS": "Mga kaganapan",
+               "PERMISSIONS": "Patakaran sa pag-access",
+               "THEME": "Tema"
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran sa pag-access",
+               "DESCRIPTION": "",
+               "TEMPLATES": {
+                  "TITLE": "Mga template"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Patakaran sa pag-access",
+                  "DESCRIPTION": "",
+                  "LABEL": "Pumili ng template",
+                  "EMPTY": "Walang template na nakita",
+                  "ROLE": "Tungkulin",
+                  "WRITE": "Sumulat",
+                  "READ": "Basahin",
+                  "ADDITIONAL_ACTIONS": "Karagdagang mga Aksyon",
+                  "ACTION": "Mga aksyon",
+                  "NEW": "Bagong patakaran",
+                  "DETAILS": "Mga detalye"
+               },
+               "ROLES": {
+                  "LABEL": "Pumili ng papel",
+                  "EMPTY": "Walang papel na nakita"
+               }
+            },
+            "METADATA": {
+               "TITLE": "Pamagat",
+               "ID": "UID",
+               "SERIES": "Mga serye",
+               "PUBLISHERS": "Tagalimbag(s)",
+               "ORGANIZERS": "(mga) Organizer",
+               "CONTRIBUTORS": "Nag-aambag(s)",
+               "RECORDING_DATE": "Petsa ng pag-record",
+               "CREATED_BY": "Ginawa ni",
+               "RIGHTS": "Mga karapatan",
+               "SUBJECT": "Paksa",
+               "LANGUAGE": "Lengguwahe",
+               "LICENSE": "Lisensya",
+               "DESCRIPTION": "Paglalarawan"
+            },
+            "PARTICIPATION": {
+               "CAPTION": "Template ng istado ng paglahok",
+               "WARNING_TEMPLATE": "Mga serye nang istado ng paglahok ay magagamit bilang default na halaga para sa bagong mga kaganapan ng mga parte ng serye.",
+               "REVIEW_STATUS": {
+                  "CAPTION": "Istado ng pagsusuri"
+               },
+               "OPTEDOUT": {
+                  "CAPTION": "Istado ng Opted-out",
+                  "READY": "Handa para sa pagrecord",
+                  "OPTEDOUT": "Piniling palabasin"
+               },
+               "MESSAGES": {
+                  "CAPTION": "Mga mensahe",
+                  "CREATION_DATE": "Petsa ng paggawa",
+                  "SENDER": "Nagpadala",
+                  "SUBJECT": "Paksa"
+               }
+            },
+            "EVENTS": {
+               "TITLE": "Pamagat",
+               "PRESENTER": "Taga-presenta(s)",
+               "CREATED": "Gumawa",
+               "MODIFIED": "Binago",
+               "STATUS": "Istado",
+               "LOCATION": "Lokasyon",
+               "LINK": "Link"
+            }
+         }
+      }
+   },
+   "RECORDINGS": {
+      "NAVIGATION": {
+         "LOCATIONS": "Mga lokasyon",
+         "BLACKLISTS": "Mga blacklist"
+      },
+      "ACTIONS": {
+         "EXPORT": "Pagluwas",
+         "ADD_BLACKLIST": "Idagdag sa blacklist",
+         "REMOVE": "Tanggalin"
+      },
+      "RECORDINGS": {
+         "TABLE": {
+            "CAPTION": "Mga lokasyon",
+            "TITLE": "UID",
+            "NAME": "Pangalan",
+            "LOCATION": "Lokasyon",
+            "UPDATED": "Huling update",
+            "NEXT_DATE": "Susunod na kaganapan",
+            "NEXT_NAME": "Susunod na pamagat ng kaganapan",
+            "STATUS": "Istado",
+            "VERSION": "Bersyon",
+            "BLACKLIST_FROM": "Blacklisted galing sa",
+            "BLACKLIST_TO": "Blacklisted hangang sa",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Mga detalye ng lokasyon - {{resourceId}}",
+            "TAB": {
+               "GENERAL": "Pangkalahatan",
+               "CONFIGURATION": "Konpigurasyon",
+               "CAPABILITIES": "Mga kapabilidad"
+            },
+            "GENERAL": {
+               "CAPTION": "Pangkalahatan",
+               "NAME": "Pangalan",
+               "URL": "Url",
+               "STATUS": "Istado",
+               "UPDATE": "Huling narinig galing sa"
+            },
+            "CONFIGURATION": {
+               "CAPTION": "Konpigurasyon",
+               "NO_CONFIGURATION": "Walang konpigurasyon ang ibinigay"
+            },
+            "CAPABILITIES": {
+               "CAPTION": "Mga kapabilidad",
+               "NO_CAPABILITIES": "Walang mga kakayahan na ibinigay"
+            }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Blacklist lokasyon",
+            "NAME": "Pangalan",
+            "ACTIONS": "Mga aksyon"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng blacklist",
+            "EDITCAPTION": "I-edit ang blacklist",
+            "TABS": {
+               "LOCATIONS": "Mga lokasyon",
+               "DATES": "Mga petsa",
+               "REASON": "Dahilan",
+               "SUMMARY": "Buod"
+            },
+            "LOCATIONS": {
+               "REMOVE": "Tanggalin",
+               "ADD_LOCATION": "Pumili ng lokasyon",
+               "ALL_LOCATIONS": "Lahat ng mga lokasyon",
+               "SELECT_LOCATION": "Pumili"
+            },
+            "DATES": {
+               "START_DATE": "Umpisa ng petsa",
+               "END_DATE": "Katapusang petsa"
+            },
+            "REASON": {
+               "SELECT_REASON": "Pumili",
+               "REASON": "Dahilan",
+               "COMMENTS": "Mga komento"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Buod",
+               "LOCATION": "Lokasyon",
+               "DATE_FROM": "Galing sa",
+               "DATE_TO": "Hanggang",
+               "REASON": "Dahilan",
+               "COMMENTS": "Mga komento"
+            }
+         }
+      }
+   },
+   "USERS": {
+      "ACTIONS": {
+         "ADD_USER": "Magdagdag ng gumagamit",
+         "ADD_GROUP": "Magdagdag ng grupo",
+         "ADD_ACL": "Patakaran sa pagdagdag ng pag-access",
+         "ADD_BLACKLIST": "Idagdag sa blacklist"
+      },
+      "NAVIGATION": {
+         "USERS": "Mga gumagamit",
+         "GROUPS": "Mga grupo",
+         "PERMISSIONS": "Mga patakaran sa pag-access",
+         "BLACKLISTS": "Blacklist"
+      },
+      "USERS": {
+         "TABLE": {
+            "CAPTION": "Mga gumagamit",
+            "NAME": "Pangalan",
+            "USERNAME": "Username",
+            "EMAIL": "Email",
+            "ROLES": "Mga tungkulin",
+            "TYPE": "Uri",
+            "PROVIDER": "Tagapagbigay",
+            "BLACKLIST_FROM": "Blacklisted galing sa",
+            "BLACKLIST_TO": "Blacklisted hangang sa",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng gumagamit",
+            "EDITCAPTION": "I-edit ang User",
+            "TABS": {
+               "USER": "Gumagamit",
+               "ROLES": "Mga tungkulin",
+               "EXTERNALROLES": "Panglabas na mga Tungkulin",
+               "EFFECTIVEROLES": "Epektibong mga tungkulin"
+            },
+            "DESCRIPTION": {
+               "ROLES": "Mga tungkulin at mga grupo na pwede o ay naitalaga na sa gumagamit.",
+               "EXTERNALROLES": "Ang listahan ng panglabas na mga patakaran na naitalaga sa gumagamit na ipinagkaloob ng panglabas na tagapagbigay ng (mga) tungkulin.",
+               "EFFECTIVEROLES": "Ang listahan ng epektibong mga tungkulin na direktang itinalaga sa gumagamit at mga tungkulin na hindi direktang kinarga sa pamamagitan ng pagiging miyembro ng grupo."
+            },
+            "FORM": {
+               "USERNAME": "Username",
+               "NAME": "Pangalan",
+               "EMAIL": "Email",
+               "PASSWORD": "Password",
+               "REPEAT_PASSWORD": "Ulitin ang password"
+            },
+            "ROLES": {
+               "LEFT": "Mga tungkulin",
+               "RIGHT": "Piniling mga papel",
+               "REMOVE": "Alisin ang tungkulin",
+               "ADD": "Dagdagan ang tungkulin"
+            }
+         }
+      },
+      "GROUPS": {
+         "NEW": {
+            "CAPTION": "Gumawa ng grupo"
+         },
+         "TABLE": {
+            "CAPTION": "Mga grupo",
+            "NAME": "Pangalan",
+            "DESCRIPTION": "Paglalarawan",
+            "ROLE": "Tungkulin",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng grupo",
+            "EDITCAPTION": "I-edit ang grupo",
+            "TABS": {
+               "GROUP": "Grupo",
+               "ROLES": "Mga tungkulin",
+               "METADATA": "Metadata",
+               "USERS": "Mga Gumagamit",
+               "SUMMARY": "Boud"
+            },
+            "FORM": {
+               "NAME": "Pangalan",
+               "DESCRIPTION": "Paglalarawan",
+               "SUMMARY": "Buod",
+               "ROLES": "Mga tungkulin",
+               "USERS": "Mga gumagamit"
+            },
+            "USERS": {
+               "LEFT": "Mga gumagamit",
+               "RIGHT": "Piniling mga gumagamit",
+               "REMOVE": "Alisin ang gumagamit",
+               "ADD": "Magdagdag ng gumagamit"
+            },
+            "ROLES": {
+               "LEFT": "Mga tungkulin",
+               "RIGHT": "Piniling mga tungkulin",
+               "REMOVE": "Alisin ang tungkulin",
+               "ADD": "Dagdagan ang tungkulin"
+            }
+         }
+      },
+      "ACLS": {
+         "TABLE": {
+            "CAPTION": "Mga patakaran sa pag-access",
+            "NAME": "Pangalan",
+            "CREATED": "Gumawa",
+            "CREATOR": "Gumawa",
+            "IN_USE": "Ginagamit",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
+         },
+         "NEW": {
+            "CAPTION": "Bagong mga patakaran sa pag-access",
+            "TABS": {
+               "SUMMARY": "Buod",
+               "METADATA": "Metadata",
+               "ACCESS": "Koneksyon"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Pangalan",
+                  "PLACEHOLDER": "Pangalan…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran sa pag-access",
+               "TEMPLATES": {
+                  "TITLE": "Mga template"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Patakaran sa pag-access",
+                  "LABEL": "Pumili ng template",
+                  "EMPTY": "Walang template na nakita",
+                  "ROLE": "Tungkulin",
+                  "WRITE": "Sumulat",
+                  "READ": "Basahin",
+                  "ADDITIONAL_ACTIONS": "Karagdagang mga Aksyon",
+                  "ACTION": "Mga aksyon",
+                  "NEW": "Bagong patakaran",
+                  "DETAILS": "Mga detalye",
+                  "DESCRIPTION": "Mangyaring pumili ng pre-configured na hanay ng mga patakaran o dagdagan ang mga patakaran sa ilalim"
+               },
+               "ROLES": {
+                  "LABEL": "Pumili ng tungkulin",
+                  "EMPTY": "Walang tungkullin ang nakita"
+               }
+            }
+         },
+         "DETAILS": {
+            "HEADER": "Mga detalye sa patakaran ng pag-access - {{resourceId}}",
+            "TABS": {
+               "SUMMARY": "Buod",
+               "METADATA": "Metadata",
+               "ACCESS": "Koneksyon"
+            },
+            "METADATA": {
+               "TITLE": "Metadata",
+               "NAME": {
+                  "CAPTION": "Pangalan",
+                  "PLACEHOLDER": "Pangalan…"
+               }
+            },
+            "ACCESS": {
+               "CAPTION": "Patakaran sa pag-access",
+               "TEMPLATES": {
+                  "TITLE": "Mga template"
+               },
+               "ACCESS_POLICY": {
+                  "TITLE": "Patakaran sa pag-access",
+                  "LABEL": "Pumili ng template",
+                  "EMPTY": "Walang template ang na kita",
+                  "ROLE": "Tungkulin",
+                  "WRITE": "Sumulat",
+                  "READ": "Basahin",
+                  "ADDITIONAL_ACTIONS": "Karagdagang mga Aksyon",
+                  "ACTION": "Mga aksyon",
+                  "NEW": "Bagong patakaran",
+                  "DETAILS": "Mga detalye",
+                  "DESCRIPTION": "Mangyaring pumili ng pre-configured na hanay ng mga patakaran o dagdagan ang mga patakaran sa ilalim"
+               },
+               "ROLES": {
+                  "LABEL": "Pumili ng papel",
+                  "EMPTY": "Walang tungkulin ang nakita"
+               }
+            }
+         }
+      },
+      "BLACKLISTS": {
+         "TABLE": {
+            "CAPTION": "Blacklist ng mga gumagamit",
+            "NAME": "Pangalan",
+            "DATE_FROM": "Galing sa",
+            "DATE_TO": "Hanggang",
+            "REASON": "Dahilan",
+            "ACTION": "Mga aksyon"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng blacklist",
+            "EDITCAPTION": "I-edit ang blacklist",
+            "TABS": {
+               "USERS": "Mga gumagamit",
+               "DATES": "Mga petsa",
+               "REASON": "Dahilan",
+               "SUMMARY": "Buod"
+            },
+            "USERS": {
+               "REMOVE": "Tanggalin",
+               "ADD_USER": "Pumili ng gumagamit",
+               "ALL_USERS": "Lahat ng mga gumagamit",
+               "SELECT_USER": "Pumili"
+            },
+            "DATES": {
+               "START_DATE": "Umpisang petsa",
+               "END_DATE": "Katapusang petsa"
+            },
+            "REASON": {
+               "SELECT_REASON": "Pumili",
+               "REASON": "Dahilan",
+               "COMMENTS": "Mga komento"
+            },
+            "SUMMARY": {
+               "SUMMARY": "Buod",
+               "USER": "Gumagamit",
+               "DATE_FROM": "Galing sa",
+               "DATE_TO": "Hanggang",
+               "REASON": "Dahilan",
+               "COMMENTS": "Mga komento"
+            }
+         }
+      }
+   },
+   "THEMES": {
+      "THEMES": {
+         "DETAILS": {
+            "HEADER": "Mga detalye ng tema {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Pangkalahatan",
+               "BUMPER": "Bumper (simulan)",
+               "TRAILER": "Bumper (taposin)",
+               "TITLE": "Pamagat",
+               "LICENSE": "Lisensya",
+               "WATERMARK": "Marka ng tubig",
+               "USAGE": "Nagamit"
+            },
+            "GENERAL": {
+               "CAPTION": "Pangkalahatan",
+               "NAME": "Pangalan",
+               "DESCRIPTION": "Paglalarawan",
+               "DEFAULT": "Default",
+               "SET_DEFAULT_INFO": "Itakda bilang default na tema para sa lahat ng mga serye at mga kaganapan",
+               "NAME_ERROR": "Ang pangalan ay nagamit na",
+               "NAME_REQUIRED": "Kinakailangan"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (simulan)",
+               "DESCRIPTION": "Paunang natukoy na video na naidagdag para sa nagsimulang pagtatala.",
+               "ACTIVE": "Aktibo"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (tapos)",
+               "DESCRIPTION": "Paunang natukoy na video na naidagdag para sa katapusan ng pagtatala.",
+               "ACTIVE": "Aktibo"
+            },
+            "TITLE": {
+               "CAPTION": "Pamagat",
+               "DESCRIPTION": "Paunang natukoy na slide kasama ang naglalarawan ng metadata na naidagdag para sa simula o katapusan ng pagtatala.",
+               "ACTIVE": "Aktibo"
+            },
+            "WATERMARK": {
+               "CAPTION": "Marka ng tubig",
+               "DESCRIPTION": "Semi-transparent na larawan na naka-overlay sa bawat frame ng pag-record.",
+               "ACTIVE": "Aktibo"
+            },
+            "USAGE": {
+               "CAPTION": "Nagamit",
+               "SERIES": "Pangalan ng serye"
+            }
+         }
+      }
+   },
+   "CONFIGURATION": {
+      "ACTIONS": {
+         "ADD_MAIL_TEMPLATE": "Magdagdag ng template",
+         "ADD_THEME": "Magdagdag ng tema"
+      },
+      "NAVIGATION": {
+         "MAIL_TEMPLATES": "Mga template ng email",
+         "MAIL_SERVERS": "Mga setting ng email",
+         "THEMES": "Mga tema"
+      },
+      "EMAIL_TEMPLATES": {
+         "TABLE": {
+            "CAPTION": "Mga template ng email",
+            "NAME": "Pangalan",
+            "CREATOR": "Gumawa",
+            "CREATED": "Gumawa",
+            "ACTION": "Mga aksyon"
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng template",
+            "EDITCAPTION": "I-edit ang template",
+            "TABS": {
+               "MESSAGE": "Mensahe",
+               "SUMMARY": "Buod"
+            },
+            "MESSAGE": {
+               "NAME": "Pangalan",
+               "SUBJECT": "Paksa",
+               "MESSAGE": "Mensahe"
+            },
+            "SUMMARY": {
+               "MESSAGE_SUMMARY": "Buod ng mensahe"
+            }
+         }
+      },
+      "THEMES": {
+         "TABLE": {
+            "CAPTION": "Mga tema",
+            "NAME": "Pangalan",
+            "DESCRIPTION": "Paglalarawan",
+            "CREATOR": "Gumawa",
+            "CREATED": "Gumawa",
+            "DEFAULT": "Default",
+            "USAGE": "Nagamit",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
+         },
+         "DETAILS": {
+            "NEWCAPTION": "Gumawa ng tema",
+            "EDITCAPTION": "I-edit ang tema",
+            "GENERAL": {
+               "CAPTION": "Pangkalahatan",
+               "NAME": "Pangalan",
+               "DESCRIPTION": "Paglalarawan",
+               "DEFAULT": "Default",
+               "SET_DEFAULT_INFO": "Itakda bilang default na tema para sa lahat ng mga serye at mga kaganapan",
+               "NAME_REQUIRED": "Kinakailangan"
+            },
+            "BUMPER": {
+               "CAPTION": "Bumper (simulan)",
+               "FILE_UPLOADED": "Na-upload ang file: ",
+               "DESCRIPTION": "Paunang natukoy na video na naidagdag para sa nagsimulang pagtatala.",
+               "ACTIVE": "Aktibo",
+               "ENABLE": "Paganahin ang bumper",
+               "SELECT": "Pumili",
+               "UPLOAD_LABEL": "I-upload ang video",
+               "UPLOAD_BUTTON": "I-upload"
+            },
+            "TRAILER": {
+               "CAPTION": "Bumper (taposin)",
+               "FILE_UPLOADED": "Na-upload ang file: ",
+               "DESCRIPTION": "Paunang natukoy na video na naidagdag para sa kataposan ng pagtatala.",
+               "ACTIVE": "Aktibo",
+               "ENABLE": "Paganahin ang bumper",
+               "UPLOAD_LABEL": "I-upload ang video",
+               "UPLOAD_BUTTON": "I-upload"
+            },
+            "TITLE": {
+               "CAPTION": "Pamagat",
+               "FILE_UPLOADED": "Na-upload ang file: ",
+               "DESCRIPTION": "Paunang natukoy na slide kasama ang naglalarawan ng metadata na naidagdag para sa simula o kataposan ng pagtatala.",
+               "ACTIVE": "Aktibo",
+               "ENABLE": "Paganahin ang slide ng pamagat",
+               "BACKGROUND": "Background",
+               "EXTRACT": "Karagdagang background",
+               "UPLOAD": "I-upload",
+               "UPLOAD_LABEL": "I-upload ang larawan",
+               "UPLOAD_BUTTON": "I-upload"
+            },
+            "WATERMARK": {
+               "CAPTION": "Marka ng tubig",
+               "FILE_UPLOADED": "Na-upload ang file: ",
+               "DESCRIPTION": "Semi-transparent na larawan na naka-overlay sa bawat frame ng pag-record.",
+               "ACTIVE": "Aktibo",
+               "ENABLE": "Paganahin ang marka ng tubig",
+               "TOP_LEFT": "Itaas sa kaliwa",
+               "TOP_RIGHT": "Itaas sa kanan",
+               "BOTTOM_LEFT": "Ibaba sa kaliwa",
+               "BOTTOM_RIGHT": "Ibaba sa kanan",
+               "UPLOAD": "I-upload",
+               "POSITION": "Posisyon ng marka ng tubig at preview",
+               "FILEUPLOAD_DESCRIPTION": "Ang file ay dapat merong alpha na channel (transparent na background). Ang mga tinatanggap na mga uri ng file ay: .PNG, .GIF, .SVG, .WEBP",
+               "UPLOAD_LABEL": "I-upload ang larawan",
+               "UPLOAD_BUTTON": "I-upload"
+            },
+            "SUMMARY": {
+               "CAPTION": "Buod"
+            },
+            "USAGE": {
+               "CAPTION": "Nagamit",
+               "SERIE": "Pangalan ng serye",
+               "EMPTY": "Walang serye ang nakita para sa kasalukuyang tema"
+            }
+         }
+      }
+   },
+   "SYSTEMS": {
+      "NAVIGATION": {
+         "JOBS": "Mga trabaho",
+         "SERVERS": "Mga server",
+         "SERVICES": "Mga serbisyo"
+      },
+      "JOBS": {
+         "TABLE": {
+            "ID": "Tagatukoy ng trabaho",
+            "ACTION": "Mga aksyon",
+            "CAPTION": "Mga trabaho",
+            "CREATED": "Gumawa",
+            "CREATOR": "Gumawa",
+            "HOST_NAME": "Pangalan ng host",
+            "OPERATION": "Operasyon",
+            "STARTED": "Nagsimula",
+            "STATUS": "Isatado",
+            "SUBMITTED": "Isinumite",
+            "TYPE": "Uri"
+         },
+         "DETAILS": {
+            "HEADER": "Mga detalye ng trabaho {{resourceId}}",
+            "TABS": {
+               "GENERAL": "Pangkalahatan",
+               "OPERATIONS": "Mga operasyon",
+               "INCIDENTS": "Mga insidente"
+            }
+         }
+      },
+      "SERVERS": {
+         "TABLE": {
+            "CAPTION": "Mga server",
+            "STATUS": "Istado",
+            "HOST_NAME": "Pangalan ng host",
+            "CORES": "Mga core",
+            "COMPLETED": "Nakumpleto ang mga trabaho",
+            "RUNNING": "Tumatakbo na mga trabaho",
+            "QUEUED": "Nakapilang mga trabaho",
+            "MEAN_RUN_TIME": "Ibig sabihin tumatakbong oras",
+            "MEAN_QUEUE_TIME": "Ibig sabihin pila ng tumatakbong oras",
+            "MAINTENANCE": "Pinapanatili",
+            "ACTION": "Mga aksyon",
+            "MAINTENANCE_OFF": "Ipasok ang pagpananatili ng mode",
+            "MAINTENANCE_ON": "Alisin ang pagpananatili ng mode"
+         }
+      },
+      "SERVICES": {
+         "TABLE": {
+            "CAPTION": "Mga serbisyo",
+            "STATUS": "Istado",
+            "NAME": "Pangalan ng service",
+            "HOST_NAME": "Pangalan ng host",
+            "COMPLETED": "Nakumpletong mga trabaho",
+            "RUNNING": "Tumtakbo na mga trabaho",
+            "QUEUED": "Nakapilang mga trabaho",
+            "MEAN_RUN_TIME": "Ibig sabihin tumatakbong oras",
+            "MEAN_QUEUE_TIME": "Ibig sabihin pila ng tumatakbong oras",
+            "SANITIZE": "Linawin ang pumalyang serbisyo",
+            "ACTION": "Mga aksyon",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
+         }
+      }
+   },
+   "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "TIMELINE": "Timeline",
+      "ZOOMLEVEL": "Antas ng pag-zoom",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "ZOOM": "Zoom",
+      "BUTTONS": {
+         "CLOSE": "Sarado",
+         "SAVE": "Save",
+         "PROCESS": "I-save at magpatuloy",
+         "ADD_COMMENT": "Dagdagan ang komento"
+      },
+      "TABS": {
+         "PLAY": "Playback",
+         "EDIT": "Patnugot",
+         "CAPTIONS": "Mga kapsyon",
+         "ANNOTATIONS": "Mga anotasyon"
+      },
+      "AREAS": {
+         "METADATA": "Metadata",
+         "COMMENTS": "Mga komento",
+         "SEGMENTS": "Mga segment"
+      },
+      "ACTIONS": {
+         "SPLIT": "Hatiin",
+         "CUT": "Putulin",
+         "REPLAY_SEGMENT": "Mag-replay sa segment",
+         "REPLAY_END_OF_SEGMENT": "Kataposan sa segment",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Suriin ang paglipat",
+         "UNDO": "Pawalang-bisa",
+         "REDO": "Gawing muli",
+         "CLEAR_SEGMENTS": "Malinaw na segment",
+         "CLEAR_SELECTED_SEGMENT": "Linawin ang piniling segment"
+      },
+      "SEGMENTS": {
+         "REMOVE_SEGMENT": "Tangalin ang segment",
+         "USE_SEGMENT": "Gamitin itong segment"
+      },
+      "PLAYER": {
+         "PLAY": "Laruin",
+         "PAUSE": "Pause",
+         "NEXT_FRAME": "Susunod na frame",
+         "PREVIOUS_FRAME": "Nakaraang frame",
+         "NEXT_SEGMENT": "Sunod na segment / Dumiretso sa huli",
+         "PREVIOUS_SEGMENT": "Nakaraang segment / Dumiretso sa simula",
+         "MUTE": "Mute",
+         "VOLUME": "Volume"
+      }
+   },
+   "LOGIN": {
+      "WELCOME": "Maligayang pagdating sa Opencast",
+      "REMEMBER": "Ako ay tandaan sa computer na ito",
+      "USERNAME": "Username…",
+      "PASSWORD": "Password…",
+      "LOGIN": "Login",
+      "ERROR": "Hindi wastong username at / o password"
+   },
+   "TABLE_FILTERS": {
+      "FILTER_SELECTION": {
+         "PLACEHOLDER": "Mangyaring pumili ng filter…",
+         "NO_OPTIONS": "Walang nakita na mga filter"
+      },
+      "FILTER_VALUE_SELECTION": {
+         "PLACEHOLDER": "Mangyaring pumili ng filter…",
+         "NO_OPTIONS": "Walang na kita na mga halaga"
+      },
+      "CLEAR": "Linisin ang mga salaan",
+      "REMOVE": "Tangalin ang filter",
+      "ADD": "Dagdagan ang mga filter",
+      "PLACEHOLDER": "Maghanap…",
+      "PROFILES": {
+         "FILTERS_HEADER": "Nai-save ang filter ng nagtatakda",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
+         "EMPTY": "Walang nai-save na mga filter sa ngayon",
+         "SAVE_FILTERS": "Save",
+         "FILTER_HEADER": "I-save ang itakda na filter",
+         "NAME": "Pangalan",
+         "NAME_PLACEHOLDER": "Pangalan…",
+         "DESCRIPTION": "Paglalarawan",
+         "DESCRIPTION_PLACEHOLDER": "Paglalarawan…"
+      }
+   },
+   "FILTERS": {
+      "ACLS": {
+         "NAME": {
+            "LABEL": "Pangalan"
+         }
+      },
+      "AGENTS": {
+         "NAME": {
+            "LABEL": "Pangalan"
+         },
+         "STATUS": {
+            "LABEL": "Istado"
+         }
+      },
+      "EVENTS": {
+         "AGENT_ID": {
+            "LABEL": "Kunan ng ID ang Agent"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Patakaran sa pag-access"
+         },
+         "COMMENTS": {
+            "LABEL": "Mga komento"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Mga nag-aambag"
+         },
+         "CREATOR": {
+            "LABEL": "Gumawa"
+         },
+         "HOSTNAME": {
+            "LABEL": "Pangalan ng host"
+         },
+         "LANGUAGE": {
+            "LABEL": "Lengguwahe"
+         },
+         "LICENSE": {
+            "LABEL": "Lisensya"
+         },
+         "LOCATION": {
+            "LABEL": "Lokasyon"
+         },
+         "OPTEDOUT": {
+            "LABEL": "Piniling palabasin"
+         },
+         "PERIOD": {
+            "LABEL": "Tuldok"
+         },
+         "PRESENTERS_BIBLIOGRAPHIC": {
+            "LABEL": "Naghahandog ng Bibliographic"
+         },
+         "PRESENTERS_TECHNICAL": {
+            "LABEL": "Naghahandog ng teknikal"
+         },
+         "PROGRESS": {
+            "LABEL": "Progreso"
+         },
+         "REVIEW_STATUS": {
+            "LABEL": "Istado ng pagsusuri",
+            "CONFIRMED": "Nakumpirma",
+            "UNCONFIRMED": "Hindi na kumpirma",
+            "UNSENT": "Hindi naipadala"
+         },
+         "SERIES": {
+            "LABEL": "Serye"
+         },
+         "SOURCE": {
+            "LABEL": "Pinagmulan"
+         },
+         "START_DATE": {
+            "LABEL": "Simula ng petsa"
+         },
+         "STATUS": {
+            "LABEL": "Istado",
+            "SCHEDULED": "Iskedyul",
+            "RECORDING": "Nagre-record",
+            "INGESTING": "Ingesting",
+            "PROCESSING": "Nagproproseso",
+            "ARCHIVE": "Archive",
+            "WAITINGFOR": "Naghihintay sa",
+            "UPLOAD": "Upload",
+            "ONHOLD": "On hold"
+         },
+         "SUBJECT": {
+            "LABEL": "Paksa"
+         },
+         "TRACK_MIMETYPE": {
+            "LABEL": "Mimetype"
+         },
+         "TRACK_RESOLUTION": {
+            "LABEL": "Resolusyon"
+         },
+         "TRACK_TYPE": {
+            "LABEL": "Uri"
+         },
+         "WORKFLOW_DEFINITION": {
+            "LABEL": "Kahulogan ng daloy ng trabaho"
+         },
+         "WORKFLOW_STATE": {
+            "LABEL": "Istado ng daloy ng trabaho"
+         }
+      },
+      "JOBS": {
+         "HOSTNAME": {
+            "LABEL": "Pangalan ng host"
+         },
+         "STATUS": {
+            "LABEL": "Istado",
+            "PAUSED": "Naka-pause",
+            "QUEUED": "Nakapila",
+            "RUNNING": "Tumatakbo",
+            "WAITING": "Naghihintay"
+         }
+      },
+      "SERIES": {
+         "TITLE": {
+            "LABEL": "Pangalan"
+         },
+         "CONTRIBUTORS": {
+            "LABEL": "Mga nag-aambag"
+         },
+         "ORGANIZERS": {
+            "LABEL": "Mga organizer"
+         },
+         "SUBJECT": {
+            "LABEL": "Paksa"
+         },
+         "LANGUAGE": {
+            "LABEL": "Lengwahe"
+         },
+         "CREATOR": {
+            "LABEL": "Gumawa"
+         },
+         "LICENSE": {
+            "LABEL": "Lisensya"
+         },
+         "ACCESS_POLICY": {
+            "LABEL": "Patakaran ng pag-access"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Araw nang paggawa"
+         }
+      },
+      "SERVERS": {
+         "HOSTNAME": {
+            "LABEL": "Pangalan ng host"
+         },
+         "STATUS": {
+            "LABEL": "Istado",
+            "MAINTENANCE": "Pagpapanatili",
+            "ONLINE": "Online",
+            "OFFLINE": "Offline"
+         }
+      },
+      "SERVICES": {
+         "ACTIONS": {
+            "LABEL": "Mga aksyon na magagamit"
+         },
+         "HOSTNAME": {
+            "LABEL": "Pangalan ng host"
+         },
+         "NAME": {
+            "LABEL": "Pangalan"
+         },
+         "STATUS": {
+            "LABEL": "Istado",
+            "ERROR": "Error",
+            "NORMAL": "Karaniwan",
+            "WARNING": "Babala"
+         }
+      },
+      "THEMES": {
+         "NAME": {
+            "LABEL": "Pangalan"
+         },
+         "DESCRIPTION": {
+            "LABEL": "Paglalarawan"
+         },
+         "CREATOR": {
+            "LABEL": "Gumawa"
+         },
+         "CREATION_DATE": {
+            "LABEL": "Ginawa"
+         }
+      },
+      "USERS": {
+         "PROVIDER": {
+            "LABEL": "Tagapagbigay"
+         },
+         "ROLE": {
+            "LABEL": "Tungkulin"
+         },
+         "USERNAME": {
+            "LABEL": "Username"
+         },
+         "NAME": {
+            "LABEL": "Pangalan"
+         },
+         "USER_DIRECTORY": {
+            "LABEL": "Direktoryo ng gumagamit"
+         }
+      },
+      "REVIEW_STATUS": {
+         "UNSENT": "Hindi naipadala",
+         "UNCONFIRMED": "Hindi na kumpirma",
+         "CONFIRMED": "Nakumpirma"
+      }
+   },
+   "TABLE_SUMMARY": "{{numberOfRows}} mga hilera",
+   "TABLE_NO_RESULT": "Walang mga resulta ang nakita",
+   "TABLE_LOADING": "Naglo-load…",
+   "TABLE_EDIT": "Edit",
+   "PM": {
+      "BLACKLIST": {
+         "REASONS": {
+            "SICK_LEAVE": "Pag-alis dahil sa sakit",
+            "LEAVE": "Alis",
+            "FAMILY_EMERGENCY": "Emergency ng pamilya",
+            "CONSTRUCTION": "Konstruksiyon"
+         }
+      }
+   },
+   "DASHBOARD": {
+      "RUNNING": "Tumatakbo",
+      "FINISHED": "Natapos",
+      "PAUSED": "Naka-pause",
+      "FAILED": "Pumalya",
+      "FINISHED_WITH_COMMENTS": "Todo",
+      "SCHEDULED": "Iskedyul",
+      "RECORDING": "Ni-record"
+   }
+}

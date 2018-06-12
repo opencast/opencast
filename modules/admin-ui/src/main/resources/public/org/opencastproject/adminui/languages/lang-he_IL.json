@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "מודול מדיה",
+   "SYSTEM_NOTIFICATIONS": "אזהרות והתראות מערכתיות",
+   "LANGUAGE": "בחירת שפה",
    "HELP": {
       "HELP": "עזרה",
       "USERS_GUIDE": "מדריך משתמש",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "לא הייתה אפשרות להתחיל עיבוד מחדש.",
       "EVENTS_PROCESSING_ACTION_NONE": "מפסיק עיבוד...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "לא ניתן היה לעצור את העיבוד.",
+      "EVENTS_PROCESSING_ACTION_STOP": "עיבוד נעצר.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "לא היתה אפשרות להפסיק את העיבוד.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "זרימות שנמחקו.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "לא ניתן למחוק את תהליך העבודה.",
       "SERIES_UPDATED_NB": "{{ number }} סדרות עודכנו בהצלחה",
       "SERIES_UPDATED_ALL": "כל הסדרות עודכנו בהצלחה",
       "SERIES_NOT_UPDATED": "לא היתה אפשרות לשמור את הסידרה",
@@ -381,6 +387,7 @@
                   "START_TIME": "זמן ההתחלה",
                   "TIMEZONE": "איזור זמן",
                   "END_DATE": "תאריך סיום",
+                  "END_TIME": "זמן סיום",
                   "DURATION": "משך"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "מצב הסקירה",
             "PREVIOUS": "הקודם",
             "NOCONTENT": "אין נתונים זמינים",
-            "PUBLISHED": "פורסם"
+            "PUBLISHED": "פורסם",
+            "TOOLTIP": {
+               "START": "מסנן עבור תאריך ההתחלה הזה",
+               "SERIES": "מסנן עבור סדרה זו",
+               "STATUS": "מסנן עבור מצב אירוע",
+               "LOCATION": "מסנן עבור מיקום זה",
+               "DETAILS": "הצגת פרטי אירוע",
+               "DELETE": "מחק אירוע",
+               "PREVIEW": "פתח נגן תצוגה מקדימה",
+               "EDITOR": "פתח עורך וידאו",
+               "COMMENTS": "הצגת הערות",
+               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "מוכן להקלטה",
@@ -495,13 +514,16 @@
                "COMMENTS": "הערות"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "סטטוס פרסום",
+               "PUBLICATION_STATUS": "פרסומים",
                "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
+               "PUBLICATION_DESCRIPTION": "האירוע הזה פורסם לערוצים הציבוריים הבאים:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "אירוע זה אינו נמצא כעת בתהליך",
                "SCHEDULING_STATUS": "מצב",
                "READY_FOR_RECORDING": "מוכן להקלטה",
-               "OPTED_OUT": "בוטל/ו",
+               "OPTED_OUT": "נבחר להוצאה",
                "CUSTOM": "מותאם אישית",
                "ENGAGE": "לעסוק",
+               "ENGAGE_LIVE": "שיחה חיה",
                "EXTERNAL_API": "פרסום API חיצוני",
                "YOUTUBE": "יוטיוב",
                "OAIPMH": "OAI-PMH",
@@ -559,6 +581,7 @@
                   "START_TIME": "זמן ההתחלה",
                   "TIMEZONE": "איזור זמן",
                   "END_DATE": "תאריך סיום",
+                  "END_TIME": "זמן סיום",
                   "DURATION": "משך"
                },
                "SCHEDULE_SINGLE": {
@@ -672,7 +695,7 @@
                      "URL": "כתובת אינטרנט",
                      "SIZE": "גודל",
                      "CHANNEL": "ערוץ",
-                     "REFERENCE": "הפניה"
+                     "REFERENCE": "יחס"
                   }
                }
             },
@@ -735,7 +758,7 @@
                "CAPTION": "פרטי אירוע",
                "TITLE": "כותרת",
                "ID": "UID",
-               "SERIES": "סדרה",
+               "SERIES": "סדרות",
                "RECORDING_DATE": "תאריך הקלטה",
                "SUBJECT": "נושא",
                "DESCRIPTION": "תאור",
@@ -794,7 +817,13 @@
                "URL": "כתובת אינטרנט",
                "CONFIGURATION": "הגדרות",
                "NO_CONFIGURATION": "אין הגדרת פרמטרים למהלך העבודה שנבחר.",
-               "WORKFLOW": "מהלך עבודה"
+               "WORKFLOW": "מהלך עבודה",
+               "TOOLTIP": {
+                  "STOP": "הפסקת ביצוע מופע של תהליך עבודה",
+                  "ABORT": "ביטול ביצוע של מופע תהליך עבודה (אל תנסה לבצע שוב פעולות שנכשלו)",
+                  "RETRY": "נסה שנית לבצע מופע של תהליך עבודה",
+                  "DELETE": "מחק מופע של תהליך עבודה"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "פרטי מהלך-עבודה",
@@ -817,7 +846,7 @@
                "URL": "כתובת אינטרנט",
                "RECORDING_DATE": "תאריך הקלטה",
                "TAGS": "תגיות",
-               "DURATION": "משך זמן",
+               "DURATION": "משך",
                "STREAM_AUDIO": "ערוצי קול",
                "STREAM_VIDEO": "ערוצי וידאו",
                "CHANNELS": "ערוצים",
@@ -860,7 +889,7 @@
                "CAPTION": "מטא-נתונים מורחב",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "מטא-נתונים מורחב"
+                  "TITLE": "מטה-נתונים מורחב"
                }
             },
             "ACCESS": {
@@ -889,13 +918,15 @@
             },
             "THEME": {
                "CAPTION": "ערכת נושא",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "באפשרותך להשתמש בערכות נושא ולמתג את סרטי הווידאו שלך. ערכות נושא עשויים להגדיר סרטח פתיח וקדימון, סימני מים, שקופיות הכותרת כולל מטא-נתונים."
+               },
                "TITLE": "ערכת נושא",
                "LABEL": "אין ערכת נושא",
                "EMPTY": "לא נמצאו ערכות נושא"
             },
             "SUMMARY": {
-               "CAPTION": "תקציר"
+               "CAPTION": "סיכום"
             }
          },
          "TABLE": {
@@ -906,7 +937,12 @@
             "CREATED": "נוצר",
             "MANAGED_ACL": "מדיניות גישה",
             "EVENTS": "אירועים",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "SERIES": "סנן אירועים עבור סדרה זו",
+               "DETAILS": "פתיחת פרטי הסדרה",
+               "DELETE": "מחיקת הסדרה"
+            }
          },
          "DETAILS": {
             "HEADER": "פרטי סידרה - {{resourceId}}",
@@ -945,7 +981,7 @@
             "METADATA": {
                "TITLE": "כותרת",
                "ID": "UID",
-               "SERIES": "סדרה",
+               "SERIES": "סדרות",
                "PUBLISHERS": "מפרסמ(ים)",
                "ORGANIZERS": "אירגונ(ים)",
                "CONTRIBUTORS": "תורמ(ים)",
@@ -961,12 +997,12 @@
                "CAPTION": "תבנית מצב השתתפות",
                "WARNING_TEMPLATE": "מצב השתתפות בסידרה ישמש בתור ערך ברירת המחדל עבור אירועים חדשים בסדרה.",
                "REVIEW_STATUS": {
-                  "CAPTION": "סקור מצב"
+                  "CAPTION": "מצב הסקירה"
                },
                "OPTEDOUT": {
                   "CAPTION": "סטטוס נבחרו להוצאה",
                   "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "נבחר להוצאה"
+                  "OPTEDOUT": "בוטל/ו"
                },
                "MESSAGES": {
                   "CAPTION": "הודעות",
@@ -1010,7 +1046,12 @@
             "VERSION": "גירסה",
             "BLACKLIST_FROM": "ברשימה השחורה מ",
             "BLACKLIST_TO": "ברשימה השחורה עד",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "NAME": "סנן אירועים עבור מיקום זה",
+               "DETAILS": "פתיחת פרטי מיקום",
+               "DELETE": "מחיקת מיקום (ביטול רישום סוכן לכידת תמונה)"
+            }
          },
          "DETAILS": {
             "HEADER": "פרטי מיקום - {{resourceId}}",
@@ -1101,7 +1142,11 @@
             "PROVIDER": "ספק",
             "BLACKLIST_FROM": "ברשימה השחורה מ",
             "BLACKLIST_TO": "ברשימה השחורה עד",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "מחק משתמש",
+               "DETAILS": "פתיחת פרטי משתמש"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "צור משתמש",
@@ -1141,7 +1186,11 @@
             "NAME": "שם",
             "DESCRIPTION": "תאור",
             "ROLE": "תפקיד",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DETAILS": "פתיחת פרטי הקבוצה",
+               "DELETE": "מחק קבוצה"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "צור קבוצה",
@@ -1181,12 +1230,16 @@
             "CREATED": "נוצר",
             "CREATOR": "יוצר",
             "IN_USE": "בשימוש",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "למחוק את מדיניות גישה",
+               "DETAILS": "פתח פרטים אודות מדיניות גישה"
+            }
          },
          "NEW": {
             "CAPTION": "הוסף מדיניות גישה",
             "TABS": {
-               "SUMMARY": "תקציר",
+               "SUMMARY": "סיכום",
                "METADATA": "מטא-נתונים",
                "ACCESS": "גישה"
             },
@@ -1224,7 +1277,7 @@
          "DETAILS": {
             "HEADER": "פרטי מדיניות גישה - {{resourceId}}",
             "TABS": {
-               "SUMMARY": "תקציר",
+               "SUMMARY": "סיכום",
                "METADATA": "מטא-נתונים",
                "ACCESS": "גישה"
             },
@@ -1376,7 +1429,7 @@
             "EDITCAPTION": "ערוך תבנית",
             "TABS": {
                "MESSAGE": "הודעה",
-               "SUMMARY": "תקציר"
+               "SUMMARY": "סיכום"
             },
             "MESSAGE": {
                "NAME": "שם",
@@ -1397,7 +1450,11 @@
             "CREATED": "נוצר",
             "DEFAULT": "ברירת מחדל",
             "USAGE": "שימוש",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "DELETE": "מחק ערכת עיצוב",
+               "DETAILS": "פתח פרטי ערכת עיצוב"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "יצירת ערכת נושא",
@@ -1526,13 +1583,19 @@
             "MEAN_RUN_TIME": "זמן ריצה ממוצע",
             "MEAN_QUEUE_TIME": "זמן תור ממוצע",
             "SANITIZE": "נקה שירות שנכשל",
-            "ACTION": "פעולות"
+            "ACTION": "פעולות",
+            "TOOLTIP": {
+               "SANITIZE": "שירות סינון ועריכה (הגדרות השירות יחזרו למצבם הרגיל)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "אזהרה: חלק את מהשינויים שלך לא נשמרו. אם תצא מעורך הוידאו, שינויים אלה עלולה ללכת לאיבוד. אתה באמת רוצה להמשיך?",
       "TIMELINE": "ציר הזמן",
       "ZOOMLEVEL": "רמת גודל התצוגה",
+      "PREVIEW_MODE": "מצב תצוגה מקדימה",
+      "PREVIEW_MODE_TOOLTIP": "לנגן קטעים נבחרים בלבד",
       "ZOOM": "הגדל/הקטן",
       "BUTTONS": {
          "CLOSE": "סגור",
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "חיפוש…",
       "PROFILES": {
          "FILTERS_HEADER": "סטים של מסננים שמורים",
+         "EDIT": "ערוך סט מסננים",
+         "REMOVE": "הסרת מסננים שמורים",
          "EMPTY": "אין עדין מסננים שמורים",
          "SAVE_FILTERS": "שמור",
          "FILTER_HEADER": "שמור סט מסננים",

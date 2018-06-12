@@ -87,11 +87,11 @@ jobs:
     - stage: build
       env: name=site
       before_script:
-        - mvn install -DskipTests=true -Dcheckstyle.skip=true -Pnone
+        - mvn install -DskipTests=true -Dcheckstyle.skip=true -P "none,!frontend"
       script:
         - >
            mvn site -Daggregate=true site:stage "-DstagingDirectory=$(pwd)/site" \
-             -Pnone \
+             -P "none,!frontend" \
              -DskipTests=true \
              -Dcheckstyle.skip=true \
              -Dpmd.skip=true \

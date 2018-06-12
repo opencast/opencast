@@ -35,5 +35,7 @@
   "no_data": "No hay datos disponibles.",
   "login_success": "Sesión iniciada correctamente.",
   "login_failed": "Error al iniciar sesión.",
-  "not_logged_in": "Sesión no iniciada."
+  "not_logged_in": "Sesión no iniciada.",
+  "live_in_progress": "Live (en curso)",
+  "live_not_in_progress": "Live (no en curso)"
 }

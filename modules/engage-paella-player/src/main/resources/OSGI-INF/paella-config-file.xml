@@ -5,7 +5,7 @@
   <property name="service.description" value="Paella config REST Endpoint" />
 
   <property name="opencast.service.type" value="org.opencastproject.engage.paella.config" />
-  <property name="opencast.service.path" value="/engage/paella/config" />
+  <property name="opencast.service.path" value="/paella/config" />
 
   <service>
     <provide interface="org.opencastproject.engage.paella.PaellaConfigRest" />

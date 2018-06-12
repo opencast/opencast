@@ -10,5 +10,5 @@ Select the Paella Player
 
 To activate the paella player set:
 
-    prop.player=/engage/paella/ui/watch.html
+    prop.player=/paella/ui/watch.html
 

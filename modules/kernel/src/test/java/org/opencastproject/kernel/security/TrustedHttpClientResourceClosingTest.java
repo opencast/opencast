@@ -59,7 +59,7 @@ public class TrustedHttpClientResourceClosingTest {
       EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(true).anyTimes();
       EasyMock.expect(
               urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(), EasyMock.anyString()))
-              .andReturn("http://ok.com");
+              .andReturn("http://127.0.0.1:" + PORT);
       EasyMock.replay(urlSigningService);
 
       setUrlSigningService(urlSigningService);
@@ -72,36 +72,34 @@ public class TrustedHttpClientResourceClosingTest {
 
   @Test
   public void testResourceClosing() throws Exception {
-    startServer(PORT);
+    startServer();
     final TestHttpClient client = new TestHttpClient();
     final HttpResponse response;
-    response = client.execute(new HttpGet("http://localhost:" + PORT));
+    response = client.execute(new HttpGet("http://127.0.0.1:" + PORT));
     assertEquals("Request should be stored in response map", 1, client.getResponseMap().size());
     client.close(response);
     assertEquals("Request should be removed from response map", 0, client.getResponseMap().size());
   }
 
-  private void startServer(int port) throws Exception {
-    final ServerSocket socket = new ServerSocket(port);
+  private void startServer() throws Exception {
+    final ServerSocket socket = new ServerSocket(PORT);
     final ExecutorService es = Executors.newFixedThreadPool(1);
     final CountDownLatch barrier = new CountDownLatch(1);
-    final Callable<Void> server = new Callable<Void>() {
-      @Override public Void call() throws Exception {
-        // notify that the server is ready
-        barrier.countDown();
-        logger.info("Waiting for incoming connection");
-        final Socket s = socket.accept();
-        logger.info("Connected");
-        final PrintStream out = new PrintStream(s.getOutputStream());
-        out.println("HTTP/1.1 200 OK\n\n");
-        out.flush();
-        out.close();
-        s.getInputStream().close();
-        s.close();
-        es.shutdown();
-        logger.info("Terminate server");
-        return null;
-      }
+    final Callable<Void> server = () -> {
+      // notify that the server is ready
+      barrier.countDown();
+      logger.info("Waiting for incoming connection");
+      final Socket s = socket.accept();
+      logger.info("Connected");
+      final PrintStream out = new PrintStream(s.getOutputStream());
+      out.println("HTTP/1.1 200 OK\n\n");
+      out.flush();
+      out.close();
+      s.getInputStream().close();
+      s.close();
+      es.shutdown();
+      logger.info("Terminate server");
+      return null;
     };
     es.submit(server);
     logger.info("Waiting for server...");

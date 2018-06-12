@@ -84,7 +84,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
 
   public static final String JOB_LOAD_KEY = "job.load.videoeditor";
 
-  private static final float DEFAULT_JOB_LOAD = 2.0f;
+  private static final float DEFAULT_JOB_LOAD = 0.8f;
 
   private float jobload = DEFAULT_JOB_LOAD;
 

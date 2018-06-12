@@ -47,6 +47,7 @@ module.exports = function (config) {
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
+            'test/unit/**/*Helper.js',
             'test/unit/**/*Spec.js'
         ],
 
@@ -80,7 +81,7 @@ module.exports = function (config) {
 
         coverageReporter: {
             type : 'html',
-            dir : '../../../coverage/'
+            dir : '../../../target/coverage/'
         },
 
         ngHtml2JsPreprocessor: {

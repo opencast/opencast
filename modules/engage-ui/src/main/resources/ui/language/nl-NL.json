@@ -35,5 +35,7 @@
   "no_data": "Geen data beschikbaar.",
   "login_success": "Login succesvol.",
   "login_failed": "Login mislukt.",
-  "not_logged_in": "Niet ingelogd."
+  "not_logged_in": "Niet ingelogd.",
+  "live_in_progress": "Live (bezig)",
+  "live_not_in_progress": "Live (niet bezig)"
 }

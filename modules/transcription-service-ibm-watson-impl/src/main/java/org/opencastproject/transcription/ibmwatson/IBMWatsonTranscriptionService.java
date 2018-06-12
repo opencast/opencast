@@ -50,6 +50,7 @@ import org.opencastproject.transcription.api.TranscriptionServiceException;
 import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.ibmwatson.persistence.TranscriptionJobControl;
+import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Option;
@@ -124,6 +125,15 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   // Cluster name
   private static final String CLUSTER_NAME_PROPERTY = "org.opencastproject.environment.name";
   private String clusterName = "";
+
+  /** The load introduced on the system by creating a transcription job */
+  public static final float DEFAULT_START_TRANSCRIPTION_JOB_LOAD = 0.1f;
+
+  /** The key to look for in the service configuration file to override the default h=job load */
+  public static final String START_TRANSCRIPTION_JOB_LOAD_KEY = "job.load.start.transcription";
+
+  /** The load introduced on the system by creating a caption job */
+  private float jobLoad = DEFAULT_START_TRANSCRIPTION_JOB_LOAD;
 
   // The events we are interested in receiving notifications
   public interface JobEvent {
@@ -263,6 +273,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         serverUrl = OsgiUtil.getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY);
         systemAccount = OsgiUtil.getContextProperty(cc, DIGEST_USER_PROPERTY);
 
+        jobLoad = LoadUtil.getConfiguredLoadValue(cc.getProperties(), START_TRANSCRIPTION_JOB_LOAD_KEY,
+                DEFAULT_START_TRANSCRIPTION_JOB_LOAD, serviceRegistry);
+
         // Schedule the workflow dispatching, starting in 2 minutes
         scheduledExecutor.scheduleWithFixedDelay(new WorkflowDispatcher(), 120, workflowDispatchInterval,
                 TimeUnit.SECONDS);
@@ -307,7 +320,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
     try {
       return serviceRegistry.createJob(JOB_TYPE, Operation.StartTranscription.name(),
-              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track)));
+              Arrays.asList(mpId, MediaPackageElementParser.getAsXml(track)), jobLoad);
     } catch (ServiceRegistryException e) {
       throw new TranscriptionServiceException("Unable to create a job", e);
     } catch (MediaPackageException e) {

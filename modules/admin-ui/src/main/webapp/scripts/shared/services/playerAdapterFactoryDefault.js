@@ -23,17 +23,38 @@ angular.module('adminNg.services')
 .factory('PlayerAdapterFactoryDefault', ['PlayerAdapter', function (PlayerAdapter) {
     var Factory = function () {
         /**
-        * A default implementation of an adapter. Its purpose is to
-        * track the state and delegate events from / to specific adapter
-        * implementations.
-        *
-        * Usage: Instantiate an instance of this DefaultAdapter and copy
-        * its capabilities to your adapter implementation by calling
-        * #extend(this).
-        */
+         * A default implementation of an adapter. Its purpose is to
+         * track the state and delegate events from / to specific adapter
+         * implementations.
+         *
+         * Usage: Instantiate an instance of this DefaultAdapter and copy
+         * its capabilities to your adapter implementation by calling
+         * #extend(this).
+         */
         var DefaultAdapter = function (targetElement) {
             // keep a reference to this, for callbacks.
-            var me = this;
+            var me = this, eventMapping = PlayerAdapter.eventMapping();
+
+            eventMapping
+                .map(PlayerAdapter.EVENTS.PAUSE, 'pause')
+                .map(PlayerAdapter.EVENTS.PLAY, 'play')
+                .map(PlayerAdapter.EVENTS.READY, 'ready')
+                .map(PlayerAdapter.EVENTS.TIMEUPDATE, 'timeupdate')
+                .map(PlayerAdapter.EVENTS.DURATION_CHANGE, 'durationchange')
+                .map(PlayerAdapter.EVENTS.CAN_PLAY, 'canplay')
+                .map(PlayerAdapter.EVENTS.VOLUMECHANGE, 'volumechange');
+
+            // Check if the given target Element is valid
+            if (typeof targetElement === 'undefined' || targetElement === null) {
+                throw 'The given target element must not be null and have to be a valid HTMLElement!';
+            }
+
+            /**
+             * Id of the player adapter
+             * @inner
+             * @type {String}
+             */
+            this.id = 'PlayerAdapter' + targetElement.id;
 
             // The state of adapter implementations must be delegated here.
             this.state = {
@@ -107,6 +128,24 @@ angular.module('adminNg.services')
             // =========================
 
             /**
+             * Register a listener listening to events of type. The event name will be translated from
+             * API event (@see PlayerAdapter) to native events of the player implementation.
+             *
+             * @param type
+             * @param listener
+             */
+            this.addListener = function (type, listener) {
+                targetElement.addEventListener(eventMapping.resolveNativeName(type), listener);
+            };
+
+            /**
+             * Query whether the adapter is ready to play
+             */
+            this.ready = function () {
+                return me.state.initialized;
+            };
+
+            /**
              * Play the video
              */
             this.play = function () {
@@ -152,9 +191,9 @@ angular.module('adminNg.services')
              */
             this.setCurrentTime = function (time) {
                 if (time < 0) {
-                  time = 0;
+                    time = 0;
                 } else if (time > me.getDuration()) {
-                  time = me.getDuration();
+                    time = me.getDuration();
                 }
                 targetElement.currentTime = time;
             };
@@ -165,57 +204,6 @@ angular.module('adminNg.services')
             this.getCurrentTime = function () {
                 return targetElement.currentTime;
             };
-
-            /**
-             * Takes the player to the next frame. The step is calculated by 1/framerate.
-             * @throws Error if called at end of player
-             * @throws Error if called in status PLAYING
-             */
-            this.nextFrame = function () {
-
-                var currentTime = me.getCurrentTime();
-
-                if (me.state.status === PlayerAdapter.STATUS.PLAYING) {
-                    throw new Error('In state playing calls to previousFrame() are not possible.');
-                }
-
-                if (currentTime >= me.getDuration()) {
-                    throw new Error('At end of video calls to nextFrame() are not possible.');
-                }
-
-                me.setCurrentTime(currentTime + 1 / me.getFramerate());
-            };
-
-            /**
-             * Takes the player to the previous frame. The step is calculated by 1/framerate.
-             * @throws Error if called at start of player
-             * @throws Error if called in status PLAYING
-             */
-            this.previousFrame = function () {
-
-                var currentTime = me.getCurrentTime();
-
-                if (me.state.status === PlayerAdapter.STATUS.PLAYING) {
-                    throw new Error('In state playing calls to previousFrame() are not possible.');
-                }
-
-                if (currentTime === 0) {
-                    throw new Error('At start of video calls to previosFrame() are not possible.');
-                }
-
-                me.setCurrentTime(currentTime - 1 / me.getFramerate());
-            };
-
-
-            /**
-             * TODO find a way to find out framerate
-             *
-             * @returns {number}
-             */
-            this.getFramerate = function () {
-                return 30;
-            };
-
 
             /**
              * Returns the current time as an object containing hours, minutes, seconds and milliseconds.
@@ -237,6 +225,13 @@ angular.module('adminNg.services')
             };
 
             /**
+             * Get the URI of the currently displayed source
+             */
+            this.getCurrentSource = function () {
+                return targetElement.currentSrc;
+            };
+
+            /**
              * Get the video duration
              */
             this.getDuration = function () {
@@ -252,7 +247,7 @@ angular.module('adminNg.services')
 
             this.toggleMute = function () {
               me.muted(! me.muted());
-            }
+            };
 
             /**
              * Turns audio on or off and returns current status
@@ -261,10 +256,10 @@ angular.module('adminNg.services')
              */
             this.muted = function (status) {
                 if (status !== undefined) {
-                  targetElement.muted = status;
+                    targetElement.muted = status;
                 }
                 return targetElement.muted;
-            }
+            };
 
             /**
              * Set and get the volume of the player
@@ -274,27 +269,28 @@ angular.module('adminNg.services')
              */
             this.volume = function (volume) {
                 if (volume !== undefined) {
-                  if (volume === 0) {
-                    me.muted(true);
-                  } else {
-                    me.muted(false);
-                  }
-                  targetElement.volume = volume / 100.0;
+                    if (volume === 0) {
+                        me.muted(true);
+                    } else {
+                        me.muted(false);
+                    }
+                    targetElement.volume = volume / 100.0;
                 }
                 return parseInt(targetElement.volume * 100);
-            }
+            };
 
             /**
              * Copies the API's default implementation methods to the target.
              */
             this.extend = function (target) {
+                target.addListener = me.addListener;
+                target.ready = me.ready;
                 target.play = me.play;
                 target.canPlay = me.canPlay;
                 target.pause = me.pause;
+                target.getCurrentSource = me.getCurrentSource;
                 target.setCurrentTime = me.setCurrentTime;
                 target.getCurrentTime = me.getCurrentTime;
-                target.nextFrame = me.nextFrame;
-                target.previousFrame = me.previousFrame;
                 target.getFramerate = me.getFramerate;
                 target.getCurrentTimeObject  = me.getCurrentTimeObject;
                 target.getDuration = me.getDuration;

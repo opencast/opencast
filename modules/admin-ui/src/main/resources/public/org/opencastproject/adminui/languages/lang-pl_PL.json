@@ -68,6 +68,8 @@
       }
    },
    "MEDIAMODULE": "Galeria",
+   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
+   "LANGUAGE": "Select language",
    "HELP": {
       "HELP": "Pomoc",
       "USERS_GUIDE": "Podręcznik użytkownika",
@@ -107,6 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Nie można wznowić przetwarzania.",
       "EVENTS_PROCESSING_ACTION_NONE": "Przerywanie przetwarzania...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Nie udało się przerwać przetwarzania.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "Seria {{ number }} została pomyślnie zaktualizowana",
       "SERIES_UPDATED_ALL": "Wszystkie serie zostały pomyślnie zaktualizowane",
       "SERIES_NOT_UPDATED": "Nie udało się zapisać serii",
@@ -381,6 +387,7 @@
                   "START_TIME": "Godzina rozpoczęcia",
                   "TIMEZONE": "Strefa czasowa",
                   "END_DATE": "Data zakończenia",
+                  "END_TIME": "End time",
                   "DURATION": "Czas trwania"
                },
                "SCHEDULE_SINGLE": {
@@ -460,7 +467,19 @@
             "REVIEW_STATUS": "Status przeglądu",
             "PREVIOUS": "Poprzednie",
             "NOCONTENT": "Brak danych",
-            "PUBLISHED": "Opublikowano"
+            "PUBLISHED": "Opublikowano",
+            "TOOLTIP": {
+               "START": "Filter for this start date",
+               "SERIES": "Filter for this series",
+               "STATUS": "Filter for this event status",
+               "LOCATION": "Filter for this location",
+               "DETAILS": "Open event details",
+               "DELETE": "Delete event",
+               "PREVIEW": "Open preview player",
+               "EDITOR": "Open video Editor",
+               "COMMENTS": "View comments",
+               "PAUSED_WORKFLOW": "View paused workflow"
+            }
          },
          "SCHEDULING_STATUS": {
             "READY_FOR_RECORDING": "Gotowy do nagrywania",
@@ -495,13 +514,16 @@
                "COMMENTS": "Komentarze"
             },
             "GENERAL": {
-               "PUBLICATION_STATUS": "Stan publikacji",
+               "PUBLICATION_STATUS": "Publikacje",
                "NO_PUBLICATIONS_AVAILABLE": "To wydarzenie nie ma publikacji",
+               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
                "SCHEDULING_STATUS": "Status",
                "READY_FOR_RECORDING": "Gotowy do nagrywania",
                "OPTED_OUT": "Wykluczone",
                "CUSTOM": "Niestandardowe",
                "ENGAGE": "Engage",
+               "ENGAGE_LIVE": "Engage Live",
                "EXTERNAL_API": "Publiczne API",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -559,6 +581,7 @@
                   "START_TIME": "Godzina rozpoczęcia",
                   "TIMEZONE": "Strefa czasowa",
                   "END_DATE": "Data zakończenia",
+                  "END_TIME": "End time",
                   "DURATION": "Czas trwania"
                },
                "SCHEDULE_SINGLE": {
@@ -604,7 +627,7 @@
                   "TYPE": "Typ",
                   "MIMETYPE": "Właściwość MIMEType",
                   "TAGS": "Tagi",
-                  "LINK": "Link",
+                  "LINK": "Odnośnik",
                   "DETAILS": {
                      "TITLE": "Szczegóły katalogu",
                      "CAPTION": "Szczegóły katalogu",
@@ -612,7 +635,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "Właściwość MIMEType",
                      "TAGS": "Tagi",
-                     "URL": "Adres URL",
+                     "URL": "URL",
                      "SIZE": "Rozmiar",
                      "CHECKSUM": "Suma kontrolna",
                      "REFERENCE": "Odnośnik"
@@ -735,7 +758,7 @@
                "CAPTION": "Szczegóły wydarzenia",
                "TITLE": "Tytuł",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Seria",
                "RECORDING_DATE": "Data nagrania",
                "SUBJECT": "Temat",
                "DESCRIPTION": "Opis",
@@ -780,7 +803,7 @@
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Actions",
+               "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "",
                "ID": "Identyfikator",
@@ -788,13 +811,19 @@
                "TITLE": "Tytuł",
                "STATE": "Stan",
                "STARTED": "Rozpoczęte",
-               "SERIES": "Serie",
+               "SERIES": "Seria",
                "SUBMITTED": "Wysłano",
                "MIMETYPE": "Właściwość MIMEType",
                "URL": "URL",
                "CONFIGURATION": "Konfiguracja",
                "NO_CONFIGURATION": "Nie ma parametrów dla wybranej definicji przepływu pracy.",
-               "WORKFLOW": "Przepływ pracy"
+               "WORKFLOW": "Przepływ pracy",
+               "TOOLTIP": {
+                  "STOP": "Stop execution workflow instance",
+                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow instance",
+                  "DELETE": "Delete workflow instance"
+               }
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Szczegóły przepływu pracy",
@@ -889,7 +918,9 @@
             },
             "THEME": {
                "CAPTION": "Motyw",
-               "DESCRIPTION": "",
+               "DESCRIPTION": {
+                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+               },
                "TITLE": "Motyw",
                "LABEL": "Brak motywu",
                "EMPTY": "Nie znaleciono motywu"
@@ -899,14 +930,19 @@
             }
          },
          "TABLE": {
-            "CAPTION": "Serie",
+            "CAPTION": "Seria",
             "TITLE": "Seria",
             "CREATORS": "Organizator(rzy)",
             "CONTRIBUTORS": "Współpracownik(cy)",
             "CREATED": "Utworzono",
             "MANAGED_ACL": "Zasady dostępu",
             "EVENTS": "Wydarzenia",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "SERIES": "Filter events for this series",
+               "DETAILS": "Open series details",
+               "DELETE": "Delete series"
+            }
          },
          "DETAILS": {
             "HEADER": "Więcej na temat serii - {{resourceId}}",
@@ -1010,24 +1046,29 @@
             "VERSION": "Wersja",
             "BLACKLIST_FROM": "Na czarnej liście od",
             "BLACKLIST_TO": "Na czarnej liście do",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "NAME": "Filter events for this location",
+               "DETAILS": "Open location details",
+               "DELETE": "Delete location (unregister capture agent)"
+            }
          },
          "DETAILS": {
             "HEADER": "Location details - {{resourceId}}",
             "TAB": {
-               "GENERAL": "General",
-               "CONFIGURATION": "Configuration",
+               "GENERAL": "Ogólne",
+               "CONFIGURATION": "Konfiguracja",
                "CAPABILITIES": "Capabilities"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
+               "CAPTION": "Ogólne",
+               "NAME": "Imię",
                "URL": "Url",
                "STATUS": "Status",
                "UPDATE": "Last heard from"
             },
             "CONFIGURATION": {
-               "CAPTION": "Configuration",
+               "CAPTION": "Konfiguracja",
                "NO_CONFIGURATION": "No configuration provided"
             },
             "CAPABILITIES": {
@@ -1098,10 +1139,14 @@
             "EMAIL": "Email",
             "ROLES": "Role",
             "TYPE": "Typ",
-            "PROVIDER": "Provider",
+            "PROVIDER": "Dostawca",
             "BLACKLIST_FROM": "Na czarnej liście od",
             "BLACKLIST_TO": "Na czarnej liście do",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "DELETE": "Delete user",
+               "DETAILS": "Open user details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz użytkownika",
@@ -1141,7 +1186,11 @@
             "NAME": "Nazwa",
             "DESCRIPTION": "Opis",
             "ROLE": "Rola",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "DETAILS": "Open group details",
+               "DELETE": "Delete group"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz grupę",
@@ -1181,7 +1230,11 @@
             "CREATED": "Utworzono",
             "CREATOR": "Twórca",
             "IN_USE": "W użyciu",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "DELETE": "Delete access policy",
+               "DETAILS": "Open access policy details"
+            }
          },
          "NEW": {
             "CAPTION": "Nowa Zasady Dostępu",
@@ -1397,7 +1450,11 @@
             "CREATED": "Utworzono",
             "DEFAULT": "Domyślne",
             "USAGE": "Wykorzystanie",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "DELETE": "Delete theme",
+               "DETAILS": "Open theme details"
+            }
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz motyw",
@@ -1437,7 +1494,7 @@
                "ENABLE": "Włącz tytuły slajdów",
                "BACKGROUND": "Tło",
                "EXTRACT": "Wyodrębnij tło",
-               "UPLOAD": "Wysyłanie",
+               "UPLOAD": "Prześlij",
                "UPLOAD_LABEL": "Przesyłanie zdjęć",
                "UPLOAD_BUTTON": "Prześlij"
             },
@@ -1526,18 +1583,24 @@
             "MEAN_RUN_TIME": "Średni czas trwania",
             "MEAN_QUEUE_TIME": "Średni czas w kolejce",
             "SANITIZE": "Wyczyść nieudane usługi",
-            "ACTION": "Działania"
+            "ACTION": "Działania",
+            "TOOLTIP": {
+               "SANITIZE": "Sanitize service (set service back to state normal)"
+            }
          }
       }
    },
    "VIDEO_TOOL": {
+      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Oś czasu",
       "ZOOMLEVEL": "Zoom Level",
-      "ZOOM": "Zoom",
+      "PREVIEW_MODE": "Preview Mode",
+      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "ZOOM": "Powiększenie",
       "BUTTONS": {
          "CLOSE": "Zamknij",
          "SAVE": "Zapisz",
-         "PROCESS": "Save & Continue",
+         "PROCESS": "Zapisz & przetwarzaj",
          "ADD_COMMENT": "Add Comment"
       },
       "TABS": {
@@ -1547,8 +1610,8 @@
          "ANNOTATIONS": "Adnotacje"
       },
       "AREAS": {
-         "METADATA": "Metadata",
-         "COMMENTS": "Comments",
+         "METADATA": "Metadane",
+         "COMMENTS": "Komentarze",
          "SEGMENTS": "Segments"
       },
       "ACTIONS": {
@@ -1600,6 +1663,8 @@
       "PLACEHOLDER": "Szukaj…",
       "PROFILES": {
          "FILTERS_HEADER": "Zapisane zestawy filtrów",
+         "EDIT": "Edit filter set",
+         "REMOVE": "Remove saved filter",
          "EMPTY": "Jeszcze nie zapisano żadnych filtrów",
          "SAVE_FILTERS": "Zapisz",
          "FILTER_HEADER": "Zapisz zestaw filtrów",
@@ -1834,7 +1899,7 @@
    "DASHBOARD": {
       "RUNNING": "W toku",
       "FINISHED": "Zakończone",
-      "PAUSED": "Wstrzymane",
+      "PAUSED": "Zatrzymane",
       "FAILED": "Zakończone niepowodzeniem",
       "FINISHED_WITH_COMMENTS": "Do zrobienia",
       "SCHEDULED": "Zaplanowane",

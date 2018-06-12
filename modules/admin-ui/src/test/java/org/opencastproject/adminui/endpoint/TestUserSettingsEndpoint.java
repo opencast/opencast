@@ -28,7 +28,6 @@ import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceE
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Ignore;
 
 import javax.ws.rs.Path;
@@ -65,15 +64,10 @@ public class TestUserSettingsEndpoint extends UserSettingsEndpoint {
     UserSettings userSettings = createUserSettings(start, finish, limit, offset, total);
     userSettingsService = EasyMock.createNiceMock(UserSettingsService.class);
     EasyMock.expect(userSettingsService.findUserSettings(limit, 0)).andReturn(userSettings);
-    final Capture<String> inputKey = new Capture<String>();
-    final Capture<String> inputValue = new Capture<String>();
+    final Capture<String> inputKey = EasyMock.newCapture();
+    final Capture<String> inputValue = EasyMock.newCapture();
     EasyMock.expect(userSettingsService.addUserSetting(EasyMock.capture(inputKey), EasyMock.capture(inputValue)))
-            .andAnswer(new IAnswer<UserSetting>() {
-              public UserSetting answer() {
-                UserSetting userSetting = new UserSetting(19, inputKey.getValue(), inputValue.getValue());
-                return userSetting;
-              }
-            });
+            .andAnswer(() -> new UserSetting(19, inputKey.getValue(), inputValue.getValue()));
     userSettingsService.deleteUserSetting(18L);
     EasyMock.expectLastCall();
     EasyMock.expect(userSettingsService.updateUserSetting(18, EXAMPLE_KEY, EXAMPLE_VALUE)).andReturn(

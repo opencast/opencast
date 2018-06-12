@@ -476,6 +476,7 @@
             <value>CONSUMERKEY</value>
           </list>
         </constructor-arg>
+        <constructor-arg index="3" value="^(admin|opencast_system_account)$" />
         -->
 
       </bean>
