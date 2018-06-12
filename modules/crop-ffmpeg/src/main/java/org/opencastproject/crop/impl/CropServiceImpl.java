@@ -112,6 +112,29 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   private float cropJobLoad = DEFAULT_CROP_JOB_LOAD;
 
   /**
+   * The threshold of greyscale to use for cropping
+   */
+  public static final String CROP_FFMPEG_GREYSCALE_LIMIT = "org.opencastproject.ffmpeg.cropping.greyscale.limit";
+  public static final String DEFAULT_CROP_GREYSCALE_LIMIT = "24";
+
+  private String greyScaleLimit = DEFAULT_CROP_GREYSCALE_LIMIT;
+
+  /**
+   * The value which the width/height should be divisible by
+   */
+  public static final String CROP_FFMPEG_ROUND = "org.opencastproject.ffmpeg.cropping.round";
+  public static final String DEFAULT_CROP_FFMPEG_ROUND = "16";
+
+  private String round = DEFAULT_CROP_FFMPEG_ROUND;
+  /**
+   * The counter that determines after how many frames cropdetect will be executed again
+   */
+  public static final String CROP_FFMEG_RESET = "org.opencastproject.ffmpeg.cropping.reset";
+  public static final String DEFAULT_CROP_FFMEG_RESET  = "240";
+
+  private String reset = DEFAULT_CROP_FFMEG_RESET;
+
+  /**
    * The logging facility
    */
   protected static final Logger logger = LoggerFactory.getLogger(CropServiceImpl.class);
@@ -196,7 +219,8 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   }
 
   protected Track cropFfmpeg(File mediafile, Track track) throws IOException, CropException {
-    String[] command = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf", "cropdetect=24:16:240",
+    String[] command = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf", "cropdetect="
+            + greyScaleLimit + ":" + round + ":" + reset,
             "-max_muxing_queue_size", "2000", "-f", "null", "-"};
     String commandline = StringUtils.join(command, " ");
 
@@ -345,6 +369,36 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       return;
     }
     logger.debug("Configuring the cropper");
+
+    if (dictionary.get(CROP_FFMPEG_GREYSCALE_LIMIT) != null) {
+      String limit = (String) dictionary.get(CROP_FFMPEG_GREYSCALE_LIMIT);
+      try {
+        greyScaleLimit = limit;
+        logger.info("Changes greyscale limit to {}", greyScaleLimit);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for greyscale limit", limit);
+      }
+    }
+
+    if (dictionary.get(CROP_FFMPEG_ROUND) != null) {
+      String r = (String) dictionary.get(CROP_FFMPEG_ROUND);
+      try {
+        round = r;
+        logger.info("Changes round to {}", round);
+      } catch (Exception e) {
+        logger.warn("Found illegal value '{}' for round", r);
+      }
+    }
+
+    if (dictionary.get(CROP_FFMEG_RESET) != null) {
+      String re = (String) dictionary.get(CROP_FFMEG_RESET);
+      try {
+        reset = re;
+        logger.info("Changes reset to {}", reset);
+      } catch (Exception e) {
+        logger.warn("Found illegal value {} for reset", re);
+      }
+    }
 
     cropJobLoad = LoadUtil
             .getConfiguredLoadValue(dictionary, CROP_JOB_LOAD_KEY, DEFAULT_CROP_JOB_LOAD, serviceRegistry);
