@@ -167,26 +167,21 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
 
   function getDefaultLanguage(language) {
       switch (language) {
-          case "en": return "en-US";
           case "de": return "de-DE";
+          case "el": return "el-GR";
+          case "en": return "en-US";
           case "es": return "es-ES";
+          case "fil": return "fil-PH";
           case "fr": return "fr-FR";
           case "gl": return "gl-ES";
           case "he": return "he-IL";
           case "nl": return "nl-NL";
-          case "fi": return "fi-FI";
-          case "it": return "it-IT";
-          case "ja": return "ja-JA";
-          case "tlh": return "tlh-AA";
-          case "no": return "no-NO";
           case "pl": return "pl-PL";
-          case "pt": return "pt-BR";
-          case "ru": return "ru-RU";
           case "sl": return "sl-SI";
           case "sv": return "sv-SE";
+          case "tl": return "tl-PH";
           case "tr": return "tr-TR";
           case "zh": return "zh-CN";
-          case "el": return "el-GR";
           default: return null;
       }
   }

@@ -102,10 +102,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   public static final String JOB_TYPE = "org.opencastproject.search";
 
   /** The load introduced on the system by creating an add job */
-  public static final float DEFAULT_ADD_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_ADD_JOB_LOAD = 0.1f;
 
   /** The load introduced on the system by creating a delete job */
-  public static final float DEFAULT_DELETE_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_DELETE_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the {@link DEFAULT_ADD_JOB_LOAD} */
   public static final String ADD_JOB_LOAD_KEY = "job.load.add";

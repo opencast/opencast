@@ -1,0 +1,18 @@
+{
+    "error": "Hata",
+    "error_unknown": "Bir hata oluştu. Lütfen daha sonra tekrar deneyin.",
+    "reloadPage": "Sayfayı Yenile",
+    "loginInformation": "Opencast kullanıcı hesabınızla giriş yapın",
+    "login": "Giriş Yap",
+    "enterUsernamePassword": "Lütfen kullanıcı adınızı ve şifrenizi giriniz:",
+    "username": "Kullanıcı Adı",
+    "password": "Şifre",
+    "rememberMe": "Beni hatırla",
+    "cancel": "İptal et",
+    "loginSuccessful": "Başarıyla giriş yapıldı. Sayfa otomatik yönlendirmezse lütfen yeniden yükleyin.",
+    "logoutSuccessful": "Başarıyla çıkış yapıldı. Sayfa otomatik yönlendirmezse lütfen yeniden yükleyin.",
+    "loginFailed": "Giriş yapılamadı.",
+    "description": "Açıklama",
+    "slideText": "Slayt metni",
+    "shortcuts": "Kısayollar"
+}

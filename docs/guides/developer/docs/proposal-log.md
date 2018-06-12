@@ -305,6 +305,50 @@ to cut the release.
 G
 ```
 
+
+### Change version numbers scheme
+Proposed by Rüdiger Rolf <rrolf@uni-osnabrueck.de>>, passed on Mar 23, 2017
+
+```no-highlight
+Hi all,
+
+as we currently approach a new release, I would like to raise a question
+when it comes to our version numbers: du we need a version number that
+consists of three parts?
+
+At the moment we have
+<main-version-number>.<major-release-number>.<minor-release-number>.
+
+With our current release process, with a new release every 6 month we
+would always increase the <major-release-number>. Additional to this we
+have the <minor-release-number> for bug-fix-releases, whenever they are
+needed.
+
+But we do not have a process for increasing the <main-version-number>.
+Okay 2 years ago we were lucky enough that two long running sub-projects
+that replaced all UIs in one release were finished. That was an obvious
+reason to increase the main version. But will we ever be that lucky
+again? Is only replacing all UIs justifying a main version increase?
+If I look at the project history we had several milestones that could
+have justified a new main version, like a nearly complete refactoring of
+the backend in 1.4, the video-editor in 1.6, the Karaf update in 2.1,
+the External API in 2.3.
+
+*So my #proposal would be to remove the first part of the version number
+for all upcoming releases. So our next release would be 3.0 and the
+release at the end of the year it would be 4.0. *
+
+We would follow other projects like Sakai in this change  - although
+without the confusing part of going from 2.9.3 to 10.0, where they
+removed the first number.
+
+What are your thoughts?
+
+Regards
+Rüdiger
+```
+
+
 ### Officially declare the Admin UI Facade as internal API for exclusive use by the module matterhorn-adminui-ng
 Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 16, 2016
 

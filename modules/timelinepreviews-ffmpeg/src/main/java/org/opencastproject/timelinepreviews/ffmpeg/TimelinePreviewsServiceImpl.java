@@ -116,7 +116,7 @@ TimelinePreviewsService, ManagedService {
 
 
   /** The default job load of a timeline previews job */
-  public static final float DEFAULT_TIMELINEPREVIEWS_JOB_LOAD = 1.0f;
+  public static final float DEFAULT_TIMELINEPREVIEWS_JOB_LOAD = 0.1f;
 
   /** The key to look for in the service configuration file to override the DEFAULT_TIMELINEPREVIEWS_JOB_LOAD */
   public static final String TIMELINEPREVIEWS_JOB_LOAD_KEY = "job.load.timelinepreviews";

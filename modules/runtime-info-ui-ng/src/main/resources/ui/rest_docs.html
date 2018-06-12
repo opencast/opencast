@@ -1,109 +1,16 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <!-- vim: et:ts=2:sw=2:sts=2:cc=121
 -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang=en>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
+<meta http-equiv=content-type content="text/html; charset=utf-8" />
 <link rel="shortcut icon" href="img/favicon.ico" />
 <title>Opencast REST Service Documentation</title>
 
-<style>
-body {
-  font-family: "Open Sans", Helvetica, sans-serif;
-  font-size: 14px;
-  padding: 0px;
-  margin: 0px;
-}
+<link rel=stylesheet type=text/css href=rest_docs.css />
 
-header {
-  padding: 20px;
-}
-
-h1 {
-  background-color: #2075b1;
-  margin: 0px;
-  padding: 15px;
-  font-size: larger;
-  color: white;
-}
-
-nav {
-  background-color: #24425c;
-  padding: 20px;
-  padding-top:30px;
-}
-
-nav input {
-  padding: 5px;
-  width: 100%;
-}
-
-.center {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-li {
-  border: 1px solid #ddd;
-  border-radius: 2px;
-  margin: 0px;
-  margin-bottom: -1px;
-  padding: 7px;
-  list-style-type: none;
-}
-
-ul {
-  font-size: smaller;
-  color: #333;
-  padding: 20px 0;
-}
-
-a {
-  display: block;
-  color: black;
-  text-decoration: none;
-}
-
-a:hover {
-  color: gray;
-}
-
-li a span {
-  display: inline-block;
-  width: 200px;
-    font-family: monospace;
-}
-</style>
-
-<script type="text/javascript" src="js/jquery/jquery.js"></script>
-<script type="text/javascript">
-function search() {
-  var value = $('input').val();
-  $('li').each(function() {
-    $(this).toggle($(this).text().toLowerCase().indexOf(value.toLowerCase()) >= 0);
-  });
-}
-
-$(document).ready(function($) {
-  $('input').change(search);
-  $('input').keyup(search);
-
-  $.getJSON("/info/components.json", function(data) {
-    $.each(data, function(section) {
-      if ("rest" == section) {
-        data.rest.sort(function(a,b) {return a.path > b.path ? 1 : -1});
-        $.each(data.rest, function(i) {
-          $('#docs').append('<li><a href="/docs.html?path='+ data.rest[i].path + '">'
-              + '<span>' + data.rest[i].path + '</span>'
-              + data.rest[i].description + '</a></li>');
-        });
-        return;
-      }
-    });
-    search();
-  });
-});
-</script>
+<script src=js/jquery/jquery.js></script>
+<script src=rest_docs.js></script>
 </head>
 <body>
 
@@ -112,7 +19,7 @@ $(document).ready(function($) {
   <img src=img/logo/opencast.svg alt=Opencast style="width: 180px;" />
   </a>
 </header>
-<h1><div class=center>REST Service Documentation</div></h1>
+<h1><span class=center>REST Service Documentation</span></h1>
 
 <nav>
   <div class=center>
@@ -120,7 +27,7 @@ $(document).ready(function($) {
   </div>
 </nav>
 
-<ul class=center id="docs"> </ul>
+<ul class=center id=docs> </ul>
 
 </body>
 </html>

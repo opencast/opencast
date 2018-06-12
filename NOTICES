@@ -528,6 +528,11 @@ modules/kernel/src/test/resources/InfusionAll.js
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
+/modules/runtime-info-ui-ng/src/main/resources/ui/js/jquery/jquery.js
+  jQuery v3.3.1 (http://jquery.com)
+  Copyright jQuery Foundation and other contributors
+  Licensed under MIT (https://github.com/jquery/jquery/blob/master/LICENSE.txt)
+
 modules/videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/ObjTree.js
   XML.ObjTree -- XML source code from/to JavaScript object like E4X
   Author: Yusuke Kawasaki http://www.kawa.net/

@@ -58,7 +58,7 @@ public class UsersEndpointTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
 
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().expect().statusCode(HttpStatus.SC_OK)
+    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(4)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(4)).when().get(rt.host("/users.json")).asString());
 
@@ -71,30 +71,30 @@ public class UsersEndpointTest {
     int offset = 2;
     int total = 4;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
             .body("limit", equalTo(limit)).body("results", hasSize(2)).when().get(rt.host("/users.json"));
 
     offset = 0;
     limit = 2;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
-            .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
+            .body("limit", equalTo(limit)).body("results", hasSize(limit)).when()
             .get(rt.host("/users.json"));
 
     offset = 2;
     limit = 2;
 
-    given().log().all().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
+    given().queryParam("limit", limit).queryParam("offset", offset).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(total)).body("offset", equalTo(offset))
-            .body("limit", equalTo(limit)).body("results", hasSize(limit > 0 ? limit : total - offset)).when()
+            .body("limit", equalTo(limit)).body("results", hasSize(limit)).when()
             .get(rt.host("/users.json"));
   }
 
   @Test
   public void testSorting() throws Exception {
-    JSONObject actual = (JSONObject) parser.parse(given().log().all().queryParam("sort", "name:ASC").expect()
+    JSONObject actual = (JSONObject) parser.parse(given().queryParam("sort", "name:ASC").expect()
             .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("total", equalTo(4))
             .body("offset", equalTo(0)).body("limit", equalTo(100)).body("results", hasSize(4)).when()
             .get(rt.host("/users.json")).asString());
