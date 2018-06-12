@@ -68,8 +68,8 @@
       }
    },
    "MEDIAMODULE": "Módulo Multimedia",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "SYSTEM_NOTIFICATIONS": "Alertas de sistema e notificacións",
+   "LANGUAGE": "Seleccione idioma",
    "HELP": {
       "HELP": "Axuda",
       "USERS_GUIDE": "Guía do Usuario",
@@ -109,10 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Non se puido retomar o procesamento.",
       "EVENTS_PROCESSING_ACTION_NONE": "Cancelando o procesamento...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Non se puido cancelar o procesamento.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Procesamento detido.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Non se puido deter o procesamento.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Fluxo de traballo borrado.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Non se puido borrar o fluxo de traballo.",
       "SERIES_UPDATED_NB": "{{ number }} series foron actualizadas correctamente",
       "SERIES_UPDATED_ALL": "Todas as series foron actualizadas correctamente",
       "SERIES_NOT_UPDATED": "Non se puido gardar a serie",
@@ -387,7 +387,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Data de fin",
-                  "END_TIME": "End time",
+                  "END_TIME": "Hora de finalización",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -469,16 +469,16 @@
             "NOCONTENT": "Non hai información dispoñible",
             "PUBLISHED": "Publicado",
             "TOOLTIP": {
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
-               "EDITOR": "Open video Editor",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow"
+               "START": "Filtro para esta data de inicio",
+               "SERIES": "Filtro para esta serie",
+               "STATUS": "Filtro para o estado deste evento",
+               "LOCATION": "Filtro para esta ubicación",
+               "DETAILS": "Abrir detalles do evento",
+               "DELETE": "Borrar evento",
+               "PREVIEW": "Abrir reprodutor da vista previa",
+               "EDITOR": "Abrir editor de vídeo",
+               "COMMENTS": "Ver comentarios",
+               "PAUSED_WORKFLOW": "Ver fluxos de traballo pausados"
             }
          },
          "SCHEDULING_STATUS": {
@@ -516,14 +516,14 @@
             "GENERAL": {
                "PUBLICATION_STATUS": "Publicacións",
                "NO_PUBLICATIONS_AVAILABLE": "Este evento non ten publicacións",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "PUBLICATION_DESCRIPTION": "Este evento foi publicado nas seguintes canles de publicación:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento non se atopa actualmente en progreso",
                "SCHEDULING_STATUS": "Estado",
                "READY_FOR_RECORDING": "Preparado para gravar",
                "OPTED_OUT": "Non se gravará",
                "CUSTOM": "Personalizado",
                "ENGAGE": "Engage",
-               "ENGAGE_LIVE": "Engage Live",
+               "ENGAGE_LIVE": "Participar en Directo",
                "EXTERNAL_API": "Publicación na API Externa",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -581,7 +581,7 @@
                   "START_TIME": "Hora de inicio",
                   "TIMEZONE": "Zona horaria",
                   "END_DATE": "Data de fin",
-                  "END_TIME": "End time",
+                  "END_TIME": "Hora de finalización",
                   "DURATION": "Duración"
                },
                "SCHEDULE_SINGLE": {
@@ -819,10 +819,10 @@
                "NO_CONFIGURATION": "Non existen parámetros de configuración para o fluxo de traballo seleccionado.",
                "WORKFLOW": "Fluxo de traballo",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "Deter a execución da instancia de fluxo de traballo",
+                  "ABORT": "Anular a execución da instancia de fluxo de traballo (non volver tentar a operación errada)",
+                  "RETRY": "Volver tentar a execución da instancia de fluxo de traballo",
+                  "DELETE": "Borrar a instancia de fluxo do traballo"
                }
             },
             "WORKFLOW_DETAILS": {
@@ -919,10 +919,10 @@
             "THEME": {
                "CAPTION": "Estilo",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Opcionalmente pode usar estilos para marcar os seus vídeos. Os estilos poden definir cortinillas e avances de vídeo, marcas de auga e diapositivas de títulos, incluindo os metadatos."
                },
                "TITLE": "Estilo",
-               "LABEL": "Sen estilo",
+               "LABEL": "Por favor seleccione un estilo",
                "EMPTY": "Non hai estilos dispoñibles"
             },
             "SUMMARY": {
@@ -939,9 +939,9 @@
             "EVENTS": "Eventos",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "SERIES": "Filtrar eventos para esta serie",
+               "DETAILS": "Abrir detalles da serie",
+               "DELETE": "Eliminar serie"
             }
          },
          "DETAILS": {
@@ -1048,9 +1048,9 @@
             "BLACKLIST_TO": "Na lista negra ata",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "Filtrar eventos para esta ubicación",
+               "DETAILS": "Abrir detalles da ubicación",
+               "DELETE": "Borrar ubicación (Dar de baixa axente de captura)"
             }
          },
          "DETAILS": {
@@ -1144,8 +1144,8 @@
             "BLACKLIST_TO": "Na lista negra ata",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Eliminar usuario",
+               "DETAILS": "Abrir detalles do usuario"
             }
          },
          "DETAILS": {
@@ -1188,8 +1188,8 @@
             "ROLE": "Rol",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "Abrir detalles do grupo",
+               "DELETE": "Eliminar o grupo"
             }
          },
          "DETAILS": {
@@ -1232,8 +1232,8 @@
             "IN_USE": "En uso",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "Eliminar política de acceso",
+               "DETAILS": "Abrir detalles da política de acceso"
             }
          },
          "NEW": {
@@ -1452,8 +1452,8 @@
             "USAGE": "Uso",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Eliminar o estilo",
+               "DETAILS": "Abrir detalles do estilo"
             }
          },
          "DETAILS": {
@@ -1585,17 +1585,17 @@
             "SANITIZE": "Limpar estado de error",
             "ACTION": "Accións",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "Sanea-lo servizo (reestablecer o servizo ó estado normal)"
             }
          }
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Advertencia: algúns dos seus cambios non foron gardados. Se abandona o editor de vídeo, estes cambios perderanse. De verdade queres continuar?",
       "TIMELINE": "Liña de tempo",
       "ZOOMLEVEL": "Nivel de zoom",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "PREVIEW_MODE": "Modo de vista previa",
+      "PREVIEW_MODE_TOOLTIP": "Reproducir só segmentos seleccionados",
       "ZOOM": "Zoom",
       "BUTTONS": {
          "CLOSE": "Pechar",
@@ -1663,8 +1663,8 @@
       "PLACEHOLDER": "Procurar…",
       "PROFILES": {
          "FILTERS_HEADER": "Grupos de filtros gardados",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
+         "EDIT": "Editar conxunto de filtros",
+         "REMOVE": "Borrar filtro gardado",
          "EMPTY": "Aínda non se gardou ningún filtro",
          "SAVE_FILTERS": "Gardar",
          "FILTER_HEADER": "Gardar grupo de filtros",
