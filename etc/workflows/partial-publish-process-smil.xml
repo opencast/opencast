@@ -67,7 +67,7 @@
        <configuration key="smil-flavor">smil/cutting</configuration>
        <!-- Both operations are tagged and flavored the same way -->
        <configuration key="target-flavors">*/delivery</configuration>
-       <configuration key="target-tags">archive,engage-download,engage-streaming</configuration>
+       <configuration key="target-tags">engage-download,engage-streaming</configuration>
        <!-- tag target media with profile Id, so that specific media can be selected  -->
        <configuration key="tag-with-profile">true</configuration>
        <!-- Separate sets of encoding profiles are defined for presenter and presentation, the two sets are separated by a semi colon in the same order as in the source flavors -->
@@ -110,7 +110,7 @@
       description="Tagging output videos for publication">
       <configurations>
         <configuration key="source-tags">mp4-hd.http</configuration>
-        <configuration key="target-tags">+720p-quality,+archive</configuration>
+        <configuration key="target-tags">+720p-quality</configuration>
       </configurations>
     </operation>
 
@@ -138,7 +138,7 @@
       <configurations>
         <configuration key="source-flavor">*/delivery</configuration>
         <!-- only use videos with these source tags -->
-        <configuration key="source-tags">mp4-hd.http</configuration>
+        <configuration key="source-tags">mp4-hd.http,mp4-vga-hd.http</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
@@ -155,7 +155,7 @@
       <configurations>
         <configuration key="source-flavor">*/delivery</configuration>
         <!-- Use ony the highest quality video to produce image -->
-        <configuration key="source-tags">mp4-hd.http</configuration>
+        <configuration key="source-tags">mp4-hd.http,mp4-vga-hd.http</configuration>
         <configuration key="target-flavor">*/player+preview</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
@@ -207,8 +207,7 @@
       description="Extracting text from presentation segments">
       <configurations>
         <configuration key="source-flavor">presentation/delivery</configuration>
-        <!-- The only media used here is presentation/delivery AND mp4-hd.http -->
-        <configuration key="source-tags">mp4-hd.http</configuration>
+        <configuration key="source-tags">mp4-hd.http,mp4-vga-hd.http</configuration>
         <configuration key="target-tags">engage-download</configuration>
       </configurations>
     </operation>
@@ -279,19 +278,6 @@
         <configuration key="streaming-tags">engage-streaming</configuration>
         <configuration key="check-availability">true</configuration>
         <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to YouTube -->
-
-    <operation
-      id="publish-youtube"
-      if="${publishToYouTube}"
-      max-attempts="2"
-      exception-handler-workflow="partial-error"
-      description="Publishing to YouTube">
-      <configurations>
-        <configuration key="source-tags">engage-download</configuration>
       </configurations>
     </operation>
 
