@@ -47,6 +47,7 @@ module.exports = function (config) {
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
+            'test/unit/setup.js',
             'test/unit/**/*Helper.js',
             'test/unit/**/*Spec.js'
         ],

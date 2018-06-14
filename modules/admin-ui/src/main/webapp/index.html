@@ -6,7 +6,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(.) styles/vendor.css -->
+        <!-- build:css(src/main) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
         <!-- endbower -->
@@ -86,6 +86,9 @@
                         <a target="_self" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
+                        </li>
+                        <li>
+                            <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
                         </li>
                     </ul>
                 </div>
@@ -331,6 +334,7 @@
         <script src="scripts/shared/controllers/applicationController.js"></script>
         <script src="scripts/shared/controllers/userPreferencesController.js"></script>
         <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
+        <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
         <script src="scripts/modules/events/controllers/eventsController.js"></script>
         <script src="scripts/modules/events/controllers/eventController.js"></script>
         <script src="scripts/modules/events/controllers/editStatusController.js"></script>
