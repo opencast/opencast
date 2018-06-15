@@ -788,7 +788,9 @@ public class EncoderEngine implements AutoCloseable {
           Boolean hasAudio) throws Exception {
     double vfade = transitionDuration / 1000; // video and audio have the same transition duration
     double afade = vfade;
-    DecimalFormat f = new DecimalFormat("0.00");
+    DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
+    ffmpegFormat.setDecimalSeparator('.');
+    DecimalFormat f = new DecimalFormat("0.00", ffmpegFormat);
     List<String> vpads = new ArrayList<>();
     List<String> apads = new ArrayList<>();
     List<String> clauses = new ArrayList<>(); // The clauses are ordered
