@@ -1473,7 +1473,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    return index.getWorkflowInstances(query, Permissions.Action.WRITE.toString(), true);
+    return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
   }
 
   /**
