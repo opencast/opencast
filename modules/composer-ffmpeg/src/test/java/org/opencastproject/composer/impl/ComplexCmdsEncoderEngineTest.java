@@ -28,6 +28,7 @@ import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -229,14 +230,12 @@ public class ComplexCmdsEncoderEngineTest {
 
       @Override
       public Job inspect(URI uri, Map<String, String> options) throws MediaInspectionException {
-        // TODO Auto-generated method stub
         return null;
       }
 
       @Override
       public Job enrich(MediaPackageElement original, boolean override, Map<String, String> options)
               throws MediaInspectionException, MediaPackageException {
-        // TODO Auto-generated method stub
         return null;
       }
     };
@@ -318,7 +317,6 @@ public class ComplexCmdsEncoderEngineTest {
       assertTrue(outputs.get(i).exists());
       assertTrue(outputs.get(i).length() > 0);
     }
-    // TODO: inspect the file
   }
 
   @Test
@@ -361,7 +359,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // When edit points are out of order in the SMIL
@@ -435,7 +432,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // Single input, Single output, No Filter
@@ -463,7 +459,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // Single input, Two outputs, No Edit, No transition
@@ -475,15 +470,97 @@ public class ComplexCmdsEncoderEngineTest {
     EncodingProfile[] eprofiles = { profileScanner.getProfile("h264-low.http"),
             profileScanner.getProfile("h264-medium.http")};
     File[] files = { sourceFile1 };
-    Map<String, String> params = new HashMap<String, String>();
-    String outDir = sourceFile1.getAbsoluteFile().getParent();
-    String outFileName = FilenameUtils.getBaseName(sourceFile1.getName());
-    params.put("out.file.basename", outFileName);
-    params.put("out.dir", outDir);
     List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), null, Arrays.asList(eprofiles), 0, true, true);
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
   }
 
+  @Test
+  public void testRawMultiEncode() throws EncoderException {
+    if (!ffmpegInstalled)
+      return;
+    // EncodingProfile profile = profileScanner.getProfile(multiProfile);
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("flash.rtmp"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, true);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+}
+
+  @Test
+  public void testRawMultiEncodeNoAudio() throws EncoderException {
+    if (!ffmpegInstalled)
+      return;
+    // EncodingProfile profile = profileScanner.getProfile(multiProfile);
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("flash.rtmp"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, false);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+  }
+
+  @Test
+  public void testMultiEncodeSingleProfile() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideo.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    // Workspace workspace = EasyMock.createNiceMock(Workspace.class);
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, false);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+  }
+
+  @Test
+  public void testMultiEncodeJob() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    String[] profiles = { "h264-low.http", "flash.rtmp", "h264-medium.http" };
+    String sourceTrack1Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
+            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type='presentation/source'"
+            + " id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>" + "<duration>7000</duration>"
+            + "<mimetype>video/mpeg</mimetype>" + "<url>video.mp4</url>"
+            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
+            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
+            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
+    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrack1Xml);
+
+    Job multiencode = composerService.multiEncode(sourceTrack, Arrays.asList(profiles));
+
+    JobBarrier barrier = new JobBarrier(null, serviceRegistry, multiencode);
+    if (!barrier.waitForJobs().isSuccess()) {
+      Assert.fail("multiEncode job did not success!");
+    }
+    @SuppressWarnings("unchecked")
+    List<Track> processedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(multiencode.getPayload());
+    Assert.assertNotNull(processedTracks);
+    Assert.assertEquals(profiles.length, processedTracks.size());
+    for (Track processedTrack : processedTracks) {
+      Assert.assertNotNull(processedTrack.getIdentifier());
+      // Assert.assertEquals(processedTrack.getMimeType(), MimeType.mimeType("video", "mp4"));
+    }
+
+  }
 }
