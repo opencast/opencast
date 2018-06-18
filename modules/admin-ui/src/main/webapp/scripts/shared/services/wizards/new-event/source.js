@@ -489,24 +489,27 @@ angular.module('adminNg.services')
 
                     //Variables needed to determine an event's start time
                     var startTime = orgProperties['admin.event.new.start_time'] || '08:00';
-                    var endTime = orgProperties['admin.event.new.end_time'] || '20:00';
-                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || (12 * 60));
+                    var cutoffTime = orgProperties['admin.event.new.end_time'] || '20:00';
+                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || 55);
                     var intervalMins = parseInt(orgProperties['admin.event.new.interval'] || 60);
 
                     var chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime );
-                    var endSlot =  moment( moment().format('YYYY-MM-DD') + ' ' + endTime );
+                    var endSlot =  moment( moment().format('YYYY-MM-DD') + ' ' + cutoffTime );
                     var dateNow = moment();
                     var timeDiff = dateNow.unix() - chosenSlot.unix();
 
-                    //Find the next available timeslot for an event's start time
+                    // Find the next available timeslot for an event's start time
                     if (timeDiff > 0) {
                         var multiple = Math.ceil( timeDiff/(intervalMins * 60) );
                         chosenSlot.add(multiple * intervalMins, 'minute');
                         if (chosenSlot.unix() >= endSlot.unix()) {
-                            endSlot = moment( chosenSlot ).add(durationMins, 'minutes');
+                          // The slot would start after the defined cutoff time (too late in the day), so we
+                          // use the day's start time on tomorrow
+                          chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime ).add(1, 'day');
+                            
                         }
-                        durationMins = endSlot.diff(chosenSlot, 'minutes');
                     }
+                    var endDateTime = moment( chosenSlot ).add(durationMins, 'minutes');
 
                     defaults.start = {
                                          date: chosenSlot.format('YYYY-MM-DD'),
@@ -520,9 +523,9 @@ angular.module('adminNg.services')
                                         };
 
                     defaults.end = {
-                                         date: endSlot.format('YYYY-MM-DD'),
-                                         hour: parseInt(endSlot.format('H')),
-                                         minute: parseInt(endSlot.format('mm'))
+                                         date: endDateTime.format('YYYY-MM-DD'),
+                                         hour: parseInt(endDateTime.format('H')),
+                                         minute: parseInt(endDateTime.format('mm'))
                                      };
 
                     defaults.presentableWeekdays = chosenSlot.format('dd');
