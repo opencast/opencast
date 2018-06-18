@@ -25,6 +25,9 @@ import static org.apache.solr.client.solrj.util.ClientUtils.escapeQueryChars;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.data.Option.option;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -43,7 +46,6 @@ import org.opencastproject.solr.SolrServerFactory;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SolrUtils;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
-import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
@@ -191,6 +193,9 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
   /** The security service */
   private SecurityService securityService = null;
+
+  /** The asset manager */
+  private AssetManager assetManager = null;
 
   /** Whether to index workflows synchronously as they are stored */
   protected boolean synchronousIndexing = true;
@@ -491,19 +496,27 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     doc.addField(WORKFLOW_CREATOR_KEY, workflowCreator.getUsername());
     doc.addField(ORG_KEY, instance.getOrganization().getId());
 
-    WorkflowInstance.WorkflowState state = instance.getState();
-    if (!(WorkflowInstance.WorkflowState.SUCCEEDED.equals(state)
-            || WorkflowInstance.WorkflowState.FAILED.equals(state)
-            || WorkflowInstance.WorkflowState.STOPPED.equals(state))) {
+    // Media package used to get the active acl
+    MediaPackage aclMp = mp;
 
-      AccessControlList acl;
-      try {
-        acl = authorizationService.getActiveAcl(mp).getA();
-      } catch (Error e) {
-        logger.error("No security xacml found on media package {}", mp);
-        throw new WorkflowException(e);
+    // If workflow has ended, get the latest acl from the asset manager because there may be no security
+    // attachments in the workspace anymore
+    WorkflowInstance.WorkflowState state = instance.getState();
+    if (state.isTerminated()) {
+      AQueryBuilder query = assetManager.createQuery();
+      AResult result = query.select(query.snapshot())
+              .where(query.mediaPackageId(mp.getIdentifier().compact()).and(query.version().isLatest())).run();
+      if (result.getSize() > 0 && result.getRecords().head().isSome()) {
+        aclMp = result.getRecords().head().get().getSnapshot().get().getMediaPackage();
       }
+    }
+
+    try {
+      AccessControlList acl = authorizationService.getActiveAcl(aclMp).getA();
       addAuthorization(doc, acl);
+    } catch (Error e) {
+      logger.warn("Could not find active acl for media package {}", mp, e);
+      // Solr document will not have acl info
     }
 
     return doc;
@@ -1113,6 +1126,16 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    */
   protected void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Callback for setting the asset manager.
+   *
+   * @param assetManager
+   *          the asset manager
+   */
+  protected void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
 }
