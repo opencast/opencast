@@ -90,6 +90,14 @@ order:
         - Password: welcome
     - [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
     - Flash based
-- AppearIn
-    - [Conference room](https://appear.in/opencast)
-    - WebRTC based; Max. 4 users
+
+### Other Services
+
+Other services and the primary contact for them:
+
+- Google
+    - Greg Logan
+- Twitter
+    - Lars Kiesow
+- Facebook
+    - Rüdiger Rolf

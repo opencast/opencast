@@ -6,8 +6,30 @@ Opencast 5
 
 ### Opencast 5.0
 
+*Released on June 12, 2018*
+
+- [[MH-12952](https://opencast.jira.com/browse/MH-12952)][[#295](https://github.com/opencast/opencast/pull/295)] -
+  animate WOH dependency version fixed
+- [[MH-12946](https://opencast.jira.com/browse/MH-12946)][[#290](https://github.com/opencast/opencast/pull/290)] -
+  Fix summary of add-event-dialog
+- [[MH-12944](https://opencast.jira.com/browse/MH-12944)][[#288](https://github.com/opencast/opencast/pull/288)] -
+  Remove bashism from start script
+- [[MH-12905](https://opencast.jira.com/browse/MH-12905)][[#287](https://github.com/opencast/opencast/pull/287)] -
+  TEMPORARY Karaf config assembly workaround (KARAF-5693)
+- [[MH-12943](https://opencast.jira.com/browse/MH-12943)][[#286](https://github.com/opencast/opencast/pull/286)] -
+  Minor Paella config REST endpoint improvements
+- [[MH-12942](https://opencast.jira.com/browse/MH-12942)][[#285](https://github.com/opencast/opencast/pull/285)] -
+  Paella player config REST endpoint should be accessible by anonymous user
 - [[MH-12941](https://opencast.jira.com/browse/MH-12941)][[#284](https://github.com/opencast/opencast/pull/284)] -
   Gracefully handle empty flavors
+- [[MH-12940](https://opencast.jira.com/browse/MH-12940)][[#283](https://github.com/opencast/opencast/pull/283)] -
+  Ensure admin configuration is applied
+- [[MH-12864](https://opencast.jira.com/browse/MH-12864)][[#282](https://github.com/opencast/opencast/pull/282)] -
+  Don't attempt to parse 'undefined'
+- [[MH-12938](https://opencast.jira.com/browse/MH-12938)][[#281](https://github.com/opencast/opencast/pull/281)] -
+  Fix NullPointerException if no flavor is set
+- [[MH-12937](https://opencast.jira.com/browse/MH-12937)][[#280](https://github.com/opencast/opencast/pull/280)] -
+  Correctly place admin UI test helper
 - [[MH-12936](https://opencast.jira.com/browse/MH-12936)][[#279](https://github.com/opencast/opencast/pull/279)] -
   Handle invalid flavors
 - [[MH-12935](https://opencast.jira.com/browse/MH-12935)][[#278](https://github.com/opencast/opencast/pull/278)] -
@@ -20,8 +42,8 @@ Opencast 5
   Kernel Build Failure
 - [[MH-12922](https://opencast.jira.com/browse/MH-12922)][[#272](https://github.com/opencast/opencast/pull/272)] -
   Job load fixes
-- [Change paella URL to /paella/ui
-  ](https://github.com/opencast/opencast/pull/271)
+- [[MH-12929](https://opencast.jira.com/browse/MH-12929)][[#271](https://github.com/opencast/opencast/pull/271)] -
+  Change paella URL to /paella/ui
 - [[MH-12928](https://opencast.jira.com/browse/MH-12928)][[#270](https://github.com/opencast/opencast/pull/270)] -
   Mitigation for KARAF-5526
 - [[MH-12926](https://opencast.jira.com/browse/MH-12926)][[#269](https://github.com/opencast/opencast/pull/269)] -
@@ -46,8 +68,8 @@ Opencast 5
   Fix segmentation default job load
 - [[MH-12906](https://opencast.jira.com/browse/MH-12906)][[#249](https://github.com/opencast/opencast/pull/249)] -
   Composoer should ignore system specific output pathes like /dev/null
-- [ MH-12902 closing videoeditor should continue in events list
-  ](https://github.com/opencast/opencast/pull/248)
+- [[MH-12902](https://opencast.jira.com/browse/MH-12902)][[#248](https://github.com/opencast/opencast/pull/248)] -
+  closing videoeditor should continue in events list
 - [[MH-12901](https://opencast.jira.com/browse/MH-12901)][[#247](https://github.com/opencast/opencast/pull/247)] -
   Fix YouTube publication job loads
 - [[MH-12900](https://opencast.jira.com/browse/MH-12900)][[#246](https://github.com/opencast/opencast/pull/246)] -
@@ -56,6 +78,8 @@ Opencast 5
   Fix streaming distribution job load defaults
 - [[MH-12898](https://opencast.jira.com/browse/MH-12898)][[#244](https://github.com/opencast/opencast/pull/244)] -
   Fix download distribution job load defaults
+- [[MH-12897](https://opencast.jira.com/browse/MH-12897)][[#243](https://github.com/opencast/opencast/pull/243)] -
+  Improve visibility of selected segments in the videoeditor
 - [[MH-12896](https://opencast.jira.com/browse/MH-12896)][[#242](https://github.com/opencast/opencast/pull/242)] -
   Clarify default player configuration
 - [[MH-12894](https://opencast.jira.com/browse/MH-12894)][[#240](https://github.com/opencast/opencast/pull/240)] -
@@ -140,8 +164,8 @@ Opencast 5
   UTF-8 encoding settings in OAI-PMH publication service remote
 - [[MH-12616](https://opencast.jira.com/browse/MH-12616)][[#152](https://github.com/opencast/opencast/pull/152)] -
   Admin UI Flexible Asset Upload override or fallback display text
-- [Add JavaScript source map generation
-  ](https://github.com/opencast/opencast/pull/146)
+- [[MH-12775](https://opencast.jira.com/browse/MH-12775)][[#146](https://github.com/opencast/opencast/pull/146)] -
+  Add JavaScript source map generation
 - [[MH-12768](https://opencast.jira.com/browse/MH-12768)][[#142](https://github.com/opencast/opencast/pull/142)] -
   Minor XACMLAuthorizationService fixes
 - [[MH-12825](https://opencast.jira.com/browse/MH-12825)][[#139](https://github.com/opencast/opencast/pull/139)] -
