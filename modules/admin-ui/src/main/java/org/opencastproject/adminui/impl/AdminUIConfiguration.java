@@ -43,6 +43,8 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_SMIL_CATALOG_FLAVOR = "smil.catalog.flavor";
   public static final String OPT_SMIL_CATALOG_TAGS = "smil.catalog.tags";
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
+  public static final String OPT_EDIT_COMPETITIVE = "competitiveEditing";
+  public static final String OPT_EDIT_LOCK_TIMEOUT = "minimumLockTimeout";
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
   private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
@@ -55,6 +57,8 @@ public class AdminUIConfiguration implements ManagedService {
   private Set<String> smilCatalogTagSet = new HashSet<>();
   private MediaPackageElementFlavor smilCatalogFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_CATALOG_FLAVOR);
   private MediaPackageElementFlavor smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(DEFAULT_SMIL_SILENCE_FLAVOR);
+  private boolean competitiveEdit = false;
+  private int lockTimeout = 30;
 
   public String getPreviewSubtype() {
     return previewSubtype;
@@ -74,6 +78,14 @@ public class AdminUIConfiguration implements ManagedService {
 
   public MediaPackageElementFlavor getSmilSilenceFlavor() {
     return smilSilenceFlavor;
+  }
+
+  public boolean isCompetitiveEdits() {
+    return competitiveEdit;
+  }
+
+  public int getLockTimeout() {
+    return lockTimeout;
   }
 
   @Override
@@ -107,6 +119,21 @@ public class AdminUIConfiguration implements ManagedService {
     smilSilenceFlavor = MediaPackageElementFlavor.parseFlavor(
       StringUtils.defaultString((String) properties.get(OPT_SMIL_SILENCE_FLAVOR), DEFAULT_SMIL_SILENCE_FLAVOR));
     logger.debug("Smil silence flavor configuration set to '{}'", smilSilenceFlavor);
+
+    // Competitive editing
+    String optCompetitive = StringUtils.trimToNull((String) properties.get(OPT_EDIT_COMPETITIVE));
+    if (optCompetitive != null) {
+      competitiveEdit = Boolean.valueOf(optCompetitive);
+    }
+    // Editing lock timeout
+    String optTimeout = StringUtils.trimToNull((String) properties.get(OPT_EDIT_LOCK_TIMEOUT));
+    if (optTimeout != null) {
+      try {
+        lockTimeout = Integer.valueOf(optTimeout);
+      } catch (NumberFormatException e) {
+        logger.info("Invalid value for minimumLockTimeout using {} min", lockTimeout);
+      }
+    }
   }
 
 }

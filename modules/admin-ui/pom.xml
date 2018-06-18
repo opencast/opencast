@@ -452,6 +452,7 @@
               OSGI-INF/language-service.xml,
               OSGI-INF/languages_endpoint.xml,
               OSGI-INF/message-receiver-acl.xml,
+              OSGI-INF/mediapackage_lock.xml,
               OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
               OSGI-INF/message-receiver-group.xml,

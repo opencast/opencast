@@ -25,10 +25,6 @@ angular.module('adminNg.controllers')
 .controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
     function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
 
-        $scope.navigateTo = function (path) {
-            $location.path(path).replace();
-        };
-
         $scope.event    = EventHelperService;
         $scope.resource = $route.current.params.resource;
         $scope.tab      = $route.current.params.tab;
@@ -40,6 +36,11 @@ angular.module('adminNg.controllers')
         $scope.event.eventId = $scope.id;
 
         $scope.unsavedChanges = false;
+
+        $scope.navigateTo = function (path) {
+            ToolsResource.release({id: $scope.id, tool: 'lock'});
+            $location.path(path).replace();
+        };
 
         $scope.setChanges = function(changed) {
             $scope.unsavedChanges = changed;
@@ -69,9 +70,26 @@ angular.module('adminNg.controllers')
 
         // TODO Move the following to a VideoCtrl
         $scope.player = {};
-        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
+        $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' }, function () {
+          if ($scope.video.status === 'locked' ) {
+            $scope.video.user = $scope.video.lockingUser.name + " (" + $scope.video.lockingUser.email + ")";
+            if ($scope.video.editWhenLocked) {
+              Notifications.addWithParams('warning', 'VIDEO_CURRENTLY_EDITED_BY', {user: $scope.video.user}, 'global', -1);
+            } else {
+              Notifications.addWithParams('error', 'VIDEO_EDIT_LOCKED_MINS', {user: $scope.video.user, minutes: $scope.video.lockedTime}, 'global', 10000);
+              $location.url('/events/' + $scope.resource);
+            }
+          }
+          if ($scope.video.status === 'no preview' ) {
+            Notifications.add('error', 'VIDEO_LOCKED_NO_PREVIEW', 'global', 10000);
+            $location.url('/events/' + $scope.resource);
+          }
+        });
 
         $scope.submitButton = false;
+        $scope.release = function() {
+          ToolsResource.release({id: $scope.id, tool: 'lock'});
+        };
         $scope.submit = function () {
             $scope.submitButton = true;
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
@@ -92,6 +110,20 @@ angular.module('adminNg.controllers')
         $scope.leave = function () {
             Storage.put('pagination', $scope.resource, 'resume', true);
             $location.url('/events/' + $scope.resource);
+        };
+        // Release lock when changing template
+        $scope.$on("$destroy", function(){
+            ToolsResource.release({id: $scope.id, tool: 'lock'});
+        });
+        // Release lock when navigating away from Opencast
+        $window.onbeforeunload = function () {
+          // Have to delete lock with synch call
+          var request = new XMLHttpRequest();
+          request.open('DELETE', 'tools/' + $scope.id + '/lock.json', false);
+          request.send(null);
+          if (request.status === 200) {
+            console.log('lock freed');
+          }
         };
     }
 ]);

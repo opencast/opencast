@@ -157,6 +157,7 @@
     <sec:intercept-url pattern="/admin-ng/series/*/theme" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_THEMES_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/lock.json" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_USERS_DELETE" />
 
     <!-- Securing the URLs for the external API interface -->
