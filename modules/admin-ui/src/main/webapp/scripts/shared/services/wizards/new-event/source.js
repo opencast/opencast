@@ -506,7 +506,6 @@ angular.module('adminNg.services')
                           // The slot would start after the defined cutoff time (too late in the day), so we
                           // use the day's start time on tomorrow
                           chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime ).add(1, 'day');
-                            
                         }
                     }
                     var endDateTime = moment( chosenSlot ).add(durationMins, 'minutes');
