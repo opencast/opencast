@@ -268,7 +268,10 @@
    "DATES": {
      "TODAY":     "Today",
      "TOMORROW":  "Tomorrow",
-     "YESTERDAY": "Yesterday"
+     "YESTERDAY": "Yesterday",
+     "THIS_YEAR": "This year",
+     "THIS_MONTH": "This month",
+     "THIS_WEEK": "This week"
    },
    "DATETIMES": {
      "TODAY":     "Today at {{ time }}",

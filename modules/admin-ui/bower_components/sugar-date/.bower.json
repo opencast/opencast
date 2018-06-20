@@ -1,0 +1,47 @@
+{
+  "name": "sugar-date",
+  "description": "Date module for the Sugar Javascript utility library.",
+  "homepage": "https://sugarjs.com/",
+  "license": "MIT",
+  "authors": [
+    "Andrew Plummer <plummer.andrew@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/andrewplummer/Sugar.git"
+  },
+  "keywords": [
+    "sugar",
+    "sugarjs",
+    "functional",
+    "browser",
+    "utility",
+    "util",
+    "date",
+    "time"
+  ],
+  "main": "dist/sugar-date.js",
+  "ignore": [
+    "**/*",
+    "!dist/*",
+    "!dist/locales/*",
+    "!CHANGELOG.md",
+    "!CAUTION.md",
+    "!README.md",
+    "!LICENSE"
+  ],
+  "moduleType": [
+    "globals"
+  ],
+  "version": "2.0.4",
+  "_release": "2.0.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "2.0.4",
+    "commit": "ac498bfb100fd87697990d1b0b5fb60538f5f55e"
+  },
+  "_source": "https://github.com/andrewplummer/sugar-date.git",
+  "_target": "^2.0.4",
+  "_originalSource": "sugar-date",
+  "_direct": true
+}
