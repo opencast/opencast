@@ -24,7 +24,7 @@ It is important that the appender jar is a valid fragment-bundle of `org.ops4j.p
 
 That means the jar MANIFEST.MF must contain this section `Fragment-Host: org.ops4j.pax.logging.pax-logging-service`.
 
-Add the following line to the startup.properties:
+Add the following line at the beginning of the startup.properties file:
 
 ```
 mvn\:org.graylog2/gelfj/X.X.X = 7
@@ -42,19 +42,40 @@ log4j.appender.gelfasync.appenders=gelf
 
 # Define the GELF destination
 log4j.appender.gelf=org.graylog2.log.GelfAppender
-log4j.appender.gelf.graylogHost=tcp:<URL OF GRAYLOG>
-log4j.appender.gelf.graylogPort=<PORT OF GRAYLOG>
+log4j.appender.gelf.graylogHost=<HOSTNAME OF GRAYLOG INPUT>
+log4j.appender.gelf.graylogPort=<PORT OF GRAYLOG INPUT>
 log4j.appender.gelf.originHost=<NAME OF SERVICE>
 log4j.appender.gelf.facility=karaf
 log4j.appender.gelf.layout=org.apache.log4j.PatternLayout
 log4j.appender.gelf.extractStacktrace=true
 log4j.appender.gelf.addExtendedInformation=true
 log4j.appender.gelf.includeLocation=true
-log4j.appender.gelf.additionalFields={'environment': 'staging'}
+log4j.appender.gelf.additionalFields={'environment': 'EXAMPLE-ENV', 'application': 'EXAMPLE-APP'}
 ```
+*Note:* The default protocol is UDP to use TCP instead, prefix hostname with `tcp:`.
 
 Add the new appender to the rootLogger
 
 ```
 log4j.rootLogger=WARN, stdout, osgi:*, gelfasync
 ```
+
+Example Configuration
+---------------------
+
+```
+# Define the GELF destination
+log4j.appender.gelf=org.graylog2.log.GelfAppender
+log4j.appender.gelf.graylogHost=tcp:graylog.opencast.org
+log4j.appender.gelf.graylogPort=12290
+log4j.appender.gelf.originHost=test.opencast.org
+log4j.appender.gelf.facility=karaf
+log4j.appender.gelf.layout=org.apache.log4j.PatternLayout
+log4j.appender.gelf.extractStacktrace=true
+log4j.appender.gelf.addExtendedInformation=true
+log4j.appender.gelf.includeLocation=true
+log4j.appender.gelf.additionalFields={'environment': 'OPENCAST-TEST-ENV', 'application': 'OC-ADMIN'}
+```
+
+You can find further gelf appender documentation [here](https://github.com/t0xa/gelfj).
+
