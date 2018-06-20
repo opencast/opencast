@@ -37,8 +37,10 @@ import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.RemoteBase;
+import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -522,6 +524,36 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     throw new EncoderException("Unable to demux track " + sourceTrack + " using a remote composer service");
   }
 
+  @Override
+  public Job processSmil(Smil smil, String trackParamGroupId, String mediaType, List<String> profileIds)
+          throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/processsmil");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("smilAsXml", smil.toXML()));
+      params.add(new BasicNameValuePair("trackId", trackParamGroupId));
+      params.add(new BasicNameValuePair("mediaType", mediaType));
+      params.add(new BasicNameValuePair("profileIds", StringUtils.join(profileIds, ","))); // comma separated profiles
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        Job r = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Concat video job {} started on a remote composer", r.getId());
+        return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to edit video group(" + trackParamGroupId + ") from smil " + smil
+            + " using the remote composer service proxy");
+  }
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.

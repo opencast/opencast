@@ -132,7 +132,7 @@
                   <!-- Correct the start script name -->
                   <replaceregexp file="target/assembly/bin/karaf" match="^KARAF_SCRIPT=.*$" replace="KARAF_SCRIPT='start-opencast'" byline="true"/>
                   <!-- Mitigation for https://issues.apache.org/jira/browse/KARAF-5526 -->
-                  <replaceregexp file="target/assembly/bin/karaf" match=" init$" replace=" [[ &quot;$TERM&quot; == *-256color ]] &amp;&amp; export TERM=xterm-color&#x0A;    init" byline="true"/>
+                  <replaceregexp file="target/assembly/bin/karaf" match=" init$" replace=" [ -z &quot;${TERM##*256color}&quot; ] &amp;&amp; export TERM=xterm-color&#x0A;    init" byline="true"/>
                   <!-- Make sure bundle cache gets cleared by default -->
                   <replaceregexp file="target/assembly/etc/system.properties" match="^karaf.clean.cache .*=.*$" replace="karaf.clean.cache = true" byline="true"/>
                   <!-- Additional config lines to system.properties -->

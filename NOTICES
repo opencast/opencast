@@ -44,13 +44,6 @@ modules/admin-ui/src/main/webapp/lib/angular-sortable.js
   Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
   MIT License
 
-modules/admin-ui/src/main/webapp/lib/backbone-1.1.0.js
-  Backbone.js 1.1.0
-  (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
-  (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
-  Backbone may be freely distributed under the MIT license.
-  http://backbonejs.org
-
 modules/admin-ui/src/main/webapp/lib/chosen.js
 modules/admin-ui/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype

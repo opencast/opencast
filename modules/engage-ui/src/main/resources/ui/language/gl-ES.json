@@ -36,6 +36,6 @@
   "login_success": "Inicio de sesión correcto.",
   "login_failed": "Fallou o inicio de sesión.",
   "not_logged_in": "Non iniciou sesión.",
-  "live_in_progress": "Live (in progress)",
-  "live_not_in_progress": "Live (not in progress)"
+  "live_in_progress": "Directo (en curso)",
+  "live_not_in_progress": "Directo (no en curso)"
 }

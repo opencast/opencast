@@ -262,6 +262,15 @@
 
 .modal {
 
+    // Just some text to loosen up the strict "tables-within-boxes" layout
+    .hint {
+        &:not(:last-child) {
+            margin-bottom: 20px;
+        }
+        font-size: 11px;
+        line-height: 18px;
+    }
+
     // Object within columns
     .obj {
         box-sizing: border-box;

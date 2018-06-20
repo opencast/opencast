@@ -24,7 +24,7 @@
   data-resource-id="{{ row.id }}"
   data-tab="comments"
   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
-  class="fa fa-comment-o">
+  class="comments">
 </a>
 
 <a ng-if="row.has_comments && row.has_open_comments"
@@ -32,7 +32,7 @@
   data-resource-id="{{ row.id }}"
   data-tab="comments"
   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
-  class="fa fa-comment">
+  class="comments-open">
 </a>
 
 <a ng-if="row.workflow_state == 'PAUSED'"
