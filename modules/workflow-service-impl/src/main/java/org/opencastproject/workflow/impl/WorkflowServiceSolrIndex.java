@@ -840,6 +840,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
    * @param query
    *          the workflow query
    * @param action
+   *          ACL action (e.g. read or write) to check for
    * @param applyPermissions
    *          whether to apply the permissions to the query. Set to false for administrative queries.
    * @return the solr query string
