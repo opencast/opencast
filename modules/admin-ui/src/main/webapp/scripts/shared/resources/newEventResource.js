@@ -39,8 +39,6 @@ angular.module('adminNg.resources')
 
             transformRequest: function (data) {
 
-                console.log(JSON.stringify(data));
-
                 if (angular.isUndefined(data)) {
                     return data = [];
                 }
