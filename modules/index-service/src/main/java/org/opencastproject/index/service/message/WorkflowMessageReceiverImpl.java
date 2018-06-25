@@ -108,8 +108,8 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
               if (loadedDC.isSome())
                 updateEvent(event, loadedDC.get());
             } catch (Throwable t) {
-              logger.warn(String.format("Unable to load dublincore catalog for the workflow %d, mp %s", wf.getId(),
-                      mp.getIdentifier().compact()), t);
+              logger.warn("Unable to load dublincore catalog for the workflow {}, mp {}", wf.getId(),
+                      mp.getIdentifier().compact(), t);
             }
 
           }

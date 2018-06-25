@@ -501,12 +501,11 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
 
     // If workflow has ended, get the latest acl from the asset manager because there may be no security
     // attachments in the workspace anymore
-    WorkflowInstance.WorkflowState state = instance.getState();
-    if (state.isTerminated()) {
+    if (instance.getState().isTerminated()) {
       AQueryBuilder query = assetManager.createQuery();
       AResult result = query.select(query.snapshot())
               .where(query.mediaPackageId(mp.getIdentifier().compact()).and(query.version().isLatest())).run();
-      if (result.getSize() > 0 && result.getRecords().head().isSome()) {
+      if (result.getRecords().head().isSome()) {
         aclMp = result.getRecords().head().get().getSnapshot().get().getMediaPackage();
       }
     }
@@ -514,7 +513,7 @@ public class WorkflowServiceSolrIndex implements WorkflowServiceIndex {
     try {
       AccessControlList acl = authorizationService.getActiveAcl(aclMp).getA();
       addAuthorization(doc, acl);
-    } catch (Error e) {
+    } catch (Exception e) {
       logger.warn("Could not find active acl for media package {}", mp, e);
       // Solr document will not have acl info
     }

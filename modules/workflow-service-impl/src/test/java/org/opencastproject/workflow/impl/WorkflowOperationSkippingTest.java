@@ -195,7 +195,6 @@ public class WorkflowOperationSkippingTest {
     Predicate p = EasyMock.createNiceMock(Predicate.class);
     EasyMock.expect(p.and(p)).andReturn(p).anyTimes();
     AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(r.getSize()).andReturn(1L).anyTimes();
     EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
     Target t = EasyMock.createNiceMock(Target.class);
     ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
