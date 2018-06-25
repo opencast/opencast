@@ -481,7 +481,7 @@
                                                             data-disable-search-threshold="8"
                                                             data-search_contains="true"
                                                             ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
-                                                            ng-options="w.id as w.title for w in workflowDefinitions"
+                                                            ng-options="w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true"
                                                             data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
                                                             no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                                                         />

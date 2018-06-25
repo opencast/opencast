@@ -1959,6 +1959,7 @@ public abstract class AbstractEventEndpoint {
 
           workflows.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
+                  f("displayOrder", v(wflDef.getDisplayOrder())),
                   f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
         }
       }

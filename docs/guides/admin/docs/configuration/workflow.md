@@ -25,6 +25,7 @@ Opencast workflows are defined in XML.  The structure of a Opencast workflow loo
       <title></title>
       <tags></tags>
       <description></description>
+      <displayOrder></displayOrder>
 
       <!-- Operations -->
       <operations>
@@ -66,6 +67,7 @@ Start by naming the workflow and giving it a meaningful description:
         Distribute to local repository.
         Publish to search index.
       </description>
+      <displayOrder>10</displayOrder>
 
       <!-- Operations -->
       <operations></operations>
@@ -80,6 +82,9 @@ Start by naming the workflow and giving it a meaningful description:
     * *archive*: Usable for archived media
     * *delete*: Usable for deletion of events with publications
     * *editor*: Usable from the video editor
+* The `displayOrder` is an integer that indicates in what order workflow definitions shall be displayed by clients.
+  If ommitted, the `displayOrder` defaults to `0`. Clients are expected to list workflow definitions in descending order.
+
 
 ### Inspect the Media
 
