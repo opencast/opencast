@@ -2,9 +2,9 @@
 
 Opencast allows restrictions considering what a user or group of users can do with capture agents to be configured.
 
-There are three kind of access restriction levels:
+There are three kinds of access restriction levels:
 
-- Unrestriced Access: Full access to all capture agents
+- Unrestricted Access: Full access to all capture agents
 - Restricted Access: No access to any capture agent
 - Selective Access: Selected access to a subset of capture agents
 
@@ -28,10 +28,10 @@ Those users cannot:
 
 It is possible to selectively allow specific users or groups of users to access subsets of capture agents.
 
-Each capture agent has a role which is derived froms its id by removing all non-alphanumerical characters and
+Each capture agent has a role which is derived from its id by removing all non-alphanumerical characters and
 prepending the prefix `ROLE_CAPTURE_AGENT_`.
-If a user with restriced access owns the roles of a set of given capture agents, the user has selective access
-to those capture agents. 
+If a user with restricted access owns the roles of a set of given capture agents, the user has selective access
+to those capture agents.
 
 **Example**
 

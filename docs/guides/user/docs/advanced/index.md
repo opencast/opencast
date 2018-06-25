@@ -4,7 +4,7 @@ This section describes facilities supposed to be used by advanced users.
 
 ### Unprivileged Users
 
-If a user owns the global administration role (`ROLE_ADMIN`), he is a privileged users in means of having access
+Privileged users are users that own the global administration role (`ROLE_ADMIN`) which grants them access
 to all data and all functionality Opencast offers.
 
 Unprivileged users are users that don't own the global administration role. For unprivileged users, Opencast offers
