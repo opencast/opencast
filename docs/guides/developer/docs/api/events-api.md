@@ -185,7 +185,7 @@ be specified for creating a single scheduled event
 To create a single scheduled event, omit the field `rrule`. The start date and time of the recording is determined by
 field `start`. The end date and time of the recording is determined by either the field `end` or `duration`.
 
-The create multiple scheduled events, the field `rrule` is used. This field contains the recurrence rule used to
+To create multiple scheduled events, the field `rrule` is used. This field contains the recurrence rule used to
 determine the dates and times the scheduled events shall be created within the time period specified by the fields
 `start` and `end` + `duration`.
 Note that `duration` is a mandatory field when creating multiple scheduled events.
