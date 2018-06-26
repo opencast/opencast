@@ -9,8 +9,8 @@ Returns a list of capture agents.
 
 Query String Parameter | Type                        | Description
 :----------------------|:----------------------------|:-----------
-`limit`                | [`integer`](types.md#basic) | The maximum number of results to return for a single request
-`offset`               | [`integer`](types.md#basic) | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return for a single request (see [Pagination](usage.md#pagination))
+`offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
 
 
 __Sample request__

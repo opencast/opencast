@@ -119,7 +119,7 @@ public class CaptureAgentsEndpoint {
       returnDescription = "",
       restParameters = {
           @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "offset", description = "Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.", isRequired = false, type = Type.INTEGER)
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = Type.INTEGER)
       },
       reponses = {
           @RestResponse(description = "A (potentially empty) list of agents is returned.", responseCode = HttpServletResponse.SC_OK)
