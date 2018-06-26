@@ -163,7 +163,7 @@
     <!-- External API GET Endpoints -->
     <sec:intercept-url pattern="/api" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <sec:intercept-url pattern="/api/agents" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/agents/*" method="GET" access="ROLE_ADMIN, ROLE_API, ROLE_API_CAPTURE_AGENTS_VIEW"/>
+    <sec:intercept-url pattern="/api/agents/*" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_VIEW"/>
