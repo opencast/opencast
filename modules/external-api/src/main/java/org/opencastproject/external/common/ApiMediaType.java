@@ -22,11 +22,12 @@ package org.opencastproject.external.common;
 
 public final class ApiMediaType {
 
-  private static final String MEDIA_TYPE_VERSION_1_1_0 = "application/v1.1.0+json";
-  private static final String MEDIA_TYPE_VERSION_1_0_0 = "application/v1.0.0+json";
-  private static final String MEDIA_TYPE_APPLICATION_JSON = "application/json";
-  private static final String MEDIA_TYPE_APPLICATION = "application/*";
-  private static final String MEDIA_TYPE_ANY = "*/*";
+  public static final String VERSION_1_1_0 = "application/v1.1.0+json";
+  public static final String VERSION_1_0_0 = "application/v1.0.0+json";
+  public static final String JSON = "application/json";
+
+  private static final String APPLICATION_ANY = "application/*";
+  private static final String ANY = "*/*";
 
   private final ApiVersion version;
   private final ApiFormat format;
@@ -41,11 +42,11 @@ public final class ApiMediaType {
   public static ApiMediaType parse(String acceptHeader) throws ApiMediaTypeException {
     /* MH-12802: The External API does not support content negotiation */
     ApiMediaType mediaType;
-    if (acceptHeader.contains(MEDIA_TYPE_VERSION_1_0_0)) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_0_0, ApiFormat.JSON, MEDIA_TYPE_VERSION_1_0_0);
-    } else if ((acceptHeader.contains(MEDIA_TYPE_VERSION_1_1_0) || acceptHeader.contains(MEDIA_TYPE_APPLICATION_JSON)
-    || acceptHeader.contains(MEDIA_TYPE_APPLICATION) || acceptHeader.contains(MEDIA_TYPE_ANY))) {
-      mediaType = new ApiMediaType(ApiVersion.VERSION_1_1_0, ApiFormat.JSON, MEDIA_TYPE_VERSION_1_1_0);
+    if (acceptHeader.contains(VERSION_1_0_0)) {
+      mediaType = new ApiMediaType(ApiVersion.VERSION_1_0_0, ApiFormat.JSON, VERSION_1_0_0);
+    } else if ((acceptHeader.contains(VERSION_1_1_0) || acceptHeader.contains(JSON)
+    || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY))) {
+      mediaType = new ApiMediaType(ApiVersion.VERSION_1_1_0, ApiFormat.JSON, VERSION_1_1_0);
     } else {
       throw ApiMediaTypeException.invalidVersion(acceptHeader);
     }

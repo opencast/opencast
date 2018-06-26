@@ -29,6 +29,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
@@ -69,7 +70,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = "", abstractText = "Provides resources and operations related to the groups")
 public class GroupsEndpoint {
 

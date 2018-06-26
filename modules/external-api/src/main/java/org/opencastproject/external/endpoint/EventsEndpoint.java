@@ -164,7 +164,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = "", abstractText = "Provides resources and operations related to the events")
 public class EventsEndpoint implements ManagedService {
   private static final String METADATA_JSON_KEY = "metadata";
@@ -1638,7 +1638,7 @@ public class EventsEndpoint implements ManagedService {
 
   @GET
   @Path("{eventId}/scheduling")
-  @Produces({ "application/json", "application/v1.1.0+json" })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, reponses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1667,7 +1667,7 @@ public class EventsEndpoint implements ManagedService {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @Produces({ "application/json", "application/v1.1.0+json" })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = STRING) }, reponses = {

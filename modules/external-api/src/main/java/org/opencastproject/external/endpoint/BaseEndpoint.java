@@ -28,6 +28,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.security.api.Organization;
@@ -80,7 +81,7 @@ import javax.ws.rs.core.Response;
  * supported API.
  */
 @Path("/")
-@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
 @RestService(name = "externalapiservice", title = "External API Service", notes = "", abstractText = "Provides a location for external apis to query the current server of the API.")
 public class BaseEndpoint {
 
@@ -207,7 +208,6 @@ public class BaseEndpoint {
 
   @GET
   @Path("version/default")
-  @Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
   @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", reponses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {

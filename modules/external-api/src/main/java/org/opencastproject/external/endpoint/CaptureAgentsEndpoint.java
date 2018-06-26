@@ -26,6 +26,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -54,7 +55,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ "application/json", "application/v1.1.0+json" })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
 @RestService(
     name = "externalapicaptureagents",
     title = "External API Capture Agents Service",

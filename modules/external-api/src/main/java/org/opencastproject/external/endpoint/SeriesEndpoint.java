@@ -119,7 +119,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/")
-@Produces({ "application/json", "application/v1.0.0+json", "application/v1.1.0+json" })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
 @RestService(name = "externalapiseries", title = "External API Series Service", notes = "", abstractText = "Provides resources and operations related to the series")
 public class SeriesEndpoint {
 
