@@ -109,8 +109,8 @@ If:
 * live.targetFlavors=presenter/delivery
 * capture agent name: ca01
 
-Then, the capture agent should stream to ('/' is replaced by '_'):
-rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/ca01-presenter_delivery.stream
+Then, the capture agent should stream to ('/' is replaced by '-'):
+rtmp://STREAMING_SERVER_HOST:PORT/STREAMING_APPLICATION/ca01-presenter-delivery.stream
 
 Note: Please refer to your streaming server or CDN documentation for the correct syntax of the streaming url. The
 _live.streamingUrl_ may be very different from the url the capture agent streams to. For instance, with Akamai, the url
