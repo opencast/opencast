@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.workflow.handler.assetmanager.AssetManagerAddWorkflowOperationHandler" immediate="true"
+               name="org.opencastproject.workflow.handler.assetmanager.AssetManagerAddWorkflowOperationHandler"
+               immediate="true"
                activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.assetmanager.AssetManagerSnapshotWorkflowOperationHandler" />
-  <property name="service.description" value="Asset Manager Take Snapshot Workflow Operation Handler" />
-  <property name="workflow.operation" value="snapshot" />
+  <implementation
+      class="org.opencastproject.workflow.handler.assetmanager.AssetManagerSnapshotWorkflowOperationHandler"/>
+  <property name="service.description" value="Asset Manager Take Snapshot Workflow Operation Handler"/>
+  <property name="workflow.operation" value="snapshot"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
-    cardinality="1..1" policy="static" bind="setAssetManager" />
+             cardinality="1..1" policy="static" bind="setAssetManager"/>
   <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-    cardinality="1..1" policy="static" bind="setServiceRegistry" />
+             cardinality="1..1" policy="static" bind="setServiceRegistry"/>
 </scr:component>

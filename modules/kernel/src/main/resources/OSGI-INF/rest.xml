@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
 
-  <scr:component name="org.opencastproject.kernel.rest.RestPublisher" activate="activate" deactivate="deactivate" immediate="true">
-    <implementation class="org.opencastproject.kernel.rest.RestPublisher" />
+  <scr:component name="org.opencastproject.kernel.rest.RestPublisher" activate="activate" deactivate="deactivate"
+                 immediate="true">
+    <implementation class="org.opencastproject.kernel.rest.RestPublisher"/>
     <service>
-      <provide interface="org.opencastproject.kernel.rest.RestPublisher" />
+      <provide interface="org.opencastproject.kernel.rest.RestPublisher"/>
     </service>
-    <property name="service.description" value="Opencast REST Endpoint Publisher" />
+    <property name="service.description" value="Opencast REST Endpoint Publisher"/>
   </scr:component>
 
 </scr:components>

@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl" immediate="true">
-    <implementation class="org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl" />
-    <property name="service.description" value="TimelinePreviews Service" />
+    <implementation class="org.opencastproject.timelinepreviews.ffmpeg.TimelinePreviewsServiceImpl"/>
+    <property name="service.description" value="TimelinePreviews Service"/>
     <service>
-      <provide interface="org.opencastproject.timelinepreviews.api.TimelinePreviewsService" />
-      <provide interface="org.osgi.service.cm.ManagedService" />
+      <provide interface="org.opencastproject.timelinepreviews.api.TimelinePreviewsService"/>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
     </service>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
-      policy="static" bind="setWorkspace" />
+               policy="static" bind="setWorkspace"/>
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.timelinepreviews.endpoint.TimelinePreviewsRestEndpoint" immediate="true">
-    <implementation class="org.opencastproject.timelinepreviews.endpoint.TimelinePreviewsRestEndpoint" />
-    <property name="service.description" value="Timeline previews REST Endpoint" />
+    <implementation class="org.opencastproject.timelinepreviews.endpoint.TimelinePreviewsRestEndpoint"/>
+    <property name="service.description" value="Timeline previews REST Endpoint"/>
 
-    <property name="opencast.service.type" value="org.opencastproject.timelinepreviews" />
-    <property name="opencast.service.path" value="/timelinepreviews" />
-    <property name="opencast.service.jobproducer" value="true" />
+    <property name="opencast.service.type" value="org.opencastproject.timelinepreviews"/>
+    <property name="opencast.service.path" value="/timelinepreviews"/>
+    <property name="opencast.service.jobproducer" value="true"/>
 
     <service>
-      <provide interface="org.opencastproject.timelinepreviews.endpoint.TimelinePreviewsRestEndpoint" />
+      <provide interface="org.opencastproject.timelinepreviews.endpoint.TimelinePreviewsRestEndpoint"/>
     </service>
 
     <reference name="timelinepreviews" interface="org.opencastproject.timelinepreviews.api.TimelinePreviewsService"
-      cardinality="1..1" policy="static" bind="setTimelinePreviewsService" />
+               cardinality="1..1" policy="static" bind="setTimelinePreviewsService"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   </scr:component>
 
 </scr:components>

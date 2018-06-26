@@ -1,75 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.publication.oaipmh.OaiPmhPublicationServiceImpl" immediate="true">
-  <implementation class="org.opencastproject.publication.oaipmh.OaiPmhPublicationServiceImpl" />
-    <property name="service.description" value="Publication Service (OAI-PMH)" />
+    <implementation class="org.opencastproject.publication.oaipmh.OaiPmhPublicationServiceImpl"/>
+    <property name="service.description" value="Publication Service (OAI-PMH)"/>
     <service>
-      <provide interface="org.opencastproject.publication.api.OaiPmhPublicationService" />
+      <provide interface="org.opencastproject.publication.api.OaiPmhPublicationService"/>
     </service>
     <reference name="serviceRegistry"
                interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
                cardinality="1..1"
                policy="static"
-               bind="setServiceRegistry" />
+               bind="setServiceRegistry"/>
     <reference name="security-service"
                interface="org.opencastproject.security.api.SecurityService"
                cardinality="1..1"
                policy="static"
-               bind="setSecurityService" />
+               bind="setSecurityService"/>
     <reference name="user-directory"
                interface="org.opencastproject.security.api.UserDirectoryService"
                cardinality="1..1"
                policy="static"
-               bind="setUserDirectoryService" />
+               bind="setUserDirectoryService"/>
     <reference name="orgDirectory"
                interface="org.opencastproject.security.api.OrganizationDirectoryService"
                cardinality="1..1"
                policy="static"
-               bind="setOrganizationDirectoryService" />
+               bind="setOrganizationDirectoryService"/>
     <reference name="persistence"
                interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
                cardinality="1..1"
                policy="static"
-               bind="setOaiPmhDatabase" />
+               bind="setOaiPmhDatabase"/>
     <reference name="downloadDistributionService"
                interface="org.opencastproject.distribution.api.DownloadDistributionService"
                cardinality="1..1"
                policy="static"
                target="(distribution.channel=download)"
-               bind="setDownloadDistributionService" />
+               bind="setDownloadDistributionService"/>
     <reference name="streamingDistributionService"
                interface="org.opencastproject.distribution.api.StreamingDistributionService"
                cardinality="1..1"
                policy="static"
-               bind="setStreamingDistributionService" />
+               bind="setStreamingDistributionService"/>
     <reference name="oaiPmhServerInfo"
                interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo"
                cardinality="1..1"
                policy="static"
-               bind="setOaiPmhServerInfo" />
+               bind="setOaiPmhServerInfo"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.publication.oaipmh.endpoint.OaiPmhPublicationRestService" immediate="true">
-    <implementation class="org.opencastproject.publication.oaipmh.endpoint.OaiPmhPublicationRestService" />
-    <property name="service.description" value="OAI-PMH Publication REST Endpoint" />
+    <implementation class="org.opencastproject.publication.oaipmh.endpoint.OaiPmhPublicationRestService"/>
+    <property name="service.description" value="OAI-PMH Publication REST Endpoint"/>
 
-    <property name="opencast.service.type" value="org.opencastproject.publication.oaipmh" />
-    <property name="opencast.service.path" value="/publication/oaipmh" />
-    <property name="opencast.service.jobproducer" value="true" />
+    <property name="opencast.service.type" value="org.opencastproject.publication.oaipmh"/>
+    <property name="opencast.service.path" value="/publication/oaipmh"/>
+    <property name="opencast.service.jobproducer" value="true"/>
 
     <service>
-      <provide interface="org.opencastproject.publication.oaipmh.endpoint.OaiPmhPublicationRestService" />
+      <provide interface="org.opencastproject.publication.oaipmh.endpoint.OaiPmhPublicationRestService"/>
     </service>
 
     <reference name="publicationService"
                interface="org.opencastproject.publication.api.OaiPmhPublicationService"
                cardinality="1..1"
                policy="static"
-               bind="setService" />
+               bind="setService"/>
     <reference name="serviceRegistry"
                interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
                cardinality="1..1"
                policy="static"
-               bind="setServiceRegistry" />
+               bind="setServiceRegistry"/>
   </scr:component>
 </scr:components>

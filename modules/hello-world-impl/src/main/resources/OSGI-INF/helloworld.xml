@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.helloworld.impl.HelloWorldServiceImpl" immediate="true">
-    <implementation class="org.opencastproject.helloworld.impl.HelloWorldServiceImpl" />
-    <property name="service.description" value="Hello World Service" />
+    <implementation class="org.opencastproject.helloworld.impl.HelloWorldServiceImpl"/>
+    <property name="service.description" value="Hello World Service"/>
     <service>
-      <provide interface="org.opencastproject.helloworld.api.HelloWorldService" />
+      <provide interface="org.opencastproject.helloworld.api.HelloWorldService"/>
     </service>
   </scr:component>
   <scr:component name="org.opencastproject.helloworld.impl.endpoint.HelloWorldRestEndpoint" immediate="true">
-    <implementation class="org.opencastproject.helloworld.impl.endpoint.HelloWorldRestEndpoint" />
-    <property name="service.description" value="Hello World REST Endpoint" />
-    <property name="opencast.service.type" value="org.opencastproject.helloworld" />
-    <property name="opencast.service.path" value="/helloworld" />
-    <property name="opencast.service.jobproducer" value="false" />
+    <implementation class="org.opencastproject.helloworld.impl.endpoint.HelloWorldRestEndpoint"/>
+    <property name="service.description" value="Hello World REST Endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.helloworld"/>
+    <property name="opencast.service.path" value="/helloworld"/>
+    <property name="opencast.service.jobproducer" value="false"/>
     <service>
-      <provide interface="org.opencastproject.helloworld.impl.endpoint.HelloWorldRestEndpoint" />
+      <provide interface="org.opencastproject.helloworld.impl.endpoint.HelloWorldRestEndpoint"/>
     </service>
     <reference name="helloworld-service" interface="org.opencastproject.helloworld.api.HelloWorldService"
-      cardinality="1..1" policy="static" bind="setHelloWorldService" />
+               cardinality="1..1" policy="static" bind="setHelloWorldService"/>
   </scr:component>
 </scr:components>

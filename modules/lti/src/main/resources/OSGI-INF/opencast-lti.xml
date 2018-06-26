@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.lti.LtiServlet" immediate="true">
-  <implementation class="org.opencastproject.lti.LtiServlet" />
-  <property name="service.description" value="LTI Servlet" />
-  <property name="alias" value="/lti" />
-  <property name="httpContext.id" value="opencast.httpcontext" />
-  <property name="httpContext.shared" value="true" />
+               name="org.opencastproject.lti.LtiServlet" immediate="true">
+  <implementation class="org.opencastproject.lti.LtiServlet"/>
+  <property name="service.description" value="LTI Servlet"/>
+  <property name="alias" value="/lti"/>
+  <property name="httpContext.id" value="opencast.httpcontext"/>
+  <property name="httpContext.shared" value="true"/>
   <service>
-    <provide interface="javax.servlet.Servlet" />
+    <provide interface="javax.servlet.Servlet"/>
   </service>
 </scr:component>

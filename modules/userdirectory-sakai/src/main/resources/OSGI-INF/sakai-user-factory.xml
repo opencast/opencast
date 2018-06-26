@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.userdirectory.sakai.SakaiUserProviderFactory" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.userdirectory.sakai.SakaiUserProviderFactory" />
-  <property name="service.pid" value="org.opencastproject.userdirectory.sakai" />
-  <property name="service.description" value="Provides Sakai user directory instances" />
+               name="org.opencastproject.userdirectory.sakai.SakaiUserProviderFactory" immediate="true"
+               activate="activate">
+  <implementation class="org.opencastproject.userdirectory.sakai.SakaiUserProviderFactory"/>
+  <property name="service.pid" value="org.opencastproject.userdirectory.sakai"/>
+  <property name="service.description" value="Provides Sakai user directory instances"/>
   <service>
     <provide interface="org.osgi.service.cm.ManagedServiceFactory"/>
   </service>
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrgDirectory" />
+             cardinality="1..1" policy="static" bind="setOrgDirectory"/>
 </scr:component>

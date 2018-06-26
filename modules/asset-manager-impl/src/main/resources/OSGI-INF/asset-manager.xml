@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-    name="org.opencastproject.assetmanager.impl.OsgiAssetManager"
-    activate="activate"
-    immediate="true">
-  
-  <implementation class="org.opencastproject.assetmanager.impl.OsgiAssetManager" />
-  <property name="service.description" value="Opencast Asset Manager" />
+               name="org.opencastproject.assetmanager.impl.OsgiAssetManager"
+               activate="activate"
+               immediate="true">
+
+  <implementation class="org.opencastproject.assetmanager.impl.OsgiAssetManager"/>
+  <property name="service.description" value="Opencast Asset Manager"/>
   <service>
-    <provide interface="org.opencastproject.assetmanager.api.AssetManager" />
+    <provide interface="org.opencastproject.assetmanager.api.AssetManager"/>
   </service>
-  
+
   <reference name="assetStore"
-    interface="org.opencastproject.assetmanager.impl.storage.AssetStore"
-    cardinality="1..1"
-    policy="static"
-    bind="setAssetStore" />
+             interface="org.opencastproject.assetmanager.impl.storage.AssetStore"
+             cardinality="1..1"
+             policy="static"
+             bind="setAssetStore"/>
   <reference name="authSvc"
-    interface="org.opencastproject.security.api.AuthorizationService"
-    cardinality="1..1"
-    policy="static"
-    bind="setAuthSvc" />
+             interface="org.opencastproject.security.api.AuthorizationService"
+             cardinality="1..1"
+             policy="static"
+             bind="setAuthSvc"/>
   <reference name="messageSender"
-    interface="org.opencastproject.message.broker.api.MessageSender"
-    cardinality="1..1"
-    policy="static"
-    bind="setMessageSender" />
+             interface="org.opencastproject.message.broker.api.MessageSender"
+             cardinality="1..1"
+             policy="static"
+             bind="setMessageSender"/>
   <reference name="messageReceiver"
-    interface="org.opencastproject.message.broker.api.MessageReceiver"
-    cardinality="1..1"
-    policy="static"
-    bind="setMessageReceiver" />
+             interface="org.opencastproject.message.broker.api.MessageReceiver"
+             cardinality="1..1"
+             policy="static"
+             bind="setMessageReceiver"/>
   <reference name="orgDir"
-    interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1"
-    policy="static"
-    bind="setOrgDir" />
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             cardinality="1..1"
+             policy="static"
+             bind="setOrgDir"/>
   <reference name="entityManagerFactory"
-    interface="javax.persistence.EntityManagerFactory"
-    target="(osgi.unit.name=org.opencastproject.assetmanager.impl)"
-    cardinality="1..1"
-    policy="static"
-    bind="setEntityManagerFactory" />
+             interface="javax.persistence.EntityManagerFactory"
+             target="(osgi.unit.name=org.opencastproject.assetmanager.impl)"
+             cardinality="1..1"
+             policy="static"
+             bind="setEntityManagerFactory"/>
   <reference name="securityService"
-    interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1"
-    policy="static"
-    bind="setSecurityService" />
+             interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSecurityService"/>
   <reference name="workspace"
-    interface="org.opencastproject.workspace.api.Workspace"
-    cardinality="1..1"
-    policy="static"
-    bind="setWorkspace" />
+             interface="org.opencastproject.workspace.api.Workspace"
+             cardinality="1..1"
+             policy="static"
+             bind="setWorkspace"/>
   <reference name="httpAssetProvider"
-    interface="org.opencastproject.assetmanager.impl.HttpAssetProvider"
-    cardinality="1..1"
-    policy="static"
-    bind="setHttpAssetProvider" />
+             interface="org.opencastproject.assetmanager.impl.HttpAssetProvider"
+             cardinality="1..1"
+             policy="static"
+             bind="setHttpAssetProvider"/>
 </scr:component>

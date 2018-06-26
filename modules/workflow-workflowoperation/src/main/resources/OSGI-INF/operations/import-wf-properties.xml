@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH" immediate="true">
-    <implementation class="org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH" />
-    <property name="service.description" value="Import Workflow Properties Workflow Operation Handler" />
-    <property name="workflow.operation" value="import-wf-properties" />
-    <service>
-        <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
-    </service>
-    <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
-               policy="static" bind="setWorkspace" />
+  <implementation class="org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH"/>
+  <property name="service.description" value="Import Workflow Properties Workflow Operation Handler"/>
+  <property name="workflow.operation" value="import-wf-properties"/>
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
+  </service>
+  <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
+             policy="static" bind="setWorkspace"/>
 </scr:component>

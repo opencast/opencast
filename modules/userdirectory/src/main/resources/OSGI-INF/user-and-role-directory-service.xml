@@ -1,62 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  
+
   <scr:component name="org.opencastproject.userdirectory.UserAndRoleDirectoryServiceImpl" immediate="true">
-    <implementation class="org.opencastproject.userdirectory.UserAndRoleDirectoryServiceImpl" />
-    <property name="service.description" value="Provides a user directory" />
+    <implementation class="org.opencastproject.userdirectory.UserAndRoleDirectoryServiceImpl"/>
+    <property name="service.description" value="Provides a user directory"/>
     <service>
-      <provide interface="org.opencastproject.security.api.UserDirectoryService" />
-      <provide interface="org.opencastproject.security.api.RoleDirectoryService" />
-      <provide interface="org.springframework.security.core.userdetails.UserDetailsService" />
+      <provide interface="org.opencastproject.security.api.UserDirectoryService"/>
+      <provide interface="org.opencastproject.security.api.RoleDirectoryService"/>
+      <provide interface="org.springframework.security.core.userdetails.UserDetailsService"/>
     </service>
     <reference name="userProviders" interface="org.opencastproject.security.api.UserProvider"
-      cardinality="1..n" policy="dynamic" bind="addUserProvider" unbind="removeUserProvider" />
+               cardinality="1..n" policy="dynamic" bind="addUserProvider" unbind="removeUserProvider"/>
     <reference name="roleProviders" interface="org.opencastproject.security.api.RoleProvider"
-      cardinality="1..n" policy="dynamic" bind="addRoleProvider" unbind="removeRoleProvider" />
+               cardinality="1..n" policy="dynamic" bind="addRoleProvider" unbind="removeRoleProvider"/>
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.userdirectory.InMemoryUserAndRoleProvider" immediate="true"
-    activate="activate">
-    <implementation class="org.opencastproject.userdirectory.InMemoryUserAndRoleProvider" />
-    <property name="service.description" value="A user and role provider" />
+                 activate="activate">
+    <implementation class="org.opencastproject.userdirectory.InMemoryUserAndRoleProvider"/>
+    <property name="service.description" value="A user and role provider"/>
     <service>
-      <provide interface="org.opencastproject.security.api.UserProvider" />
-      <provide interface="org.opencastproject.security.api.RoleProvider" />
+      <provide interface="org.opencastproject.security.api.UserProvider"/>
+      <provide interface="org.opencastproject.security.api.RoleProvider"/>
     </service>
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.userdirectory.RoleEndpoint" immediate="true">
-    <implementation class="org.opencastproject.userdirectory.RoleEndpoint" />
-    <property name="service.description" value="Role listing REST endpoint" />
-    <property name="opencast.service.type" value="org.opencastproject.userdirectory.roles" />
-    <property name="opencast.service.path" value="/roles" />
-    <property name="opencast.service.jobproducer" value="false" />
+    <implementation class="org.opencastproject.userdirectory.RoleEndpoint"/>
+    <property name="service.description" value="Role listing REST endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.userdirectory.roles"/>
+    <property name="opencast.service.path" value="/roles"/>
+    <property name="opencast.service.jobproducer" value="false"/>
     <service>
-      <provide interface="org.opencastproject.userdirectory.RoleEndpoint" />
+      <provide interface="org.opencastproject.userdirectory.RoleEndpoint"/>
     </service>
     <reference name="roleDirectoryService" interface="org.opencastproject.security.api.RoleDirectoryService"
-      cardinality="1..1" policy="static" bind="setRoleDirectoryService" />
-	<reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-	  cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setRoleDirectoryService"/>
+    <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   </scr:component>
-  
+
   <scr:component name="org.opencastproject.userdirectory.UserEndpoint" immediate="true">
-    <implementation class="org.opencastproject.userdirectory.UserEndpoint" />
-    <property name="service.description" value="User listing REST endpoint" />
-    <property name="opencast.service.type" value="org.opencastproject.userdirectory.users" />
-    <property name="opencast.service.path" value="/users" />
-    <property name="opencast.service.jobproducer" value="false" />
+    <implementation class="org.opencastproject.userdirectory.UserEndpoint"/>
+    <property name="service.description" value="User listing REST endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.userdirectory.users"/>
+    <property name="opencast.service.path" value="/users"/>
+    <property name="opencast.service.jobproducer" value="false"/>
     <service>
-      <provide interface="org.opencastproject.userdirectory.UserEndpoint" />
+      <provide interface="org.opencastproject.userdirectory.UserEndpoint"/>
     </service>
     <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
   </scr:component>
 
 </scr:components>

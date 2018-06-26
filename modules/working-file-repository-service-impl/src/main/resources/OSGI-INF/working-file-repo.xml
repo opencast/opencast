@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workingfilerepository.impl.WorkingFileRepository" immediate="true" activate="activate" deactivate="deactivate">
+               name="org.opencastproject.workingfilerepository.impl.WorkingFileRepository" immediate="true"
+               activate="activate" deactivate="deactivate">
 
-  <implementation class="org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryRestEndpoint" />
+  <implementation class="org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryRestEndpoint"/>
 
-  <property name="service.description" value="Working File Repository REST Endpoint" />
+  <property name="service.description" value="Working File Repository REST Endpoint"/>
 
-  <property name="opencast.service.type" value="org.opencastproject.files" />
+  <property name="opencast.service.type" value="org.opencastproject.files"/>
 
-  <property name="opencast.service.path" value="/files" />
+  <property name="opencast.service.path" value="/files"/>
 
   <service>
-    <provide interface="org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryRestEndpoint" />
-    <provide interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository" />
-    <provide interface="org.opencastproject.workingfilerepository.api.PathMappable" />
+    <provide interface="org.opencastproject.workingfilerepository.impl.WorkingFileRepositoryRestEndpoint"/>
+    <provide interface="org.opencastproject.workingfilerepository.api.WorkingFileRepository"/>
+    <provide interface="org.opencastproject.workingfilerepository.api.PathMappable"/>
   </service>
 
-  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
-  <reference name="tikaOSGIParser" interface="org.apache.tika.parser.Parser" cardinality="1..1" policy="static" bind="setTikaParser" />
-  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService" />
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1" policy="static" bind="setRemoteServiceManager"/>
+  <reference name="tikaOSGIParser" interface="org.apache.tika.parser.Parser" cardinality="1..1" policy="static"
+             bind="setTikaParser"/>
+  <reference name="securityService" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1"
+             policy="static" bind="setSecurityService"/>
 
 </scr:component>

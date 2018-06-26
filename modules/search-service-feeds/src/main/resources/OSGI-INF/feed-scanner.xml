@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.feed.scanner.FeedRegistrationScanner"
-  immediate="true" activate="activate" deactivate="deactivate">
-  <implementation class="org.opencastproject.feed.scanner.FeedRegistrationScanner" />
-  <property name="service.description" value="Feed Definition Scanner" />
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.feed.scanner.FeedRegistrationScanner"
+               immediate="true" activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.feed.scanner.FeedRegistrationScanner"/>
+  <property name="service.description" value="Feed Definition Scanner"/>
   <service>
-    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
+    <provide interface="org.apache.felix.fileinstall.ArtifactInstaller"/>
   </service>
   <reference name="search-service-impl" interface="org.opencastproject.search.api.SearchService" cardinality="1..1"
-    policy="static" bind="setSearchService" />
+             policy="static" bind="setSearchService"/>
   <reference name="series-service-impl" interface="org.opencastproject.series.api.SeriesService" cardinality="1..1"
-    policy="static" bind="setSeriesService" />
+             policy="static" bind="setSeriesService"/>
 </scr:component>

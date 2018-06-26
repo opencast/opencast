@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.userdirectory.AdminUserAndGroupLoader" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.userdirectory.AdminUserAndGroupLoader" />
-  <property name="service.description" value="System admin user and group loader" />
+               name="org.opencastproject.userdirectory.AdminUserAndGroupLoader" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.userdirectory.AdminUserAndGroupLoader"/>
+  <property name="service.description" value="System admin user and group loader"/>
   <service>
-    <provide interface="org.opencastproject.userdirectory.AdminUserAndGroupLoader" />
+    <provide interface="org.opencastproject.userdirectory.AdminUserAndGroupLoader"/>
   </service>
   <reference name="groupRoleProvider" interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
-    policy="static" cardinality="1..1" bind="setGroupRoleProvider" />
+             policy="static" cardinality="1..1" bind="setGroupRoleProvider"/>
   <reference name="userAndRoleProvider" interface="org.opencastproject.userdirectory.JpaUserAndRoleProvider"
-    policy="static" cardinality="1..1" bind="setUserAndRoleProvider" />
-  <reference name="organizationDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    policy="static" cardinality="1..1" bind="setOrganizationDirectoryService" />
+             policy="static" cardinality="1..1" bind="setUserAndRoleProvider"/>
+  <reference name="organizationDirectoryService"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             policy="static" cardinality="1..1" bind="setOrganizationDirectoryService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
 </scr:component>

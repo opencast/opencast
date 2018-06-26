@@ -2,13 +2,13 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.animate.remote.AnimateServiceRemoteImpl"
                immediate="true">
-  <implementation class="org.opencastproject.animate.remote.AnimateServiceRemoteImpl" />
-  <property name="service.description" value="Remote Animation Service" />
+  <implementation class="org.opencastproject.animate.remote.AnimateServiceRemoteImpl"/>
+  <property name="service.description" value="Remote Animation Service"/>
   <service>
-    <provide interface="org.opencastproject.animate.api.AnimateService" />
+    <provide interface="org.opencastproject.animate.api.AnimateService"/>
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-             bind="setTrustedHttpClient" />
+             bind="setTrustedHttpClient"/>
   <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             bind="setRemoteServiceManager" />
+             bind="setRemoteServiceManager"/>
 </scr:component>

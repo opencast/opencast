@@ -2,16 +2,16 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint"
                immediate="true">
-  <implementation class="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint" />
-  <property name="service.description" value="Message Broker REST Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.message.broker.endpoint" />
-  <property name="opencast.service.path" value="/broker" />
+  <implementation class="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint"/>
+  <property name="service.description" value="Message Broker REST Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.message.broker.endpoint"/>
+  <property name="opencast.service.path" value="/broker"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint" />
+    <provide interface="org.opencastproject.message.broker.endpoint.MessageBrokerServiceEndpoint"/>
   </service>
   <reference name="messageReceuver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-        cardinality="1..1" policy="static" bind="setMessageReceiver" />
+             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="messageSender" interface="org.opencastproject.message.broker.api.MessageSender"
-        cardinality="1..1" policy="static" bind="setMessageSender" />
+             cardinality="1..1" policy="static" bind="setMessageSender"/>
 </scr:component>
