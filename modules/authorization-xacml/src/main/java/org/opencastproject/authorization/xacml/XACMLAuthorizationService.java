@@ -420,6 +420,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
   public boolean hasPermission(final MediaPackage mp, final String action) {
     Option<Attachment> xacml = getXacmlAttachment(mp);
     if (xacml.isNone()) {
+      logger.debug("No attached XACML. Denying access by default.");
       return false;
     }
     Attachment attachment = xacml.get();
@@ -427,6 +428,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     try {
       acl = XACMLUtils.parseXacml(workspace.read(attachment.getURI()));
     } catch (XACMLParsingException | NotFoundException | IOException e) {
+      logger.warn("Error reading XACML file {}", attachment.getURI(), e);
       return false;
     }
     boolean allowed = false;
@@ -441,12 +443,14 @@ public class XACMLAuthorizationService implements AuthorizationService {
           // immediately abort on matching deny rules
           // (never allow if a deny rule matches, even if another allow rule matches)
           if (!entry.isAllow()) {
+            logger.debug("Access explicitely denied for role({}), action({})", role.getName(), action);
             return false;
           }
           allowed = true;
         }
       }
     }
+    logger.debug("XACML file allowed access");
     return allowed;
   }
 
