@@ -138,11 +138,6 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     EasyMock.expect(serviceRegistry.getJob(EasyMock.anyLong())).andReturn(job2);
     EasyMock.replay(serviceRegistry);
 
-    // set up service
-    operationHandler = new MultiEncodeWorkflowOperationHandler();
-    operationHandler.setWorkspace(workspace);
-    operationHandler.setServiceRegistry(serviceRegistry);
-
     // set up mock profiles
     profile = EasyMock.createNiceMock(EncodingProfile.class);
     EasyMock.expect(profile.getIdentifier()).andStubReturn(PROFILE1_ID);
@@ -175,7 +170,13 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     EasyMock.expect(composerService.multiEncode((Track) EasyMock.anyObject(), (List<String>) EasyMock.anyObject()))
             .andReturn(job2);
     EasyMock.replay(composerService);
+
+    // set up services
+    operationHandler = new MultiEncodeWorkflowOperationHandler();
+    operationHandler.setWorkspace(workspace);
+    operationHandler.setServiceRegistry(serviceRegistry);
     operationHandler.setComposerService(composerService);
+    operationHandler.setJobBarrierPollingInterval(0);
   }
 
   @Test
@@ -194,7 +195,6 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track trackEncoded;
 
     Assert.assertTrue(tracksEncoded.length == 6);
-    // * TODO: Fix the workflow
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
     Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
     Assert.assertEquals(0, trackEncoded.getTags().length);
@@ -255,7 +255,6 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track trackEncoded;
 
     Assert.assertTrue(tracksEncoded.length == 6);
-    // * TODO: Fix the workflow
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
     Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
     Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());
@@ -288,7 +287,6 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     Track trackEncoded;
 
     Assert.assertTrue(tracksEncoded.length == 6);
-    // * TODO: Fix the workflow
     trackEncoded = mpNew.getTrack(ENCODED_TRACK_ID1);
     Assert.assertTrue("presenter/work".equals(trackEncoded.getFlavor().toString()));
     Assert.assertArrayEquals(targetTags1, trackEncoded.getTags());

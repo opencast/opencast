@@ -5,7 +5,7 @@
 The MultiencodeWorkflowHandler is used to encode source media into multiple formats concurrently.
 The source recording are selected by source-flavors AND source-tags.
 Each source media selector (eg presenter or presentation) can have an independent set of encoding profile ids
-(one for each target recording) and target tags.
+(one for each target medium) and target tags.
 Encoding of each source medium runs as one ffmpeg command.
 This operation will generate one multiencode operation per source medium,
 all of them running concurrently on the same or on different workers.
@@ -21,14 +21,14 @@ The use of the semi-colon is optional. If it is absent, there is only one sectio
 ```
 <configuration key="source-flavors">*/source</configuration>
 ```
->   One source selector means that all the matching recording will be processed the same way.
+> One source selector means that all the matching recording will be processed the same way.
 >
 ```
 <configuration key="source-flavors">presenter/source;presentation/source</configuration>
 ```
->   Two different source selectors means that all the matching recordings in the first selector will be processed
->   according to the parameters in the first section and the all the matching recordings in the second selector will
->   be processed according to the parameters in next section.
+> Two different source selectors means that all the matching recordings in the first selector will be processed
+> according to the parameters in the first section and the all the matching recordings in the second selector will
+> be processed according to the parameters in next section.
 
 Each source selector can have only one corresponding section.
 If there is only one section in one parameter, eg: target-flavors,
@@ -49,9 +49,9 @@ For example:
 ```
 <configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
 ```
->   Using the example above.
->   "presenter/preview" is tagged with "engage-streaming,rss,atom".
->   "presentation/preview" is tagged with "engage-download,rss,atom".
+> Using the example above.
+> "presenter/preview" is tagged with "engage-streaming,rss,atom".
+> "presentation/preview" is tagged with "engage-download,rss,atom".
 
 When a configuration has the same number of sections as the source, then the configurations for the operation
 are taken from the corresponding sections.
@@ -59,12 +59,10 @@ are taken from the corresponding sections.
 Each section runs independently as a parallel encoding job.
 
 For example, if presenter/source is to encoded with "mp4-low.http,mp4-medium.http" and
-presentation/source is to be encoded with "*mp4-hd.http,mp4-hd.http"
+presentation/source is to be encoded with "mp4-hd.http,mp4-hd.http"
 
 The target flavors are presenter/delivery and presentation/delivery and all are tagged "rss, archive".
 The target flavors are additionally tagged with encoding profiles, so that they can selected individually.
-
-It will look like the following.
 
 ## Parameter Table
 
@@ -74,7 +72,7 @@ It will look like the following.
 |target-flavors     | */preview                  | Specifies the flavor of the new media                               |
 |target-tags        | rss,archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-medium.http*;*mp4-hd.http,mp4-hd.http | Encoding profiles for each source flavor |
-|tag-with-profile   | true (default to false)     | target medium are tagged with coresponding encoding profile Id      |
+|tag-with-profile   | true  | target media are tagged with coresponding encoding profile Id (false if omitted)     |
 
 
 
@@ -84,7 +82,7 @@ It will look like the following.
         id="multiencode"
         fail-on-error="true"
         exception-handler-workflow="error"
-        description="Encoding presenter (camera) video to Flash download">
+        description="Encoding media to delivery formats">
         <configurations>
             <configuration key="source-flavors">presenter/work;presentation/work</configuration>
             <configuration key="target-flavors">*/delivery</configuration>
@@ -101,7 +99,7 @@ of the encoding profile commands.
 * Care must be taken that no ffmpeg complex filters are used in the encoding profiles used for this workflow,
 as it can cause a conflict.
 
-* Encoded target recording are distinguished by the suffix, it is important that all the encoding profiles used have
+* Encoded target media are distinguished by the suffix, it is important that all the encoding profiles used have
 distinct suffixes to use "tag-with-profile" configuration, for example:
 ```
 profile.mp4-vga-medium.http.suffix = -vga-medium.mp4

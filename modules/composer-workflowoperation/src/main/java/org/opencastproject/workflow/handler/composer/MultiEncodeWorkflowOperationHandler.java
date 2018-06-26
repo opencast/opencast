@@ -43,6 +43,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,9 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-//
 /**
- * The workflow definition for handling multiple concurrent outputs in one ffmpeg operation of one source This allows to
- * encoding and tagging to be done in one operation
+ * The workflow definition for handling multiple concurrent outputs in one ffmpeg operation. This allows encoding and
+ * tagging to be done in one operation
  */
 public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
@@ -84,7 +84,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     CONFIG_OPTIONS.put("target-tags",
             "The tags to apply to the encoded files, sections ordered as in the encoding profile and separated by \";\"");
     CONFIG_OPTIONS.put("tag-with-profile",
-            "Add encoding profile name as a tag to the corresponding encoded file (default: true)");
+            "Add encoding profile name as a tag to the corresponding encoded file (default: false)");
   }
 
   /** The composer service */
@@ -146,8 +146,8 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     private AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
     private String targetFlavor = null;
     private String targetTags = null;
-    private List<String> encodingProfiles = new ArrayList<String>(); // redundant storage
-    private List<EncodingProfile> encodingProfileList = new ArrayList<EncodingProfile>();
+    private List<String> encodingProfiles = new ArrayList<>(); // redundant storage
+    private List<EncodingProfile> encodingProfileList = new ArrayList<>();
 
     ElementProfileTagFlavor(String profiles) {
       List<String> profilelist = asList(profiles);
@@ -211,7 +211,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   private List<ElementProfileTagFlavor> getSrcSelector(String[] sourceFlavors, String[] sourceTags,
           String[] targetFlavors, String[] targetTags, String[] profiles) throws WorkflowOperationException {
     int n = 0;
-    List<ElementProfileTagFlavor> elementSelectors = new ArrayList<ElementProfileTagFlavor>();
+    List<ElementProfileTagFlavor> elementSelectors = new ArrayList<>();
     if (sourceTags == null && sourceFlavors == null)
       throw new WorkflowOperationException("No source tags or Flavor");
     if (profiles == null)
@@ -274,91 +274,55 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
                         + sourceFlavors.length + " (must be the same or one set of tags or flavors)");
       }
     }
-    populateTag(elementSelectors, sourceTags);
-    populateFlavor(elementSelectors, sourceFlavors);
-    populateTargetTag(elementSelectors, targetTags);
-    populateTargetFlavor(elementSelectors, targetFlavors);
+    populateFlavorsAndTags(elementSelectors, sourceFlavors, targetFlavors, sourceTags, targetTags);
     return elementSelectors;
   }
 
-  private List<ElementProfileTagFlavor> populateTag(List<ElementProfileTagFlavor> elementSelectors, String[] sourceTags)
+  private List<ElementProfileTagFlavor> populateFlavorsAndTags(List<ElementProfileTagFlavor> elementSelectors,
+          String[] sourceFlavors, String[] targetFlavors, String[] sourceTags, String[] targetTags)
           throws WorkflowOperationException {
-    if (sourceTags == null)
-      return elementSelectors;
-    int i = 0;
-    for (ElementProfileTagFlavor ep : elementSelectors) {
-      for (String tag : asList(sourceTags[i])) {
-        try {
-          ep.addSourceTag(tag);
-        } catch (IllegalArgumentException e) {
-          throw new WorkflowOperationException("Source Tags " + e.getMessage());
-        }
-      }
-      if (sourceTags.length != 1)
-        i++;
-    }
-    return elementSelectors;
-  }
-
-  private List<ElementProfileTagFlavor> populateFlavor(List<ElementProfileTagFlavor> elementSelectors,
-          String[] sourceFlavors) throws WorkflowOperationException {
-    if (sourceFlavors == null)
-      return elementSelectors;
-    int i = 0;
-    for (ElementProfileTagFlavor ep : elementSelectors) {
-      for (String flavor : asList(sourceFlavors[i])) {
-        try {
-          ep.addSourceFlavor(flavor);
-        } catch (IllegalArgumentException e) {
-          throw new WorkflowOperationException("Source flavor " + e.getMessage());
-        }
-      }
-      if (sourceFlavors.length != 1)
-        i++;
-    }
-    return elementSelectors;
-  }
-
-  private List<ElementProfileTagFlavor> populateTargetFlavor(List<ElementProfileTagFlavor> elementSelectors,
-          String[] targetFlavors) throws WorkflowOperationException {
-    if (targetFlavors == null)
-      return elementSelectors;
-    int i = 0;
-    for (ElementProfileTagFlavor ep : elementSelectors) {
-      for (String flavor : asList(targetFlavors[i])) {
-        try {
-          ep.setTargetFlavor(flavor);
-        } catch (IllegalArgumentException e) {
-          throw new WorkflowOperationException("Target flavor " + e.getMessage());
-        }
-      }
-      if (targetFlavors.length != 1)
-        i++;
-    }
-    return elementSelectors;
-  }
-
-  private List<ElementProfileTagFlavor> populateTargetTag(List<ElementProfileTagFlavor> elementSelectors,
-          String[] targetTags) throws WorkflowOperationException {
-    if (targetTags == null)
-      return elementSelectors;
-    int i = 0;
+    int sf = 0;
+    int tf = 0;
+    int st = 0;
+    int tt = 0;
     for (ElementProfileTagFlavor ep : elementSelectors) {
       try {
-        ep.setTargetTags(targetTags[i]);
+        if (sourceTags != null) {
+          for (String tag : asList(sourceTags[st])) {
+            ep.addSourceTag(tag);
+          }
+          if (sourceTags.length != 1)
+            st++;
+        }
+        if (targetTags != null) {
+          ep.setTargetTags(targetTags[tt]);
+          if (targetTags.length != 1)
+            tt++;
+        }
+        if (sourceFlavors != null) {
+          for (String flavor : asList(sourceFlavors[sf])) {
+            ep.addSourceFlavor(flavor);
+          }
+          if (sourceFlavors.length != 1)
+            sf++;
+        }
+        if (targetFlavors != null) {
+          for (String flavor : asList(targetFlavors[tf])) {
+            ep.setTargetFlavor(flavor);
+          }
+          if (targetFlavors.length != 1)
+            tf++;
+        }
       } catch (IllegalArgumentException e) {
-        throw new WorkflowOperationException("Target flavor " + e.getMessage());
+        throw new WorkflowOperationException("Set Tags or Flavor " + e.getMessage());
       }
-      if (targetTags.length != 1)
-        i++;
     }
     return elementSelectors;
   }
 
   private String[] getConfigAsArray(WorkflowOperationInstance operation, String name) {
     String sourceOption = StringUtils.trimToNull(operation.getConfiguration(name));
-    String[] options = (sourceOption != null) ? sourceOption.split(SEPARATOR) : null;
-    return (options);
+    return StringUtils.split(sourceOption, SEPARATOR);
   }
 
   /*
@@ -389,7 +353,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     String[] targetTags = getConfigAsArray(operation, "target-tags");
     String[] targetFlavors = getConfigAsArray(operation, "target-flavors");
     String tagWithProfileConfig = StringUtils.trimToNull(operation.getConfiguration("tag-with-profile"));
-    boolean tagWithProfile = tagWithProfileConfig != null && Boolean.parseBoolean(tagWithProfileConfig);
+    boolean tagWithProfile = BooleanUtils.toBoolean(tagWithProfileConfig);
 
     // Make sure either one of tags or flavors are provided
     if (sourceFlavors == null && sourceTags == null) {
@@ -405,7 +369,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
             profiles);
 
     long totalTimeInQueue = 0;
-    Map<Job, JobInformation> encodingJobs = new HashMap<Job, JobInformation>();
+    Map<Job, JobInformation> encodingJobs = new HashMap<>();
     // Find the encoding profiles - should only be one per flavor or tag
     for (ElementProfileTagFlavor eptf : selectors) {
       // Look for elements matching the tag and flavor

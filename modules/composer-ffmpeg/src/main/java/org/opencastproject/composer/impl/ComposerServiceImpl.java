@@ -1405,7 +1405,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         case MultiEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
           List<String> encodingProfiles2 = arguments.subList(1, arguments.size());
-          outTracks = multiEncode(job, firstTrack, encodingProfiles2, null);
+          outTracks = multiEncode(job, firstTrack, encodingProfiles2);
           serialized = StringUtils.trimToEmpty(MediaPackageElementParser.getArrayAsXml(outTracks));
           break;
         default:
@@ -2184,7 +2184,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       } finally {
         activeEncoder.remove(encoderEngine);
       }
-      logger.info("ProcessSmil/MultiTrimConcat returns " + outputs.size() + " media files ", outputs);
+      logger.info("ProcessSmil/MultiTrimConcat returns {} media files {}", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
       tracks.forEach(track -> track.setIdentifier(idBuilder.createNew().toString()));
@@ -2227,35 +2227,31 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *           - if missing arguments
    *
    */
-  protected List<Track> multiEncode(final Job job, Track track, List<String> profileIds,
-          Map<String, String> properties) throws EncoderException, IllegalArgumentException {
+  protected List<Track> multiEncode(final Job job, Track track, List<String> profileIds)
+          throws EncoderException, IllegalArgumentException {
     if (job == null)
       throw new IllegalArgumentException("The Job parameter must not be null");
     if (track == null)
       throw new IllegalArgumentException("Source track cannot be null");
     if (profileIds == null || profileIds.isEmpty())
-      throw new IllegalArgumentException("Cannot encode without encodeing profiles");
+      throw new IllegalArgumentException("Cannot encode without encoding profiles");
+    List<File> outputs = null;
     try {
-        final File videoFile = loadTrackIntoWorkspace(job, "source", track);
-        // Get the encoding profiles
-        List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
-        for (String profileId : profileIds) {
+      final File videoFile = loadTrackIntoWorkspace(job, "source", track);
+      // Get the encoding profiles
+      List<EncodingProfile> profiles = new ArrayList<>();
+      for (String profileId : profileIds) {
         EncodingProfile profile = getProfile(job, profileId);
         profiles.add(profile);
       }
       logger.info("Encoding source track {} using profiles '{}'", track.getIdentifier(), profileIds);
       // Do the work
       EncoderEngine encoderEngine = getEncoderEngine();
-      List<File> outputs;
       try {
         outputs = encoderEngine.multiTrimConcat(Arrays.asList(videoFile), null, profiles, 0, track.hasVideo(),
                 track.hasAudio());
       } catch (EncoderException e) {
         Map<String, String> params = new HashMap<>();
-        List<String> profileList = new ArrayList<>();
-        for (EncodingProfile p : profiles) {
-          profileList.add(p.getIdentifier().toString());
-        }
         params.put("videos", videoFile.getName());
         params.put("profiles", StringUtils.join(profileIds, ","));
         incident().recordFailure(job, MULTI_ENCODE_FAILED, e, params, detailsFor(e, encoderEngine));
@@ -2263,12 +2259,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       } finally {
         activeEncoder.remove(encoderEngine);
       }
-      logger.info("MultiEncode returns " + outputs.size() + " media files ", outputs);
+      logger.info("MultiEncode returns {} media files {} ", outputs.size(), outputs);
       List<URI> workspaceURIs = putToCollection(job, outputs, "multiencode files");
       List<Track> tracks = inspect(job, workspaceURIs);
       tracks.forEach(eachtrack -> eachtrack.setIdentifier(idBuilder.createNew().toString()));
       return tracks;
-    } catch (Exception e) { // rethrow errors
+    } catch (Exception e) {
       throw new EncoderException("MultiEncode operation failed to run ", e);
     }
   }

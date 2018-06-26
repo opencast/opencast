@@ -736,7 +736,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "multiencode", description = "Starts an encoding process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
           @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "flash.http") }, reponses = {
+          @RestParameter(description = "The comma-delimited encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "mp4-medium.http,mp4-low.http") }, reponses = {
                   @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response multiEncode(@FormParam("sourceTrack") String sourceTrackAsXml,
