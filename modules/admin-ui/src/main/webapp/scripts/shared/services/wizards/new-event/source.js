@@ -412,7 +412,7 @@ angular.module('adminNg.services')
                 var hour = self.ud[getType()].start.hour;
                 var minute = self.ud[getType()].start.minute;
                 if (angular.isDefined(hour) && angular.isDefined(minute)) {
-                    time = JsHelper.humanizeTime(hour, minute);
+                    time = moment().hour(hour).minute(minute).toISOString();
                 }
             }
 
@@ -426,7 +426,7 @@ angular.module('adminNg.services')
                 var hour = self.ud[getType()].end.hour;
                 var minute = self.ud[getType()].end.minute;
                 if (angular.isDefined(hour) && angular.isDefined(minute)) {
-                    time = JsHelper.humanizeTime(hour, minute);
+                    time = moment().hour(hour).minute(minute).toISOString();
                 }
             }
 
@@ -434,14 +434,17 @@ angular.module('adminNg.services')
         };
 
         this.getFormattedDuration = function () {
+
             var time;
 
             if (!self.isUpload()) {
-                var hour = self.ud[getType()].duration.hour;
-                var minute = self.ud[getType()].duration.minute;
-                if (angular.isDefined(hour) && angular.isDefined(minute)) {
-                    time = JsHelper.secondsToTime(((hour * 60) + minute) * 60);
-                }
+                var hours = self.ud[getType()].duration.hour;
+                var minutes = self.ud[getType()].duration.minute;
+
+                if (hours < 10)   { hours = '0' + hours; }
+                if (minutes < 10) { minutes = '0' + minutes; }
+
+                return hours + ':' + minutes;
             }
 
             return time;

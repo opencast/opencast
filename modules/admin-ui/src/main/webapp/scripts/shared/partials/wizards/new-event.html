@@ -683,20 +683,20 @@
                         <!-- Start date schedule -->
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date | localizeDate:'date' }}</td>
                         </tr>
 
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.hour !== undefined">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME"><!-- Start Time --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getFormattedStartTime() }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getFormattedStartTime() | localizeDate:'time' }}</td>
                         </tr>
                         <tr ng-if="(wizard.step.ud.type === 'SCHEDULE_MULTIPLE') && wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE"><!-- End Date --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end.date }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end.date | localizeDate:'date' }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.hour !== undefined">
                           <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME"><!-- End Time --></td>
-                          <td>{{ wizard.getStateControllerByName('source').getFormattedEndTime() }}</td>
+                          <td>{{ wizard.getStateControllerByName('source').getFormattedEndTime() | localizeDate:'time' }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].repetitionOption">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON"><!-- Repeat On --></td>
