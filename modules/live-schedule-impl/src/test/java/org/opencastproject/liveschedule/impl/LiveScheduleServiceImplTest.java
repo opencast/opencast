@@ -83,6 +83,7 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -897,7 +898,7 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in) {
+    public AccessControlList getAclFromInputStream(InputStream in) throws IOException {
       // TODO Auto-generated method stub
       return null;
     }
