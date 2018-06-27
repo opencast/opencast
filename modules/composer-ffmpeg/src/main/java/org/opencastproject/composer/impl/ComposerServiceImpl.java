@@ -2218,8 +2218,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          - source track
    * @param profileIds
    *          - list of encoding profile Ids
-   * @param properties
-   *          - used in the command templates from profiles
    * @return encoded files
    * @throws EncoderException
    *           - if can't encode
