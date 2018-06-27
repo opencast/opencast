@@ -174,32 +174,26 @@ __Scheduling__
 Field      | Required | Type                                 | Description
 :----------|:---------|:-------------------------------------|:-----------
 `agent_id` | Yes      | [`string`](types.md#basic)           | The technical identifier of the capture agent
-`start`    | Yes      | [`datetime`](types.md#date-and-time) | The date and time when the recording shall start
-`end`      | Yes\*    | [`datetime`](types.md#date-and-time) | The date and time when the recording shall end
+`start`    | Yes      | [`datetime`](types.md#date-and-time) | The date and time (UTC) when the recording shall start
+`end`      | Yes\*    | [`datetime`](types.md#date-and-time) | The date and time (UTC) when the recording shall end
 `duration` | Yes\*    | [`integer`](types.md#basic)          | The duration of the recording in milliseconds
-`rrule`    | No       | [`string`](types.md#string)          | The optional recurrence rule used to create multiple scheduled events
+`rrule`    | Yes\*    | [`rrule`](types.md#recurrence-rule)  | The recurrence rule used to create multiple scheduled events
 
-\* Both `end` and `duration` must be specified for creating multiple scheduled events, either `end` or `duration` must
-be specified for creating a single scheduled event
+\* When creating a single scheduled event, either `end` or `duration` must be specified. When creating multiple
+scheduled events, the fields `end`, `duration` and `rrule` are required
 
-To create a single scheduled event, omit the field `rrule`. The start date and time of the recording is determined by
-field `start`. The end date and time of the recording is determined by either the field `end` or `duration`.
+To create a single scheduled event, omit the field `rrule`. You can specify the start and end of the recording by
+using either the fields `start` and `end` or the fields `start` and `duration`.
+Please note that specifying both `end` and `duration` is not valid.
 
 To create multiple scheduled events, the field `rrule` is used. This field contains the recurrence rule used to
 determine the dates and times the scheduled events shall be created within the time period specified by the fields
 `start` and `end` + `duration`.
-Note that `duration` is a mandatory field when creating multiple scheduled events.
+Please note that `duration` is a mandatory field when creating multiple scheduled events.
 
-For more details about the reccurrence rule, please refer to the
-[Internet Calendaring and Scheduling Core Object Specification (iCalendar)](https://tools.ietf.org/html/rfc5545).
+__Additional Notes__
 
-Example rrule:
-
-```
-"rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
-```
-
-Please note that `BYHOUR` is specified in UTC.
+- Both `start` and `end` must be specified in UTC
 
 __Sample__
 
