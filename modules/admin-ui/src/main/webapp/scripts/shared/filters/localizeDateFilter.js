@@ -33,10 +33,6 @@ angular.module('adminNg.filters')
             case 'dateTime':
                 return Language.formatDateTime(format, input);
             case 'time':
-                if (!angular.isDate(Date.parse(input))) {
-                    return input;
-                }
-
                 return Language.formatTime(format, input);
             default:
                 return input;
