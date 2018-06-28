@@ -4,6 +4,7 @@ Documentation for modules included in Opencast.
 
 * [Atom and RSS Feed](atomrss.md)
 * Amazon Services
+    * [Amazon S3 Archive Storage](awss3archive.md)
     * [Amazon S3 Distribution](awss3distribution.md)
 * [Execute Service](execute.md)
 * [Live  Schedule](liveschedule.md)

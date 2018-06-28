@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-restore</id>
+  <title>Restore</title>
+  <tags>
+    <tag>archive-ng</tag>
+  </tags>
+  <description/>
+  <configuration_panel>
+    <![CDATA[
+      <style type="text/css">
+      <!--
+          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
+          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
+      -->
+      </style>
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Restore to:</legend>
+            <ul>
+              <li>
+                <span>
+                  <input id="restoreToLocal" name="restoreToLocal" type="checkbox" checked="checked" disabled="true" class="configField" value="true" />
+                  <span>&nbsp;Local storage</span>
+                </span>
+              </li>
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Offload the archived mediapackage -->
+
+    <operation
+      id="restore-from-remote"
+      if="${restoreToLocal}"
+      description="Restoring to local storage">
+    </operation>
+
+  </operations>
+
+</definition>

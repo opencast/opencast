@@ -137,3 +137,7 @@ press Reply. The initial comment will be marked as resolved.
 
 ### How to delete comments
 To delete a comment or a reply to a comment, click on the **Delete** in the comment section.
+
+## How to archive an Event to AWS S3
+
+Please refer to the [Offload to S3 documentation](advanced/offload-s3.md)

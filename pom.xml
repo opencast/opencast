@@ -47,6 +47,7 @@
     <module>modules/asset-manager-api</module>
     <module>modules/asset-manager-impl</module>
     <module>modules/asset-manager-workflowoperation</module>
+    <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>
     <module>modules/asset-manager-util</module>
     <module>modules/authorization-manager</module>

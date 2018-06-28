@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>ng-offload</id>
+  <title>Offload</title>
+  <tags>
+    <tag>archive-ng</tag>
+  </tags>
+  <description/>
+  <configuration_panel>
+    <![CDATA[
+      <style type="text/css">
+      <!--
+          #workflow-configuration legend { padding-top:20px; padding-bottom:5px }
+          #workflow-configuration li { padding-top:5px; padding-bottom:5px; line-height:14px }
+      -->
+      </style>
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Offload to:</legend>
+            <ul>
+              <li>
+                <span>
+                  <input id="offloadToAWSS3" name="offloadTo" type="radio" class="configField" value="aws-s3" disabled="true"/>
+                  <span>&nbsp;AWS S3</span>
+                </span>
+              </li>
+          </ul>
+        </fieldset>
+      </div>
+
+      <!-- Show or hide the hold and publication configuration panel -->
+      <script type="text/javascript">
+        var s3Enabled = false;
+
+        $('#offloadToAWSS3').prop('disabled', !s3Enabled);
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Offload the archived mediapackage -->
+
+    <operation
+      id="move-to-remote"
+      if="${offloadToAWSS3}"
+      description="Offloading to AWS S3">
+      <configurations>
+        <configuration key="target-storage">aws-s3</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.assetmanager.aws.s3.AwsS3AssetStore" activate="activate" immediate="true">
+  <implementation class="org.opencastproject.assetmanager.aws.s3.AwsS3AssetStore" />
+  <property name="service.description" value="Amazon S3 based asset store" />
+  <property name="store.type" value="aws-s3" />
+  <service>
+    <provide interface="org.opencastproject.assetmanager.impl.storage.RemoteAssetStore" />
+    <provide interface="org.opencastproject.assetmanager.aws.s3.AwsS3AssetStore" />
+  </service>
+
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" policy="static"
+    cardinality="1..1" bind="setWorkspace" />
+  <reference name="database" interface="org.opencastproject.assetmanager.aws.persistence.AwsAssetDatabase" policy="static"
+             cardinality="1..1" bind="setDatabase" />
+</scr:component>

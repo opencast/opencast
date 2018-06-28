@@ -60,7 +60,9 @@ pages:
 - Modules:
    - Overview: 'modules/index.md'
    - Atom/RSS Feed: 'modules/atomrss.md'
-   - AWS S3 Distribution: 'modules/awss3distribution.md'
+   - Amazon Services:
+      - Amazon S3 Archive Storage: 'modules/awss3archive.md'
+      - Amazon S3 Distribution: 'modules/awss3distribution.md'
    - Execute Service: 'modules/execute.md'
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
