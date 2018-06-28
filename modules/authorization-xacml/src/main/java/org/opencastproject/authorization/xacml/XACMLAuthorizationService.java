@@ -229,11 +229,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
   }
 
   @Override
-  public List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope) {
-    return getAttachments(mp, toFlavors(scope.get()));
-  }
-
-  @Override
   public MediaPackage removeAcl(MediaPackage mp, AclScope scope) {
     return removeFromMediaPackageAndWorkspace(mp, toFlavors(scope)).getA();
   }

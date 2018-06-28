@@ -887,11 +887,6 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope) {
-      return null;
-    }
-
-    @Override
     public Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope) {
       return null;
     }
