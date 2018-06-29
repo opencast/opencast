@@ -517,6 +517,8 @@ public class IndexServiceImplTest {
     EasyMock.expect(mediapackage.getSeries()).andReturn(null).anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
     EasyMock.expectLastCall();
+    mediapackage.setDate(EasyMock.anyObject(Date.class));
+    EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
     IngestService ingestService = setupIngestService(mediapackage, Capture.<InputStream> newInstance());
@@ -656,6 +658,8 @@ public class IndexServiceImplTest {
     EasyMock.expectLastCall().anyTimes();
     mediapackage.setSeries(EasyMock.anyString());
     mediapackage.setSeriesTitle(EasyMock.anyString());
+    EasyMock.expectLastCall();
+    mediapackage.setDate(EasyMock.anyObject(Date.class));
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 

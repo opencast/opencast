@@ -146,6 +146,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -818,6 +819,7 @@ public class IndexServiceImpl implements IndexService {
     MetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
             .getMetadataByAdapter(eventCatalogUIAdapter).get();
 
+    Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
@@ -828,13 +830,20 @@ public class IndexServiceImpl implements IndexService {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
         throw new IllegalArgumentException("Unable to parse device");
       }
+      if (StringUtils.isNotEmpty((String) sourceMetadata.get("start"))) {
+        currentStartDate = EncodingSchemeUtils.decodeDate((String) sourceMetadata.get("start"));
+      }
     }
 
-    Date currentStartDate = null;
-    MetadataField<?> starttime = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_TEMPORAL.getLocalName());
-    if (starttime != null && starttime.isUpdated() && starttime.getValue().isSome()) {
-      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod((DublinCoreValue)starttime.getValue().get());
-      currentStartDate = period.getStart();
+    MetadataField<?> startDate = eventMetadata.getOutputFields().get("startDate");
+    if (startDate != null && startDate.isUpdated() && startDate.getValue().isSome()) {
+      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
+      currentStartDate = sdf.parse((String) startDate.getValue().get());
+    } else if (currentStartDate != null) {
+      eventMetadata.removeField(startDate);
+      MetadataField<String> newStartDate = MetadataUtils.copyMetadataField(startDate);
+      newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
+      eventMetadata.addField(newStartDate);
     }
 
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
