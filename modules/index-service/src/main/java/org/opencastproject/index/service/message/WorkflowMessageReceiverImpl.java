@@ -93,10 +93,7 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
           event.setWorkflowState(wf.getState());
           WorkflowInstance.WorkflowState state = wf.getState();
 
-          if (!(WorkflowInstance.WorkflowState.SUCCEEDED.equals(state)
-                  || WorkflowInstance.WorkflowState.FAILED.equals(state)
-                  || WorkflowInstance.WorkflowState.STOPPED.equals(state))) {
-
+          if (!state.isTerminated()) {
             Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getActiveAcl(mp);
             List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
             Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, activeAcl.getA());
@@ -111,7 +108,8 @@ public class WorkflowMessageReceiverImpl extends BaseMessageReceiverImpl<Workflo
               if (loadedDC.isSome())
                 updateEvent(event, loadedDC.get());
             } catch (Throwable t) {
-              logger.warn("Unable to load dublincore catalog for the workflow {}", wf.getId(), t);
+              logger.warn("Unable to load dublincore catalog for the workflow {}, mp {}", wf.getId(),
+                      mp.getIdentifier().compact(), t);
             }
 
           }
