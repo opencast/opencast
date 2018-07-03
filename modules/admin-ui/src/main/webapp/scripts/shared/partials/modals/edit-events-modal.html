@@ -121,7 +121,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.start.hour"
                                             ng-change="onTemporalValueChange('start'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                                             ng-options="h.index as h.value for h in hours"
                                             />
                                     <select chosen
@@ -130,7 +130,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.start.minute"
                                             ng-change="onTemporalValueChange('start'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                                             ng-options="m.index as m.value for m in minutes"
                                             />
                                   </td>
@@ -144,7 +144,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.end.hour"
                                             ng-change="onTemporalValueChange('end'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                                             ng-options="h.index as h.value for h in hours"
                                             />
                                     <select chosen
@@ -153,7 +153,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.end.minute"
                                             ng-change="onTemporalValueChange('end'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                                             ng-options="m.index as m.value for m in minutes"
                                             />
                                     <span ng-bind="scheduling.end.date"
@@ -171,7 +171,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.location"
                                             ng-options="value.name for (id, value) in captureAgents"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                                             />
                                   </td>
                                   <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
