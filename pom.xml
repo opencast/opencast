@@ -8,7 +8,7 @@
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
   <url>http://opencast.org</url>
-  <inceptionYear>2009</inceptionYear>
+  <inceptionYear>2010</inceptionYear>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
     <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
