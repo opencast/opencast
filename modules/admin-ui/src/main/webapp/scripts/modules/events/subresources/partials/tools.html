@@ -43,21 +43,20 @@
             </div>
         </div>
         <div data-admin-ng-notifications=""></div>
+        <!-- Currently, the editor is the only supported tool. Therefore we don't show the tool selection.
+             Uncomment this to see how tool selection works.
         <div class="tab-menu">
             <nav class="view-controller">
-                <a ng-class="{active: tab === 'playback'}"
-                    ng-click="openTab('playback')" translate>VIDEO_TOOL.TABS.PLAY</a>
                 <a ng-class="{active: tab === 'editor'}"
                     ng-click="openTab('editor')" translate>VIDEO_TOOL.TABS.EDIT</a>
+                <a ng-Class="{active: tab === 'captions'}"
+                    ng-click="openTab('captions')" translate>VIDEO_TOOL.TABS.CAPTIONS</a>
             </nav>
         </div>
+        -->
         <div class="video-container">
 
-            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" data-controls="{{ tab === 'playback' }}"/>
-
-            <div ng-if="tab === 'playback'">
-              <!-- nothing to show here yet -->
-            </div>
+            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" />
 
             <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
                 <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
@@ -65,11 +64,6 @@
                 <div data-admin-ng-notifications="" context="video-tools"></div>
 
             </div>
-            <!-- captions and annotations to come later
-            <div ng-if="tab === 'captions'">
-            </div>
-            <div ng-if="tab === 'annotations'">
-            </div>-->
             <div class="event-container" ng-controller="EventCtrl">
                 <div>
                     <nav class="modal-nav view-controller-secondary">

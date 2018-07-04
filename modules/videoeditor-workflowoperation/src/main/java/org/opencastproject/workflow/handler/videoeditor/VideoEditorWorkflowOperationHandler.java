@@ -90,6 +90,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
   /** Name of the configuration option that provides the preview flavors we use as preview. */
   private static final String PREVIEW_FLAVORS_PROPERTY = "preview-flavors";
 
+  /** Bypasses Videoeditor's encoding operation but keep the raw smil for later processing */
+  private static final String SKIP_PROCESSING_PROPERTY = "skip-processing";
+
   /** Name of the configuration option that provides the source flavors on skipped videoeditor operation. */
   private static final String SKIPPED_FLAVORS_PROPERTY = "skipped-flavors";
 
@@ -129,6 +132,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     CONFIG_OPTIONS.put(TARGET_SMIL_FLAVOR_PROPERTY, "The flavor for target SMIL file.");
     CONFIG_OPTIONS.put(TARGET_FLAVOR_SUBTYPE_PROPERTY, "The flavor subtype for target media files.");
     CONFIG_OPTIONS.put(INTERACTIVE_PROPERTY, "Whether the operation is interactive or not.");
+    CONFIG_OPTIONS.put(SKIP_PROCESSING_PROPERTY,
+            "Do not processing the files, keep the raw smil produced by the videoeditor operation if it is enabled."
+                    + " This is an optional option." + " Default value is \"FALSE\".");
     CONFIG_OPTIONS.put(SKIP_NOT_TRIMMED_PROPERTY,
             "If 'true', do not process the input track(s) if no trimming points are defined.");
   }
@@ -197,9 +203,14 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
               PREVIEW_FLAVORS_PROPERTY);
     }
 
-    if (StringUtils.trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY)) == null) {
+    /* false if it is missing */
+    final boolean skipProcessing = BooleanUtils
+            .toBoolean(worflowOperationInstance.getConfiguration(SKIP_PROCESSING_PROPERTY));
+    /* skip smil processing (done in another operation) so target_flavors do not matter */
+    if (!skipProcessing && StringUtils
+            .trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY)) == null) {
       throw new WorkflowOperationException(
-              format("Required configuration property %s not set", TARGET_FLAVOR_SUBTYPE_PROPERTY));
+              String.format("Required configuration property %s not set", TARGET_FLAVOR_SUBTYPE_PROPERTY));
     }
 
     final boolean interactive = BooleanUtils.toBoolean(worflowOperationInstance.getConfiguration(INTERACTIVE_PROPERTY));
@@ -215,8 +226,10 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     if (smilCatalogs.isEmpty()) {
 
       // There is nothing to do, skip the operation
-      if (!interactive) {
-        logger.info("Skipping cutting opertion since no edit decision list is available");
+      // however, we still need the smil file to be produced for the entire video as one clip if
+      // skipProcessing is TRUE
+      if (!interactive && !skipProcessing) {
+        logger.info("Skipping cutting operation since no edit decision list is available");
         return skip(workflowInstance, context);
       }
 
@@ -279,7 +292,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     Catalog[] targetSmilCatalogs = mp.getCatalogs(targetSmilFlavor);
     if (targetSmilCatalogs == null || targetSmilCatalogs.length == 0) {
 
-      if (!interactive)
+      if (!interactive && !skipProcessing) // create a smil even if not interactive
         return skip(workflowInstance, context);
 
       // Create new empty SMIL to fill it from editor UI
@@ -306,6 +319,8 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 ex);
       }
 
+      if (!interactive) // deferred skip, keep empty smil
+        return skip(workflowInstance, context);
       logger.info("Holding for video edit...");
       return createResult(mp, Action.PAUSE);
     } else {
@@ -340,6 +355,12 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 format("Required configuration property %s not set.", SOURCE_FLAVORS_PROPERTY));
       }
     }
+    // processing will operate directly on source tracks as named in smil file
+    final boolean skipProcessing = BooleanUtils
+            .toBoolean(worflowOperationInstance.getConfiguration(SKIP_PROCESSING_PROPERTY));
+    if (skipProcessing)
+      return createResult(mp, Action.SKIP);
+    // If not skipProcessing (set it up for process-smil), then clone and tag to target
     String targetFlavorSubTypeProperty = StringUtils
             .trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY));
     if (targetFlavorSubTypeProperty == null) {
@@ -397,9 +418,15 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     }
     String targetFlavorSybTypeProperty = StringUtils
             .trimToNull(worflowOperationInstance.getConfiguration(TARGET_FLAVOR_SUBTYPE_PROPERTY));
-    if (targetFlavorSybTypeProperty == null) {
-      throw new WorkflowOperationException(
-              format("Required configuration property %s not set.", TARGET_FLAVOR_SUBTYPE_PROPERTY));
+
+    // if set, smil processing is done by another operation
+    final boolean skipProcessing = BooleanUtils
+            .toBoolean(worflowOperationInstance.getConfiguration(SKIP_PROCESSING_PROPERTY));
+    if (!skipProcessing) {
+      if (targetFlavorSybTypeProperty == null) {
+        throw new WorkflowOperationException(
+                format("Required configuration property %s not set.", TARGET_FLAVOR_SUBTYPE_PROPERTY));
+      }
     }
 
     boolean skipIfNoTrim = BooleanUtils.toBoolean(worflowOperationInstance.getConfiguration(SKIP_NOT_TRIMMED_PROPERTY));
@@ -457,7 +484,13 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
     } catch (SmilException ex) {
       throw new WorkflowOperationException(ex);
     }
-
+    // If skipProcessing, The track is processed by a separate operation which takes the SMIL file and encode directly
+    // to delivery format
+    if (skipProcessing) {
+      logger.info("VideoEdit workflow {} finished - smil file is {}", workflowInstance.getId(), smil.getId());
+      return createResult(mp, Action.CONTINUE);
+    }
+    // create video edit jobs and run them
     if (skipIfNoTrim) {
       // We need to check whether or not there are trimming points defined
       // TODO The SmilService implementation does not do any filtering or optimizations for us. We need to
@@ -587,6 +620,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
 
     long start;
     long end;
+    boolean hasElements = false; // Check for missing smil so the process will fail early if no tracks found
     // iterate over all elements inside SMIL body
     for (SmilMediaObject elem : smil.getBody().getMediaElements()) {
       start = -1L;
@@ -602,6 +636,7 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
             end = media.getClipEndMS();
             // remove it
             smilResponse = smilService.removeSmilElement(smilResponse.getSmil(), media.getId());
+            hasElements = true;
           }
         }
         if (start != -1L && end != -1L) {
@@ -611,6 +646,9 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       } else if (elem instanceof SmilMediaElement) {
         throw new SmilException("Media elements inside SMIL body are not supported yet.");
       }
+    }
+    if (!hasElements) {
+      throw new SmilException("Smil does not define any elements");
     }
     return smilResponse.getSmil();
   }

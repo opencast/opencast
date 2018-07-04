@@ -146,6 +146,7 @@
       "EMAIL_SENT": "Die Nachricht wurde gesendet",
       "EMAIL_NOT_SENT": "Die Nachricht konnte nicht gesendet werden",
       "CONFLICT_DETECTED": "Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
+      "CONFLICT_BULK_DETECTED":   "Planungskonflikt: Die Änderungen führen zu Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
       "CONFLICT_ALREADY_ENDED": "Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
       "CONFLICT_END_BEFORE_START": "Planungskonflikt: Der Endzeitpunkt der Aufzeichnung muss nach dem Anfangszeitpunkt liegen.",
       "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
@@ -237,6 +238,29 @@
             "CONFIGURATION": "Konfiguration",
             "WORKFLOW": "Task"
          }
+      },
+      "EDIT_EVENTS": {
+          "CAPTION": "Geplante Aufzeichnungen bearbeiten",
+          "GENERAL": {
+              "CAPTION": "Allgemein",
+              "CANNOTSTART": "Markierte Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
+              "NOCHANGES": "Es wurden keine Änderungen an den Aufzeichnungen festgestellt!"
+          },
+          "METADATA": {
+              "EDIT": "Metadaten bearbeiten"
+          },
+          "SUMMARY": {
+              "CAPTION": "Zusammenfassung",
+              "SINGLE_EVENT_CAPTION": "Aufzeichnung “{{ title }}”",
+              "TYPE": "Typ",
+              "PREVIOUS": "Alter Wert",
+              "NEXT": "Neuer Wert"
+          },
+          "EDIT": {
+              "CAPTION": "Bearbeiten",
+              "METADATA": "Metadaten",
+              "SCHEDULING": "Planung"
+          }
       }
    },
    "DATES": {
@@ -454,6 +478,7 @@
             "SERIES": "Serien",
             "DATE": "Datum",
             "START": "Beginn",
+            "END": "Ende",
             "STOP": "Ende",
             "STATUS": "Status",
             "LOCATION": "Raum",
@@ -468,6 +493,7 @@
             "PREVIOUS": "Zurück",
             "NOCONTENT": "Keine Daten verfügbar",
             "PUBLISHED": "Veröffentlicht",
+            "WEEKDAY": "Wochentag",
             "TOOLTIP": {
                "START": "Nach diesem Startdatum filtern",
                "SERIES": "Nach dieser Serie filtern",

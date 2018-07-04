@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>5-SNAPSHOT</version>
+    <version>6-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -144,7 +144,7 @@
                     <filelist dir="../resources" files="startup.properties.append"/>
                   </concat>
                   <!-- Adding extra OSGi system packages to configuration -->
-                  <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= \ com.sun.image.codec.jpeg, \"/>
+                  <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>
                   <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
                   <replaceregexp file="target/assembly/etc/config.properties" match="^felix.fileinstall.enableConfigSave .*=.*$" replace="felix.fileinstall.enableConfigSave = false" byline="true"/>
                   <!-- Special configuration for development -->

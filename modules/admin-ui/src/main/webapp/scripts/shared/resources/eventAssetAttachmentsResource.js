@@ -21,6 +21,8 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('EventGeneralResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/event/:id/general.json', { id: '@id' });
+.factory('EventAssetAttachmentsResource', ['$resource', function ($resource) {
+    return $resource('/admin-ng/event/:id0/asset/attachment/attachments.json', {}, {
+        get: { method: 'GET', isArray: true, paramDefaults: { id0: '@id'}}
+    });
 }]);

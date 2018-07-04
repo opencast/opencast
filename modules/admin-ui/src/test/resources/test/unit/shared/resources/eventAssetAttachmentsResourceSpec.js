@@ -1,12 +1,12 @@
-describe('Event Attachments API Resource', function () {
-    var $httpBackend, EventAttachmentsResource;
+describe('Event Asset Attachments API Resource', function () {
+    var $httpBackend, EventAssetAttachmentsResource;
 
     beforeEach(module('adminNg.resources'));
     beforeEach(module('ngResource'));
 
-    beforeEach(inject(function (_$httpBackend_, _EventAttachmentsResource_) {
+    beforeEach(inject(function (_$httpBackend_, _EventAssetAttachmentsResource_) {
         $httpBackend  = _$httpBackend_;
-        EventAttachmentsResource = _EventAttachmentsResource_;
+        EventAssetAttachmentsResource = _EventAssetAttachmentsResource_;
     }));
 
     describe('#get', function () {
@@ -19,14 +19,14 @@ describe('Event Attachments API Resource', function () {
         it('queries the group API', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/attachment/attachments.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json')));
-            EventAttachmentsResource.get({ id0: '30112'});
+            EventAssetAttachmentsResource.get({ id0: '30112'});
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
             $httpBackend.expectGET('/admin-ng/event/30112/asset/attachment/attachments.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/attachment/attachments.json')));
-            var data = EventAttachmentsResource.get({ id0: '30112' });
+            var data = EventAssetAttachmentsResource.get({ id0: '30112' });
             $httpBackend.flush();
             expect(data).toBeDefined();
             expect(data.length).toEqual(1);

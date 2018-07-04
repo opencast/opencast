@@ -9,6 +9,90 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### No more merge tickets
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 17 May 2018
+
+```no-highlight
+Hi everyone,
+
+  tl;dr
+  I hereby #propose to drop the practice of keeping a Jira ticket for
+  synchronizing merges
+
+Today we had a short internal discussion about Opencast's merge tickets
+where we found that all of us here at Osnabrück think that we should
+drop the practice of keeping them.
+
+The original goal for those was to prevent two developers to merge
+things simultaneously causing conflicts for each other. Nowadays most
+people use Github's merge button anyway which makes this far less
+problematic since developers do not need to keep track of the upstream
+branch but can just merge which will just magically work as long as
+there is no conflict.
+
+Some people still merge via command line but they are usually those who
+can handle conflicts anyway ;-)
+
+What also plays into this proposal is that we do not have that many
+merges. So this is not that big a problem in the first place. And for
+the few occasions where there are many merges (e.g. I remember some
+merge sprints before a feature freeze) we always coordinated those
+efforts anyway (who is taking which review, what's the progress, …) so
+that not having a merge ticket wouldn't be a problem here either.
+
+From experience I can say that even for cutting a release I probably
+could have worked without a merge ticket with no problem: I pulled the
+version I was cutting into my local branch anyway, so I could work
+there and additional merges would not have interfered.
+
+Finally, if there is a rare case where it actually makes sense to block
+a branch, I deem us flexible enough to shout out on list, which may even
+work better since the message is not drowned by hundreds of similar
+messages :)
+
+Best regards,
+Lars
+```
+
+
+### Migrate Docker Images to Quay.io
+Proposed by Matthias Neugebauer <matthias.neugebauer@uni-muenster.de>, passed on Tue, 1 May 2018
+
+```no-highlight
+Hi,
+
+as you might have noticed, there are currently no images available on Docker Hub
+for Opencast 4.3. The problem is, that Docker Hub itself uses an old version of
+Docker to build new images (version 17.06.1 is from mid 2017). When Opencast 4.3
+was released, I prepared new Dockerfiles and also fixed an issue that resulted
+in unnecessary large images. Now the problem is, that this requires (only for
+building images) a feature that was only added to Docker 17.09 in September
+2017. In addition, I found Docker Hub to be really slow and unreliable. Builds
+start minutes after triggering and take a long time to complete. And there are
+times when nearly all builds simply fail, e.g. because the base image could not
+be downloaded or the machine used for building run out of disk space. All things
+that should not happen leaving me quite frustrated with Docker Hub.
+
+While Docker Hub is the "official" (more like default) image registry, there
+exist multiple alternatives. Quay (https://quay.io/), for example, is another
+bigger registry now run by CoreOS (owned by Red Hat). The service is free for
+public images and offers some additional features compared to Docker Hub (e.g.
+image vulnerability scanning). In my initial tests, I was really pleased. I
+don't know what they are doing, but image builds start quick and take under 6
+minutes! My local builds take 15-20 minutes :D
+
+To come to the point: I herby #propose to further test out Quay and, if this
+service performs well, migrate the Docker images to this registry. For the
+tests, I would need to connect the opencast-docker repository to Quay, for which
+I don't have the permissions. Also, the migration would leave the already
+existing images on Docker Hub, but users would be advised to use the new
+repository ("quay.io/opencast/allinone" instead of "opencast/allinone").
+
+Best regards
+Matthias
+```
+
+
 ### Drop Undocumented Workflow Handler
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 10 Nov 2017
 
@@ -220,6 +304,50 @@ to cut the release.
 
 G
 ```
+
+
+### Change version numbers scheme
+Proposed by Rüdiger Rolf <rrolf@uni-osnabrueck.de>>, passed on Mar 23, 2017
+
+```no-highlight
+Hi all,
+
+as we currently approach a new release, I would like to raise a question
+when it comes to our version numbers: du we need a version number that
+consists of three parts?
+
+At the moment we have
+<main-version-number>.<major-release-number>.<minor-release-number>.
+
+With our current release process, with a new release every 6 month we
+would always increase the <major-release-number>. Additional to this we
+have the <minor-release-number> for bug-fix-releases, whenever they are
+needed.
+
+But we do not have a process for increasing the <main-version-number>.
+Okay 2 years ago we were lucky enough that two long running sub-projects
+that replaced all UIs in one release were finished. That was an obvious
+reason to increase the main version. But will we ever be that lucky
+again? Is only replacing all UIs justifying a main version increase?
+If I look at the project history we had several milestones that could
+have justified a new main version, like a nearly complete refactoring of
+the backend in 1.4, the video-editor in 1.6, the Karaf update in 2.1,
+the External API in 2.3.
+
+*So my #proposal would be to remove the first part of the version number
+for all upcoming releases. So our next release would be 3.0 and the
+release at the end of the year it would be 4.0. *
+
+We would follow other projects like Sakai in this change  - although
+without the confusing part of going from 2.9.3 to 10.0, where they
+removed the first number.
+
+What are your thoughts?
+
+Regards
+Rüdiger
+```
+
 
 ### Officially declare the Admin UI Facade as internal API for exclusive use by the module matterhorn-adminui-ng
 Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 16, 2016

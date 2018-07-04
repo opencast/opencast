@@ -6,7 +6,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(.) styles/vendor.css -->
+        <!-- build:css(src/main) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
         <!-- endbower -->
@@ -86,6 +86,9 @@
                         <a target="_self" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
+                        </li>
+                        <li>
+                            <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
                         </li>
                     </ul>
                 </div>
@@ -186,14 +189,15 @@
         <script src="scripts/shared/resources/newSeriesThemeResource.js"></script>
         <script src="scripts/shared/resources/conflictCheckResource.js"></script>
         <script src="scripts/shared/resources/bulkDeleteResource.js"></script>
-        <script src="scripts/shared/resources/eventMediaResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetMediaResource.js"></script>
         <script src="scripts/shared/resources/eventAttachmentDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventMediaDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventCatalogDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventParticipationResource.js"></script>
         <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetPublicationsResource.js"></script>
         <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
+        <script src="scripts/shared/resources/eventsSchedulingResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowsResource.js"></script>
         <script src="scripts/shared/resources/eventTransactionResource.js"></script>
         <script src="scripts/shared/resources/eventErrorsResource.js"></script>
@@ -202,12 +206,13 @@
         <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
-        <script src="scripts/shared/resources/eventAttachmentsResource.js"></script>
-        <script src="scripts/shared/resources/eventCatalogsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetAttachmentsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetCatalogsResource.js"></script>
         <script src="scripts/shared/resources/eventAssetsResource.js"></script>
         <script src="scripts/shared/resources/eventAccessResource.js"></script>
-        <script src="scripts/shared/resources/eventGeneralResource.js"></script>
+        <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
         <script src="scripts/shared/resources/eventHasSnapshotsResource.js"></script>
+        <script src="scripts/shared/resources/eventBulkEditResource.js"></script>
         <script src="scripts/shared/resources/toolsResource.js"></script>
         <script src="scripts/shared/resources/commentResource.js"></script>
         <script src="scripts/shared/resources/usersResource.js"></script>
@@ -329,9 +334,11 @@
         <script src="scripts/shared/controllers/applicationController.js"></script>
         <script src="scripts/shared/controllers/userPreferencesController.js"></script>
         <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
+        <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
         <script src="scripts/modules/events/controllers/eventsController.js"></script>
         <script src="scripts/modules/events/controllers/eventController.js"></script>
         <script src="scripts/modules/events/controllers/editStatusController.js"></script>
+        <script src="scripts/modules/events/controllers/editEventsController.js"></script>
         <script src="scripts/modules/events/controllers/newEventController.js"></script>
         <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
         <script src="scripts/modules/events/controllers/seriesController.js"></script>

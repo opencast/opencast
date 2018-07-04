@@ -1,0 +1,12 @@
+{
+  "timezone": "UTC",
+  "start": {
+    "hour": 10,
+    "minute": 13
+  },
+  "end": {
+    "hour": 11,
+    "minute": 23
+  },
+  "agentId": "der_werner"
+}

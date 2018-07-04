@@ -113,20 +113,17 @@ public final class DublinCoreMetadataUtil {
    */
   private static void setIterableString(DublinCoreCatalog dc, MetadataField<?> field, final EName ename) {
     if (field.getValue().isSome()) {
-      String valueString;
+      dc.remove(ename);
       if (field.getValue().get() instanceof String) {
-        valueString = (String) field.getValue().get();
+        String valueString = (String) field.getValue().get();
+        dc.set(ename, valueString);
       } else {
         @SuppressWarnings("unchecked")
         Iterable<String> valueIterable = (Iterable<String>) field.getValue().get();
-        valueString = StringUtils.join(valueIterable.iterator(), ",");
-      }
-
-      if (StringUtils.isBlank(StringUtils.trimToEmpty(valueString))) {
-        // The value of the iterative string is empty so we will remove it.
-        dc.remove(ename);
-      } else {
-        dc.set(ename, valueString);
+        for (String valueString : valueIterable) {
+          if (StringUtils.isNotBlank(valueString))
+            dc.add(ename, valueString);
+        }
       }
     }
   }
