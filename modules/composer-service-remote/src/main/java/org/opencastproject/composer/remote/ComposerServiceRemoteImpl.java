@@ -571,9 +571,9 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       response = getResponse(post);
       if (response != null) {
         String content = EntityUtils.toString(response.getEntity());
-        Job r = JobParser.parseJob(content);
-        logger.info("Encoding job {} started on a remote multiencode", r.getId());
-        return r;
+        Job job = JobParser.parseJob(content);
+        logger.info("Encoding job {} started on a remote multiencode", job.getId());
+        return job;
       }
     } catch (Exception e) {
       throw new EncoderException("Unable to multiencode track " + sourceTrack + " using a remote composer service", e);

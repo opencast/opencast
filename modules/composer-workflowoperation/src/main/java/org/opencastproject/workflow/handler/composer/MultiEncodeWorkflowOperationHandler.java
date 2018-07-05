@@ -259,12 +259,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       if (sourceFlavors.length > n)
         n = sourceFlavors.length; // at least this many tracks
     }
-    int j = 0;
+    int numProfiles = 0;
     // One for each source flavor
     for (int i = 0; i < n; i++) {
-      elementSelectors.add(new ElementProfileTagFlavor(profiles[j]));
+      elementSelectors.add(new ElementProfileTagFlavor(profiles[numProfiles]));
       if (profiles.length > 1)
-        j++; // All source use the same set of profiles or its own
+        numProfiles++; // All source use the same set of profiles or its own
     }
     // If uses tags to select, but sets target flavor, they must match
     if (sourceTags != null && sourceFlavors != null) {
@@ -374,11 +374,11 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     for (ElementProfileTagFlavor eptf : selectors) {
       // Look for elements matching the tag and flavor
       Collection<Track> elements = eptf.elementSelector.select(mediaPackage, true);
-      for (Track track : elements) { // For each source
-        logger.info("Encoding track {} using encoding profile '{}'", track, eptf.getProfiles().get(0).toString());
+      for (Track sourceTrack : elements) {
+        logger.info("Encoding track {} using encoding profile '{}'", sourceTrack, eptf.getProfiles().get(0).toString());
         // Start encoding and wait for the result
-        encodingJobs.put(composerService.multiEncode(track, eptf.getProfiles()),
-                new JobInformation(track, eptf, tagWithProfile));
+        encodingJobs.put(composerService.multiEncode(sourceTrack, eptf.getProfiles()),
+                new JobInformation(sourceTrack, eptf, tagWithProfile));
       }
     }
 
@@ -395,7 +395,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
     // Process the result
     for (Map.Entry<Job, JobInformation> entry : encodingJobs.entrySet()) {
       Job job = entry.getKey();
-      Track track = entry.getValue().getTrack(); // source
+      Track sourceTrack = entry.getValue().getTrack(); // source
       ElementProfileTagFlavor info = entry.getValue().getInfo(); // tags and flavors
       // add this receipt's queue time to the total
       totalTimeInQueue += job.getQueueTime();
@@ -410,7 +410,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
         for (Track composedTrack : composedTracks) {
           if (info.getTargetFlavor() != null) { // Has Flavors
             // set it to the matching flavor in the order listed
-            composedTrack.setFlavor(newFlavor(track, info.getTargetFlavor()));
+            composedTrack.setFlavor(newFlavor(sourceTrack, info.getTargetFlavor()));
             logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
           }
           if (info.getTargetTags() != null) { // Has Tags
@@ -435,10 +435,10 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
             }
           }
           // store new tracks to mediaPackage
-          String fileName = getFileNameFromElements(track, composedTrack);
+          String fileName = getFileNameFromElements(sourceTrack, composedTrack);
           composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
                   composedTrack.getIdentifier(), fileName));
-          mediaPackage.addDerived(composedTrack, track);
+          mediaPackage.addDerived(composedTrack, sourceTrack);
         }
       } else {
         logger.warn("No output from MultiEncode operation");
@@ -450,10 +450,9 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   }
 
   private MediaPackageElementFlavor newFlavor(Track track, String flavor) throws WorkflowOperationException {
-    MediaPackageElementFlavor targetFlavor = null;
     if (StringUtils.isNotBlank(flavor)) {
       try {
-        targetFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
+        MediaPackageElementFlavor targetFlavor = MediaPackageElementFlavor.parseFlavor(flavor);
         String flavorType = targetFlavor.getType();
         String flavorSubtype = targetFlavor.getSubtype();
         // Adjust the target flavor. Make sure to account for partial updates
