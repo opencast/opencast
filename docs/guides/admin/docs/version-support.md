@@ -4,8 +4,8 @@ Supported Versions
 Opencast has a standing policy of supporting the current version, and the previous version.  In general terms, this
 means a roughly 1 year support cycle for any given release due to our release process (see the development process
 documentation for more details).  Support, in this context, means development time; building fixes, applying them, and
-releasing those changes.  For example, as of the time of writing we currently support versions 3.0, and 2.3.  Once
-version 4.0 releases version 2.3 will no longer be supported, but 3.0 will.  This does not mean questions for older
+releasing those changes.  For example, as of the time of writing we currently support versions 6.x, and 5.x.  Once
+version 7.0 releases version 5.x will no longer be supported, but 6.x will.  This does not mean questions for older
 releases will not be answered!  Our community has a good track record of addressing issues and answering questions
 regarding older versions as best we can, but developer time will usually not be allocated to fixing additional issues.
 
