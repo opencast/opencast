@@ -342,7 +342,7 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
     };
 
     $scope.rowsValid = function() {
-        return !$scope.nonScheduleSelected() && $scope.hasAnySelected();
+        return !$scope.nonScheduleSelected() && $scope.hasAnySelected() && $scope.hasAllAgentsAccess();
     };
 
     $scope.generateEventSummariesAndContinue = function() {
