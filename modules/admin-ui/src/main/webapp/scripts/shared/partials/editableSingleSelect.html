@@ -7,6 +7,7 @@
   <div class="editable-select" ng-show="editMode">
 
     <select chosen pre-select-from="collection"
+            pre-select-from-value
             ng-model="params.value"
             name="{{ params.name }}"
             ng-change="submit()"
