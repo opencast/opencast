@@ -337,7 +337,6 @@ ALTER TABLE oc_user_settings ADD CONSTRAINT UNQ_oc_user_settings UNIQUE (usernam
 ALTER TABLE oc_user_settings DROP INDEX UNQ_mh_user_settings;
 
 CREATE INDEX IX_oc_user_setting_organization ON oc_user_settings (organization);
-DROP INDEX IX_mh_user_setting_organization ON oc_user_settings;
 
 RENAME TABLE mh_email_configuration TO oc_email_configuration;
 ALTER TABLE oc_email_configuration ADD CONSTRAINT UNQ_oc_email_configuration UNIQUE (organization);
