@@ -475,7 +475,7 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("scheduling.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getEventsScheduling", description = "Returns all of the scheduling metadata for a list of events", returnDescription = "All the technical metadata related to scheduling as JSON", pathParameters = {
+  @RestQuery(name = "getEventsScheduling", description = "Returns all of the scheduling metadata for a list of events", returnDescription = "All the technical metadata related to scheduling as JSON", restParameters = {
     @RestParameter(name = "eventIds", description = "An array of event IDs (mediapackage id)", isRequired = true, type = RestParameter.Type.STRING),
     @RestParameter(name = "ignoreNonScheduled", description = "Whether events that are not really scheduled events should be ignored or produce an error", isRequired = true, type = RestParameter.Type.BOOLEAN) }, reponses = {
     @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON", responseCode = HttpServletResponse.SC_OK),
