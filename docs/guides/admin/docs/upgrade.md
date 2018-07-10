@@ -29,7 +29,8 @@ Opencast 3.0 includes the following database changes:
 It should be needless to say that this migration should not take a lot of time and should be safe. Nevertheless, as with
 all database migrations, we recommend to make a database backup before attempting the upgrade.
 
-You can find the database upgrade script at `…/docs/upgrade/2.3_to_3.0/`.
+You can find the database upgrade script [in the Opencast repository
+](https://github.com/opencast/opencast/tree/r/3.x/docs/upgrade/2.3_to_3.0).
 
 Recreate Admin UI Search Index
 ------------------------------
