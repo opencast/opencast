@@ -242,6 +242,7 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Geplante Aufzeichnungen bearbeiten",
+         "CONFLICT_CHECK_RUNNING": "Konfliktprüfung läuft…",
          "GENERAL": {
             "CAPTION": "Allgemein",
             "CANNOTSTART": "Hervorgehobene Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",

@@ -243,6 +243,7 @@
       },
       "EDIT_EVENTS": {
           "CAPTION": "Edit scheduled events",
+          "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
           "GENERAL": {
               "CAPTION": "General",
               "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
