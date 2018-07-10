@@ -72,6 +72,12 @@
                       <div data-admin-ng-notifications="" context="event-scheduling"></div>
                       <div class="obj list-obj" ng-show="conflicts.length > 0">
                         <table class="main-tbl scheduling-conflict">
+                          <tr>
+                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_FIRST_EVENT' | translate }}</th>
+                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_SECOND_EVENT' | translate }}</th>
+                            <th>{{ 'EVENTS.EVENTS.TABLE.START' | translate }}</th>
+                            <th>{{ 'EVENTS.EVENTS.TABLE.END' | translate }}</th>
+                          </tr>
                           <tr ng-repeat="conflict in conflicts">
                             <td>{{ conflict.eventId }}</td>
                             <td>{{ conflict.title }}</td>

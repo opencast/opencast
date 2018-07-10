@@ -244,7 +244,9 @@
           "GENERAL": {
               "CAPTION": "Allgemein",
               "CANNOTSTART": "Markierte Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
-              "NOCHANGES": "Es wurden keine Änderungen an den Aufzeichnungen festgestellt!"
+              "NOCHANGES": "Es wurden keine Änderungen an den Aufzeichnungen festgestellt!",
+              "CONFLICT_FIRST_EVENT": "Geänderte Aufzeichnung",
+              "CONFLICT_SECOND_EVENT": "Aufzeichnung in Konflikt"
           },
           "METADATA": {
               "EDIT": "Metadaten bearbeiten"

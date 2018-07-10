@@ -246,7 +246,9 @@
           "GENERAL": {
               "CAPTION": "General",
               "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
-              "NOCHANGES": "No changes to the events detected!"
+              "NOCHANGES": "No changes to the events detected!",
+              "CONFLICT_FIRST_EVENT": "Changed event",
+              "CONFLICT_SECOND_EVENT": "Event in conflict"
           },
           "METADATA": {
               "EDIT": "Edit metadata"
