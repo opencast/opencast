@@ -175,7 +175,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
             // make sure the user does not gain organization administrator privileges
             String organizationAdminRole = requestedOrganization.getAdminRole();
-            if (requestedUser.hasRole(organizationAdminRole)) {
+            if (!originalUser.hasRole(organizationAdminRole) && requestedUser.hasRole(organizationAdminRole)) {
               logger.warn("An unauthorized request is trying to switch to an admin user, from '{}' to '{}'",
                       originalUser.getUsername(), userHeader);
               ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -219,7 +219,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
           // Role switching is only allowed to non-organization administrator roles
           String organizationAdminRole = requestedOrganization.getAdminRole();
-          if (requestedRoles.contains(organizationAdminRole)) {
+          if (!originalUser.hasRole(organizationAdminRole) && requestedRoles.contains(organizationAdminRole)) {
             logger.warn("An unauthorized request by user '{}' is trying to gain admin role '{}'",
                     originalUser.getUsername(), organizationAdminRole);
             ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
