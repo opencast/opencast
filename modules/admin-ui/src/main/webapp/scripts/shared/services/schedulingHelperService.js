@@ -66,7 +66,7 @@ angular.module('adminNg.services')
 
         this.hasAgentAccess = function(agentId) {
             if (AuthService.isOrganizationAdmin()) return true;
-            var role = "ROLE_CAPTURE_AGENT_" + agentId.replace("[^a-zA-Z0-9_]", "").toUpperCase();
+            var role = "ROLE_CAPTURE_AGENT_" + agentId.replace(/[^a-zA-Z0-9_]/g, "").toUpperCase();
             return AuthService.userIsAuthorizedAs(role);
         };
     };
