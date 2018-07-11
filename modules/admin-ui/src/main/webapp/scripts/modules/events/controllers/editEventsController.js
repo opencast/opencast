@@ -22,8 +22,8 @@
 
 // Controller for the "edit scheduled events" wizard
 angular.module('adminNg.controllers')
-    .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'SeriesResource', 'CaptureAgentsResource', 'EventsSchedulingResource', 'JsHelper', 'SchedulingHelperService', 'WizardHandler', 'Language', '$translate', 'decorateWithTableRowSelection','$timeout',
-function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, CaptureAgentsResource, EventsSchedulingResource, JsHelper, SchedulingHelperService, WizardHandler, Language, $translate, decorateWithTableRowSelection, $timeout) {
+    .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'SeriesResource', 'CaptureAgentsResource', 'EventsSchedulingResource', 'JsHelper', 'SchedulingHelperService', 'WizardHandler', 'Language', '$translate', 'decorateWithTableRowSelection','$timeout', 'Modal',
+function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, CaptureAgentsResource, EventsSchedulingResource, JsHelper, SchedulingHelperService, WizardHandler, Language, $translate, decorateWithTableRowSelection, $timeout, Modal) {
     var me = this;
     var SCHEDULING_CONTEXT = 'event-scheduling';
 
@@ -54,6 +54,21 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
             $scope.seriesResults[row.title] = row.id;
         });
     });
+
+    $scope.keyUp = function (event) {
+        switch (event.keyCode) {
+        case 27:
+            $scope.close();
+            break;
+        }
+    };
+
+    $scope.close = function() {
+        if (me.notificationConflict) {
+            Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
+        }
+        Modal.$scope.close();
+    };
 
     // Given a series id, get me the title (we need this for the summary prettification)
     var seriesTitleForId = function(id) {
