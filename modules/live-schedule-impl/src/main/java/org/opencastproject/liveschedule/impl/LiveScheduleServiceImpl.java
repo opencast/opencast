@@ -302,7 +302,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // If the snapshot version is in our local cache, it means that this snapshot was created by us so
     // nothing to do. Note that this is just to save time; if the entry has already been deleted, the mp
     // will be compared below.
-    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier()))) {
+    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier().toString()))) {
       logger.debug("Snapshot version {} was created by us so this change is ignored.", snapshot.getVersion());
       return false;
     }
