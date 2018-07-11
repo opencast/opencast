@@ -72,6 +72,10 @@ angular.module('adminNg.controllers')
         if (me.notificationConflict) {
           Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
         }
+        if (me.notificationInvalidDate) {
+          Notifications.remove(me.notificationInvalidDate, SCHEDULING_CONTEXT);
+          me.notificationInvalidDate = undefined;
+        }
         Modal.$scope.close();
       };
 
@@ -121,15 +125,47 @@ angular.module('adminNg.controllers')
         return getRowForId(id).title;
       };
 
+      // For a given event id, get its scheduling data
+      var getSchedulingEvent = function(id) {
+        for(var i = 0; i < $scope.schedulingSingle.length; i++) {
+          var row = $scope.schedulingSingle[i];
+          if (row.eventId === id) {
+            return row;
+          }
+        }
+        return null;
+
+      };
+
+      // Convert a Javascript, sunday-based weekday to the corresponding
+      // OC weekday object
+      var jsWeekdayToOcKey = function(d) {
+        // Javascript week days start at sunday (so 0=SU), so we have to roll over.
+        return JsHelper.getWeekDays()[(d + 6) % 7];
+      };
+
+      var getWeekdayString = function(date) {
+        return jsWeekdayToOcKey(new Date(date).getDay()).key;
+      };
+
       // Iterate over all (selected) events (via the rows) and get the
       // specific metadata element. Returns the empty string if the
       // value is ambiguous between the rows.
-      var getMetadataPart = function(getter) {
+      // A weekday can be passed to filter specific weekdays
+      var getMetadataPart = function(getter, weekday) {
         var result = null;
         for (var i = 0; i < $scope.rows.length; i++) {
           var row = $scope.rows[i];
           if (!row.selected) {
             continue;
+          }
+          if (!angular.isUndefined(weekday)) {
+            // If we've got a weekday, we have to retrieve the event's start date from the scheduling
+            // information
+            var schedulingEvent = getSchedulingEvent(row.id);
+            if (getWeekdayString(schedulingEvent.start.date) !== weekday) {
+              continue;
+            }
           }
           var val = getter(row);
           if (!angular.isDefined(val)) {
@@ -154,10 +190,14 @@ angular.module('adminNg.controllers')
       };
 
       // see "getMetadataPart", but this one is for scheduling information
-      var getSchedulingPart = function(getter) {
+      // A weekday can be passed in order to filter specific weekdays
+      var getSchedulingPart = function(getter, weekday) {
         var result = { ambiguous: false, value: null };
         angular.forEach($scope.schedulingSingle, function(value) {
           if (!isSelected(value.eventId)) {
+            return;
+          }
+          if (!angular.isUndefined(weekday) && getWeekdayString(value.start.date) !== weekday) {
             return;
           }
           var val = getter(value);
@@ -177,13 +217,6 @@ angular.module('adminNg.controllers')
         }
       };
 
-      // Convert a Javascript, sunday-based weekday to the corresponding
-      // OC weekday object
-      var fromJsWeekday = function(d) {
-      // Javascript week days start at sunday (so 0=SU), so we have to roll over.
-        return JsHelper.getWeekDays()[(d + 6) % 7];
-      };
-
       $scope.hours = JsHelper.initArray(24);
       $scope.minutes = JsHelper.initArray(60);
       $scope.weekdays = JsHelper.getWeekDays();
@@ -195,8 +228,32 @@ angular.module('adminNg.controllers')
         ignoreNonScheduled: true
       });
 
-      $scope.onTemporalValueChange = function(type) {
-        SchedulingHelperService.applyTemporalValueChange($scope.scheduling, type, false);
+      $scope.onTemporalValueChange = function(weekday, type) {
+        SchedulingHelperService.applyTemporalValueChange($scope.scheduling[weekday], type, false);
+        var startTime = $scope.scheduling[weekday].start.hour * 60 + $scope.scheduling[weekday].start.minute;
+        var endTime = $scope.scheduling[weekday].end.hour * 60 + $scope.scheduling[weekday].end.minute;
+        var conflictsBefore = $scope.hasInvalidDates();
+        if (endTime < startTime) {
+          $scope.invalidDates[weekday] = true;
+          if (!conflictsBefore) {
+            me.notificationInvalidDate = Notifications.add('error', 'CONFLICT_END_BEFORE_START', SCHEDULING_CONTEXT);
+          }
+        } else {
+          $scope.invalidDates[weekday] = false;
+        }
+        if (!$scope.hasInvalidDates() && me.notificationInvalidDate) {
+          Notifications.remove(me.notificationInvalidDate, SCHEDULING_CONTEXT);
+          me.notificationInvalidDate = undefined;
+        }
+      };
+
+      $scope.hasInvalidDates = function() {
+        for (var i = 0; i < $scope.weekdays.length; i++) {
+          if ($scope.invalidDates[$scope.weekdays[i].key]) {
+            return true;
+          }
+        }
+        return false;
       };
 
       this.clearConflicts = function () {
@@ -234,8 +291,8 @@ angular.module('adminNg.controllers')
       // What we send to the server is slightly different than what we
       // internally use for the forms. This function returns the
       // "cleaned up" result.
-      var postprocessScheduling = function() {
-        var scheduling = $.extend(true, {}, $scope.scheduling);
+      var postprocessScheduling = function(weekday) {
+        var scheduling = $.extend(true, {}, $scope.scheduling[weekday]);
         JsHelper.removeNulls(scheduling);
         JsHelper.removeNulls(scheduling.start);
         JsHelper.removeNulls(scheduling.end);
@@ -253,19 +310,40 @@ angular.module('adminNg.controllers')
         return scheduling;
       };
 
+      var eventIdsForWeekday = function(weekday) {
+        var result = [];
+        angular.forEach($scope.schedulingSingle, function(value) {
+          if (!isSelected(value.eventId)) {
+            return;
+          }
+          if (getWeekdayString(value.start.date) === weekday) {
+            result.push(value.eventId);
+          }
+        });
+        return result;
+      };
+
       $scope.checkConflicts = function () {
         if ($scope.conflictCheckingEnabled === false) {
           return;
         }
-        $scope.checkingConflicts = true;
-        var payload = {
-          events: $scope.getSelectedIds(),
-          scheduling: postprocessScheduling()
-        };
-        EventBulkEditResource.conflicts(payload, me.noConflictsDetected, me.conflictsDetected);
+        return new Promise(function(resolve, reject) {
+          $scope.checkingConflicts = true;
+          var weekdays = $scope.validWeekdays();
+          var payload = [];
+          for (var i = 0; i < weekdays.length; i++) {
+            var wd = weekdays[i];
+            payload.push({
+              events: eventIdsForWeekday(wd),
+              scheduling: postprocessScheduling(wd)
+            });
+          }
+          EventBulkEditResource.conflicts(payload, me.noConflictsDetected, me.conflictsDetected);
+        });
       };
 
       $scope.checkingConflicts = false;
+      $scope.invalidDates = {};
 
       $scope.nextWizardStep = function() {
         WizardHandler.wizard('editEventsWz').next();
@@ -292,25 +370,40 @@ angular.module('adminNg.controllers')
 
       // This is triggered after the user selected some events in the first wizard step
       $scope.clearFormAndContinue = function() {
+        if (me.notificationInvalidDate) {
+          Notifications.remove(me.notificationInvalidDate, SCHEDULING_CONTEXT);
+          me.notificationInvalidDate = undefined;
+        }
+
         $scope.conflictCheckingEnabled = true;
 
-        $scope.scheduling = {
-          timezone: JsHelper.getTimeZoneName(),
-          location: getCaById(getMetadataPart(function(row) { return row.agent_id; })),
-          start: {
-            hour: getSchedulingPart(function(entry) { return entry.start.hour; }),
-            minute: getSchedulingPart(function(entry) { return entry.start.minute; })
-          },
-          end: {
-            hour: getSchedulingPart(function(entry) { return entry.end.hour; }),
-            minute: getSchedulingPart(function(entry) { return entry.end.minute; })
-          },
-          duration: {
-            hour: getSchedulingPart(function(entry) { return entry.duration.hour; }),
-            minute: getSchedulingPart(function(entry) { return entry.duration.minute; })
-          },
-          weekday: getSchedulingPart(function(entry) {return fromJsWeekday(new Date(entry.start.date).getDay()).key;})
-        };
+        angular.forEach($scope.schedulingSingle, function(value) {
+          if (!isSelected(value.eventId)) {
+            return;
+          }
+          var weekday = getWeekdayString(value.start.date);
+          if (weekday in $scope.scheduling) {
+            return;
+          }
+
+          $scope.scheduling[weekday] = {
+            timezone: JsHelper.getTimeZoneName(),
+            location: getCaById(getMetadataPart(function(row) { return row.agent_id; }, weekday)),
+            start: {
+              hour: getSchedulingPart(function(entry) { return entry.start.hour; }, weekday),
+              minute: getSchedulingPart(function(entry) { return entry.start.minute; }, weekday)
+            },
+            end: {
+              hour: getSchedulingPart(function(entry) { return entry.end.hour; }, weekday),
+              minute: getSchedulingPart(function(entry) { return entry.end.minute; }, weekday)
+            },
+            duration: {
+              hour: getSchedulingPart(function(entry) { return entry.duration.hour; }, weekday),
+              minute: getSchedulingPart(function(entry) { return entry.duration.minute; }, weekday)
+            },
+            weekday: weekday
+          };
+        });
 
         return $scope.seriesLoaded.then(function() {
 
@@ -357,8 +450,39 @@ angular.module('adminNg.controllers')
         return JsHelper.filter($scope.getSelected(), $scope.nonSchedule).length > 0;
       };
 
+      $scope.translateWeekdayLong = function(wd) {
+        return $translate.instant(JsHelper.weekdayTranslation(wd, true));
+      };
+
+      $scope.numberOfEventsForWeekday = function(wd) {
+        var result = 0;
+        angular.forEach($scope.schedulingSingle, function(value) {
+          if (!isSelected(value.eventId)) {
+            return;
+          }
+          if (getWeekdayString(value.start.date) === wd) {
+            result++;
+          }
+        });
+        return result;
+      };
+
+      $scope.eventOrEvents = function(wd) {
+        var key;
+        if ($scope.numberOfEventsForWeekday(wd) === 1) {
+          key = 'BULK_ACTIONS.EDIT_EVENTS.EDIT.EVENT';
+        } else {
+          key = 'BULK_ACTIONS.EDIT_EVENTS.EDIT.EVENTS';
+        }
+        return $translate.instant(key);
+      };
+
       $scope.rowsValid = function() {
         return !$scope.nonScheduleSelected() && $scope.hasAnySelected() && $scope.hasAllAgentsAccess();
+      };
+
+      $scope.validWeekdays = function() {
+        return Object.keys($scope.scheduling);
       };
 
       $scope.generateEventSummariesAndContinue = function() {
@@ -369,26 +493,35 @@ angular.module('adminNg.controllers')
           }
 
           var changes = [];
+          var jsDateBefore = new Date(value.start.date);
+          var ocWeekdayStruct = jsWeekdayToOcKey(jsDateBefore.getDay());
+          var scheduling = $scope.scheduling[ocWeekdayStruct.key];
 
-          if ($scope.scheduling.location !== null
-            && $scope.scheduling.location.id !== null
-            && $scope.scheduling.location.id !== value.agentId)
-          {
+          if (scheduling.location !== null &&
+              scheduling.location.id !== null &&
+              scheduling.location.id !== value.agentId) {
             changes.push({
               type: 'EVENTS.EVENTS.TABLE.LOCATION',
               previous: value.agentId,
-              next: $scope.scheduling.location.id
+              next: scheduling.location.id
             });
           }
 
-          var valueWeekDay = fromJsWeekday(new Date(value.start.date).getDay());
-          if ($scope.scheduling.weekday !== null && valueWeekDay.key !== $scope.scheduling.weekday) {
+          if (scheduling.weekday !== null && ocWeekdayStruct.key !== scheduling.weekday) {
+            var dayOfWeekPrevious = $translate.instant(ocWeekdayStruct.translationLong);
+            var datePrevious = Language.format('medium', jsDateBefore.toISOString(), 'date');
+            var germanWeekdayNext = (JsHelper.weekdayByKey(scheduling.weekday).jsWeekday + 6) % 7;
+            var germanWeekdayBefore = (jsDateBefore.getDay() + 6) % 7;
+            var jsDateNext = new Date(jsDateBefore.getTime());
+            jsDateNext.setHours(24 * (germanWeekdayNext - germanWeekdayBefore));
+            var dayOfWeekNext = $translate.instant(JsHelper.weekdayTranslation( scheduling.weekday, true));
+            var dateNext = Language.format('medium', jsDateNext.toISOString(), 'date');
             changes.push({
               type: 'EVENTS.EVENTS.TABLE.WEEKDAY',
               // Might be better to actually use the promise rather than using instant,
               // but it's difficult with the two-way binding here.
-              previous: $translate.instant(valueWeekDay.translationLong),
-              next: $translate.instant(JsHelper.weekdayTranslation($scope.scheduling.weekday, true))
+              previous: dayOfWeekPrevious + ', ' + datePrevious,
+              next: dayOfWeekNext + ', ' + dateNext
             });
           }
 
@@ -470,8 +603,8 @@ angular.module('adminNg.controllers')
             }
           };
 
-          formatPart($scope.scheduling.start, value.start, 'START');
-          formatPart($scope.scheduling.end, value.end, 'END');
+          formatPart(scheduling.start, value.start, 'START');
+          formatPart(scheduling.end, value.end, 'END');
 
           if (changes.length > 0) {
             $scope.eventSummaries.push({
@@ -517,23 +650,29 @@ angular.module('adminNg.controllers')
       $scope.submitButton = false;
       $scope.submit = function () {
         $scope.submitButton = true;
-        var payload = {
-          metadata: {
-            flavor: 'dublincore/episode',
-            title: 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
-            fields: JsHelper.filter(
-              $scope.metadataRows,
-              function(row) {
-                // Search for "hack" in this file for an explanation of this typeof magic.
-                return angular.isDefined(row.value)
-                  && row.value !== null
-                  && typeof row.value !== 'object'
-                  && row.value !== '';
-              })
-          },
-          scheduling: postprocessScheduling(),
-          events: $scope.getSelectedIds()
+        var metadata = {
+          flavor: 'dublincore/episode',
+          title: 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
+          fields: JsHelper.filter(
+            $scope.metadataRows,
+            function(row) {
+              // Search for "hack" in this file for an explanation of this typeof magic.
+              return angular.isDefined(row.value)
+                && row.value !== null
+                && typeof row.value !== 'object'
+                && row.value !== '';
+            })
         };
+        var weekdays = $scope.validWeekdays();
+        var payload = [];
+        for (var i = 0; i < weekdays.length; i++) {
+          var wd = weekdays[i];
+          payload.push({
+            events: eventIdsForWeekday(wd),
+            metadata: metadata,
+            scheduling: postprocessScheduling(wd)
+          });
+        }
         if ($scope.valid()) {
           EventBulkEditResource.update(payload, onSuccess, onFailure);
         }

@@ -270,34 +270,24 @@ public final class BulkUpdateUtil {
   }
 
   /**
-   * Model class for the bulk update instructions which are sent by the UI.
+   * Model class for one group of update instructions
    */
-  public static class BulkUpdateInstructions {
-    private static final String KEY_EVENTS = "events";
-    private static final String KEY_METADATA = "metadata";
-    private static final String KEY_SCHEDULING = "scheduling";
-
+  public static class BulkUpdateInstructionGroup {
     private final List<String> eventIds;
     private final JSONObject metadata;
     private final JSONObject scheduling;
 
     /**
-     * Create a new instance by parsing the given json String.
+     * Create a new group from parsed JSON data
      *
-     * @param json The json serialized version of the bulk update instructions sent by the UI.
-     *
-     * @throws IllegalArgumentException If the json string cannot be parsed.
+     * @param eventIds Event IDs in this group
+     * @param metadata Metadata for this group
+     * @param scheduling Scheduling for this group
      */
-    @SuppressWarnings("unchecked")
-    public BulkUpdateInstructions(final String json) throws IllegalArgumentException {
-      try {
-        final JSONObject jsonObject = (JSONObject) parser.parse(json);
-        eventIds = (JSONArray) jsonObject.get(KEY_EVENTS);
-        metadata = (JSONObject) jsonObject.get(KEY_METADATA);
-        scheduling = (JSONObject) jsonObject.get(KEY_SCHEDULING);
-      } catch (ParseException e) {
-        throw new IllegalArgumentException(e);
-      }
+    public BulkUpdateInstructionGroup(final List<String> eventIds, final JSONObject metadata, final JSONObject scheduling) {
+      this.eventIds = eventIds;
+      this.metadata = metadata;
+      this.scheduling = scheduling;
     }
 
     /**
@@ -325,6 +315,45 @@ public final class BulkUpdateUtil {
      */
     public JSONObject getScheduling() {
       return scheduling;
+    }
+  }
+
+  /**
+   * Model class for the bulk update instructions which are sent by the UI.
+   */
+  public static class BulkUpdateInstructions {
+    private static final String KEY_EVENTS = "events";
+    private static final String KEY_METADATA = "metadata";
+    private static final String KEY_SCHEDULING = "scheduling";
+
+    private final List<BulkUpdateInstructionGroup> groups;
+
+    /**
+     * Create a new instance by parsing the given json String.
+     *
+     * @param json The json serialized version of the bulk update instructions sent by the UI.
+     *
+     * @throws IllegalArgumentException If the json string cannot be parsed.
+     */
+    @SuppressWarnings("unchecked")
+    public BulkUpdateInstructions(final String json) throws IllegalArgumentException {
+      try {
+        final JSONArray root = (JSONArray) parser.parse(json);
+        groups = new ArrayList<>(root.size());
+        for (final Object jsonGroup : root) {
+          final JSONObject jsonObject = (JSONObject) jsonGroup;
+          final JSONArray eventIds = (JSONArray) jsonObject.get(KEY_EVENTS);
+          final JSONObject metadata = (JSONObject) jsonObject.get(KEY_METADATA);
+          final JSONObject scheduling = (JSONObject) jsonObject.get(KEY_SCHEDULING);
+          groups.add(new BulkUpdateInstructionGroup(eventIds, metadata, scheduling));
+        }
+      } catch (final ParseException e) {
+        throw new IllegalArgumentException(e);
+      }
+    }
+
+    public List<BulkUpdateInstructionGroup> getGroups() {
+      return groups;
     }
   }
 

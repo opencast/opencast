@@ -113,6 +113,7 @@ import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -131,6 +132,7 @@ import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -1135,10 +1137,10 @@ public abstract class AbstractEventEndpoint {
   @PUT
   @Path("bulk/update")
   @RestQuery(name = "bulkupdate", description = "Update all of the given events at once", restParameters = {
-    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of events and fields to update.")}, reponses = {
+    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of groups with events and fields to update.")}, reponses = {
     @RestResponse(description = "All events have been updated successfully.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Could not parse update instructions.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-    @RestResponse(description = "Faield updating metadata or scheduling information. Some events may have been updated. Details are available in the response body.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
+    @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been updated. Details are available in the response body.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
     @RestResponse(description = "The events in the response body were not found. No events were updated.", responseCode = HttpServletResponse.SC_NOT_FOUND)},
     returnDescription = "In case of success, no content is returned. In case of errors while updating the metadata or scheduling information, the errors are returned. In case events were not found, their ids are returned")
   public Response bulkUpdate(@FormParam("update") String updateJson) {
@@ -1150,50 +1152,49 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Cannot parse bulk update instructions");
     }
 
-    // Get all the events to edit
-    final Map<String, Optional<Event>> events = instructions.getEventIds().stream()
-      .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
-
-    // Check for invalid (non-existing) event ids
-    final Set<String> notFoundIds = events.entrySet().stream()
-      .filter(e -> !e.getValue().isPresent())
-      .map(Entry::getKey)
-      .collect(Collectors.toSet());
-    if (!notFoundIds.isEmpty()) {
-      return notFoundJson(JSONUtils.setToJSON(notFoundIds));
-    }
-
     final Map<String, String> metadataUpdateFailures = new HashMap<>();
     final Map<String, String> schedulingUpdateFailures = new HashMap<>();
 
-    events.values().forEach(e -> e.ifPresent(event -> {
+    for (final BulkUpdateUtil.BulkUpdateInstructionGroup groupInstructions : instructions.getGroups()) {
+      // Get all the events to edit
+      final Map<String, Optional<Event>> events = groupInstructions.getEventIds().stream()
+        .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
 
-      JSONObject metadata = null;
-
-      // Update the scheduling information
-      try {
-        if (instructions.getScheduling() != null) {
-          // Since we only have the start/end time, we have to add the correct date(s) for this event.
-          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, instructions.getScheduling());
-          updateEventScheduling(scheduling.toJSONString(), event);
-          // We have to update the non-technical metadata as well to keep them in sync with the technical ones.
-          metadata = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
-        }
-      } catch (Exception exception) {
-        schedulingUpdateFailures.put(event.getIdentifier(), exception.getMessage());
+      // Check for invalid (non-existing) event ids
+      final Set<String> notFoundIds = events.entrySet().stream().filter(e -> !e.getValue().isPresent()).map(Entry::getKey).collect(Collectors.toSet());
+      if (!notFoundIds.isEmpty()) {
+        return notFoundJson(JSONUtils.setToJSON(notFoundIds));
       }
 
-      // Update the event metadata
-      try {
-        if (instructions.getMetadata() != null || metadata != null) {
-          metadata = BulkUpdateUtil.mergeMetadataFields(metadata, instructions.getMetadata());
-          getIndexService().updateAllEventMetadata(event.getIdentifier(),
-            JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+
+      events.values().forEach(e -> e.ifPresent(event -> {
+
+        JSONObject metadata = null;
+
+        // Update the scheduling information
+        try {
+          if (groupInstructions.getScheduling() != null) {
+            // Since we only have the start/end time, we have to add the correct date(s) for this event.
+            final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupInstructions.getScheduling());
+            updateEventScheduling(scheduling.toJSONString(), event);
+            // We have to update the non-technical metadata as well to keep them in sync with the technical ones.
+            metadata = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
+          }
+        } catch (Exception exception) {
+          schedulingUpdateFailures.put(event.getIdentifier(), exception.getMessage());
         }
-      } catch (Exception exception) {
-        metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
-      }
-    }));
+
+        // Update the event metadata
+        try {
+          if (groupInstructions.getMetadata() != null || metadata != null) {
+            metadata = BulkUpdateUtil.mergeMetadataFields(metadata, groupInstructions.getMetadata());
+            getIndexService().updateAllEventMetadata(event.getIdentifier(), JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+          }
+        } catch (Exception exception) {
+          metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
+        }
+      }));
+    }
 
     // Check if there were any errors updating the metadata or scheduling information
     if (!metadataUpdateFailures.isEmpty() || !schedulingUpdateFailures.isEmpty()) {
@@ -1221,25 +1222,28 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Cannot parse bulk update instructions");
     }
 
-    // Get all the events to check
-    final Map<String, Optional<Event>> events = instructions.getEventIds().stream()
-      .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
-
+    final Map<String, List<JValue>> conflicts = new HashMap<>();
+    final List<Tuple3<String, Optional<Event>, JSONObject>> eventsWithSchedulingOpt = instructions.getGroups().stream()
+      .flatMap(group -> group.getEventIds().stream().map(eventId -> Tuple3
+        .tuple3(eventId, BulkUpdateUtil.getEvent(getIndexService(), getIndex(), eventId), group.getScheduling())))
+      .collect(Collectors.toList());
     // Check for invalid (non-existing) event ids
-    final Set<String> notFoundIds = events.entrySet().stream()
-      .filter(e -> !e.getValue().isPresent())
-      .map(Entry::getKey)
-      .collect(Collectors.toSet());
+    final Set<String> notFoundIds = eventsWithSchedulingOpt.stream().filter(e -> !e.getB().isPresent())
+      .map(Tuple3::getA).collect(Collectors.toSet());
     if (!notFoundIds.isEmpty()) {
       return notFoundJson(JSONUtils.setToJSON(notFoundIds));
     }
-
-    final Map<String, List<JValue>> conflicts = new HashMap<>();
-    events.values().forEach(e -> e.ifPresent(event -> {
+    final List<Tuple<Event, JSONObject>> eventsWithScheduling = eventsWithSchedulingOpt.stream()
+      .map(e -> Tuple.tuple(e.getB().get(), e.getC())).collect(Collectors.toList());
+    final Set<String> changedIds = eventsWithScheduling.stream().map(e -> e.getA().getIdentifier())
+      .collect(Collectors.toSet());
+    for (final Tuple<Event, JSONObject> eventWithGroup : eventsWithScheduling) {
+      final Event event = eventWithGroup.getA();
+      final JSONObject groupScheduling = eventWithGroup.getB();
       try {
-        if (instructions.getScheduling() != null) {
+        if (groupScheduling != null) {
           // Since we only have the start/end time, we have to add the correct date(s) for this event.
-          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, instructions.getScheduling());
+          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupScheduling);
           final Date start = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_START_KEY)));
           final Date end = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_END_KEY)));
           final String agentId = Optional.ofNullable((String) scheduling.get(SCHEDULING_AGENT_ID_KEY))
@@ -1248,41 +1252,39 @@ public abstract class AbstractEventEndpoint {
           final List<JValue> currentConflicts = new ArrayList<>();
 
           // Check for conflicts between the events themselves
-          events.values().forEach(oe -> oe.ifPresent(otherEvent -> {
-            if (otherEvent.getIdentifier().equals(event.getIdentifier())) {
-              // don't check event against itself
-              return;
-            }
-            final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent, instructions.getScheduling());
+          eventsWithScheduling.stream()
+            .filter(otherEvent -> !otherEvent.getA().getIdentifier().equals(event.getIdentifier()))
+            .forEach(otherEvent -> {
+            final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(), otherEvent.getB());
             final Date otherStart = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_START_KEY)));
             final Date otherEnd = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_END_KEY)));
             final String otherAgentId = Optional.ofNullable((String) otherScheduling.get(SCHEDULING_AGENT_ID_KEY))
-              .orElse(otherEvent.getAgentId());
+              .orElse(otherEvent.getA().getAgentId());
             if (!otherAgentId.equals(agentId)) {
               // different agent -> no conflict
               return;
             }
-            if (start.before(otherEnd) && end.after(otherStart)) {
+            if (Util.schedulingIntervalsOverlap(start, end, otherStart, otherEnd)) {
               // conflict
               currentConflicts.add(convertEventToConflictingObject(DateTimeSupport.toUTC(otherStart.getTime()),
-                DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getTitle()));
+                DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getA().getTitle()));
             }
-          }));
+          });
 
           // Check for conflicts with other events from the database
           final List<MediaPackage> conflicting = getSchedulerService().findConflictingEvents(agentId, start, end)
             .stream()
-            .filter(mp -> !events.keySet().contains(mp.getIdentifier().toString()))
+            .filter(mp -> !changedIds.contains(mp.getIdentifier().toString()))
             .collect(Collectors.toList());
-          if (conflicting != null && !conflicting.isEmpty()) {
+          if (!conflicting.isEmpty()) {
             currentConflicts.addAll(convertToConflictObjects(event.getIdentifier(), conflicting));
           }
           conflicts.put(event.getIdentifier(), currentConflicts);
         }
-      } catch (SchedulerException | UnauthorizedException | SearchIndexException exception) {
+      } catch (final SchedulerException | UnauthorizedException | SearchIndexException exception) {
         throw new RuntimeException(exception);
       }
-    }));
+    }
 
     if (!conflicts.isEmpty()) {
       final List<JValue> responseJson = new ArrayList<>();

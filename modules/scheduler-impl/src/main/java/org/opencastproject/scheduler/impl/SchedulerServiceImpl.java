@@ -181,9 +181,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
 
-  /** The minimum separation between one event ending and the next starting */
-  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
-
   /** The last modifed cache configuration key */
   private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
 
@@ -1421,10 +1418,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       If the potential event begins before, and ends after event r (ie, containment) OR
       If the potential event begins or ends within the minimum separation distance of event r
       */
-      if (checkStart.after(start) && checkStart.before(end)
-       || checkEnd.after(start) && checkEnd.before(end)
-       || checkStart.before(start) && checkEnd.after(end)
-       || eventWithinMinimumSeparation(checkStart, checkEnd, start, end)) {
+      if (Util.schedulingIntervalsOverlap(checkStart, checkEnd, start, end)) {
         result.add(r);
       }
     }
@@ -1437,20 +1431,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
     });
     return Stream.mk(result).bind(recordToMp).toList();
-  }
-
-  /**
-   * Returns true of checkStart is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates, or checkEnd
-   * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
-   */
-  private boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
-    if (Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
-        || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
-      return true;
-    }
-    return false;
   }
 
   @Override

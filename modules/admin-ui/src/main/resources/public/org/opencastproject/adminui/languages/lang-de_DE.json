@@ -272,15 +272,18 @@
          },
          "SUMMARY": {
             "CAPTION": "Zusammenfassung",
-            "SINGLE_EVENT_CAPTION": "Event \"{{ title }}\"",
+            "SINGLE_EVENT_CAPTION": "Aufzeichnung \"{{ title }}\"",
             "TYPE": "Typ",
             "PREVIOUS": "Alter Wert",
             "NEXT": "Neuer Wert"
          },
          "EDIT": {
             "CAPTION": "Bearbeiten",
+            "EVENT": "Aufzeichnung",
+            "EVENTS": "Aufzeichnungen",
+            "HEADER": "Dieser Schritte erlaubt die Änderung von Aufzeichnungen, gruppiert nach Wochentag. Die Eingabefelder sind vorausgefüllt, falls alle Aufzeichnungen dieses Wochentages denselben Wert haben. Ansonsten ist das entsprechende Eingabefeld leer. Wird es leer gelassen, so bedeutet dies, dass keine Änderungen gemacht werden.",
             "METADATA": "Metadaten",
-            "SCHEDULING": "Planung"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,6 +448,7 @@
                   "CAPTION": "Mehrere Aufzeichnungen planen",
                   "REPEATS": "Wiederholt sich",
                   "REPEAT_ON": "Wiederholen am",
+                  "WEEKDAY": "Wochentag",
                   "WEEKDAYS": "Wochentage"
                },
                "NO_SOURCE_AVAILABLE": "Kein Capture-Agent zur Planung einer Aufzeichnung verfügbar"
