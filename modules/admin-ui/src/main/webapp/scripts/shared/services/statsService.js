@@ -21,8 +21,8 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$timeout',
-    function ($rootScope, $filter, Storage, $location, $timeout) {
+.factory('Stats', ['$rootScope', '$filter', 'Storage', '$location', '$timeout', 'RelativeDatesService',
+    function ($rootScope, $filter, Storage, $location, $timeout, RelativeDatesService) {
     var StatsService = function () {
         var me = this,
             DEFAULT_REFRESH_DELAY = 5000;
@@ -35,6 +35,10 @@ angular.module('adminNg.services')
             me.apiService = options.apiService;
             me.stats = options.stats;
             me.refreshDelay = options.refreshDelay || DEFAULT_REFRESH_DELAY;
+
+            me.stats.sort(function(a, b) {
+                return a.order - b.order;
+            });
         };
 
         /**
@@ -49,11 +53,24 @@ angular.module('adminNg.services')
             me.runningQueries = 0;
 
             angular.forEach(me.stats, function (stat) {
+
                 var query = {};
                 var filters = [];
+
                 angular.forEach(stat.filters, function (filter) {
-                    filters.push(filter.name + ':' + filter.value);
+
+                    var name = filter.name;
+                    var value = filter.value;
+
+                    if (value.hasOwnProperty('relativeDateSpan')) {
+                        value = RelativeDatesService.relativeDateSpanToFilterValue(value.relativeDateSpan.from,
+                                                                                   value.relativeDateSpan.to,
+                                                                                   value.relativeDateSpan.unit);
+                    }
+
+                    filters.push(name + ':' + value);
                 });
+
                 if (filters.length) {
                     query.filter = filters.join(',');
                 }

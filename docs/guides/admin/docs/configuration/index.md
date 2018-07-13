@@ -27,3 +27,4 @@ General Configuration
     * [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 * [External API Configuration](external-api.md)
 * [OAI-PMH Configuration](oaipmh.md)
+* [Admin UI Configuration](ui.md)
