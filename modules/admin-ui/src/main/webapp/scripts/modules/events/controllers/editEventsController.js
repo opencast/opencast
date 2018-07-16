@@ -368,8 +368,8 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
                     type: 'EVENTS.EVENTS.TABLE.WEEKDAY',
                     // Might be better to actually use the promise rather than using instant,
                     // but it's difficult with the two-way binding here.
-                    previous: $translate.instant(valueWeekDay.translation),
-                    next: $translate.instant(JsHelper.weekdayTranslation($scope.scheduling.weekday))
+                    previous: $translate.instant(valueWeekDay.translationLong),
+                    next: $translate.instant(JsHelper.weekdayTranslation($scope.scheduling.weekday, true))
                 });
             }
 

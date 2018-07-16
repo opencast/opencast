@@ -467,6 +467,15 @@
            "FR": "Fr",
            "SA": "Sa",
            "SU": "Su"
+         },
+         "WEEKDAYSLONG": {
+           "MO": "Monday",
+           "TU": "Tuesday",
+           "WE": "Wednesday",
+           "TH": "Thursday",
+           "FR": "Friday",
+           "SA": "Saturday",
+           "SU": "Sunday"
          }
        },
        "NAVIGATION": {
