@@ -1,0 +1,16 @@
+[
+  {
+    "agent_id": "ca24",
+    "status": "offline",
+    "inputs": ["default"],
+    "update": "2018-03-12T18:17:25Z",
+    "url": "127.0.0.1"
+  },
+  {
+    "agent_id": "ca25",
+    "status": "online",
+    "inputs": ["default1", "default2"],
+    "update": "2018-01-11T14:12:00Z",
+    "url": "127.1.0.1"
+  }
+]

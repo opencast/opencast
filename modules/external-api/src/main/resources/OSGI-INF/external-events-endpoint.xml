@@ -47,4 +47,14 @@
             cardinality="1..1"
             policy="static"
             bind="setUrlSigningService" />
+  <reference name="SchedulerService"
+             interface="org.opencastproject.scheduler.api.SchedulerService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSchedulerService" />
+  <reference name="agentStateService"
+             interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
+             cardinality="1..1"
+             policy="static"
+             bind="setAgentStateService" />
 </scr:component>

@@ -20,28 +20,34 @@
  */
 package org.opencastproject.external.common;
 
-/** The existing versions */
+/** The existing External API versions */
 public enum ApiVersion {
 
-  VERSION_UNDEFINED("v*.*.*"),
+  VERSION_1_0_0(1, 0, 0),
+  VERSION_1_1_0(1, 1, 0);
 
-  VERSION_1_0_0("v1.0.0");
+  /** The most recent version of the External API */
+  public static final ApiVersion CURRENT_VERSION = VERSION_1_1_0;
 
-  public static final ApiVersion CURRENT_VERSION = VERSION_1_0_0;
+  private int major;
+  private int minor;
+  private int patch;
 
   private String versionString;
 
-  ApiVersion(String versionString) {
-    this.versionString = versionString;
+  ApiVersion(int major, int minor, int patch) {
+    this.major = major;
+    this.minor = minor;
+    this.patch = patch;
+    versionString = "v" + major + "." + minor + "." + patch;
   }
 
-  public static ApiVersion of(String version) {
-    switch (version) {
-      case "v1.0.0":
-        return VERSION_1_0_0;
-      default:
-        throw new IllegalArgumentException("'" + version + "' is not a valid version");
-    }
+  public boolean isSmallerThan(ApiVersion other) {
+    if (this.major < other.major) return true;
+    if (this.major > other.major) return false;
+    if (this.minor < other.minor) return true;
+    if (this.minor > other.minor) return false;
+    return this.patch < other.patch;
   }
 
   public String toExternalForm() {
