@@ -63,7 +63,6 @@ pages:
    - Execute Service: 'modules/execute.md'
    - Live Schedule: 'modules/liveschedule.md'
    - LTI Module: 'modules/ltimodule.md'
-   - Mattermost Notification Module: 'modules/notification.md'
    - Media Module: 'modules/mediamodule.configuration.md'
    - Player:
       - Configuration: 'modules/player.configuration.md'
@@ -118,6 +117,7 @@ pages:
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Log: 'workflowoperationhandlers/log-woh.md'
+   - Mattermost Notification Module: 'workflowoperationhandlers/notification.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'
    - Post Media Package: 'workflowoperationhandlers/postmediapackage-woh.md'

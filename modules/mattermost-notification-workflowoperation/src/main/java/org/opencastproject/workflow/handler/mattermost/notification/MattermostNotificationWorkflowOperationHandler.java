@@ -58,7 +58,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow operation for notifying mattermost about status of current workflow.
+ * Workflow operation for notifying Mattermost about the status of the current workflow.
  */
 public class MattermostNotificationWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
   /**
@@ -82,7 +82,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
   public static final String OPT_MAX_RETRY = "max-retry";
 
   /**
-   * Configuration key for the request timeout
+   * Configuration key for the request timeout in milliseconds
    */
   public static final String OPT_TIMEOUT = "timeout";
 
@@ -90,6 +90,17 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    * Name of the subject HTTP parameter
    */
   public static final String HTTP_PARAM_PAYLOAD = "payload";
+
+  /**
+   * HTTP method POST
+   */
+  public static final String POST = "post";
+
+  /**
+   * HTTP method PUT
+   */
+  public static final String PUT = "put";
+
 
 
   /**
@@ -103,12 +114,12 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
   private static final int DEFAULT_MAX_RETRY = 5;
 
   /**
-   * Default maximum wait time the client when trying to execute a request
+   * Default maximum wait time the client when trying to execute a request in milliseconds
    */
   private static final int DEFAULT_TIMEOUT = 10 * 1000;
 
   /**
-   * Default time between two request attempts
+   * Default time between two request attempts in milliseconds
    */
   public static final int INITIAL_SLEEP_TIME = 10 * 1000;
 
@@ -137,9 +148,9 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
     // Optional configuration
     String notificationMessage = getConfig(workflowInstance, OPT_NOTIFICATION_MESSAGE, null);
-    String method = getConfig(workflowInstance, OPT_METHOD, "post");
-    String maxRetryOpt = getConfig(workflowInstance, OPT_MAX_RETRY, null);
-    String timeoutOpt = getConfig(workflowInstance, OPT_TIMEOUT, null);
+    String method = getConfig(workflowInstance, OPT_METHOD, POST);
+    String maxRetryOpt = getConfig(workflowInstance, OPT_MAX_RETRY, DEFAULT_MAX_RETRY);
+    String timeoutOpt = getConfig(workflowInstance, OPT_TIMEOUT, DEFAULT_TIMEOUT);
 
     // If set, convert the timeout to milliseconds
     if (timeoutOpt != null) {
@@ -153,9 +164,9 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
     // Figure out which request method to use
     HttpEntityEnclosingRequestBase request = null;
-    if (StringUtils.equalsIgnoreCase("post", method)) {
+    if (StringUtils.equalsIgnoreCase(POST, method)) {
       request = new HttpPost(urlPath);
-    } else if (StringUtils.equalsIgnoreCase("put", method)) {
+    } else if (StringUtils.equalsIgnoreCase(PUT, method)) {
       request = new HttpPut(urlPath);
     } else {
       throw new WorkflowOperationException("The configuration key '" + OPT_METHOD + "' only supports 'post' and 'put'");
