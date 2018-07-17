@@ -479,17 +479,10 @@ public final class EventIndexUtils {
   }
 
   public static Event updateTechnicalDate(Event event) {
-    if (event.hasRecordingStarted()) {
-      // Override technical dates from recording if already started
+    if (StringUtils.isBlank(event.getTechnicalStartTime()))
       event.setTechnicalStartTime(event.getRecordingStartDate());
+    if (StringUtils.isBlank(event.getTechnicalEndTime()))
       event.setTechnicalEndTime(event.getRecordingEndDate());
-    } else {
-      // If this is an upload where the start time is not set, set the start time to same as dublin core
-      if (StringUtils.isBlank(event.getTechnicalStartTime()))
-        event.setTechnicalStartTime(event.getRecordingStartDate());
-      if (StringUtils.isBlank(event.getTechnicalEndTime()))
-        event.setTechnicalEndTime(event.getRecordingEndDate());
-    }
     return event;
   }
 
