@@ -36,7 +36,7 @@
     <dependency>
       <groupId>org.owasp.esapi</groupId>
       <artifactId>esapi</artifactId>
-    </dependency>     
+    </dependency>
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
