@@ -31,4 +31,5 @@ Release Schedule
 Release Managers
 ----------------
 
-- Still looking for candidates
+- Matthias Neugebauer (University of Münster)
+- Lars Kiesow (ELAN e.V.)
