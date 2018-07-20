@@ -74,7 +74,8 @@
       "HELP": "Hulp",
       "USERS_GUIDE": "Gebruikershandleiding",
       "DOCUMENTATION": "Documentatie",
-      "REST_DOC": "REST API documentatie"
+      "REST_DOC": "REST API documentatie",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Het toegangsbeleid werd aangemaakt",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Het bericht werd verzonden",
       "EMAIL_NOT_SENT": "Het bericht kon niet verzonden worden",
       "CONFLICT_DETECTED": "Plannings conflict: het nieuwe event overlapt met een reeds bestaand event. Gelieve de locatie, datum of tijd aan te passen.",
+      "CONFLICT_BULK_DETECTED": "Planningsconflict: de wijzigingen aan de gebeurtenis resulteert in conflicten. Wijzig de locatie, datums of tijden.",
       "CONFLICT_ALREADY_ENDED": "Planningsfout: het evenement is reeds beëindigd.",
       "CONFLICT_END_BEFORE_START": "Planningsfout: eindtijd moet later zijn dan het begin.",
       "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees en / of schrijf rechten hebben.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Je hebt {{numberOfEvents}} events geselecteerd",
             "CONFIGURATION": "Configuratie",
             "WORKFLOW": "Taak"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Geplande gebeurtenissen bewerken",
+         "GENERAL": {
+            "CAPTION": "Algemeen",
+            "CANNOTSTART": "Gemarkeerde Event (s) kunnen niet worden verwerkt, alleen geplande gebeurtenissen worden ondersteund.",
+            "NOCHANGES": "Geen veranderingen in de gebeurtenissen gedetecteerd!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Metagegevens bewerken"
+         },
+         "SUMMARY": {
+            "CAPTION": "Samenvatting",
+            "SINGLE_EVENT_CAPTION": "Evenement \"{{ title }}\"",
+            "TYPE": "Type",
+            "PREVIOUS": "Oude waarde",
+            "NEXT": "Nieuwe waarde"
+         },
+         "EDIT": {
+            "CAPTION": "Editeer",
+            "METADATA": "Metadata",
+            "SCHEDULING": "Planning"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Toegangspolicy"
             },
             "SUMMARY": {
-               "CAPTION": "Samenvatting"
+               "CAPTION": "Samenvatting",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Ma",
@@ -436,6 +466,15 @@
                "FR": "Vr",
                "SA": "Za",
                "SU": "Zo"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Reeks",
             "DATE": "Datum",
             "START": "Start",
+            "END": "Einde",
             "STOP": "Stop",
             "STATUS": "Status",
             "LOCATION": "Locatie",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Vorige",
             "NOCONTENT": "Geen gegevens beschikbaar",
             "PUBLISHED": "Gepubliceerd",
+            "WEEKDAY": "Weekdag",
             "TOOLTIP": {
                "START": "Filter voor deze begindatum",
                "SERIES": "Filter voor deze serie",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter voor deze locatie",
                "DETAILS": "Open evenement details",
                "DELETE": "Verwijder event",
-               "PREVIEW": "Open voorvertoning speler",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video-Editor (een opmerking geeft aan dat video trimmen is aangevraagd)",
                "COMMENTS": "Commentaar bekijken",
                "PAUSED_WORKFLOW": "Onderbroken workflow weergeven"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Details van evenement {{resourceId}}",
             "TABS": {
-               "GENERAL": "Algemeen",
                "METADATA": "Metadata",
                "EXTENDED-METADATA": "Metadata II",
                "ASSETS": "Assets",
+               "PUBLICATIONS": "Publicaties",
                "SCHEDULING": "Planning",
                "WORKFLOWS": "Werkstromen",
                "ACCESS": "Toegangspolicy",
                "COMMENTS": "Commentaren"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publicaties",
+            "PUBLICATIONS": {
+               "CAPTION": "Publicaties",
                "NO_PUBLICATIONS_AVAILABLE": "Deze gebeurtenis heeft geen publicaties",
                "PUBLICATION_DESCRIPTION": "Dit evenement is gepubliceerd op de volgende publicatie kanalen:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Deze gebeurtenis wordt niet uitgevoerd",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Commentaar toevoegen"
       },
       "TABS": {
-         "PLAY": "Afspelen",
          "EDIT": "Editor",
          "CAPTIONS": "Ondertitels",
          "ANNOTATIONS": "Annotaties"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Taak",
       "SCHEDULED": "Gepland",
       "RECORDING": "Opnemen"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Algemeen",
+         "PLAYER": "Player",
+         "EDITOR": "Editor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Alle filters verwijderen",
+            "EVENT_VIEW": "Evenementen",
+            "SERIES_VIEW": "Reeks",
+            "NEW_EVENT": "Event toevoegen",
+            "NEW_SERIES": "Reeks toevoegen",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Vorig frame",
+            "NEXT_FRAME": "Volgend frame",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Segmenteer",
+            "CUT_SELECTED_SEGMENT": "Knippen",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Einde van segment"
+         }
+      }
    }
 }

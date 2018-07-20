@@ -74,7 +74,8 @@
       "HELP": "Aide",
       "USERS_GUIDE": "Guide de l'utilisateur",
       "DOCUMENTATION": "Documentation",
-      "REST_DOC": "Documentation des API REST"
+      "REST_DOC": "Documentation des API REST",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Les droits d'accès ont été créés",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Le messag a été envoyé",
       "EMAIL_NOT_SENT": "Le message n'a pas pu être envoyé",
       "CONFLICT_DETECTED": "Conflit de programmation: le nouvel événement entre en conflit avec un événement existant. Veuillez changer l'emplacement ou les dates.",
+      "CONFLICT_BULK_DETECTED": "Conflit dans la planification: la modification des événements entraîne des conflits. S'il vous plaît changer l'emplacement, les dates ou les heures.",
       "CONFLICT_ALREADY_ENDED": "Erreur de programmation : l’événement est déjà terminée.",
       "CONFLICT_END_BEFORE_START": "Erreur de programmation : la fin de l’événement programmé doit être postérieure au début.",
       "INVALID_ACL_RULES": "Les règles doivent contenir un rôle valide et un droit d'accès lecture et/ou écriture.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Vous avez sélectionné {{numberOfEvents}} événements",
             "CONFIGURATION": "Configuration",
             "WORKFLOW": "Tâche"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Éditer l'événements programmé",
+         "GENERAL": {
+            "CAPTION": "Général",
+            "CANNOTSTART": "Les événements surlignés ne peuvent pas être traités, seuls les événements planifiés sont pris en charge.",
+            "NOCHANGES": "Aucun changement aux événements détectés !",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Éditer les métadonnées"
+         },
+         "SUMMARY": {
+            "CAPTION": "Résumé",
+            "SINGLE_EVENT_CAPTION": "L'événement \"{{ title }}\"",
+            "TYPE": "Type",
+            "PREVIOUS": "Ancienne valeur",
+            "NEXT": "Nouvelle valeur"
+         },
+         "EDIT": {
+            "CAPTION": "Éditer",
+            "METADATA": "Métadonnées",
+            "SCHEDULING": "Planification"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Droits d'accès"
             },
             "SUMMARY": {
-               "CAPTION": "Résumé"
+               "CAPTION": "Résumé",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Lu",
@@ -436,6 +466,15 @@
                "FR": "Ve",
                "SA": "Sa",
                "SU": "Di"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Séries",
             "DATE": "Date",
             "START": "Début",
+            "END": "Fin",
             "STOP": "Fin",
             "STATUS": "Statut",
             "LOCATION": "Emplacement",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Précédente",
             "NOCONTENT": "Aucune donnée disponible",
             "PUBLISHED": "Publié",
+            "WEEKDAY": "Jour de la semaine",
             "TOOLTIP": {
                "START": "Filtrer pour cette date de début",
                "SERIES": "Filtrer pour cette série",
@@ -475,8 +516,8 @@
                "LOCATION": "Filtrer pour cet emplacement",
                "DETAILS": "Voir les détails de l’évènement",
                "DELETE": "Supprimer l’événement",
-               "PREVIEW": "Ouvrir le lecteur d'aperçu",
                "EDITOR": "Ouvrir l’éditeur vidéo",
+               "EDITOR_NEEDS_CUTTING": "Ouvrir l'éditeur vidéo (un commentaire indique que la découpe de la vidéo a été demandée)",
                "COMMENTS": "Voir commentaires",
                "PAUSED_WORKFLOW": "Voir événement en pause"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Détails de l'événement {{resourceId}}",
             "TABS": {
-               "GENERAL": "Général",
                "METADATA": "Métadonnées",
                "EXTENDED-METADATA": "Métadonnées II",
                "ASSETS": "Ressources",
+               "PUBLICATIONS": "Publications",
                "SCHEDULING": "Planification",
                "WORKFLOWS": "Flux de travail",
                "ACCESS": "Droits d'accès",
                "COMMENTS": "Commentaires"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publications",
+            "PUBLICATIONS": {
+               "CAPTION": "Publications",
                "NO_PUBLICATIONS_AVAILABLE": "Cet événement n’a pas de publications",
                "PUBLICATION_DESCRIPTION": "Cet événement a été publié sur les chaînes de publication suivantes :",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Cet événement n'est actuellement pas en cours",
@@ -527,7 +568,7 @@
                "EXTERNAL_API": "Publication de l’API externe",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
-               "SELECT_WORKFLOW": "Sélectionner le flux de travail",
+               "SELECT_WORKFLOW": "Sélectionnez workflow",
                "SELECT_WORKFLOW_EMPTY": "Aucun flux de travail disponible"
             },
             "MEDIA": {
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Ajouter un commentaire"
       },
       "TABS": {
-         "PLAY": "Lecture",
          "EDIT": "Éditeur",
          "CAPTIONS": "Sous-titres",
          "ANNOTATIONS": "Annotations"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "À faire",
       "SCHEDULED": "Programmé",
       "RECORDING": "Enregistrement"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Général",
+         "PLAYER": "Player",
+         "EDITOR": "Éditeur"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Supprimer tous les filtres",
+            "EVENT_VIEW": "Événements",
+            "SERIES_VIEW": "Série",
+            "NEW_EVENT": "Ajouter événement",
+            "NEW_SERIES": "Ajouter série",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Image précédente",
+            "NEXT_FRAME": "Image suivante",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Segmenter",
+            "CUT_SELECTED_SEGMENT": "Couper",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin du segment"
+         }
+      }
    }
 }
