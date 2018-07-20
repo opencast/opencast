@@ -74,7 +74,8 @@
       "HELP": "עזרה",
       "USERS_GUIDE": "מדריך משתמש",
       "DOCUMENTATION": "תיעוד",
-      "REST_DOC": "תיעוד ממשק תוכנה (REST API)"
+      "REST_DOC": "תיעוד ממשק תוכנה (REST API)",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "מדיניות הגישה נוצרה",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "ההודעה נשלחה",
       "EMAIL_NOT_SENT": "לא ניתן היה לשלוח את ההודעה",
       "CONFLICT_DETECTED": "סתירה בתזמון: האירוע החדש מתנגש עם אירוע קיים. בבקשה שנו את המיקום, התאריך או השעה.",
+      "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
       "CONFLICT_END_BEFORE_START": "שגיאה בתזמון: תזמון הסיום חייב להיות אחרי תזמון ההתחלה.",
       "INVALID_ACL_RULES": "חוקים חייבים להכיל תפקיד חוקי ו/או הרשאות קריאה/כתיבה.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "בחרת מספר אירועים",
             "CONFIGURATION": "הגדרות",
             "WORKFLOW": "משימה"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "עריכת אירועים מתוזמנים",
+         "GENERAL": {
+            "CAPTION": "כללי",
+            "CANNOTSTART": "לא ניתן לעבד את האירוע(ים) המסומנים, רק אירועים מתוזמנים נתמכים.",
+            "NOCHANGES": "לא זוהה שינויים לאירוע!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "לערוך מטא-נתונים"
+         },
+         "SUMMARY": {
+            "CAPTION": "סיכום",
+            "SINGLE_EVENT_CAPTION": "אירוע \"{{ title }}\"",
+            "TYPE": "סוג",
+            "PREVIOUS": "ערך ישן",
+            "NEXT": "ערך חדש"
+         },
+         "EDIT": {
+            "CAPTION": "ערוך",
+            "METADATA": "מטא-נתונים",
+            "SCHEDULING": "תזמון"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "מדיניות גישה"
             },
             "SUMMARY": {
-               "CAPTION": "תקציר"
+               "CAPTION": "תקציר",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "יום שני",
@@ -436,6 +466,15 @@
                "FR": "שישי",
                "SA": "שבת",
                "SU": "ראשון"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "סדרה",
             "DATE": "תאריך",
             "START": "התחל",
+            "END": "סוף",
             "STOP": "עצור",
             "STATUS": "מצב",
             "LOCATION": "מיקום",
@@ -468,6 +508,7 @@
             "PREVIOUS": "הקודם",
             "NOCONTENT": "אין נתונים זמינים",
             "PUBLISHED": "פורסם",
+            "WEEKDAY": "יום חול",
             "TOOLTIP": {
                "START": "מסנן עבור תאריך ההתחלה הזה",
                "SERIES": "מסנן עבור סדרה זו",
@@ -475,8 +516,8 @@
                "LOCATION": "מסנן עבור מיקום זה",
                "DETAILS": "הצגת פרטי אירוע",
                "DELETE": "מחק אירוע",
-               "PREVIEW": "פתח נגן תצוגה מקדימה",
                "EDITOR": "פתח עורך וידאו",
+               "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
                "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "פרטי אירוע - {{resourceId}}",
             "TABS": {
-               "GENERAL": "כללי",
                "METADATA": "מטא-נתונים",
                "EXTENDED-METADATA": "מטא-נתונים II",
                "ASSETS": "נכסים",
+               "PUBLICATIONS": "פרסומים",
                "SCHEDULING": "תזמון",
                "WORKFLOWS": "תהליכים",
                "ACCESS": "מדיניות גישה",
                "COMMENTS": "הערות"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "פרסומים",
+            "PUBLICATIONS": {
+               "CAPTION": "פרסומים",
                "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
                "PUBLICATION_DESCRIPTION": "האירוע הזה פורסם לערוצים הציבוריים הבאים:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "אירוע זה אינו נמצא כעת בתהליך",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "הוספת הערה"
       },
       "TABS": {
-         "PLAY": "השמעה",
          "EDIT": "עורך",
          "CAPTIONS": "כותרות",
          "ANNOTATIONS": "הערות"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "משימות",
       "SCHEDULED": "מתוזמן",
       "RECORDING": "מקליט"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "כללי",
+         "PLAYER": "Player",
+         "EDITOR": "עורך"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "ניקוי כל המסננים",
+            "EVENT_VIEW": "אירועים",
+            "SERIES_VIEW": "סדרות",
+            "NEW_EVENT": "הוסף ארוע",
+            "NEW_SERIES": "הוסף סדרה",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "פריים קודם",
+            "NEXT_FRAME": "לפריים הבא",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "פצל",
+            "CUT_SELECTED_SEGMENT": "גזור",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "סוף קטע"
+         }
+      }
    }
 }

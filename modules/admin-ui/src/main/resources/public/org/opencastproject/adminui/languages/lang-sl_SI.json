@@ -74,7 +74,8 @@
       "HELP": "Pomoč",
       "USERS_GUIDE": "Uporabniški priročnik",
       "DOCUMENTATION": "Dokumentacija",
-      "REST_DOC": "Dokumenti za API REST"
+      "REST_DOC": "Dokumenti za API REST",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Pravilnik o dostopu je ustvarjen",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Sporočilo je poslano",
       "EMAIL_NOT_SENT": "Sporočila ni bilo mogoče poslati",
       "CONFLICT_DETECTED": "Spor v urniku: ta novi dogodek se prekriva z obstoječim. Spremenite lokacijo, datume ali ure.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Napaka urnika: dogodek se je že končal.",
       "CONFLICT_END_BEFORE_START": "Napaka urnika: konec urnika mora biti pozneje kot začetek.",
       "INVALID_ACL_RULES": "Pravila morajo vsebovati veljavo vlogo ter pravice do branja in/ali zapisovanja.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Izbrali ste toliko dogodkov: {{numberOfEvents}}",
             "CONFIGURATION": "Konfiguracija",
             "WORKFLOW": "Opravilo"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "Splošno",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Povzetek",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Vrsta",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Uredi",
+            "METADATA": "Metapodatki",
+            "SCHEDULING": "Načrtovanje urnika"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Pravilnik o dostopu"
             },
             "SUMMARY": {
-               "CAPTION": "Povzetek"
+               "CAPTION": "Povzetek",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "pon.",
@@ -436,6 +466,15 @@
                "FR": "pet.",
                "SA": "sob.",
                "SU": "ned."
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Serije",
             "DATE": "Datum",
             "START": "Začetek",
+            "END": "End",
             "STOP": "Ustavi",
             "STATUS": "Stanje",
             "LOCATION": "Lokacija",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Nazaj",
             "NOCONTENT": "Ni podatkov",
             "PUBLISHED": "Objavljeno",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Podrobnosti dogodka – {{resourceId}}",
             "TABS": {
-               "GENERAL": "Splošno",
                "METADATA": "Metapodatki",
                "EXTENDED-METADATA": "Metapodatki II",
                "ASSETS": "Sredstva",
+               "PUBLICATIONS": "Objave",
                "SCHEDULING": "Načrtovanje urnika",
                "WORKFLOWS": "Poteki dela",
                "ACCESS": "Pravilnik o dostopu",
                "COMMENTS": "Komentarji"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Objave",
+            "PUBLICATIONS": {
+               "CAPTION": "Objave",
                "NO_PUBLICATIONS_AVAILABLE": "Ta dogodek nima objav",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Dodaj komentar"
       },
       "TABS": {
-         "PLAY": "Predvajanje",
          "EDIT": "Urejevalnik",
          "CAPTIONS": "Pripisi",
          "ANNOTATIONS": "Pripisi"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Opravila",
       "SCHEDULED": "Načrtovano",
       "RECORDING": "Posnetek"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Splošno",
+         "PLAYER": "Player",
+         "EDITOR": "Urejevalnik"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Počisti vse filtre",
+            "EVENT_VIEW": "Dogodki",
+            "SERIES_VIEW": "Serije",
+            "NEW_EVENT": "Dodaj dogodek",
+            "NEW_SERIES": "Dodaj serijo",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Prejšnja sličica",
+            "NEXT_FRAME": "Naslednja sličica",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Razdelitev",
+            "CUT_SELECTED_SEGMENT": "Izreži",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Konec segmenta"
+         }
+      }
    }
 }

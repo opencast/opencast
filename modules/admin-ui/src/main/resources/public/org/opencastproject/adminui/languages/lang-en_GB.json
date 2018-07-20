@@ -74,7 +74,8 @@
       "HELP": "Help",
       "USERS_GUIDE": "User's Guide",
       "DOCUMENTATION": "Documentation",
-      "REST_DOC": "REST API Docs"
+      "REST_DOC": "REST API Docs",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "The access policy has been created",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "The message has been sent",
       "EMAIL_NOT_SENT": "The message could not be sent",
       "CONFLICT_DETECTED": "Scheduling conflict: this new event overlaps with an existing event. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
       "CONFLICT_END_BEFORE_START": "Scheduling error: Schedule end has to be later than the start.",
       "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "You have selected {{numberOfEvents}} events",
             "CONFIGURATION": "Configuration",
             "WORKFLOW": "Task"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "General",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Summary",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Type",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Edit",
+            "METADATA": "Metadata",
+            "SCHEDULING": "Scheduling"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Access policy"
             },
             "SUMMARY": {
-               "CAPTION": "Summary"
+               "CAPTION": "Summary",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Mo",
@@ -436,6 +466,15 @@
                "FR": "Fr",
                "SA": "Sa",
                "SU": "Su"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Series",
             "DATE": "Date",
             "START": "Start",
+            "END": "End",
             "STOP": "Stop",
             "STATUS": "Status",
             "LOCATION": "Location",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Previous",
             "NOCONTENT": "No data available",
             "PUBLISHED": "Published",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Event details - {{resourceId}}",
             "TABS": {
-               "GENERAL": "General",
                "METADATA": "Metadata",
                "EXTENDED-METADATA": "Metadata II",
                "ASSETS": "Assets",
+               "PUBLICATIONS": "Publications",
                "SCHEDULING": "Scheduling",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Access policy",
                "COMMENTS": "Comments"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publications",
+            "PUBLICATIONS": {
+               "CAPTION": "Publications",
                "NO_PUBLICATIONS_AVAILABLE": "This event has no publications",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Add Comment"
       },
       "TABS": {
-         "PLAY": "Playback",
          "EDIT": "Editor",
          "CAPTIONS": "Captions",
          "ANNOTATIONS": "Annotations"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Scheduled",
       "RECORDING": "Recording"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "General",
+         "PLAYER": "Player",
+         "EDITOR": "Editor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Clear all filters",
+            "EVENT_VIEW": "Events",
+            "SERIES_VIEW": "Series",
+            "NEW_EVENT": "Add event",
+            "NEW_SERIES": "Add series",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Previous frame",
+            "NEXT_FRAME": "Next frame",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Split",
+            "CUT_SELECTED_SEGMENT": "Cut",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
+         }
+      }
    }
 }
