@@ -120,7 +120,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     if (sourceTracks.isEmpty()) {
       logger.info("No tracks found in mediapackage {} with specified {} = {}", mediaPackage, SOURCE_FLAVOR_PROPERTY,
               sourceFlavorProperty);
-      createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
     }
 
     List<Job> waveformJobs = new ArrayList<>(sourceTracks.size());
