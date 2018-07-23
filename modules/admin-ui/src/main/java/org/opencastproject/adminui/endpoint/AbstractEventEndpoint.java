@@ -1198,7 +1198,7 @@ public abstract class AbstractEventEndpoint {
               // different agent -> no conflict
               return;
             }
-            if (!start.after(otherEnd) && !end.before(otherStart)) {
+            if (start.before(otherEnd) && end.after(otherStart)) {
               // conflict
               currentConflicts.add(convertEventToConflictingObject(DateTimeSupport.toUTC(otherStart.getTime()),
                 DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getTitle()));
