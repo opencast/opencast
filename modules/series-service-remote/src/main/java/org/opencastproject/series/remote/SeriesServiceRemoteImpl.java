@@ -118,6 +118,9 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   /** Default number of items on page */
   private static final int DEFAULT_LIMIT = 20;
 
+  /** Default character encoding */
+  private static final String ENCODING = "UTF-8";
+
   @Override
   public DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
     String seriesId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
@@ -126,7 +129,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("series", dc.toXmlString()));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, ENCODING));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId, e);
     }
@@ -164,7 +167,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("seriesID", seriesID));
       params.add(new BasicNameValuePair("acl", AccessControlParser.toXml(accessControl)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, ENCODING));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);
     }
@@ -625,7 +628,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("name", propertyName));
       params.add(new BasicNameValuePair("value", propertyValue));
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params, ENCODING));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesID
               + " series property " + propertyName + ":" + propertyValue, e);
