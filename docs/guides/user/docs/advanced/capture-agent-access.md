@@ -35,7 +35,7 @@ to those capture agents.
 
 **Example**
 
-- Capture agent ID: `Opencast's Capture Agent`
+- Capture agent ID: `OpencastsCaptureAgent`
 - Derived role: `ROLE_CAPTURE_AGENT_OPENCASTSCAPTUREAGENT`
 
 If the user Bob with restricted access has the role `ROLE_CAPTURE_AGENT_OPENCASTSCAPTUREAGENT`, Bob is allowed

@@ -462,7 +462,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createEvent(HttpServletRequest request, boolean checkAgentAccess) throws IndexServiceException {
+  public String createEvent(HttpServletRequest request) throws IndexServiceException {
     JSONObject metadataJson = null;
     MediaPackage mp = null;
     // regex for form field name matching an attachment or a catalog
@@ -484,7 +484,7 @@ public class IndexServiceImpl implements IndexService {
               try {
                 metadataJson = (JSONObject) new JSONParser().parse(metadata);
                 // in case of scheduling: Check if user has access to the CA
-                if (checkAgentAccess && metadataJson.containsKey("source")) {
+                if (metadataJson.containsKey("source")) {
                   final JSONObject sourceJson = (JSONObject) metadataJson.get("source");
                   if (sourceJson.containsKey("metadata")) {
                     final JSONObject sourceMetadataJson = (JSONObject) sourceJson.get("metadata");

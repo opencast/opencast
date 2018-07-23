@@ -336,11 +336,10 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "deleteevent", description = "Delete a single event.", returnDescription = "Ok if the event has been deleted.", pathParameters = {
           @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.", type = STRING), }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The event could not be found."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
     try {
-      checkAgentAccess(id);
+      checkAgentAccessForEvent(id);
       if (!getIndexService().removeEvent(id))
         return Response.serverError().build();
     } catch (NotFoundException e) {
@@ -386,7 +385,7 @@ public abstract class AbstractEventEndpoint {
     for (Object eventIdObject : eventIdsJsonArray) {
       String eventId = eventIdObject.toString();
       try {
-        checkAgentAccess(eventId);
+        checkAgentAccessForEvent(eventId);
         if (!getIndexService().removeEvent(eventId)) {
           result.addServerError(eventId);
         } else {
@@ -550,9 +549,9 @@ public abstract class AbstractEventEndpoint {
     }
 
     // Check if we are allowed to re-schedule on this agent
-    SecurityUtil.checkAgentAccess(getSecurityService(), technicalMetadata.getAgentId());
+    checkAgentAccessForAgent(technicalMetadata.getAgentId());
     if (agentId.isSome()) {
-      SecurityUtil.checkAgentAccess(getSecurityService(), agentId.get());
+      checkAgentAccessForAgent(agentId.get());
     }
 
     Opt<Date> start = Opt.none();
@@ -1476,7 +1475,7 @@ public abstract class AbstractEventEndpoint {
         if (caMetadataOpt.isNone() && workflowConfigOpt.isNone())
           return Response.noContent().build();
 
-        SecurityUtil.checkAgentAccess(getSecurityService(), optEvent.get().getAgentId());
+        checkAgentAccessForAgent(optEvent.get().getAgentId());
 
         getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt,
@@ -1851,7 +1850,7 @@ public abstract class AbstractEventEndpoint {
   public Response updateEventOptOut(@PathParam("eventId") String eventId, @PathParam("optout") boolean optout)
           throws NotFoundException, UnauthorizedException {
     try {
-      checkAgentAccess(eventId);
+      checkAgentAccessForEvent(eventId);
       getIndexService().changeOptOutStatus(eventId, optout, getIndex());
       return Response.noContent().build();
     } catch (SchedulerException e) {
@@ -2124,7 +2123,7 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })
   public Response createNewEvent(@Context HttpServletRequest request) {
     try {
-      String result = getIndexService().createEvent(request, true);
+      String result = getIndexService().createEvent(request);
       return Response.status(Status.CREATED).entity(result).build();
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
@@ -2623,12 +2622,16 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private void checkAgentAccess(final String eventId) throws UnauthorizedException, SearchIndexException {
+  private void checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
     final Opt<Event> event = getIndexService().getEvent(eventId, getIndex());
     if (event.isNone() || !event.get().getEventStatus().contains("SCHEDULE")) {
       return;
     }
     SecurityUtil.checkAgentAccess(getSecurityService(), event.get().getAgentId());
+  }
+
+  private void checkAgentAccessForAgent(final String agentId) throws UnauthorizedException {
+    SecurityUtil.checkAgentAccess(getSecurityService(), agentId);
   }
 
 }
