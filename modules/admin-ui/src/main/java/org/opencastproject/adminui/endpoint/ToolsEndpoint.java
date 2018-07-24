@@ -366,7 +366,8 @@ public class ToolsEndpoint implements ManagedService {
     // Get workflows
     List<JValue> jWorkflows = new ArrayList<>();
     for (WorkflowDefinition workflow : getEditingWorkflows()) {
-      jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK))));
+      jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK)),
+              f("displayOrder", v(workflow.getDisplayOrder()))));
     }
 
     return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
