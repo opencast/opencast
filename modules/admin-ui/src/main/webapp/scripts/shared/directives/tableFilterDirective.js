@@ -48,8 +48,8 @@ angular.module('adminNg.directives')
                 scope.showFilterSelector = true;
                 $timeout(function(){
                     angular.element('.main-filter').trigger('chosen:open');
-                })
-            }
+                });
+            };
 
             scope.initializeMap = function() {
                 for (var key in scope.filters.filters) {
@@ -130,30 +130,62 @@ angular.module('adminNg.directives')
                 scope.mode = scope.mode ? 0:1;
             };
 
-            scope.selectFilterPeriodValue = function (filter) {
-                var filterName = scope.getFilterName();
-                // Merge from-to values of period filter)
-                if (!filter.period.to || !filter.period.from) {
-                    scope.openSecondFilter(filter);
-                    return;
+            scope.selectFilterPeriodValue = function (filter, dateField, otherDateField) {
+
+                if (!filter.hasOwnProperty('prefilled')) {
+                    filter.prefilled = {};
+                    filter.prefilled[otherDateField] = false;
                 }
-                if (filter.period.to && filter.period.from) {
+
+                filter.prefilled[dateField] = false;
+
+                //pre-fill second date field if empty
+                if (!filter.period[otherDateField]) {
+                    filter.period[otherDateField] = filter.period[dateField];
+                    filter.prefilled[otherDateField] = true;
+
+                    scope.showDatepicker(otherDateField);
+                }
+                else if (filter.period[otherDateField] && filter.prefilled[otherDateField]) {
+                    scope.showDatepicker(otherDateField);
+                }
+                else {
+                    var filterName = scope.getFilterName();
+
                     var from = new Date(new Date(filter.period.from).setHours(0, 0, 0, 0));
                     var to = new Date(new Date(filter.period.to).setHours(23, 59, 59, 999));
                     filter.value = from.toISOString() + '/' + to.toISOString();
-                }
 
-                if (filter.value) {
                     scope.showFilterSelector = false;
                     scope.selectedFilter = null;
 
                     if (!scope.filters.map[filterName]) {
-                      scope.filters.map[filterName] = {};
+                        scope.filters.map[filterName] = {};
                     }
                     scope.filters.map[filterName].value = filter.value;
                     scope.addFilterToStorage('filter', scope.namespace, filterName, filter.value);
                 }
             };
+
+            scope.showDatepicker = function(dateField) {
+
+                var element;
+
+                switch (dateField) {
+                    case "from":
+                        element = '.small-search.start-date';
+                        break;
+                    case "to":
+                        element = '.small-search.end-date';
+                        break;
+                    default:
+                        return;
+                }
+
+                $timeout(function(){
+                    angular.element(element).datepicker('show');
+                });
+            }
 
             scope.addFilterToStorage = function(type, namespace, filterName, filterValue) {
                 Storage.put(type, namespace, filterName, filterValue);
@@ -224,24 +256,14 @@ angular.module('adminNg.directives')
 
             scope.onChangeSelectMainFilter = function(selectedFilter) {
                 scope.filter = selectedFilter;
-                scope.openSecondFilter(selectedFilter);
-            }
 
-            scope.openSecondFilter = function (filter) {
-
-                switch (filter.type) {
-                    case 'period':
-                        if(!filter.hasOwnProperty('period')){
-                            angular.element('.small-search.start-date').datepicker('show');
-                        }else if(!filter.period.hasOwnProperty('to')){
-                            angular.element('.small-search.end-date').datepicker('show');
-                        }
-                        break;
-                    default:
-                        $timeout(function(){
-                            angular.element('.second-filter').trigger('chosen:open');
-                        })
-                        break;
+                if (selectedFilter.type === 'period') {
+                    scope.showDatepicker("from");
+                }
+                else {
+                    $timeout(function(){
+                        angular.element('.second-filter').trigger('chosen:open');
+                    });
                 }
             }
 
