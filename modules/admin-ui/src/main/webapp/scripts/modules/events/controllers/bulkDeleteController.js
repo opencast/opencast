@@ -33,13 +33,7 @@ angular.module('adminNg.controllers')
             publicationCount++;
         });
 
-        if (publicationCount == 1 && currentEvent.publications[0].id == "engage-live") {
-        	return false;
-        } else if (publicationCount > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return publicationCount > 0 && currentEvent.publications[0].id != "engage-live";
     },
     tableByPublicationStatus = function(isPublished) {
         var result = {
