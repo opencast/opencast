@@ -1170,7 +1170,7 @@ public abstract class AbstractEventEndpoint {
       return notFoundJson(JSONUtils.setToJSON(notFoundIds));
     }
 
-    final Map<String, List<MediaPackage>> conflicts = new HashMap<>();
+    final Map<String, List<JValue>> conflicts = new HashMap<>();
     events.values().forEach(e -> e.ifPresent(event -> {
       try {
         if (instructions.getScheduling() != null) {
@@ -1180,13 +1180,42 @@ public abstract class AbstractEventEndpoint {
           final Date end = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_END_KEY)));
           final String agentId = Optional.ofNullable((String) scheduling.get(SCHEDULING_AGENT_ID_KEY))
             .orElse(event.getAgentId());
-          final List<MediaPackage> conflicting = getSchedulerService().findConflictingEvents(agentId, start, end);
-          if (conflicting != null && !conflicting.isEmpty() && !(
-            conflicting.size() == 1 && conflicting.get(0).getIdentifier().toString().equals(event.getIdentifier()))) {
-            conflicts.put(event.getIdentifier(), conflicting);
+
+          final List<JValue> currentConflicts = new ArrayList<>();
+
+          // Check for conflicts between the events themselves
+          events.values().forEach(oe -> oe.ifPresent(otherEvent -> {
+            if (otherEvent.getIdentifier().equals(event.getIdentifier())) {
+              // don't check event against itself
+              return;
+            }
+            final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent, instructions.getScheduling());
+            final Date otherStart = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_START_KEY)));
+            final Date otherEnd = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_END_KEY)));
+            final String otherAgentId = Optional.ofNullable((String) otherScheduling.get(SCHEDULING_AGENT_ID_KEY))
+              .orElse(otherEvent.getAgentId());
+            if (!otherAgentId.equals(agentId)) {
+              // different agent -> no conflict
+              return;
+            }
+            if (start.before(otherEnd) && end.after(otherStart)) {
+              // conflict
+              currentConflicts.add(convertEventToConflictingObject(DateTimeSupport.toUTC(otherStart.getTime()),
+                DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getTitle()));
+            }
+          }));
+
+          // Check for conflicts with other events from the database
+          final List<MediaPackage> conflicting = getSchedulerService().findConflictingEvents(agentId, start, end)
+            .stream()
+            .filter(mp -> !events.keySet().contains(mp.getIdentifier().toString()))
+            .collect(Collectors.toList());
+          if (conflicting != null && !conflicting.isEmpty()) {
+            currentConflicts.addAll(convertToConflictObjects(event.getIdentifier(), conflicting));
           }
+          conflicts.put(event.getIdentifier(), currentConflicts);
         }
-      } catch (SchedulerException | UnauthorizedException exception) {
+      } catch (SchedulerException | UnauthorizedException | SearchIndexException exception) {
         throw new RuntimeException(exception);
       }
     }));
@@ -1194,13 +1223,8 @@ public abstract class AbstractEventEndpoint {
     if (!conflicts.isEmpty()) {
       final List<JValue> responseJson = new ArrayList<>();
       conflicts.forEach((eventId, conflictingEvents) -> {
-        try {
-          final List<JValue> eventsJSON = convertToConflictObjects(eventId, conflictingEvents);
-          if (!eventsJSON.isEmpty()) {
-            responseJson.add(obj(f("eventId", eventId), f("conflicts", arr(eventsJSON))));
-          }
-        } catch (SearchIndexException e) {
-          throw new RuntimeException(e);
+        if (!conflictingEvents.isEmpty()) {
+          responseJson.add(obj(f("eventId", eventId), f("conflicts", arr(conflictingEvents))));
         }
       });
       if (!responseJson.isEmpty()) {
@@ -2090,14 +2114,21 @@ public abstract class AbstractEventEndpoint {
         if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
           continue;
         }
-        eventsJSON.add(obj(f("start", v(e.getTechnicalStartTime())), f("end", v(e.getTechnicalEndTime())),
-          f("title", v(e.getTitle()))));
+        eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
       } else {
         logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
           event.getIdentifier().compact());
       }
     }
     return eventsJSON;
+  }
+
+  private JValue convertEventToConflictingObject(final String start, final String end, final String title) {
+    return obj(
+      f("start", v(start)),
+      f("end", v(end)),
+      f("title", v(title))
+    );
   }
 
   @POST
