@@ -24,7 +24,6 @@ backup before attempting the upgrade.
 
 You can find the database upgrade script at `docs/upgrade/4_to_5/mysql5.sql`.
 
-
 ActiveMQ Migration
 ------------------
 
