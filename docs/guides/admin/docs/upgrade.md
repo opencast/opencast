@@ -32,7 +32,6 @@ Additionally, you need to ensure your Opencast user is granted all necessary rig
 versions, `GRANT CREATE TEMPORARY TABLES` is required as well. You can simply re-set your users following the user
 set-up step from the [database configuration guide](configuration/database/#step-1-create-an-opencast-database)
 
-
 ActiveMQ Migration
 ------------------
 
@@ -85,4 +84,3 @@ The introduction of the new scheduler service requires an update to the ElasticS
     - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
       symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
       `/recreateIndex`.
-
