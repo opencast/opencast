@@ -1,7 +1,9 @@
 describe('SchedulingHelperService', function () {
     var $httpBackend, SchedulingHelperService;
 
+    beforeEach(module('ngResource'));
     beforeEach(module('adminNg.services'));
+    beforeEach(module('adminNg.resources'));
 
     beforeEach(inject(function (_SchedulingHelperService_) {
         SchedulingHelperService = _SchedulingHelperService_;

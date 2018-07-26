@@ -52,10 +52,11 @@ angular.module('adminNg.controllers')
                 var nbErrors = data.error ? data.error.length : 0,
                     nbOK = data.ok ? data.ok.length : 0,
                     nbNotFound = data.notFound ? data.notFound.length : 0,
+                    nbUnauthorized = data.unauthorized ? data.unauthorized.length : 0,
                     nbBadRequest = data.badRequest ? data.badRequest.length : 0;
                 Table.deselectAll();
                 Modal.$scope.close();
-                if (nbErrors === 0 && nbBadRequest === 0 && nbNotFound === 0) {
+                if (nbErrors === 0 && nbBadRequest === 0 && nbNotFound === 0 && nbUnauthorized === 0) {
                     Notifications.add('success', sourceNotification + '_UPDATED_ALL');
                 } else {
                     if (nbOK > 0) {
@@ -74,7 +75,11 @@ angular.module('adminNg.controllers')
 
                     if (data.badRequest) {
                         errors = errors.concat(data.badRequest);
-                    }                    
+                    }
+
+                    if (data.unauthorized) {
+                        errors = errors.concat(data.unauthorized);
+                    }
 
                     if (data.forbidden) {
                         errors = errors.concat(data.forbidden);

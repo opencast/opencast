@@ -25,6 +25,7 @@ angular.module('adminNg.services')
     var AuthService = function () {
         var me = this,
             isAdmin = false,
+            isOrgAdmin = false,
             isUserLoaded = false,
             callbacks = [],
             identity,
@@ -47,6 +48,7 @@ angular.module('adminNg.services')
                 var globalAdminRole = "ROLE_ADMIN";
                 me.user = user;
                 isAdmin = angular.isDefined(globalAdminRole) && user.roles.indexOf(globalAdminRole) > -1;
+                isOrgAdmin = angular.isDefined(user.org.adminRole) && user.roles.indexOf(user.org.adminRole) > -1;
                 if (angular.isDefined(user.userRole)) {
                     userRole = user.userRole;
                 }
@@ -63,6 +65,10 @@ angular.module('adminNg.services')
 
         this.getUserRole = function () {
             return userRole;
+        };
+
+        this.isOrganizationAdmin = function () {
+            return isOrgAdmin;
         };
 
         this.userIsAuthorizedAs = function (role, success, error) {

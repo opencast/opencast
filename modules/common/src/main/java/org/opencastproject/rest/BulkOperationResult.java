@@ -37,11 +37,13 @@ import java.io.StringWriter;
 public class BulkOperationResult {
   public static final String OK_KEY = "ok";
   public static final String BAD_REQUEST_KEY = "badRequest";
+  public static final String UNAUTHORIZED_KEY = "unauthorized";
   public static final String NOT_FOUND_KEY = "notFound";
   public static final String ERROR_KEY = "error";
 
   private JSONArray ok = new JSONArray();
   private JSONArray badRequest = new JSONArray();
+  private JSONArray unauthorized = new JSONArray();
   private JSONArray notFound = new JSONArray();
   private JSONArray serverError = new JSONArray();
 
@@ -73,6 +75,10 @@ public class BulkOperationResult {
     addBadRequest(Long.toString(id));
   }
 
+  public void addUnauthorized(String id) {
+    unauthorized.add(id);
+  }
+
   public void addNotFound(Long id) {
     addNotFound(Long.toString(id));
   }
@@ -89,6 +95,10 @@ public class BulkOperationResult {
     return badRequest;
   }
 
+  public JSONArray getUnauthorized() {
+    return unauthorized;
+  }
+
   public JSONArray getNotFound() {
     return notFound;
   }
@@ -103,6 +113,7 @@ public class BulkOperationResult {
     bulkOperationResult.put(OK_KEY, ok);
     bulkOperationResult.put(BAD_REQUEST_KEY, badRequest);
     bulkOperationResult.put(NOT_FOUND_KEY, notFound);
+    bulkOperationResult.put(UNAUTHORIZED_KEY, unauthorized);
     bulkOperationResult.put(ERROR_KEY, serverError);
     return bulkOperationResult.toJSONString();
   }
@@ -115,6 +126,7 @@ public class BulkOperationResult {
     this.ok = (JSONArray) result.get(OK_KEY);
     this.badRequest = (JSONArray) result.get(BAD_REQUEST_KEY);
     this.notFound = (JSONArray) result.get(NOT_FOUND_KEY);
+    this.unauthorized = (JSONArray) result.get(UNAUTHORIZED_KEY);
     this.serverError = (JSONArray) result.get(ERROR_KEY);
   }
 

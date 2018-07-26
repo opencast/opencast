@@ -13,4 +13,6 @@
     cardinality="0..1" policy="dynamic" bind="setService" unbind="unsetService" />
   <reference name="scheduler-service" interface="org.opencastproject.scheduler.api.SchedulerService"
     cardinality="1..1" policy="static" bind="setSchedulerService" />
+  <reference name="role-provider" interface="org.opencastproject.capture.admin.api.CaptureAgentAdminRoleProvider"
+             cardinality="1..1" policy="static" bind="setRoleProvider" />
 </scr:component>

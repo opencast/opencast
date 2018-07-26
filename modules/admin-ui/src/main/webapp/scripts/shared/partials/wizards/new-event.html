@@ -62,7 +62,7 @@
                     <td>{{ conflict.end }}</td>
                 </tr>
             </table>
-            <div class="obj list-obj">
+            <div class="obj list-obj" ng-if="(wizard.step.captureAgents | filter:wizard.step.hasAgentAccess).length > 0">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE">
                     <!-- Select Source -->
                 </header>
@@ -81,10 +81,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION">
                                     <!-- Schedule Single Event -->
                                 </span>
                             </label>
@@ -93,10 +91,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION">
                                     <!-- Schedule Multiple Events -->
                                 </span>
                             </label>
@@ -261,7 +257,7 @@
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
                                 placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>
@@ -415,7 +411,7 @@
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
                                 placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>

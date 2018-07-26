@@ -120,6 +120,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.Jsons.Val;
@@ -335,10 +336,10 @@ public abstract class AbstractEventEndpoint {
   @RestQuery(name = "deleteevent", description = "Delete a single event.", returnDescription = "Ok if the event has been deleted.", pathParameters = {
           @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.", type = STRING), }, reponses = {
                   @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
-                  @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The event could not be found."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
-  public Response deleteEvent(@PathParam("eventId") String id) throws NotFoundException, UnauthorizedException {
+  public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
     try {
+      checkAgentAccessForEvent(id);
       if (!getIndexService().removeEvent(id))
         return Response.serverError().build();
     } catch (NotFoundException e) {
@@ -362,7 +363,7 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Events have been deleted", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
-  public Response deleteEvents(String eventIdsContent) throws UnauthorizedException {
+  public Response deleteEvents(String eventIdsContent) throws UnauthorizedException, SearchIndexException {
     if (StringUtils.isBlank(eventIdsContent)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -384,6 +385,7 @@ public abstract class AbstractEventEndpoint {
     for (Object eventIdObject : eventIdsJsonArray) {
       String eventId = eventIdObject.toString();
       try {
+        checkAgentAccessForEvent(eventId);
         if (!getIndexService().removeEvent(eventId)) {
           result.addServerError(eventId);
         } else {
@@ -391,6 +393,8 @@ public abstract class AbstractEventEndpoint {
         }
       } catch (NotFoundException e) {
         result.addNotFound(eventId);
+      } catch (UnauthorizedException e) {
+        result.addUnauthorized(eventId);
       }
     }
     return Response.ok(result.toJson()).build();
@@ -542,6 +546,12 @@ public abstract class AbstractEventEndpoint {
       agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
       logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
         event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
+    }
+
+    // Check if we are allowed to re-schedule on this agent
+    checkAgentAccessForAgent(technicalMetadata.getAgentId());
+    if (agentId.isSome()) {
+      checkAgentAccessForAgent(agentId.get());
     }
 
     Opt<Date> start = Opt.none();
@@ -764,6 +774,7 @@ public abstract class AbstractEventEndpoint {
       } else {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
+        // We could check agent access here if we want to forbid updating ACLs for users without access.
         getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
                 Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
@@ -1488,6 +1499,8 @@ public abstract class AbstractEventEndpoint {
         if (caMetadataOpt.isNone() && workflowConfigOpt.isNone())
           return Response.noContent().build();
 
+        checkAgentAccessForAgent(optEvent.get().getAgentId());
+
         getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt,
                 Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
@@ -1861,6 +1874,7 @@ public abstract class AbstractEventEndpoint {
   public Response updateEventOptOut(@PathParam("eventId") String eventId, @PathParam("optout") boolean optout)
           throws NotFoundException, UnauthorizedException {
     try {
+      checkAgentAccessForEvent(eventId);
       getIndexService().changeOptOutStatus(eventId, optout, getIndex());
       return Response.noContent().build();
     } catch (SchedulerException e) {
@@ -2639,5 +2653,16 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
+  private void checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
+    final Opt<Event> event = getIndexService().getEvent(eventId, getIndex());
+    if (event.isNone() || !event.get().getEventStatus().contains("SCHEDULE")) {
+      return;
+    }
+    SecurityUtil.checkAgentAccess(getSecurityService(), event.get().getAgentId());
+  }
+
+  private void checkAgentAccessForAgent(final String agentId) throws UnauthorizedException {
+    SecurityUtil.checkAgentAccess(getSecurityService(), agentId);
+  }
 
 }
