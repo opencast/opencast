@@ -28,7 +28,6 @@ import org.opencastproject.util.data.Tuple;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 
 /**
@@ -103,17 +102,6 @@ public interface AuthorizationService {
    * @return the set of permissions and explicit denials
    */
   Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope);
-
-  /**
-   * Return access control attachments of a certain scope or all.
-   *
-   * @param mp
-   *          the media package
-   * @param scope
-   *          the scope or none to get all ACL attachments
-   * @return a list of attachments that fit the given criteria
-   */
-  List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope);
 
   /**
    * Attaches the provided policies to a media package as a XACML attachment, replacing any previous policy element of
