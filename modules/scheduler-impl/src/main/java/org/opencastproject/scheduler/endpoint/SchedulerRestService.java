@@ -1037,23 +1037,27 @@ public class SchedulerRestService {
   }
 
   @GET
-  @Produces(MediaType.TEXT_XML)
-  @Path("recordings.xml")
-  @RestQuery(name = "recordingsasxml", description = "Searches recordings and returns result as XML", returnDescription = "XML formated results", restParameters = {
+  @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
+  @Path("recordings.{type:xml|json}")
+  @RestQuery(name = "recordingsaslist", description = "Searches recordings and returns result as XML or JSON", returnDescription = "XML or JSON formated results",
+       pathParameters = {
+          @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]", defaultValue = "xml", type = Type.STRING), },
+       restParameters = {
           @RestParameter(name = "agent", description = "Search by device", isRequired = false, type = Type.STRING),
           @RestParameter(name = "startsfrom", description = "Search by when does event start", isRequired = false, type = Type.INTEGER),
           @RestParameter(name = "startsto", description = "Search by when does event start", isRequired = false, type = Type.INTEGER),
           @RestParameter(name = "endsfrom", description = "Search by when does event finish", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "endsto", description = "Search by when does event finish", isRequired = false, type = Type.INTEGER) }, reponses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
-  public Response getEventsAsXml(@QueryParam("agent") String device, @QueryParam("startsfrom") Long startsFromTime,
+          @RestParameter(name = "endsto", description = "Search by when does event finish", isRequired = false, type = Type.INTEGER) },
+       reponses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Search completed, results returned in body") })
+  public Response getEventsAsList(@PathParam("type") final String type, @QueryParam("agent") String device,
+          @QueryParam("startsfrom") Long startsFromTime,
           @QueryParam("startsto") Long startsToTime, @QueryParam("endsfrom") Long endsFromTime,
           @QueryParam("endsto") Long endsToTime) throws UnauthorizedException {
     Date startsfrom = null;
     Date startsTo = null;
     Date endsFrom = null;
     Date endsTo = null;
-
     if (startsFromTime != null)
       startsfrom = new DateTime(startsFromTime).toDateTime(DateTimeZone.UTC).toDate();
     if (startsToTime != null)
@@ -1066,7 +1070,11 @@ public class SchedulerRestService {
     try {
       List<MediaPackage> events = service.search(Opt.nul(StringUtils.trimToNull(device)), Opt.nul(startsfrom),
               Opt.nul(startsTo), Opt.nul(endsFrom), Opt.nul(endsTo));
-      return Response.ok(MediaPackageParser.getArrayAsXml(events)).build();
+      if ("json".equalsIgnoreCase(type)) {
+        return Response.ok(getEventListAsJsonString(events)).build();
+      } else {
+        return Response.ok(MediaPackageParser.getArrayAsXml(events)).build();
+      }
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
@@ -1074,6 +1082,7 @@ public class SchedulerRestService {
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
+
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("conflicts.json")
