@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+
+  <OCD description="CanvasProvider" name="org.opencastproject.userdirectory.canvas" id="org.opencastproject.userdirectory.canvas">
+
+    <AD name="Canvas Server URL" id="org.opencastproject.userdirectory.canvas.url" required="true" type="String" default="" />
+    <AD name="Organization ID" id="org.opencastproject.userdirectory.canvas.org" required="true" type="String" default="mh_default_org" />
+    <AD name="Canvas token" id="org.opencastproject.userdirectory.canvas.token" required="true" type="String" default="" />
+    <AD name="Cache size" id="org.opencastproject.userdirectory.canvas.cache.size" required="false" type="Integer" default="1000" />
+    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.canvas.cache.expiration" required="false" type="Integer" default="60" />
+    <AD name="Canvas Site ID pattern (regular expression)" id="org.opencastproject.userdirectory.canvas.site.pattern" required="false" type="String" default="" />
+    <AD name="Canvas User ID (EID) pattern (regular expression)" id="org.opencastproject.userdirectory.canvas.user.pattern" required="false" type="String" default="" />
+    <AD name="Canvas roles mapped to Instructor (comma-separated list)" id="org.opencastproject.userdirectory.canvas.instructor.roles" required="false" type="String" default="Instructor,Site owner,maintain" />
+    
+  </OCD>
+
+  <Designate pid="org.opencastproject.userdirectory.canvas">
+    <Object ocdref="org.opencastproject.userdirectory.canvas" />
+  </Designate>
+
+</metatype:MetaData>
