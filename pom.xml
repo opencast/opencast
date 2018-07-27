@@ -216,6 +216,7 @@
     <module>modules/urlsigning-verifier-service-api</module>
     <module>modules/urlsigning-verifier-service-impl</module>
     <module>modules/userdirectory</module>
+    <module>modules/userdirectory-canvas</module>
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
