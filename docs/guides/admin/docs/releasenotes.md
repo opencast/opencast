@@ -4,7 +4,7 @@ Opencast 6: Release Notes
 New Features and Improvements
 -----------------------------
 
-* **Admin UI** - Deleting Series now warns if series contains events. You can configure if the user is allowed to
+- **Admin UI** - Deleting Series now warns if series contains events. You can configure if the user is allowed to
   delete a series containing events in the series endpoint config file.
 
 
