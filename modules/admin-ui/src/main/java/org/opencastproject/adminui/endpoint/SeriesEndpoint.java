@@ -109,6 +109,7 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
@@ -224,7 +225,7 @@ public class SeriesEndpoint implements ManagedService {
 
     Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
     if (dictionaryValue != null) {
-      deleteSeriesWithEventsAllowed = Boolean.parseBoolean(dictionaryValue.toString());
+      deleteSeriesWithEventsAllowed = BooleanUtils.toBoolean(dictionaryValue.toString());
     }
   }
 
@@ -1062,7 +1063,7 @@ public class SeriesEndpoint implements ManagedService {
       SearchResult<Event> result = searchIndex.getByQuery(query);
       elementsCount = result.getHitCount();
     } catch (SearchIndexException e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 

@@ -67,10 +67,10 @@
        "CONFIRMATION" : "Confirmation"
      },
      "WARNINGS": {
-       "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events"
+       "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
      },
      "ERRORS": {
-       "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events"
+       "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
      }
    },
    "MEDIAMODULE": "Media Module",

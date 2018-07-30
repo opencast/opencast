@@ -110,7 +110,7 @@ angular.module('adminNg.controllers')
 
     $scope.allowed = function () {
         var allowed = true;
-        if (Table.resource.indexOf('series') >= 0 && $scope.deleteSeriesWithEventsAllowed == false) {
+        if (Table.resource.indexOf('series') >= 0 && !$scope.deleteSeriesWithEventsAllowed) {
             angular.forEach($scope.rows, function (row) {
                 if (allowed && row.selected && row.hasEvents) {
                     allowed = false;
@@ -218,7 +218,6 @@ angular.module('adminNg.controllers')
         SeriesConfigurationResource.get(function (data) {
             $scope.deleteSeriesWithEventsAllowed = data.deleteSeriesWithEventsAllowed;
         });
-        var result = [];
         angular.forEach($scope.rows, function(row) {
             SeriesHasEventsResource.get({id: row.id}, function (data) {
                 row.hasEvents = data.hasEvents;

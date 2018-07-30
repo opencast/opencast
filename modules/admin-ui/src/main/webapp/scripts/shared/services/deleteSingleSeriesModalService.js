@@ -68,7 +68,7 @@ angular.module('adminNg.services.modal')
             //64 picked by random experimentation
             if (me.$scope.name.length > 64) {
                 me.$scope.name = me.$scope.name.substr(0,61);
-                me.$scope.name = me.$scope.name + "...";
+                me.$scope.name = me.$scope.name + "…";
             }
 
             SeriesHasEventsResource.get({id: object.id}, function (data) {
