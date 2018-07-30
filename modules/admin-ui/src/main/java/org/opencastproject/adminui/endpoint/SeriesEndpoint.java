@@ -223,7 +223,9 @@ public class SeriesEndpoint implements ManagedService {
     }
 
     Object dictionaryValue = properties.get(SERIES_HASEVENTS_DELETE_ALLOW_KEY);
-    deleteSeriesWithEventsAllowed = Boolean.parseBoolean(dictionaryValue.toString());
+    if (dictionaryValue != null) {
+      deleteSeriesWithEventsAllowed = Boolean.parseBoolean(dictionaryValue.toString());
+    }
   }
 
   @GET
