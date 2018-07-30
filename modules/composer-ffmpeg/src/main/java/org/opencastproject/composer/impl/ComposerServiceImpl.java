@@ -334,8 +334,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          tracks to use for processing
    * @param profileId
    *          the encoding profile
-   * @param properties
-   *          encoding properties
    * @return the encoded track or none if the operation does not return a track. This may happen for example when doing
    *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
@@ -1205,12 +1203,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
-   *      java.lang.String...)
-   */
   @Override
   public Job convertImage(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
     if (image == null)
@@ -1233,23 +1225,27 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   @Override
-  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+  public List<Attachment> convertImageSync(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
     Job job = null;
     try {
-      final EncodingProfile profile = profileScanner.getProfile(profileId);
+
+      final float jobLoad = (float) Arrays.stream(profileIds)
+          .map(p -> profileScanner.getProfile(p))
+          .mapToDouble(EncodingProfile::getJobLoad)
+          .max()
+          .orElse(0);
       job = serviceRegistry
           .createJob(
-              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+              JOB_TYPE, Operation.Image.toString(), null, null, false, jobLoad);
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      List<Attachment> result = convertImage(job, image, profileId);
+      List<Attachment> results = convertImage(job, image, profileIds);
       job.setStatus(Job.Status.FINISHED);
-      if (result.isEmpty()) {
-        throw new EncoderException(format(
-                "Unable to convert image %s with encoding profile %s. The result set is empty.",
-                image.getURI().toString(), profileId));
+      if (results.size() == 0) {
+        return null;
+      } else {
+        return results;
       }
-      return result.get(0);
     } catch (ServiceRegistryException | NotFoundException e) {
       throw new EncoderException("Unable to create a job", e);
     } finally {

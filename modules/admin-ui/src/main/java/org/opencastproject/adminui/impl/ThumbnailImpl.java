@@ -28,10 +28,12 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
+import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
@@ -143,6 +145,7 @@ public final class ThumbnailImpl {
   private final ConfigurablePublicationService configurablePublicationService;
   private final ComposerService composerService;
   private final String oaiPmhChannel;
+  private final String apiChannel;
   private final String encodingProfile;
   private final double defaultPosition;
   private final MediaPackageElementFlavor defaultTrackPrimary;
@@ -151,8 +154,9 @@ public final class ThumbnailImpl {
   private final String tempThumbnailId;
   private URI tempThumbnail;
   private MimeType tempThumbnailMimeType;
-
-  private boolean thumbnailAutoDistribution;
+  private final String[] apiConversionProfiles;
+  private final String[] oaipmhConversionProfiles;
+  private final boolean thumbnailAutoDistribution;
 
   public ThumbnailImpl(final AdminUIConfiguration config, final Workspace workspace,
     final OaiPmhPublicationService oaiPmhPublicationService,
@@ -163,6 +167,7 @@ public final class ThumbnailImpl {
     this.publishFlavor = parseFlavor(config.getThumbnailPublishFlavor());
     this.publishTags = Arrays.asList(config.getThumbnailPublishTags().split(","));
     this.oaiPmhChannel = config.getOaipmhChannel();
+    this.apiChannel = config.getApiChannel();
     this.encodingProfile = config.getThumbnailEncodingProfile();
     this.defaultPosition = config.getThumbnailDefaultPosition();
     this.defaultTrackPrimary = flavor(config.getThumbnailDefaultTrackPrimary(), config.getThumbnailSourceFlavorSubtype());
@@ -177,6 +182,8 @@ public final class ThumbnailImpl {
     this.tempThumbnailMimeType = null;
     this.tempThumbnailFileName = null;
     this.thumbnailAutoDistribution = config.getThumbnailAutoDistribution();
+    this.apiConversionProfiles = config.getApiProfiles();
+    this.oaipmhConversionProfiles = config.getOaipmhProfiles();
   }
 
   private Optional<Attachment> getThumbnailPreviewForMediaPackage(final MediaPackage mp) {
@@ -234,7 +241,7 @@ public final class ThumbnailImpl {
 
   public MediaPackageElement upload(final MediaPackage mp, final InputStream inputStream, final String contentType)
     throws IOException, NotFoundException, MediaPackageException, PublicationException,
-    EncoderException {
+    EncoderException, DistributionException {
     createTempThumbnail(mp, inputStream, contentType);
 
     final Collection<URI> deletionUris = new ArrayList<>(0);
@@ -244,7 +251,7 @@ public final class ThumbnailImpl {
 
       final MediaPackageElementFlavor trackFlavor = getPrimaryOrSecondaryTrack(mp).getFlavor();
 
-      final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, true);
+      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, true);
       deletionUris.add(internalPublicationResult.getA());
       if (thumbnailAutoDistribution) {
         deletionUris.add(updateExternalPublication(mp, trackFlavor));
@@ -257,7 +264,7 @@ public final class ThumbnailImpl {
       WorkflowPropertiesUtil
         .storeProperty(assetManager, mp, THUMBNAIL_PROPERTY_TYPE, Long.toString(ThumbnailSource.UPLOAD.getNumber()));
 
-      return internalPublicationResult.getB();
+      return internalPublicationResult.getB().get(0);
     } finally {
       inputStream.close();
       workspace.cleanup(mp.getIdentifier());
@@ -292,22 +299,22 @@ public final class ThumbnailImpl {
     mp.add(sourceAttachment);
   }
 
-  private Tuple<URI, MediaPackageElement> updateInternalPublication(final MediaPackage mp, final boolean downscale)
-    throws NotFoundException, IOException, MediaPackageException, PublicationException,
+  private Tuple<URI, List<MediaPackageElement>> updateInternalPublication(final MediaPackage mp, final boolean downscale)
+    throws DistributionException, NotFoundException, IOException, MediaPackageException, PublicationException,
     EncoderException {
     final Predicate<Attachment> priorFilter = attachment -> previewFlavor.matches(attachment.getFlavor());
-    final String conversionProfile;
     if (downscale) {
-      conversionProfile = "editor.thumbnail.preview.downscale";
-    } else {
-      conversionProfile = null;
+      return updatePublication(mp, InternalPublicationChannel.CHANNEL_ID, priorFilter, previewFlavor,
+        Collections.emptyList(), "editor.thumbnail.preview.downscale");
     }
     return updatePublication(mp, InternalPublicationChannel.CHANNEL_ID, priorFilter, previewFlavor,
-      Collections.emptyList(), conversionProfile);
+      Collections.emptyList());
   }
 
   private URI updateOaiPmh(final MediaPackage mp, final MediaPackageElementFlavor trackFlavor)
-    throws NotFoundException, IOException, PublicationException, MediaPackageException {
+    throws NotFoundException, IOException, PublicationException, MediaPackageException, DistributionException,
+    EncoderException {
+
     // Use OaiPmhPublicationService to re-publish thumbnail
     final Optional<Publication> oldOaiPmhPub = getPublication(mp,
       OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX + this.oaiPmhChannel);
@@ -316,7 +323,7 @@ public final class ThumbnailImpl {
     }
 
     // We have to update the external publication to contain the new thumbnail as an attachment
-    final Optional<Publication> externalPublicationOpt = getPublication(mp, "api");
+    final Optional<Publication> externalPublicationOpt = getPublication(mp, apiChannel);
     final Set<Publication> publicationsToUpdate = new HashSet<>();
     externalPublicationOpt.ifPresent(publicationsToUpdate::add);
 
@@ -332,9 +339,17 @@ public final class ThumbnailImpl {
     publishTags.forEach(publishAttachment::addTag);
     publishAttachment.setMimeType(this.tempThumbnailMimeType);
 
+    // Create downscaled thumbnails if desired
+    final Set<Attachment> addElements = new HashSet<>();
+    if (oaipmhConversionProfiles != null && oaipmhConversionProfiles.length > 0) {
+      addElements.addAll(downscaleAttachment(publishAttachment, oaipmhConversionProfiles));
+    } else {
+      addElements.add(publishAttachment);
+    }
+
     final Publication oaiPmhPub = oaiPmhPublicationService.replaceSync(
       mp, oaiPmhChannel,
-      Collections.singleton(publishAttachment), Collections.emptySet(),
+      addElements, Collections.emptySet(),
       Collections.singleton(publishFlavor), Collections.emptySet(),
       publicationsToUpdate, false);
     mp.remove(oldOaiPmhPub.get());
@@ -342,9 +357,9 @@ public final class ThumbnailImpl {
     return publishThumbnailUri;
   }
 
-  private Tuple<URI, MediaPackageElement> updatePublication(final MediaPackage mp, final String channelId,
-    final Predicate<Attachment> priorFilter, final MediaPackageElementFlavor flavor, final Iterable<String> tags,
-    final String conversionProfile) throws NotFoundException, IOException,
+  private Tuple<URI, List<MediaPackageElement>> updatePublication(final MediaPackage mp, final String channelId,
+    final Predicate<Attachment> priorFilter, final MediaPackageElementFlavor flavor, final Collection<String> tags,
+    final String... conversionProfiles) throws DistributionException, NotFoundException, IOException,
   MediaPackageException, PublicationException, EncoderException {
 
     final Optional<Publication> pubOpt = getPublication(mp, channelId);
@@ -362,38 +377,45 @@ public final class ThumbnailImpl {
     attachment.setFlavor(flavor);
     tags.forEach(attachment::addTag);
     attachment.setMimeType(tempThumbnailMimeType);
-    if (conversionProfile != null) {
-      downscaleAttachment(conversionProfile, attachment);
-    }
 
-    final Collection<MediaPackageElement> addElements = Collections.singleton(attachment);
+    final Collection<MediaPackageElement> addElements = new ArrayList<>();
+    if (conversionProfiles != null && conversionProfiles.length > 0) {
+      addElements.addAll(downscaleAttachment(attachment, conversionProfiles));
+    } else {
+      addElements.add(attachment);
+    }
     final Set<String> removeElementsIds = Arrays.stream(pub.getAttachments()).filter(priorFilter)
       .map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
     final Publication newPublication = this.configurablePublicationService.replaceSync(mp, channelId, addElements, removeElementsIds);
     mp.remove(pub);
     mp.add(newPublication);
     //noinspection ConstantConditions
-    final Attachment newElement = Arrays.stream(newPublication.getAttachments())
-      .filter(att -> att.getIdentifier().equals(aid)).findAny().get();
-    return Tuple.tuple(aUri, newElement);
+
+    final Set<String> newAttachmentIds = addElements.stream()
+      .map(MediaPackageElement::getIdentifier)
+      .collect(Collectors.toSet());
+    return Tuple.tuple(aUri, Arrays.stream(newPublication.getAttachments())
+      .filter(att -> newAttachmentIds.contains(att.getIdentifier()))
+      .collect(Collectors.toList()));
   }
 
-  private void downscaleAttachment(final String conversionProfile, final Attachment attachment)
-    throws EncoderException, MediaPackageException {
+  private List<Attachment> downscaleAttachment(final Attachment attachment, final String... conversionProfiles)
+    throws EncoderException, MediaPackageException, DistributionException {
     // What the composer returns is not our original attachment, modified, but a new one, basically containing just
     // a URI.
-    final Attachment downscaled = composerService.convertImageSync(attachment, conversionProfile);
-    attachment.setURI(downscaled.getURI());
+    final List<Attachment> downscaled = composerService.convertImageSync(attachment, conversionProfiles);
+    return downscaled.stream().map(a -> cloneAttachment(attachment, a.getURI())).collect(Collectors.toList());
   }
 
   private URI updateExternalPublication(final MediaPackage mp, final MediaPackageElementFlavor trackFlavor)
     throws IOException, NotFoundException, MediaPackageException, PublicationException,
-    EncoderException {
-    final Predicate<Attachment> flavorFilter = a -> a.getFlavor().matches(publishFlavor);
-    final Predicate<Attachment> tagsFilter = a -> Arrays.asList(a.getTags()).containsAll(publishTags);
+    EncoderException, DistributionException {
+    final Predicate<Attachment> flavorFilter = a -> a.getFlavor().matches(apiPublishFlavor);
+    final Predicate<Attachment> tagsFilter = a -> publishTags.stream()
+      .allMatch(t -> Arrays.asList(a.getTags()).contains(t));
     final Predicate<Attachment> priorFilter = flavorFilter.and(tagsFilter);
-    final Tuple<URI, MediaPackageElement> result = updatePublication(mp, "api", priorFilter,
-      publishFlavor.applyTo(trackFlavor), publishTags, null);
+    final Tuple<URI, List<MediaPackageElement>> result = updatePublication(mp, apiChannel, priorFilter,
+      publishFlavor.applyTo(trackFlavor), publishTags, this.apiConversionProfiles);
     if (result != null) {
       return result.getA();
     } else {
@@ -420,7 +442,7 @@ public final class ThumbnailImpl {
 
   private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
-    UnknownFileTypeException {
+    UnknownFileTypeException, DistributionException {
     tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
     tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
     tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
@@ -431,7 +453,7 @@ public final class ThumbnailImpl {
       // Remove any uploaded thumbnails
       Arrays.stream(mp.getElementsByFlavor(sourceFlavor)).forEach(mp::remove);
 
-      final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, false);
+      final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, false);
       deletionUris.add(internalPublicationResult.getA());
       if (thumbnailAutoDistribution) {
         deletionUris.add(updateExternalPublication(mp, track.getFlavor()));
@@ -440,7 +462,7 @@ public final class ThumbnailImpl {
 
       assetManager.takeSnapshot(mp);
 
-      return internalPublicationResult.getB();
+      return internalPublicationResult.getB().get(0);
     } finally {
       workspace.cleanup(mp.getIdentifier());
       for (final URI uri : deletionUris) {
@@ -453,7 +475,7 @@ public final class ThumbnailImpl {
 
   public MediaPackageElement chooseDefaultThumbnail(final MediaPackage mp, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
-    UnknownFileTypeException {
+    UnknownFileTypeException, DistributionException {
 
     final MediaPackageElement result = chooseThumbnail(mp, getPrimaryOrSecondaryTrack(mp), position);
 
@@ -470,7 +492,7 @@ public final class ThumbnailImpl {
 
   public MediaPackageElement chooseThumbnail(final MediaPackage mp, final String trackFlavorType, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
-    UnknownFileTypeException {
+    UnknownFileTypeException, DistributionException {
 
     final MediaPackageElementFlavor trackFlavor = flavor(trackFlavorType, sourceFlavor.getSubtype());
     final Optional<Track> track = Arrays.stream(mp.getTracks(trackFlavor)).findFirst();
@@ -490,5 +512,17 @@ public final class ThumbnailImpl {
     WorkflowPropertiesUtil.storeProperty(assetManager, mp, THUMBNAIL_PROPERTY_TRACK, trackFlavor.getType());
 
     return result;
+  }
+
+  private static Attachment cloneAttachment(final Attachment attachmentToClone, final URI newUri) {
+    try {
+      final Attachment result = (Attachment) MediaPackageElementParser
+        .getFromXml(MediaPackageElementParser.getAsXml(attachmentToClone));
+      result.setIdentifier(UUID.randomUUID().toString());
+      result.setURI(newUri);
+      return result;
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

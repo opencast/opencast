@@ -817,8 +817,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *
    * @param sourceImageXml
    *          The source image
-   * @param profileId
-   *          The profile to use in image conversion
+   * @param profileIds
+   *          The profiles to use in image conversion
    * @return A {@link Response} with the resulting image in the response body
    * @throws Exception
    */
@@ -830,10 +830,10 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
       @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response convertImageSync(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
+  public Response convertImageSync(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileIds") String profileIds)
       throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileId))
+    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileIds))
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage and profileId must not be null").build();
 
     // Deserialize the source track
@@ -842,8 +842,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage element must be of type track").build();
 
     try {
-      Attachment result = composerService.convertImageSync((Attachment) sourceImage, profileId);
-      return Response.ok().entity(MediaPackageElementParser.getAsXml(result)).build();
+      List<Attachment> result = composerService.convertImageSync((Attachment) sourceImage, StringUtils.split(profileIds, ','));
+      return Response.ok().entity(MediaPackageElementParser.getArrayAsXml(result)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to convert image: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

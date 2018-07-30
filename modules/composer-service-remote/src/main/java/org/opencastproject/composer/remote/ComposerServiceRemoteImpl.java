@@ -365,12 +365,12 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+  public List<Attachment> convertImageSync(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/convertimagesync");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
-      params.add(new BasicNameValuePair("profileId", profileId));
+      params.add(new BasicNameValuePair("profileIds", StringUtils.join(profileIds, ',')));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException(e);
@@ -380,7 +380,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       response = getResponse(post);
       if (response != null) {
         final String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
-        return (Attachment) MediaPackageElementParser.getFromXml(xml);
+        return MediaPackageElementParser.getArrayFromXml(xml).stream().map(a -> (Attachment) a).collect(Collectors.toList());
       }
     } catch (Exception e) {
       throw new EncoderException(e);
