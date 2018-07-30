@@ -24,9 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('BulkDeleteCtrl', ['$scope', 'Modal', 'FormNavigatorService', 'Table', 'Notifications',
     'BulkDeleteResource', 'NewEventProcessing', 'TaskResource', 'decorateWithTableRowSelection',
-    'SeriesHasEventsResource', 'SeriesOptionsResource',
+    'SeriesHasEventsResource', 'SeriesConfigurationResource',
         function ($scope, Modal, FormNavigatorService, Table, Notifications, BulkDeleteResource, NewEventProcessing,
-                  TaskResource, decorateWithTableRowSelection, SeriesHasEventsResource, SeriesOptionsResource) {
+                  TaskResource, decorateWithTableRowSelection, SeriesHasEventsResource, SeriesConfigurationResource) {
 
     var hasPublishedElements = function (currentEvent) {
         var publicationCount = 0;
@@ -215,7 +215,7 @@ angular.module('adminNg.controllers')
         $scope.events.unpublished.selected = true;
     }
     else {
-        SeriesOptionsResource.get(function (data) {
+        SeriesConfigurationResource.get(function (data) {
             $scope.deleteSeriesWithEventsAllowed = data.deleteSeriesWithEventsAllowed;
         });
         var result = [];

@@ -21,8 +21,8 @@
 'use strict';
 
 angular.module('adminNg.resources')
-.factory('SeriesOptionsResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/series/options.json', { }, {
+.factory('SeriesConfigurationResource', ['$resource', function ($resource) {
+    return $resource('/admin-ng/series/configuration.json', { }, {
         get: { method: 'GET' }
     });
 }]);

@@ -1090,9 +1090,9 @@ public class SeriesEndpoint implements ManagedService {
   }
 
   @GET
-  @Path("options.json")
+  @Path("configuration.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesoptions", description = "Get the series configuration options", returnDescription = "List of configuration keys", reponses = {
+  @RestQuery(name = "getseriesconfiguration", description = "Get the series configuration", returnDescription = "List of configuration keys", reponses = {
     @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
     @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
     @RestResponse(responseCode = SC_OK, description = "The access information ") })
