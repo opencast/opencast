@@ -137,7 +137,8 @@ public final class ThumbnailImpl {
 
   private final MediaPackageElementFlavor sourceFlavor;
   private final MediaPackageElementFlavor previewFlavor;
-  private final MediaPackageElementFlavor publishFlavor;
+  private final MediaPackageElementFlavor oaipmhPublishFlavor;
+  private final MediaPackageElementFlavor apiPublishFlavor;
   private final List<String> publishTags;
   private final Workspace workspace;
   private final OaiPmhPublicationService oaiPmhPublicationService;
@@ -164,10 +165,11 @@ public final class ThumbnailImpl {
     final ComposerService composerService) {
     this.sourceFlavor = flavor(config.getThumbnailSourceFlavorType(), config.getThumbnailSourceFlavorSubtype());
     this.previewFlavor = parseFlavor(config.getThumbnailPreviewFlavor());
-    this.publishFlavor = parseFlavor(config.getThumbnailPublishFlavor());
+    this.oaipmhPublishFlavor = parseFlavor(config.getOaipmhFlavor());
     this.publishTags = Arrays.asList(config.getThumbnailPublishTags().split(","));
     this.oaiPmhChannel = config.getOaipmhChannel();
     this.apiChannel = config.getApiChannel();
+    this.apiPublishFlavor = parseFlavor(config.getApiFlavor());
     this.encodingProfile = config.getThumbnailEncodingProfile();
     this.defaultPosition = config.getThumbnailDefaultPosition();
     this.defaultTrackPrimary = flavor(config.getThumbnailDefaultTrackPrimary(), config.getThumbnailSourceFlavorSubtype());
@@ -335,7 +337,7 @@ public final class ThumbnailImpl {
 
     final Attachment publishAttachment = AttachmentImpl.fromURI(publishThumbnailUri);
     publishAttachment.setIdentifier(UUID.randomUUID().toString());
-    publishAttachment.setFlavor(publishFlavor.applyTo(trackFlavor));
+    publishAttachment.setFlavor(oaipmhPublishFlavor.applyTo(trackFlavor));
     publishTags.forEach(publishAttachment::addTag);
     publishAttachment.setMimeType(this.tempThumbnailMimeType);
 
@@ -350,7 +352,7 @@ public final class ThumbnailImpl {
     final Publication oaiPmhPub = oaiPmhPublicationService.replaceSync(
       mp, oaiPmhChannel,
       addElements, Collections.emptySet(),
-      Collections.singleton(publishFlavor), Collections.emptySet(),
+      Collections.singleton(oaipmhPublishFlavor), Collections.emptySet(),
       publicationsToUpdate, false);
     mp.remove(oldOaiPmhPub.get());
     mp.add(oaiPmhPub);
@@ -415,7 +417,7 @@ public final class ThumbnailImpl {
       .allMatch(t -> Arrays.asList(a.getTags()).contains(t));
     final Predicate<Attachment> priorFilter = flavorFilter.and(tagsFilter);
     final Tuple<URI, List<MediaPackageElement>> result = updatePublication(mp, apiChannel, priorFilter,
-      publishFlavor.applyTo(trackFlavor), publishTags, this.apiConversionProfiles);
+      apiPublishFlavor.applyTo(trackFlavor), publishTags, this.apiConversionProfiles);
     if (result != null) {
       return result.getA();
     } else {
