@@ -756,7 +756,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       Job job = composerService.multiEncode((Track) sourceTrack, Arrays.asList(profiles));
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
-      logger.warn("Unable to encode the track: " + e);
+      logger.warn("Unable to encode the track: ", e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

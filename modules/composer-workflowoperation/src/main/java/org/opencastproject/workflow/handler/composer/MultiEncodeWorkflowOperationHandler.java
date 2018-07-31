@@ -54,8 +54,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition for handling multiple concurrent outputs in one ffmpeg operation. This allows encoding and
@@ -66,26 +64,8 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MultiEncodeWorkflowOperationHandler.class);
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** seperator for independent clauses */
   static final String SEPARATOR = ";";
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put("source-flavors", "The \"flavor\" of the track to use as a source input");
-    CONFIG_OPTIONS.put("source-tags",
-            "The \"tag\" of the track to use as a source input (if used,track is both (source tag AND source flavor) )");
-    CONFIG_OPTIONS.put("encoding-profiles",
-            "The encoding profile to use, this is one profile with multiple outputs listed");
-    CONFIG_OPTIONS.put("target-flavors",
-            "The flavors to apply to the encoded file in the same order as in the encoding profile,sections separated by \";\"");
-    CONFIG_OPTIONS.put("target-tags",
-            "The tags to apply to the encoded files, sections ordered as in the encoding profile and separated by \";\"");
-    CONFIG_OPTIONS.put("tag-with-profile",
-            "Add encoding profile name as a tag to the corresponding encoded file (default: false)");
-  }
 
   /** The composer service */
   private ComposerService composerService = null;
@@ -112,16 +92,6 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#getConfigurationOptions()
-   */
-  @Override
-  public SortedMap<String, String> getConfigurationOptions() {
-    return CONFIG_OPTIONS;
   }
 
   /**
@@ -245,7 +215,7 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       }
       // If use target tags, there should be the same number of source flavors and target tags or all map into one
       // target tag
-      if (targetTags != null && (targetTags.length != 1 && sourceFlavors.length != targetTags.length)) {
+      if (targetTags != null && targetTags.length != 1 && sourceFlavors.length != targetTags.length) {
         throw new WorkflowOperationException(
                 "number of source flavors " + sourceFlavors.length + " segment does not match number of target Tags"
                         + targetTags.length + " (must be the same or one target)");

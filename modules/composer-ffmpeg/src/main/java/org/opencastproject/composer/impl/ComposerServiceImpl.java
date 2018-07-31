@@ -2199,8 +2199,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     try {
       // Job Load is based on number of encoding profiles
       float load = calculateJobLoadForMultipleProfiles(profileIds, multiEncodeJobLoadFactor);
-      ArrayList<String> args = new ArrayList<String>();
-      args.addAll(Arrays.asList(MediaPackageElementParser.getAsXml(sourceTrack)));
+      ArrayList<String> args = new ArrayList<>();
+      args.add(MediaPackageElementParser.getAsXml(sourceTrack));
       args.addAll(profileIds);
       return serviceRegistry.createJob(JOB_TYPE, Operation.MultiEncode.toString(), args, load);
     } catch (ServiceRegistryException e) {
