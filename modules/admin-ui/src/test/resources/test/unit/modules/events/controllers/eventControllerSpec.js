@@ -56,6 +56,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
             .respond(JSON.stringify({"results":[],"total":0}));
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
 
         $controller('EventCtrl', {$scope: $scope});
     });

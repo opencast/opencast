@@ -35,10 +35,12 @@ import static org.junit.Assert.fail;
 import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
 
+import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.external.common.ApiFormat;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.util.AclUtils;
+import org.opencastproject.external.util.SchedulingUtils;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.impl.index.IndexObject;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -55,6 +57,8 @@ import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 
+import com.entwinemedia.fn.data.Opt;
+
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
@@ -67,6 +71,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +95,6 @@ public class EventsEndpointTest {
      env.tearDownServer();
    }
 
-  @Ignore
   private List<Publication> getExamplePublications() throws URISyntaxException {
     List<Publication> publications = new ArrayList<Publication>();
     Publication youtubePublication = PublicationImpl.publication("youtube-pub-id", "youtube",
@@ -153,7 +157,7 @@ public class EventsEndpointTest {
     events.add(event2);
 
     EventsEndpoint endpoint = new EventsEndpoint();
-    Response result = endpoint.getJsonEvents(acceptHeader, events, false, false, false, false);
+    Response result = endpoint.getJsonEvents(acceptHeader, events, false, false, false,false, false, ApiVersion.VERSION_1_0_0);
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/v1.0.0+json", result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(eventJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
@@ -188,7 +192,7 @@ public class EventsEndpointTest {
 
     EventsEndpoint endpoint = new EventsEndpoint();
     Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0,
-            endpoint.eventToJSON(event, false, false, false, false));
+            endpoint.eventToJSON(event, false, false, false,false, false, ApiVersion.VERSION_1_0_0));
     assertTrue(result.getMetadata().get("Content-Type") != null);
     assertEquals("application/v1.0.0+json", result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(eventJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
@@ -425,6 +429,41 @@ public class EventsEndpointTest {
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
     assertThat(actualMetadataList.getMetadataByFlavor("dublincore/episode").get().toJSON().toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
+  /**
+   * Test GET /{event_id}/scheduling.
+   */
+  @Test
+  public void testGetEventScheduling() throws IOException {
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-scheduling-expected.json"),
+        Charset.forName("UTF-8"));
+    String eventId = TestEventsEndpoint.SCHEDULING_GET_EVENT;
+    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when()
+        .get(env.host("{event_id}/scheduling")).asString();
+    assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
+  /**
+   * Test PUT /{event_id}/scheduling.
+   */
+  @Test
+  public void testUpdateEventScheduling() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-scheduling-update.json"),
+        Charset.forName("UTF-8"));
+    String eventId = TestEventsEndpoint.SCHEDULING_UPDATE_EVENT;
+    given().formParam("scheduling", jsonString).pathParam("event_id", eventId)
+        .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/scheduling"));
+
+    SchedulingUtils.SchedulingInfo schedulingInfo = new SchedulingUtils.SchedulingInfo();
+    schedulingInfo.setAgentId(TestEventsEndpoint.getCapturedAgentId().getValue());
+    schedulingInfo.setStartDate(TestEventsEndpoint.getCapturedStartDate().getValue());
+    schedulingInfo.setEndDate(TestEventsEndpoint.getCapturedEndDate().getValue());
+    if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isSome()) {
+      schedulingInfo.setInputs(Opt.some(TestEventsEndpoint.getCapturedAgentConfig()
+          .getValue().get().get(CaptureParameters.CAPTURE_DEVICE_NAMES)));
+    }
+    assertThat(schedulingInfo.toJson().toString(), SameJSONAs.sameJSONAs(jsonString).allowingAnyArrayOrdering());
   }
 
 }

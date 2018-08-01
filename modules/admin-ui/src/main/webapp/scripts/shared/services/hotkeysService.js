@@ -39,7 +39,7 @@ angular.module('adminNg.services')
               var properties = info.org.properties;
               angular.forEach(Object.keys(properties), function (key) {
                 if (key.indexOf("admin.shortcut.") >= 0) {
-                  var keyIdentifier = key.substring(15),
+                  var keyIdentifier = key.substring("admin.shortcut.".length),
                       value = properties[key];
                   me.keyBindings[keyIdentifier] = value;
                 }
@@ -52,31 +52,31 @@ angular.module('adminNg.services')
         });
       };
 
-      this.activateHotkey = function (scope, keyIdentifier, description, callback) {
+      function activateHotkey(hotkeys, keyIdentifier, callback) {
         me.loading.then(function () {
           var key = me.keyBindings[keyIdentifier];
-          if (key !== undefined) {
-            hotkeys.bindTo(scope).add({
-              combo: key,
-              description: description,
-              callback: callback
-            });
-          }
-        });
-      }
-
-      this.activateUniversalHotkey = function (keyIdentifier, description, callback) {
-        me.loading.then(function () {
-          var key = me.keyBindings[keyIdentifier];
-          if (key !== undefined) {
+          if (key) {
             hotkeys.add({
               combo: key,
-              description: description,
+              // We abuse the `description` argument of `angular-hotkeys` a bit here,
+              // since it is the only place it offers to store custom hotkey identifying
+              // information, which we need in our custom cheat sheet template
+              // to translate and group the keys.
+              description: keyIdentifier,
               callback: callback
             });
           }
         });
-      }
+      };
+
+      this.activateHotkey = function (scope, keyIdentifier, callback) {
+        activateHotkey(hotkeys.bindTo(scope), keyIdentifier, callback);
+      };
+
+      this.activateUniversalHotkey = function (keyIdentifier, callback) {
+        activateHotkey(hotkeys, keyIdentifier, callback);
+      };
+
       this.loading = this.loadHotkeys();
     };
 

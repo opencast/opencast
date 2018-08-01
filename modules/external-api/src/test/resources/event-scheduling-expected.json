@@ -1,0 +1,6 @@
+{
+  "agent_id": "testAgent24",
+  "start": "2017-08-29T00:05:00Z",
+  "end": "2017-08-29T00:07:00Z",
+  "inputs": ["default1", "default2"]
+}

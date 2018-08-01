@@ -80,6 +80,7 @@ public class EventHttpServletRequest {
   private Opt<MetadataList> metadataList = Opt.none();
   private Opt<JSONObject> processing = Opt.none();
   private Opt<JSONObject> source = Opt.none();
+  private Opt<JSONObject> scheduling = Opt.none();
 
   public void setAcl(AccessControlList acl) {
     this.acl = Opt.some(acl);
@@ -95,6 +96,10 @@ public class EventHttpServletRequest {
 
   public void setProcessing(JSONObject processing) {
     this.processing = Opt.some(processing);
+  }
+
+  public void setScheduling(JSONObject scheduling) {
+    this.scheduling = Opt.some(scheduling);
   }
 
   public void setSource(JSONObject source) {
@@ -115,6 +120,10 @@ public class EventHttpServletRequest {
 
   public Opt<JSONObject> getProcessing() {
     return processing;
+  }
+
+  public Opt<JSONObject> getScheduling() {
+    return scheduling;
   }
 
   public Opt<JSONObject> getSource() {
@@ -144,12 +153,10 @@ public class EventHttpServletRequest {
           HttpServletRequest request,
           IngestService ingestService,
           List<EventCatalogUIAdapter> eventCatalogUIAdapters,
-          JSONObject source,
           Opt<String> startDatePattern,
           Opt<String> startTimePattern)
                   throws IndexServiceException {
     EventHttpServletRequest eventHttpServletRequest = new EventHttpServletRequest();
-    eventHttpServletRequest.setSource(source);
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
         eventHttpServletRequest.setMediaPackage(ingestService.createMediaPackage());
@@ -268,6 +275,15 @@ public class EventHttpServletRequest {
       } catch (Exception e) {
         logger.warn("Unable to parse processing configuration {}", processing);
         throw new IllegalArgumentException("Unable to parse processing configuration");
+      }
+    } else if ("scheduling".equals(item.getFieldName())) {
+      String scheduling = Streams.asString(item.openStream());
+      JSONParser parser = new JSONParser();
+      try {
+        eventHttpServletRequest.setScheduling((JSONObject) parser.parse(scheduling));
+      } catch (Exception e) {
+        logger.warn("Unable to parse scheduling information {}", scheduling);
+        throw new IllegalArgumentException("Unable to parse scheduling information");
       }
     }
   }

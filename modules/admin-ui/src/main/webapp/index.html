@@ -6,7 +6,7 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(.) styles/vendor.css -->
+        <!-- build:css(src/main) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
         <!-- endbower -->
@@ -25,8 +25,6 @@
         <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
         <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
         <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
-        <script type="text/javascript" src="lib/backbone-1.1.0.js"></script>
-        <script type="text/javascript" src="lib/visualsearch.js"></script>
         <script type="text/javascript" src="lib/chosen.jquery.js"></script>
         <script type="text/javascript" src="lib/moment.min.js"></script>
     </head>
@@ -86,6 +84,9 @@
                         <a target="_self" href="{{restdocsUrl}}">
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
+                        </li>
+                        <li>
+                            <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
                         </li>
                     </ul>
                 </div>
@@ -331,6 +332,7 @@
         <script src="scripts/shared/controllers/applicationController.js"></script>
         <script src="scripts/shared/controllers/userPreferencesController.js"></script>
         <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
+        <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
         <script src="scripts/modules/events/controllers/eventsController.js"></script>
         <script src="scripts/modules/events/controllers/eventController.js"></script>
         <script src="scripts/modules/events/controllers/editStatusController.js"></script>
@@ -347,6 +349,7 @@
         <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
         <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
         <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
+        <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
         <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>

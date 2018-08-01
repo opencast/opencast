@@ -29,7 +29,7 @@ describe('Workflows API Resource', function () {
             $httpBackend.flush();
 
             expect(data).toBeDefined();
-            expect(data.length).toBe(14);
+            expect(data.length).toBe(19);
         });
 
         it('handles empty results gracefully', function () {

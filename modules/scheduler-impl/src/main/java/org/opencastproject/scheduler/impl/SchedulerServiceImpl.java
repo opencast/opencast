@@ -1622,19 +1622,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       CalendarGenerator cal = new CalendarGenerator(seriesService);
       for (ARecord record : records) {
-        boolean blacklisted;
-        // isBlacklisted() methods are not implemented in the persistence layer and return always false
-//        try {
-//          //blacklisted = isBlacklisted(record.getMediaPackageId());
-//        } catch (NotFoundException e) {
-//          continue;
-//        }
-        blacklisted = false;
-
-        // Skip blacklisted events
-        if (blacklisted)
-          continue;
-
         Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
 
         // If the event media package is empty, skip the event
@@ -1667,9 +1654,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
         } catch (Exception e) {
-          logger.warn("Error adding event '{}' to calendar, event is not recorded: {}", record.getMediaPackageId(),
-                  getStackTrace(e));
-          continue;
+          logger.warn("Error adding event '{}' to calendar, event is not recorded", record.getMediaPackageId(), e);
         }
       }
 
@@ -1685,9 +1670,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return cal.getCalendar().toString();
 
     } catch (Exception e) {
-      if (e instanceof SchedulerException)
-        throw e;
-      logger.error("Failed getting calendar: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
   }

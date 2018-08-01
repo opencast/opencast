@@ -22,26 +22,17 @@ package org.opencastproject.external.common;
 
 import static java.lang.String.format;
 
-import org.opencastproject.external.util.XMLListWrapper;
-import org.opencastproject.index.service.impl.index.IndexObject;
-
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 
 /**
  * A utility class for creating responses from the external api.
@@ -82,7 +73,24 @@ public final class ApiResponses {
      * @return The new {@link Response}
      */
     public static Response ok(ApiVersion version, String body) {
+      // FIXME: This does not make sense. Sending content type 'application/json' for a plain string?
+      // Maybe, when a new major release happens, wrap the string with a JSON object.
+      // See MH-12798: The External API should consistently return JSON strings
       return Response.ok(body, APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
+    }
+
+    /**
+     * Create an ok json response for the external api
+     *
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
+     * @param body
+     *          The body of the response.
+     * @return The new {@link Response}
+     */
+    public static Response ok(String acceptHeader, String body) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
+      return ok(version, body);
     }
 
     /**
@@ -99,27 +107,33 @@ public final class ApiResponses {
     }
 
     /**
-     * Create a no content response for the external api
+     * Create an ok json response for the external api
      *
-     * @param version
-     *          The version that was requested for the api
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
+     * @param json
+     *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response noContent(ApiVersion version) {
-      return Response.noContent().build();
+    public static Response ok(String acceptHeader, JValue json) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
+      return ok(version, json);
     }
 
     /**
      * Create a created json response for the external api
      *
-     * @param version
-     *          The version that was requested for the api
+     * @param acceptHeader
+     *          The accept header string that was sent by the client.
      * @param location
      *          The location
+     * @param json
+     *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response created(ApiVersion version, URI location) {
-      return Response.created(location).build();
+    public static Response created(String acceptHeader, URI location, JValue json) {
+      final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
+      return created(version, location, json);
     }
 
     /**
@@ -138,54 +152,18 @@ public final class ApiResponses {
               .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
 
-  }
-
-  /**
-   * Class that handles Xml responses for the external API.
-   */
-  public static class Xml {
-    private static final String XML_SUFFIX = "+xml";
-
     /**
-     * Create a ok xml response for the external api
+     * Create a conflict json response for the external api
      *
      * @param version
-     *          The version that was requested for the api.
-     * @param body
-     *          The body of the response.
+     *          The version that was requested for the api
+     * @param json
+     *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response ok(ApiVersion version, String body) {
-      return Response.ok(body, APPLICATION_PREFIX + version.toExternalForm() + XML_SUFFIX).build();
+    public static Response conflict(ApiVersion version, JValue json) {
+      return Response.status(Status.CONFLICT).entity(serializer.toJson(json))
+          .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
-
-    /**
-     * Serialize a list of index objects into an XML response.
-     *
-     * @param version
-     *          The version that was requested of the api
-     * @param indexObjects
-     *          The objects to serialize.
-     * @param clazz
-     *          The class that these objects represent
-     * @param xmlSurroundingTag
-     *          The surrounding tag for the objects (usually the plural form)
-     * @return The {@link Response}
-     */
-    public static Response getXmlListResponse(ApiVersion version, List<IndexObject> indexObjects, Class clazz,
-            String xmlSurroundingTag) {
-      try {
-        JAXBContext jc = JAXBContext.newInstance(XMLListWrapper.class, clazz);
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        String result = XMLListWrapper.marshal(marshaller, indexObjects, xmlSurroundingTag);
-        return ok(version, result);
-      } catch (JAXBException e) {
-        logger.error("Unable to create xml response because {}", ExceptionUtils.getStackTrace(e));
-        throw new WebApplicationException(e);
-      }
-    }
-
   }
-
 }

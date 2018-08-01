@@ -4,7 +4,7 @@ var serveStatic = require('serve-static');
 module.exports = function (grunt, appPath) {
     return function (connect) {
             var middlewares = [
-              serveStatic('.tmp'),
+              serveStatic('target/grunt/.tmp'),
               connect().use(
                 '/admin-ng',
                 serveStatic('./src/test/resources/app/GET/admin-ng')

@@ -26,23 +26,55 @@ angular.module('adminNg.services')
 .factory('JsHelper', [
     function () {
         var weekdaysArray = [
-                    { key: 'MO', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO' },
-                    { key: 'TU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU' },
-                    { key: 'WE', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE' },
-                    { key: 'TH', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TH' },
-                    { key: 'FR', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR' },
-                    { key: 'SA', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA' },
-                    { key: 'SU', translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU' }
+            {
+                key: 'MO',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.MO',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.MO',
+            },
+            {
+                key: 'TU',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TU',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.TU',
+            },
+            {
+                key: 'WE',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.WE',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.WE',
+            },
+            {
+                key: 'TH',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.TH',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.TH',
+            },
+            {
+                key: 'FR',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.FR',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.FR',
+            },
+            {
+                key: 'SA',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SA',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.SA',
+            },
+            {
+                key: 'SU',
+                translation: 'EVENTS.EVENTS.NEW.WEEKDAYS.SU',
+                translationLong: 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.SU',
+            }
         ];
         return {
             getWeekDays: function () {
                 return weekdaysArray;
             },
 
-            weekdayTranslation: function(d) {
+            weekdayTranslation: function(d, longTranslation) {
                 for (var i = 0; i < weekdaysArray.length; i++) {
                     if (weekdaysArray[i].key === d) {
-                        return weekdaysArray[i].translation;
+                        if (longTranslation === true) {
+                            return weekdaysArray[i].translationLong;
+                        } else {
+                            return weekdaysArray[i].translation;
+                        }
                     }
                 }
                 return null;

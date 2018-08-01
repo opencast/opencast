@@ -1000,7 +1000,7 @@ public class MetadataField<A> {
         if (jsonValue == null)
           return "";
         if (!(jsonValue instanceof String)) {
-          logger.warn("Value cannot be parsed as String.");
+          logger.warn("Value cannot be parsed as String. Expecting type 'String', but received type '{}'.", jsonValue.getClass().getName());
           return null;
         }
         return (String) jsonValue;

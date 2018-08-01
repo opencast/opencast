@@ -66,6 +66,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
   @XmlElement(name = "description")
   private String description;
 
+  @XmlElement(name = "displayOrder")
+  private int displayOrder = 0;
+
   @XmlElement(name = "published")
   private boolean published;
 
@@ -110,6 +113,24 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#getDisplayOrder()
+   */
+  public int getDisplayOrder() {
+    return displayOrder;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#setDisplayOrder(int)
+   */
+  public void setDisplayOrder(int displayOrder) {
+    this.displayOrder = displayOrder;
   }
 
   /**

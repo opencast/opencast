@@ -74,7 +74,8 @@
       "HELP": "Pomoc",
       "USERS_GUIDE": "Podręcznik użytkownika",
       "DOCUMENTATION": "Dokumentacja",
-      "REST_DOC": "Dokumentacja interfejsu API REST"
+      "REST_DOC": "Dokumentacja interfejsu API REST",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Zasady dostępu zostały utworzone",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Wiadomość została wysłana",
       "EMAIL_NOT_SENT": "Wysłanie wiadomości nie powiodło się",
       "CONFLICT_DETECTED": "Konflikt w harmonogramie: nowe wydarzenie pokrywa się z już zaplanowanym. Proszę zmienić salę lub termin wydarzenia.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Błąd w harmonogramie: Wydarzenie się już zakończyło.",
       "CONFLICT_END_BEFORE_START": "Błąd w harmonogramie: Rozpoczęcie zakończenie zdarzenia zaplanowano przed jego rozpoczęciem.",
       "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Wybrałeś {{numberOfEvents}} wydarzeń",
             "CONFIGURATION": "Konfiguracja",
             "WORKFLOW": "Zadanie"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "Ogólne",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Podsumowanie",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Typ",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Edycja",
+            "METADATA": "Metadane",
+            "SCHEDULING": "Harmonogram"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Zasady dostępu"
             },
             "SUMMARY": {
-               "CAPTION": "Podsumowanie"
+               "CAPTION": "Podsumowanie",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Pon",
@@ -436,6 +466,15 @@
                "FR": "pt.",
                "SA": "sob.",
                "SU": "Nd"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Serie",
             "DATE": "Data",
             "START": "Start",
+            "END": "End",
             "STOP": "Zatrzymaj",
             "STATUS": "Status",
             "LOCATION": "Lokalizacja",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Poprzednie",
             "NOCONTENT": "Brak danych",
             "PUBLISHED": "Opublikowano",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Szczegóły wydarzenia - {{resourceId}}",
             "TABS": {
-               "GENERAL": "Ogólne",
                "METADATA": "Metadane",
                "EXTENDED-METADATA": "Metadane II",
                "ASSETS": "Zasoby",
+               "PUBLICATIONS": "Publikacje",
                "SCHEDULING": "Harmonogram",
                "WORKFLOWS": "Przepływy pracy",
                "ACCESS": "Zasady dostępu",
                "COMMENTS": "Komentarze"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publikacje",
+            "PUBLICATIONS": {
+               "CAPTION": "Publikacje",
                "NO_PUBLICATIONS_AVAILABLE": "To wydarzenie nie ma publikacji",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Add Comment"
       },
       "TABS": {
-         "PLAY": "Odtwarzanie",
          "EDIT": "Edytor",
          "CAPTIONS": "Napisy",
          "ANNOTATIONS": "Adnotacje"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Do zrobienia",
       "SCHEDULED": "Zaplanowane",
       "RECORDING": "Nagrywanie"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Ogólne",
+         "PLAYER": "Player",
+         "EDITOR": "Edytor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Wyczyść wszystkie filtry",
+            "EVENT_VIEW": "Wydarzenia",
+            "SERIES_VIEW": "Serie",
+            "NEW_EVENT": "Dodaj wydarzenie",
+            "NEW_SERIES": "Dodaj serię",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Poprzednia ramka",
+            "NEXT_FRAME": "Następna klatka",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Podziel",
+            "CUT_SELECTED_SEGMENT": "Wytnij",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Koniec segmentu"
+         }
+      }
    }
 }

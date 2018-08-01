@@ -25,11 +25,11 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_0_0;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
@@ -63,6 +63,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 @Path("/")
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0 })
 @RestService(name = "externalapisecurity", title = "External API Security Service", notes = "", abstractText = "Provides security operations related to the external API")
 public class SecurityEndpoint implements ManagedService {
 
@@ -111,7 +112,6 @@ public class SecurityEndpoint implements ManagedService {
 
   @POST
   @Path("sign")
-  @Produces({ "application/json", "application/v1.0.0+json" })
   @RestQuery(name = "signurl", description = "Returns a signed URL that can be played back for the indicated period of time, while access is optionally restricted to the specified IP address.", returnDescription = "", restParameters = {
           @RestParameter(name = "url", isRequired = true, description = "The linke to encode.", type = STRING),
           @RestParameter(name = "valid-until", description = "Until when is the signed url valid", isRequired = false, type = STRING),
@@ -120,7 +120,6 @@ public class SecurityEndpoint implements ManagedService {
                   @RestResponse(description = "The caller is not authorized to have the link signed.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
   public Response signUrl(@HeaderParam("Accept") String acceptHeader, @FormParam("url") String url,
           @FormParam("valid-until") String validUntilUtc, @FormParam("valid-source") String validSource) {
-
     if (isBlank(url))
       return R.badRequest("Query parameter 'url' is mandatory");
 
@@ -141,11 +140,11 @@ public class SecurityEndpoint implements ManagedService {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
         log.warn("Error while trying to sign url '{}': {}", url, getStackTrace(e));
-        return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("error", "Error while signing url")));
+        return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
       }
-      return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
+      return ApiResponses.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
     } else {
-      return ApiResponses.Json.ok(VERSION_1_0_0, obj(f("error", "Given URL cannot be signed")));
+      return ApiResponses.Json.ok(acceptHeader, obj(f("error", "Given URL cannot be signed")));
     }
   }
 }

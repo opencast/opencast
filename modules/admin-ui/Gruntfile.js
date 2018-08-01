@@ -237,10 +237,6 @@ module.exports = function (grunt) {
             }
           }
         }
-      },
-      sass: {
-        src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-        ignorePath: /(\.\.\/){1,2}bower_components\//
       }
     },
 
@@ -390,7 +386,9 @@ module.exports = function (grunt) {
 
     uglify: {
       options: {
-        sourceMap: true,
+        sourceMap: {
+          includeSources: true
+        },
         sourceMapIn: function (file) {
           return file + '.map';
         }

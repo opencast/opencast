@@ -74,7 +74,8 @@
       "HELP": "幫助",
       "USERS_GUIDE": "使用說明",
       "DOCUMENTATION": "文件檔案",
-      "REST_DOC": "REST API 文檔"
+      "REST_DOC": "REST API 文檔",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "存取權限已新增",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "訊息已發送",
       "EMAIL_NOT_SENT": "訊息無法發送",
       "CONFLICT_DETECTED": "預約程序有衝突 ︰ 新的事件與現有的事件重疊。請更改位置、 日期或時間。",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
       "CONFLICT_END_BEFORE_START": "排程有誤: 排程結束的時間，必須晚於開始時間。",
       "INVALID_ACL_RULES": "規則必須包含一個有效的角色，讀 或/和 寫的權利。",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "您已選擇 {{numberOfEvents}} 事件",
             "CONFIGURATION": "設定",
             "WORKFLOW": "任務"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "一般",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "摘要",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "類型",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "編輯",
+            "METADATA": "後設資料",
+            "SCHEDULING": "排程"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "存取權限"
             },
             "SUMMARY": {
-               "CAPTION": "摘要"
+               "CAPTION": "摘要",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "星期一",
@@ -436,6 +466,15 @@
                "FR": "星期五",
                "SA": "星期六",
                "SU": "星期日"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "系列",
             "DATE": "日期",
             "START": "開始",
+            "END": "End",
             "STOP": "結束",
             "STATUS": "狀態",
             "LOCATION": "位置",
@@ -468,6 +508,7 @@
             "PREVIOUS": "前一項",
             "NOCONTENT": "無可用數據",
             "PUBLISHED": "已發佈",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "事件的細節 - {{resourceId}}",
             "TABS": {
-               "GENERAL": "常規",
                "METADATA": "後設資料",
                "EXTENDED-METADATA": "後設資料II",
                "ASSETS": "媒體資源",
+               "PUBLICATIONS": "出版",
                "SCHEDULING": "排程",
                "WORKFLOWS": "工作流程",
                "ACCESS": "存取權限",
                "COMMENTS": "意見"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "出版",
+            "PUBLICATIONS": {
+               "CAPTION": "出版",
                "NO_PUBLICATIONS_AVAILABLE": "此事件沒有發佈",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "新增評論"
       },
       "TABS": {
-         "PLAY": "播放",
          "EDIT": "編輯",
          "CAPTIONS": "字幕",
          "ANNOTATIONS": "註解"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "待辦事項",
       "SCHEDULED": "已排程",
       "RECORDING": "錄製中"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "一般",
+         "PLAYER": "Player",
+         "EDITOR": "編輯"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "清除所有搜尋過濾器",
+            "EVENT_VIEW": "事件",
+            "SERIES_VIEW": "系列",
+            "NEW_EVENT": "增加事件",
+            "NEW_SERIES": "增加系列",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "上一格",
+            "NEXT_FRAME": "下一格",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "分割",
+            "CUT_SELECTED_SEGMENT": "切段",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "區段結束"
+         }
+      }
    }
 }

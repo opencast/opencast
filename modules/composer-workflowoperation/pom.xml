@@ -127,7 +127,8 @@
               OSGI-INF/operations/image.xml,
               OSGI-INF/operations/partial-import.xml,
               OSGI-INF/operations/prepare-av.xml,
-              OSGI-INF/operations/segmentpreviews.xml
+              OSGI-INF/operations/segmentpreviews.xml,
+              OSGI-INF/operations/process-smil.xml
             </Service-Component>
           </instructions>
         </configuration>

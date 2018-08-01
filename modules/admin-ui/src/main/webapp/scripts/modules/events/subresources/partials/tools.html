@@ -13,7 +13,7 @@
 <section class="main-content">
     <nav id="roll-up-menu"></nav>
 
-    <div class="main-view" ng-controller="ToolsCtrl">
+    <div class="main-view">
       <div ng-controller="VideoEditCtrl">
         <div class="video-header">
             <div class="main-video-details">
@@ -31,7 +31,7 @@
                         data-width="'175px'"
                         data-disable-search-threshold="8"
                         ng-model="video.workflow"
-                        ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+                        ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                     <a ng-click="submit()"
                         ng-class="{disabled: submitButton}"

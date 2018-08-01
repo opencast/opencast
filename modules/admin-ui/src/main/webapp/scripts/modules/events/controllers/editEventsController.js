@@ -288,7 +288,7 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
                 id: "title",
                 label: "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
                 readOnly: false,
-                required: true,
+                required: false,
                 type: "text",
                 value: getMetadataPart(getterForMetadata('title'))
             },
@@ -342,7 +342,7 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
     };
 
     $scope.rowsValid = function() {
-        return !$scope.nonScheduleSelected() && $scope.hasAnySelected();
+        return !$scope.nonScheduleSelected() && $scope.hasAnySelected() && $scope.hasAllAgentsAccess();
     };
 
     $scope.generateEventSummariesAndContinue = function() {
@@ -368,8 +368,8 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
                     type: 'EVENTS.EVENTS.TABLE.WEEKDAY',
                     // Might be better to actually use the promise rather than using instant,
                     // but it's difficult with the two-way binding here.
-                    previous: $translate.instant(valueWeekDay.translation),
-                    next: $translate.instant(JsHelper.weekdayTranslation($scope.scheduling.weekday))
+                    previous: $translate.instant(valueWeekDay.translationLong),
+                    next: $translate.instant(JsHelper.weekdayTranslation($scope.scheduling.weekday, true))
                 });
             }
 
@@ -503,5 +503,27 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
             EventBulkEditResource.update(payload, onSuccess, onFailure);
         }
     };
+
+    $scope.hasAgentAccess = function (agent, index, array) {
+        return SchedulingHelperService.hasAgentAccess(agent.id);
+    };
+
+    $scope.noAgentAccess = function (row) {
+        return !$scope.nonSchedule(row) && !SchedulingHelperService.hasAgentAccess(row.agent_id);
+    };
+
+    $scope.hasAllAgentsAccess = function () {
+        for (var i = 0; i < $scope.rows.length; i++) {
+            var row = $scope.rows[i];
+            if (!row.selected || $scope.nonSchedule(row)) {
+                continue;
+            }
+            if (!SchedulingHelperService.hasAgentAccess(row.agent_id)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
     decorateWithTableRowSelection($scope);
 }]);

@@ -36,7 +36,18 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 @XmlJavaTypeAdapter(WorkflowInstanceImpl.Adapter.class)
 public interface WorkflowInstance extends Configurable {
   enum WorkflowState {
-    INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING
+    INSTANTIATED, RUNNING, STOPPED, PAUSED, SUCCEEDED, FAILED, FAILING;
+
+    public boolean isTerminated() {
+      switch (this) {
+        case STOPPED:
+        case SUCCEEDED:
+        case FAILED:
+          return true;
+        default:
+          return false;
+      }
+    }
   }
 
   /**
