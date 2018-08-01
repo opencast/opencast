@@ -293,10 +293,7 @@ paella.addPlugin(function() {
           }
           else {
             paella.debug.log("No Revelance");
-            if (!thisClass.foundAlready){
-              //setNoSegmentDataAvailable();
-            }
-            else {
+            if (thisClass.foundAlready){
               thisClass.setNoActualResultAvailable(value);
             }
           }

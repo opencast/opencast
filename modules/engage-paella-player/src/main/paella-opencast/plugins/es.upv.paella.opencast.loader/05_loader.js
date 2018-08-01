@@ -32,5 +32,3 @@ function loadOpencastPaella(containerId) {
 		}
 	);
 }
-
-

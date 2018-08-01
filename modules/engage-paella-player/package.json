@@ -20,6 +20,6 @@
     "gulp-minify": "^1.0.0",
     "run-sequence": "^1.2.2",
     "nightwatch": "^0.9.14",
-    "paellaplayer": "github:polimediaupv/paella#5.3.7"
+    "paellaplayer": "github:polimediaupv/paella#5.3.9"
   }
 }

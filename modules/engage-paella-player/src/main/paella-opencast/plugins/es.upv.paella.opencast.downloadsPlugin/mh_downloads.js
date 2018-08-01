@@ -70,8 +70,8 @@ paella.addPlugin(function() {
             download = true;
               break;
             }
-                }
-              }
+          }
+        }
         if (download) {
           paella.debug.log(track.type);
           container.appendChild(this.createLink(track, i));
