@@ -64,7 +64,13 @@
        "NAME" : "Name"
      },
      "ACTIONS": {
-       "CONFIRMATION" : "Confirmation required"
+       "CONFIRMATION" : "Confirmation"
+     },
+     "WARNINGS": {
+       "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+     },
+     "ERRORS": {
+       "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
      }
    },
    "MEDIAMODULE": "Media Module",
@@ -197,7 +203,8 @@
       "DELETE": {
           "SERIES": {
             "CAPTION": "Delete",
-            "BUTTON": "Delete"
+            "BUTTON": "Delete",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
           },
           "EVENTS": {
             "CAPTION": "Delete",
@@ -978,6 +985,7 @@
        "TABLE": {
          "CAPTION":      "Series",
          "TITLE":        "Series",
+         "HAS_EVENTS":    "Contains events",
          "CREATORS":     "Organizer(s)",
          "CONTRIBUTORS": "Contributor(s)",
          "CREATED":      "Created",

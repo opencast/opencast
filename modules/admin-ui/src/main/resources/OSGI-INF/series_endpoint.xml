@@ -8,6 +8,7 @@
   <property name="opencast.service.path" value="/admin-ng/series" />
   <service>
     <provide interface="org.opencastproject.adminui.endpoint.SeriesEndpoint" />
+    <provide interface="org.osgi.service.cm.ManagedService" />
   </service>
 
    <reference name="AclServiceFactory" interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
