@@ -554,6 +554,35 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     throw new EncoderException("Unable to edit video group(" + trackParamGroupId + ") from smil " + smil
             + " using the remote composer service proxy");
   }
+
+  @Override
+  public Job multiEncode(Track sourceTrack, List<String> profileIds) throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/multiencode");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("profileIds", StringUtils.join(profileIds, ","))); // comma separated profiles
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException("Unable to assemble a remote demux request for track " + sourceTrack, e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        String content = EntityUtils.toString(response.getEntity());
+        Job job = JobParser.parseJob(content);
+        logger.info("Encoding job {} started on a remote multiencode", job.getId());
+        return job;
+      }
+    } catch (Exception e) {
+      throw new EncoderException("Unable to multiencode track " + sourceTrack + " using a remote composer service", e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to multiencode track " + sourceTrack + " using a remote composer service");
+  }
+
   /**
    * Converts a Map<String, String> to s key=value\n string, suitable for the properties form parameter expected by the
    * workflow rest endpoint.
