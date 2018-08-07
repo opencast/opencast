@@ -32,7 +32,7 @@ What you need to do:
 
 The first task is easy. Opencast comes with a ActiveMQ configuration file, located at
 `docs/scripts/activemq/activemq.xml` (RPM repo: `/usr/share/opencast/docs/scripts/activemq/activemq.xml`). This file
-will give you a basic configuration with all queues set-up and accepting connections from all hosts over TCP port
+will give you a basic configuration with all queues set-up and accepting connections from the local host over TCP port
 `61616`.
 
 Replacing the default ActiveMQ configuration with this file will already give you a fully functional ActiveMQ set-up for
