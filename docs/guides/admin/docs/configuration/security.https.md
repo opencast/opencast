@@ -225,14 +225,14 @@ Upgrading to HTTPS if already-processed media packages exist
     sed -i 's/http\:\/\/presentation\.opencast\.example\.com\:80/https:\/\/presentation.opencast.example.com/g' {} +`
 5. Update 2 database tables:
 
-        UPDATE opencast.mh_archive_episode
+        UPDATE opencast.oc_assets_snapshot
         SET mediapackage_xml =
            REPLACE( mediapackage_xml,
                     'http://presentation.opencast.example.com:80',
                     'https://presentation.opencast.example.com')
            WHERE INSTR( mediapackage_xml,
                         'http://presentation.opencast.example.com:80') > 0;
-        UPDATE opencast.mh_search
+        UPDATE opencast.oc_search
         SET mediapackage_xml =
            REPLACE( mediapackage_xml,
                     'http://presentation.opencast.example.com:80',
