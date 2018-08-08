@@ -284,8 +284,6 @@ public class ToolsEndpoint implements ManagedService {
                   @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
   public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId)
           throws IndexServiceException, NotFoundException {
-    if (!isEditorAvailable(mediaPackageId))
-      return R.notFound();
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
