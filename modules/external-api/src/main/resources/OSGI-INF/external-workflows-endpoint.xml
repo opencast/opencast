@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.external.endpoint.WorkflowsEndpoint"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.external.endpoint.WorkflowsEndpoint"/>
+  <property name="service.description" value="External API - Workflow Instances Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.external.workflows.instances"/>
+  <property name="opencast.service.path" value="/api/workflows"/>
+  <service>
+    <!-- expose interface for MH REST publisher! -->
+    <provide interface="org.opencastproject.external.endpoint.WorkflowsEndpoint"/>
+  </service>
+  <reference name="workflowService"
+             interface="org.opencastproject.workflow.api.WorkflowService"
+             cardinality="1..1"
+             policy="static"
+             bind="setWorkflowService"/>
+  <reference name="ExternalIndex"
+             interface="org.opencastproject.external.impl.index.ExternalIndex"
+             cardinality="1..1"
+             policy="static"
+             bind="setExternalIndex"/>
+  <reference name="IndexService"
+             interface="org.opencastproject.index.service.api.IndexService"
+             cardinality="1..1"
+             policy="static"
+             bind="setIndexService"/>
+</scr:component>

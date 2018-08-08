@@ -224,6 +224,8 @@
               OSGI-INF/external-index.xml,
               OSGI-INF/external-security-endpoint.xml,
               OSGI-INF/external-series-endpoint.xml,
+              OSGI-INF/external-workflow-definitions-endpoint.xml,
+              OSGI-INF/external-workflows-endpoint.xml,
               OSGI-INF/message-receiver-acl.xml,
               OSGI-INF/message-receiver-assetmanager.xml,
               OSGI-INF/message-receiver-comment.xml,
