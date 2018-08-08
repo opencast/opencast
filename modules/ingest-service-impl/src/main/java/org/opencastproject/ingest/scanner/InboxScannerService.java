@@ -36,6 +36,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -108,6 +109,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   private SecurityService securityService;
   private UserDirectoryService userDir;
   private OrganizationDirectoryService orgDir;
+  private SeriesService seriesService;
 
   private ComponentContext cc;
 
@@ -169,7 +171,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
       ingestor = some(new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
-            workflowConfig, mediaFlavor, inbox, maxthreads));
+            workflowConfig, mediaFlavor, inbox, maxthreads, seriesService));
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
@@ -196,7 +198,8 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       throw new Error("Cannot obtain a reference to the ConfigurationAdmin service");
     }
     final Dictionary<String, String> fileInstallConfig = dict(tuple("felix.fileinstall.dir", inbox.getAbsolutePath()),
-            tuple("felix.fileinstall.poll", Integer.toString(interval)));
+            tuple("felix.fileinstall.poll", Integer.toString(interval)),
+            tuple("felix.fileinstall.subdir.mode", "recurse"));
 
     // update file install config with the new directory
     try {
@@ -311,5 +314,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }
+  }
+
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 }

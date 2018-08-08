@@ -30,7 +30,11 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
@@ -69,6 +73,7 @@ public class Ingestor {
   private final File inbox;
 
   /** Thread pool to run the ingest worker. */
+  private final SeriesService seriesService;
   private final ExecutorService executorService;
 
   /**
@@ -93,7 +98,8 @@ public class Ingestor {
    *          maximum worker threads doing the actual ingest
    */
   public Ingestor(IngestService ingestService, WorkingFileRepository workingFileRepository, SecurityContext secCtx,
-      String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads) {
+          String workflowDefinition, Map<String, String> workflowConfig, String mediaFlavor, File inbox, int maxThreads,
+          SeriesService seriesService) {
     this.ingestService = ingestService;
     this.secCtx = secCtx;
     this.workflowDefinition = workflowDefinition;
@@ -101,6 +107,7 @@ public class Ingestor {
     this.mediaFlavor = MediaPackageElementFlavor.parseFlavor(mediaFlavor);
     this.inbox = inbox;
     this.executorService = Executors.newFixedThreadPool(maxThreads);
+    this.seriesService = seriesService;
   }
 
   /** Asynchronous ingest of an artifact. */
@@ -111,6 +118,7 @@ public class Ingestor {
 
   private Runnable getIngestRunnable(final File artifact) {
     return () -> secCtx.runInContext(() -> {
+      String seriesID = "";
       try (InputStream in = new FileInputStream(artifact)) {
         if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
           ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
@@ -121,9 +129,20 @@ public class Ingestor {
           ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
           logger.info("Added track to mediapackage for ingest from inbox");
 
+          /* Check if we have a subdir and if its name matches an existing series */
+          File dir = artifact.getParentFile();
+          if (dir.getCanonicalPath().length() > inbox.getCanonicalPath().length()) {
+            /* cut away inbox path and trailing slash from artifact path */
+            seriesID = dir.getCanonicalPath().substring(inbox.getCanonicalPath().length() + 1);
+            if (seriesService.getSeries(seriesID) != null) {
+              logger.info("Ingest from inbox into series with id {}", seriesID);
+            }
+          }
+
           /* Add title */
           DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
           dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
+          dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
           ByteArrayOutputStream dcout = new ByteArrayOutputStream();
           dcc.toXml(dcout, true);
           InputStream dcin = new ByteArrayInputStream(dcout.toByteArray());
@@ -134,6 +153,13 @@ public class Ingestor {
           ingestService.ingest(mp, workflowDefinition, workflowConfig);
           logger.info("Ingested {} from inbox", artifact.getName());
         }
+        in.close();
+      } catch (UnauthorizedException e) {
+        logger.warn("Not authorized to check if series with id {} exists", seriesID, e);
+      } catch (NotFoundException e) {
+        logger.warn("Could not find series with id {}", seriesID, e);
+      } catch (SeriesException e) {
+        logger.warn("Error while getting series with id {}", seriesID, e);
       } catch (IOException e) {
         logger.error("Error accessing inbox file '{}'", artifact.getName(), e);
       } catch (Exception e) {
@@ -147,17 +173,19 @@ public class Ingestor {
     });
   }
 
-  /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does
-   * not start with a ".". */
+  /**
+   * Return true if the passed artifact can be handled by this ingestor,
+   * false if not (e.g. it lies outside of inbox or its name starts with a ".")
+   */
   public boolean canHandle(final File artifact) {
     logger.debug("CanHandle {}, {}", myInfo(), artifact.getAbsolutePath());
     File dir = artifact.getParentFile();
     try {
-      return dir != null
-        && inbox.getCanonicalPath().equals(dir.getCanonicalPath())
-        && !artifact.getName().startsWith(".");
+      /* Stop if dir is empty, stop if artifact is dotfile, stop if artifact lives outside of inbox path */
+      return dir != null && !artifact.getName().startsWith(".")
+              && dir.getCanonicalPath().startsWith(inbox.getCanonicalPath());
     } catch (IOException e) {
-      logger.warn("Unable to determine canonical path of {} ", artifact.getAbsolutePath());
+      logger.warn("Unable to determine canonical path of {}", artifact.getAbsolutePath(), e);
       return false;
     }
   }
