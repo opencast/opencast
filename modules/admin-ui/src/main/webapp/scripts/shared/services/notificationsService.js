@@ -92,6 +92,18 @@ angular.module('adminNg.services')
             }
         };
 
+        scope.removeAll = function(context) {
+
+            if (!context) {
+                context = 'global';
+            }
+
+            delete keyList[context]
+            delete notifications[context]
+
+            scope.$emit('deleted', context);
+        }
+
         scope.addWithParams = function (type, key, messageParams, context, duration) {
             scope.add(type, key, context, duration, messageParams);
         };
