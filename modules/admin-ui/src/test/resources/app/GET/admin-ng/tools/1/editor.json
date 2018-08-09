@@ -7,17 +7,13 @@
   },
   "presenters":["somebody","somebody else","nobody","nobody else"],
   "previews": [{
-    "uri": "/admin-ng/resources/video/bubble.mp4"
+    "uri": "/admin-ng/resources/video/sunrise.mp4"
   }],
   "tracks": [{
     "id": "id-1",
     "flavor": "presenter\/audio",
     "mimetype": "audio\/mp3",
     "waveform": "/admin-ng/resources/img/waveform.png"
-  }, {
-    "id": "id-2",
-    "flavor": "presenter\/video",
-    "mimetype": "video\/mpeg"
   }],
   "segments": [{
     "start": 0,
