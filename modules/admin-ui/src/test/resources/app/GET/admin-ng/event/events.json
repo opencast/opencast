@@ -18,7 +18,6 @@
     "has_open_comments":false,
     "has_preview":false,
     "scheduling_status": "",
-    "source":"ARCHIVE",
     "review_status": "",
     "comments": {
       "resolved": 0,
@@ -46,7 +45,7 @@
     "technical_end": "2012-12-23T11:15:00Z",
     "workflow_state": "ARCHIVED",
     "has_open_comments":true,
-    "has_preview":true,
+    "has_preview": false,
     "scheduling_status": "",
     "review_status": "",
     "comments": {
@@ -62,7 +61,7 @@
     "presenters": ["John Doe"],
     "series": {
       "id": "11113d04-18a4-4327-9a61-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
+      "title": "Physics semester 2 with preview"
     },
     "location": "Auditorium",
     "start_date": "2012-11-01T14:30:00Z",
@@ -70,6 +69,7 @@
     "technical_start": "2012-11-01T14:30:00Z",
     "technical_end": "2012-11-01T15:45:00Z",
     "workflow_state": "processed",
+    "has_preview": true,
     "scheduling_status": "",
     "review_status": "",
     "comments": {
@@ -89,7 +89,7 @@
     "presenters": ["Chuck Norris"],
     "series": {
       "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
+      "title": "Physics semester 2 with preview"
     },
     "location": "Room 1",
     "start_date": "2012-12-01T08:30:00Z",
@@ -153,7 +153,7 @@
     "technical_start": "2012-12-01T08:30:00Z",
     "technical_end": "2012-12-01T08:30:00Z",
     "workflow_state": "ARCHIVED",
-    "has_preview":true,
+    "has_preview": false,
     "scheduling_status": "",
     "review_status": "",
     "comments": {
@@ -224,7 +224,7 @@
     "technical_start": "2012-12-01T08:30:00Z",
     "technical_end": "2012-12-01T08:30:00Z",
     "workflow_state": "ARCHIVED",
-    "has_preview":true,
+    "has_preview": false,
     "scheduling_status": "",
     "review_status": "",
     "comments": {
@@ -253,7 +253,7 @@
     "technical_end": "2012-12-01T08:30:00Z",
     "workflow_state": "",
     "scheduling_status": "",
-    "has_preview":true,
+    "has_preview": false,
     "review_status": "",
     "comments": {
       "resolved": 1,
