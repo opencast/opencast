@@ -32,12 +32,14 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.elasticsearch.common.lang3.StringUtils.isNoneBlank;
+import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.impl.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -51,6 +53,7 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -109,11 +112,8 @@ public class WorkflowsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
 
-  /** Default server URL */
-  protected String serverUrl = "http://localhost:8080";
-
-  /** Service url */
-  protected String serviceUrl;
+  /** Base URL of this endpoint */
+  private String endpointBaseUrl;
 
   /* OSGi service references */
   private WorkflowService workflowService;
@@ -139,16 +139,12 @@ public class WorkflowsEndpoint {
    * OSGi activation method
    */
   void activate(ComponentContext cc) {
-    this.serverUrl = "http://localhost:8080";
-    if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
-      if (ccServerUrl != null) {
-        logger.debug("Configured server url is {}", ccServerUrl);
-        this.serverUrl = ccServerUrl;
-      }
-    }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    logger.info("Activated External API - Workflow Instances Endpoint");
+    logger.info("Activating External API - Workflow Instances Endpoint");
+
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
+            RestConstants.SERVICE_PATH_PROPERTY);
+    endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
+    logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }
 
   @GET
@@ -336,19 +332,16 @@ public class WorkflowsEndpoint {
   @RestQuery(name = "createworkflowinstance", description = "Creates a workflow instance.", returnDescription = "", restParameters = {
           @RestParameter(name = "event_identifier", description = "The event identifier this workflow should run against", isRequired = true, type = STRING),
           @RestParameter(name = "workflow_definition_identifier", description = "The identifier of the workflow definition to use", isRequired = true, type = STRING),
-          @RestParameter(name = "parent_identifier", description = "The optional parent workflow identifier", isRequired = false, type = INTEGER),
           @RestParameter(name = "configuration", description = "The optional configuration for this workflow", isRequired = false, type = STRING),
           @RestParameter(name = "withoperations", description = "Whether the workflow operations should be included in the response", isRequired = false, type = BOOLEAN),
           @RestParameter(name = "withconfiguration", description = "Whether the workflow configuration should be included in the response", isRequired = false, type = BOOLEAN), }, reponses = {
           @RestResponse(description = "A new workflow is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The event, workflow definition or specified parent workflow could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "The event or workflow definition could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response createWorkflowInstance(@HeaderParam("Accept") String acceptHeader,
           @FormParam("event_identifier") String eventId,
           @FormParam("workflow_definition_identifier") String workflowDefinitionIdentifier,
-          @FormParam("parent_identifier") Long parentIdentifier, @FormParam("configuration") String configuration,
-          @QueryParam("withoperations") boolean withOperations,
+          @FormParam("configuration") String configuration, @QueryParam("withoperations") boolean withOperations,
           @QueryParam("withconfiguration") boolean withConfiguration) {
     if (isBlank(eventId)) {
       return RestUtil.R.badRequest("Required parameter 'event_identifier' is missing or invalid");
@@ -359,15 +352,6 @@ public class WorkflowsEndpoint {
     }
 
     try {
-      // Parent workflow
-      if (parentIdentifier != null) {
-        try {
-          workflowService.getWorkflowById(parentIdentifier);
-        } catch (NotFoundException e) {
-          return ApiResponses.notFound("Cannot find the parent workflow with id '%s'.", workflowDefinitionIdentifier);
-        }
-      }
-
       // Media Package
       Opt<Event> event = indexService.getEvent(eventId, externalIndex);
       if (event.isNone()) {
@@ -395,11 +379,12 @@ public class WorkflowsEndpoint {
       }
 
       // Start workflow
-      WorkflowInstance wi = workflowService.start(wd, mp, parentIdentifier, properties);
+      WorkflowInstance wi = workflowService.start(wd, mp, null, properties);
       return ApiResponses.Json.created(acceptHeader, URI.create(getWorkflowUrl(wi.getId())),
               workflowInstanceToJSON(wi, withOperations, withConfiguration));
-    } catch (UnauthorizedException e) {
-      return Response.status(Response.Status.FORBIDDEN).build();
+    } catch (IllegalStateException e) {
+      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+      return ApiResponses.Json.conflict(requestedVersion, obj(f("message", v(getMessage(e), BLANK))));
     } catch (Exception e) {
       logger.error("Could not create workflow instances: {}", getStackTrace(e));
       return ApiResponses.serverError("Could not create workflow instances, reason: '%s'", getMessage(e));
@@ -435,7 +420,7 @@ public class WorkflowsEndpoint {
 
   @PUT
   @Path("{workflowInstanceId}")
-  @RestQuery(name = "createworkflowinstance", description = "Creates a workflow instance.", returnDescription = "", pathParameters = {
+  @RestQuery(name = "updateworkflowinstance", description = "Creates a workflow instance.", returnDescription = "", pathParameters = {
           @RestParameter(name = "workflowInstanceId", description = "The workflow instance id", isRequired = true, type = INTEGER) }, restParameters = {
           @RestParameter(name = "configuration", description = "The optional configuration for this workflow", isRequired = false, type = STRING),
           @RestParameter(name = "state", description = "The optional state transition for this workflow", isRequired = false, type = STRING),
@@ -444,8 +429,8 @@ public class WorkflowsEndpoint {
           @RestResponse(description = "The workflow instance is updated.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The workflow instance or specified parent workflow could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader,
+          @RestResponse(description = "The workflow instance could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response updateWorkflowInstance(@HeaderParam("Accept") String acceptHeader,
           @PathParam("workflowInstanceId") Long id, @FormParam("configuration") String configuration,
           @FormParam("state") String stateStr, @QueryParam("withoperations") boolean withOperations,
           @QueryParam("withconfiguration") boolean withConfiguration) {
@@ -565,7 +550,6 @@ public class WorkflowsEndpoint {
     fields.add(f("title", v(wi.getTitle(), BLANK)));
     fields.add(f("description", v(wi.getDescription(), BLANK)));
     fields.add(f("workflow_definition_identifier", v(wi.getTemplate(), BLANK)));
-    fields.add(f("parent_identifier", v(wi.getParentId(), NULL)));
     fields.add(f("event_identifier", v(wi.getMediaPackage().getIdentifier().toString())));
     fields.add(f("creator", v(wi.getCreator().getName())));
     fields.add(f("state", enumToJSON(wi.getState())));
@@ -624,6 +608,6 @@ public class WorkflowsEndpoint {
   }
 
   private String getWorkflowUrl(long workflowInstanceId) {
-    return UrlSupport.concat(serverUrl, serviceUrl, Long.toString(workflowInstanceId));
+    return UrlSupport.concat(endpointBaseUrl, Long.toString(workflowInstanceId));
   }
 }

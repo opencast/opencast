@@ -129,6 +129,8 @@ public class TestEventsEndpoint extends EventsEndpoint {
   }
 
   public TestEventsEndpoint() throws Exception {
+    this.endpointBaseUrl = "https://api.opencast.org";
+
     ExternalIndex externalIndex = new ExternalIndex();
 
     IndexService indexService = EasyMock.createMock(IndexService.class);

@@ -72,6 +72,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   @SuppressWarnings("unchecked")
   public TestSeriesEndpoint() throws Exception {
 
+    this.endpointBaseUrl = "https://api.opencast.org";
+
     // Prepare mocked organization
     Organization org = createNiceMock(Organization.class);
     expect(org.getId()).andStubReturn("opencast");
@@ -145,6 +147,9 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     expect(indexService.getSeries("unknown-series-id", externalIndex)).andStubReturn(Opt.<Series> none());
     expect(indexService.getSeriesCatalogUIAdapters()).andStubReturn(adapters);
     expect(indexService.getCommonSeriesCatalogUIAdapter()).andStubReturn(commonAdapter);
+    expect(indexService
+            .createSeries(EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject()))
+            .andStubReturn("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f");
     expect(indexService.updateAllSeriesMetadata(EasyMock.anyString(), EasyMock.anyString(),
             EasyMock.anyObject(ExternalIndex.class))).andStubReturn(new MetadataList());
     indexService.removeCatalogByFlavor(series1, MediaPackageElementFlavor.parseFlavor("missing/series"));

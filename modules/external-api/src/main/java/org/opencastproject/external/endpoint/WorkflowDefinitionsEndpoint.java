@@ -109,7 +109,7 @@ public class WorkflowDefinitionsEndpoint {
    * OSGi activation method
    */
   void activate(ComponentContext cc) {
-    logger.info("Activated External API - Workflow Definitions Endpoint");
+    logger.info("Activating External API - Workflow Definitions Endpoint");
   }
 
   @GET

@@ -84,7 +84,6 @@ Field                            | Type                                         
 `operations`                     | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 `configuration`                  | [`property`](types.md#property)                            | The configuration for this workflow instance
 `workflow_definition_identifier` | [`string`](types.md#basic)                                 | The template of this workflow instance (i.e. the unique identifier of the workflow definition)
-`parent_identifier`              | [`integer`](types.md#basic)                                | The optional identifier of the parent workflow instance of this workflow instance
 `event_identifier`               | [`string`](types.md#basic)                                 | The id of the event this workflow instance belongs to
 `creator`                        | [`string`](types.md#basic)                                 | The name of the creator of this workflow instance
 
@@ -96,7 +95,6 @@ __Example__
 [
   {
     "workflow_definition_identifier": "fast",
-    "parent_identifier": null,
     "identifier": 1603,
     "creator": "Opencast Project Administrator",
     "operations": [
@@ -168,7 +166,6 @@ Form Parameters                  | Required |Type                             | 
 :--------------------------------|:---------|:--------------------------------|:-----------
 `event_identifier`               | yes      | [`string`](types.md#basic)      | The event identifier this workflow should run against
 `workflow_definition_identifier` | yes      | [`string`](types.md#basic)      | The identifier of the workflow definition to use
-`parent_identifier`              | no       | [`integer`](types.md#basic)     | The optional parent workflow identifier
 `configuration`                  | no       | [`property`](types.md#property) | The optional configuration for this workflow
 
 This request additionally supports the following query string parameters to include additional information directly in
@@ -189,11 +186,6 @@ f41e4417-b841-4d20-a466-f98ddfbe4c2a
 workflow\_definition\_identifier:
 ```
 fast
-```
-
-parent\_identifier:
-```
-3169
 ```
 
 configuration:
@@ -227,7 +219,6 @@ Field                 | Type                                                    
 `operations`          | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
-`403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
 `404 (NOT FOUND)`: The specified workflow instance does not exist.
 
 ### GET /api/workflows/{workflow_instance_id}
@@ -255,14 +246,13 @@ Field                 | Type                                                    
 `operations`          | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
-`404 (NOT FOUND)`: The event, workflow definition or specified parent workflow could not be found.
+`404 (NOT FOUND)`: The event or workflow definition could not be found.
 
 __Example__
 
 ```
 {
   "workflow_definition_identifier": "fast",
-  "parent_identifier": null,
   "identifier": 1603,
   "creator": "Opencast Project Administrator",
   "operations": [
@@ -389,7 +379,7 @@ Field                 | Type                                                    
 
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
-`404 (NOT FOUND)`: The workflow instance or specified parent workflow could not be found.
+`404 (NOT FOUND)`: The workflow instance could not be found.
 
 ### DELETE /api/workflows/{workflow_instance_id}
 
