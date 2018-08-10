@@ -21,7 +21,6 @@
 package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.ZERO;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
@@ -113,7 +112,7 @@ public class WorkflowsEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
 
   /** Base URL of this endpoint */
-  private String endpointBaseUrl;
+  protected String endpointBaseUrl;
 
   /* OSGi service references */
   private WorkflowService workflowService;
@@ -296,8 +295,8 @@ public class WorkflowsEndpoint {
             query.withSort(WorkflowQuery.Sort.WORKFLOW_DEFINITION_ID, isASC);
             break;
           default:
-            return RestUtil.R
-                    .badRequest(String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
+            return RestUtil.R.badRequest(
+                    String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
         }
       }
     }
@@ -322,7 +321,8 @@ public class WorkflowsEndpoint {
     }
 
     List<JValue> json = Arrays.stream(workflowInstances.getItems())
-            .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration)).collect(Collectors.toList());
+                              .map(wi -> workflowInstanceToJSON(wi, withOperations, withConfiguration))
+                              .collect(Collectors.toList());
 
     return ApiResponses.Json.ok(acceptHeader, arr(json));
   }
@@ -554,12 +554,16 @@ public class WorkflowsEndpoint {
     fields.add(f("creator", v(wi.getCreator().getName())));
     fields.add(f("state", enumToJSON(wi.getState())));
     if (withOperations) {
-      fields.add(f("operations", arr(wi.getOperations().stream().map(this::workflowOperationInstanceToJSON)
-              .collect(Collectors.toList()))));
+      fields.add(f("operations", arr(wi.getOperations()
+                                       .stream()
+                                       .map(this::workflowOperationInstanceToJSON)
+                                       .collect(Collectors.toList()))));
     }
     if (withConfiguration) {
-      fields.add(f("configuration", obj(wi.getConfigurationKeys().stream().map(key -> f(key, wi.getConfiguration(key)))
-              .collect(Collectors.toList()))));
+      fields.add(f("configuration", obj(wi.getConfigurationKeys()
+                                          .stream()
+                                          .map(key -> f(key, wi.getConfiguration(key)))
+                                          .collect(Collectors.toList()))));
     }
 
     return obj(fields);
@@ -579,12 +583,14 @@ public class WorkflowsEndpoint {
     fields.add(f("if", v(woi.getExecutionCondition(), BLANK)));
     fields.add(f("unless", v(woi.getSkipCondition(), BLANK)));
     fields.add(f("fail_workflow_on_error", v(woi.isFailWorkflowOnException())));
-    fields.add(f("exception_handler_workflow", v(woi.getExceptionHandlingWorkflow(), BLANK)));
+    fields.add(f("error_handler_workflow", v(woi.getExceptionHandlingWorkflow(), BLANK)));
     fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(woi.getRetryStrategy()), BLANK)));
     fields.add(f("max_attempts", v(woi.getMaxAttempts())));
     fields.add(f("failed_attempts", v(woi.getFailedAttempts())));
-    fields.add(f("configuration", obj(woi.getConfigurationKeys().stream().map(key -> f(key, woi.getConfiguration(key)))
-            .collect(Collectors.toList()))));
+    fields.add(f("configuration", obj(woi.getConfigurationKeys()
+                                         .stream()
+                                         .map(key -> f(key, woi.getConfiguration(key)))
+                                         .collect(Collectors.toList()))));
     if (woi.getDateStarted() != null) {
       fields.add(f("start", v(dateFormatter.format(woi.getDateStarted().toInstant().atZone(UTC)))));
     } else {

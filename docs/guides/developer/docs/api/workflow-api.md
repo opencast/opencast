@@ -119,7 +119,7 @@ __Example__
         "operation": "defaults",
         "if": "",
         "retry_strategy": "none",
-        "exception_handler_workflow": ""
+        "error_handler_workflow": ""
       },
       {
         "identifier": 1605,
@@ -138,7 +138,7 @@ __Example__
         "operation": "series",
         "if": "",
         "retry_strategy": "none",
-        "exception_handler_workflow": "partial-error"
+        "error_handler_workflow": "partial-error"
       }
       ...
     ],
@@ -277,7 +277,7 @@ __Example__
       "operation": "defaults",
       "if": "",
       "retry_strategy": "none",
-      "exception_handler_workflow": ""
+      "error_handler_workflow": ""
     },
     {
       "identifier": 1605,
@@ -296,7 +296,7 @@ __Example__
       "operation": "series",
       "if": "",
       "retry_strategy": "none",
-      "exception_handler_workflow": "partial-error"
+      "error_handler_workflow": "partial-error"
     }
     ...
   ],
@@ -478,7 +478,7 @@ __Example__
         "unless": "",
         "if": "",
         "fail_workflow_on_error": "true",
-        "exception_handler_workflow": "",
+        "error_handler_workflow": "",
         "retry_strategy": "none",
         "max_attempts": "1"
       },
@@ -491,7 +491,7 @@ __Example__
         "unless": "",
         "if": "",
         "fail_workflow_on_error": "true",
-        "exception_handler_workflow": "partial_error",
+        "error_handler_workflow": "partial_error",
         "retry_strategy": "none",
         "max_attempts": "1"
       }
@@ -554,7 +554,7 @@ __Example__
       "unless": "",
       "if": "",
       "fail_workflow_on_error": "true",
-      "exception_handler_workflow": "",
+      "error_handler_workflow": "",
       "retry_strategy": "none",
       "max_attempts": "1"
     },
@@ -567,7 +567,7 @@ __Example__
       "unless": "",
       "if": "",
       "fail_workflow_on_error": "true",
-      "exception_handler_workflow": "partial_error",
+      "error_handler_workflow": "partial_error",
       "retry_strategy": "none",
       "max_attempts": "1"
     }

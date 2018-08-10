@@ -185,8 +185,8 @@ public class WorkflowDefinitionsEndpoint {
             });
             break;
           default:
-            return RestUtil.R
-                    .badRequest(String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
+            return RestUtil.R.badRequest(
+                    String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
         }
       }
     }
@@ -204,9 +204,8 @@ public class WorkflowDefinitionsEndpoint {
       workflowDefinitions = workflowDefinitions.limit(limit);
     }
 
-    List<JValue> json = workflowDefinitions
-            .map(wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel))
-            .collect(Collectors.toList());
+    List<JValue> json = workflowDefinitions.map(
+            wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel)).collect(Collectors.toList());
 
     return ApiResponses.Json.ok(acceptHeader, arr(json));
   }
@@ -241,11 +240,13 @@ public class WorkflowDefinitionsEndpoint {
     fields.add(f("description", v(wd.getDescription(), BLANK)));
     fields.add(f("tags", arr(Arrays.stream(wd.getTags()).map(Jsons::v).collect(Collectors.toList()))));
     if (withConfigurationPanel) {
-      fields.add(f("configuration_panel", v(wd.getDescription(), BLANK)));
+      fields.add(f("configuration_panel", v(wd.getConfigurationPanel(), BLANK)));
     }
     if (withOperations) {
-      fields.add(f("operations", arr(wd.getOperations().stream().map(this::workflowOperationDefinitionToJSON)
-              .collect(Collectors.toList()))));
+      fields.add(f("operations", arr(wd.getOperations()
+                                       .stream()
+                                       .map(this::workflowOperationDefinitionToJSON)
+                                       .collect(Collectors.toList()))));
     }
 
     return obj(fields);
@@ -256,12 +257,14 @@ public class WorkflowDefinitionsEndpoint {
 
     fields.add(f("operation", v(wod.getId())));
     fields.add(f("description", v(wod.getDescription(), BLANK)));
-    fields.add(f("configuration", obj(wod.getConfigurationKeys().stream().map(key -> f(key, wod.getConfiguration(key)))
-            .collect(Collectors.toList()))));
+    fields.add(f("configuration", obj(wod.getConfigurationKeys()
+                                         .stream()
+                                         .map(key -> f(key, wod.getConfiguration(key)))
+                                         .collect(Collectors.toList()))));
     fields.add(f("if", v(wod.getExecutionCondition(), BLANK)));
     fields.add(f("unless", v(wod.getSkipCondition(), BLANK)));
     fields.add(f("fail_workflow_on_error", v(wod.isFailWorkflowOnException())));
-    fields.add(f("exception_handler_workflow", v(wod.getExceptionHandlingWorkflow(), BLANK)));
+    fields.add(f("error_handler_workflow", v(wod.getExceptionHandlingWorkflow(), BLANK)));
     fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(wod.getRetryStrategy()), BLANK)));
     fields.add(f("max_attempts", v(wod.getMaxAttempts())));
 
