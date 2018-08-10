@@ -68,7 +68,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -888,7 +887,7 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope) {
+    public Tuple<AccessControlList, AclScope> getAcl(MediaPackage mp, AclScope scope) {
       return null;
     }
 

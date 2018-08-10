@@ -50,13 +50,10 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Option.Match;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +61,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -94,24 +89,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
   @Override
   public Tuple<AccessControlList, AclScope> getActiveAcl(final MediaPackage mp) {
     logger.debug("getActiveACl for media package {}", mp.getIdentifier());
-    return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
-      @Override
-      public Tuple<AccessControlList, AclScope> apply() {
-        // has an episode ACL?
-        Option<AccessControlList> episode = getAcl(mp, list(XACML_POLICY_EPISODE));
-        if (episode.isSome()) {
-          logger.debug("Found event ACL for mediapackage {}", mp.getIdentifier());
-          return tuple(episode.get(), AclScope.Episode);
-        }
-        Option<AccessControlList> series = getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
-        if (series.isSome()) {
-          logger.debug("Found series ACL for mediapackage {}", mp.getIdentifier());
-          return tuple(series.get(), AclScope.Series);
-        }
-        logger.debug("Found neither event nor series ACL for mediapackage {}", mp.getIdentifier());
-        return getDefaultAcl(mp);
-      }
-    });
+    return getAcl(mp, AclScope.Episode);
   }
 
   /** Returns an ACL based on a given file/inputstream. */
@@ -124,52 +102,33 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
   }
 
-  private Tuple<AccessControlList, AclScope> getDefaultAcl(final MediaPackage mp) {
-    logger.debug("Get default ACL for media package {}", mp.getIdentifier());
-    if (StringUtils.isNotBlank(mp.getSeries())) {
-      logger.debug("Falling back to acl from series {} for media package {}", mp.getSeries(), mp.getIdentifier());
-      try {
-        return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
-      } catch (Exception e) {
-        logger.debug("Unable to get acl from series '{}'", mp.getSeries());
-      }
-    }
-    logger.trace("Falling back to global default acl for media package '{}'", mp.getIdentifier());
-    return tuple(new AccessControlList(), AclScope.Global);
-  }
-
   @Override
-  @SuppressWarnings("unchecked")
-  public Option<AccessControlList> getAcl(final MediaPackage mp, final AclScope scope) {
-    return withContextClassLoader(new Function0<Option<AccessControlList>>() {
-      @Override
-      public Option<AccessControlList> apply() {
-        switch (scope) {
-          case Episode:
-            return getAcl(mp, list(XACML_POLICY_EPISODE)).orElse(new Function0<Option<AccessControlList>>() {
-              @Override
-              public Option<AccessControlList> apply() {
-                return getAcl(mp, list(XACML_POLICY_SERIES)).fold(
-                        new Match<AccessControlList, Option<AccessControlList>>() {
-                          @Override
-                          public Option<AccessControlList> some(AccessControlList a) {
-                            return Option.<AccessControlList> none();
-                          }
+  public Tuple<AccessControlList, AclScope> getAcl(final MediaPackage mp, final AclScope scope) {
+    List<Tuple<AclScope, MediaPackageElementFlavor>> scopes = new ArrayList<>(3);
 
-                          @Override
-                          public Option<AccessControlList> none() {
-                            return getAcl(mp, list(XACML_POLICY));
-                          }
-                        });
-              }
-            });
-          case Series:
-            return getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
-          default:
-            throw new NotImplementedException("AclScope " + scope + " has not been implemented yet!");
+    // Start with the requested scope but fall back to the less specific scope if it does not exist.
+    // The order is: episode -> series -> general (deprecated) -> global
+    if (AclScope.Episode.equals(scope)) {
+      scopes.add(tuple(AclScope.Episode, XACML_POLICY_EPISODE));
+    }
+    if (AclScope.Episode.equals(scope) || AclScope.Series.equals(scope)) {
+      scopes.add(tuple(AclScope.Series, XACML_POLICY_SERIES));
+    }
+
+    // hint: deprecated global flavor
+    scopes.add(tuple(AclScope.Series, XACML_POLICY));
+
+    for (Tuple<AclScope, MediaPackageElementFlavor> currentScope: scopes) {
+      for (Attachment xacml : mp.getAttachments(currentScope.getB())) {
+        Option<AccessControlList> acl = loadAcl(xacml.getURI());
+        if (acl.isSome()) {
+          return tuple(acl.get(), currentScope.getA());
         }
       }
-    });
+    }
+
+    logger.debug("Falling back to global default ACL");
+    return tuple(new AccessControlList(), AclScope.Global);
   }
 
   @Override
@@ -303,31 +262,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
       default:
         return unexhaustiveMatch();
     }
-  }
-
-  /** Get the ACL of the given flavor from a media package. */
-  private Option<AccessControlList> getAcl(final MediaPackage mp, final List<MediaPackageElementFlavor> flavors) {
-
-    Option<AccessControlList> result = Option.none();
-
-    Set<Attachment> attachments = new HashSet<>();
-    for (MediaPackageElementFlavor flavor : flavors) {
-      Attachment[] attachmentsArray = mp.getAttachments(flavor);
-      attachments.addAll(Arrays.asList(attachmentsArray));
-    }
-
-    if (attachments.size() == 1) {
-      logger.debug("One security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-      for (Attachment attachment : attachments) {
-        result = loadAcl(attachment.getURI());
-      }
-    } else if (attachments.size() < 1) {
-      logger.debug("No security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-    } else if (attachments.size() > 1) {
-      logger.warn("More than one security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-    }
-
-    return result;
   }
 
   /**
