@@ -47,7 +47,7 @@ all pull requests are to ensure that:
 * An upgrade path exists (usually relevant for database changes)
 
 
-The exact review process heavily depends on the type, size and purpose of the pull request. 
+The exact review process heavily depends on the type, size and purpose of the pull request.
 
 Here are some things a reviewer should usually do:
 
