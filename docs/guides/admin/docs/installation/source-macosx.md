@@ -2,7 +2,7 @@ Install from Source (Mac OS X)
 ====================================
 
 These instructions outline how to install an all in one Opencast system on the Mac OS X operating system.
-Tested on OS X 10.9 Mavericks.
+Tested on OS X 10.13.6 High Sierra.
 
 > *The installation on Mac OS X is not officially supported. Use this at your own risk.*
 
@@ -49,6 +49,8 @@ Required:
     ffmpeg >= 3.2.4
     maven >= 3.1
 
+(If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin](https://stackoverflow.com/a/37466252).)
+
 Required (not necessarily on the same machine):
 
     ActiveMQ >= 5.10 (older versions untested)
@@ -84,7 +86,7 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
     brew install tesseract
     brew install hunspell
-    brew install sox --with-lame --with-flac --with-libvorbis
+    brew install sox
 
 #### Using pre-built binaries
 
