@@ -306,14 +306,6 @@
                 "value": "00:00:00"
             },
             {
-                "id": "agent",
-                "label": "EVENTS.EVENTS.DETAILS.METADATA.AGENT",
-                "readOnly": false,
-                "required": false,
-                "type": "text",
-                "value": ""
-            },
-            {
                 "id": "source",
                 "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
                 "readOnly": false,
@@ -339,7 +331,7 @@
             },
             {
                 "id": "uid",
-                "label": "EVENTS.EVENTS.DETAILS.METADATA.UID",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
                 "readOnly": true,
                 "required": false,
                 "type": "text",

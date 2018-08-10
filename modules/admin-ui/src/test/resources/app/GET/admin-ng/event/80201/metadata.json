@@ -11,7 +11,7 @@
           "readOnly": false
         }, {
           "id": "uid",
-          "label": "EVENTS.EVENTS.DETAILS.METADATA.UID",
+          "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
           "value": "78753d04-18a4-4327-9a61-b6d93816a7d2",
           "type": "text",
           "readOnly": true
@@ -86,16 +86,6 @@
           "value": "01:05:00",
           "type": "text",
           "readOnly": true
-        }, {
-          "id": "agent",
-          "label": "EVENTS.EVENTS.DETAILS.METADATA.AGENT",
-          "value": "epi001",
-          "type": "text",
-          "collection": {
-            "ahg008": "AHG 008",
-            "epi001": "EPI 001"
-          },
-          "readOnly": false
         }, {
           "id": "source",
           "label": "EVENTS.EVENTS.DETAILS.METADATA.SOURCE",
