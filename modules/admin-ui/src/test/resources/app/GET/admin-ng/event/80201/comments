@@ -1,0 +1,18 @@
+[
+   {
+      "reason":"EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING",
+      "resolvedStatus":false,
+      "modificationDate":"2018-07-12T09:44:41Z",
+      "replies":[
+
+      ],
+      "author":{
+         "name":"Capture Agent",
+         "email":null,
+         "username":"ca-switch-ch"
+      },
+      "id":1132804,
+      "text":"This event has been marked for cutting.",
+      "creationDate":"2018-07-12T09:44:41Z"
+   }
+]

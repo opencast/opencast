@@ -70,6 +70,9 @@
     "technical_end": "2012-11-01T15:45:00Z",
     "workflow_state": "processed",
     "has_preview": true,
+    "has_comments": true,
+    "has_open_comments": true,
+    "needs_cutting": true,
     "scheduling_status": "",
     "review_status": "",
     "comments": {
