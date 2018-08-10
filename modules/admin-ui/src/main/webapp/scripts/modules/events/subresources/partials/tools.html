@@ -43,6 +43,8 @@
             </div>
         </div>
         <div data-admin-ng-notifications=""></div>
+        <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
+
         <div class="tab-menu">
             <nav class="view-controller">
                 <a ng-class="{active: tab === 'playback'}"
@@ -84,7 +86,6 @@
 
                 <div ng-if="area === 'metadata'">
                   <div class="area-body">
-                      <div data-admin-ng-notifications="" context="events-access"></div>
                       <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
                       <div class="full-col">
                           <div class="obj tbl-details">
@@ -106,7 +107,6 @@
                 </div>
                 <div ng-if="area === 'comments'">
                   <div class="area-body">
-                      <div data-admin-ng-notifications="" context="events-access"></div>
                       <div class="full-col">
                           <div class="obj comments">
                               <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
