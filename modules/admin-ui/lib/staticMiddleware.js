@@ -62,6 +62,10 @@ module.exports = function (grunt, appPath) {
                 serveStatic('src/main/webapp/scripts/shared')
               ),
               connect().use(
+                '/services',
+                serveStatic('./src/test/resources/app/GET/services')
+              ),
+              connect().use(
                 '/public',
                 serveStatic('src/main/resources/public/')
               ),
