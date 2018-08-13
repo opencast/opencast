@@ -1,0 +1,12 @@
+{
+  "reference":"",
+  "size":0,
+  "checksum":"1d032d6a5a09bac5053052d640c85a2d",
+  "mimetype":"text\/xml",
+  "id":"security-policy-episode",
+  "type":"security\/xacml+episode",
+  "url":"http:\/\/localhost:8080\/assets\/assets\/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a\/security-policy-episode\/1\/xacml.xml",
+  "tags":[
+    "archive"
+  ]
+}
