@@ -53,7 +53,7 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
   private static final Logger logger = LoggerFactory.getLogger(TieredStorageAssetManagerJobProducer.class);
 
   public static final String JOB_TYPE = "org.opencastproject.assetmanager";
-  public static final Float JOB_LOAD = 1.0f;
+  public static final Float JOB_LOAD = 0.1f;
   public static final Float NONTERMINAL_JOB_LOAD = 0.1f;
 
   public enum Operation {
