@@ -225,7 +225,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           description = "There has been an internal error, and the job was not created",
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
-  public Response moveByIdAndVersion(@FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
+  public Response moveByDate(@FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
     Date start = new Date(startInt);
     Date end = new Date(endInt);
 
@@ -289,7 +289,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           description = "There has been an internal error, and the job was not created",
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
-  public Response moveByIdAndVersion(@FormParam("id") final String id, @FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
+  public Response moveByIdAndDate(@FormParam("id") final String id, @FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
     final String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {
       return badRequest("Invalid mediapackage ID: " + mpid);
