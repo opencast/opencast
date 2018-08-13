@@ -131,36 +131,70 @@ describe('adminNg.directives.adminNgTableFilter', function () {
 
         describe('with only the from date', function () {
 
-            it('does not set a filter value', function () {
-                var filter = { period: { from: 'from-date' } };
+            var filter;
+
+            beforeEach(function () {
+                filter = { period: { from: 'from-date' } };
                 spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue(filter);
+                element.find('div').scope().selectFilterPeriodValue(filter, 'from', 'to');
+            });
+
+            it('does not set a filter value', function () {
                 expect(Storage.put).not.toHaveBeenCalled();
+            });
+
+            it('pre-fills to date', function () {
+                expect(filter.period.to).toEqual(filter.period.from);
+                expect(filter.prefilled.from).toBe(false);
+                expect(filter.prefilled.to).toBe(true);
             });
         });
 
         describe('with only the to date', function () {
 
-            it('does not set a filter value', function () {
-                var filter = { period: { to: 'to-date' } };
+            var filter;
+
+            beforeEach(function() {
+                filter = { period: { to: 'to-date' } };
                 spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue(filter);
+                element.find('div').scope().selectFilterPeriodValue(filter, 'to', 'from');
+            });
+
+            it('does not set a filter value', function () {
                 expect(Storage.put).not.toHaveBeenCalled();
+            });
+
+            it('pre-fills from date', function () {
+                expect(filter.period.from).toEqual(filter.period.to);
+                expect(filter.prefilled.to).toBe(false);
+                expect(filter.prefilled.from).toBe(true);
             });
         });
 
         describe('with both from- and to dates', function () {
 
+            var filter, fromDate, toDate;
+
+            beforeEach(function() {
+                fromDate = new Date('2015-01-01');
+                toDate = new Date('2015-01-02');
+                filter = { period: { type: "period", from: fromDate, to: toDate } };
+                spyOn(Storage, 'put');
+                element.find('div').scope().selectFilterPeriodValue(filter, 'from', 'to');
+            });
+
+            it('does not pre-fill dates', function () {
+                expect(filter.prefilled.to).toBe(false);
+                expect(filter.prefilled.from).toBe(false);
+            })
+
             it('sets the time period filter value', function () {
-                var fromDate = new Date('2015-01-01');
-                var toDate = new Date('2015-01-02');
-                var filter = { period: { type: "period", from: fromDate, to: toDate } };
+
                 var expectedFromDate = new Date(fromDate);
                 expectedFromDate.setHours(0, 0, 0, 0);
                 var expectedToDate = new Date(toDate);
                 expectedToDate.setHours(23, 59, 59, 999);
-                spyOn(Storage, 'put');
-                element.find('div').scope().selectFilterPeriodValue(filter);
+
                 expect(Storage.put).toHaveBeenCalledWith('filter', 'furniture', undefined, expectedFromDate.toISOString() + '/' + expectedToDate.toISOString());
             });
         });
