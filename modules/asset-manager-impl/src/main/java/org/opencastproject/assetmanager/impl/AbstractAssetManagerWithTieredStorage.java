@@ -141,9 +141,8 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
           String intermediateStore = getLocalAssetStore().getStoreType();
           logger.debug(format("Moving {} from {} to {}, then to {}",
                   s.toString(), currentStoreId, intermediateStore, targetStoreId));
-          Snapshot snap = record.getSnapshot().get();
-          Version version = snap.getVersion();
-          String mpId = snap.getMediaPackage().getIdentifier().toString();
+          Version version = s.getVersion();
+          String mpId = s.getMediaPackage().getIdentifier().toString();
           try {
             moveSnapshotToStore(version, mpId, intermediateStore);
             moveSnapshotToStore(version, mpId, targetStoreId);

@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
@@ -100,8 +99,6 @@ public class TieredStorageAssetManagerJobProducer extends AbstractJobProducer {
     VersionImpl version;
     Date start;
     Date end;
-    boolean bypass;
-    Set<Job> subjobs;
     try {
       op = Operation.valueOf(operation);
       switch (op) {
