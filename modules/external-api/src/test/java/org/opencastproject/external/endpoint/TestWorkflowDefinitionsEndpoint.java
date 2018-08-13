@@ -27,7 +27,6 @@ import static org.easymock.EasyMock.replay;
 import org.opencastproject.workflow.api.RetryStrategy;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowOperationDefinition;
-import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.google.common.collect.Lists;
@@ -42,7 +41,7 @@ import javax.ws.rs.Path;
 public class TestWorkflowDefinitionsEndpoint extends WorkflowDefinitionsEndpoint {
 
   public TestWorkflowDefinitionsEndpoint() throws Exception {
-    WorkflowOperationDefinition wod1 = createNiceMock(WorkflowOperationDefinitionImpl.class);
+    WorkflowOperationDefinition wod1 = createNiceMock(WorkflowOperationDefinition.class);
     expect(wod1.getId()).andReturn("my-op");
     expect(wod1.getDescription()).andReturn("Example Operation");
     expect(wod1.getExceptionHandlingWorkflow()).andReturn("fail");
@@ -55,7 +54,7 @@ public class TestWorkflowDefinitionsEndpoint extends WorkflowDefinitionsEndpoint
     expect(wod1.getConfiguration("foo")).andReturn("bar");
     replay(wod1);
 
-    WorkflowOperationDefinition wod2 = createNiceMock(WorkflowOperationDefinitionImpl.class);
+    WorkflowOperationDefinition wod2 = createNiceMock(WorkflowOperationDefinition.class);
     expect(wod2.getId()).andReturn("my-op2");
     expect(wod2.getDescription()).andReturn("Example Operation2");
     expect(wod2.getSkipCondition()).andReturn("${letfail}");

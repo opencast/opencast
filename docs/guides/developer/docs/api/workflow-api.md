@@ -100,6 +100,7 @@ __Example__
     "operations": [
       {
         "identifier": 1604,
+        "completion": "2018-08-08T08:46:57.3Z",
         "configuration": {
           "publishLive": "false",
           "uploadedSearchPreview": "false",
@@ -109,7 +110,7 @@ __Example__
         },
         "time_in_queue": 0,
         "failed_attempts": 0,
-        "start": "2018-08-08T08:46:57.3Z",
+        "start": "2018-08-08T08:46:57.201Z",
         "description": "Applying default configuration values",
         "fail_workflow_on_error": true,
         "unless": "",
@@ -123,12 +124,13 @@ __Example__
       },
       {
         "identifier": 1605,
+        "completion": "",
         "configuration": {
           "apply-acl": "true"
         },
         "time_in_queue": 0,
         "failed_attempts": 0,
-        "start": "",
+        "start": "2018-08-08T08:47:02.209Z",
         "description": "Applying access control entries from series",
         "fail_workflow_on_error": true,
         "unless": "",
@@ -258,6 +260,7 @@ __Example__
   "operations": [
     {
       "identifier": 1604,
+      "completion": "2018-08-08T08:46:57.3Z",
       "configuration": {
         "publishLive": "false",
         "uploadedSearchPreview": "false",
@@ -267,7 +270,7 @@ __Example__
       },
       "time_in_queue": 0,
       "failed_attempts": 0,
-      "start": "2018-08-08T08:46:57.3Z",
+      "start": "2018-08-08T08:46:57.201Z",
       "description": "Applying default configuration values",
       "fail_workflow_on_error": true,
       "unless": "",
@@ -281,12 +284,13 @@ __Example__
     },
     {
       "identifier": 1605,
+      "completion": "",
       "configuration": {
         "apply-acl": "true"
       },
       "time_in_queue": 0,
       "failed_attempts": 0,
-      "start": "",
+      "start": "2018-08-08T08:47:02.209Z",
       "description": "Applying access control entries from series",
       "fail_workflow_on_error": true,
       "unless": "",

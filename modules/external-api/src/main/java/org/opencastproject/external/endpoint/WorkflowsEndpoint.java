@@ -597,9 +597,9 @@ public class WorkflowsEndpoint {
       fields.add(f("start", BLANK));
     }
     if (woi.getDateCompleted() != null) {
-      fields.add(f("start", v(dateFormatter.format(woi.getDateCompleted().toInstant().atZone(UTC)))));
+      fields.add(f("completion", v(dateFormatter.format(woi.getDateCompleted().toInstant().atZone(UTC)))));
     } else {
-      fields.add(f("start", BLANK));
+      fields.add(f("completion", BLANK));
     }
 
     return obj(fields);
