@@ -38,13 +38,14 @@ public interface TieredStorageAssetManager extends AssetManager {
   Set<String> getRemoteAssetStoreIds();
 
   void addRemoteAssetStore(RemoteAssetStore assetStore);
+
   void removeRemoteAssetStore(RemoteAssetStore assetStore);
+
   Opt<AssetStore> getRemoteAssetStore(String id);
 
   Opt<AssetStore> getAssetStore(String storeId);
 
-  void moveSnapshotToStore(Version version, String mpId, String storeId)
-          throws NotFoundException;
+  void moveSnapshotToStore(Version version, String mpId, String storeId) throws NotFoundException;
 
   /**
    * Returns a stream of {@link RichAResult} filtered by mediapackage IDs
@@ -89,8 +90,7 @@ public interface TieredStorageAssetManager extends AssetManager {
    *   The store ID to move this version of the mediapackage to
    * @throws NotFoundException
    */
-  void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore)
-          throws NotFoundException;
+  void moveSnapshotsByIdAndVersion(String mpId, Version version, String targetStore) throws NotFoundException;
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all versions of all mediapackages
@@ -116,8 +116,7 @@ public interface TieredStorageAssetManager extends AssetManager {
    *   THe store ID to move the snapshots to
    * @throws NotFoundException
    */
-  void moveSnapshotsByDate(Date start, Date end, String targetStore)
-          throws NotFoundException;
+  void moveSnapshotsByDate(Date start, Date end, String targetStore) throws NotFoundException;
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date and mediapackage. This stream consists of all versions of
@@ -147,8 +146,7 @@ public interface TieredStorageAssetManager extends AssetManager {
    *   THe store ID to move the snapshots to
    * @throws NotFoundException
    */
-  void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore)
-          throws NotFoundException;
+  void moveSnapshotsByIdAndDate(String mpId, Date start, Date end, String targetStore) throws NotFoundException;
 
   Opt<String> getSnapshotStorageLocation(Version version, String mpId) throws NotFoundException;
 

@@ -310,7 +310,8 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
     return !isLocalAssetStoreId(storeId);
   }
 
-  @Override public Opt<Asset> getAsset(Version version, final String mpId, final String mpeId) {
+  @Override
+  public Opt<Asset> getAsset(Version version, final String mpId, final String mpeId) {
     // try to fetch the asset
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
       for (final String storageId : getSnapshotStorageLocation(version, mpId)) {

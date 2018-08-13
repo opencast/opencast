@@ -119,7 +119,8 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
       return badRequest("Target store " + trimmedTarget + " not found");
     }
     return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
+      @Override
+      public Response get1() {
         Job j = tsamjp.moveById(mpid, trimmedTarget);
         return Response.ok(new JaxbJob(j)).build();
       }
@@ -182,7 +183,8 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
     }
 
     return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
+      @Override
+      public Response get1() {
         Job j = tsamjp.moveByIdAndVersion(v, mpid, trimmedTarget);
         return ok(new JaxbJob(j));
       }
@@ -239,7 +241,8 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
     }
 
     return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
+      @Override
+      public Response get1() {
         Job j = tsamjp.moveByDate(start, end, trimmedTarget);
         return ok(new JaxbJob(j));
       }
@@ -307,7 +310,8 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
     }
 
     return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
+      @Override
+      public Response get1() {
         Job j = tsamjp.moveByIdAndDate(mpid, start, end, trimmedTarget);
         return ok(new JaxbJob(j));
       }
