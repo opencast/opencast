@@ -51,8 +51,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManagerFactory;
@@ -76,7 +74,6 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   private MessageSender messageSender;
   private MessageReceiver messageReceiver;
   private EntityManagerFactory emf;
-  private List<RemoteAssetStore> remotes = new LinkedList<>();
 
   // collect all objects that need to be closed on service deactivation
   private AutoCloseable toClose;
@@ -153,10 +150,6 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
             systemUserName);
     // compose with security
     delegate = new AssetManagerWithSecurity(withMessaging, authSvc, secSvc);
-    for (RemoteAssetStore ras : remotes) {
-      delegate.addRemoteAssetStore(ras);
-    }
-    remotes.clear();
     // collect all objects that need to be closed
     toClose = new AutoCloseable() {
       @Override
@@ -239,19 +232,11 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   public void addRemoteAssetStore(RemoteAssetStore assetStore) {
-    if (null == delegate) {
-      remotes.add(assetStore);
-    } else {
-      delegate.addRemoteAssetStore(assetStore);
-    }
+    delegate.addRemoteAssetStore(assetStore);
   }
 
   public void removeRemoteAssetStore(RemoteAssetStore assetStore) {
-    if (null != delegate) {
-      delegate.removeRemoteAssetStore(assetStore);
-    } else {
-      logger.warn("Unable to remove remote store of type {} because delegate is null!", assetStore.getStoreType());
-    }
+    delegate.removeRemoteAssetStore(assetStore);
   }
 
   public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
