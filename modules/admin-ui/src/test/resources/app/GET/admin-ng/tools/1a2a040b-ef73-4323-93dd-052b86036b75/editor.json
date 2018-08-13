@@ -1,0 +1,36 @@
+{
+  "date": "2018-08-10T12:39:02Z",
+  "duration": 23857,
+  "series": {
+    "id": "",
+    "title": ""
+  },
+  "presenters": [
+    "Usain Unpublished"
+  ],
+  "previews": [
+    {
+      "uri": "/admin-ng/resources/video/sunrise.mp4",
+      "frameRate": 29.97003
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Publish",
+      "id": "publish-after-cutting"
+    },
+    {
+      "name": "Trim and Encode to 3 delivery formats without theme ",
+      "id": "publish-after-cutting-process-smil"
+    }
+  ],
+  "title": "Mock Event Unpublished",
+  "tracks": [
+    {
+      "flavor": "presenter",
+      "id": "9ab974d7-93c0-4958-baf1-c49d20c87be6",
+      "waveform": "/admin-ng/resources/img/waveform.png"
+    }
+  ],
+  "segments": []
+}
