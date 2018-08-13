@@ -1,0 +1,315 @@
+[
+  {
+    "configuration":{
+      "publishToYouTube":"false",
+      "publishLive":"false",
+      "uploadedSearchPreview":"false",
+      "publishToOaiPmh":"true",
+      "flagQuality1080p":"false",
+      "publishToEngage":"true",
+      "straightToPublishing":"true",
+      "flagQuality360p":"false",
+      "flagQuality480p":"false",
+      "flagForCutting":"false",
+      "flagQuality720p":"true",
+      "flagForReview":"false",
+      "flagQuality2160p":"false",
+      "publishToApi":"true",
+      "publishToAws":"false"
+    },
+    "description":"Applying default configuration values",
+    "id":1677,
+    "title":"defaults",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "target-flavor":"processing\/defaults"
+    },
+    "description":"Export workflow settings to Java properties file",
+    "id":1678,
+    "title":"export-wf-properties",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "workflow-id":"partial-ingest"
+    },
+    "description":"Finalize upload and ingest",
+    "id":1679,
+    "title":"include",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "delete-external":"true"
+    },
+    "description":"Ingesting external elements",
+    "id":1680,
+    "title":"ingest-download",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "accept-no-media":"false",
+      "overwrite":"false"
+    },
+    "description":"Inspecting audio and video streams",
+    "id":1681,
+    "title":"inspect",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "attach":"*",
+      "apply-acl":"true"
+    },
+    "description":"Applying access control entries",
+    "id":1683,
+    "title":"series",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"*\/*",
+      "target-tags":"+archive"
+    },
+    "description":"Tagging source material for archival",
+    "id":1684,
+    "title":"tag",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"${download-source-flavors}",
+      "target-tags":"+engage-download"
+    },
+    "description":"Tagging uploaded assets for distribution",
+    "id":1685,
+    "title":"tag",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"dublincore\/*",
+      "target-tags":"+engage-download"
+    },
+    "description":"Tagging metadata catalogs for publication",
+    "id":1686,
+    "title":"tag",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"*\/captions",
+      "target-tags":"+engage-download"
+    },
+    "description":"Tagging captions for publication",
+    "id":1687,
+    "title":"tag",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-tags":"archive"
+    },
+    "description":"Archive raw recording after ingest",
+    "id":1688,
+    "title":"snapshot",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "workflow-id":"partial-work"
+    },
+    "description":"Prepare the recording for further processing",
+    "id":1689,
+    "title":"include",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavor":"presenter\/source",
+      "audio-muxing-source-flavors":"*\/?,*\/*",
+      "target-tags":"-archive",
+      "target-flavor":"presenter\/work",
+      "rewrite":"false"
+    },
+    "description":"Preparing presenter (camera) audio and video work versions",
+    "id":1690,
+    "title":"prepare-av",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavor":"presentation\/source",
+      "audio-muxing-source-flavors":"*\/?,*\/*",
+      "target-tags":"-archive",
+      "target-flavor":"presentation\/work",
+      "rewrite":"false"
+    },
+    "description":"Preparing presentation (screen) audio and video work version",
+    "id":1691,
+    "title":"prepare-av",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "workflow-id":"partial-preview"
+    },
+    "description":"Prepare preview versions of the recording",
+    "id":1692,
+    "title":"include",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavor":"*\/work"
+    },
+    "description":"Analyze tracks in media package an set control variables",
+    "id":1693,
+    "title":"analyze-tracks",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"*\/work",
+      "encoding-profile":"mp4-preview.http",
+      "target-tags":"preview",
+      "target-flavor":"*\/preview"
+    },
+    "description":"Create single-stream video preview",
+    "id":1694,
+    "title":"compose",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "layout":"preview",
+      "layout-preview":"\n          {\"horizontalCoverage\":0.5,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"reference\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"x\":0,\"y\":0}}};\n          {\"horizontalCoverage\":0.5,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"reference\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"x\":0,\"y\":0}}};\n        ",
+      "output-resolution":"1280x400",
+      "source-flavor-lower":"presentation\/work",
+      "output-background":"0x000000FF",
+      "encoding-profile":"mp4-preview.dual.http",
+      "source-flavor-upper":"presenter\/work",
+      "target-tags":"preview",
+      "target-flavor":"composite\/preview"
+    },
+    "description":"Create dual-stream video preview",
+    "id":1697,
+    "title":"composite",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "source-flavor":"*\/preview",
+      "target-tags":"preview",
+      "target-flavor":"*\/waveform"
+    },
+    "description":"Generating waveform",
+    "id":1698,
+    "title":"waveform",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "reference-tracks-flavor":"*\/work",
+      "smil-flavor-subtype":"silence",
+      "source-flavors":"*\/preview"
+    },
+    "description":"Detecting silence",
+    "id":1699,
+    "title":"silence",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-flavors":"*\/silence",
+      "target-tags":"+archive"
+    },
+    "description":"Preparing silence detection for preview",
+    "id":1700,
+    "title":"tag",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "url-pattern":"http:\/\/localhost:8080\/admin-ng\/index.html#\/events\/events\/${event_id}\/tools\/playback",
+      "source-tags":"preview",
+      "channel-id":"internal",
+      "check-availability":"true"
+    },
+    "description":"Publish to preview publication channel",
+    "id":1751,
+    "title":"publish-configure",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "source-tags":"archive"
+    },
+    "description":"Archive preview information",
+    "id":1753,
+    "title":"snapshot",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "reason":"EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING",
+      "action":"create",
+      "description":"Recording has not been cut yet."
+    },
+    "description":"Mark the recording for cutting",
+    "id":1754,
+    "title":"comment",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "reason":"EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.REVIEW",
+      "action":"create",
+      "description":"Recording has not been reviewed yet."
+    },
+    "description":"Mark the recording for review",
+    "id":1755,
+    "title":"comment",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "workflow-id":"partial-publish"
+    },
+    "description":"Publish the recording",
+    "id":1756,
+    "title":"include",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "source-tags":"archive"
+    },
+    "description":"Archive publishing information",
+    "id":1757,
+    "title":"snapshot",
+    "status":"SKIPPED"
+  },
+  {
+    "configuration":{
+      "workflow-id":"partial-cleanup"
+    },
+    "description":"Remove temporary processing artifacts",
+    "id":1758,
+    "title":"include",
+    "status":"SUCCEEDED"
+  },
+  {
+    "configuration":{
+      "preserve-flavors":"security\/*",
+      "delete-external":"true"
+    },
+    "description":"Remove temporary processing artifacts",
+    "id":1759,
+    "title":"cleanup",
+    "status":"SUCCEEDED"
+  }
+]
