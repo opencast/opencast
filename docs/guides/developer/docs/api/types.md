@@ -90,6 +90,21 @@ __Examples__
 
 [4]: http://en.wikipedia.org/wiki/ISO_8601
 
+## Recurrence Rule
+
+To define a set of recurring events within a given time period, Opencast uses recurrence rules.
+
+For more details about reccurrence rules, please refer to the
+[Internet Calendaring and Scheduling Core Object Specification (iCalendar)](https://tools.ietf.org/html/rfc5545).
+
+__Example__
+
+```
+"rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
+```
+
+Please note that `BYHOUR` is specified in UTC.
+
 ## Metadata Catalogs
 
 The External API is designed to take full advantage of the powerful metadata facilities of Opencast.

@@ -320,6 +320,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     WorkflowOperationDefinitionImpl wfDOp2 = new WorkflowOperationDefinitionImpl("archive", "Archive", "error", true);
     wfD.add(wfDOp1);
     wfD.add(wfDOp2);
+    wfD.setDisplayOrder(99);
 
     WorkflowDefinitionImpl wfD2 = new WorkflowDefinitionImpl();
     wfD2.setTitle("Full HTML5");
@@ -327,6 +328,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.addTag("quick_actions");
     wfD2.addTag("test");
     wfD2.setDescription("Test description");
+    wfD2.setDisplayOrder(100);
     wfD2.setConfigurationPanel("<h2>Test</h2>");
 
     MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");
@@ -513,6 +515,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
             new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), false, userIds,
             wfProperties, caProperties, Opt.<Recording> none());
+    expect(schedulerService.getTechnicalMetadata("notExists")).andThrow(new NotFoundException()).anyTimes();
     expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
 
     EasyMock.replay(schedulerService);

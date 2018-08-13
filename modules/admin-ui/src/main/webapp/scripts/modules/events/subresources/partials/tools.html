@@ -13,7 +13,7 @@
 <section class="main-content">
     <nav id="roll-up-menu"></nav>
 
-    <div class="main-view" ng-controller="ToolsCtrl">
+    <div class="main-view">
       <div ng-controller="VideoEditCtrl">
         <div class="video-header">
             <div class="main-video-details">
@@ -31,7 +31,7 @@
                         data-width="'175px'"
                         data-disable-search-threshold="8"
                         ng-model="video.workflow"
-                        ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+                        ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                     <a ng-click="submit()"
                         ng-class="{disabled: submitButton}"
@@ -43,21 +43,20 @@
             </div>
         </div>
         <div data-admin-ng-notifications=""></div>
+        <!-- Currently, the editor is the only supported tool. Therefore we don't show the tool selection.
+             Uncomment this to see how tool selection works.
         <div class="tab-menu">
             <nav class="view-controller">
-                <a ng-class="{active: tab === 'playback'}"
-                    ng-click="openTab('playback')" translate>VIDEO_TOOL.TABS.PLAY</a>
                 <a ng-class="{active: tab === 'editor'}"
                     ng-click="openTab('editor')" translate>VIDEO_TOOL.TABS.EDIT</a>
+                <a ng-Class="{active: tab === 'captions'}"
+                    ng-click="openTab('captions')" translate>VIDEO_TOOL.TABS.CAPTIONS</a>
             </nav>
         </div>
+        -->
         <div class="video-container">
 
-            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" data-controls="{{ tab === 'playback' }}"/>
-
-            <div ng-if="tab === 'playback'">
-              <!-- nothing to show here yet -->
-            </div>
+            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" />
 
             <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
                 <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
@@ -65,11 +64,6 @@
                 <div data-admin-ng-notifications="" context="video-tools"></div>
 
             </div>
-            <!-- captions and annotations to come later
-            <div ng-if="tab === 'captions'">
-            </div>
-            <div ng-if="tab === 'annotations'">
-            </div>-->
             <div class="event-container" ng-controller="EventCtrl">
                 <div>
                     <nav class="modal-nav view-controller-secondary">
@@ -93,10 +87,10 @@
                                   <table class="main-tbl">
                                       <tr ng-repeat="row in episodeCatalog.fields track by $index">
                                           <td translate="{{ row.label }}"></td>
-                                          <td ng-if="row.id === 'created' ">{{ row.value  | localizeDate : 'dateTime' : 'medium' }}</td>
-                                          <td ng-if="row.id !== 'created' "  admin-ng-editable
+                                          <td admin-ng-editable
                                               required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                                              params="row" save="getSaveFunction(episodeCatalog.flavor)"></td>
+                                              params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                                          </td>
                                       </tr>
                                   </table>
                               </div>
@@ -243,7 +237,7 @@
                           <!-- Save and Continue -->
                         </a>
 
-                        <a class="return-button" ng-click="navigateTo('/events/events')" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+                        <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
                     </div>
                 </div>
             </div>

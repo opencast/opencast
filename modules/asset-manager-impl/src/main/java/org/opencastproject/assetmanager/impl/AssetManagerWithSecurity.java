@@ -53,12 +53,18 @@ import org.opencastproject.security.api.User;
 import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * Security layer.
  */
 public class AssetManagerWithSecurity extends AssetManagerDecorator {
+  private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithSecurity.class);
+
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
@@ -90,7 +96,13 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
     Opt<Asset> secAsset = super.getAsset(version, mpId, "security-policy-episode");
     if (secAsset.isSome()) {
       InputStream in = secAsset.get().getInputStream();
-      final AccessControlList acl = authSvc.getAclFromInputStream(in).getA();
+      final AccessControlList acl;
+      try {
+        acl = authSvc.getAclFromInputStream(in);
+      } catch (IOException e) {
+        logger.error("Error parsing XACML for media package '{}', version '{}'. Denying access.", mpId, version);
+        return false;
+      }
       return isAuthorizedByAcl(acl, action);
     }
 

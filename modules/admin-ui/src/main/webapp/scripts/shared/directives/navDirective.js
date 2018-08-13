@@ -59,7 +59,7 @@ angular.module('adminNg.directives')
                 }
             };
 
-            HotkeysService.activateHotkey(scope, "general.main_menu", "Main Menu", function(event) {
+            HotkeysService.activateHotkey(scope, 'general.main_menu', function (event) {
                 event.preventDefault();
                 scope.toggleMenu();
             });

@@ -1,48 +1,48 @@
 {
-    "count": 4,
-    "limit": 0,
-    "offset": 0,
-    "results": [
-        {
-            "creator": "testuser1",
-            "id": 1,
-            "operation": "test",
-            "processingHost": "host1",
-            "started": "2014-06-05T09:10:00Z",
-            "status": "RUNNING",
-            "submitted": "2014-06-05T09:10:00Z",
-            "type": "org.opencastproject.composer"
-        },
-        {
-            "creator": "testuser2",
-            "id": 3,
-            "operation": "RESUME",
-            "processingHost": "host3",
-            "started": "2014-06-05T09:11:11Z",
-            "status": "RUNNING",
-            "submitted": "2014-06-05T09:11:11Z",
-            "type": "org.opencastproject.workflow"
-        },
-        {
-            "creator": "testuser1",
-            "id": 4,
-            "operation": "Inspect",
-            "processingHost": "host2",
-            "started": "2014-06-05T09:16:00Z",
-            "status": "RUNNING",
-            "submitted": "2014-06-05T09:16:00Z",
-            "type": "org.opencastproject.inspection"
-        },
-        {
-            "creator": "testuser3",
-            "id": 5,
-            "operation": "Encode",
-            "processingHost": "host1",
-            "started": "2014-06-05T09:05:00Z",
-            "status": "RUNNING",
-            "submitted": "2014-06-05T09:05:00Z",
-            "type": "org.opencastproject.composer"
-        }
-    ],
-    "total": 5
+  "total": 4,
+  "offset": 0,
+  "count": 4,
+  "limit": 0,
+  "results": [
+    {
+      "creator": "testuser3",
+      "submitted": "2014-06-05T09:05:00Z",
+      "processingHost": "host1",
+      "started": "2014-06-05T09:05:00Z",
+      "id": 5,
+      "type": "org.opencastproject.composer",
+      "operation": "Encode",
+      "status": "RUNNING"
+    },
+    {
+      "creator": "testuser1",
+      "submitted": "2014-06-05T09:10:00Z",
+      "processingHost": "host1",
+      "started": "2014-06-05T09:10:00Z",
+      "id": 1,
+      "type": "org.opencastproject.composer",
+      "operation": "test",
+      "status": "RUNNING"
+    },
+    {
+      "creator": "testuser2",
+      "submitted": "2014-06-05T09:11:11Z",
+      "processingHost": "host3",
+      "started": "2014-06-05T09:11:11Z",
+      "id": 3,
+      "type": "org.opencastproject.workflow",
+      "operation": "RESUME",
+      "status": "RUNNING"
+    },
+    {
+      "creator": "testuser1",
+      "submitted": "2014-06-05T09:16:00Z",
+      "processingHost": "host2",
+      "started": "2014-06-05T09:16:00Z",
+      "id": 4,
+      "type": "org.opencastproject.inspection",
+      "operation": "Inspect",
+      "status": "RUNNING"
+    }
+  ]
 }

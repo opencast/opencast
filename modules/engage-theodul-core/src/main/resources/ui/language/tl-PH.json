@@ -1,0 +1,18 @@
+{
+    "error": "Error",
+    "error_unknown": "May error na nangyari. Mangyaring i-reload ang pahina.",
+    "reloadPage": "I-reload ang pahina",
+    "loginInformation": "Log in sa pamamagitan ng iyong user account sa Opencast",
+    "login": "Log in",
+    "enterUsernamePassword": "Mangyaring ipasok ang iyong username at password:",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Tandaan mo ako",
+    "cancel": "Kansela",
+    "loginSuccessful": "Tagumpay na naka-log in. Mangyaring i-reload ang pahina kung ang pahina ay hindi awtomatikong nag-reload.",
+    "logoutSuccessful": "Tagumpay na naka-log out. Mangyaring i-reload ang pahina kung ang pahina ay hindi awtomatikong nag-reload.",
+    "loginFailed": "Bigo sa pag-log in.",
+    "description": "Paglalarawan",
+    "slideText": "I-slide ang texto",
+    "shortcuts": "Mga shortcut"
+}

@@ -17,6 +17,7 @@ distributed systems) to be installed.
 |target-flavor-subtype|`trimmed`|The flavor subtype to be applied to all resulting videos, e.g. for a value of `baz`, a track with flavor `foo/bar` will generate another track with flavor `foo/baz`|
 |target-smil-flavor| `smil/cutting` |the flavor of the SMIL file containing the final video segments.<br/>Should be the same as the `smil.catalog.flavor` property in `etc/org.opencastproject.adminui.cfg`|
 |skip-if-not-trimmed|`false`       |(Optional) if set to `true`, the track encoding will be skipped if no trimming points were defined (i.e. there is only one segment from the very beginning to the very end of the video). Defaults to `false`|
+|skip-processing|`true`|Do not do the actual encoding, just create the smil file and exit. This option is used with *process-smil* workflow operation, which will use the smil to run the encodings then. Default is false. |
 |*preview_flavors*|*`*/preview`*|*(Legacy) Flavors used to preview the video in the editor.*<br/>***Currently has no effect. Preview flavors are now configured in the file `etc/org.opencastproject.adminui.cfg`***|
 |*interactive*|*`false`*|*(Legacy) If `true` make the operation interactive, i.e. pause and wait for user input.*<br/>***Do not use. Interactive operations are deprecated in the current API.***|
 

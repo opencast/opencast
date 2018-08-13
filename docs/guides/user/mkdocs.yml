@@ -32,4 +32,5 @@ pages:
 - Internationalization: 'i18n.md'
 - Advanced:
   - Overview: 'advanced/index.md'
+  - Capture Agent Access Control: 'advanced/capture-agent-access.md'
   - Role-Based Visibility: 'advanced/role-based-visibility.md'

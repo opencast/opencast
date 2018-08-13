@@ -30,10 +30,10 @@
                                         <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
                                             <!-- Title -->
                                         </th>
-                                        <th class="full-width" translate="EVENTS.EVENTS.TABLE.SERIES">
+                                        <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
                                             <!-- Series -->
                                         </th>
-                                        <th class="full-width" translate="EVENTS.EVENTS.TABLE.WORKFLOW_STATE">
+                                        <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
                                             <!-- Progress -->
                                         </th>
                                     </tr>
@@ -42,8 +42,8 @@
                                     <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.taskStartable}">
                                         <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" task-startable="{{row.source}}" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
                                         <td>{{ row.title }}</td>
-                                        <td>{{ row.series_name}}</td>
-                                        <td>{{ row.source }}</td>
+                                        <td class="nowrap">{{ row.series_name}}</td>
+                                        <td class="nowrap">{{ row.event_status }}</td>
                                     </tr>
                                     </tbody>
                                 </table>
@@ -83,9 +83,9 @@
                                         not-empty-selection
                                         ng-model="processing.ud.workflow"
                                         ng-model-options="{ allowInvalid: true }"
-                                        ng-options="w.title for w in processing.workflows"
-                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
-                                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                                        ng-options="w.title for w in processing.workflows | orderBy: 'displayOrder':true"
+                                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW' | translate }}"
+                                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW_EMPTY' | translate }}'"
                                 >
                                     <option value=""></option>
                                 </select>

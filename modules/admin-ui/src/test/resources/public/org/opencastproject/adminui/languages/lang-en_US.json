@@ -441,7 +441,7 @@
        "DETAILS": {
          "HEADER": "Event details {{resourceId}}",
          "TABS": {
-           "GENERAL":     "General",
+           "PUBLICATIONS":     "Publications",
            "METADATA":    "Metadata",
            "EXTENDED-METADATA":    "Metadata II",
            "ASSETS": "Assets",
@@ -450,8 +450,8 @@
            "ACCESS":      "Access policy",
            "COMMENTS":    "Comments"
          },
-         "GENERAL": {
-           "PUBLICATION_STATUS":         "Publication status",
+         "PUBLICATIONS": {
+           "CAPTION":                    "Publications",
            "SCHEDULING_STATUS":          "Status",
            "READY_FOR_RECORDING":        "Ready for recording",
            "OPTED_OUT":                  "Opted-out",

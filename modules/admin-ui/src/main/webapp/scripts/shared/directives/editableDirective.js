@@ -21,7 +21,7 @@
 'use strict';
 
 angular.module('adminNg.directives')
-.directive('adminNgEditable', ['AuthService', 'ResourcesListResource', function (AuthService, ResourcesListResource) {
+.directive('adminNgEditable', ['$filter', 'AuthService', 'ResourcesListResource', function ($filter, AuthService, ResourcesListResource) {
     return {
         restrict: 'A',
         templateUrl: 'shared/partials/editable.html',
@@ -36,56 +36,80 @@ angular.module('adminNg.directives')
         link: function (scope, element) {
             scope.mixed = false;
             scope.ordered = false;
+            scope.readOnly = false;
 
             if (scope.params === undefined || scope.params.type === undefined) {
               console.warn("Illegal parameters for editable field");
               return;
             }
+
+            scope.getDisplayableValue = function () {
+                var result;
+                if (scope.mode === 'dateValue') {
+                    result = $filter('localizeDate')(scope.params.value, 'dateTime', 'medium');
+                } else if (scope.mode === 'singleSelect') {
+                    angular.forEach(scope.collection, function(key, value) {
+                       if (angular.equals(scope.params.value, key)) {
+                           result = value;
+                       }
+                    });
+                    if ((scope.params.type === 'ordered_text') && angular.isDefined(result)) {
+                        result = JSON.parse(result)['label'];
+                    }
+                } else if ((scope.mode === 'multiSelect') || (scope.mode === 'multiValue')) {
+                    result = scope.params.value.join(',');
+                } else {
+                    result = scope.params.value;
+                }
+                if (scope.params.translatable) {
+                    result = $filter('translate')(result);
+                }
+                return result;
+            }
+
             if (scope.params.readOnly) {
-                scope.mode = 'readOnly';
+                scope.readOnly = true;
             } else {
                 if (angular.isDefined(scope.requiredRole)) {
                     AuthService.userIsAuthorizedAs(scope.requiredRole, function () { }, function () {
-                        scope.mode = 'readOnly';
+                        scope.readOnly = true;
                     });
                 }
+            }
 
-                if (scope.mode !== 'readOnly') {
-                    if (typeof scope.params.collection === 'string') {
-                        scope.collection = ResourcesListResource.get({ resource: scope.params.collection });
-                    } else if (typeof scope.params.collection === 'object') {
-                        scope.collection = scope.params.collection;
-                    }
+            if (typeof scope.params.collection === 'string') {
+                scope.collection = ResourcesListResource.get({ resource: scope.params.collection });
+            } else if (typeof scope.params.collection === 'object') {
+                scope.collection = scope.params.collection;
+            }
 
-                    if (scope.params.type === 'boolean') {
-                        scope.mode = 'booleanValue';
-                    } else if (scope.params.type === 'date') {
-                        scope.mode = 'dateValue';
-                    } else {
-                        if (scope.params.value instanceof Array) {
-                            if (scope.collection) {
-                                if (scope.params.type === 'mixed_text') {
-                                    scope.mixed = true;
-                                }
-                                scope.mode = 'multiSelect';
-                            } else {
-                                scope.mode = 'multiValue';
-                            }
-                        } else {
-                            if (scope.collection) {
-                                if (scope.params.type === 'ordered_text') {
-                                    scope.ordered = true;
-                                }
-                                scope.mode = 'singleSelect';
-                            } else {
-                                scope.mode = 'singleValue';
-                            }
+            if (scope.params.type === 'boolean') {
+                scope.mode = 'booleanValue';
+            } else if (scope.params.type === 'date') {
+                scope.mode = 'dateValue';
+            } else {
+                if (scope.params.value instanceof Array) {
+                    if (scope.collection) {
+                        if (scope.params.type === 'mixed_text') {
+                            scope.mixed = true;
                         }
+                        scope.mode = 'multiSelect';
+                    } else {
+                        scope.mode = 'multiValue';
+                    }
+                } else {
+                    if (scope.collection) {
+                        if (scope.params.type === 'ordered_text') {
+                            scope.ordered = true;
+                        }
+                        scope.mode = 'singleSelect';
+                    } else {
+                        scope.mode = 'singleValue';
                     }
                 }
             }
 
-            if (scope.mode !== 'readOnly') {
+            if (!scope.readOnly) {
                 element.addClass('editable');
             }
         }

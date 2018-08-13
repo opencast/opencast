@@ -6,6 +6,7 @@
   <tags>
     <tag>archive</tag>
   </tags>
+  <displayOrder>1000</displayOrder>
   <description/>
   <configuration_panel>
     <![CDATA[
@@ -73,9 +74,9 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        // Remove the line below if you wish to publish to AWS S3
         $('#publishToAws').prop('disabled', true);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
+        // Remove the line above if you wish to publish to AWS S3
 
         awsWasDisabled = $('#publishToAws').prop('disabled');
         awsWasChecked = $('#publishToAws').prop('checked');

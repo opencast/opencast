@@ -1,0 +1,18 @@
+{
+  "flavor": "dublincore/episode",
+  "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+  "fields": [
+    {
+      "id": "location",
+      "value": "der_werner"
+    },
+    {
+      "id": "startDate",
+      "value": "2018-05-16T10:13:23.000Z"
+    },
+    {
+      "id": "duration",
+      "value": "01:09:50"
+    }
+  ]
+}

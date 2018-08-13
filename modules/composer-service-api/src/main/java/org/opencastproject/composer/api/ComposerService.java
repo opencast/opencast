@@ -26,8 +26,10 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.data.Option;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -36,6 +38,10 @@ import java.util.Map;
 public interface ComposerService {
 
   String JOB_TYPE = "org.opencastproject.composer";
+
+  /** Used as mediaType to mark the source to omit processing of audio or video stream for process smil */
+  String AUDIO_ONLY = "a";
+  String VIDEO_ONLY = "v";
 
   /**
    * Encode one track, using that track's audio and video streams.
@@ -95,12 +101,13 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
-   * Concat multiple tracks to a single track. Required ffmpeg version 1.1
+   * Concat multiple tracks to a single track.
    *
    * @param profileId
    *          The encoding profile to use
    * @param outputDimension
    *          The output dimensions
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks
    *          an array of track to concat in order of the array
    * @return The receipt for this concat job
@@ -109,7 +116,7 @@ public interface ComposerService {
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -118,12 +125,13 @@ public interface ComposerService {
    * @param profileId The encoding profile to use
    * @param outputDimension The output dimensions
    * @param outputFrameRate The output frame rate
+   * @param sameCodec Defines if lossless concat should be used
    * @param tracks an array of track to concat in order of the array
    * @return The receipt for this concat job
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, Track... tracks) throws EncoderException,
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
           MediaPackageException;
 
   /**
@@ -244,5 +252,55 @@ public interface ComposerService {
    */
   Job parallelEncode(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
 
+  /**
+   * Demux a multi-track source into 2 media as defined by the encoding profile, the results are flavored and tagged
+   * positionally. eg: One ffmpeg operation to produce presenter/work and presentation/work
+   *
+   * @param sourceTrack
+   * @param profileId
+   * @return Receipt for this demux based on the profile
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+  Job demux(Track sourceTrack, String profileId) throws EncoderException, MediaPackageException;
+
+  /**
+   * Reads a smil definition and create one media track in multiple delivery formats. The track in the smil is selected
+   * by "trackParamGroupId" which is the paramGroup in the smil The multiple delivery formats are determined by a list
+   * of encoding profiles by name. The resultant tracks will be tagged by profile name. The smil file can contain more
+   * than one source track but they must have the same dimension. This is used mainly on smil.xml from the editor. There
+   * is a configurable fadein/fadeout between each clip (default is 2s).
+   *
+   * @param smil
+   *          - Describes one media (can contain multiple source in ws) and editing instructions (in out points of video
+   *          clips) for concatenation into one video with transitions
+   * @param trackParamGroupId
+   *          - track group id to process, if missing, will process first track found in smil
+   * @param mediaType
+   *          - v for videoOnly, a for audioOnly, anything else is AudioVisual
+   * @param profileIds
+   *          - Encoding profiles for each output from this media
+   * @return Receipt for this processing based on the smil file and the list of profiles
+   * @throws EncoderException
+   * @throws MediaPackageException
+   */
+
+  Job processSmil(Smil smil, String trackParamGroupId, String mediaType, List<String> profileIds)
+          throws EncoderException, MediaPackageException;
+
+  /**
+   * Encodes a track to set of media targets as defined by a list of encoding profiles
+   * 
+   * @param track
+   *          - video or audio track
+   * @param profileIds
+   *          - a list of encoding profiles by name
+   * @return Receipt for this processing based on the inputs
+   * @throws EncoderException
+   *           if it fails
+   * @throws MediaPackageException
+   *           if adding files to a mediapackage produces errors
+   */
+  Job multiEncode(Track track, List<String> profileIds) throws EncoderException, MediaPackageException;
 
 }

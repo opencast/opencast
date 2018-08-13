@@ -28,6 +28,10 @@ public final class ApiMediaTypeException extends RuntimeException {
     return new ApiMediaTypeException("'" + mediaType + "' does not contain a valid version");
   }
 
+  public static ApiMediaTypeException invalidFormat(String mediaType) {
+    return new ApiMediaTypeException("'" + mediaType + "' does not contain a valid format");
+  }
+
   private ApiMediaTypeException(String message) {
     super(message);
   }

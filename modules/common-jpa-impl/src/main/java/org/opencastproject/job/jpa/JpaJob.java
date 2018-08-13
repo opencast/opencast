@@ -478,6 +478,10 @@ public class JpaJob {
     return dateCreated;
   }
 
+  public Date getDateCompleted() {
+    return dateCompleted;
+  }
+
   public String getCreator() {
     return creator;
   }

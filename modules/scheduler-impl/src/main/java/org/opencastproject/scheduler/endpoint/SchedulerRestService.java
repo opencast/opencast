@@ -100,6 +100,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -553,15 +556,15 @@ public class SchedulerRestService {
   @RestQuery(name = "getcalendar", description = "Returns iCalendar for specified set of events", returnDescription = "ICalendar for events", restParameters = {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER) }, reponses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
+          @QueryParam("cutoff") Long cutoff, @Context HttpServletRequest request) {
     Date endDate = null;
-    if (StringUtils.isNotEmpty(cutoff)) {
+    if (cutoff != null) {
       try {
-        endDate = new Date(Long.valueOf(cutoff));
+        endDate = new Date(cutoff);
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }
@@ -1071,6 +1074,42 @@ public class SchedulerRestService {
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("conflicts.json")
+  @RestQuery(name = "conflictingrecordingsasjson", description = "Searches for conflicting recordings based on parameters", returnDescription = "Returns NO CONTENT if no recordings are in conflict within specified period or list of conflicting recordings in JSON", restParameters = {
+          @RestParameter(name = "agent", description = "Device identifier for which conflicts will be searched", isRequired = true, type = Type.STRING),
+          @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds", isRequired = true, type = Type.INTEGER),
+          @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds", isRequired = true, type = Type.INTEGER),
+          @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
+          @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) }, reponses = {
+                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "Not authorized to make this request"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "A detailed stack track of the internal issue.")})
+  public Response getConflictingEventsJson(@QueryParam("agent") String device, @QueryParam("rrule") String rrule,
+          @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
+          @QueryParam("timezone") String timezone) throws UnauthorizedException {
+    try {
+      List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
+      if (!events.isEmpty()) {
+        String eventsJsonString = getEventListAsJsonString(events);
+        return Response.ok(eventsJsonString).build();
+      } else {
+        return Response.noContent().build();
+      }
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
+              device, rrule, startDate, endDate, duration, getStackTrace(e));
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   @GET
   @Produces(MediaType.TEXT_XML)
@@ -1084,57 +1123,27 @@ public class SchedulerRestService {
           @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) }, reponses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
+                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "Not authorized to make this request"),
+                  @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR, description = "A detailed stack track of the internal issue.")})
+
   public Response getConflictingEventsXml(@QueryParam("agent") String device, @QueryParam("rrule") String rrule,
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
           @QueryParam("timezone") String timezone) throws UnauthorizedException {
-    if (StringUtils.isBlank(device) || startDate == null || endDate == null) {
-      logger.info("Either agent, start date or end date were not specified");
-      return Response.status(Status.BAD_REQUEST).build();
-    }
-
-    RRule rule = null;
-    if (StringUtils.isNotBlank(rrule)) {
-      if (duration == null || StringUtils.isBlank(timezone)) {
-        logger.info("Either duration or timezone were not specified");
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-
-      try {
-        rule = new RRule(rrule);
-        rule.validate();
-      } catch (Exception e) {
-        logger.info("Unable to parse rrule {}: {}", rrule, getMessage(e));
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-
-      if (!Arrays.asList(TimeZone.getAvailableIDs()).contains(timezone)) {
-        logger.info("Unable to parse timezone: {}", timezone);
-        return Response.status(Status.BAD_REQUEST).build();
-      }
-    }
-
-    Date start = new DateTime(startDate).toDateTime(DateTimeZone.UTC).toDate();
-
-    Date end = new DateTime(endDate).toDateTime(DateTimeZone.UTC).toDate();
-
     try {
-      List<MediaPackage> events;
-      if (StringUtils.isNotBlank(rrule)) {
-        events = service.findConflictingEvents(device, rule, start, end, duration, TimeZone.getTimeZone(timezone));
-      } else {
-        events = service.findConflictingEvents(device, start, end);
-      }
+      List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
       if (!events.isEmpty()) {
         return Response.ok(MediaPackageParser.getArrayAsXml(events)).build();
       } else {
         return Response.noContent().build();
       }
+    } catch (IllegalArgumentException e) {
+      return Response.status(Status.BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Unable to find conflicting events for {}, {}, {}, {}, {}: {}",
-              device, rrule, start, end, duration, getStackTrace(e));
+              device, rrule, startDate, endDate, duration, getStackTrace(e));
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1743,6 +1752,50 @@ public class SchedulerRestService {
     }
   }
 
+  private List<MediaPackage> getConflictingEvents(String device, String rrule,
+          Long startDate, Long endDate, Long duration, String timezone)
+                  throws IllegalArgumentException, UnauthorizedException, SchedulerException {
+
+    List<MediaPackage> events = null;
+
+    if (StringUtils.isBlank(device) || startDate == null || endDate == null) {
+      logger.info("Either agent, start date or end date were not specified");
+      throw new IllegalArgumentException();
+    }
+
+    RRule rule = null;
+    if (StringUtils.isNotBlank(rrule)) {
+      if (duration == null || StringUtils.isBlank(timezone)) {
+        logger.info("Either duration or timezone were not specified");
+        throw new IllegalArgumentException();
+      }
+
+      try {
+        rule = new RRule(rrule);
+        rule.validate();
+      } catch (Exception e) {
+        logger.info("Unable to parse rrule {}: {}", rrule, getMessage(e));
+        throw new IllegalArgumentException();
+      }
+
+      if (!Arrays.asList(TimeZone.getAvailableIDs()).contains(timezone)) {
+        logger.info("Unable to parse timezone: {}", timezone);
+        throw new IllegalArgumentException();
+      }
+    }
+
+    Date start = new DateTime(startDate).toDateTime(DateTimeZone.UTC).toDate();
+
+    Date end = new DateTime(endDate).toDateTime(DateTimeZone.UTC).toDate();
+
+    if (StringUtils.isNotBlank(rrule)) {
+      events = service.findConflictingEvents(device, rule, start, end, duration, TimeZone.getTimeZone(timezone));
+    } else {
+      events = service.findConflictingEvents(device, start, end);
+    }
+    return events;
+  }
+
   private MediaPackage addCatalog(Workspace workspace, InputStream in, String fileName,
           MediaPackageElementFlavor flavor, MediaPackage mediaPackage) throws IOException {
     Catalog[] catalogs = mediaPackage.getCatalogs(flavor);
@@ -1793,4 +1846,32 @@ public class SchedulerRestService {
     caProperties.load(new StringReader(serializedProperties));
     return caProperties;
   }
+
+  /**
+   * Serializes mediapackage schedule metadata into JSON array string.
+   *
+   * @return serialized array as json array string
+   * @throws SchedulerException
+   *           if parsing list into JSON format fails
+   */
+  public String getEventListAsJsonString(List<MediaPackage> mpList) throws SchedulerException {
+    JSONParser parser = new JSONParser();
+    JSONObject jsonObj = new JSONObject();
+    JSONArray jsonArray = new JSONArray();
+    for (MediaPackage mp: mpList) {
+      JSONObject mpJson;
+      try {
+        mpJson = (JSONObject) parser.parse(MediaPackageParser.getAsJSON(mp));
+        mpJson = (JSONObject) mpJson.get("mediapackage");
+        jsonArray.add(mpJson);
+      } catch (org.json.simple.parser.ParseException e) {
+        logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().compact(), e);
+        throw new SchedulerException(e);
+      }
+    }
+    jsonObj.put("totalCount", String.valueOf(mpList.size()));
+    jsonObj.put("events", jsonArray);
+    return jsonObj.toJSONString();
+  }
 }
+

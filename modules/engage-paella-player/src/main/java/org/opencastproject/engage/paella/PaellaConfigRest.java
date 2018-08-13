@@ -21,16 +21,16 @@
 
 package org.opencastproject.engage.paella;
 
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,21 +55,17 @@ import javax.ws.rs.core.MediaType;
 @RestService(
   name = "PaellaConfigRest",
   title = "Paella Config Information",
-  abstractText = "This service provides information about the runtime environment, including the services that are "
-    + "deployed and the current user context.",
+  abstractText = "This service provides the configuration for the Paella player.",
   notes = {})
 public class PaellaConfigRest {
 
   private static final Logger logger = LoggerFactory.getLogger(PaellaConfigRest.class);
 
-  /** Configuration properties id */
+  /** Configuration Key for Paella's config folder */
   private static final String PAELLA_CONFIG_FOLDER_PROPERTY = "org.opencastproject.engage.paella.config.folder";
 
-  /**
-   * The rest publisher looks for any non-servlet with the 'opencast.service.path' property
-   */
-  public static final String SERVICE_FILTER = "(&(!(objectClass=javax.servlet.Servlet))("
-          + RestConstants.SERVICE_PATH_PROPERTY + "=*))";
+  /** Default configuration location (relative to ${karaf.etc}) */
+  private static final String PAELLA_CONFIG_FOLDER_DEFAULT = "paella";
 
   private String paellaConfigFolder;
   private SecurityService securityService;
@@ -78,31 +74,31 @@ public class PaellaConfigRest {
     this.securityService = securityService;
   }
 
-  public void activate(ComponentContext cc) {
-    logger.debug("activate()");
-
+  protected void activate(ComponentContext cc) {
     paellaConfigFolder = cc.getBundleContext().getProperty(PAELLA_CONFIG_FOLDER_PROPERTY);
-    logger.debug("Paella configuration folder is {}", paellaConfigFolder);
-  }
 
-  public void deactivate() {
-    // Nothing to do
-    logger.debug("deactivate()");
+    // Fall back to default location if necessary
+    if (StringUtils.isBlank(paellaConfigFolder)) {
+      paellaConfigFolder = cc.getBundleContext().getProperty("karaf.etc");
+      if (StringUtils.isBlank(paellaConfigFolder)) {
+        throw new ConfigurationException("Paella configuration not set and unable to fall back to default location");
+      }
+      paellaConfigFolder = new File(paellaConfigFolder, PAELLA_CONFIG_FOLDER_DEFAULT).getAbsolutePath();
+    }
+    logger.debug("Paella configuration folder is {}", paellaConfigFolder);
   }
 
   @GET
   @Path("config.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "config.json", description = "Paella configuration file", reponses = { @RestResponse(description = "Returns the paella configuration file", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  @SuppressWarnings("unchecked")
+  @RestQuery(name = "configJson", description = "Paella configuration",
+          reponses = {
+            @RestResponse(description = "Returns the paella configuration", responseCode = HttpServletResponse.SC_OK)
+          }, returnDescription = "")
   public String getMyInfo() throws IOException {
     // Add the current user's organizational information
     Organization org = securityService.getOrganization();
-
     File configFile = new File(PathSupport.concat(new String[] { paellaConfigFolder, org.getId(), "config.json" }));
-    String configContent = FileUtils.readFileToString(configFile);
-
-
-    return configContent;
+    return FileUtils.readFileToString(configFile, "UTF-8");
   }
 }

@@ -23,11 +23,10 @@ package org.opencastproject.security.api;
 
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 
 
 /**
@@ -56,63 +55,55 @@ public interface AuthorizationService {
   boolean hasPermission(MediaPackage mp, String action);
 
   /**
-   * Gets the active permissions associated with this media package, as specified by its XACML attachment. The following
-   * rules are used to determine the access control in descending order:
+   * Gets the active access control list associated with the given media package, as specified by its XACML
+   * attachments. XACML attachments are evaluated in the following order:
+   *
    * <ol>
-   * <li>If exactly zero {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_EPISODE} and
-   * {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_SERIES} attachments are present, the
-   * returned ACL will be empty.</li>
-   * <li>If exactly one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_EPISODE} is attached
-   * to the media package, this is the source of authority</li>
-   * <li>If exactly one {@link org.opencastproject.mediapackage.MediaPackageElements#XACML_POLICY_SERIES} is attached to
-   * the media package, this is the source of authority</li>
-   * <li>If more than one XACML attachments are present, and one of them has no reference (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), that attachment is
-   * presumed to be the source of authority. Episode XACMLs are considered before series XACMLs.</li>
-   * <li>If more than one XACML attachments are present, and more than one of them has no reference (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns null), the returned ACL will be
-   * empty. Episode XACMLs are considered before series XACMLs.</li>
-   * <li>If more than one XACML attachments are present, and all of them have references (
-   * {@link org.opencastproject.mediapackage.MediaPackageElement#getReference()} returns a non-null reference), the
-   * returned ACL will be empty. Episode XACMLs are considered before series XACMLs.</li>
+   *   <li>Use episode XACML attachment if present</li>
+   *   <li>Use series XACML attachment if present</li>
+   *   <li>Use non-specific XACML attachment if present. Note that the usage of this is deprecated!</li>
+   *   <li>Use the global default ACL</li>
    * </ol>
+   *
+   * Note that this is identical to calling {@link #getAcl(MediaPackage, AclScope)} with scope set to
+   * {@link AclScope#Series}.
    *
    * @param mp
    *          the media package
-   * @return the set of permissions and explicit denials
+   * @return the active access control list as well as the scope identifying the source of the access rules (episode,
+   *          series, …).
    */
   Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp);
 
   /**
-   * Gets the active permissions as specified by the given XACML attachment.
+   * Gets the active permissions as specified by the given XACML.
    *
    * @param in
    *          the XACML attachment used to determine a set of permissions and explicit denials
    * @return a set of permissions and explicit denials
    */
-  Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in);
+  AccessControlList getAclFromInputStream(InputStream in) throws IOException;
 
   /**
-   * Gets the permissions by its scope associated with this media package, as specified by its XACML attachment.
+   * Gets the access control list for a given scope associated with the given media package, as specified by its XACML
+   * attachments. XACML attachments are evaluated in the following order:
+   *
+   * <ol>
+   *   <li>Use episode XACML attachment if present. This applies only if scope is set to {@link AclScope#Episode}</li>
+   *   <li>Use series XACML attachment if present. This applies only if scope is set to {@link AclScope#Episode} or
+   *      {@link AclScope#Series}</li>
+   *   <li>Use non-specific XACML attachment if present. Note that the usage of this is deprecated!</li>
+   *   <li>Use the global default ACL</li>
+   * </ol>
    *
    * @param mp
    *          the media package
    * @param scope
    *          the acl scope
-   * @return the set of permissions and explicit denials
+   * @return the access control list as well as the scope identifying the source of the access rules (episode,
+   *          series, …) for the given media package and scope.
    */
-  Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope);
-
-  /**
-   * Return access control attachments of a certain scope or all.
-   *
-   * @param mp
-   *          the media package
-   * @param scope
-   *          the scope or none to get all ACL attachments
-   * @return a list of attachments that fit the given criteria
-   */
-  List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope);
+  Tuple<AccessControlList, AclScope> getAcl(MediaPackage mp, AclScope scope);
 
   /**
    * Attaches the provided policies to a media package as a XACML attachment, replacing any previous policy element of

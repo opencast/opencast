@@ -52,7 +52,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.io.LineReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -148,8 +147,8 @@ VideoSegmenterService, ManagedService {
   /** Default value for the option whether segments numbers depend on track duration */
   public static final boolean DEFAULT_DURATION_DEPENDENT = false;
 
-  /** The load introduced on the system by creating a caption job */
-  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 1.0f;
+  /** The load introduced on the system by a segmentation job */
+  public static final float DEFAULT_SEGMENTER_JOB_LOAD = 0.3f;
 
   /** The key to look for in the service configuration file to override the DEFAULT_CAPTION_JOB_LOAD */
   public static final String SEGMENTER_JOB_LOAD_KEY = "job.load.videosegmenter";
@@ -629,18 +628,15 @@ VideoSegmenterService, ManagedService {
    * @param changesThreshold the changesThreshold that is used as option for the FFmpeg call
    * @return a list of the resulting segments
    * @throws IOException
+   * @throws VideoSegmenterException
    */
   protected LinkedList<Segment> runSegmentationFFmpeg(Track track, Video videoContent, File mediaFile,
-          float changesThreshold) throws IOException {
+          float changesThreshold) throws IOException, VideoSegmenterException {
 
-    String[] command = new String[] { binary, "-nostats", "-i",
-      mediaFile.getAbsolutePath().replaceAll(" ", "\\ "),
-      "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo",
-      "-f", "null", "-"
-    };
-    String commandline = StringUtils.join(command, " ");
+    String[] command = new String[] { binary, "-nostats", "-i", mediaFile.getAbsolutePath(),
+      "-filter:v", "select=gt(scene\\," + changesThreshold + "),showinfo", "-f", "null", "-"};
 
-    logger.info("Running {}", commandline);
+    logger.info("Detecting video segments using command: {}", command);
 
     ProcessBuilder pbuilder = new ProcessBuilder(command);
     List<String> segmentsStrings = new LinkedList<String>();
@@ -689,7 +685,12 @@ VideoSegmenterService, ManagedService {
           // filter is used for multiple purposes.
           continue;
         }
-        endtime = Long.parseLong(time) * 1000;
+        try {
+          endtime = Math.round(Float.parseFloat(time) * 1000);
+        } catch (NumberFormatException e) {
+          logger.error("Unable to parse FFmpeg output, likely FFmpeg version mismatch!", e);
+          throw new VideoSegmenterException(e);
+        }
         long segmentLength = endtime - starttime;
         if (1000 * stabilityThresholdPrefilter < segmentLength) {
           Segment segment = videoContent.getTemporalDecomposition()

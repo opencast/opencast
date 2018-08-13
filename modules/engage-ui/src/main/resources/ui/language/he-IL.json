@@ -35,5 +35,7 @@
   "no_data": "אין נתונים זמינים.",
   "login_success": "התחברת בהצלחה.",
   "login_failed": "התחברות נכשלה.",
-  "not_logged_in": "אינך מחובר למערכת."
+  "not_logged_in": "אינך מחובר למערכת.",
+  "live_in_progress": "חי (בתהליך)",
+  "live_not_in_progress": "חי (לא בתהליך)"
 }

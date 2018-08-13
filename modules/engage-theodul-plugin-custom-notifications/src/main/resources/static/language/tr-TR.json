@@ -1,0 +1,13 @@
+{
+    "value_locale": "ing",
+    "value_dateFormatFull": "Do MMMM YYYY, h:mm:ss a",
+    "error_videoLoading": "Video yükleniyor. Lütfen biraz bekleyiniz.",
+    "error_audioLoading": "Ses yükleniyor. Lütfen biraz bekleyiniz.",
+    "msg_videoLoadedSuccessfully": "Video başarıyla yüklendi.",
+    "msg_audioLoadedSuccessfully": "Ses başarıyla yüklendi.",
+    "msg_videoBuffering": "Video şu anda ara belleğe alınıyor. Lütfen biraz bekleyiniz.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Video başarıyla ara belleğe alındı ve otomatik oynatılıyor.",
+    "msg_videoBufferedSuccessfully": "Video başarıyla ara belleğe alındı.",
+    "error": "Hata",
+    "error_AudioCodecNotSupported": "Hata: Ses codec bileşeni bu tarayıcı tarafından desteklenmiyor"
+}

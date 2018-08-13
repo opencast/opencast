@@ -22,8 +22,8 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('ToolsCtrl', ['$scope', '$route', '$location', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
-    function ($scope, $route, $location, $window, ToolsResource, Notifications, EventHelperService) {
+.controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
+    function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
 
         $scope.navigateTo = function (path) {
             $location.path(path).replace();
@@ -34,8 +34,6 @@ angular.module('adminNg.controllers')
         $scope.tab      = $route.current.params.tab;
         if ($scope.tab === "editor") {
           $scope.area   = "segments";
-        } else if ($scope.tab === "playback") {
-          $scope.area   = "metadata";
         }
         $scope.id       = $route.current.params.itemId;
 
@@ -50,9 +48,7 @@ angular.module('adminNg.controllers')
         $scope.openTab = function (tab) {
             $scope.tab = tab;
             if ($scope.tab === "editor") {
-              $scope.area   = "segments";
-            } else if ($scope.tab === "playback") {
-              $scope.area   = "metadata";
+              $scope.area = "segments";
             }
 
             // This fixes a problem where video playback breaks after switching tabs. Changing the location seems
@@ -91,6 +87,11 @@ angular.module('adminNg.controllers')
                 $scope.submitButton = false;
                 Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
             });
+        };
+
+        $scope.leave = function () {
+            Storage.put('pagination', $scope.resource, 'resume', true);
+            $location.url('/events/' + $scope.resource);
         };
     }
 ]);

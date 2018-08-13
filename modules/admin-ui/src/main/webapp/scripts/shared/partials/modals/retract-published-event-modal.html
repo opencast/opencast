@@ -26,9 +26,9 @@
                         not-empty-selection
                         ng-model="processing.ud.workflow"
                         ng-model-options="{ allowInvalid: true }"
-                        ng-options="w.title for w in processing.workflows"
-                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW' | translate }}"
-                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.GENERAL.SELECT_WORKFLOW_EMPTY' | translate }}'"
+                        ng-options="w.title for w in processing.workflows | orderBy: 'displayOrder':true"
+                        data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW' | translate }}"
+                        no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.PUBLICATIONS.SELECT_WORKFLOW_EMPTY' | translate }}'"
                         >
                             <option value=""></option>
                     </select>

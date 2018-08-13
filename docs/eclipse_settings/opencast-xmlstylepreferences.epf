@@ -1,0 +1,22 @@
+# As of Thu Jun 28 08:11:43 EDT 2018
+# MH-12969, "Ensure formatting of OSGI configuration"
+# Opencast XML format standard attributes. The Opencast Java codestyle, templates, import orders are in other settings files.
+# To import this file in Eclipse, use File -> Import -> General -> Preferences. Leave the "Import All" checked.
+
+# At least one top level Java Code Style Preference, and the file export version, is needed to hook in the XML style during the preference import.
+# Be aware, the Opencast import order is also set by opencast-codestyle.xml
+file_export_version=1.0
+/instance/org.eclipse.jdt.ui/org.eclipse.jdt.ui.importorder=\#;org.opencastproject;com;net;org;java;javax;
+
+# Extra Java save actions to remove trailing white space, you'll be grateful for this when running mvn checkstyle
+/instance/org.eclipse.jdt.ui/sp_cleanup.on_save_use_additional_actions=true
+/instance/org.eclipse.jdt.ui/sp_cleanup.remove_trailing_whitespaces_all=true
+/instance/org.eclipse.jdt.ui/sp_cleanup.remove_trailing_whitespaces=true
+
+# Opencast XML format standard attributes
+/instance/org.eclipse.wst.xml.core/indentationChar=space
+/instance/org.eclipse.wst.xml.core/indentationSize=2
+/instance/org.eclipse.wst.xml.core/lineWidth=120
+/instance/org.eclipse.wst.xml.core/preserveCDATAContent=true
+/instance/org.eclipse.wst.xml.core/spaceBeforeEmptyCloseTag=false
+

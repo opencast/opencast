@@ -71,3 +71,8 @@ create a new one with the correct columns.
 
 ## How to delete Filter sets
 Click on the cogwheel and then on the delete icon ( ![icon_delete][] ) next to the filter you want to delete.
+
+## Predefined Filters
+A set of commonly used filters for events is displayed at the top right of the Admin UI along with the current amount
+of events matching that filter, filtering by event status or start date. They can be applied to the events table by
+clicking on them. Currently filters can only be added or removed from this view by a system administrator.

@@ -35,5 +35,7 @@
   "no_data": "Pas de données disponibles.",
   "login_success": "Connexion réussie.",
   "login_failed": "Connexion échouée.",
-  "not_logged_in": "Pas connecté."
+  "not_logged_in": "Pas connecté.",
+  "live_in_progress": "Live (en cours)",
+  "live_not_in_progress": "Live (pas en cours)"
 }

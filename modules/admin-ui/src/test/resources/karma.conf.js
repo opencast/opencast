@@ -25,7 +25,7 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/angular-sortable.js',
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
-            '../../main/webapp/scripts/lib/moment.min.js',
+            '../../main/webapp/scripts/lib/moment-with-locales.js',
             '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
             '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 
@@ -47,6 +47,8 @@ module.exports = function (config) {
             {pattern: 'test/unit/fixtures/**/*.json', watched: true, served: true, included: false},
             {pattern: 'app/GET/**/*', watched: true, served: true, included: false},
 
+            'test/unit/setup.js',
+            'test/unit/**/*Helper.js',
             'test/unit/**/*Spec.js'
         ],
 
@@ -80,7 +82,7 @@ module.exports = function (config) {
 
         coverageReporter: {
             type : 'html',
-            dir : '../../../coverage/'
+            dir : '../../../target/coverage/'
         },
 
         ngHtml2JsPreprocessor: {

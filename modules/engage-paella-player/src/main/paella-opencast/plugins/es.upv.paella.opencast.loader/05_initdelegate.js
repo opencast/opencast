@@ -8,7 +8,7 @@ function loadOpencastPaella(containerId) {
 			if (data.streams.length < 1) {
 				paella.messageBox.showError("Error loading video! No video traks found");
 			}
-			paella.load(containerId, {data:data, configUrl:'/engage/paella/config/config.json'});
+			paella.load(containerId, {data:data, configUrl:'/paella/config/config.json'});
 		},
 		function(){
 			var oacl = new OpencastAccessControl();

@@ -71,7 +71,7 @@ import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
@@ -1324,8 +1324,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           // mediapackage
 
           AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage, AclScope.Series);
-          if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
+          Tuple<AccessControlList, AclScope> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
+                  AclScope.Series);
+          if (!AclScope.Series.equals(activeSeriesAcl.getB()) || !AccessControlUtil.equals(activeSeriesAcl.getA(), acl))
             authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
         }
       } catch (SeriesException e) {
@@ -1473,7 +1474,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
-    return index.getWorkflowInstances(query, Permissions.Action.WRITE.toString(), true);
+    return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
   }
 
   /**

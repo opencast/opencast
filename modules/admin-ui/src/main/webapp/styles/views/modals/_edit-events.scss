@@ -1,0 +1,16 @@
+td.weekdays {
+    // Horizontal alignment
+    input[type="radio"], label {
+        display:inline-block;
+        vertical-align: middle;
+    }
+
+    input[type="radio"] {
+        margin-right:2px !important;
+        margin-top:0px !important;
+    }
+
+    label {
+        margin-right:5px;
+    }
+}

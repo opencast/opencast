@@ -1,4 +1,4 @@
-describe('Event Catalogs API Resource', function () {
+describe('Event Publications API Resource', function () {
     var $httpBackend, EventPublicationsResource;
 
     beforeEach(module('adminNg.resources'));
@@ -12,24 +12,22 @@ describe('Event Catalogs API Resource', function () {
     describe('#get', function () {
         beforeEach(function () {
             jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-            $httpBackend.whenGET('/admin-ng/event/30112/asset/publication/publications.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json')));
+            $httpBackend.whenGET('/admin-ng/event/40518/publications.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/publications.json')));
         });
 
-        it('queries the group API', function () {
-            $httpBackend.expectGET('/admin-ng/event/30112/asset/publication/publications.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json')));
-            EventPublicationsResource.get({ id0: '30112'});
+        it('queries the publications API', function () {
+            $httpBackend.expectGET('/admin-ng/event/40518/publications.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/publications.json')));
+            EventPublicationsResource.get({ id: '40518'});
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.expectGET('/admin-ng/event/30112/asset/publication/publications.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/30112/asset/publication/publications.json')));
-            var data = EventPublicationsResource.get({ id0: '30112' });
+            $httpBackend.whenGET('/admin-ng/event/40518/publications.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/publications.json')));
+            var data = EventPublicationsResource.get({ id: '40518' });
             $httpBackend.flush();
             expect(data).toBeDefined();
-            expect(data.length).toEqual(1);
+            expect(data.publications.length).toBe(1);
+            expect(data.publications[0].name).toBe('engage-player');
         });
     });
 });

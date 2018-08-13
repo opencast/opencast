@@ -99,6 +99,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
@@ -482,6 +483,16 @@ public class IndexServiceImpl implements IndexService {
               String metadata = Streams.asString(item.openStream());
               try {
                 metadataJson = (JSONObject) new JSONParser().parse(metadata);
+                // in case of scheduling: Check if user has access to the CA
+                if (metadataJson.containsKey("source")) {
+                  final JSONObject sourceJson = (JSONObject) metadataJson.get("source");
+                  if (sourceJson.containsKey("metadata")) {
+                    final JSONObject sourceMetadataJson = (JSONObject) sourceJson.get("metadata");
+                    if (sourceMetadataJson.containsKey("device")) {
+                      SecurityUtil.checkAgentAccess(securityService, (String) sourceMetadataJson.get("device"));
+                    }
+                  }
+                }
               } catch (Exception e) {
                 logger.warn("Unable to parse metadata {}", metadata);
                 throw new IllegalArgumentException("Unable to parse metadata");
@@ -672,7 +683,7 @@ public class IndexServiceImpl implements IndexService {
         }
       }
       // 2. Save the snapshot
-      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      assetManager.takeSnapshot(mediaPackage);
 
       // 3. start the new workflow on the snapshot
       // Workflow params are assumed to be String (not mixed with Number)
@@ -1196,7 +1207,7 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1271,7 +1282,7 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
         try {
@@ -1333,7 +1344,7 @@ public class IndexServiceImpl implements IndexService {
         throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
       case ARCHIVE:
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-        assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+        assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:
         mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
@@ -1966,7 +1977,7 @@ public class IndexServiceImpl implements IndexService {
                   break;
                 case ARCHIVE:
                   logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+                  assetManager.takeSnapshot(mediaPackage);
                   break;
                 case SCHEDULE:
                   logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());

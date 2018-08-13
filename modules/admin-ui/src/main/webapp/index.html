@@ -6,12 +6,12 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
         <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(.) styles/vendor.css -->
+        <!-- build:css(src/main) styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
         <!-- endbower -->
         <!-- endbuild -->
-        <!-- build:css(.tmp) styles/main.css -->
+        <!-- build:css(target/grunt/.tmp) styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
         <!-- endbuild -->
         <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
@@ -25,10 +25,8 @@
         <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
         <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
         <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
-        <script type="text/javascript" src="lib/backbone-1.1.0.js"></script>
-        <script type="text/javascript" src="lib/visualsearch.js"></script>
         <script type="text/javascript" src="lib/chosen.jquery.js"></script>
-        <script type="text/javascript" src="lib/moment.min.js"></script>
+        <script type="text/javascript" src="lib/moment-with-locales.js"></script>
     </head>
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
@@ -87,6 +85,9 @@
                             <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
                         </a>
                         </li>
+                        <li>
+                            <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
+                        </li>
                     </ul>
                 </div>
 
@@ -119,7 +120,7 @@
         </footer>
 
 
-        <!-- build:js({.tmp,src/main}) scripts/bower.js -->
+        <!-- build:js(src/main) scripts/bower.js -->
         <!-- bower:js -->
         <script src="../../bower_components/angular/angular.js"></script>
         <script src="../../bower_components/angular-route/angular-route.js"></script>
@@ -135,19 +136,20 @@
         <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
         <!-- endbower -->
         <!-- endbuild -->
-        <!-- build:js({.tmp,src/main/webapp}) scripts/vendor.js -->
+        <!-- build:js(src/main/webapp) scripts/vendor.js -->
         <script src="scripts/lib/angular-chosen.js"></script>
         <script src="scripts/lib/angular-sortable.js"></script>
         <script src="scripts/lib/video-js/video.js"></script>
         <script src="scripts/lib/javascript-md5/js/md5.min.js"></script>
         <!-- endbuild -->
 
-        <!-- build:js({.tmp,src/main/webapp}) scripts/scripts.js -->
+        <!-- build:js(src/main/webapp) scripts/scripts.js -->
         <script src="scripts/app.js"></script>
         <script src="scripts/shared/services/services.js"></script>
         <script src="scripts/shared/services/resourceHelperService.js"></script>
         <script src="scripts/shared/services/authService.js"></script>
         <script src="scripts/shared/services/cryptService.js"></script>
+        <script src="scripts/shared/services/relativeDatesService.js"></script>
         <script src="scripts/shared/services/jsHelperService.js"></script>
         <script src="scripts/shared/services/languageService.js"></script>
         <script src="scripts/shared/services/storageService.js"></script>
@@ -176,6 +178,8 @@
         <script src="scripts/shared/resources/seriesMetadataResource.js"></script>
         <script src="scripts/shared/resources/seriesParticipationResource.js"></script>
         <script src="scripts/shared/resources/seriesEventsResource.js"></script>
+        <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
+        <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
         <script src="scripts/shared/resources/seriesThemeResource.js"></script>
         <script src="scripts/shared/resources/eventMetadataResource.js"></script>
         <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
@@ -186,14 +190,15 @@
         <script src="scripts/shared/resources/newSeriesThemeResource.js"></script>
         <script src="scripts/shared/resources/conflictCheckResource.js"></script>
         <script src="scripts/shared/resources/bulkDeleteResource.js"></script>
-        <script src="scripts/shared/resources/eventMediaResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetMediaResource.js"></script>
         <script src="scripts/shared/resources/eventAttachmentDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventMediaDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventCatalogDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventParticipationResource.js"></script>
         <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetPublicationsResource.js"></script>
         <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
+        <script src="scripts/shared/resources/eventsSchedulingResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowsResource.js"></script>
         <script src="scripts/shared/resources/eventTransactionResource.js"></script>
         <script src="scripts/shared/resources/eventErrorsResource.js"></script>
@@ -202,12 +207,13 @@
         <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
         <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
-        <script src="scripts/shared/resources/eventAttachmentsResource.js"></script>
-        <script src="scripts/shared/resources/eventCatalogsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetAttachmentsResource.js"></script>
+        <script src="scripts/shared/resources/eventAssetCatalogsResource.js"></script>
         <script src="scripts/shared/resources/eventAssetsResource.js"></script>
         <script src="scripts/shared/resources/eventAccessResource.js"></script>
-        <script src="scripts/shared/resources/eventGeneralResource.js"></script>
+        <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
         <script src="scripts/shared/resources/eventHasSnapshotsResource.js"></script>
+        <script src="scripts/shared/resources/eventBulkEditResource.js"></script>
         <script src="scripts/shared/resources/toolsResource.js"></script>
         <script src="scripts/shared/resources/commentResource.js"></script>
         <script src="scripts/shared/resources/usersResource.js"></script>
@@ -281,7 +287,6 @@
         <script src="scripts/shared/filters/humanByteSizeFilter.js"></script>
         <script src="scripts/shared/filters/humanDurationFilter.js"></script>
         <script src="scripts/shared/filters/arrayFilter.js"></script>
-        <script src="scripts/shared/filters/presentValue.js"></script>
         <script src="scripts/shared/filters/removeQueryParams.js"></script>
         <script src="scripts/shared/filters/translateOverrideFallbackFilter.js"></script>
         <script src="scripts/shared/filters/trustedResourceUrlFilter.js"></script>
@@ -297,6 +302,7 @@
         <script src="scripts/shared/directives/tableDirective.js"></script>
         <script src="scripts/shared/directives/statsDirective.js"></script>
         <script src="scripts/shared/directives/confirmationModalDirective.js"></script>
+        <script src="scripts/shared/directives/deleteSingleSeriesModalDirective.js"></script>
         <script src="scripts/shared/directives/resourceModalDirective.js"></script>
         <script src="scripts/shared/directives/editableDirective.js"></script>
         <script src="scripts/shared/directives/editableBooleanValueDirective.js"></script>
@@ -323,6 +329,7 @@
         <script src="scripts/shared/directives/uploadAssetDirective.js"></script>
         <script src="scripts/shared/services/resourceModalService.js"></script>
         <script src="scripts/shared/services/confirmationModalService.js"></script>
+        <script src="scripts/shared/services/deleteSingleSeriesModalService.js"></script>
         <script src="scripts/shared/services/uploadAssetOptionsService.js"></script>
         <script src="scripts/shared/controllers/controllers.js"></script>
         <script src="scripts/shared/controllers/navigationController.js"></script>
@@ -330,9 +337,11 @@
         <script src="scripts/shared/controllers/applicationController.js"></script>
         <script src="scripts/shared/controllers/userPreferencesController.js"></script>
         <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
+        <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
         <script src="scripts/modules/events/controllers/eventsController.js"></script>
         <script src="scripts/modules/events/controllers/eventController.js"></script>
         <script src="scripts/modules/events/controllers/editStatusController.js"></script>
+        <script src="scripts/modules/events/controllers/editEventsController.js"></script>
         <script src="scripts/modules/events/controllers/newEventController.js"></script>
         <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
         <script src="scripts/modules/events/controllers/seriesController.js"></script>
@@ -345,6 +354,7 @@
         <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
         <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
         <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
+        <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
         <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>

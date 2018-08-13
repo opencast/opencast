@@ -31,7 +31,7 @@ describe('Event controller', function () {
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
         $httpBackend.whenGET('/admin-ng/event/40518/metadata.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/metadata.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/general.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/40518/publications.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/media/media.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/attachment/attachments.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond('{}');
@@ -56,6 +56,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
             .respond(JSON.stringify({"results":[],"total":0}));
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
 
         $controller('EventCtrl', {$scope: $scope});
     });

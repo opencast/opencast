@@ -1,21 +1,33 @@
 Concat Workflow Operation Handler
 =================================
 
-Overview
---------
+The *concat* operation handler has been created to concatenate multiple video tracks into one video track.
 
-The "concat" operation handler has been created to concatenate multiple video tracks into one video track. Note, that
-the concatenation process used will always re-encode the videos.
+For a concatenation of two video files to work, both files need to have the same format (timebase, resolution, codecs,
+frame rate, etc.). This workflow operation has two modes to deal with this restriction:
+
+- A *general* mode which re-encodes all input files, hence ensuring that this restriction is always met.
+- A *same codec* mode which assumes the restriction is already met and can hence concatenate the files much faster while
+  also being a lossless process. But it will fail or produce a weird output if if the restrictions are not met.
+
+
+General Mode
+------------
+
+*No restriction on source tracks codecs*
+
+This will re-encode the videos first to the same format (framerate/timebase/codec, etc) before concatenation.
 
 ![Concat](Concat.png)
 
-The internal ffmpeg command is using the following filters: fps, scale, pad and setdar for scaling all videos to a
-similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for the actual
-concatenation step.
+The internal FFmpeg command for re-encoding is using the following filters: fps, scale, pad and setdar for scaling all
+videos to a similar size including letterboxing, aevalsrc for creating silent audio streams and of course the concat for
+the actual concatenation step.
 
+This requires an output-resolution and an optional output-framerate for the pre-concatenation encode.
 
-FFmpeg Filter Example
----------------------
+The automatically generated FFmpeg filter for this process does look like this:
+
 
     -filter_complex '
       [0:v]fps=fps=25.0,scale=iw*min(640/iw\,480/ih):ih*min(640/iw\,480/ih),pad=640:480:(ow-iw)/2:(oh-ih)/2,setdar=4:3[b];
@@ -24,17 +36,55 @@ FFmpeg Filter Example
       aevalsrc=0::d=1[silent];
       [b][0:a][c][silent][d][2:a]concat=n=3:v=1:a=1[v][a]' -map '[v]' -map '[a]'
 
+
+
+Same Codec Mode
+---------------
+
+*Requires the source tracks having the same format (same timebase/resolution/encoding, etc.)*
+
+If the `same-codec` option is specified to use this mode, the sources files can be arranged into one container
+losslessly without re-encoding first.  This is often the case if the tracks came from the same camera/recorder for
+example.
+
+This mode uses [FFmpeg's concat demuxer](https://www.ffmpeg.org/ffmpeg-formats.html#concat-1), which puts all the video
+content into a single container without any re-encoding. The encoding profile then operates on the source in this
+container. If `-c copy` is used in the encoding profile, the complete concatenation is lossless.
+
+The FFmpeg command for this is is:
+
+    -f concat -i videolist.txt
+
+…where `videolist.txt` contains a line in the form `file <path to video>` for each source track.
+
+
 Usage
 -----
 
 This operation is quite similar to the compose operation. The only difference is that the input properties are not only
-limited to one `source-flavor` and `source-tag`. The operation supports multiple flavor and tags as input.  To add
-multiple source, add different key with the prefix `source-flavor-`/`source-tag-` and an incremental number starting
+limited to one `source-flavor` and `source-tag`. The operation supports multiple flavor and tags as input. To add
+multiple sources, add different keys with the prefix `source-flavor-`/`source-tag-` and an incremental number starting
 with 0. For example:
 
-* `source-flavor-part-0`
-* `source-flavor-part-1`
-* `source-flavor-part-..`
+- `source-flavor-part-0`
+- `source-flavor-part-1`
+- `source-flavor-part-..`
+
+
+Alternatively, using the `source-flavor-numbered-files` option, the operation supports an undetermined number of
+ordered input files.
+
+This is useful when the number of input files cannot be known in advance, such as chunked output files from some
+camera/recorders, and the names are ordered by number or timestamps and to be sorted lexicographically.
+
+For example, the configuration could be `source-flavor-numbered-files: multipart/part+source` and the ordered input
+files:
+
+    video-201711201020.mp4
+    video-201711201030.mp4
+    video-201711201040.mp4
+
+*Note that both methods of defining input files are mutually exclusive.*
 
 
 Configuration Keys
@@ -51,6 +101,8 @@ Configuration Keys
 |`target-tags`                   |false   |Tag(s) to add to the output track                      |`NULL` |`engage-download`|
 |`output-resolution`             |true    |Output resolution in width, height or a source part    |`NULL` |`1900x1080`, `part-1`|
 |`output-framerate`              |false   |Output frame rate in frames per second or a source part|`-1.0` |`25`, `23.976`, `part-1`|
+|`source-flavor-numbered-files`  |false   |Files of this flavor are ordered lexicographically to use as input track.  |`NULL` |`multipart/sections`|
+|`same-codec`                    |false   |All source files have identical formats.               |`false` |`true`|
 
 
 Example
@@ -58,37 +110,52 @@ Example
 
 Example of a concat operation in a workflow definition.
 
-    <!-- Add intro and outro part to the presenter track -->
-    <operation
-      id="concat"
-      fail-on-error="true"
-      exception-handler-workflow="error"
-      description="Concatenate the presenter track and the intro/outro videos.">
-      <configurations>
-        <configuration key="source-flavor-part-0">intro/source</configuration>
-        <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
-        <configuration key="source-flavor-part-1-mandatory">true</configuration>
-        <configuration key="source-flavor-part-2">outro/source</configuration>
-        <configuration key="target-flavor">presenter/concat</configuration>
-        <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">concat</configuration>
-        <configuration key="output-resolution">1920x1080</configuration>
-        <configuration key="output-framerate">part-1</configuration>
-      </configurations>
-    </operation>
+```xml
+<!-- Add intro and outro part to the presenter track -->
+<operation
+  id="concat"
+  fail-on-error="true"
+  exception-handler-workflow="error"
+  description="Concatenate the presenter track and the intro/outro videos.">
+  <configurations>
+    <configuration key="source-flavor-part-0">intro/source</configuration>
+    <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
+    <configuration key="source-flavor-part-1-mandatory">true</configuration>
+    <configuration key="source-flavor-part-2">outro/source</configuration>
+    <configuration key="target-flavor">presenter/concat</configuration>
+    <configuration key="target-tags">engage-download,engage-streaming</configuration>
+    <configuration key="encoding-profile">concat</configuration>
+    <configuration key="output-resolution">1920x1080</configuration>
+    <configuration key="output-framerate">part-1</configuration>
+  </configurations>
+</operation>
+```
 
+Example of a lossless concat operation for videos with identical formats in a workflow definition.
+
+```xml
+<!-- Concatenate chunked video from camera -->
+<operation
+  id="concat"
+  fail-on-error="true"
+  exception-handler-workflow="error"
+  description="Concatenate the generated videos.">
+  <configurations>
+    <configuration key="source-flavor-numbered-files">multipart/chunkedsource</configuration>
+    <configuration key="target-flavor">presenter/concat</configuration>
+    <configuration key="target-tags">engage-download,engage-streaming</configuration>
+    <!-- do not encode before concatenation -->
+    <configuration key="same-codec">true</configuration>
+    <configuration key="encoding-profile">concat-samecodec</configuration>
+  </configurations>
+</operation>
+```
 
 Encoding Profile
 ----------------
 
-The encoding profile command must contain the the #{concatCommand} parameter.
+The encoding profile command must contain the #{concatCommand} parameter which will set all input and possibly filter
+commands required for this operation:
 
-    profile.concat.name = concat
-    profile.concat.input = visual
-    profile.concat.output = visual
-    profile.concat.suffix = -concatenated.mp4
-    profile.concat.mimetype = video/mp4
     profile.concat.ffmpeg.command = #{concatCommand} \
-      -c:a aac -b:a 128k \
-      -c:v mpeg4 -b:v 1200k -flags +aic+mv4 \
-      #{out.dir}/#{out.name}#{out.suffix}
+      … #{out.dir}/#{out.name}#{out.suffix}

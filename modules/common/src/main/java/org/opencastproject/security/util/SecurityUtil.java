@@ -21,8 +21,10 @@
 
 package org.opencastproject.security.util;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ANONYMOUS_USERNAME;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
@@ -33,7 +35,9 @@ import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.ConfigurationException;
@@ -47,9 +51,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URL;
+import java.util.regex.Pattern;
 
 /** Opencast security helpers. */
 public final class SecurityUtil {
+  private static final Pattern SANITIZING_PATTERN = Pattern.compile("[^a-zA-Z0-9_]");
+
   private SecurityUtil() {
   }
 
@@ -177,5 +184,42 @@ public final class SecurityUtil {
   /** Extract hostname and port number from a URL. */
   public static Tuple<String, Integer> hostAndPort(URL url) {
     return tuple(StringUtils.strip(url.getHost(), "/"), url.getPort());
+  }
+
+  /**
+   * Check if the current user has access to the capture agent with the given id.
+   * @param agentId
+   *           The agent id to check.
+   * @throws UnauthorizedException
+   *           If the user doesn't have access.
+   */
+  public static void checkAgentAccess(final SecurityService securityService, final String agentId)
+      throws UnauthorizedException {
+    if (isBlank(agentId)) {
+      return;
+    }
+    final User user = securityService.getUser();
+    if (user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(user.getOrganization().getAdminRole())) {
+      return;
+    }
+    if (!user.hasRole(SecurityUtil.getCaptureAgentRole(agentId))) {
+      throw new UnauthorizedException(user, "schedule");
+    }
+  }
+
+  private static String sanitizeCaName(final String ca) {
+    return SANITIZING_PATTERN.matcher(ca).replaceAll("").toUpperCase();
+  }
+
+  /**
+   * Get the role name of the role required to access the capture agent with the given agent id.
+   *
+   * @param
+   *     agentId The id of the agent to get the role for.
+   * @return
+   *     The role name.
+   */
+  public static String getCaptureAgentRole(final String agentId) {
+    return GLOBAL_CAPTURE_AGENT_ROLE + "_" + sanitizeCaName(agentId);
   }
 }

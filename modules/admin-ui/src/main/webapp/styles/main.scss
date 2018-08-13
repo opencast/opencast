@@ -19,9 +19,6 @@
  *
  */
 
-// bower:scss
-// endbower
-
 // Frameworks
 // ----------------------------------------
 
@@ -546,6 +543,10 @@ table.main-tbl {
 
 tr.error {
   background: $state-warning-bg !important;
+}
+
+tr.info {
+  background: $state-info-bg !important;
 }
 
 /*

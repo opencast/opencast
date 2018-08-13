@@ -53,7 +53,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*/attachments.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/general.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/event/*/publications.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/hasActiveTransaction" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/hasSnapshots.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
@@ -162,6 +162,8 @@
     <!-- Securing the URLs for the external API interface -->
     <!-- External API GET Endpoints -->
     <sec:intercept-url pattern="/api" method="GET" access="ROLE_ADMIN, ROLE_API"/>
+    <sec:intercept-url pattern="/api/agents" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
+    <sec:intercept-url pattern="/api/agents/*" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_VIEW"/>
@@ -175,6 +177,7 @@
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/publications" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/publications/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
+    <sec:intercept-url pattern="/api/events/*/scheduling" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_VIEW"/>
     <sec:intercept-url pattern="/api/groups" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
     <sec:intercept-url pattern="/api/groups/*" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
     <sec:intercept-url pattern="/api/info/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
@@ -193,6 +196,7 @@
     <sec:intercept-url pattern="/api/events/*/comments/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
+    <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_EDIT"/>
     <sec:intercept-url pattern="/api/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/series/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_EDIT"/>
@@ -240,8 +244,9 @@
     <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Paella player -->
-    <sec:intercept-url pattern="/engage/paella/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/engage/paella/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/paella/config/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -484,6 +489,7 @@
             <value>CONSUMERKEY</value>
           </list>
         </constructor-arg>
+        <constructor-arg index="3" value="^(admin|opencast_system_account)$" />
         -->
 
       </bean>

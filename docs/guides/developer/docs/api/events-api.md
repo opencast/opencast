@@ -5,41 +5,53 @@
 
 Returns a list of events.
 
-By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if signing is turned on
-in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
-response.
+The following query string parameters are supported to filter, sort and pagingate the returned list:
 
-Query String Parameter     |Type            | Description
-:--------------------------|:---------------|:----------------------------
-`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
-`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
-`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
-`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
-`filter`                   | [`string`](types.md#basic)  | A comma seperated list of filters to limit the results with. A filter is the filter's name followed by a colon ":" and then the value to filter with so it is the form `Filter Name`:`Value to Filter With`. See the below table for the list of available filters.
-`sort`                     | [`string`](types.md#basic)  | Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: `Sort Name`:`ASC` or `Sort Name`:`DESC`. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory. See the below table about the available sort names in the table below.
-`limit`                    | [`string`](types.md#basic)  | The maximum number of results to return for a single request.
-`offset`                   | [`string`](types.md#basic)  | Number of results to skip based on the limit. 0 is the first set of results up to the limit, 1 is the second set of results after the first limit, 2 is third set of results after skipping the first two sets of results etc.
+Query String Parameter |Type                         | Description
+:----------------------|:----------------------------|:-----------
+`filter`               | [`string`](types.md#basic)  | A comma-separated list of filters to limit the results with (see [Filtering](usage.md#filtering)). See the below table for the list of available filters
+`sort`                 | [`string`](types.md#basic)  | A comma-separated list of sort criteria (see [Sorting](usage.md#sorting)).  See the below table for the list of available sort criteria
+`limit`                | [`integer`](types.md#basic) | The maximum number of results to return (see [Pagination](usage.md#pagination))
+`offset`               | [`integer`](types.md#basic) | The index of the first result to return (see [Pagination](usage.md#pagination))
 
-Filter Name     | Description
-:---------------|:------------------
-`contributors`  | Events where the contributors match.
-`location`      | Events based upon the location it is scheduled in.
-`series`        | Events based upon which series they are a part of.
-`subject`       | Filters events based upon which subject they are a part of.
-`textFilter`    | Filters events where any part of the event's metadata fields match this value.
+The following filters are available:
 
-Sort Name           | Description
-:-------------------|:---------------
-`title`             | By the title of the event.
-`presenter`         | By the presenter of the event.
-`start_date`        | By the start date of the event.
-`end_date`          | By the end date of the event.
-`review_status`     | By whether the event has been reviewed and approved or not.
-`workflow_state`    | By the current processing state of the event. Is it scheduled to be recorded (INSTANTIATED), currently processing (RUNNING), paused waiting for a resource or user paused (PAUSED), cancelled (STOPPED), currently failing (FAILING), already failed (FAILED), or finally SUCCEEDED.
-`scheduling_status` | By the current scheduling status of the event.
-`series_name`       | By the series name of the event.
-`location`          | By the location (capture agent) that the event will be or has been recorded on.
+Filter Name    | Description
+:--------------|:-----------
+`contributors` | Events where the contributors match
+`location`     | Events based upon the location it is scheduled in
+`series`       | Events based upon which series they are a part of
+`subject`      | Filters events based upon which subject they are a part of
+`textFilter`   | Filters events where any part of the event's metadata fields match this value
 
+The list can be sorted by the following criteria:
+
+Sort Criteria       | Description
+:-------------------|:-----------
+`title`             | By the title of the event
+`presenter`         | By the presenter of the event
+`start_date`        | By the start date of the event
+`end_date`          | By the end date of the event
+`review_status`     | By whether the event has been reviewed and approved or not
+`workflow_state`    | By the current processing state of the event. Is it scheduled to be recorded (INSTANTIATED), currently processing (RUNNING), paused waiting for a resource or user paused (PAUSED), cancelled (STOPPED), currently failing (FAILING), already failed (FAILED), or finally SUCCEEDED
+`scheduling_status` | By the current scheduling status of the event
+`series_name`       | By the series name of the event
+`location`          | By the location (capture agent) that the event will be or has been recorded on
+
+This request additionally supports the following query string parameters to include additional information directly in
+the response:
+
+Query String Parameter     |Type                         | Description
+:--------------------------|:----------------------------|:-----------
+`sign`                     | [`boolean`](types.md#basic) | Whether public distribution urls should be signed
+`withacl`                  | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response
+`withmetadata`             | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response
+`withpublications`         | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response
+`withscheduling`           | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
+
+By setting the optional `sign` parameter to `true`, the method will pre-sign distribution urls if URL signing is turned
+on in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching
+this response.
 
 __Sample request__
 
@@ -57,9 +69,9 @@ Field                | Type                                 | Description
 `identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
 `creator`            | [`string`](types.md#basic)           | The technical creator of this event
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
-`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
-`start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
+`start`\*            | [`datetime`](types.md#date-and-time) | The bibliographic start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
 `title`\*            | [`string`](types.md#basic)           | The title of this event
 `processing_state`   | [`string`](types.md#basic)           | The current processing state of this event
@@ -69,6 +81,14 @@ Field                | Type                                 | Description
 `has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
 `location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
 `publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
+`language`\*         | [`string`](types.md#basic)           | The language of this event (version 1.1.0 and higher)
+`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event (version 1.1.0 and higher)
+`license`\*          | [`string`](types.md#basic)           | The license of this event (version 1.1.0 and higher)
+`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to (version 1.1.0 and higher)
+`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to (version 1.1.0 and higher)
+`source`\*           | [`string`](types.md#basic)           | The source of this event (version 1.1.0 and higher)
+`status`             | [`string`](types.md#basic)           | The technical status of this event (version 1.1.0 and higher)
+
 
 \* Metadata fields of metadata catalog `dublincore/episode`
 
@@ -139,7 +159,7 @@ __Example__
 
 Creates an event by sending metadata, access control list, processing instructions and files in a [multipart request](http://www.w3.org/Protocols/rfc1341/7_2_Multipart.html).
 
-Multipart Form Parameters  |Type                             | Description
+Multipart Form Parameters  | Type                            | Description
 :--------------------------|:--------------------------------|:-----------
 `acl`                      | [`acl`](types.md#acl)           | A collection of roles with their possible action
 `metadata`                 | [`catalogs`](types.md#catalogs) | Event metadata as Form param
@@ -147,6 +167,33 @@ Multipart Form Parameters  |Type                             | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
+
+__Scheduling__
+
+Field      | Required | Type                                 | Description
+:----------|:---------|:-------------------------------------|:-----------
+`agent_id` | Yes      | [`string`](types.md#basic)           | The technical identifier of the capture agent
+`start`    | Yes      | [`datetime`](types.md#date-and-time) | The date and time (UTC) when the recording shall start
+`end`      | Yes\*    | [`datetime`](types.md#date-and-time) | The date and time (UTC) when the recording shall end
+`duration` | Yes\*    | [`integer`](types.md#basic)          | The duration of the recording in milliseconds
+`rrule`    | Yes\*    | [`rrule`](types.md#recurrence-rule)  | The recurrence rule used to create multiple scheduled events
+
+\* When creating a single scheduled event, either `end` or `duration` must be specified. When creating multiple
+scheduled events, the fields `end`, `duration` and `rrule` are required
+
+To create a single scheduled event, omit the field `rrule`. You can specify the start and end of the recording by
+using either the fields `start` and `end` or the fields `start` and `duration`.
+Please note that specifying both `end` and `duration` is not valid.
+
+To create multiple scheduled events, the field `rrule` is used. This field contains the recurrence rule used to
+determine the dates and times the scheduled events shall be created within the time period specified by the fields
+`start` and `end` + `duration`.
+Please note that `duration` is a mandatory field when creating multiple scheduled events.
+
+__Additional Notes__
+
+- Both `start` and `end` must be specified in UTC
 
 __Sample__
 
@@ -209,11 +256,37 @@ acl:
 ]
 ```
 
+scheduling (`rrule` is optional and can be used to schedule multiple events):
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"],
+  "rrule":"FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=16;BYMINUTE=0"
+}
+```
+
 __Response__
 
+`200 (OK)`: Multiple new events were created (scheduling with `rrule`).<br/>
 `201 (CREATED)`: A new event is created and its identifier is returned in the `Location` header.<br/>
-`400 (BAD REQUEST)`: The request is invalid or inconsistent.
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
+`409 (CONFLICT)`: The event could not be created due to a scheduling conflict. A list of conflicting events is returned.
 
+In case of success, when scheduling multiple events (200):
+```
+[
+  {
+    "identifier": "e6aeb8df-a852-46cd-8128-b89de696f20e"
+  },
+  {
+    "identifier": "90e93bf6-ed95-483b-8e57-3e2de77a786f"
+  }
+]
+```
+
+In case of success (201):
 ```xml
 Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20e
 ```
@@ -223,6 +296,18 @@ Location: http://api.opencast.org/api/events/e6aeb8df-a852-46cd-8128-b89de696f20
 }
 ```
 
+In case of a conflict (409):
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
+```
+
+
 ### GET /api/events/{event_id}
 
 Returns a single event.
@@ -231,12 +316,14 @@ By setting the optional `sign` parameter to `true`, the method will pre-sign dis
 in Opencast. Remember to consider the [maximum validity of signed URLs](security-api.md#Introduction) when caching this
 response.
 
-Query String Parameter |Type                         | Description
+Query String Parameter | Type                        | Description
 :----------------------|:----------------------------|:-----------
 `sign`                 | [`boolean`](types.md#basic) | Whether public distribution urls should be signed.
 `withacl`              | [`boolean`](types.md#basic) | Whether the acl metadata should be included in the response.
 `withmetadata`         | [`boolean`](types.md#basic) | Whether the metadata catalogs should be included in the response.
 `withpublications`     | [`boolean`](types.md#basic) | Whether the publication ids and urls should be included in the response.
+`withscheduling`       | [`boolean`](types.md#basic) | Whether the scheduling information should be included in the response (version 1.1.0 and higher).
+
 
 __Response__
 
@@ -247,7 +334,7 @@ Field                | Type                                 | Description
 `identifier`         | [`string`](types.md#basic)           | The unique identifier of the event
 `creator`            | [`string`](types.md#basic)           | The technical creator of this event
 `presenter`\*        | [`array[string]`](types.md#array)    | The presenters of this event
-`created`            | [`datetime`](types.md#date-and-time) | The date and time this event was created
+`created`\*          | [`datetime`](types.md#date-and-time) | The date and time this event was created
 `subjects`\*         | [`array[string]`](types.md#array)    | The subjects of this event
 `start`              | [`datetime`](types.md#date-and-time) | The technical start date and time of this event
 `description`\*      | [`string`](types.md#basic)           | The description of this event
@@ -259,6 +346,13 @@ Field                | Type                                 | Description
 `has_previews`       | [`boolean`](types.md#basic)          | Whether this event can be opened with the video editor
 `location`\*         | [`string`](types.md#basic)           | The bibliographic location of this event
 `publication_status` | [`array[string]`](types.md#array)    | The publications available for this event
+`language`\*         | [`string`](types.md#basic)           | The language of this event (version 1.1.0 and higher)
+`rightsholder`\*     | [`string`](types.md#basic)           | The rights holder of this event (version 1.1.0 and higher)
+`license`\*          | [`string`](types.md#basic)           | The license of this event (version 1.1.0 and higher)
+`is_part_of`\*       | [`string`](types.md#basic)           | The technical identifier of the series this event belongs to (version 1.1.0 and higher)
+`series`             | [`string`](types.md#basic)           | The title of the series this event belongs to (version 1.1.0 and higher)
+`source`\*           | [`string`](types.md#basic)           | The source of this event (version 1.1.0 and higher)
+`status`             | [`string`](types.md#basic)           | The technical status of this event (version 1.1.0 and higher)
 
 \* Metadata fields of metadata catalog `dublincore/episode`
 
@@ -309,6 +403,7 @@ Multipart Form Parameters  |Type                             | Description
 `presentation`             | [`file`](types.md#file)         | Presentation movie track
 `audio`                    | [`file`](types.md#file)         | Audio track
 `processing`               | [`string`](types.md#basic)      | Processing instructions task configuration
+`scheduling`               | [`string`](types.md#basic)      | Scheduling information (version 1.1.0 and higher)
 
 __Sample__
 
@@ -341,6 +436,18 @@ __Response__
 
 `204 (NO CONTENT)`: The event has been updated.<br/>
 `404 (NOT FOUND)`: The specified event does not exist.<br/>
+`409 (CONFLICT)`: The event could not be updated due to a scheduling conflict. A list of conflicting events is returned.
+
+In case of a conflict (when updating `scheduling`):
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
+```
 
 ### DELETE /api/events/{event_id}
 
@@ -729,4 +836,67 @@ __Response__
     }
   ]
 }
+```
+
+# Scheduling Information
+
+### GET /api/events/{event_id}/scheduling
+
+Available since API version 1.1.0.
+
+Returns an event's scheduling information.
+
+__Response__
+
+`200 (OK)`: The scheduling information is returned.<br/>
+`204 (NO CONTENT)`: The event is not scheduled.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.
+
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"]
+}
+```
+
+### PUT /api/events/{event_id}/scheduling
+
+Available since API version 1.1.0.
+
+Update the scheduling information of the event with id `{event_id}`.
+
+Form Parameters             |Type            | Description
+:---------------------------|:---------------|:----------------------------
+`scheduling`                | `string`       | The scheduling information.
+
+__Sample__
+
+scheduling:
+```
+{
+  "agent_id": "ca24",
+  "start": "2018-03-27T16:00:00Z",
+  "end": "2018-03-27T19:00:00Z",
+  "inputs": ["default"]
+}
+```
+
+__Response__
+
+`204 (NO CONTENT)`: The scheduling information of the event has been updated.<br/>
+`400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
+`404 (NOT FOUND)`: The specified event does not exist.<br/>
+`409 (CONFLICT)`: The scheduling information could not be updated due to a conflict. A list of conflicting events is returned.
+
+In case of a conflict:
+```
+[
+  {
+    "start":"2018-03-21T14:00:00Z",
+    "end":"2018-03-21T16:00:00Z",
+    "title":"My Event 06"
+  }
+]
 ```

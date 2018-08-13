@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>opencast-external-api</artifactId>
   <packaging>bundle</packaging>
@@ -25,6 +25,11 @@
       <artifactId>org.osgi.compendium</artifactId>
     </dependency>
     <!-- opencast -->
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-capture-admin-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
@@ -211,6 +216,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/external-base-endpoint.xml,
+              OSGI-INF/external-capture-agents-endpoint.xml,
               OSGI-INF/external-events-endpoint.xml,
               OSGI-INF/external-group-loader.xml,
               OSGI-INF/external-role-provider.xml,

@@ -1,5 +1,5 @@
 describe('Tools Edit controller', function () {
-    var $scope, $controller, $parentScope, $location, $window, $httpBackend, Notifications;
+    var $scope, $controller, $parentScope, $location, $httpBackend, Notifications;
 
     beforeEach(module('adminNg'));
     beforeEach(module(function ($provide) {
@@ -15,10 +15,6 @@ describe('Tools Edit controller', function () {
                 }
             }
         });
-
-        $window = { location: { reload: jasmine.createSpy() } };
-
-        $provide.value('$window', $window);
     }));
 
     beforeEach(inject(function ($rootScope, _$controller_, _$location_, _$httpBackend_, _Notifications_) {
@@ -30,7 +26,7 @@ describe('Tools Edit controller', function () {
         $parentScope = $rootScope.$new();
         $scope = $parentScope.$new();
 
-        $controller('ToolsCtrl', {$scope: $scope});
+        $controller('ToolsCtrl', { $scope: $scope });
     }));
 
     beforeEach(function () {

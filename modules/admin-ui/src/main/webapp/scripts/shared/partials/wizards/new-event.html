@@ -13,11 +13,11 @@
                                     <span translate="{{ row.label }}"></span>
                                     <i ng-show="row.required" class="required">*</i>
                                 </td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id"
                                     target="dublincore/episode"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
@@ -38,10 +38,10 @@
                         <table class="main-tbl">
                             <tr ng-repeat="row in block.fields">
                                 <td>{{ row.label | translate }} <i ng-show="row.required" class="required">*</i></td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id" target="{{name}}"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
@@ -62,7 +62,7 @@
                     <td>{{ conflict.end }}</td>
                 </tr>
             </table>
-            <div class="obj list-obj">
+            <div class="obj list-obj" ng-if="(wizard.step.captureAgents | filter:wizard.step.hasAgentAccess).length > 0">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE">
                     <!-- Select Source -->
                 </header>
@@ -81,10 +81,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION">
                                     <!-- Schedule Single Event -->
                                 </span>
                             </label>
@@ -93,10 +91,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION">
                                     <!-- Schedule Multiple Events -->
                                 </span>
                             </label>
@@ -136,11 +132,11 @@
                                     <span translate="{{ row.label }}"></span>
                                     <i ng-show="row.required" class="required">*</i>
                                 </td>
-                                <td ng-if="!row.readOnly" admin-ng-editable
+                                <td admin-ng-editable
                                     class="editable" name="row.id"
                                     target="dublincore/episode"
-                                    params="row" save="$parent.wizard.save"></td>
-                                <td ng-if="row.readOnly">{{ row.value }}</td>
+                                    params="row" save="$parent.wizard.save">
+                                </td>
                             </tr>
                         </table>
                     </form>
@@ -176,7 +172,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -187,7 +183,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -203,7 +199,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -214,7 +210,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -230,7 +226,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.hour" ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                             >
                               <option value=""></option>
@@ -241,7 +237,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.minute" ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                             >
                               <option value=""></option>
@@ -255,14 +251,14 @@
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }} <i class="required">*</i></td>
                             <td>
                             <select chosen
-                                data-width="'200px'"
+                                data-width="'203px'"
                                 tabindex="11"
                                 ng-disabled="wizard.step.checkingConflicts"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                                placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>
                             </select>
@@ -328,7 +324,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
                                     ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -340,7 +336,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
                                     ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -357,7 +353,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -369,7 +365,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -386,7 +382,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.hour"
                                     ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                             >
                               <option value=""></option>
@@ -398,7 +394,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.minute"
                                     ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                             >
                               <option value=""></option>
@@ -410,13 +406,13 @@
                             <td>
                             <select chosen
                                 ng-disabled="wizard.step.checkingConflicts"
-                                data-width="'100%'"
+                                data-width="'203px'"
                                 tabindex="19"
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                                placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>
                             </select>
@@ -425,11 +421,9 @@
                         <tr>
                             <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.INPUTS' | translate }} <i class="required">*</i></td>
                             <td>
-                                <label ng-repeat-start="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
+                                <label ng-repeat="inputMethod in wizard.step.ud.SCHEDULE_MULTIPLE.device.inputs">
                                     <input type="checkbox" ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device.inputMethods[inputMethod.id]" tabindex="20">{{ inputMethod.id | translate }}</input>
-                                     <br>
                                 </label>
-                                <br ng-repeat-end>
                             </td>
                         </tr>
                     </table>
@@ -475,8 +469,8 @@
                         data-disable-search-threshold="8"
                         data-search_contains="true"
                         ng-model="wizard.step.ud.workflow"
-                        ng-options="w.title for (obj, w) in wizard.step.workflows"
-                        data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
+                        ng-options="w.title for (obj, w) in wizard.step.workflows | orderBy: 'displayOrder':true"
+                        placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                         no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                     >
                         <option value=""></option>
@@ -531,7 +525,7 @@
                                                     ng-change="wizard.step.changeBaseAcl()"
                                                     ng-model="wizard.step.ud.id"
                                                     ng-options="id as name for (id, name) in wizard.step.acls"
-                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                    placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                                 >
                                                     <option value=""></option>
@@ -581,7 +575,7 @@
                                                     ng-model="policy.role"
                                                     ng-get-more="wizard.step.getMoreRoles"
                                                     ng-options="id as id for (id, type) in wizard.step.roles"
-                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                                    placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'">
                                                     <option value=""></option>
                                                  </select>
@@ -675,37 +669,50 @@
                     </table>
                   <!-- scheduled items -->
                     <table class="main-tbl">
+
+                        <!-- Start date upload -->
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start">
+                          <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
+                          <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start.value | localizeDate:'dateTime' }}</td>
+                        </tr>
+
+                        <!-- Start date schedule -->
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.date | localizeDate:'date' }}</td>
                         </tr>
+
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].start.hour !== undefined">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_TIME"><!-- Start Time --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getFormatedStartTime() }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getFormattedStartTime() | localizeDate:'time' }}</td>
                         </tr>
-                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end">
+                        <tr ng-if="(wizard.step.ud.type === 'SCHEDULE_MULTIPLE') && wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.date">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_DATE"><!-- End Date --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.end.date | localizeDate:'date' }}</td>
                         </tr>
-                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.repetitionOption">
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].end.hour !== undefined">
+                          <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.END_TIME"><!-- End Time --></td>
+                          <td>{{ wizard.getStateControllerByName('source').getFormattedEndTime() | localizeDate:'time' }}</td>
+                        </tr>
+                        <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].repetitionOption">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.REPEAT_ON"><!-- Repeat On --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.repetitionOption }}</td>
                         </tr>
-                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.weekdays)">
+                        <tr ng-if="!isEmpty(wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].weekdays)">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS"><!-- Weekdays --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries().SCHEDULE_MULTIPLE.presentableWeekdays }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].duration.hour !== undefined">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.DURATION"><!-- Duration --></td>
-                            <td>{{ wizard.getStateControllerByName('source').getFormatedDuration() }}</td>
+                            <td>{{ wizard.getStateControllerByName('source').getFormattedDuration() }}</td>
                         </tr>
                         <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name">
                             <td translate="EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION"><!-- Location --></td>
                             <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.name }}</td>
                         </tr>
-                        <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].SCHEDULE_SINGLE.device.inputs">
-                            <td>Input {{ key}}</td>
-                            <td>{{ value.value }}</td>
+                        <tr ng-repeat="(key, value) in wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].device.inputMethods">
+                            <td>{{ 'EVENTS.EVENTS.NEW.SUMMARY.SOURCE.INPUT' | translate }} {{ key }}</td>
+                            <td>{{ value }}</td>
                         </tr>
                     </table>
                 </div>

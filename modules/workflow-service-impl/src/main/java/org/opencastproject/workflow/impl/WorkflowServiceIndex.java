@@ -74,8 +74,10 @@ public interface WorkflowServiceIndex {
    *
    * @param query
    *          the query to use in the search for workflow instances
-   * @param action TODO
-   * @param applyPermissions TODO
+   * @param action
+   *          ACL action (e.g. read or write) to check for
+   * @param applyPermissions
+   *          whether to apply the permissions to the query. Set to false for administrative queries.
    *
    * @return the set of matching workflow instances
    * @throws WorkflowDatabaseException

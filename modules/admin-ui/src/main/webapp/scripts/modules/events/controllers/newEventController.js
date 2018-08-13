@@ -65,6 +65,9 @@ angular.module('adminNg.controllers')
               args.current.stateController.loadCaptureAgents();
               args.current.stateController.setDefaultsIfNeeded();
             }
+            if (!args.current.stateController.hasAgents()) {
+              args.current.stateController.ud.type = "UPLOAD";
+            }
         }
     });
 

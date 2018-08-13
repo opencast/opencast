@@ -16,17 +16,15 @@ educational videos.
 Installation
 ------------
 
-Installation instructions can be found locally at
-
-    docs/guides/admin/docs
-
-or in our [online documentation](https://docs.opencast.org).
+Installation instructions can be found locally at `docs/guides/admin/docs` or in
+our [online documentation](https://docs.opencast.org).
 
 
 Issue Tracker
 -------------
 
-You have found a bug, please file a ticket in our [issue tracker](https://opencast.jira.com).
+If you have found a bug, please file a ticket in our [issue tracker
+](https://opencast.jira.com).
 
 
 Community
@@ -34,6 +32,7 @@ Community
 
 More information about the community:
 
-- [Opencast Website](http://opencast.org/)
+- [Website](https://opencast.org)
+- [Documentation](https://docs.opencast.org)
 - [Twitter](https://twitter.com/openmatter)
 - [Facebook](https://facebook.com/opencast)

@@ -21,5 +21,5 @@
 package org.opencastproject.external.common;
 
 public enum ApiFormat {
-  JSON, XML
+  JSON;
 }

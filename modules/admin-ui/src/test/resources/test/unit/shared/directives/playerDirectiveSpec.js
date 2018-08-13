@@ -7,9 +7,7 @@ describe('adminNg.directives.playerDirective', function () {
         },
         addListener: function () {
         },
-        previousFrame: function () {
-        },
-        nextFrame: function () {
+        ready: function () {
         }
     };
 
@@ -47,8 +45,6 @@ describe('adminNg.directives.playerDirective', function () {
     beforeEach(function () {
         spyOn(adapter, 'play');
         spyOn(adapter, 'pause');
-        spyOn(adapter, 'previousFrame');
-        spyOn(adapter, 'nextFrame');
 
         // mock angular.element(..)
         spyOn(angular, 'element').and.returnValue($('<video id=player/>'));
@@ -89,11 +85,6 @@ describe('adminNg.directives.playerDirective', function () {
 
     describe('html', function () {
 
-        it('delegates to adapter.previousFrame()', function () {
-            element.find('div.playback-controls-wrapper > div:nth-child(2)').click();
-            expect(adapter.previousFrame).toHaveBeenCalled();
-        });
-
         it('delegates to adapter.play() if playing is false', function () {
             element.find('div.playback-controls-wrapper > div:nth-child(3)').click();
             expect(adapter.play).toHaveBeenCalled();
@@ -103,11 +94,6 @@ describe('adminNg.directives.playerDirective', function () {
             element.isolateScope().playing = true;
             element.find('div.playback-controls-wrapper > div:nth-child(3)').click();
             expect(adapter.pause).toHaveBeenCalled();
-        });
-
-        it('delegates to adapter.pause() if playing is true', function () {
-            element.find('div.playback-controls-wrapper > div:nth-child(4)').click();
-            expect(adapter.nextFrame).toHaveBeenCalled();
         });
     });
 });

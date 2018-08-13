@@ -1,0 +1,24 @@
+{
+  "events": [
+    "24323ba3-7ff5-4962-85a6-313cb9d9176d",
+    "29c059d8-4e8d-48e8-98ca-453082935704",
+    "b2d2caa4-ac72-47c3-acd5-f5732a0987da"
+  ],
+  "metadata": {
+    "flavor": "dublincore/episode",
+    "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+    "fields": [
+      {
+        "id": "title",
+        "value": "Test12"
+      }
+    ]
+  },
+  "scheduling": {
+    "timezone": "CET",
+    "duration": {
+      "hour": 10
+    },
+    "agentId": "der_werner"
+  }
+}
