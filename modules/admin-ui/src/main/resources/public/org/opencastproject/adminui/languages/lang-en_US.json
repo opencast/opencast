@@ -174,10 +174,12 @@
      "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
      "THEME_NAME_EMPTY": "The name cannot be empty",
      "BUMPER_UPLOAD_ERROR": "Error while uploading media",
+     "BUMPER_REQUIRED": "You must upload a bumper",
      "TRAILER_UPLOAD_ERROR": "Error while uploading media",
      "TITLE_UPLOAD_ERROR": "Error while uploading media",
      "LICENSE_UPLOAD_ERROR": "Error while uploading media",
      "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
+     "WATERMARK_REQUIRED": "You must upload a watermark",
      "THEME_UPLOAD_STARTED": "The media is being uploaded…",
      "THEME_CREATED": "The theme has been created",
      "THEME_NOT_CREATED": "The theme could not be created",
@@ -455,6 +457,7 @@
            "CAPTION": "Asset Upload",
            "SELECT_TYPE": "Select asset type",
            "ADD": "Add Asset",
+           "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
            "OPTION": {
                "CLASS_HANDOUT_NOTES":"Class handout notes",
                "CAPTIONS_DFXP" : "Captions DFXP",
@@ -657,6 +660,8 @@
               "TYPE"    : "Type",
               "SIZE"    : "Size",
               "DETAILS" : "Details",
+              "STREAMS": "Streams",
+              "PREVIEW": "Preview",
               "ATTACHMENTS": {
                   "TITLE": "Attachments",
                   "CAPTION": "Attachments",
@@ -864,6 +869,7 @@
             "ACTIONS": "Actions",
             "DETAILS": "Details",
             "DESCRIPTION": "",
+            "MORE_INFO": "More Information & Actions",
             "ID": "ID",
             "TYPE": "Type",
             "TITLE": "Title",
@@ -883,15 +889,39 @@
               "DELETE": "Delete workflow instance"
             }
           },
+         "WORKFLOW_INSTANCES": {
+           "TITLE": "Workflow instances"
+         },
          "WORKFLOW_DETAILS": {
            "TITLE": "Workflow details",
            "CONFIGURATION": "Workflow configuration"
          },
          "WORKFLOW_OPERATIONS": {
-           "TITLE": "Workflow operations"
+           "TITLE": "Workflow operations",
+           "DETAILS_LINK": "Operations",
+           "TABLE_HEADERS": {
+             "TITLE": "Title",
+             "STATUS": "Status",
+             "DESCRIPTION": "Description"
+           }
          },
          "OPERATION_DETAILS": {
-           "TITLE": "Operation details"
+           "TITLE": "Operation details",
+           "TABLE_HEADERS": {
+             "TITLE": "Title",
+             "STATE": "State",
+             "DESCRIPTION": "Description",
+             "EXECUTION_HOST": "Execution Host",
+             "JOB": "Job",
+             "TIME_IN_QUEUE": "Time in Queue",
+             "STARTED": "Started",
+             "FINISHED": "Finished",
+             "RETRY_STRATEGY": "Retry Strategy",
+             "FAILED_ATTEMPTS": "Failed Attempts",
+             "MAX_ATTEMPTS": "Max",
+             "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+             "FAIL_ON_ERROR": "Fail on Error"
+           }
          },
          "QUICKACTION_WORKFLOW_DETAILS": {
            "TITLE": "Workflow details"
@@ -1543,7 +1573,8 @@
            "ACTIVE": "Active",
            "ENABLE": "Enable bumper",
            "UPLOAD_LABEL": "Upload video",
-           "UPLOAD_BUTTON": "Upload"
+           "UPLOAD_BUTTON": "Upload",
+           "SELECT": "Select"
          },
          "TITLE": {
            "CAPTION": "Title",
@@ -1685,7 +1716,9 @@
      },
      "SEGMENTS": {
        "REMOVE_SEGMENT":  "Remove Segment",
-       "USE_SEGMENT":     "Use this Segment"
+       "USE_SEGMENT":     "Use this Segment",
+       "START":           "Start",
+       "END":             "End"
      },
      "PLAYER":{
        "PLAY":              "Play",

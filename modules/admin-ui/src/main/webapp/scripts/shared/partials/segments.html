@@ -14,11 +14,11 @@
                 ng-class="{ unused: segment.deleted, used: !segment.deleted }"
                 ng-click="toggleSegment($event, segment)" />
             </div>
-            <div class="segment-start segment-start-end"> Start:
+            <div class="segment-start segment-start-end"> {{'VIDEO_TOOL.SEGMENTS.START' | translate}}:
               <input type="text" ng-model="segment.startTime" ng-change="updateStartTime(segment)"
                      ng-disabled="segment.start === 0"/>
             </div>
-            <div class="segment-end segment-start-end"> End:
+            <div class="segment-end segment-start-end"> {{'VIDEO_TOOL.SEGMENTS.END' | translate}}:
               <input type="text" ng-model="segment.endTime" ng-change="updateEndTime(segment)"
                      ng-disabled="segment.end === video.duration"/>
             </div>
