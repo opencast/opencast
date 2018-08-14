@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/resources/eventUploadAssetResource.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">shared/resources/</a> eventUploadAssetResource.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">8.33% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>2/24</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/12</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">20% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>1/5</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">8.33% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>2/24</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+/** Upload asset resource
+ This resource performs the POST communication with the server
+ to start the workflow to process the upload files  */
+angular.module('adminNg.resources')
+.factory('EventUploadAssetResource', ['$resource', function ($resource) {
+    return $resource('/admin-ng/event/:id/assets', {}, {
+        save: {
+        method: 'POST',
+        // By setting ‘Content-Type’: undefined, the browser sets the
+        // Content-Type to multipart/form-data for us and fills in the
+        // correct boundary. Manually setting ‘Content-Type’:
+        // multipart/form-data will fail to fill in the boundary parameter
+        // of the request.
+        // multi-part file must be POST (not PUT) per ServletFileUpload.isMultipartContent
+        headers: { 'Content-Type': undefined },
+        responseType: 'text',
+        transformResponse: [],
+        transformRequest: <span class="fstat-no" title="function not covered" >function (data) {</span>
+<span class="cstat-no" title="statement not covered" >                var workflowConfiguration = {};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (angular.isUndefined(data)) {</span>
+<span class="cstat-no" title="statement not covered" >                    return data;</span>
+                }
+                // The end point expects a multipart request payload with two fields
+                // 1. A form field called 'metadata' containing asset data
+                // 2. A non-form field which contains a File object
+<span class="cstat-no" title="statement not covered" >                var fd = new FormData(), assets, tempAssetList = [], flavorList = [];</span>
+<span class="cstat-no" title="statement not covered" >                var assetMetadata = data['metadata'].assets;</span>
+<span class="cstat-no" title="statement not covered" >                if (data['upload-asset']) {</span>
+<span class="cstat-no" title="statement not covered" >                  assets = data['upload-asset'];</span>
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (assets) {</span>
+<span class="cstat-no" title="statement not covered" >                  angular.forEach(assets, <span class="fstat-no" title="function not covered" >function(files, name) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    angular.forEach(files, <span class="fstat-no" title="function not covered" >function (file, index) {</span></span>
+<span class="cstat-no" title="statement not covered" >                      fd.append(name + "." + index, file);</span>
+<span class="cstat-no" title="statement not covered" >                      tempAssetList.push(name);</span>
+                    });
+                  });
+                }
+&nbsp;
+                // get source flavors
+<span class="cstat-no" title="statement not covered" >               assetMetadata.forEach(<span class="fstat-no" title="function not covered" >function(dataItem) {</span></span>
+<span class="cstat-no" title="statement not covered" >                   if (tempAssetList.indexOf(dataItem.id) &gt;= 0) {</span>
+<span class="cstat-no" title="statement not covered" >                     flavorList.push(dataItem.flavorType + "/" + dataItem.flavorSubType);</span>
+                     // Special case to flag workflow to skip the "search+preview" image operation.
+                     // If more than one special case comes up in the future,
+                     // consider generalizing variable creation with
+                     //   camelCase('uploaded', flavor, subflavor)
+<span class="cstat-no" title="statement not covered" >                     if (dataItem.flavorSubType == "search+preview") {</span>
+<span class="cstat-no" title="statement not covered" >                       workflowConfiguration["uploadedSearchPreview"] = "true";</span>
+                     }
+                   }
+                });
+&nbsp;
+                // set workflow boolean param and flavor list param
+<span class="cstat-no" title="statement not covered" >                if (flavorList.length &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >                    workflowConfiguration["downloadSourceflavorsExist"] = "true";</span>
+<span class="cstat-no" title="statement not covered" >                    workflowConfiguration["download-source-flavors"] = flavorList.join(", ");</span>
+                }
+&nbsp;
+                // Add metadata form field
+<span class="cstat-no" title="statement not covered" >                fd.append('metadata', JSON.stringify({</span>
+                    assets: {
+                      options: assetMetadata
+                    },
+                    processing: {
+                      workflow: data['workflow'],
+                      configuration: workflowConfiguration
+                    }
+                }));
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                return fd;</span>
+            }
+        }
+    });
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

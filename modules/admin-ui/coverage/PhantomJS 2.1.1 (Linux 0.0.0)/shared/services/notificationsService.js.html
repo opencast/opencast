@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/services/notificationsService.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">shared/services/</a> notificationsService.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">92.19% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>59/64</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.38% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>29/37</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">77.78% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>7/9</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.44% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>57/61</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">808×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">808×</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">76×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">64×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">63×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">73×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">589×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+angular.module('adminNg.services')
+.provider('Notifications', function () {
+    var notifications = {},
+        keyList = {},
+        uniqueId = 0;
+&nbsp;
+    this.$get = ['$rootScope', '$injector', function ($rootScope, $injector) {
+        var AuthService;
+&nbsp;
+        // notification durations for different log level in seconds
+        var notificationDurationError = -1,
+            notificationDurationSuccess = 5,
+            notificationDurationWarning = 5;
+&nbsp;
+        var scope = $rootScope.$new(),
+            initContext = function (context) {
+                if (angular.isDefined(keyList[context])) {
+                    return notifications[context];
+                }
+&nbsp;
+                // initialize the arrays the first time
+                keyList[context] = [];
+                notifications[context] = {};
+&nbsp;
+                return notifications[context];
+            };
+&nbsp;
+        scope.get = function (context) {
+            var ADMIN_NOTIFICATION_DURATION_ERROR = 'admin.notification.duration.error',
+                ADMIN_NOTIFICATION_DURATION_SUCCESS = 'admin.notification.duration.success',
+                ADMIN_NOTIFICATION_DURATION_WARNING = 'admin.notification.duration.warning';
+&nbsp;
+            // We bind to AuthService here to prevent a circular dependency to $http
+            if (!AuthService) { AuthService = $injector.get('AuthService'); }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (AuthService) {
+                AuthService.getUser().$promise.then(function(user) {
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_ERROR])) {
+                        notificationDurationError = user.org.properties[ADMIN_NOTIFICATION_DURATION_ERROR];
+                    }
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_SUCCESS])) {
+                        notificationDurationSuccess = user.org.properties[ADMIN_NOTIFICATION_DURATION_SUCCESS];
+                    }
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING])) {
+                        notificationDurationWarning = user.org.properties[ADMIN_NOTIFICATION_DURATION_WARNING];
+                    }
+                });
+            }
+&nbsp;
+            if (!context) {
+                context = 'global';
+            }
+            return notifications[context] || initContext(context);
+        };
+&nbsp;
+        scope.remove = function (id, context) {
+            var key;
+            if (!context) {
+                context = 'global';
+            }
+&nbsp;
+            if (notifications[context] &amp;&amp; notifications[context][id]) {
+                // remove from key list
+                key = notifications[context][id].key;
+                keyList[context].splice(keyList[context].indexOf(key), 1);
+&nbsp;
+                notifications[context][id] = undefined;
+                delete notifications[context][id];
+                scope.$emit('deleted', context);
+            }
+        };
+&nbsp;
+        scope.addWithParams = <span class="fstat-no" title="function not covered" >function (type, key, messageParams, context, duration) {</span>
+<span class="cstat-no" title="statement not covered" >            scope.add(type, key, context, duration, messageParams);</span>
+        };
+&nbsp;
+        scope.add = function (type, key, context, duration, messageParams) {
+            if (angular.isUndefined(duration)) {
+                // fall back to defaults
+                switch (type) {
+                    case 'error':
+                        duration = notificationDurationError;
+                        break;
+                    case 'success':
+                        duration = notificationDurationSuccess;
+                        break;
+                    case 'warning':
+                        duration = notificationDurationWarning;
+                        break;
+                }
+                // default durations are in seconds. duration needs to be in milliseconds
+                if (duration &gt; 0) duration *= 1000;
+            }
+&nbsp;
+            if (!context) {
+                context = 'global';
+            }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (!messageParams) {
+                messageParams = {};
+            }
+&nbsp;
+            initContext(context);
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if(keyList[context].indexOf(key) &lt; 0) {
+                // only add notification if not yet existent
+&nbsp;
+                // add key to an array
+                keyList[context].push(key);
+&nbsp;
+                notifications[context][++uniqueId] = {
+                    type       : type,
+                    key        : key,
+                    message    : 'NOTIFICATIONS.' + key,
+                    parameters : messageParams,
+                    duration   : duration,
+                    id         : uniqueId,
+                    hidden     : false
+                };
+&nbsp;
+                scope.$emit('added', context);
+            } else {
+<span class="cstat-no" title="statement not covered" >              var notification = _.find(notifications.global, <span class="fstat-no" title="function not covered" >function(a) {<span class="cstat-no" title="statement not covered" ></span>return a.key === key}</span>);</span>
+<span class="cstat-no" title="statement not covered" >              if(notification) {</span>
+<span class="cstat-no" title="statement not covered" >                  notification.hidden = false;</span>
+              }
+            }
+            return uniqueId;
+        };
+&nbsp;
+        return scope;
+    }];
+});
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

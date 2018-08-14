@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/directives/segmentsDirective.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">shared/directives/</a> segmentsDirective.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.33% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>112/120</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.82% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>67/85</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">100% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>23/23</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">93.28% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>111/119</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">134×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">134×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">536×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">134×</span>
+<span class="cline-any cline-yes">134×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">134×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">254×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">639×</span>
+<span class="cline-any cline-yes">146×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">493×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1372×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-yes">66×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">23×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">57×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+angular.module('adminNg.directives')
+.directive('adminNgSegments', ['PlayerAdapter', '$document', 'VideoService', '$timeout',
+function (PlayerAdapter, $document, VideoService, $timeout) {
+    return {
+        templateUrl: 'shared/partials/segments.html',
+        priority: 0,
+        scope: {
+            player: '=',
+            video: '='
+        },
+        link: function (scope, element) {
+&nbsp;
+            /**
+            * Formats time stamps to HH:MM:SS.sss
+            *
+            * @param {Number} ms is the time in milliseconds,
+            * @param {Boolean} showMilliseconds should the milliseconds be displayed
+            * @return {String} Formatted time string
+           */
+            scope.formatMilliseconds = function (ms, showMilliseconds) {
+&nbsp;
+               <span class="missing-if-branch" title="if path not taken" >I</span>if (isNaN(ms)) {
+<span class="cstat-no" title="statement not covered" >                   return '';</span>
+               }
+&nbsp;
+               var date = new Date(ms),
+                   pad = function (number, padding) {
+                       return (new Array(padding + 1).join('0') + number)
+                           .slice(-padding);
+                   };
+&nbsp;
+               <span class="missing-if-branch" title="else path not taken" >E</span>if (typeof showMilliseconds === 'undefined') {
+                   showMilliseconds = true;
+               }
+&nbsp;
+               return pad(date.getUTCHours(), 2) + ':' +
+                   pad(date.getUTCMinutes(), 2) + ':' +
+                   pad(date.getUTCSeconds(), 2) +
+                   (showMilliseconds ? '.' + pad(date.getUTCMilliseconds(), 3) : <span class="branch-1 cbranch-no" title="branch not covered" >'')</span>;
+            };
+&nbsp;
+            /**
+             * Converts a string with a human readable time to ms
+             *
+             * @param {type} time in the format HH:MM:SS.sss
+             * @returns {Number} time in ms
+             */
+            scope.parseTime = function (time) {
+              <span class="missing-if-branch" title="else path not taken" >E</span>if ( time !== undefined &amp;&amp; time.length === 12) {
+                var hours = parseInt(time.substring(0,2)),
+                    minutes = parseInt(time.substring(3,5)),
+                    seconds = parseInt(time.substring(6,8)),
+                    millis = parseInt(time.substring(9));
+&nbsp;
+                return millis + (seconds * 1000) + (minutes * 60000) + (hours * 3600000);
+              }
+&nbsp;
+            };
+&nbsp;
+            /**
+             * Returns an object that describes the css classes for a given segment.
+             *
+             * @param {Object} segment object
+             * @return {Object} object with {class}: {boolean} values for CSS classes.
+             */
+            scope.getSegmentClass = function (segment) {
+                return { deleted: segment.deleted, selected: segment.selected};
+            };
+&nbsp;
+            /**
+             * Removes the given segment.
+             *
+             * The previous or, failing that, the next segment will take up
+             * the space of the given segment.
+             *
+             * @param {Event} event that triggered the merge action
+             * @param {Object} segment Segment object
+             */
+            scope.mergeSegment = function (event, segment) {
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+&nbsp;
+                if (!scope.isRemovalAllowed(segment)) {
+                    return;
+                }
+&nbsp;
+                var index = scope.video.segments.indexOf(segment);
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (scope.video.segments[index - 1]) {
+                    scope.video.segments[index - 1].end = segment.end;
+                    scope.video.segments.splice(index, 1);
+                } else <span class="cstat-no" title="statement not covered" >if (scope.video.segments[index + 1]) {</span>
+<span class="cstat-no" title="statement not covered" >                    scope.video.segments[index + 1].start = segment.start;</span>
+<span class="cstat-no" title="statement not covered" >                    scope.video.segments.splice(index, 1);</span>
+                }
+              scope.$root.$broadcast("segmentTimesUpdated");
+            };
+&nbsp;
+            /**
+             * Toggle the deleted flag for a segment. Indicating if it should be used or not.
+             *
+             * @param {Event} event for checkbox link - stop the propogation
+             * @param {Object} segment object on which the deleted variable will change
+             */
+            scope.toggleSegment = function (event, segment) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+&nbsp;
+                if (angular.isUndefined(segment) || scope.video.segments.indexOf(segment) === -1) {
+                    return;
+                }
+&nbsp;
+                if (scope.isRemovalAllowed(segment)) {
+                    segment.deleted = !segment.deleted;
+                }
+            };
+&nbsp;
+            /**
+             * Sets the position marker to the start of the given segment.
+             *
+             * @param {Event} event details
+             * @param {Object} segment Segment object
+             */
+            scope.skipToSegment = function (event, segment) {
+                event.preventDefault();
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (!segment.selected) {
+                    scope.player.adapter.setCurrentTime(segment.start / 1000);
+                }
+            };
+&nbsp;
+            scope.isRemovalAllowed = function(segment) {
+                if (!segment) {
+                    return false;
+                }
+&nbsp;
+                return (segment.deleted || scope.video.segments
+                                               .filter(function(seg) {
+                                                   return !seg.deleted;
+                                               }).length &gt; 1);
+            };
+&nbsp;
+            /**
+             * Sets / Updates the human readable start and end times of the segments.
+             */
+            scope.setHumanReadableTimes = function () {
+              angular.forEach(scope.video.segments, function(segment, key) {
+                segment.startTime = scope.formatMilliseconds(segment.start);
+                segment.endTime = scope.formatMilliseconds(segment.end);
+              });
+            };
+&nbsp;
+            /*
+             * Make sure that times are updates if needed.
+             */
+            scope.$root.$on("segmentTimesUpdated", function () {
+              scope.setHumanReadableTimes();
+              scope.$parent.setChanges(scope.segmentsChanged());
+            });
+&nbsp;
+            scope.segmentsChanged = function() {
+                if (scope.video.segments.length !== scope.originalSegments.length) return true;
+                return !scope.originalSegments.every(function(curr, idx) {
+                  return curr.start === scope.video.segments[idx].start
+                      &amp;&amp; curr.end === scope.video.segments[idx].end
+                      &amp;&amp; curr.selected === scope.video.segments[idx].selected;
+                });
+            };
+&nbsp;
+            /**
+             * Checks if a time is within the valid boundaries
+             * @param {type} time time to check
+             * @returns {Boolean} true if time is &gt; 0 and &lt;video duration
+             */
+            scope.timeValid = function (time) {
+              if (time &gt;= 0 &amp;&amp; time &lt;= scope.video.duration) {
+                return true;
+              } else {
+                return false;
+              }
+            };
+&nbsp;
+            /**
+             * Set a new Start time of a segment, other segments are changed or deleted accordingly
+             * @param {type} segment that should change
+             */
+&nbsp;
+            scope.updateStartTime = function (segment) {
+              var newTime = scope.parseTime(segment.startTime);
+              <span class="missing-if-branch" title="else path not taken" >E</span>if (newTime &amp;&amp; newTime !== segment.start) {
+                if (newTime &gt; segment.end || ! scope.timeValid(newTime)) {
+                  segment.startTime = scope.formatMilliseconds(segment.start);
+                } else {
+                  var previousSegment = scope.getPreviousSegment(segment);
+                  var allow = scope.isRemovalAllowed(previousSegment);
+                  segment.start = newTime;
+                  while (previousSegment &amp;&amp; allow &amp;&amp; previousSegment.start &gt; newTime) {
+                    scope.removeSegment(previousSegment);
+                    previousSegment = scope.getPreviousSegment(segment);
+                    allow = scope.isRemovalAllowed(previousSegment);
+                  }
+                  if (!allow &amp;&amp; previousSegment) {
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (previousSegment.start &gt; newTime) {
+                        segment.start = previousSegment.end;
+                    }
+                    else {
+<span class="cstat-no" title="statement not covered" >                        var endTime = Math.max(newTime, previousSegment.start + 1);</span>
+<span class="cstat-no" title="statement not covered" >                        segment.start = previousSegment.end = endTime;</span>
+                    }
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                  else <span class="missing-if-branch" title="else path not taken" >E</span>if (previousSegment) {
+                    previousSegment.end = newTime;
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                }
+              }
+            };
+&nbsp;
+            /**
+             * Sets a new end time of a segment, other segments are changed or deleted accordingly
+             * @param {type} segment that should change
+             */
+            scope.updateEndTime = function (segment) {
+              var newTime = scope.parseTime(segment.endTime);
+              <span class="missing-if-branch" title="else path not taken" >E</span>if (newTime &amp;&amp; newTime !== segment.end) {
+                if (newTime &lt; segment.start || ! scope.timeValid(newTime)) {
+                  segment.endTime = scope.formatMilliseconds(segment.end);
+                } else {
+                  var nextSegment = scope.getNextSegment(segment);
+                  var allow = scope.isRemovalAllowed(nextSegment);
+                  segment.end = newTime;
+                  while (nextSegment &amp;&amp; allow &amp;&amp; nextSegment.end &lt; newTime) {
+                    scope.removeSegment(nextSegment);
+                    nextSegment = scope.getNextSegment(segment);
+                    allow = scope.isRemovalAllowed(nextSegment);
+                  }
+                  if (!allow &amp;&amp; nextSegment) {
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (nextSegment.end &lt; newTime) {
+                      segment.end = nextSegment.start;
+                    }
+                    else {
+<span class="cstat-no" title="statement not covered" >                      var startTime = Math.min(newTime, nextSegment.end - 1);</span>
+<span class="cstat-no" title="statement not covered" >                      segment.end = nextSegment.start = startTime;</span>
+                    }
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                  else <span class="missing-if-branch" title="else path not taken" >E</span>if (nextSegment) {
+                    nextSegment.start = newTime;
+                    scope.$root.$broadcast("segmentTimesUpdated");
+                  }
+                }
+              }
+            };
+&nbsp;
+            /**
+             * Deletes a segment from the segment list. Times of other segments are not changed!
+             * @param {type} segment that should be deleted
+             */
+            scope.removeSegment = function (segment) {
+              <span class="missing-if-branch" title="else path not taken" >E</span>if (segment) {
+                var index = scope.video.segments.indexOf(segment);
+                scope.video.segments.splice(index, 1);
+              }
+            };
+&nbsp;
+            /**
+             * Gets the segment previous to the provided segment.
+             * @param {type} currentSegment the reference segment
+             * @returns {unresolved} the previous segment or "undefinded" if current segment is the first
+             */
+            scope.getPreviousSegment = function (currentSegment) {
+              var index = scope.video.segments.indexOf(currentSegment);
+              <span class="missing-if-branch" title="else path not taken" >E</span>if (index &gt; 0)
+                return scope.video.segments[index - 1];
+            };
+&nbsp;
+            /**
+             * Gets the next segment to the provided segment
+             * @param {type} currentSegment the reference segment
+             * @returns {unresolved} the next segment or "undefined" if the current segment is the last.
+             */
+            scope.getNextSegment = function (currentSegment) {
+              var index = scope.video.segments.indexOf(currentSegment);
+              <span class="missing-if-branch" title="else path not taken" >E</span>if (index &lt; (scope.video.segments.length - 1))
+                return scope.video.segments[index + 1];
+            };
+&nbsp;
+            scope.video.$promise.then(function () {
+              // Take a snapshot of the original segments to track if we have changes
+              scope.originalSegments = angular.copy(scope.video.segments);
+&nbsp;
+              scope.$root.$broadcast("segmentTimesUpdated");
+            });
+        }
+    };
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

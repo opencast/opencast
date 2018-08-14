@@ -1,0 +1,716 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for modules/users/controllers/aclController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">modules/users/controllers/</a> aclController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">1.09% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>1/92</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/41</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">1.09% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>1/92</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+// Controller for all single series screens.
+angular.module('adminNg.controllers')
+.controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications',
+<span class="fstat-no" title="function not covered" >        function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications) {</span>
+<span class="cstat-no" title="statement not covered" >    var roleSlice = 100;</span>
+<span class="cstat-no" title="statement not covered" >    var roleOffset = 0;</span>
+<span class="cstat-no" title="statement not covered" >    var loading = false;</span>
+<span class="cstat-no" title="statement not covered" >    var rolePromise = null;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    var createPolicy = <span class="fstat-no" title="function not covered" >function (role) {</span></span>
+<span class="cstat-no" title="statement not covered" >            return {</span>
+                role  : role,
+                read  : false,
+                write : false,
+                actions : {
+                    name : 'edit-acl-actions',
+                    value : []
+                }
+            };
+        },
+        fetchChildResources,
+        changePolicies = <span class="fstat-no" title="function not covered" >function (access, loading) {</span>
+<span class="cstat-no" title="statement not covered" >            var newPolicies = {};</span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach(access, <span class="fstat-no" title="function not covered" >function (acl) {</span></span>
+<span class="cstat-no" title="statement not covered" >                var policy = newPolicies[acl.role];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (angular.isUndefined(policy)) {</span>
+<span class="cstat-no" title="statement not covered" >                    newPolicies[acl.role] = createPolicy(acl.role);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                if (acl.action === 'read' || acl.action === 'write') {</span>
+<span class="cstat-no" title="statement not covered" >                    newPolicies[acl.role][acl.action] = acl.allow;</span>
+                } else <span class="cstat-no" title="statement not covered" >if (acl.allow === true || acl.allow === 'true'){</span>
+<span class="cstat-no" title="statement not covered" >                    newPolicies[acl.role].actions.value.push(acl.action);</span>
+                }
+            });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            $scope.policies = [];</span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach(newPolicies, <span class="fstat-no" title="function not covered" >function (policy) {</span></span>
+<span class="cstat-no" title="statement not covered" >                $scope.policies.push(policy);</span>
+            });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if (!loading) {</span>
+<span class="cstat-no" title="statement not covered" >                $scope.save();</span>
+            }
+        };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.policies = [];</span>
+<span class="cstat-no" title="statement not covered" >    $scope.baseAcl = {};</span>
+<span class="cstat-no" title="statement not covered" >    $scope.metadata = {};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.changeBaseAcl = <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >        $scope.baseAcl = AclResource.get({id: this.baseAclId}, <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >            changePolicies($scope.baseAcl.acl.ace);</span>
+        });
+<span class="cstat-no" title="statement not covered" >        this.baseAclId = '';</span>
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.addPolicy = <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >        $scope.policies.push(createPolicy());</span>
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.deletePolicy = <span class="fstat-no" title="function not covered" >function (policyToDelete) {</span></span>
+<span class="cstat-no" title="statement not covered" >        var index;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        angular.forEach($scope.policies, <span class="fstat-no" title="function not covered" >function (policy, idx) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (policy.role === policyToDelete.role &amp;&amp;</span>
+                policy.write === policyToDelete.write &amp;&amp;
+                policy.read === policyToDelete.read) {
+<span class="cstat-no" title="statement not covered" >                index = idx;</span>
+            }
+        });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (angular.isDefined(index)) {</span>
+<span class="cstat-no" title="statement not covered" >            $scope.policies.splice(index, 1);</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        $scope.save();</span>
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.getMoreRoles = <span class="fstat-no" title="function not covered" >function (value) {</span></span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (loading)</span>
+<span class="cstat-no" title="statement not covered" >            return rolePromise;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        loading = true;</span>
+<span class="cstat-no" title="statement not covered" >        var queryParams = {limit: roleSlice, offset: roleOffset};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if ( angular.isDefined(value) &amp;&amp; (value != "")) {</span>
+            //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+            //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+<span class="cstat-no" title="statement not covered" >            queryParams["filter"] = "role_name:"+ value +",role_target:ACL";</span>
+<span class="cstat-no" title="statement not covered" >            queryParams["offset"] = 0;</span>
+        } else {
+<span class="cstat-no" title="statement not covered" >            queryParams["filter"] = "role_target:ACL";</span>
+        }
+<span class="cstat-no" title="statement not covered" >        rolePromise = UserRolesResource.query(queryParams);</span>
+<span class="cstat-no" title="statement not covered" >        rolePromise.$promise.then(<span class="fstat-no" title="function not covered" >function (data) {</span></span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach(data, <span class="fstat-no" title="function not covered" >function (role) {</span></span>
+<span class="cstat-no" title="statement not covered" >                $scope.roles[role.name] = role.value;</span>
+            });
+<span class="cstat-no" title="statement not covered" >            roleOffset = Object.keys($scope.roles).length;</span>
+        }).finally(<span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            loading = false;</span>
+        });
+<span class="cstat-no" title="statement not covered" >        return rolePromise;</span>
+    };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    fetchChildResources = <span class="fstat-no" title="function not covered" >function (id) {</span></span>
+        //NB: roles is updated in both the functions for $scope.acl (MH-11716) and $scope.roles (MH-11715, MH-11717)
+<span class="cstat-no" title="statement not covered" >        $scope.roles = {};</span>
+<span class="cstat-no" title="statement not covered" >        $scope.acl = AclResource.get({id: id}, <span class="fstat-no" title="function not covered" >function (data) {</span></span>
+<span class="cstat-no" title="statement not covered" >            $scope.metadata.name = data.name;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if (angular.isDefined(data.acl)) {</span>
+<span class="cstat-no" title="statement not covered" >                var json = angular.fromJson(data.acl);</span>
+<span class="cstat-no" title="statement not covered" >                changePolicies(json.ace, true);</span>
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            angular.forEach(angular.fromJson(data.acl.ace), <span class="fstat-no" title="function not covered" >function(value, key) {</span></span>
+<span class="cstat-no" title="statement not covered" >                var rolename = value["role"];</span>
+<span class="cstat-no" title="statement not covered" >                if (angular.isUndefined($scope.roles[rolename])) {</span>
+<span class="cstat-no" title="statement not covered" >                    $scope.roles[rolename] = rolename;</span>
+                }
+            }, this);
+        });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });</span>
+<span class="cstat-no" title="statement not covered" >        $scope.actions = {};</span>
+<span class="cstat-no" title="statement not covered" >        $scope.hasActions = false;</span>
+<span class="cstat-no" title="statement not covered" >        ResourcesListResource.get({ resource: 'ACL.ACTIONS'}, <span class="fstat-no" title="function not covered" >function(data) {</span></span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach(data, <span class="fstat-no" title="function not covered" >function (value, key) {</span></span>
+<span class="cstat-no" title="statement not covered" >                if (key.charAt(0) !== '$') {</span>
+<span class="cstat-no" title="statement not covered" >                    $scope.actions[key] = value;</span>
+<span class="cstat-no" title="statement not covered" >                    $scope.hasActions = true;</span>
+                }
+            });
+        });
+<span class="cstat-no" title="statement not covered" >        $scope.getMoreRoles();</span>
+    };
+&nbsp;
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    fetchChildResources($scope.resourceId);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.$on('change', <span class="fstat-no" title="function not covered" >function (event, id) {</span></span>
+<span class="cstat-no" title="statement not covered" >        fetchChildResources(id);</span>
+    });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    $scope.save = <span class="fstat-no" title="function not covered" >function (field) {</span></span>
+<span class="cstat-no" title="statement not covered" >        var ace = [];</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (angular.isDefined(field) &amp;&amp; angular.isUndefined(field.role)) {</span>
+<span class="cstat-no" title="statement not covered" >            return;</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        angular.forEach($scope.policies, <span class="fstat-no" title="function not covered" >function (policy) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (angular.isDefined(policy.role)) {</span>
+<span class="cstat-no" title="statement not covered" >                if (policy.read) {</span>
+<span class="cstat-no" title="statement not covered" >                    ace.push({</span>
+                        'action' : 'read',
+                        'allow'  : policy.read,
+                        'role'   : policy.role
+                    });
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (policy.write) {</span>
+<span class="cstat-no" title="statement not covered" >                    ace.push({</span>
+                        'action' : 'write',
+                        'allow'  : policy.write,
+                        'role'   : policy.role
+                    });
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                angular.forEach(policy.actions.value, <span class="fstat-no" title="function not covered" >function(customAction){</span></span>
+<span class="cstat-no" title="statement not covered" >                    ace.push({</span>
+                        'action' : customAction,
+                        'allow'  : true,
+                        'role'   : policy.role
+                   });
+                });
+            }
+&nbsp;
+        });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        AclResource.save({id: $scope.resourceId}, {</span>
+            acl: {
+                ace: ace
+            },
+            name: $scope.metadata.name
+        }, <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            Notifications.add('success', 'ACL_UPDATED', 'acl-form');</span>
+        }, <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            Notifications.add('error', 'ACL_NOT_SAVED', 'acl-form');</span>
+        });
+    };
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

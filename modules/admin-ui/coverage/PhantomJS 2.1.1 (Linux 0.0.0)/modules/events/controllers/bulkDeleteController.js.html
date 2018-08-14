@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for modules/events/controllers/bulkDeleteController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">modules/events/controllers/</a> bulkDeleteController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80.2% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>81/101</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">59.52% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>25/42</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">68% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>17/25</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">80.2% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>81/101</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">44×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-yes">22×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">48×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">36×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+// Controller for all event screens.
+angular.module('adminNg.controllers')
+.controller('BulkDeleteCtrl', ['$scope', 'Modal', 'FormNavigatorService', 'Table', 'Notifications',
+    'BulkDeleteResource', 'NewEventProcessing', 'TaskResource', 'decorateWithTableRowSelection',
+        function ($scope, Modal, FormNavigatorService, Table, Notifications, BulkDeleteResource, NewEventProcessing,
+                  TaskResource, decorateWithTableRowSelection) {
+&nbsp;
+    var hasPublishedElements = function (currentEvent) {
+        var publicationCount = 0;
+        angular.forEach(currentEvent.publications, function() {
+            publicationCount++;
+        });
+&nbsp;
+        if (publicationCount &gt; 0) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    tableByPublicationStatus = function(isPublished) {
+        var result = {
+            allSelected: true,
+            rows: (function () {
+                var result = [];
+                angular.forEach($scope.rows, function (row){
+                    if (hasPublishedElements(row) === isPublished &amp;&amp; row.selected) {
+                        result.push(row);
+                    }
+                });
+                return result;
+            })()
+        };
+        decorateWithTableRowSelection(result);
+        return result;
+    },
+    getSelected = function (rows) {
+        var result = [];
+        angular.forEach(rows, function(row) {
+            if (row.selected) {
+                result.push(row);
+            }
+        });
+        return result;
+    },
+    countSelected = function (rows) {
+        return getSelected(rows).length;
+    };
+    $scope.rows = Table.copySelected();
+    $scope.allSelected = true; // by default, all records are selected
+    $scope.currentForm = 'deleteForm'; // By default start on the delete form
+    $scope.processing = NewEventProcessing.get('delete-event');
+    $scope.published = tableByPublicationStatus(true);
+    $scope.unpublished = tableByPublicationStatus(false);
+    $scope.navigateTo = <span class="fstat-no" title="function not covered" >function (targetForm, currentForm, requiredForms) {</span>
+<span class="cstat-no" title="statement not covered" >        $scope.currentForm = FormNavigatorService.navigateTo(targetForm, currentForm, requiredForms);</span>
+    };
+&nbsp;
+    var getSelectedSeriesIds = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        var result = [];</span>
+<span class="cstat-no" title="statement not covered" >        angular.forEach($scope.rows, <span class="fstat-no" title="function not covered" >function (row) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (row.selected) {</span>
+<span class="cstat-no" title="statement not covered" >                result.push(row.id);</span>
+            }
+        });
+<span class="cstat-no" title="statement not covered" >        return result;</span>
+    };
+&nbsp;
+    $scope.valid = function () {
+        var selectedCount;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (Table.resource.indexOf('series') &gt;= 0) {
+<span class="cstat-no" title="statement not covered" >            selectedCount = 0;</span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach($scope.rows, <span class="fstat-no" title="function not covered" >function (row) {</span></span>
+<span class="cstat-no" title="statement not covered" >                if (row.selected) {</span>
+<span class="cstat-no" title="statement not covered" >                    selectedCount++;</span>
+                }
+            });
+<span class="cstat-no" title="statement not covered" >            return selectedCount &gt; 0;</span>
+        } else {
+            selectedCount = countSelected($scope.unpublished.rows) + countSelected($scope.published.rows);
+            if (countSelected($scope.published.rows) &gt; 0) {
+                return angular.isDefined($scope.processing.ud.workflow.id) &amp;&amp; selectedCount &gt; 0;
+            } else {
+                return selectedCount &gt; 0;
+            }
+        }
+    };
+&nbsp;
+    $scope.submitButton = false;
+    $scope.submit = function () {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if ($scope.valid()) {
+            $scope.submitButton = true;
+            var resetSubmitButton = true,
+            deleteIds = [],
+            resource = Table.resource.indexOf('series') &gt;= 0 ? <span class="branch-0 cbranch-no" title="branch not covered" >'series' </span>: 'event',
+            endpoint = Table.resource.indexOf('series') &gt;= 0 ? <span class="branch-0 cbranch-no" title="branch not covered" >'deleteSeries' </span>: 'deleteEvents',
+            sourceNotification = resource === 'series' ? <span class="branch-0 cbranch-no" title="branch not covered" >'SERIES' </span>: 'EVENTS';
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (Table.resource.indexOf('series') &gt;= 0) {
+<span class="cstat-no" title="statement not covered" >                deleteIds = getSelectedSeriesIds();</span>
+            } else {
+                angular.forEach(getSelected($scope.unpublished.rows), function (row) {
+                    deleteIds.push(row.id);
+                });
+            }
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (deleteIds.length &gt; 0) {
+                resetSubmitButton = false;
+                BulkDeleteResource.delete({}, {
+                    resource: resource,
+                    endpoint: endpoint,
+                    eventIds: deleteIds
+                }, function () {
+                    $scope.submitButton = false;
+                    Table.deselectAll();
+                    Notifications.add('success', sourceNotification + '_DELETED');
+                    Modal.$scope.close();
+                }, function () {
+                    $scope.submitButton = false;
+                    Notifications.add('error', sourceNotification + '_NOT_DELETED');
+                    Modal.$scope.close();
+                });
+            }
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (Table.resource.indexOf('series') &lt; 0 &amp;&amp; countSelected($scope.published.rows) &gt; 0) {
+                var retractEventIds = [], payload;
+                angular.forEach($scope.getPublishedEvents(), function (row) {
+                    retractEventIds.push(row.id);
+                });
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (retractEventIds.length &gt; 0) {
+                    resetSubmitButton = false;
+                    payload = {
+                        workflow: $scope.processing.ud.workflow.id,
+                        configuration: $scope.processing.ud.workflow.selection.configuration,
+                        eventIds: retractEventIds
+                    };
+                    TaskResource.save(payload, $scope.onSuccess, $scope.onFailure);
+                }
+            }
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (resetSubmitButton) {
+                // in this case, no callback would ever set submitButton to false again
+<span class="cstat-no" title="statement not covered" >                $scope.submitButton = false;</span>
+            }
+        }
+&nbsp;
+    };
+&nbsp;
+    $scope.onSuccess = function () {
+        $scope.submitButton = false;
+        $scope.close();
+        Notifications.add('success', 'TASK_CREATED');
+    };
+&nbsp;
+    $scope.onFailure = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        $scope.submitButton = false;</span>
+<span class="cstat-no" title="statement not covered" >        $scope.close();</span>
+<span class="cstat-no" title="statement not covered" >        Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);</span>
+    };
+&nbsp;
+    $scope.getPublishedEvents = function () {
+        return getSelected($scope.published.rows);
+    };
+&nbsp;
+    $scope.getUnpublishedEvents = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        return getSelected($scope.unpublished.rows);</span>
+    };
+&nbsp;
+    $scope.toggleAllUnpublishedEvents = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        angular.forEach($scope.rows, <span class="fstat-no" title="function not covered" >function (row) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (!$scope.hasPublishedElements(row)) {</span>
+<span class="cstat-no" title="statement not covered" >                row.selected = $scope.events.unpublished.selected;</span>
+            }
+        });
+    };
+&nbsp;
+    <span class="missing-if-branch" title="else path not taken" >E</span>if (Table.resource.indexOf('series') &lt; 0) {
+        $scope.events = {};
+        $scope.events.published = {};
+        $scope.events.published.has = $scope.published.rows.length &gt; 0;
+        $scope.events.published.selected = true;
+        $scope.events.unpublished = {};
+        $scope.events.unpublished.has = $scope.unpublished.rows.length &gt; 0;
+        $scope.events.unpublished.selected = true;
+    }
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

@@ -1,0 +1,1673 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/services/wizards/new-event/source.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../../prettify.css" />
+    <link rel="stylesheet" href="../../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../../index.html">all files</a> / <a href="index.html">shared/services/wizards/new-event/</a> source.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">58.85% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>143/243</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">49.11% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>55/112</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">57.89% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>33/57</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">58.72% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>138/235</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480
+481
+482
+483
+484
+485
+486
+487
+488
+489
+490
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">8×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">112×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">58×</span>
+<span class="cline-any cline-yes">88×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-yes">9×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">17×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">35×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">16×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+angular.module('adminNg.services')
+.factory('NewEventSource', ['JsHelper', 'CaptureAgentsResource', 'ConflictCheckResource', 'Notifications', 'Language', '$translate', '$filter', 'underscore', '$timeout', 'localStorageService', 'AuthService', 'SchedulingHelperService',
+    function (JsHelper, CaptureAgentsResource, ConflictCheckResource, Notifications, Language, $translate, $filter, _, $timeout, localStorageService, AuthService, SchedulingHelperService) {
+&nbsp;
+    // -- constants ------------------------------------------------------------------------------------------------- --
+&nbsp;
+    var NOTIFICATION_CONTEXT = 'events-form';
+    var SCHEDULE_SINGLE = 'SCHEDULE_SINGLE';
+    var SCHEDULE_MULTIPLE = 'SCHEDULE_MULTIPLE';
+    var WEEKDAY_PREFIX = 'EVENTS.EVENTS.NEW.WEEKDAYS.';
+    var UPLOAD = 'UPLOAD';
+&nbsp;
+    var WEEKDAYS = {
+        'MO': WEEKDAY_PREFIX + 'MO',
+        'TU': WEEKDAY_PREFIX + 'TU',
+        'WE': WEEKDAY_PREFIX + 'WE',
+        'TH': WEEKDAY_PREFIX + 'TH',
+        'FR': WEEKDAY_PREFIX + 'FR',
+        'SA': WEEKDAY_PREFIX + 'SA',
+        'SU': WEEKDAY_PREFIX + 'SU'
+    };
+&nbsp;
+    // -- instance -------------------------------------------------------------------------------------------------- --
+&nbsp;
+    var Source = function () {
+        var self = this;
+&nbsp;
+        this.save = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            self.ud.UPLOAD.metadata['start'] = self.startDate;</span>
+        };
+&nbsp;
+        this.createStartDate = function () {
+            self.startDate = {
+                "id": "startDate",
+                "label": "EVENTS.EVENTS.DETAILS.METADATA.START_DATE",
+                "value": new Date(Date.now()).toISOString(),
+                "type": "date",
+                "readOnly": false,
+                "required": false,
+                "tabindex": 7
+            };
+        };
+&nbsp;
+        self.isSourceState = true;
+&nbsp;
+        this.defaultsSet = false;
+&nbsp;
+        this.checkingConflicts = false;
+        this.hasConflicts = false;
+        this.conflicts = [];
+        this.hasConflictingSettings = function () {
+            return self.hasConflicts;
+        };
+&nbsp;
+        /* Get the current client timezone */
+        self.tzOffset = (new Date()).getTimezoneOffset() / -60;
+        self.tz = 'UTC' + (self.tzOffset &lt; 0 ? <span class="branch-0 cbranch-no" title="branch not covered" >'' </span>: '+') + self.tzOffset;
+&nbsp;
+        this.loadCaptureAgents = function () {
+            CaptureAgentsResource.query({inputs: true}).$promise.then(function (data) {
+              self.captureAgents = data.rows;
+            });
+        };
+        this.loadCaptureAgents();
+&nbsp;
+        this.reset = function (opts) {
+&nbsp;
+            self.createStartDate();
+            self.weekdays = _.clone(WEEKDAYS);
+            self.ud = {
+                UPLOAD: {
+                    tracks: {},
+                    metadata: {
+                        start: self.startDate
+                    }
+                },
+                SCHEDULE_SINGLE: {
+                    device: {
+                        inputMethods: {}
+                    }
+                },
+&nbsp;
+                SCHEDULE_MULTIPLE: {
+                    device: {
+                        inputMethods: {}
+                    },
+                    weekdays: {},
+                    presentableWeekdays: ''
+                },
+&nbsp;
+                type: "UPLOAD"
+            };
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (opts) {
+<span class="cstat-no" title="statement not covered" >                if (opts.resetDefaults) {</span>
+<span class="cstat-no" title="statement not covered" >                  self.defaultsSet = !opts.resetDefaults;</span>
+<span class="cstat-no" title="statement not covered" >                  return;</span>
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                var singleKeys = ['duration', 'start', 'end', 'device']; </span>//Only apply these default fields to SCHEDULE_SINGLE
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                for (var key in opts) {</span>
+<span class="cstat-no" title="statement not covered" >                    if (key === 'type') {</span>
+<span class="cstat-no" title="statement not covered" >                      continue;</span>
+                    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    self.ud.SCHEDULE_MULTIPLE[key] = angular.copy(opts[key]);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    if (singleKeys.indexOf(key) &gt; -1) {</span>
+<span class="cstat-no" title="statement not covered" >                      self.ud.SCHEDULE_SINGLE[key] = angular.copy(opts[key]);</span>
+                    }
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (opts.presentableWeekdays) {</span>
+<span class="cstat-no" title="statement not covered" >                    self.ud.SCHEDULE_MULTIPLE.weekdays[opts.presentableWeekdays.toUpperCase()] = true;</span>
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                if (opts.type) {</span>
+<span class="cstat-no" title="statement not covered" >                    self.ud.type = opts.type;</span>
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                self.checkConflicts();</span>
+            }
+        };
+        this.reset();
+&nbsp;
+        this.changeType = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >            localStorageService.set('sourceSticky', getType());</span>
+        }
+&nbsp;
+        this.sortedWeekdays = _.map(self.weekdays, function(day, index) {
+            return { key: index, translation: day };
+        });
+&nbsp;
+        this.hours = JsHelper.initArray(24);
+        this.minutes = JsHelper.initArray(60);
+&nbsp;
+        this.roomChanged = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            self.ud[self.ud.type].device.inputMethods = {};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            self.ud[self.ud.type]</span>
+                .device.inputs.forEach(<span class="fstat-no" title="function not covered" >function(input) {</span>
+<span class="cstat-no" title="statement not covered" >                    self.ud[self.ud.type].device.inputMethods[input.id] = true;</span>
+                });
+        };
+&nbsp;
+        this.toggleWeekday = <span class="fstat-no" title="function not covered" >function (weekday) {</span>
+<span class="cstat-no" title="statement not covered" >            var weekdays = self.ud[SCHEDULE_MULTIPLE].weekdays;</span>
+<span class="cstat-no" title="statement not covered" >            if (_.has(weekdays, weekday)) {</span>
+<span class="cstat-no" title="statement not covered" >                weekdays[weekday] = !weekdays[weekday];</span>
+            }
+        };
+&nbsp;
+        /*
+         * Some internal utilities.
+         */
+         var fields = [
+             'start.date',
+             'start.hour',
+             'start.minute',
+             'duration.hour',
+             'duration.minute',
+             'end.date',
+             'end.hour',
+             'end.minute',
+             'device.name'];
+&nbsp;
+        var getType = function() { return self.ud.type; };
+        var isDefined = function(value) { return !(_.isUndefined(value) || _.isNull(value)); };
+        var validators = {
+            later: function() { return true; },
+            UPLOAD: function() {
+                // test for any type of upload source (MH-12085)
+                return Object.keys(self.ud.UPLOAD.tracks).length &gt; 0;
+            },
+            SCHEDULE_SINGLE: function () {
+                return !self.hasConflicts &amp;&amp; _.every(fields, function(field) {
+                    var fieldValue = JsHelper.getNested(self.ud[SCHEDULE_SINGLE], field);
+                    return isDefined(fieldValue);
+                });
+            },
+            SCHEDULE_MULTIPLE: function() {
+                var isAllFieldsDefined = _.every(fields, function(field) {
+                    var fieldValue = JsHelper.getNested(self.ud[SCHEDULE_MULTIPLE], field);
+                    return isDefined(fieldValue);
+                });
+&nbsp;
+                return !self.hasConflicts &amp;&amp; isAllFieldsDefined &amp;&amp; self.atLeastOneRepetitionDayMarked();
+            }
+        };
+&nbsp;
+        this.isScheduleSingle = <span class="fstat-no" title="function not covered" >function() {</span> <span class="cstat-no" title="statement not covered" >return getType() === SCHEDULE_SINGLE; </span>};
+        this.isScheduleMultiple = function() { return getType() === SCHEDULE_MULTIPLE; };
+        this.isUpload = <span class="fstat-no" title="function not covered" >function() {</span> <span class="cstat-no" title="statement not covered" >return getType() === UPLOAD; </span>};
+&nbsp;
+        this.atLeastOneInputMethodDefined = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            var inputMethods = self.ud[getType()].device.inputMethods;</span>
+<span class="cstat-no" title="statement not covered" >            return isDefined(_.find(inputMethods, <span class="fstat-no" title="function not covered" >function(inputMethod) {</span> <span class="cstat-no" title="statement not covered" >return inputMethod; </span>}));</span>
+        };
+&nbsp;
+        this.atLeastOneRepetitionDayMarked = function () {
+            return isDefined(_.find(self.ud[SCHEDULE_MULTIPLE].weekdays, function(weekday) { return weekday; }));
+        };
+&nbsp;
+        this.canPollConflicts = function () {
+            var data = self.ud[getType()];
+&nbsp;
+            var result = isDefined(data) &amp;&amp; isDefined(data.start) &amp;&amp;
+                isDefined(data.start.date) &amp;&amp; data.start.date.length &gt; 0 &amp;&amp;
+                angular.isDefined(data.duration) &amp;&amp;
+                angular.isDefined(data.duration.hour) &amp;&amp; angular.isDefined(data.duration.minute) &amp;&amp;
+                isDefined(data.device) &amp;&amp;
+                isDefined(data.device.id) &amp;&amp; data.device.id.length &gt; 0;
+&nbsp;
+            if (self.isScheduleMultiple() &amp;&amp; result) {
+                return angular.isDefined(data.end.date) &amp;&amp;
+                    data.end.date.length &gt; 0 &amp;&amp;
+                    self.atLeastOneRepetitionDayMarked();
+            } else {
+                return result;
+            }
+        };
+&nbsp;
+        // Sort source select options by short title
+        this.translatedSourceShortTitle = <span class="fstat-no" title="function not covered" >function(asset) {</span>
+<span class="cstat-no" title="statement not covered" >            return $filter('translate')(asset.title + '.SHORT');</span>
+        }
+&nbsp;
+        // Create the data array for use in the summary view
+        this.updateUploadTracksForSummary =  <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            self.ud.trackuploadlistforsummary = [];</span>
+<span class="cstat-no" title="statement not covered" >            var namemap = self.wizard.sharedData.uploadNameMap;</span>
+<span class="cstat-no" title="statement not covered" >            angular.forEach(self.ud.UPLOAD.tracks, <span class="fstat-no" title="function not covered" >function ( value, key) {</span></span>
+<span class="cstat-no" title="statement not covered" >                var item = {};</span>
+<span class="cstat-no" title="statement not covered" >                var fileNames = [];</span>
+<span class="cstat-no" title="statement not covered" >                item.id = key;</span>
+<span class="cstat-no" title="statement not covered" >                item.title = namemap[key].title;</span>
+<span class="cstat-no" title="statement not covered" >                angular.forEach(value, <span class="fstat-no" title="function not covered" >function (file) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    fileNames.push(file.name);</span>
+                });
+<span class="cstat-no" title="statement not covered" >                item.filename =  fileNames.join(", ");</span>
+<span class="cstat-no" title="statement not covered" >                item.type = namemap[key].type;</span>
+<span class="cstat-no" title="statement not covered" >                item.flavor = namemap[key].flavorType + "/" + namemap[key].flavorSubType;</span>
+<span class="cstat-no" title="statement not covered" >                self.ud.trackuploadlistforsummary.push(item);</span>
+            });
+        };
+&nbsp;
+        this.checkConflicts = function () {
+&nbsp;
+            // -- semaphore ----------------------------------------------------------------------------------------- --
+&nbsp;
+            var acquire = function() { return !self.checkingConflicts &amp;&amp; self.canPollConflicts(); };
+&nbsp;
+            var release = function(conflicts) {
+&nbsp;
+              self.hasConflicts = _.size(conflicts) &gt; 0;
+&nbsp;
+              while (self.conflicts.length &gt; 0) { // remove displayed conflicts, existing ones will be added again in
+                self.conflicts.pop();             // the next step.
+              }
+&nbsp;
+              if (self.hasConflicts) {
+                angular.forEach(conflicts, function (d) {
+                    self.conflicts.push({
+                        title: d.title,
+                        start: Language.formatDateTime('medium', d.start),
+                        end: Language.formatDateTime('medium', d.end)
+                    });
+                    console.log ("Conflict: " + d.title + " Start: " + d.start + " End:" + d.end);
+                });
+              }
+&nbsp;
+              self.updateWeekdays();
+              self.checkValidity();
+            };
+&nbsp;
+            // -- ajax ---------------------------------------------------------------------------------------------- --
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (acquire()) {
+//                Notifications.remove(self.notification, NOTIFICATION_CONTEXT);
+&nbsp;
+                var onSuccess = function () {
+                  <span class="missing-if-branch" title="else path not taken" >E</span>if (self.notification) {
+                    Notifications.remove(self.notification, NOTIFICATION_CONTEXT);
+                    self.notification = undefined;
+                  }
+                  release();
+                };
+                var onError = function (response) {
+&nbsp;
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (response.status === 409) {
+                        <span class="missing-if-branch" title="else path not taken" >E</span>if (!self.notification) {
+                            self.notification = Notifications.add('error', 'CONFLICT_DETECTED', NOTIFICATION_CONTEXT, -1);
+                        }
+&nbsp;
+                        release(response.data);
+                    } else {
+                        // todo show general error
+<span class="cstat-no" title="statement not covered" >                        release();</span>
+                    }
+                };
+&nbsp;
+                var settings = self.ud[getType()];
+                ConflictCheckResource.check(settings, onSuccess, onError);
+            }
+        };
+&nbsp;
+        this.getStartDate = function() {
+            var start = self.ud[getType()].start;
+            return SchedulingHelperService.parseDate(start.date, start.hour, start.minute);
+        };
+&nbsp;
+        this.checkValidity = function () {
+            var data = self.ud[getType()];
+&nbsp;
+            if (self.alreadyEndedNotification) {
+                Notifications.remove(self.alreadyEndedNotification, NOTIFICATION_CONTEXT);
+            }
+            // check if start is in the past and has already ended
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(data.start) &amp;&amp; angular.isDefined(data.start.hour)
+                &amp;&amp; angular.isDefined(data.start.minute) &amp;&amp; angular.isDefined(data.start.date)
+                &amp;&amp; angular.isDefined(data.duration) &amp;&amp; angular.isDefined(data.duration.hour)
+                &amp;&amp; angular.isDefined(data.duration.minute)) {
+                var startDate = self.getStartDate();
+                var endDate = new Date(startDate.getTime());
+                endDate.setHours(endDate.getHours() + data.duration.hour, endDate.getMinutes() + data.duration.minute, 0, 0);
+                var nowDate = new Date();
+                if (endDate &lt; nowDate) {
+                    self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
+                        NOTIFICATION_CONTEXT, -1);
+                    self.hasConflicts = true;
+                }
+            }
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (self.endBeforeStartNotification) {
+<span class="cstat-no" title="statement not covered" >                Notifications.remove(self.endBeforeStartNotification, NOTIFICATION_CONTEXT);</span>
+            }
+            // check if end date is before start date
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(data.start) &amp;&amp; angular.isDefined(data.start.date)
+                &amp;&amp; angular.isDefined(data.end.date)) {
+                var startDate = new Date(data.start.date);
+                var endDate = new Date(data.end.date);
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (endDate &lt; startDate) {
+<span class="cstat-no" title="statement not covered" >                    self.endBeforeStartNotification = Notifications.add('error', 'CONFLICT_END_BEFORE_START',</span>
+                        NOTIFICATION_CONTEXT, -1);
+<span class="cstat-no" title="statement not covered" >                    self.hasConflicts = true;</span>
+                }
+            }
+        };
+&nbsp;
+        /**
+         * Update the presentation fo the weekdays for the summary
+         */
+        this.updateWeekdays = function () {
+            var keyWeekdays = [];
+            var keysOrder = [];
+            var sortDay = <span class="fstat-no" title="function not covered" >function (day1, day2) {</span>
+<span class="cstat-no" title="statement not covered" >                    return keysOrder[day1] - keysOrder[day2];</span>
+                };
+&nbsp;
+            angular.forEach(self.sortedWeekdays, function (day, idx) {
+                keysOrder[day.translation] = idx;
+            });
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (self.isScheduleMultiple()) {
+<span class="cstat-no" title="statement not covered" >                angular.forEach(self.ud.SCHEDULE_MULTIPLE.weekdays, <span class="fstat-no" title="function not covered" >function (weekday, index) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    if (weekday) {</span>
+<span class="cstat-no" title="statement not covered" >                        keyWeekdays.push(self.weekdays[index]);</span>
+                    }
+                 });
+            }
+&nbsp;
+            keyWeekdays.sort(sortDay);
+&nbsp;
+            $translate(keyWeekdays).then(function (translations) {
+                var translatedWeekdays = [];
+&nbsp;
+                angular.forEach(translations, <span class="fstat-no" title="function not covered" >function(t) {</span>
+<span class="cstat-no" title="statement not covered" >                    translatedWeekdays.push(t);</span>
+                });
+&nbsp;
+                self.ud[SCHEDULE_MULTIPLE].presentableWeekdays = translatedWeekdays.join(',');
+            });
+        };
+&nbsp;
+        this.getFormatedStartTime = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            var time;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if (!self.isUpload()) {</span>
+<span class="cstat-no" title="statement not covered" >                var hour = self.ud[getType()].start.hour;</span>
+<span class="cstat-no" title="statement not covered" >                var minute = self.ud[getType()].start.minute;</span>
+<span class="cstat-no" title="statement not covered" >                if (angular.isDefined(hour) &amp;&amp; angular.isDefined(minute)) {</span>
+<span class="cstat-no" title="statement not covered" >                    time = JsHelper.humanizeTime(hour, minute);</span>
+                }
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            return time;</span>
+        };
+&nbsp;
+        this.getFormatedDuration = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            var time;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            if (!self.isUpload()) {</span>
+<span class="cstat-no" title="statement not covered" >                var hour = self.ud[getType()].duration.hour;</span>
+<span class="cstat-no" title="statement not covered" >                var minute = self.ud[getType()].duration.minute;</span>
+<span class="cstat-no" title="statement not covered" >                if (angular.isDefined(hour) &amp;&amp; angular.isDefined(minute)) {</span>
+<span class="cstat-no" title="statement not covered" >                    time = JsHelper.secondsToTime(((hour * 60) + minute) * 60);</span>
+                }
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            return time;</span>
+        };
+&nbsp;
+        var getValidatorByType = function() {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (_.has(validators, getType())) {
+                return validators[getType()];
+            }
+        };
+&nbsp;
+        // Update summary when exiting this step
+        // One-time update prevents an infinite loop in
+        // summary's ng-repeat.
+        this.ud.trackuploadlistforsummary = [];
+        this.getTrackUploadSummary = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >            return this.ud.trackuploadlistforsummary;</span>
+        }
+        this.onExitStep = <span class="fstat-no" title="function not covered" >function () {</span>
+            // update summary of selections
+<span class="cstat-no" title="statement not covered" >            this.updateUploadTracksForSummary();</span>
+        };
+&nbsp;
+        this.isValid = function () {
+            var validator = getValidatorByType();
+            <span class="missing-if-branch" title="else path not taken" >E</span>if(isDefined(validator)) {
+                return validator();
+            }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >            return false;</span>
+        };
+&nbsp;
+        this.getUserEntries = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            return self.ud;</span>
+        };
+&nbsp;
+        this.setDefaultsIfNeeded = <span class="fstat-no" title="function not covered" >function() {</span>
+<span class="cstat-no" title="statement not covered" >                if (self.defaultsSet) {</span>
+<span class="cstat-no" title="statement not covered" >                  return;</span>
+                }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                var defaults = {};</span>
+<span class="cstat-no" title="statement not covered" >                AuthService.getUser().$promise.then(<span class="fstat-no" title="function not covered" >function (user) {</span></span>
+<span class="cstat-no" title="statement not covered" >                    var orgProperties = user.org.properties;</span>
+&nbsp;
+                    //Variables needed to determine an event's start time
+<span class="cstat-no" title="statement not covered" >                    var startTime = orgProperties['admin.event.new.start_time'] || '08:00';</span>
+<span class="cstat-no" title="statement not covered" >                    var endTime = orgProperties['admin.event.new.end_time'] || '20:00';</span>
+<span class="cstat-no" title="statement not covered" >                    var durationMins = parseInt(orgProperties['admin.event.new.duration'] || (12 * 60));</span>
+<span class="cstat-no" title="statement not covered" >                    var intervalMins = parseInt(orgProperties['admin.event.new.interval'] || 60);</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    var chosenSlot = moment( moment().format('YYYY-MM-DD') + ' ' + startTime );</span>
+<span class="cstat-no" title="statement not covered" >                    var endSlot =  moment( moment().format('YYYY-MM-DD') + ' ' + endTime );</span>
+<span class="cstat-no" title="statement not covered" >                    var dateNow = moment();</span>
+<span class="cstat-no" title="statement not covered" >                    var timeDiff = dateNow.unix() - chosenSlot.unix();</span>
+&nbsp;
+                    //Find the next available timeslot for an event's start time
+<span class="cstat-no" title="statement not covered" >                    if (timeDiff &gt; 0) {</span>
+<span class="cstat-no" title="statement not covered" >                        var multiple = Math.ceil( timeDiff/(intervalMins * 60) );</span>
+<span class="cstat-no" title="statement not covered" >                        chosenSlot.add(multiple * intervalMins, 'minute');</span>
+<span class="cstat-no" title="statement not covered" >                        if (chosenSlot.unix() &gt;= endSlot.unix()) {</span>
+<span class="cstat-no" title="statement not covered" >                            endSlot = moment( chosenSlot ).add(durationMins, 'minutes');</span>
+                        }
+<span class="cstat-no" title="statement not covered" >                        durationMins = endSlot.diff(chosenSlot, 'minutes');</span>
+                    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    defaults.start = {</span>
+                                         date: chosenSlot.format('YYYY-MM-DD'),
+                                         hour: parseInt(chosenSlot.format('H')),
+                                         minute: parseInt(chosenSlot.format('mm'))
+                                     };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    defaults.duration = {</span>
+                                            hour: parseInt(durationMins / 60),
+                                            minute: durationMins % 60
+                                        };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    defaults.end = {</span>
+                                         date: endSlot.format('YYYY-MM-DD'),
+                                         hour: parseInt(endSlot.format('H')),
+                                         minute: parseInt(endSlot.format('mm'))
+                                     };
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    defaults.presentableWeekdays = chosenSlot.format('dd');</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    if (self.captureAgents.length === 0) {</span>
+                        //No capture agents, so user can only upload files
+<span class="cstat-no" title="statement not covered" >                        defaults.type = UPLOAD;</span>
+                    }
+                    else <span class="cstat-no" title="statement not covered" >if (localStorageService.get('sourceSticky')) {</span>
+                        //auto-select previously chosen source
+<span class="cstat-no" title="statement not covered" >                        defaults.type = localStorageService.get('sourceSticky');</span>
+                    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >                    self.reset(defaults);</span>
+<span class="cstat-no" title="statement not covered" >                    self.defaultsSet = true;</span>
+                });
+        };
+&nbsp;
+        this.onTemporalValueChange = <span class="fstat-no" title="function not covered" >function(type) {</span>
+<span class="cstat-no" title="statement not covered" >            SchedulingHelperService.applyTemporalValueChange(self.ud[getType()], type, self.isScheduleSingle() );</span>
+<span class="cstat-no" title="statement not covered" >            self.checkConflicts();</span>
+        }
+    };
+    return new Source();
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../../sorter.js"></script>
+</body>
+</html>

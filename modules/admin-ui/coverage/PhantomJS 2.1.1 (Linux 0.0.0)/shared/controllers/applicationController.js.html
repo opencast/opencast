@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/controllers/applicationController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">shared/controllers/</a> applicationController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">60% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>36/60</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">42.31% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>11/26</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">23.08% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>3/13</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">60% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>36/60</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">6×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+// The main controller that all other scopes inherit from (except isolated scopes).
+angular.module('adminNg.controllers')
+.controller('ApplicationCtrl', ['$scope', '$rootScope', '$location', '$window', 'AuthService', 'Notifications',
+            'ResourceModal', 'VersionResource', 'HotkeysService', '$interval', 'RestServiceMonitor',
+    function ($scope, $rootScope, $location, $window, AuthService, Notifications, ResourceModal,
+              VersionResource, HotkeysService, $interval, RestServiceMonitor){
+&nbsp;
+        $scope.bodyClicked = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            angular.element('[old-admin-ng-dropdown]').removeClass('active');</span>
+        };
+&nbsp;
+        var FEEDBACK_URL_PROPERTY = 'org.opencastproject.admin.feedback.url',
+            DOCUMENTATION_URL_PROPERTY = 'org.opencastproject.admin.help.documentation.url',
+            RESTDOCS_URL_PROPERTY = 'org.opencastproject.admin.help.restdocs.url',
+            MEDIA_MODULE_URL_PROPERTY = 'org.opencastproject.admin.mediamodule.url';
+&nbsp;
+        $scope.currentUser  = null;
+        $scope.feedbackUrl = undefined;
+        $scope.documentationUrl = undefined;
+        $scope.restdocsUrl = undefined;
+        $scope.mediaModuleUrl = undefined;
+        RestServiceMonitor.run();
+        $scope.services = RestServiceMonitor.getServiceStatus();
+&nbsp;
+        AuthService.getUser().$promise.then(function (user) {
+            $scope.currentUser = user;
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (angular.isDefined(user.org.properties[FEEDBACK_URL_PROPERTY])) {
+<span class="cstat-no" title="statement not covered" >                $scope.feedbackUrl = user.org.properties[FEEDBACK_URL_PROPERTY];</span>
+            }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[DOCUMENTATION_URL_PROPERTY])) {
+                $scope.documentationUrl = user.org.properties[DOCUMENTATION_URL_PROPERTY];
+            }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[RESTDOCS_URL_PROPERTY])) {
+                $scope.restdocsUrl = user.org.properties[RESTDOCS_URL_PROPERTY];
+            }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(user.org.properties[MEDIA_MODULE_URL_PROPERTY])) {
+                $scope.mediaModuleUrl = user.org.properties[MEDIA_MODULE_URL_PROPERTY];
+            }
+        });
+&nbsp;
+        //Running RestService on loop - updating $scope.service
+        $interval(<span class="fstat-no" title="function not covered" >function(){</span>
+<span class="cstat-no" title="statement not covered" >            RestServiceMonitor.run();</span>
+<span class="cstat-no" title="statement not covered" >            $scope.service = RestServiceMonitor.getServiceStatus();</span>
+        }, 60000);
+&nbsp;
+        $scope.toServices = <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            RestServiceMonitor.jumpToServices(event);</span>
+        };
+&nbsp;
+        $scope.toDoc = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            if ($scope.documentationUrl) {</span>
+<span class="cstat-no" title="statement not covered" >                $window.open ($scope.documentationUrl);</span>
+            } else {
+<span class="cstat-no" title="statement not covered" >                console.warn('Documentation Url is not set.');</span>
+            }
+        };
+&nbsp;
+        $scope.toRestDoc = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >          if ($scope.restdocsUrl) {</span>
+<span class="cstat-no" title="statement not covered" >              $window.open ($scope.restdocsUrl);</span>
+          } else {
+<span class="cstat-no" title="statement not covered" >              console.warn('REST doc Url is not set.');</span>
+          }
+        };
+&nbsp;
+        $rootScope.userIs = AuthService.userIsAuthorizedAs;
+&nbsp;
+        // Restore open modals if any
+        var params = $location.search();
+        if (params.modal &amp;&amp; params.resourceId) {
+            ResourceModal.show(params.modal, params.resourceId, params.tab, params.action);
+        }
+&nbsp;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isUndefined($rootScope.version)) {
+            VersionResource.query(function(response) {
+                $rootScope.version = response.version ? response : (<span class="branch-1 cbranch-no" title="branch not covered" >angular.isArray(response.versions)?response.versions[0]:{})</span>;
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (!response.consistent) {
+<span class="cstat-no" title="statement not covered" >                    $rootScope.version.buildNumber = 'inconsistent';</span>
+                }
+            });
+        }
+&nbsp;
+        HotkeysService.activateUniversalHotkey("general.event_view", "Open Events Table", <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            event.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >            $location.path('/events/events').replace();</span>
+        });
+&nbsp;
+        HotkeysService.activateUniversalHotkey("general.series_view", "Open Series Table", <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            event.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >            $location.path('/events/series').replace();</span>
+        });
+&nbsp;
+        HotkeysService.activateUniversalHotkey("general.new_event", "Create New Event", <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            event.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >            ResourceModal.show("new-event-modal");</span>
+        });
+&nbsp;
+        HotkeysService.activateUniversalHotkey("general.new_series", "Create New Series", <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            event.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >            ResourceModal.show("new-series-modal");</span>
+        });
+&nbsp;
+        HotkeysService.activateUniversalHotkey("general.help", "Show Help", <span class="fstat-no" title="function not covered" >function(event) {</span>
+<span class="cstat-no" title="statement not covered" >            event.preventDefault();</span>
+<span class="cstat-no" title="statement not covered" >            if(angular.element('#help-dd').hasClass('active')) {</span>
+<span class="cstat-no" title="statement not covered" >              angular.element('#help-dd').removeClass('active');</span>
+            } else {
+<span class="cstat-no" title="statement not covered" >              angular.element('#help-dd').addClass('active');</span>
+            }
+        })
+    }
+]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

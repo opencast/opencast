@@ -1,0 +1,1223 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for shared/services/tableService.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../index.html">all files</a> / <a href="index.html">shared/services/</a> tableService.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.5% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>162/181</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">82.14% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>69/84</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">78.57% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>22/28</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">89.5% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>162/181</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line high'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">56×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">56×</span>
+<span class="cline-any cline-yes">56×</span>
+<span class="cline-any cline-yes">1640×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">25×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">21×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">231×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">29×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">31×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">43×</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">28×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">19×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">68×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-yes">13×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">26×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-yes">194×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+angular.module('adminNg.services')
+.factory('Table', ['$rootScope', '$filter', 'Storage', '$location', '$timeout', 'decorateWithTableRowSelection',
+    function ($rootScope, $filter, Storage, $location, $timeout, decorateWithTableRowSelection) {
+    var TableService = function () {
+        var me = this,
+            ASC = 'ASC',
+            DESC = 'DESC',
+            DEFAULT_REFRESH_DELAY = 5000;
+&nbsp;
+        this.rows = [];
+        this.allSelected = false;
+        this.sorters = [];
+        this.loading = true;
+&nbsp;
+        // Variable related to the pagination
+        this.pagination = {
+            totalItems  :       100, // the number of items in total
+            pages       :        [], // list of pages
+            limit       :        10, // the number of items per page
+            offset      :         0, // currently selected page
+            directAccessibleNo :  3  // number of pages on each side of the current index
+        };
+&nbsp;
+        this.updatePagination = function () {
+            var p = me.pagination, i, numberOfPages = p.totalItems / p.limit;
+&nbsp;
+            p.pages = [];
+            for (i = 0; i &lt; numberOfPages || (i === 0 &amp;&amp; numberOfPages === 0); i++) {
+                p.pages.push({
+                    number: i,
+                    label: (i + 1).toString(),
+                    active: i === p.offset
+                });
+            }
+        };
+&nbsp;
+        this.refreshColumns = function () {
+            var currentTable, currentPath, localStorageColumnConfig;
+            currentPath = $location.path();
+            currentTable = currentPath.substring(currentPath.lastIndexOf('/') + 1, currentPath.length);
+            localStorageColumnConfig = Storage.get('table_column_visibility', currentTable, currentPath);
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (!$.isEmptyObject(localStorageColumnConfig)) {
+<span class="cstat-no" title="statement not covered" >                me.columns = localStorageColumnConfig.columns;</span>
+<span class="cstat-no" title="statement not covered" >                me.columnsConfiguredFromLocalStorage = true;</span>
+            } else {
+                me.columnsConfiguredFromLocalStorage = false;
+            }
+        };
+&nbsp;
+        this.getDirectAccessiblePages = function () {
+            var startIndex = me.pagination.offset - me.pagination.directAccessibleNo,
+                endIndex = me.pagination.offset + me.pagination.directAccessibleNo,
+                retVal = [], i, pageToPush;
+&nbsp;
+&nbsp;
+            if (startIndex &lt; 0) {
+                //adjust window if selected window is to low
+                endIndex = endIndex - startIndex; // e.g. startIndex: -2 / endIndex: 1 -&gt; endIndex = 1 - (-2) = 3
+                startIndex = 0;
+            }
+&nbsp;
+            if (endIndex &gt;= me.pagination.pages.length) {
+                //adjust window if selected window is to high
+                startIndex = startIndex - (endIndex - me.pagination.pages.length) - 1;
+                endIndex = me.pagination.pages.length - 1;
+            }
+            //set endIndex to the highest possible value
+            endIndex = Math.min(me.pagination.pages.length - 1, endIndex);
+            startIndex = Math.max(0, startIndex);
+&nbsp;
+            for (i = startIndex; i &lt;= endIndex; i++) {
+&nbsp;
+                if (i === startIndex &amp;&amp; startIndex !== 0) {
+                    // we take the first item if start index is not 0
+                    pageToPush = me.pagination.pages[0];
+                }
+                else if (i === endIndex &amp;&amp; endIndex !== me.pagination.pages.length - 1) {
+                    // we add the last item if end index is not the real end
+                    pageToPush = me.pagination.pages[me.pagination.pages.length - 1];
+                }
+                else if ((i === startIndex + 1 &amp;&amp; startIndex !== 0) || i === endIndex - 1 &amp;&amp; endIndex !== me.pagination.pages.length - 1) {
+                    // we add the .. at second position or second last position if start- or  end-index is not 0
+                    me.pagination.pages[i].label = '..';
+                    pageToPush = me.pagination.pages[i];
+                }
+                else {
+                    pageToPush = me.pagination.pages[i];
+                }
+                retVal.push(pageToPush);
+            }
+            if (retVal[endIndex]) {
+                me.maxLabel = retVal[endIndex].label;
+            }
+            return retVal;
+        };
+&nbsp;
+        this.goToPage = function (page) {
+            me.allSelected = false;
+            me.pagination.pages[me.pagination.offset].active = false;
+            me.pagination.offset = page;
+            me.pagination.pages[me.pagination.offset].active = true;
+            Storage.put('pagination', me.resource, 'offset', page);
+            me.fetch();
+        };
+&nbsp;
+        this.isNavigatePrevious = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            return me.pagination.offset &gt; 0;</span>
+        };
+&nbsp;
+        this.isNavigateNext = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            return me.pagination.offset &lt; me.pagination.pages.length - 1;</span>
+        };
+&nbsp;
+        /**
+         * Changes the number of items on a page to the given value.
+         *
+         * @param pageSize
+         */
+        this.updatePageSize = function (pageSize) {
+            var p = me.pagination, oldPageSize = p.limit;
+&nbsp;
+            p.limit = pageSize;
+            p.offset = 0;
+&nbsp;
+            me.updatePagination();
+&nbsp;
+            Storage.put('pagination', me.resource, 'limit', p.limit);
+            Storage.put('pagination', me.resource, 'offset', p.offset);
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (p.limit !== oldPageSize) {
+<span class="cstat-no" title="statement not covered" >                me.fetch();</span>
+            }
+        };
+&nbsp;
+        this.configure = function (options) {
+            var pagination;
+            me.allSelected = false;
+            me.options = options;
+            me.refreshColumns();
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (!me.columnsConfiguredFromLocalStorage) {
+                // The user has not configured the columns before, hence we will
+                // configure them from scratch
+                me.columns = options.columns;
+                angular.forEach(me.columns, function (column) {
+                    column.deactivated = false;
+                });
+            }
+&nbsp;
+            me.caption = options.caption;
+            me.resource = options.resource;
+            me.category = options.category;
+            me.apiService = options.apiService;
+            me.multiSelect = options.multiSelect;
+            me.refreshDelay = options.refreshDelay || DEFAULT_REFRESH_DELAY;
+            me.postProcessRow = options.postProcessRow;
+&nbsp;
+            me.predicate = '';
+            me.reverse = false;
+&nbsp;
+            me.sorters = [];
+&nbsp;
+            // Load pagination configuration from local storage
+            pagination = Storage.get('pagination', me.resource);
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(pagination)) {
+                if (angular.isDefined(pagination.limit)) {
+                    me.pagination.limit = pagination.limit;
+                }
+&nbsp;
+                if (angular.isDefined(pagination.offset)) {
+                    me.pagination.offset = pagination.offset;
+                }
+            }
+&nbsp;
+            me.updatePageSize(me.pagination.limit);
+&nbsp;
+            // Load sorting criteria from local storage
+            angular.forEach(Storage.get('sorter', me.resource), function (values, name) {
+                me.sorters[values.priority] = {
+                    name: name,
+                    priority: values.priority,
+                    order: values.order
+                };
+            });
+&nbsp;
+            if (me.sorters.length &gt; 0) {
+                me.predicate = me.sorters[0].name;
+                me.reverse = me.sorters[0].order === DESC;
+            }
+            // if no entry in local storage, sort by first sortable column
+            else {
+                for (var i = 0; i &lt; me.columns.length; i++) {
+                    var column = me.columns[i];
+&nbsp;
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (!column.dontSort) {
+                        me.sortBy(column);
+                        break;
+                    }
+                }
+            }
+        };
+&nbsp;
+        this.saveSortingCriteria = function (sorterCriteria) {
+            angular.forEach(sorterCriteria, function (values, priority) {
+                values.priority = priority;
+                Storage.put('sorter', me.resource, values.name, values);
+            });
+        };
+&nbsp;
+        this.sortBy = function (column) {
+            // Avoid sorting by action column
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (angular.isUndefined(column) || column.dontSort) {
+<span class="cstat-no" title="statement not covered" >                return;</span>
+            }
+&nbsp;
+            var newOrder, values;
+&nbsp;
+            values = Storage.get('sorter', me.resource)[column.name];
+            newOrder = (values &amp;&amp; values.order &amp;&amp; values.order === ASC) ? DESC : ASC;
+&nbsp;
+            if (values &amp;&amp; angular.isDefined(values.priority)) {
+                me.sorters.splice(values.priority, 1);
+            }
+&nbsp;
+            me.sorters.splice(0, 0, {
+                name     : column.name,
+                priority : 0,
+                order    : newOrder
+            });
+&nbsp;
+            me.saveSortingCriteria(me.sorters);
+&nbsp;
+            me.predicate = column.name;
+            me.reverse = newOrder === DESC;
+&nbsp;
+            me.fetch();
+        };
+&nbsp;
+        /**
+         * Retrieve data from the defined API with the given filter values.
+         */
+        this.fetch = function (reset) {
+            if (angular.isUndefined(me.apiService)) {
+                return;
+            }
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if(reset) {
+<span class="cstat-no" title="statement not covered" >              me.rows = [];</span>
+<span class="cstat-no" title="statement not covered" >              me.pagination.totalItems = 0;</span>
+<span class="cstat-no" title="statement not covered" >              me.updatePagination();</span>
+<span class="cstat-no" title="statement not covered" >              me.updateAllSelected();</span>
+            }
+&nbsp;
+            var query = {},
+                filters = [],
+                sorters = [];
+&nbsp;
+            me.loading = true;
+&nbsp;
+            angular.forEach(Storage.get('filter', me.resource), function (value, filter) {
+                filters.push(filter + ':' + value);
+            });
+&nbsp;
+            if (filters.length) {
+                query.filter = filters.join(',');
+            }
+&nbsp;
+            // Limit temporary to sort by one criteria
+            if (me.sorters.length &gt; 0) {
+                sorters.push(me.sorters[0].name + ':' + me.sorters[0].order);
+            }
+&nbsp;
+            query.limit = me.pagination.limit;
+            query.offset = me.pagination.offset * me.pagination.limit;
+&nbsp;
+            if (filters.length) {
+                query.filter = filters.join(',');
+            }
+&nbsp;
+            if (sorters.length) {
+                query.sort = sorters.join(',');
+            }
+&nbsp;
+            query.limit = me.pagination.limit;
+            query.offset = me.pagination.offset * me.pagination.limit;
+&nbsp;
+            (function(resource){
+              me.apiService.query(query).$promise.then(function (data) {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if(resource != me.resource) {
+<span class="cstat-no" title="statement not covered" >                  return;</span>
+                }
+&nbsp;
+                var selected = [];
+                angular.forEach(me.rows, function (row) {
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (row.selected) {
+<span class="cstat-no" title="statement not covered" >                        selected.push(row.id);</span>
+                    }
+                });
+                angular.forEach(data.rows, function (row) {
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (selected.indexOf(row.id) &gt; -1) {
+<span class="cstat-no" title="statement not covered" >                        row.selected = true;</span>
+                    }
+                });
+                if (angular.isDefined(me.postProcessRow)) {
+                    angular.forEach(data.rows, function(row) {
+                        me.postProcessRow(row);
+                    });
+                }
+                me.rows = data.rows;
+                me.loading = false;
+                me.pagination.totalItems = data.total;
+&nbsp;
+                // If the current offset is not 0 and we have no result, we move to the first page
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (me.pagination.offset !== 0 &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >data.count === 0)</span> {
+<span class="cstat-no" title="statement not covered" >                    me.goToPage(0);</span>
+                }
+&nbsp;
+                me.updatePagination();
+                me.updateAllSelected();
+              });
+            })(me.resource);
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (me.refreshScheduler.on) {
+                me.refreshScheduler.newSchedule();
+            }
+        };
+&nbsp;
+        /**
+         * Scheduler for the refresh of the fetch
+         */
+        this.refreshScheduler = {
+            on: true,
+            newSchedule: function () {
+                me.refreshScheduler.cancel();
+                me.refreshScheduler.nextTimeout = $timeout(me.fetch, me.refreshDelay);
+            },
+            cancel: function () {
+                if (me.refreshScheduler.nextTimeout) {
+                    $timeout.cancel(me.refreshScheduler.nextTimeout);
+                }
+            }
+        };
+&nbsp;
+        this.addFilterToStorage = <span class="fstat-no" title="function not covered" >function(column, filter) {</span>
+<span class="cstat-no" title="statement not covered" >          Storage.put('filter', me.resource, column, filter);</span>
+        }
+&nbsp;
+        this.addFilterToStorageForResource = <span class="fstat-no" title="function not covered" >function(resource, column, filter) {</span>
+<span class="cstat-no" title="statement not covered" >          Storage.put('filter', resource, column, filter);</span>
+        }
+&nbsp;
+        this.gotoRoute = <span class="fstat-no" title="function not covered" >function(path) {</span>
+<span class="cstat-no" title="statement not covered" >          $location.path(path);</span>
+        }
+&nbsp;
+        // Reload the table if the language is changed
+        $rootScope.$on('language-changed', <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            if (!me.loading) {</span>
+<span class="cstat-no" title="statement not covered" >                me.fetch();</span>
+            }
+        });
+    };
+    var tableService = new TableService();
+    return decorateWithTableRowSelection(tableService);
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../sorter.js"></script>
+</body>
+</html>

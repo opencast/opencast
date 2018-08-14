@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for modules/events/controllers/serieController.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../prettify.css" />
+    <link rel="stylesheet" href="../../../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../../../index.html">all files</a> / <a href="index.html">modules/events/controllers/</a> serieController.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">76.22% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>141/185</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">56.12% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>55/98</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">75.56% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>34/45</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">76.63% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>141/184</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line medium'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401</td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">14×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">80×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">80×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">20×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">12×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">30×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">15×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">4×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">10×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">7×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2×</span>
+<span class="cline-any cline-yes">1×</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+'use strict';
+&nbsp;
+// Controller for all single series screens.
+angular.module('adminNg.controllers')
+.controller('SerieCtrl', ['$scope', 'SeriesMetadataResource', 'SeriesEventsResource', 'SeriesAccessResource', 'SeriesThemeResource', 'ResourcesListResource', 'UserRolesResource',
+        'Notifications', 'OptoutSingleResource', 'SeriesParticipationResource',
+        function ($scope, SeriesMetadataResource, SeriesEventsResource, SeriesAccessResource, SeriesThemeResource, ResourcesListResource, UserRolesResource, Notifications,
+            OptoutSingleResource, SeriesParticipationResource) {
+&nbsp;
+    var roleSlice = 100;
+    var roleOffset = 0;
+    var loading = false;
+    var rolePromise = null;
+&nbsp;
+    var saveFns = {}, aclNotification,
+        me = this,
+        NOTIFICATION_CONTEXT = 'series-acl',
+        mainCatalog = 'dublincore/series', fetchChildResources,
+        createPolicy = function (role) {
+            return {
+                role  : role,
+                read  : false,
+                write : false,
+                actions : {
+                    name : 'series-acl-actions',
+                    value : []
+                }
+            };
+        },
+        changePolicies = function (access, loading) {
+            var newPolicies = {};
+            angular.forEach(access, function (acl) {
+                var policy = newPolicies[acl.role];
+&nbsp;
+                if (angular.isUndefined(policy)) {
+                    newPolicies[acl.role] = createPolicy(acl.role);
+                }
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (acl.action === 'read' || acl.action === 'write') {
+                    newPolicies[acl.role][acl.action] = acl.allow;
+                } else <span class="cstat-no" title="statement not covered" >if (acl.allow === true || acl.allow === 'true') {</span>
+<span class="cstat-no" title="statement not covered" >                    newPolicies[acl.role].actions.value.push(acl.action);</span>
+                }
+            });
+&nbsp;
+            $scope.policies = [];
+            angular.forEach(newPolicies, function (policy) {
+                $scope.policies.push(policy);
+            });
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (!loading) {
+<span class="cstat-no" title="statement not covered" >                $scope.accessSave();</span>
+            }
+        };
+&nbsp;
+    $scope.aclLocked = false,
+    $scope.policies = [];
+    $scope.baseAcl = {};
+&nbsp;
+    $scope.changeBaseAcl = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        $scope.baseAcl = SeriesAccessResource.getManagedAcl({id: this.baseAclId}, <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >            changePolicies($scope.baseAcl.acl.ace);</span>
+        });
+<span class="cstat-no" title="statement not covered" >        this.baseAclId = '';</span>
+    };
+&nbsp;
+    $scope.addPolicy = <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >        $scope.policies.push(createPolicy());</span>
+    };
+&nbsp;
+    $scope.deletePolicy = <span class="fstat-no" title="function not covered" >function (policyToDelete) {</span>
+<span class="cstat-no" title="statement not covered" >        var index;</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        angular.forEach($scope.policies, <span class="fstat-no" title="function not covered" >function (policy, idx) {</span></span>
+<span class="cstat-no" title="statement not covered" >            if (policy.role === policyToDelete.role &amp;&amp;</span>
+                policy.write === policyToDelete.write &amp;&amp;
+                policy.read === policyToDelete.read) {
+<span class="cstat-no" title="statement not covered" >                index = idx;</span>
+            }
+        });
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        if (angular.isDefined(index)) {</span>
+<span class="cstat-no" title="statement not covered" >            $scope.policies.splice(index, 1);</span>
+        }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        $scope.accessSave();</span>
+    };
+&nbsp;
+    $scope.updateOptout = <span class="fstat-no" title="function not covered" >function (newBoolean) {</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >        OptoutSingleResource.save({</span>
+            resource: 'series',
+            id: $scope.resourceId,
+            optout: newBoolean
+        }, <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            Notifications.add('success', 'SERIES_PARTICIPATION_STATUS_UPDATE_SUCCESS', 'series-participation');</span>
+        }, <span class="fstat-no" title="function not covered" >function () {</span>
+<span class="cstat-no" title="statement not covered" >            Notifications.add('error', 'SERIES_PARTICIPATION_STATUS_UPDATE_ERROR', 'series-participation');</span>
+        });
+    };
+&nbsp;
+    $scope.getMoreRoles = function (value) {
+&nbsp;
+        if (loading)
+            return rolePromise;
+&nbsp;
+        loading = true;
+        var queryParams = {limit: roleSlice, offset: roleOffset};
+&nbsp;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if ( angular.isDefined(value) &amp;&amp; (<span class="branch-1 cbranch-no" title="branch not covered" >value != "")</span>) {
+            //Magic values here.  Filter is from ListProvidersEndpoint, role_name is from RolesListProvider
+            //The filter format is care of ListProvidersEndpoint, which gets it from EndpointUtil
+<span class="cstat-no" title="statement not covered" >            queryParams["filter"] = "role_name:"+ value +",role_target:ACL";</span>
+<span class="cstat-no" title="statement not covered" >            queryParams["offset"] = 0;</span>
+        } else {
+            queryParams["filter"] = "role_target:ACL";
+        }
+        rolePromise = UserRolesResource.query(queryParams);
+        rolePromise.$promise.then(function (data) {
+            angular.forEach(data, function (role) {
+                $scope.roles[role.name] = role.value;
+            });
+            roleOffset = Object.keys($scope.roles).length;
+        }).finally(function () {
+            loading = false;
+        });
+        return rolePromise;
+    };
+&nbsp;
+    fetchChildResources = function (id) {
+        $scope.metadata = SeriesMetadataResource.get({ id: id }, function (metadata) {
+            var seriesCatalogIndex, keepGoing = true;
+            angular.forEach(metadata.entries, function (catalog, index) {
+                if (catalog.flavor === mainCatalog) {
+                    $scope.seriesCatalog = catalog;
+                    seriesCatalogIndex = index;
+                    var tabindex = 2;
+                    angular.forEach(catalog.fields, function (entry) {
+                        if (entry.id === 'title' &amp;&amp; angular.isString(entry.value)) {
+                            $scope.titleParams = { resourceId: entry.value.substring(0,70) };
+                        }
+                        if (keepGoing &amp;&amp; entry.locked) {
+                            metadata.locked = entry.locked;
+                            keepGoing = false;
+                        }
+                        entry.tabindex = tabindex++;
+                    });
+                }
+            });
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(seriesCatalogIndex)) {
+                metadata.entries.splice(seriesCatalogIndex, 1);
+            }
+        });
+&nbsp;
+        $scope.roles = {};
+&nbsp;
+        $scope.access = SeriesAccessResource.get({ id: id }, function (data) {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(data.series_access)) {
+                var json = angular.fromJson(data.series_access.acl);
+                changePolicies(json.acl.ace, true);
+&nbsp;
+                $scope.aclLocked = data.series_access.locked;
+&nbsp;
+                <span class="missing-if-branch" title="if path not taken" >I</span>if ($scope.aclLocked) {
+<span class="cstat-no" title="statement not covered" >                    aclNotification = Notifications.add('warning', 'SERIES_ACL_LOCKED', 'series-acl-' + id, -1);</span>
+                } else <span class="missing-if-branch" title="if path not taken" >I</span>if (aclNotification) {
+<span class="cstat-no" title="statement not covered" >                    Notifications.remove(aclNotification, 'series-acl');</span>
+                }
+                angular.forEach(data.series_access.privileges, function(value, key) {
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isUndefined($scope.roles[key])) {
+                        $scope.roles[key] = key;
+                    }
+                });
+            }
+        });
+&nbsp;
+        $scope.participation = SeriesParticipationResource.get({ id: id });
+        $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });
+        $scope.actions = {};
+        $scope.hasActions = false;
+        ResourcesListResource.get({ resource: 'ACL.ACTIONS' }, function(data) {
+            angular.forEach(data, function (value, key) {
+                <span class="missing-if-branch" title="if path not taken" >I</span>if (key.charAt(0) !== '$') {
+<span class="cstat-no" title="statement not covered" >                    $scope.actions[key] = value;</span>
+<span class="cstat-no" title="statement not covered" >                    $scope.hasActions = true;</span>
+                }
+            });
+        });
+&nbsp;
+        $scope.selectedTheme = {};
+&nbsp;
+        $scope.updateSelectedThemeDescripton = function () {
+            if(angular.isDefined($scope.themeDescriptions)) {
+                $scope.selectedTheme.description = $scope.themeDescriptions[$scope.selectedTheme.id];
+            }
+        };
+&nbsp;
+        ResourcesListResource.get({ resource: 'THEMES.NAME' }, function (data) {
+            $scope.themes = data;
+&nbsp;
+            //after themes have been loaded we match the current selected
+            SeriesThemeResource.get({ id: id }, function (response) {
+&nbsp;
+                //we want to get rid of $resolved, etc. - therefore we use toJSON()
+                angular.forEach(data.toJSON(), function (value, key) {
+&nbsp;
+                    <span class="missing-if-branch" title="if path not taken" >I</span>if (angular.isDefined(response[key])) {
+<span class="cstat-no" title="statement not covered" >                        $scope.selectedTheme.id = key;</span>
+<span class="cstat-no" title="statement not covered" >                        return false;</span>
+                    }
+                });
+&nbsp;
+                ResourcesListResource.get({ resource: 'THEMES.DESCRIPTION' }, function (data) {
+                    $scope.themeDescriptions = data;
+                    $scope.updateSelectedThemeDescripton();
+                });
+            });
+        });
+&nbsp;
+        $scope.getMoreRoles();
+    };
+&nbsp;
+      // Generate proxy function for the save metadata function based on the given flavor
+      // Do not generate it
+    $scope.getSaveFunction = function (flavor) {
+        var fn = saveFns[flavor],
+            catalog;
+&nbsp;
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isUndefined(fn)) {
+            if ($scope.seriesCatalog.flavor === flavor) {
+                catalog = $scope.seriesCatalog;
+            } else {
+                angular.forEach($scope.metadata.entries, function (c) {
+                    if (flavor === c.flavor) {
+                        catalog = c;
+                    }
+                });
+            }
+&nbsp;
+            fn = function (id, callback) {
+                $scope.metadataSave(id, callback, catalog);
+            };
+&nbsp;
+            saveFns[flavor] = fn;
+        }
+        return fn;
+    };
+&nbsp;
+    $scope.replyToId = null; // the id of the comment to which the user wants to reply
+&nbsp;
+    fetchChildResources($scope.resourceId);
+&nbsp;
+    $scope.$on('change', function (event, id) {
+        fetchChildResources(id);
+    });
+&nbsp;
+    $scope.metadataSave = function (id, callback, catalog) {
+        catalog.attributeToSend = id;
+&nbsp;
+        SeriesMetadataResource.save({ id: $scope.resourceId }, catalog,  function () {
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (angular.isDefined(callback)) {
+                callback();
+            }
+&nbsp;
+            // Mark the saved attribute as saved
+            angular.forEach(catalog.fields, function (entry) {
+                if (entry.id === id) {
+                    entry.saved = true;
+                }
+            });
+        });
+    };
+&nbsp;
+    $scope.accessChanged = <span class="fstat-no" title="function not covered" >function (role) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!role) <span class="cstat-no" title="statement not covered" >return;</span></span>
+<span class="cstat-no" title="statement not covered" >      $scope.accessSave();</span>
+    };
+&nbsp;
+    $scope.accessSave = function () {
+            var ace = [],
+                hasRights = false,
+                rulesValid = false;
+&nbsp;
+            angular.forEach($scope.policies, function (policy) {
+                rulesValid = false;
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if (policy.read &amp;&amp; policy.write) {
+                    hasRights = true;
+                }
+&nbsp;
+                <span class="missing-if-branch" title="else path not taken" >E</span>if ((policy.read || <span class="branch-1 cbranch-no" title="branch not covered" >policy.write </span>|| <span class="branch-2 cbranch-no" title="branch not covered" >policy.actions.value.length &gt; 0)</span> &amp;&amp; !angular.isUndefined(policy.role)) {
+                    rulesValid = true;
+&nbsp;
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (policy.read) {
+                        ace.push({
+                            'action' : 'read',
+                            'allow'  : policy.read,
+                            'role'   : policy.role
+                        });
+                    }
+&nbsp;
+                    <span class="missing-if-branch" title="else path not taken" >E</span>if (policy.write) {
+                        ace.push({
+                            'action' : 'write',
+                            'allow'  : policy.write,
+                            'role'   : policy.role
+                        });
+                    }
+&nbsp;
+                    angular.forEach(policy.actions.value, <span class="fstat-no" title="function not covered" >function(customAction) {</span>
+<span class="cstat-no" title="statement not covered" >                           ace.push({</span>
+                                'action' : customAction,
+                                'allow'  : true,
+                                'role'   : policy.role
+                           });
+                    });
+                }
+            });
+&nbsp;
+            me.unvalidRule = !rulesValid;
+            me.hasRights = hasRights;
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (me.unvalidRule) {
+<span class="cstat-no" title="statement not covered" >                if (!angular.isUndefined(me.notificationRules)) {</span>
+<span class="cstat-no" title="statement not covered" >                    Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                me.notificationRules = Notifications.add('warning', 'INVALID_ACL_RULES', NOTIFICATION_CONTEXT);</span>
+            } else <span class="missing-if-branch" title="if path not taken" >I</span>if (!angular.isUndefined(me.notificationRules)) {
+<span class="cstat-no" title="statement not covered" >                Notifications.remove(me.notificationRules, NOTIFICATION_CONTEXT);</span>
+<span class="cstat-no" title="statement not covered" >                me.notificationRules = undefined;</span>
+            }
+&nbsp;
+            <span class="missing-if-branch" title="if path not taken" >I</span>if (!me.hasRights) {
+<span class="cstat-no" title="statement not covered" >                if (!angular.isUndefined(me.notificationRights)) {</span>
+<span class="cstat-no" title="statement not covered" >                    Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);</span>
+                }
+<span class="cstat-no" title="statement not covered" >                me.notificationRights = Notifications.add('warning', 'MISSING_ACL_RULES', NOTIFICATION_CONTEXT);</span>
+            } else <span class="missing-if-branch" title="if path not taken" >I</span>if (!angular.isUndefined(me.notificationRights)) {
+<span class="cstat-no" title="statement not covered" >                Notifications.remove(me.notificationRights, NOTIFICATION_CONTEXT);</span>
+<span class="cstat-no" title="statement not covered" >                me.notificationRights = undefined;</span>
+            }
+&nbsp;
+            <span class="missing-if-branch" title="else path not taken" >E</span>if (hasRights &amp;&amp; rulesValid) {
+                SeriesAccessResource.save({ id: $scope.resourceId }, {
+                    acl: {
+                        ace: ace
+                    },
+                    override: true
+                });
+&nbsp;
+                Notifications.add('info', 'SAVED_ACL_RULES', NOTIFICATION_CONTEXT, 1200);
+            }
+    };
+&nbsp;
+    // Reload tab resource on tab changes
+    $scope.$parent.$watch('tab', function (value) {
+      switch (value) {
+        case 'permissions':
+<span class="cstat-no" title="statement not covered" >            $scope.acls  = ResourcesListResource.get({ resource: 'ACL' });</span>
+<span class="cstat-no" title="statement not covered" >            $scope.getMoreRoles();</span>
+<span class="cstat-no" title="statement not covered" >          break;</span>
+      }
+    });
+&nbsp;
+    $scope.themeSave = function () {
+        var selectedThemeID = $scope.selectedTheme.id;
+        $scope.updateSelectedThemeDescripton();
+&nbsp;
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (angular.isUndefined(selectedThemeID) || selectedThemeID === null) {
+<span class="cstat-no" title="statement not covered" >            SeriesThemeResource.delete({ id: $scope.resourceId }, { theme: selectedThemeID }, <span class="fstat-no" title="function not covered" >function () {</span></span>
+<span class="cstat-no" title="statement not covered" >                Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');</span>
+            });
+        } else {
+            SeriesThemeResource.save({ id: $scope.resourceId }, { theme: selectedThemeID }, function () {
+                Notifications.add('warning', 'SERIES_THEME_REPROCESS_EXISTING_EVENTS', 'series-theme');
+            });
+        }
+    };
+&nbsp;
+}]);
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="http://istanbul-js.org/" target="_blank">istanbul</a> at Mon Apr 16 2018 11:12:17 GMT+0200 (CEST)
+</div>
+</div>
+<script src="../../../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../../../sorter.js"></script>
+</body>
+</html>

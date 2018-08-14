@@ -202,7 +202,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    *
    * @param s                The notification message to transform to Json-String
    * @param workflowInstance The workflowInstance which getting metadata from
-   * @return
+   * @return JSON-String containing the information of the workflowInstance
    */
   private String makeJson(String s, WorkflowInstance workflowInstance) {
     s = s.replace("%t", checkIfNull(workflowInstance.getTitle(), "Title"));
@@ -232,7 +232,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    *
    * @param o The object to check
    * @param s The name of metadata to check
-   * @return
+   * @return String containing the transformed object
    */
   private String checkIfNull(Object o, String s) {
 
@@ -254,6 +254,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    * @param request     The request to execute
    * @param maxAttempts The number of attempts in case of error
    * @param timeout     The wait time in milliseconds at which a connection attempt will throw
+   * @param sleepTime   The sleep time in milliseconds of a connection
    * @return true if the request has been executed successfully
    */
   private boolean executeRequest(HttpUriRequest request, int maxAttempts, int timeout, int sleepTime) {
