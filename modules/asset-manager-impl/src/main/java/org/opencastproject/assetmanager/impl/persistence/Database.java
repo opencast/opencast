@@ -161,41 +161,6 @@ public class Database implements EntityPaths {
   }
 
   /**
-   * Save a property to the database. This is either an insert or an update operation.
-   */
-  public boolean saveAssetProperty(final Property property) {
-    return penv.tx(new Fn<EntityManager, Boolean>() {
-      @Override public Boolean apply(EntityManager em) {
-        final PropertyId pId = property.getId();
-        // check the existence of both the media package and the property in one query
-        //
-        // either the property matches or it does not exist <- left outer join
-        final BooleanExpression eitherMatchOrNull =
-                Q_PROPERTY.namespace.eq(pId.getNamespace())
-                        .and(Q_PROPERTY.propertyName.eq(pId.getName())).or(Q_PROPERTY.namespace.isNull());
-        final Tuple result = new JPAQuery(em, TEMPLATES)
-                .from(Q_SNAPSHOT)
-                .leftJoin(Q_PROPERTY).on(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(eitherMatchOrNull))
-                .where(Q_SNAPSHOT.mediaPackageId.eq(pId.getMediaPackageId()))
-                // only one result is interesting, no need to fetch all versions of the media package
-                .singleResult(Q_SNAPSHOT.id, Q_PROPERTY);
-        if (result != null) {
-          // media package exists, now check if the property exists
-          final PropertyDto exists = result.get(Q_PROPERTY);
-          Queries.persistOrUpdate(em, exists == null
-                  ? PropertyDto.mk(property)
-                  : exists.update(property.getValue()));
-          return true;
-        } else {
-          logger.debug("Mediapackage {} not found!", property.getId().getMediaPackageId());
-          // media package does not exist
-          return false;
-        }
-      }
-    });
-  }
-
-  /**
    * Claim a new version for media package <code>mpId</code>.
    */
   public VersionImpl claimVersion(final String mpId) {
