@@ -199,7 +199,7 @@ public final class AQueryBuilderImpl implements AQueryBuilder, EntityPaths {
   }
 
   @Override public Field<String> storage() {
-    return new AbstractSnapshotField<String, String>(Q_SNAPSHOT.availability) {
+    return new AbstractSnapshotField<String, String>(Q_SNAPSHOT.storageId) {
       @Override protected String extract(String storageId) {
         return storageId;
       }
