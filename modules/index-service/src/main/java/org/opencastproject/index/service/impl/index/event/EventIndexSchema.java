@@ -129,6 +129,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The creator */
   String CREATOR = "creator";
 
+  /** The publisher */
+  String PUBLISHER = "publisher";
+
   /** The license */
   String LICENSE = "license";
 

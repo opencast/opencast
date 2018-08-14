@@ -105,6 +105,7 @@ import org.opencastproject.mediapackage.track.VideoStreamImpl;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataCollection;
+import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.rest.BulkOperationResult;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.scheduler.api.Recording;
@@ -2018,6 +2019,18 @@ public abstract class AbstractEventEndpoint {
         collection.removeField(collection.getOutputFields().get("startTime"));
       if (collection.getOutputFields().containsKey("location"))
         collection.removeField(collection.getOutputFields().get("location"));
+      if (collection.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
+        MetadataField<String> publisher = (MetadataField<String>) collection.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
+        Map<String, String> users = new HashMap<String, String>();
+        if (!publisher.getCollection().isNone()) {
+          users = publisher.getCollection().get();
+        }
+        String loggedInUser = getSecurityService().getUser().getName();
+        if (!users.containsKey(loggedInUser)) {
+          users.put(loggedInUser, loggedInUser);
+        }
+        publisher.setValue(loggedInUser);
+      }
       metadataList.add(getIndexService().getCommonEventCatalogUIAdapter(), collection);
     }
     return okJson(metadataList.toJSON());
@@ -2252,6 +2265,8 @@ public abstract class AbstractEventEndpoint {
         query.withOptedOut(Boolean.parseBoolean(filters.get(name)));
       if (EventListQuery.FILTER_REVIEW_STATUS_NAME.equals(name))
         query.withReviewStatus(filters.get(name));
+      if (EventListQuery.FILTER_PUBLISHER_NAME.equals(name))
+        query.withPublisher(filters.get(name));
       if (EventListQuery.FILTER_COMMENTS_NAME.equals(name)) {
         switch (Comments.valueOf(filters.get(name))) {
           case NONE:

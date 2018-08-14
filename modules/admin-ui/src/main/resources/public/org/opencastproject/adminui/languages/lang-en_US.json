@@ -833,6 +833,7 @@
            "SOURCE":         "Source",
            "CREATED":        "Created",
            "CREATED_BY":     "Created by",
+           "PUBLISHER":      "Publisher",
            "LICENSE":        "License",
            "CONTRIBUTORS":   "Contributor(s)",
            "RIGHTS":         "Rights",
@@ -1862,6 +1863,9 @@
        },
        "CREATOR": {
          "LABEL": "Creator"
+       },
+       "PUBLISHER": {
+         "LABEL": "Publisher"
        },
        "HOSTNAME": {
          "LABEL": "Host name"

@@ -88,6 +88,9 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_REVIEW_STATUS_NAME = "reviewStatus";
   private static final String FILTER_REVIEW_STATUS_LABEL = "FILTERS.EVENTS.REVIEW_STATUS.LABEL";
 
+  public static final String FILTER_PUBLISHER_NAME = "publisher";
+  private static final String FILTER_PUBLISHER_LABEL = "FILTERS.EVENTS.PUBLISHER.LABEL";
+
   public static final String FILTER_TEXT_NAME = "textFilter";
 
   public EventListQuery() {
@@ -101,6 +104,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
+    this.availableFilters.add(createPublisherFilter(Option.<String> none()));
 //    this.availableFilters.add(createOptedoutFilter(Option.<Boolean> none()));
 //    this.availableFilters.add(createReviewStatusFilter(Option.<String> none()));
   }
@@ -334,6 +338,25 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Add a {@link ResourceListFilter} filter to the query with the given publishers
+   *
+   * @param publishers
+   *          the publishers to filter for
+   */
+  public void withPublishers(String publishers) {
+    this.addFilter(createPublisherFilter(Option.option(publishers)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the publisher used to filter if set
+   *
+   * @return an {@link Option} containing the publisher or none.
+   */
+  public Option<String> getPublisher() {
+    return this.getFilterValue(FILTER_PUBLISHER_NAME);
+  }
+
+  /**
    * Create a new {@link ResourceListFilter} based on the Series id
    *
    * @param seriesId
@@ -451,6 +474,18 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createCommentsFilter(Option<String> comments) {
     return FiltersUtils.generateFilter(comments, FILTER_COMMENTS_NAME, FILTER_COMMENTS_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.COMMENTS));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on publishers
+   *
+   * @param publisher
+   *          the publisher to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for progress based query
+   */
+  public static ResourceListFilter<String> createPublisherFilter(Option<String> publisher) {
+    return FiltersUtils.generateFilter(publisher, FILTER_PUBLISHER_NAME, FILTER_PUBLISHER_LABEL, SourceType.SELECT,
+            Option.some(EventsListProvider.PUBLISHER));
   }
 
   /**

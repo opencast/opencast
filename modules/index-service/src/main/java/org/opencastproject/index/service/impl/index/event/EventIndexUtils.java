@@ -130,6 +130,8 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.CREATED, event.getCreated(), true);
     if (StringUtils.isNotBlank(event.getCreator()))
       metadata.addField(EventIndexSchema.CREATOR, event.getCreator(), true);
+    if (StringUtils.isNotBlank(event.getPublisher()))
+      metadata.addField(EventIndexSchema.PUBLISHER, event.getPublisher(), true);
     if (StringUtils.isNotBlank(event.getLicense()))
       metadata.addField(EventIndexSchema.LICENSE, event.getLicense(), true);
     if (StringUtils.isNotBlank(event.getRights()))
@@ -446,6 +448,7 @@ public final class EventIndexUtils {
     event.setSeriesId(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF));
     event.setLicense(dc.getFirst(DublinCore.PROPERTY_LICENSE));
     event.setRights(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
+    event.setPublisher(dc.getFirst(DublinCore.PROPERTY_PUBLISHER));
     Date created;
     String encodedDate = dc.getFirst(DublinCore.PROPERTY_CREATED);
     if (StringUtils.isBlank(encodedDate)) {

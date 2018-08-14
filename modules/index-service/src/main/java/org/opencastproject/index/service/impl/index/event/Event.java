@@ -67,7 +67,7 @@ import javax.xml.transform.stream.StreamSource;
  */
 @XmlType(name = "event", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "organization",
         "title", "description", "subject", "location", "presenters", "contributors", "seriesId", "seriesName",
-        "language", "source", "created", "creator", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
+        "language", "source", "created", "creator", "publisher", "license", "rights", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration", "trackMimetypes",
         "trackStreamResolutions", "trackFlavors", "metadataFlavors", "metadataMimetypes", "attachmentFlavors",
         "reviewStatus", "reviewDate", "optedOut", "blacklisted", "hasComments", "hasOpenComments", "hasPreview", "needsCutting",
@@ -170,6 +170,10 @@ public class Event implements IndexObject {
   /** The creator of the event */
   @XmlElement(name = "creator")
   private String creator = null;
+
+  /** The publisher of the event */
+  @XmlElement(name = "publisher")
+  private String publisher = null;
 
   /** The license of the event */
   @XmlElement(name = "license")
@@ -548,6 +552,25 @@ public class Event implements IndexObject {
    */
   public String getCreator() {
     return creator;
+  }
+
+  /**
+   * Sets the publisher
+   *
+   * @param publisher
+   *          the publisher
+   */
+  public void setPublisher(String publisher) {
+    this.publisher = publisher;
+  }
+
+  /**
+   * Returns the publisher
+   *
+   * @return the publisher
+   */
+  public String getPublisher() {
+    return publisher;
   }
 
   /**
