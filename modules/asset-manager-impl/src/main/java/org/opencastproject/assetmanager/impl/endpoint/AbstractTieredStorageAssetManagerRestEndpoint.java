@@ -40,6 +40,9 @@ import com.entwinemedia.fn.P1Lazy;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import javax.ws.rs.FormParam;
@@ -51,6 +54,7 @@ import javax.ws.rs.core.Response;
 
 public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends AbstractAssetManagerRestEndpoint {
 
+  private DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
   protected TieredStorageAssetManagerJobProducer tsamjp = null;
   protected ServiceRegistry serviceRegistry = null;
 
@@ -199,15 +203,15 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "start",
                           isRequired = true,
-                          type = RestParameter.Type.INTEGER,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
-                          description = "The mediapackage ID to move."),
+                          description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
                   @RestParameter(
                           name = "end",
                           isRequired = true,
-                          type = RestParameter.Type.INTEGER,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
-                          description = "The version to move."),
+                          description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
                   @RestParameter(
                           name = "target",
                           isRequired = true,
@@ -225,9 +229,15 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           description = "There has been an internal error, and the job was not created",
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
-  public Response moveByDate(@FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
-    Date start = new Date(startInt);
-    Date end = new Date(endInt);
+  public Response moveByDate(@FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
+    Date start;
+    Date end;
+    try {
+      start = sdf.parse(startString);
+      end = sdf.parse(endString);
+    } catch (ParseException e) {
+      return badRequest("Invalid start or end date format");
+    }
 
     if (end.before(start)) {
       return badRequest("Start date " + start + " must be before end date " + end);
@@ -263,15 +273,15 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "start",
                           isRequired = true,
-                          type = RestParameter.Type.INTEGER,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
-                          description = "The mediapackage ID to move."),
+                          description = "The start date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
                   @RestParameter(
                           name = "end",
                           isRequired = true,
-                          type = RestParameter.Type.INTEGER,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
-                          description = "The version to move."),
+                          description = "The end date, in the format yyyy-MM-dd'T'HH:mm:ss'Z'."),
                   @RestParameter(
                           name = "target",
                           isRequired = true,
@@ -289,14 +299,20 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           description = "There has been an internal error, and the job was not created",
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
-  public Response moveByIdAndDate(@FormParam("id") final String id, @FormParam("start") final Integer startInt, @FormParam("end") final Integer endInt, @FormParam("target") final String target) {
+  public Response moveByIdAndDate(@FormParam("id") final String id, @FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
     final String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {
       return badRequest("Invalid mediapackage ID: " + mpid);
     }
 
-    Date start = new Date(startInt);
-    Date end = new Date(endInt);
+    Date start;
+    Date end;
+    try {
+      start = sdf.parse(startString);
+      end = sdf.parse(endString);
+    } catch (ParseException e) {
+      return badRequest("Invalid start or end date format");
+    }
 
     if (end.before(start)) {
       return badRequest("Start date " + start + " must be before end date " + end);
