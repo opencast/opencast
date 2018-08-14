@@ -40,7 +40,7 @@ angular.module('adminNg.controllers')
         });
 
         $scope.role = {
-            available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}), // Load all the internal roles
+            available: UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'}), // Load all the internal roles
             external: [],
             selected:  [],
             derived: [],
