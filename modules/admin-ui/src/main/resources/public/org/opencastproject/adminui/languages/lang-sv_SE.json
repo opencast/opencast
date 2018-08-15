@@ -74,7 +74,8 @@
       "HELP": "Hjälp",
       "USERS_GUIDE": "Användarhandbok",
       "DOCUMENTATION": "Dokumentation",
-      "REST_DOC": "REST API dokumentation"
+      "REST_DOC": "REST API dokumentation",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Åtkomstpolicyn har skapats",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Meddelandet har skickats",
       "EMAIL_NOT_SENT": "Meddelandet kunde inte skickas",
       "CONFLICT_DETECTED": "Konflikt vid schemaläggning: Denna nya händelse överlappar med en annan. Ändra rum, datum eller tider.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
       "INVALID_ACL_RULES": "Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Du har valt {{numberOfEvents}} händelser",
             "CONFIGURATION": "Konfiguration",
             "WORKFLOW": "Uppgift"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "Allmänt",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Summering",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Typ",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Redigera",
+            "METADATA": "Metadata",
+            "SCHEDULING": "Schemaläggning"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Åtkomstpolicy"
             },
             "SUMMARY": {
-               "CAPTION": "Summering"
+               "CAPTION": "Summering",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Må",
@@ -436,6 +466,15 @@
                "FR": "Fr",
                "SA": "Lö",
                "SU": "Sö"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Serie",
             "DATE": "Datum",
             "START": "Start",
+            "END": "End",
             "STOP": "Stopp",
             "STATUS": "Status",
             "LOCATION": "Plats",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Föregående",
             "NOCONTENT": "Inga data tillgängliga",
             "PUBLISHED": "Publicerad",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Händelsedetaljer - {{resourceId}}",
             "TABS": {
-               "GENERAL": "Allmänt",
                "METADATA": "Metadata",
                "EXTENDED-METADATA": "Metadata II",
                "ASSETS": "Resurser",
+               "PUBLICATIONS": "Publikationer",
                "SCHEDULING": "Schemaläggning",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Åtkomstpolicy",
                "COMMENTS": "Kommentarer"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publikationer",
+            "PUBLICATIONS": {
+               "CAPTION": "Publikationer",
                "NO_PUBLICATIONS_AVAILABLE": "Denna händelse har inga publikationer",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Lägg till kommentar"
       },
       "TABS": {
-         "PLAY": "Uppspelning",
          "EDIT": "Redigerare",
          "CAPTIONS": "Bildtexter",
          "ANNOTATIONS": "Noteringar"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Schemalagd",
       "RECORDING": "Spelar in"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Allmänt",
+         "PLAYER": "Player",
+         "EDITOR": "Redigerare"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Rensa alla filter",
+            "EVENT_VIEW": "Händelser",
+            "SERIES_VIEW": "Serie",
+            "NEW_EVENT": "Lägg till händelse",
+            "NEW_SERIES": "Lägg till serie",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Föregående bild",
+            "NEXT_FRAME": "Nästa bild",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Dela",
+            "CUT_SELECTED_SEGMENT": "Klipp ut",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
+         }
+      }
    }
 }

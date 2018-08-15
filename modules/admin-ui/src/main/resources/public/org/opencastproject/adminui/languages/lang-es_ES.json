@@ -74,7 +74,8 @@
       "HELP": "Ayuda",
       "USERS_GUIDE": "Guía del usuario",
       "DOCUMENTATION": "Documentación",
-      "REST_DOC": "Documentación de la API REST"
+      "REST_DOC": "Documentación de la API REST",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Se ha creado la política de acceso",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "El mensaje ha sido enviado",
       "EMAIL_NOT_SENT": "No se ha podido enviar el mensaje",
       "CONFLICT_DETECTED": "Conflicto de programación: el nuevo evento se solapa con otro existente. Por favor, cambie la sala, las fechas o las horas.",
+      "CONFLICT_BULK_DETECTED": "Conflicto de programación: los cambios propuestos causan un conflicto. Por favor, cambia la ubicación, las fechas o horas.",
       "CONFLICT_ALREADY_ENDED": "Error de programación: El evento ya ha terminado.",
       "CONFLICT_END_BEFORE_START": "Error de programación: El final tiene que ser más tarde que el comienzo.",
       "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Ha seleccionado {{numberOfEvents}} eventos",
             "CONFIGURATION": "Configuración",
             "WORKFLOW": "Tarea"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Editar eventos programados",
+         "GENERAL": {
+            "CAPTION": "General",
+            "CANNOTSTART": "Los eventos remarcados no se pueden procesar, sólo se admiten eventos programados.",
+            "NOCHANGES": "No se han detectado cambios en los eventos.",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Editar metadatos"
+         },
+         "SUMMARY": {
+            "CAPTION": "Resumen",
+            "SINGLE_EVENT_CAPTION": "Evento \"{{ title }}\"",
+            "TYPE": "Tipo",
+            "PREVIOUS": "Valor anterior",
+            "NEXT": "Nuevo valor"
+         },
+         "EDIT": {
+            "CAPTION": "Modificar",
+            "METADATA": "Metadatos",
+            "SCHEDULING": "Programación"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Política de acceso"
             },
             "SUMMARY": {
-               "CAPTION": "Resumen"
+               "CAPTION": "Resumen",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Lu",
@@ -436,6 +466,15 @@
                "FR": "Vi",
                "SA": "Sá",
                "SU": "Do"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Serie",
             "DATE": "Fecha",
             "START": "Inicio",
+            "END": "Fin",
             "STOP": "Fin",
             "STATUS": "Estado",
             "LOCATION": "Ubicación",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Anterior",
             "NOCONTENT": "No hay información disponible",
             "PUBLISHED": "Publicado",
+            "WEEKDAY": "Día de la semana",
             "TOOLTIP": {
                "START": "Filtrar para esta fecha de inicio",
                "SERIES": "Filtrar para esta serie",
@@ -475,8 +516,8 @@
                "LOCATION": "Filtrar para esta ubicación",
                "DETAILS": "Abrir detalles de evento",
                "DELETE": "Borrar evento",
-               "PREVIEW": "Abrir player para previsualización",
                "EDITOR": "Abrir en el editor",
+               "EDITOR_NEEDS_CUTTING": "Abrir editor de vídeo (un comentario indica que se ha solicitado edición)",
                "COMMENTS": "Ver comentarios",
                "PAUSED_WORKFLOW": "Ver Workflows pausados"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Detalles del evento - {{resourceId}}",
             "TABS": {
-               "GENERAL": "General",
                "METADATA": "Metadatos",
                "EXTENDED-METADATA": "Metadatos II",
                "ASSETS": "Recursos",
+               "PUBLICATIONS": "Publicaciones",
                "SCHEDULING": "Programación",
                "WORKFLOWS": "Flujos de Trabajo",
                "ACCESS": "Política de acceso",
                "COMMENTS": "Comentarios"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Publicaciones",
+            "PUBLICATIONS": {
+               "CAPTION": "Publicaciones",
                "NO_PUBLICATIONS_AVAILABLE": "Este evento no ha sido publicado",
                "PUBLICATION_DESCRIPTION": "Este evento ha sido publicado en los siguientes canales de publicación:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Este evento no está actualmente en progreso",
@@ -527,7 +568,7 @@
                "EXTERNAL_API": "Publicación en la API Externa",
                "YOUTUBE": "Youtube",
                "OAIPMH": "OAI-PMH",
-               "SELECT_WORKFLOW": "Seleccione el flujo de trabajo",
+               "SELECT_WORKFLOW": "Seleccione flujo de trabajo",
                "SELECT_WORKFLOW_EMPTY": "No hay flujos de trabajo disponibles"
             },
             "MEDIA": {
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Añadir comentario"
       },
       "TABS": {
-         "PLAY": "Reproducción",
          "EDIT": "Editor",
          "CAPTIONS": "Subtítulos",
          "ANNOTATIONS": "Anotaciones"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Pendiente",
       "SCHEDULED": "Programado",
       "RECORDING": "Grabando"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "General",
+         "PLAYER": "Player",
+         "EDITOR": "Editor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Borrar todos los filtros",
+            "EVENT_VIEW": "Eventos",
+            "SERIES_VIEW": "Series",
+            "NEW_EVENT": "Añadir evento",
+            "NEW_SERIES": "Añadir serie",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Fotograma anterior",
+            "NEXT_FRAME": "Siguiente fotograma",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Dividir",
+            "CUT_SELECTED_SEGMENT": "Cortar",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
+         }
+      }
    }
 }

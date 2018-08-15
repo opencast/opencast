@@ -27,6 +27,11 @@
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-capture-admin-service-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -211,6 +216,7 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/external-base-endpoint.xml,
+              OSGI-INF/external-capture-agents-endpoint.xml,
               OSGI-INF/external-events-endpoint.xml,
               OSGI-INF/external-group-loader.xml,
               OSGI-INF/external-role-provider.xml,

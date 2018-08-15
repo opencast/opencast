@@ -288,4 +288,19 @@ public interface ComposerService {
   Job processSmil(Smil smil, String trackParamGroupId, String mediaType, List<String> profileIds)
           throws EncoderException, MediaPackageException;
 
+  /**
+   * Encodes a track to set of media targets as defined by a list of encoding profiles
+   * 
+   * @param track
+   *          - video or audio track
+   * @param profileIds
+   *          - a list of encoding profiles by name
+   * @return Receipt for this processing based on the inputs
+   * @throws EncoderException
+   *           if it fails
+   * @throws MediaPackageException
+   *           if adding files to a mediapackage produces errors
+   */
+  Job multiEncode(Track track, List<String> profileIds) throws EncoderException, MediaPackageException;
+
 }

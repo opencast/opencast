@@ -23,7 +23,7 @@
 angular.module('adminNg.resources')
 .factory('ResourcesListResource', ['$resource', function ($resource) {
     return $resource('/admin-ng/resources/:resource.json', {}, {
-        query: {
+        query: { // for parsing lists where the value is a string
             method: 'GET',
             isArray: true,
             transformResponse: function (data) {
@@ -44,6 +44,31 @@ angular.module('adminNg.resources')
 
               return result;
             }
+        },
+        queryRecursive: { // for parsing lists where the value is json
+          method: 'GET',
+          isArray: true,
+          transformResponse: function (data) {
+
+            var result = [];
+
+            data = JSON.parse(data);
+
+            if (angular.isDefined(data)) {
+              angular.forEach(data, function(value, key) {
+
+                var jsonValue = JSON.parse(value);
+
+                result.push({
+                  name: key,
+                  value: jsonValue
+                });
+
+              });
+            }
+
+            return result;
+          }
         }
-      });
+    });
 }]);

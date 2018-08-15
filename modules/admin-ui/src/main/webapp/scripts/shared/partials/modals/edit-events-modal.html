@@ -14,6 +14,11 @@
                                 <!-- Cannot start -->
                             </p>
                         </div>
+                        <div ng-show="!hasAllAgentsAccess()" class="alert sticky info">
+                          <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE">
+                            <!-- Cannot update scheduling -->
+                          </p>
+                        </div>
                     </div>
                     <div class="full-col">
                         <div class="obj tbl-list">
@@ -35,7 +40,7 @@
                                     </tr>
                                     </thead>
                                     <tbody >
-                                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row)}">
+                                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
                                         <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
                                         <td>{{ row.title }}</td>
                                         <td class="nowrap">{{ row.series_name}}</td>
@@ -72,6 +77,12 @@
                       <div data-admin-ng-notifications="" context="event-scheduling"></div>
                       <div class="obj list-obj" ng-show="conflicts.length > 0">
                         <table class="main-tbl scheduling-conflict">
+                          <tr>
+                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_FIRST_EVENT' | translate }}</th>
+                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_SECOND_EVENT' | translate }}</th>
+                            <th>{{ 'EVENTS.EVENTS.TABLE.START' | translate }}</th>
+                            <th>{{ 'EVENTS.EVENTS.TABLE.END' | translate }}</th>
+                          </tr>
                           <tr ng-repeat="conflict in conflicts">
                             <td>{{ conflict.eventId }}</td>
                             <td>{{ conflict.title }}</td>
@@ -103,7 +114,7 @@
 
                         </div><!--list-obj -->
 
-                        <div class="obj tbl-details">
+                        <div class="obj tbl-details" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                             <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"><!-- Edit scheduling --></header>
                             <div class="obj-container">
 
@@ -121,7 +132,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.start.hour"
                                             ng-change="onTemporalValueChange('start'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                                             ng-options="h.index as h.value for h in hours"
                                             />
                                     <select chosen
@@ -130,7 +141,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.start.minute"
                                             ng-change="onTemporalValueChange('start'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                                             ng-options="m.index as m.value for m in minutes"
                                             />
                                   </td>
@@ -144,7 +155,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.end.hour"
                                             ng-change="onTemporalValueChange('end'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                                             ng-options="h.index as h.value for h in hours"
                                             />
                                     <select chosen
@@ -153,7 +164,7 @@
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.end.minute"
                                             ng-change="onTemporalValueChange('end'); checkConflicts();"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                                             ng-options="m.index as m.value for m in minutes"
                                             />
                                     <span ng-bind="scheduling.end.date"
@@ -170,8 +181,8 @@
                                             ng-change="roomChanged(); checkConflicts()"
                                             data-disable-search-threshold="8"
                                             ng-model="scheduling.location"
-                                            ng-options="value.name for (id, value) in captureAgents"
-                                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
+                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                                             />
                                   </td>
                                   <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">

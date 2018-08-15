@@ -541,7 +541,16 @@ angular.module('adminNg.controllers')
         $scope.onTemporalValueChange = function(type) {
             SchedulingHelperService.applyTemporalValueChange($scope.source, type, true);
             $scope.saveScheduling();
-        }
+        };
+
+
+        $scope.hasCurrentAgentAccess = function() {
+            return SchedulingHelperService.hasAgentAccess($scope.source.agentId);
+        };
+
+        $scope.currentAgentOrAccess = function(agent, index, array) {
+            return agent.id === $scope.source.agentId || SchedulingHelperService.hasAgentAccess(agent.id);
+        };
 
         /**
          * End Scheduling related resources

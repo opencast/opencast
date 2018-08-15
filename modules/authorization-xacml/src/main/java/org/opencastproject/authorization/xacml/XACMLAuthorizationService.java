@@ -37,6 +37,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -49,23 +50,10 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Option.Match;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.NotImplementedException;
-import org.apache.commons.lang3.StringUtils;
-import org.jboss.security.xacml.core.JBossPDP;
-import org.jboss.security.xacml.core.model.context.AttributeType;
-import org.jboss.security.xacml.core.model.context.RequestType;
-import org.jboss.security.xacml.core.model.context.SubjectType;
-import org.jboss.security.xacml.factories.RequestAttributeFactory;
-import org.jboss.security.xacml.factories.RequestResponseContextFactory;
-import org.jboss.security.xacml.interfaces.PolicyDecisionPoint;
-import org.jboss.security.xacml.interfaces.RequestContext;
-import org.jboss.security.xacml.interfaces.XACMLConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +61,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -104,84 +89,46 @@ public class XACMLAuthorizationService implements AuthorizationService {
   @Override
   public Tuple<AccessControlList, AclScope> getActiveAcl(final MediaPackage mp) {
     logger.debug("getActiveACl for media package {}", mp.getIdentifier());
-    return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
-      @Override
-      public Tuple<AccessControlList, AclScope> apply() {
-        // has an episode ACL?
-        Option<AccessControlList> episode = getAcl(mp, list(XACML_POLICY_EPISODE));
-        if (episode.isSome()) {
-          logger.debug("Found event ACL for mediapackage {}", mp.getIdentifier());
-          return tuple(episode.get(), AclScope.Episode);
-        }
-        Option<AccessControlList> series = getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
-        if (series.isSome()) {
-          logger.debug("Found series ACL for mediapackage {}", mp.getIdentifier());
-          return tuple(series.get(), AclScope.Series);
-        }
-        logger.debug("Found neither event nor series ACL for mediapackage {}", mp.getIdentifier());
-        return getDefaultAcl(mp);
-      }
-    });
+    return getAcl(mp, AclScope.Episode);
   }
 
   /** Returns an ACL based on a given file/inputstream. */
-  public Tuple<AccessControlList, AclScope> getAclFromInputStream(final InputStream in) {
+  public AccessControlList getAclFromInputStream(final InputStream in) throws IOException {
     logger.debug("Get ACL from inputstream");
-    return withContextClassLoader(new Function0<Tuple<AccessControlList, AclScope>>() {
-      @Override
-      public Tuple<AccessControlList, AclScope> apply() {
-        Option<AccessControlList> episode = loadAclFromFile(in);
-        return tuple(episode.get(), AclScope.Episode);
-      }
-    });
-  }
-
-  private Tuple<AccessControlList, AclScope> getDefaultAcl(final MediaPackage mp) {
-    logger.debug("Get default ACL for media package {}", mp.getIdentifier());
-    if (StringUtils.isNotBlank(mp.getSeries())) {
-      logger.debug("Falling back to acl from series {} for media package {}", mp.getSeries(), mp.getIdentifier());
-      try {
-        return tuple(seriesService.getSeriesAccessControl(mp.getSeries()), AclScope.Series);
-      } catch (Exception e) {
-        logger.debug("Unable to get acl from series '{}'", mp.getSeries());
-      }
+    try {
+      return XACMLUtils.parseXacml(in);
+    } catch (XACMLParsingException e) {
+      throw new IOException(e);
     }
-    logger.trace("Falling back to global default acl for media package '{}'", mp.getIdentifier());
-    return tuple(new AccessControlList(), AclScope.Global);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public Option<AccessControlList> getAcl(final MediaPackage mp, final AclScope scope) {
-    return withContextClassLoader(new Function0<Option<AccessControlList>>() {
-      @Override
-      public Option<AccessControlList> apply() {
-        switch (scope) {
-          case Episode:
-            return getAcl(mp, list(XACML_POLICY_EPISODE)).orElse(new Function0<Option<AccessControlList>>() {
-              @Override
-              public Option<AccessControlList> apply() {
-                return getAcl(mp, list(XACML_POLICY_SERIES)).fold(
-                        new Match<AccessControlList, Option<AccessControlList>>() {
-                          @Override
-                          public Option<AccessControlList> some(AccessControlList a) {
-                            return Option.<AccessControlList> none();
-                          }
+  public Tuple<AccessControlList, AclScope> getAcl(final MediaPackage mp, final AclScope scope) {
+    List<Tuple<AclScope, MediaPackageElementFlavor>> scopes = new ArrayList<>(3);
 
-                          @Override
-                          public Option<AccessControlList> none() {
-                            return getAcl(mp, list(XACML_POLICY));
-                          }
-                        });
-              }
-            });
-          case Series:
-            return getAcl(mp, list(XACML_POLICY_SERIES, XACML_POLICY));
-          default:
-            throw new NotImplementedException("AclScope " + scope + " has not been implemented yet!");
+    // Start with the requested scope but fall back to the less specific scope if it does not exist.
+    // The order is: episode -> series -> general (deprecated) -> global
+    if (AclScope.Episode.equals(scope)) {
+      scopes.add(tuple(AclScope.Episode, XACML_POLICY_EPISODE));
+    }
+    if (AclScope.Episode.equals(scope) || AclScope.Series.equals(scope)) {
+      scopes.add(tuple(AclScope.Series, XACML_POLICY_SERIES));
+    }
+
+    // hint: deprecated global flavor
+    scopes.add(tuple(AclScope.Series, XACML_POLICY));
+
+    for (Tuple<AclScope, MediaPackageElementFlavor> currentScope: scopes) {
+      for (Attachment xacml : mp.getAttachments(currentScope.getB())) {
+        Option<AccessControlList> acl = loadAcl(xacml.getURI());
+        if (acl.isSome()) {
+          return tuple(acl.get(), currentScope.getA());
         }
       }
-    });
+    }
+
+    logger.debug("Falling back to global default ACL");
+    return tuple(new AccessControlList(), AclScope.Global);
   }
 
   @Override
@@ -226,11 +173,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
         return tuple(mp, attachment);
       }
     });
-  }
-
-  @Override
-  public List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope) {
-    return getAttachments(mp, toFlavors(scope.get()));
   }
 
   @Override
@@ -322,31 +264,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
   }
 
-  /** Get the ACL of the given flavor from a media package. */
-  private Option<AccessControlList> getAcl(final MediaPackage mp, final List<MediaPackageElementFlavor> flavors) {
-
-    Option<AccessControlList> result = Option.none();
-
-    Set<Attachment> attachments = new HashSet<>();
-    for (MediaPackageElementFlavor flavor : flavors) {
-      Attachment[] attachmentsArray = mp.getAttachments(flavor);
-      attachments.addAll(Arrays.asList(attachmentsArray));
-    }
-
-    if (attachments.size() == 1) {
-      logger.debug("One security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-      for (Attachment attachment : attachments) {
-        result = loadAcl(attachment.getURI());
-      }
-    } else if (attachments.size() < 1) {
-      logger.debug("No security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-    } else if (attachments.size() > 1) {
-      logger.warn("More than one security attachment found for media package {} with flavors {}", mp.getIdentifier(), flavors);
-    }
-
-    return result;
-  }
-
   /**
    * Get a file from the workspace.
    *
@@ -402,20 +319,6 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Option.none();
   }
 
-
-  /** Produces an ACL derived from a given security policy file. */
-  private Option<AccessControlList> loadAclFromFile(final InputStream in) {
-    try {
-      AccessControlList acl = XACMLUtils.parseXacml(in);
-      if (acl != null) {
-        return Option.option(acl);
-      }
-    } catch (Exception e) {
-      logger.error("Failed to produce Acl when reading file:", e);
-    }
-    return Option.none();
-  }
-
   /**
    * {@inheritDoc}
    *
@@ -428,88 +331,40 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   @Override
   public boolean hasPermission(final MediaPackage mp, final String action) {
-    return withContextClassLoader(new Function0<Boolean>() {
-      @Override
-      public Boolean apply() {
-        return getXacmlAttachment(mp).map(new Function<Attachment, Boolean>() {
-          @Override
-          public Boolean apply(Attachment attachment) {
-            final File xacmlPolicyFile = fromWorkspace(attachment.getURI());
-            if (xacmlPolicyFile == null) {
-              logger.warn("Unable to read XACML file from {}! Prevent access permissions.", attachment);
-              return false;
-            }
-
-            final RequestContext requestCtx = RequestResponseContextFactory.createRequestCtx();
-            final User user = securityService.getUser();
-
-            // Create a subject type
-            SubjectType subject = new SubjectType();
-            subject.getAttribute().add(
-                    RequestAttributeFactory.createStringAttributeType(XACMLUtils.SUBJECT_IDENTIFIER, XACMLUtils.ISSUER,
-                            user.getUsername()));
-            for (Role role : user.getRoles()) {
-              AttributeType attSubjectID = RequestAttributeFactory.createStringAttributeType(
-                      XACMLUtils.SUBJECT_ROLE_IDENTIFIER, XACMLUtils.ISSUER, role.getName());
-              subject.getAttribute().add(attSubjectID);
-            }
-
-            // Create a resource type
-            URI uri = null;
-            try {
-              uri = new URI(mp.getIdentifier().toString());
-            } catch (URISyntaxException e) {
-              logger.warn("Unable to represent mediapackage identifier '{}' as a URI", mp.getIdentifier().toString());
-            }
-            org.jboss.security.xacml.core.model.context.ResourceType resourceType = new org.jboss.security.xacml.core.model.context.ResourceType();
-            resourceType.getAttribute().add(
-                    RequestAttributeFactory.createAnyURIAttributeType(XACMLUtils.RESOURCE_IDENTIFIER,
-                            XACMLUtils.ISSUER, uri));
-
-            // Create an action type
-            org.jboss.security.xacml.core.model.context.ActionType actionType = new org.jboss.security.xacml.core.model.context.ActionType();
-            actionType.getAttribute().add(
-                    RequestAttributeFactory.createStringAttributeType(XACMLUtils.ACTION_IDENTIFIER, XACMLUtils.ISSUER,
-                            action));
-
-            // Create a Request Type
-            RequestType requestType = new RequestType();
-            requestType.getSubject().add(subject);
-            requestType.getResource().add(resourceType);
-            requestType.setAction(actionType);
-            try {
-              requestCtx.setRequest(requestType);
-            } catch (IOException e) {
-              logger.warn("Unable to set the xacml request type", e);
-              return false;
-            }
-
-            PolicyDecisionPoint pdp = getPolicyDecisionPoint(xacmlPolicyFile);
-            FileUtils.deleteQuietly(xacmlPolicyFile);
-
-            return pdp.evaluate(requestCtx).getDecision() == XACMLConstants.DECISION_PERMIT;
-          }
-        }).getOrElse(false);
-      }
-    });
-  }
-
-  private PolicyDecisionPoint getPolicyDecisionPoint(File xacmlFile) {
-    // Build a JBoss PDP configuration. This is a custom jboss format, so we're just hacking it together here
-    StringBuilder sb = new StringBuilder();
-    sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>");
-    sb.append("<ns:jbosspdp xmlns:ns=\"urn:jboss:xacml:2.0\">");
-    sb.append("<ns:Policies><ns:Policy><ns:Location>");
-    sb.append(xacmlFile.toURI().toString());
-    sb.append("</ns:Location></ns:Policy></ns:Policies><ns:Locators>");
-    sb.append("<ns:Locator Name=\"org.jboss.security.xacml.locators.JBossPolicyLocator\">");
-    sb.append("</ns:Locator></ns:Locators></ns:jbosspdp>");
-    try (InputStream is = IOUtils.toInputStream(sb.toString(), "UTF-8")) {
-      return new JBossPDP(is);
-    } catch (IOException e) {
-      // Only happens if 'UTF-8' is an invalid encoding, which it isn't
-      throw new IllegalStateException("Unable to transform a string into a stream");
+    Option<Attachment> xacml = getXacmlAttachment(mp);
+    if (xacml.isNone()) {
+      logger.debug("No attached XACML. Denying access by default.");
+      return false;
     }
+    Attachment attachment = xacml.get();
+    AccessControlList acl;
+    try {
+      acl = XACMLUtils.parseXacml(workspace.read(attachment.getURI()));
+    } catch (XACMLParsingException | NotFoundException | IOException e) {
+      logger.warn("Error reading XACML file {}", attachment.getURI(), e);
+      return false;
+    }
+    boolean allowed = false;
+    final User user = securityService.getUser();
+    for (AccessControlEntry entry: acl.getEntries()) {
+      // ignore entries for other actions
+      if (!entry.getAction().equals(action)) {
+        continue;
+      }
+      for (Role role : user.getRoles()) {
+        if (entry.getRole().equals(role.getName())) {
+          // immediately abort on matching deny rules
+          // (never allow if a deny rule matches, even if another allow rule matches)
+          if (!entry.isAllow()) {
+            logger.debug("Access explicitely denied for role({}), action({})", role.getName(), action);
+            return false;
+          }
+          allowed = true;
+        }
+      }
+    }
+    logger.debug("XACML file allowed access");
+    return allowed;
   }
 
   /**

@@ -359,6 +359,7 @@ public class ProcessSmilWorkflowOperationHandlerTest {
 
     operationHandler = new ProcessSmilWorkflowOperationHandler();
     operationHandler.setSmilService(smilService);
+    operationHandler.setJobBarrierPollingInterval(0);
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
     operationHandler.setComposerService(composerService);

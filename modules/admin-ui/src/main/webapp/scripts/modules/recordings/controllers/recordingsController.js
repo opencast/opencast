@@ -62,8 +62,12 @@ angular.module('adminNg.controllers')
                 Table.fetch();
                 Modal.$scope.close();
                 Notifications.add('success', 'LOCATION_DELETED');
-            }, function () {
-                Notifications.add('error', 'LOCATION_NOT_DELETED');
+            }, function (error) {
+                if (error.status === 401) {
+                    Notifications.add('error', 'LOCATION_NOT_DELETED_NOT_AUTHORIZED');
+                } else {
+                    Notifications.add('error', 'LOCATION_NOT_DELETED');
+                }
             });
         };
     }

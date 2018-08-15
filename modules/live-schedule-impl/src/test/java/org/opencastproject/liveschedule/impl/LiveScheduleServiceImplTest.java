@@ -68,7 +68,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -83,6 +82,7 @@ import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -887,17 +887,12 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public List<Attachment> getAclAttachments(MediaPackage mp, Option<AclScope> scope) {
+    public Tuple<AccessControlList, AclScope> getAcl(MediaPackage mp, AclScope scope) {
       return null;
     }
 
     @Override
-    public Option<AccessControlList> getAcl(MediaPackage mp, AclScope scope) {
-      return null;
-    }
-
-    @Override
-    public Tuple<AccessControlList, AclScope> getAclFromInputStream(InputStream in) {
+    public AccessControlList getAclFromInputStream(InputStream in) throws IOException {
       // TODO Auto-generated method stub
       return null;
     }

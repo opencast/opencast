@@ -74,7 +74,8 @@
       "HELP": "Yardım",
       "USERS_GUIDE": "Kullanım Kılavuzu",
       "DOCUMENTATION": "Dökümantasyon",
-      "REST_DOC": "REST API Dökümanları"
+      "REST_DOC": "REST API Dökümanları",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Erişim ilkesi oluşturuldu",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Mesaj gönderildi",
       "EMAIL_NOT_SENT": "Mesaj gönderilemedi",
       "CONFLICT_DETECTED": "Zamanlama sorunu: yeni etkinlik eski etkinlikle çakışmakta. Lütfen konumu, tarihi ve zamanı değiştirin.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Zamanlama hatası: Etkinlik zaten bitmiş durumda.",
       "CONFLICT_END_BEFORE_START": "Zamanlama hatası: Bitiş zamanlaması başlangıçtan daha sonra olmalı.",
       "INVALID_ACL_RULES": "Kuralların okuma veya/ve yazma hakkında(haklarında) etkin bir rolü olmalı.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "{{numberOfEvents}} etkinlik seçtiniz",
             "CONFIGURATION": "Yapılandır",
             "WORKFLOW": "Görev"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "Genel",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Özet",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Tip",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Düzenle",
+            "METADATA": "Üstveri",
+            "SCHEDULING": "Zamanlanıyor"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Erişim İlkesi"
             },
             "SUMMARY": {
-               "CAPTION": "Özet"
+               "CAPTION": "Özet",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Pzt",
@@ -436,6 +466,15 @@
                "FR": "Cum",
                "SA": "Cmt",
                "SU": "Paz"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Seriler",
             "DATE": "Tarih",
             "START": "Başlat",
+            "END": "End",
             "STOP": "Durdur",
             "STATUS": "Durum",
             "LOCATION": "Konum",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Önceki",
             "NOCONTENT": "Veri yok",
             "PUBLISHED": "Yayınlandı",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Etkinlik detayları - {{resourceId}}",
             "TABS": {
-               "GENERAL": "Genel",
                "METADATA": "Üstveri",
                "EXTENDED-METADATA": "Üstveri II",
                "ASSETS": "Varlıklar",
+               "PUBLICATIONS": "Yayınlar",
                "SCHEDULING": "Zamanlanıyor",
                "WORKFLOWS": "İş Akışları",
                "ACCESS": "Erişim İlkesi",
                "COMMENTS": "Yorumlar"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Yayınlar",
+            "PUBLICATIONS": {
+               "CAPTION": "Yayınlar",
                "NO_PUBLICATIONS_AVAILABLE": "Etkinliğin hiçbir yayını yok",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -527,7 +568,7 @@
                "EXTERNAL_API": "External API Publication",
                "YOUTUBE": "Youtube",
                "OAIPMH": "OAI-PMH",
-               "SELECT_WORKFLOW": "İş Akışı Seç",
+               "SELECT_WORKFLOW": "İş akışı seçin",
                "SELECT_WORKFLOW_EMPTY": "Kullanılabilir iş alanları yok"
             },
             "MEDIA": {
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Yorum Ekle"
       },
       "TABS": {
-         "PLAY": "Oynatma",
          "EDIT": "Düzenleyici",
          "CAPTIONS": "Altyazılar",
          "ANNOTATIONS": "Ek açıklamalar"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Yapılacaklar",
       "SCHEDULED": "Zamanlandı",
       "RECORDING": "Kayıt ediliyor"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Genel",
+         "PLAYER": "Player",
+         "EDITOR": "Düzenleyici"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Tüm filtreleri temizle",
+            "EVENT_VIEW": "Etkinlikler",
+            "SERIES_VIEW": "Seri",
+            "NEW_EVENT": "Etkinlik ekle",
+            "NEW_SERIES": "Seri ekle",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Önceki kare",
+            "NEXT_FRAME": "Sonraki kare",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Ayır",
+            "CUT_SELECTED_SEGMENT": "Kes",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Böüm sonu"
+         }
+      }
    }
 }

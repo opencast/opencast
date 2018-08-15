@@ -80,6 +80,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -126,7 +127,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("series", dc.toXmlString()));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesId, e);
     }
@@ -164,7 +165,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("seriesID", seriesID));
       params.add(new BasicNameValuePair("acl", AccessControlParser.toXml(accessControl)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params,  StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);
     }
@@ -357,7 +358,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       if (response != null) {
         int statusCode = response.getStatusLine().getStatusCode();
         if (SC_OK == statusCode) {
-          DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), "UTF-8"));
+          DublinCoreCatalogList list = DublinCoreCatalogList.parse(EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8));
           logger.info("Successfully get series dublin core catalog list from the remote series index");
           return list;
         } else if (SC_UNAUTHORIZED == statusCode) {
@@ -385,7 +386,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         if (SC_UNAUTHORIZED == statusCode) {
           throw new UnauthorizedException("Not authorized to get series");
         } else if (SC_OK == statusCode) {
-          String seriesJSON = EntityUtils.toString(response.getEntity(), "UTF-8");
+          String seriesJSON = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
           Object resultContainer = new JSONParser().parse(seriesJSON);
           if (resultContainer instanceof JSONObject) {
             Map<String, String> result = new HashMap<>();
@@ -441,7 +442,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
           throw new NotFoundException("Series with id '" + seriesId + "' not found on remote series service!");
         } else {
-          String optOutString = EntityUtils.toString(response.getEntity(), "UTF-8");
+          String optOutString = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
           Boolean booleanObject = BooleanUtils.toBooleanObject(optOutString);
           if (booleanObject == null)
             throw new SeriesException("Could not parse opt out status from the remote series service: " + optOutString);
@@ -542,7 +543,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
     queryStringParams.add(new BasicNameValuePair("startPage", Long.toString(q.getStartPage())));
     queryStringParams.add(new BasicNameValuePair("count", Long.toString(q.getCount())));
 
-    url.append(URLEncodedUtils.format(queryStringParams, "UTF-8"));
+    url.append(URLEncodedUtils.format(queryStringParams, StandardCharsets.UTF_8));
     return url.toString();
   }
 
@@ -561,7 +562,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         } else {
           logger.debug("Successfully received series {} properties from the remote series index", seriesID);
           StringWriter writer = new StringWriter();
-          IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
+          IOUtils.copy(response.getEntity().getContent(), writer, StandardCharsets.UTF_8);
           JSONArray jsonProperties = (JSONArray) parser.parse(writer.toString());
           Map<String, String> properties = new TreeMap<>();
           for (int i = 0; i < jsonProperties.length(); i++) {
@@ -601,7 +602,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           logger.debug("Successfully received series {} property {} from the remote series index", seriesID,
                   propertyName);
           StringWriter writer = new StringWriter();
-          IOUtils.copy(response.getEntity().getContent(), writer, "UTF-8");
+          IOUtils.copy(response.getEntity().getContent(), writer, StandardCharsets.UTF_8);
           return writer.toString();
         }
       }
@@ -625,7 +626,7 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("name", propertyName));
       params.add(new BasicNameValuePair("value", propertyValue));
-      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+      post.setEntity(new UrlEncodedFormEntity(params,  StandardCharsets.UTF_8));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating series " + seriesID
               + " series property " + propertyName + ":" + propertyValue, e);

@@ -20,55 +20,37 @@
  */
 package org.opencastproject.external.common;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public final class ApiMediaType {
 
-  private static final String VERSION_REG_EX_PATTERN = "[v][0-9]+\\.[0-9]+\\.[0-9]+";
+  public static final String VERSION_1_1_0 = "application/v1.1.0+json";
+  public static final String VERSION_1_0_0 = "application/v1.0.0+json";
+  public static final String JSON = "application/json";
+
+  private static final String APPLICATION_ANY = "application/*";
+  private static final String ANY = "*/*";
 
   private final ApiVersion version;
   private final ApiFormat format;
   private final String externalForm;
 
-  public static ApiMediaType parse(String mediaType) throws ApiMediaTypeException {
-    return new ApiMediaType(extractVersion(mediaType), extractFormat(mediaType), mediaType);
-  }
-
-  private static ApiVersion extractVersion(String mediaType) throws ApiMediaTypeException {
-    Matcher matcher = Pattern.compile(VERSION_REG_EX_PATTERN).matcher(mediaType);
-    if (matcher.find()) {
-      String versionPart = mediaType.substring(matcher.start(), matcher.end());
-      try {
-        return ApiVersion.of(versionPart);
-      } catch (Exception e) {
-        throw ApiMediaTypeException.invalidVersion(mediaType);
-      }
-    } else {
-      return ApiVersion.VERSION_UNDEFINED;
-    }
-  }
-
-  private static ApiFormat extractFormat(String mediaType) {
-    final String subtype = extractSubtype(mediaType);
-    final String format;
-    if (subtype.contains("+")) {
-      format = subtype.substring(subtype.indexOf("+") + 1);
-    } else {
-      format = subtype;
-    }
-
-    return ApiFormat.valueOf(format.toUpperCase());
-  }
-
-  private static String extractSubtype(String mediaType) {
-    return mediaType.substring(mediaType.indexOf("/") + 1);
-  }
-
   private ApiMediaType(ApiVersion version, ApiFormat format, String externalForm) {
     this.version = version;
     this.format = format;
     this.externalForm = externalForm;
+  }
+
+  public static ApiMediaType parse(String acceptHeader) throws ApiMediaTypeException {
+    /* MH-12802: The External API does not support content negotiation */
+    ApiMediaType mediaType;
+    if (acceptHeader.contains(VERSION_1_0_0)) {
+      mediaType = new ApiMediaType(ApiVersion.VERSION_1_0_0, ApiFormat.JSON, VERSION_1_0_0);
+    } else if ((acceptHeader.contains(VERSION_1_1_0) || acceptHeader.contains(JSON)
+    || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY))) {
+      mediaType = new ApiMediaType(ApiVersion.VERSION_1_1_0, ApiFormat.JSON, VERSION_1_1_0);
+    } else {
+      throw ApiMediaTypeException.invalidVersion(acceptHeader);
+    }
+    return mediaType;
   }
 
   public ApiFormat getFormat() {

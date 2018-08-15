@@ -74,7 +74,8 @@
       "HELP": "Βοήθεια",
       "USERS_GUIDE": "Εγχειρίδιο χρήσης",
       "DOCUMENTATION": "Τεκμηρίωση",
-      "REST_DOC": "Εγχειρίδιο REST API"
+      "REST_DOC": "Εγχειρίδιο REST API",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "H πολιτική πρόσβασης έχει δημιουργηθεί",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Το μήνυμα έχει σταλεί",
       "EMAIL_NOT_SENT": "Δεν μπόρεσε να σταλεί το μήνυμα",
       "CONFLICT_DETECTED": "Σύγκρουση στον προγραμματισμό: η νέα εκδήλωση συμπίμπτει με μία υπάρχουσα. Παρακαλώ αλλάξτε την αίθουσα, τις ημερηνίες ή τις ημέρες.",
+      "CONFLICT_BULK_DETECTED": "Προγραμματισμός σε σύγκρουση: η αλλαγή στις εκδηλώσεις οδηγεί σε συγκρούση. Παρακαλώ να αλλάξετε την τοποθεσία, τις ημερομηνίες ή τις ώρες.",
       "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
       "CONFLICT_END_BEFORE_START": "Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
       "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Έχετε επιλέξει {{numberOfEvents}} εκδηλώσεις",
             "CONFIGURATION": "Ρύθμιση παραμέτρων",
             "WORKFLOW": "Εργασία"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Επεξεργασία προγραμματισμένων εκδηλώσεων",
+         "GENERAL": {
+            "CAPTION": "Γενικά",
+            "CANNOTSTART": "Επισημανθείσα(ες) εκδήλωση(εις) δεν μπορούν να επεξεργαστούν, μόνο οι προγραμματισμένες εκδηλώσεις υποστηρίζονται.",
+            "NOCHANGES": "Καμία αλλαγή στις εκδηλώσεις δεν ανιχνεύεται!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Επεξεργασία μεταδεδομένων"
+         },
+         "SUMMARY": {
+            "CAPTION": "Σύνοψη",
+            "SINGLE_EVENT_CAPTION": "Εκδήλωση «{{ title }}»",
+            "TYPE": "Τύπος",
+            "PREVIOUS": "Παλιά τιμή",
+            "NEXT": "Νέα τιμή"
+         },
+         "EDIT": {
+            "CAPTION": "Επεξεργασία",
+            "METADATA": "Μεταδεδομένα",
+            "SCHEDULING": "Προγραμματισμός"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Πολιτική πρόσβασης"
             },
             "SUMMARY": {
-               "CAPTION": "Περίληψη"
+               "CAPTION": "Περίληψη",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Δευτ",
@@ -436,6 +466,15 @@
                "FR": "Παρ",
                "SA": "Σάβ",
                "SU": "Κυρ"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Σειρά",
             "DATE": "Ημερομηνία",
             "START": "Έναρξη",
+            "END": "Τέλος",
             "STOP": "Διακοπή",
             "STATUS": "Κατάσταση",
             "LOCATION": "Τοποθεσία",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Προηγούμενη",
             "NOCONTENT": "Δεν υπάρχουν διαθέσιμα δεδομένα",
             "PUBLISHED": "Δημοσιευμένο",
+            "WEEKDAY": "Ημέρες εβδομάδας",
             "TOOLTIP": {
                "START": "Φίλτρο για αυτήν την ημερομηνία έναρξης",
                "SERIES": "Φίλτρο για αυτή τη σειρά",
@@ -475,8 +516,8 @@
                "LOCATION": "Εκδήλωση για αυτήν την τοποθεσία",
                "DETAILS": "Προβολή λεπτομερειών εκδήλωσης",
                "DELETE": "Διαγραφή εκδήλωσης",
-               "PREVIEW": "Άνοιγμα προεπισκόπησης",
                "EDITOR": "Άνοιγμα επεξεργασίας βίντεο",
+               "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
                "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση"
             }
@@ -504,22 +545,22 @@
          "DETAILS": {
             "HEADER": "Λεπτομέρειες εκδήλωσης {{resourceId}}",
             "TABS": {
-               "GENERAL": "Γενικά",
                "METADATA": "Μεταδεδομένα",
                "EXTENDED-METADATA": "Μεταδεδομένα ΙΙ",
                "ASSETS": "Αντικείμενα",
+               "PUBLICATIONS": "Δημοσιεύσεις",
                "SCHEDULING": "Προγραμματισμός",
                "WORKFLOWS": "Ροές εργασίας",
                "ACCESS": "Πολιτική πρόσβασης",
                "COMMENTS": "Σχόλια"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Δημοσιεύσεις",
+            "PUBLICATIONS": {
+               "CAPTION": "Δημοσιεύσεις",
                "NO_PUBLICATIONS_AVAILABLE": "Αυτή η εκδήλωση δεν έχει δημοσιεύσεις",
                "PUBLICATION_DESCRIPTION": "Αυτό η εκδήλωση έχει δημοσιευθεί στα παρακάτω κανάλια δημοσίευσης:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Αυτή η εκδήλωση δεν είναι σε εξέλιξη",
                "SCHEDULING_STATUS": "Κατάσταση",
-               "READY_FOR_RECORDING": "Έτοιμη για καταγραφή",
+               "READY_FOR_RECORDING": "Έτοιμη για εγγραφή",
                "OPTED_OUT": "Επιλογή εξόδου",
                "CUSTOM": "Προσαρμοσμένη",
                "ENGAGE": "Engage",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Προσθήκη σχολίου"
       },
       "TABS": {
-         "PLAY": "Αναπαραγωγη",
          "EDIT": "Πρόγραμμα επεξεργασίας",
          "CAPTIONS": "Λεζάντες",
          "ANNOTATIONS": "Σχολιασμοί"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Προγραμματισμένη",
       "RECORDING": "Εγγραφή"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Γενικά",
+         "PLAYER": "Player",
+         "EDITOR": "Πρόγραμμα επεξεργασίας"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Απαλοιφή όλων των φίλτρων",
+            "EVENT_VIEW": "Εκδηλώσεις",
+            "SERIES_VIEW": "Σειρά",
+            "NEW_EVENT": "Προσθήκη εκδήλωσης",
+            "NEW_SERIES": "Προσθήκη σειράς",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Προηγούμενο καρέ",
+            "NEXT_FRAME": "Επόμενο καρέ",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Διαχωρισμός",
+            "CUT_SELECTED_SEGMENT": "Αποκοπή",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Τέλος του τμήματος"
+         }
+      }
    }
 }

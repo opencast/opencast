@@ -24,8 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('BulkDeleteCtrl', ['$scope', 'Modal', 'FormNavigatorService', 'Table', 'Notifications',
     'BulkDeleteResource', 'NewEventProcessing', 'TaskResource', 'decorateWithTableRowSelection',
+    'SeriesHasEventsResource', 'SeriesConfigurationResource',
         function ($scope, Modal, FormNavigatorService, Table, Notifications, BulkDeleteResource, NewEventProcessing,
-                  TaskResource, decorateWithTableRowSelection) {
+                  TaskResource, decorateWithTableRowSelection, SeriesHasEventsResource, SeriesConfigurationResource) {
 
     var hasPublishedElements = function (currentEvent) {
         var publicationCount = 0;
@@ -105,6 +106,18 @@ angular.module('adminNg.controllers')
                 return selectedCount > 0;
             }
         }
+    };
+
+    $scope.allowed = function () {
+        var allowed = true;
+        if (Table.resource.indexOf('series') >= 0 && !$scope.deleteSeriesWithEventsAllowed) {
+            angular.forEach($scope.rows, function (row) {
+                if (allowed && row.selected && row.hasEvents) {
+                    allowed = false;
+                }
+            });
+        }
+        return allowed;
     };
 
     $scope.submitButton = false;
@@ -200,5 +213,16 @@ angular.module('adminNg.controllers')
         $scope.events.unpublished = {};
         $scope.events.unpublished.has = $scope.unpublished.rows.length > 0;
         $scope.events.unpublished.selected = true;
+    }
+    else {
+        SeriesConfigurationResource.get(function (data) {
+            $scope.deleteSeriesWithEventsAllowed = data.deleteSeriesWithEventsAllowed;
+        });
+        angular.forEach($scope.rows, function(row) {
+            SeriesHasEventsResource.get({id: row.id}, function (data) {
+                row.hasEvents = data.hasEvents;
+            });
+
+        });
     }
 }]);

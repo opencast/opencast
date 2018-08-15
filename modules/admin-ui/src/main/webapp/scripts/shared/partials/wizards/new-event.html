@@ -62,7 +62,7 @@
                     <td>{{ conflict.end }}</td>
                 </tr>
             </table>
-            <div class="obj list-obj">
+            <div class="obj list-obj" ng-if="(wizard.step.captureAgents | filter:wizard.step.hasAgentAccess).length > 0">
                 <header class="no-expand" translate="EVENTS.EVENTS.NEW.SOURCE.SELECT_SOURCE">
                     <!-- Select Source -->
                 </header>
@@ -81,10 +81,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_SINGLE" data-upload-type="SCHEDULE_SINGLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_SINGLE.CAPTION">
                                     <!-- Schedule Single Event -->
                                 </span>
                             </label>
@@ -93,10 +91,8 @@
                             <label>
                                 <input ng-model="wizard.step.ud.type" type="radio" name="source-toggle"
                                        class="source-toggle" value="SCHEDULE_MULTIPLE" data-upload-type="SCHEDULE_MULTIPLE"
-                                       ng-change="wizard.step.changeType()" ng-disabled="wizard.step.captureAgents.length === 0">
-                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION"
-                                      ng-class="wizard.step.captureAgents.length === 0 ? 'ui-state-disabled' : ''"
-                                      ng-attr-title="{{ (wizard.step.captureAgents.length === 0 ? 'EVENTS.EVENTS.NEW.SOURCE.NO_SOURCE_AVAILABLE' : '') | translate }}">
+                                       ng-change="wizard.step.changeType()">
+                                <span translate="EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.CAPTION">
                                     <!-- Schedule Multiple Events -->
                                 </span>
                             </label>
@@ -176,7 +172,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.hour" ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -187,7 +183,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.start.minute" ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -203,7 +199,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.hour" ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -214,7 +210,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.duration.minute" ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -230,7 +226,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.hour" ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                             >
                               <option value=""></option>
@@ -241,7 +237,7 @@
                                     ng-disabled="wizard.step.checkingConflicts"
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_SINGLE.end.minute" ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                             >
                               <option value=""></option>
@@ -261,8 +257,8 @@
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_SINGLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                                placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>
                             </select>
@@ -328,7 +324,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.hour"
                                     ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -340,7 +336,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.start.minute"
                                     ng-change="wizard.step.onTemporalValueChange('start')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -357,7 +353,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.hour"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                                 >
                                     <option value=""></option>
@@ -369,7 +365,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.duration.minute"
                                     ng-change="wizard.step.onTemporalValueChange('duration')"
-                                    data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                                    placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                                 >
                                     <option value=""></option>
@@ -386,7 +382,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.hour"
                                     ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate }}'"
                                     ng-options="h.index as h.value for h in wizard.step.hours"
                             >
                               <option value=""></option>
@@ -398,7 +394,7 @@
                                     data-disable-search-threshold="8"
                                     ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.end.minute"
                                     ng-change="wizard.step.onTemporalValueChange('end')"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate }}'"
                                     ng-options="m.index as m.value for m in wizard.step.minutes"
                             >
                               <option value=""></option>
@@ -415,8 +411,8 @@
                                 ng-change="wizard.step.roomChanged(); wizard.step.checkConflicts()"
                                 data-disable-search-threshold="8"
                                 ng-model="wizard.step.ud.SCHEDULE_MULTIPLE.device"
-                                ng-options="value.name for (id, value) in wizard.step.captureAgents"
-                                data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                                ng-options="value.name for (id, value) in wizard.step.captureAgents | filter:wizard.step.hasAgentAccess"
+                                placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                             >
                                 <option value=""></option>
                             </select>
@@ -474,7 +470,7 @@
                         data-search_contains="true"
                         ng-model="wizard.step.ud.workflow"
                         ng-options="w.title for (obj, w) in wizard.step.workflows | orderBy: 'displayOrder':true"
-                        data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
+                        placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                         no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                     >
                         <option value=""></option>
@@ -529,7 +525,7 @@
                                                     ng-change="wizard.step.changeBaseAcl()"
                                                     ng-model="wizard.step.ud.id"
                                                     ng-options="id as name for (id, name) in wizard.step.acls"
-                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                                    placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                                 >
                                                     <option value=""></option>
@@ -579,7 +575,7 @@
                                                     ng-model="policy.role"
                                                     ng-get-more="wizard.step.getMoreRoles"
                                                     ng-options="id as id for (id, type) in wizard.step.roles"
-                                                    data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                                    placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                                     no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'">
                                                     <option value=""></option>
                                                  </select>

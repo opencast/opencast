@@ -106,7 +106,6 @@ import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -610,7 +609,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Load dublincore and acl for update
       Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
-      Option<AccessControlList> acl = authorizationService.getAcl(mediaPackage, AclScope.Episode);
+      AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
       // Get updated agent properties
       Map<String, String> finalCaProperties = getFinalAgentProperties(caMetadata, wfProperties, captureAgentId,
@@ -619,14 +618,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Persist asset
       String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
                                           captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut,
-                                          acl.toOpt().getOr(new AccessControlList()));
+                                          acl);
       persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
               Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
               Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource, trxId);
 
       if (trxId.isNone()) {
         // Send updates
-        sendUpdateAddEvent(mediaPackageId, acl.toOpt(), dublinCore, Opt.some(startDateTime),
+        sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime),
                 Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
                 Opt.some(optOut));
 
@@ -763,7 +762,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         Date endDateTime = cal.getTime();
         // Load dublincore and acl for update
         Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
-        Option<AccessControlList> acl = authorizationService.getAcl(mediaPackage, AclScope.Episode);
+        AccessControlList acl = authorizationService.getActiveAcl(mediaPackage).getA();
 
         // Get updated agent properties
         Map<String, String> finalCaProperties = getFinalAgentProperties(caMetadata, wfProperties, captureAgentId,
@@ -771,13 +770,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
         // Persist asset
         String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
-                captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl.toOpt().getOr(new AccessControlList()));
+                captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl);
         persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
                 Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource, trxId);
 
         if (trxId.isNone()) {
           // Send updates
-          sendUpdateAddEvent(mediaPackageId, acl.toOpt(), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+          sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                   Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
 
           // Update last modified
@@ -934,11 +933,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
 
         // Check for ACL change and send update
-        Option<AccessControlList> aclNew = authorizationService.getAcl(mpToUpdate, AclScope.Episode);
-        if (aclNew.isSome()) {
-          if (aclOld.isNone() || !AccessControlUtil.equals(aclNew.get(), aclOld.get())) {
-            acl = aclNew.toOpt();
-          }
+        AccessControlList aclNew = authorizationService.getActiveAcl(mpToUpdate).getA();
+        if (aclOld.isNone() || !AccessControlUtil.equals(aclNew, aclOld.get())) {
+          acl = some(aclNew);
         }
 
         // Check for dublin core change and send update
@@ -960,7 +957,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               endDateTime.getOr(end), captureAgentId.getOr(agentId), userIds.getOr(presenters),
               mediaPackage.getOr(record.getSnapshot().get().getMediaPackage()),
               some(dublinCore.getOr(dublinCoreOpt.get())), wfProperties.getOr(wfProps),
-              finalCaProperties.getOr(caProperties), optOut.getOr(oldOptOut), acl.getOr(aclOld.getOr(new AccessControlList())));
+              finalCaProperties.getOr(caProperties), optOut.getOr(oldOptOut), acl.getOr(new AccessControlList()));
 
       if (trxId.isNone()) {
         String oldChecksum = record.getProperties().apply(Properties.getString(CHECKSUM));
@@ -1622,19 +1619,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       CalendarGenerator cal = new CalendarGenerator(seriesService);
       for (ARecord record : records) {
-        boolean blacklisted;
-        // isBlacklisted() methods are not implemented in the persistence layer and return always false
-//        try {
-//          //blacklisted = isBlacklisted(record.getMediaPackageId());
-//        } catch (NotFoundException e) {
-//          continue;
-//        }
-        blacklisted = false;
-
-        // Skip blacklisted events
-        if (blacklisted)
-          continue;
-
         Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
 
         // If the event media package is empty, skip the event
@@ -1667,9 +1651,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
         } catch (Exception e) {
-          logger.warn("Error adding event '{}' to calendar, event is not recorded: {}", record.getMediaPackageId(),
-                  getStackTrace(e));
-          continue;
+          logger.warn("Error adding event '{}' to calendar, event is not recorded", record.getMediaPackageId(), e);
         }
       }
 
@@ -1685,9 +1667,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return cal.getCalendar().toString();
 
     } catch (Exception e) {
-      if (e instanceof SchedulerException)
-        throw e;
-      logger.error("Failed getting calendar: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
   }

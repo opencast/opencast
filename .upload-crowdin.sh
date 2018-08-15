@@ -13,7 +13,9 @@ if ! echo "${TRAVIS_BRANCH}" | grep -Eq '^(r/[0-9]+\.x|develop)$'; then
 fi
 # Crowdin branches do not use the `r/` prefix
 CROWDIN_BRANCH="${TRAVIS_BRANCH//r\//}"
-wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
-sudo dpkg -i crowdin.deb
+command -v crowdin >/dev/null 2>&1 || {
+  wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin.deb
+  sudo dpkg -i crowdin.deb
+}
 echo "api_key: ${CROWDIN_API_KEY}" > ~/.crowdin.yaml
 crowdin --config .crowdin.yaml upload sources -b "${CROWDIN_BRANCH}"

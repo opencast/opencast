@@ -240,7 +240,7 @@
                                 <td>
                                     <input datepicker
                                         type="text"
-                                        ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"
+                                        ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT') || !hasCurrentAgentAccess()"
                                         placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.START_DATE' | translate }}"
                                         ng-model="source.start.date"
                                         ng-change="onTemporalValueChange('start')" />
@@ -250,7 +250,7 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
                                 <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts  || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.hour" ng-change="onTemporalValueChange('start')"
@@ -258,7 +258,7 @@
                                         ng-options="h.index as h.value for h in hours"
                                     />
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.start.minute" ng-change="onTemporalValueChange('start')"
@@ -274,7 +274,7 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.DURATION' | translate }}</td>
                                 <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.hour" ng-change="onTemporalValueChange('duration')"
@@ -283,7 +283,7 @@
                                     />
 
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.duration.minute" ng-change="onTemporalValueChange('duration')"
@@ -299,7 +299,7 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME' | translate }}</td>
                                 <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.end.hour" ng-change="onTemporalValueChange('end')"
@@ -307,7 +307,7 @@
                                         ng-options="h.index as h.value for h in hours"
                                     />
                                     <select chosen
-                                        ng-disabled="checkingConflicts"
+                                        ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                         data-width="'100px'"
                                         data-disable-search-threshold="8"
                                         ng-model="source.end.minute" ng-change="onTemporalValueChange('end')"
@@ -329,12 +329,12 @@
                                 <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
                                 <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                                 <select chosen pre-select-from="captureAgents"
-                                    ng-disabled="checkingConflicts"
+                                    ng-disabled="checkingConflicts || !hasCurrentAgentAccess()"
                                     data-width="'200px'"
                                     ng-change="roomChanged(); saveScheduling()"
                                     data-disable-search-threshold="8"
                                     ng-model="source.device"
-                                    ng-options="value.name for (id, value) in captureAgents"
+                                    ng-options="value.name for (id, value) in captureAgents | filter:currentAgentOrAccess"
                                     data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
                                 />
                                 </td>
@@ -349,7 +349,7 @@
                                         <input type="checkbox"
                                             ng-change="saveScheduling()"
                                             ng-model="source.device.inputMethods[inputMethod.id]"
-                                            ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
+                                            ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT') || !hasCurrentAgentAccess()"> {{ inputMethod.value | translate }}
                                         <br>
                                     </label>
                                 </td>
@@ -480,7 +480,7 @@
                                                             ng-change="changeWorkflow(false)"
                                                             data-disable-search-threshold="8"
                                                             data-search_contains="true"
-                                                            ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
+                                                            ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT') || !hasCurrentAgentAccess()"
                                                             ng-options="w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true"
                                                             data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
                                                             no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
@@ -510,7 +510,7 @@
                                                     <div class="obj-container padded">
                                                         <div id="event-workflow-configuration"
                                                              class="checkbox-container"
-                                                             ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
+                                                             ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT') || !hasCurrentAgentAccess()"
                                                              ng-bind-html="workflowConfiguration"
                                                              class="obj-container">
                                                         </div>

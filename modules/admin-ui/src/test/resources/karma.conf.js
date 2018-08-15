@@ -25,7 +25,7 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/angular-sortable.js',
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
-            '../../main/webapp/scripts/lib/moment.min.js',
+            '../../main/webapp/scripts/lib/moment-with-locales.js',
             '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
             '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 

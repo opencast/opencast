@@ -22,8 +22,9 @@ As part of removing mentions of the old name Matterhorn, all database table name
 with `oc_`.  This requires an database schema update. As with all database migrations, we recommend to make a database
 backup before attempting the upgrade.
 
-You can find the database upgrade script at `docs/upgrade/4_to_5/mysql5.sql`.
-
+You can find the database upgrade script in `docs/upgrade/4_to_5/`. There are two scripts which are essentially doing
+the same thing with the MariaDB one running a few more checks on the database for safety which cannot be run like this
+on MySQL.  More information about the differences can be found in the readme next to the scripts.
 
 ActiveMQ Migration
 ------------------

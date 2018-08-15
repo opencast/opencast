@@ -26,7 +26,7 @@
         <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
         <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
         <script type="text/javascript" src="lib/chosen.jquery.js"></script>
-        <script type="text/javascript" src="lib/moment.min.js"></script>
+        <script type="text/javascript" src="lib/moment-with-locales.js"></script>
     </head>
     <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
         <header ng-controller="NavCtrl" class="primary-header">
@@ -149,6 +149,7 @@
         <script src="scripts/shared/services/resourceHelperService.js"></script>
         <script src="scripts/shared/services/authService.js"></script>
         <script src="scripts/shared/services/cryptService.js"></script>
+        <script src="scripts/shared/services/relativeDatesService.js"></script>
         <script src="scripts/shared/services/jsHelperService.js"></script>
         <script src="scripts/shared/services/languageService.js"></script>
         <script src="scripts/shared/services/storageService.js"></script>
@@ -177,6 +178,8 @@
         <script src="scripts/shared/resources/seriesMetadataResource.js"></script>
         <script src="scripts/shared/resources/seriesParticipationResource.js"></script>
         <script src="scripts/shared/resources/seriesEventsResource.js"></script>
+        <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
+        <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
         <script src="scripts/shared/resources/seriesThemeResource.js"></script>
         <script src="scripts/shared/resources/eventMetadataResource.js"></script>
         <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
@@ -299,6 +302,7 @@
         <script src="scripts/shared/directives/tableDirective.js"></script>
         <script src="scripts/shared/directives/statsDirective.js"></script>
         <script src="scripts/shared/directives/confirmationModalDirective.js"></script>
+        <script src="scripts/shared/directives/deleteSingleSeriesModalDirective.js"></script>
         <script src="scripts/shared/directives/resourceModalDirective.js"></script>
         <script src="scripts/shared/directives/editableDirective.js"></script>
         <script src="scripts/shared/directives/editableBooleanValueDirective.js"></script>
@@ -325,6 +329,7 @@
         <script src="scripts/shared/directives/uploadAssetDirective.js"></script>
         <script src="scripts/shared/services/resourceModalService.js"></script>
         <script src="scripts/shared/services/confirmationModalService.js"></script>
+        <script src="scripts/shared/services/deleteSingleSeriesModalService.js"></script>
         <script src="scripts/shared/services/uploadAssetOptionsService.js"></script>
         <script src="scripts/shared/controllers/controllers.js"></script>
         <script src="scripts/shared/controllers/navigationController.js"></script>
@@ -349,6 +354,7 @@
         <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
         <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
         <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
+        <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
         <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
         <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>

@@ -556,15 +556,15 @@ public class SchedulerRestService {
   @RestQuery(name = "getcalendar", description = "Returns iCalendar for specified set of events", returnDescription = "ICalendar for events", restParameters = {
           @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
           @RestParameter(name = "seriesid", description = "Filter events by series", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "cutoff", description = "A cutoff date at which the number of events returned in the calendar are limited.", isRequired = false, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER) }, reponses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body") })
   public Response getCalendar(@QueryParam("agentid") String captureAgentId, @QueryParam("seriesid") String seriesId,
-          @QueryParam("cutoff") String cutoff, @Context HttpServletRequest request) {
+          @QueryParam("cutoff") Long cutoff, @Context HttpServletRequest request) {
     Date endDate = null;
-    if (StringUtils.isNotEmpty(cutoff)) {
+    if (cutoff != null) {
       try {
-        endDate = new Date(Long.valueOf(cutoff));
+        endDate = new Date(cutoff);
       } catch (NumberFormatException e) {
         return Response.status(Status.BAD_REQUEST).build();
       }

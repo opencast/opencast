@@ -173,7 +173,7 @@ offset is essential. Paging is enabled for all requests that return lists of ite
 
 Paramter | Description
 :--------|:-----------
-`limit`  | The maximum number of records to return per request
+`limit`  | The maximum number of results to return for a single request
 `offset` | The index of the first record to return (counting starts on zero)
 
 __Example__

@@ -31,6 +31,7 @@ describe('Events controller', function () {
         });
 
         it('reloads events after deletion', function () {
+            $httpBackend.expectGET('/admin-ng/resources/STATS.json').respond('[]');
             $httpBackend.expectGET('/admin-ng/resources/events/filters.json').respond('[]');
             $httpBackend.expectGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
             $httpBackend.expectDELETE('/admin-ng/event/12').respond('12');

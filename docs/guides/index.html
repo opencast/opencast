@@ -49,9 +49,8 @@
     <div class="jumbotron">
       <div class="container">
         <h1>Welcome to the Opencast docs!</h1>
-        <p>Opencast is an open source video capture and processing software.
-        For more information about the project visit the website at <a
-        href="http://opencast.org">http://opencast.org</a></p>
+        <p>Opencast is an open source video capture and processing software.  For more information about the project
+        visit <a href="https://opencast.org">opencast.org</a></p>
       </div>
     </div>
 
@@ -63,7 +62,7 @@
           <p>The Opencast administration guide contains official release documentation and installation and configuration details.</p>
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
-              Choose version
+              Select a version
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="adminGuides">
@@ -76,7 +75,7 @@
           <p>This set of documentation is written for users who will primarily access and use Opencast through the administrative user interfaces.</p>
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
-              Choose version
+              Select a version
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="userGuides">
@@ -89,7 +88,7 @@
           <p>The Opencast developer guide contains information for active developers and those who want to become involved in Opencast development.</p>
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
-              Choose version
+              Select a version
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="developerGuides">
@@ -103,40 +102,47 @@
 
       <h3><span class="glyphicon glyphicon-bullhorn" aria-hidden="true"></span> Communication &amp; Help</h3>
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h4>Mailing lists</h4>
           <p>Discussions take place in several mailing lists:</p>
           <ul>
-            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/security-notices">Security Notices</a></li>
-            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/announcements">Announcements</a></li>
-            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/users">Users</a></li>
-            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/dev">Developers</a></li>
-            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/anwender">German Speaking Community</a></li>
-            <li><a href="mailto:opencast-es@opencastproject.es">Spanish Speaking Community</a></li>
+            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/security-notices">
+                security-notices@opencast.org</a> –
+                Security announcements (low frequency)</li>
+            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/announcements">
+                announcements@opencast.org</a> –
+                Community announcements (low frequency)</li>
+            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/users">
+                users@opencast.org</a> –
+                Users list</li>
+            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/dev">
+                dev@opencast.org</a> –
+                Developers list</li>
+            <li><a href="https://groups.google.com/a/opencast.org/forum/#!forum/anwender">
+                anwender@opencast.org</a> –
+                German speaking community list</li>
           </ul>
+
+          You can subscribe via Google Groups (linked above) or simply by sending a mail to
+          <em>[list]+subscribe@opencast.org</em> (e.g. <em>users+subscribe@opencast.org</em>).
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h4>IRC channel (Chat)</h4>
           <p>For occasional quick questions we have an IRC channel on <a
-            href="https://webchat.freenode.net/?channels=opencast">Freenode</a>: <strong>#opencast</strong>.</p>
+            href="https://webchat.freenode.net/?channels=opencast">Freenode</a>: <em>#opencast</em>.</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h4>Technical meeting</h4>
-          <p>Our weekly meeting takes place in
-          <a href="http://opencast.blindsidenetworks.net/opencast/">BigBlueButton</a> (room 1, password: welcome) on
+          <p>Our weekly meeting of developers and dev-ops takes place in
+          <a href="https://opencast.blindsidenetworks.net/opencast/">BigBlueButton</a> (room 1, password: welcome) on
           every Tuesday at 3pm UTC. Feel free to join!</p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h4>Adopters meeting</h4>
           <p>Every last Wednesday of each month adopters meet at 11am EDT in the
-          <a href="http://opencast.blindsidenetworks.net/opencast/">BigBlueButton</a> (room 1, password: welcome). Feel
-          free to join!</p>
-        </div>
-        <div class="col-md-4">
-          <h4>Bugs</h4>
-          <p>Please report <strong>security</strong> related bugs by sending an email to
-          <a href="mailto:security@opencast.org">security@opencast.org</a>.</p>
-          <p>Everything else should be filed as a ticket in our <a href="https://opencast.jira.com">issue tracker</a>.</p>
+          <a href="https://opencast.blindsidenetworks.net/opencast/">BigBlueButton</a> (room 1, password: welcome).
+          Note that the meeting alternates between international adopters and the German speaking community. Watch the
+          users list for announcements and feel free to join!</p>
         </div>
       </div>
 
@@ -144,27 +150,20 @@
 
       <h3>Development</h3>
       <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <h4>Code</h4>
           <p>You can find the codebase of Opencast in the Git repository hosted at
-          <a href="https://github.com/opencast/opencast">GitHub</a>.</p>
+          <a href="https://github.com/opencast/opencast">github.com/opencast/opencast</a>. Feel free to fork to project
+          and open pull requests. If you need help or more information, please do not hesitate to ask any question on
+          the developers list.</p>
         </div>
-        <div class="col-md-4">
-          <h4>Pull requests</h4>
-          <p>New features and bug fixes are only accepted over pull requests. There is a
-          <a href="http://pullrequests.opencast.org">list of open pull requests</a> where you also can find the official
-          reviewer.</p>
+
+        <div class="col-md-6">
+          <h4>Bugs</h4>
+          <p>Please report <em>security</em> related bugs by sending an email to
+          <a href="mailto:security@opencast.org">security@opencast.org</a>.</p>
+          <p>Everything else should be filed as a ticket in our <a href="https://opencast.jira.com">issue tracker</a>.</p>
         </div>
-		  <!-- <div class="col-md-4">
-          <h4>REST APIs</h4>
-          <p>We currently have two REST APIs.  The service REST interfaces can be found
-          <a href="https://nightly.opencast.org/rest_docs.html">here</a>.  These service interfaces change more frequently than the
-          <a href="https://docs.opencast.org/develop/developer/api/">External API</a>, so if you are developing a third
-          party tool that will integrate with Opencast, please use the External API!  Note that the External API is
-          versioned, and is thus stable across versions, whereas the older APIs are not.  Please make sure to use the
-          correct API version for your target Opencast release.  The links in this paragraph are to the very latest,
-          unreleased version.</p>
-		  </div> -->
       </div>
 
     </div> <!-- /container -->

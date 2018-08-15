@@ -74,7 +74,8 @@
       "HELP": "Tulong",
       "USERS_GUIDE": "Gabay sa gumagamit",
       "DOCUMENTATION": "Dokumentasyon",
-      "REST_DOC": "REST API Docs"
+      "REST_DOC": "REST API Docs",
+      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Ang polisiya sa pag-access ay nagawa na",
@@ -146,6 +147,7 @@
       "EMAIL_SENT": "Ang mensahe ay naipadala na",
       "EMAIL_NOT_SENT": "Ang mensahe ay hindi maipadala",
       "CONFLICT_DETECTED": "Salungatan sa pag-iskedyul: itong bagong kaganapan ay nagkasabay sa isang umiiral na kaganapan. Mangyaring baguhin ang lokasyon, mga petsa, o oras.",
+      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Error sa pag-iskedyul: Ang kaganapan ay natapos na.",
       "CONFLICT_END_BEFORE_START": "Error sa pag-iskedyul: Ang wakas ng pag-iskedyul ay dapat mas huli kaysa sa simula.",
       "INVALID_ACL_RULES": "Ang mga patakaran ay dapat naglalaman ng balidong tungkulin at pagbasa o/at pagsulat ng (mga) karapatan.",
@@ -236,6 +238,31 @@
             "EVENTS_SUMMARY": "Ikaw ay pumili ng {{numberOfEvents}} na mga kaganapan",
             "CONFIGURATION": "Konpigurasyon",
             "WORKFLOW": "Gawain"
+         }
+      },
+      "EDIT_EVENTS": {
+         "CAPTION": "Edit scheduled events",
+         "GENERAL": {
+            "CAPTION": "Pangkalahatan",
+            "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
+            "NOCHANGES": "No changes to the events detected!",
+            "CONFLICT_FIRST_EVENT": "Changed event",
+            "CONFLICT_SECOND_EVENT": "Event in conflict"
+         },
+         "METADATA": {
+            "EDIT": "Edit metadata"
+         },
+         "SUMMARY": {
+            "CAPTION": "Buod",
+            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "TYPE": "Uri",
+            "PREVIOUS": "Old value",
+            "NEXT": "New value"
+         },
+         "EDIT": {
+            "CAPTION": "Edit",
+            "METADATA": "Metadata",
+            "SCHEDULING": "Pag-iskedyul"
          }
       }
    },
@@ -426,7 +453,10 @@
                "ACL": "Patakaran sa pag-access"
             },
             "SUMMARY": {
-               "CAPTION": "Buod"
+               "CAPTION": "Buod",
+               "SOURCE": {
+                  "INPUT": "Input"
+               }
             },
             "WEEKDAYS": {
                "MO": "Mo",
@@ -436,6 +466,15 @@
                "FR": "Fr",
                "SA": "Sa",
                "SU": "Su"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Monday",
+               "TU": "Tuesday",
+               "WE": "Wednesday",
+               "TH": "Thursday",
+               "FR": "Friday",
+               "SA": "Saturday",
+               "SU": "Sunday"
             }
          },
          "NAVIGATION": {
@@ -454,6 +493,7 @@
             "SERIES": "Mga serye",
             "DATE": "Petsa",
             "START": "Simulan",
+            "END": "End",
             "STOP": "Ihinto",
             "STATUS": "Istado",
             "LOCATION": "Lokasyon",
@@ -468,6 +508,7 @@
             "PREVIOUS": "Nakaraan",
             "NOCONTENT": "Walang data na maaring magamit",
             "PUBLISHED": "Nai-publish",
+            "WEEKDAY": "Weekday",
             "TOOLTIP": {
                "START": "Filter for this start date",
                "SERIES": "Filter for this series",
@@ -475,8 +516,8 @@
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
                "EDITOR": "Open video Editor",
+               "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "View comments",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
@@ -504,17 +545,17 @@
          "DETAILS": {
             "HEADER": "Mga detalye ng kaganapan - {{resourceId}}",
             "TABS": {
-               "GENERAL": "Pangkalahatan",
                "METADATA": "Metadata",
                "EXTENDED-METADATA": "Metadata II",
                "ASSETS": "Mga asset",
+               "PUBLICATIONS": "Mga paglalathala",
                "SCHEDULING": "Pag-iskedyul",
                "WORKFLOWS": "Mga daloy ng trabaho",
                "ACCESS": "Patakaran sa pag-access",
                "COMMENTS": "Mga komento"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Mga paglalathala",
+            "PUBLICATIONS": {
+               "CAPTION": "Mga paglalathala",
                "NO_PUBLICATIONS_AVAILABLE": "Itong kaganapan ay walang mga paglalathala",
                "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
@@ -1604,7 +1645,6 @@
          "ADD_COMMENT": "Dagdagan ang komento"
       },
       "TABS": {
-         "PLAY": "Playback",
          "EDIT": "Patnugot",
          "CAPTIONS": "Mga kapsyon",
          "ANNOTATIONS": "Mga anotasyon"
@@ -1904,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Todo",
       "SCHEDULED": "Iskedyul",
       "RECORDING": "Ni-record"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Keyboard shortcuts",
+         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+      },
+      "KEYS": {
+         "CTRL": "Ctrl",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Space",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Page↑",
+         "PAGEDOWN": "Page↓",
+         "END": "End",
+         "HOME": "Home",
+         "INS": "Ins",
+         "DEL": "Del"
+      },
+      "GROUPS": {
+         "GENERAL": "Pangkalahatan",
+         "PLAYER": "Player",
+         "EDITOR": "Patnugot"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Main menu",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "REMOVE_FILTERS": "Linisin ang mga salaan",
+            "EVENT_VIEW": "Mga kaganapan",
+            "SERIES_VIEW": "Mga serye",
+            "NEW_EVENT": "Dumagdag ng kaganapan",
+            "NEW_SERIES": "Dumagdag ng mga serye",
+            "CHEAT_SHEET": "Keyboard shortcuts"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Play/pause",
+            "PREVIOUS_FRAME": "Nakaraang frame",
+            "NEXT_FRAME": "Susunod na frame",
+            "STEP_BACKWARD": "Jump 10s back",
+            "STEP_FORWARD": "Jump 10s forward",
+            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
+            "NEXT_SEGMENT": "Next segment/jump to end",
+            "VOLUME_UP": "Volume up",
+            "VOLUME_DOWN": "Volume down",
+            "MUTE": "Mute/unmute"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Hatiin",
+            "CUT_SELECTED_SEGMENT": "Putulin",
+            "PLAY_CURRENT_SEGMENT": "Play current segment",
+            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Kataposan sa segment"
+         }
+      }
    }
 }

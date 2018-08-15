@@ -58,7 +58,8 @@ jobs:
     # - Ensure no tabs are used
     # - Ensure there are no trailing spaces
     # - Run markdownlint
-    - stage: test documentation
+    - stage: quick tests
+      env: name=documentation
       sudo: false
       language: python
       python: "3.6"
@@ -74,6 +75,32 @@ jobs:
         - (cd docs/guides/developer && mkdocs build)
         - (cd docs/guides/user && mkdocs build)
         - (cd docs/guides && grunt)
+
+    # Test database scripts with MariaDB 10.x
+    - stage: quick tests
+      env: name=mariadb10
+      sudo: false
+      addons:
+        mariadb: '10.3'
+      install:
+        - echo "select version()" | mysql -u root
+        - echo 'create database opencast;' | mysql -u root
+      script:
+        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
+        - sh docs/upgrade/.test.sh
+
+    # Test database scripts with MySQL
+    - stage: quick tests
+      env: name=mysql
+      sudo: false
+      services:
+        - mysql
+      install:
+        - echo "select version()" | mysql -u root
+        - echo 'create database opencast;' | mysql -u root
+      script:
+        - mysql -u root opencast < docs/scripts/ddl/mysql5.sql
+        - ./docs/upgrade/.test.sh
 
     # Make a build excluding the assembly steps
     - stage: build

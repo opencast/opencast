@@ -57,10 +57,14 @@ public class ComposerRestServiceTest {
 
   private JobImpl job;
   private EncodingProfileImpl profile;
+  private EncodingProfileImpl profile2;
   private EncodingProfileList profileList;
   private Track audioTrack;
   private Track videoTrack;
   private String profileId;
+  private String profileId2;
+  private List<String> profileIdsList;
+  private String profileIds;
   private ComposerRestService restService;
 
   @Before
@@ -74,22 +78,32 @@ public class ComposerRestServiceTest {
     videoTrack.setIdentifier("video1");
 
     profileId = "profile1";
+    profileId2 = "profile2";
 
     job = new JobImpl(1);
     job.setStatus(Job.Status.QUEUED);
     job.setJobType(ComposerService.JOB_TYPE);
     profile = new EncodingProfileImpl();
     profile.setIdentifier(profileId);
+    profile2 = new EncodingProfileImpl();
+    profile2.setIdentifier(profileId2);
+    profileIds = profileId + "," + profileId2;
+    profileIdsList = new ArrayList<>();
+    profileIdsList.add(profileId);
+    profileIdsList.add(profileId2);
     List<EncodingProfileImpl> list = new ArrayList<EncodingProfileImpl>();
     list.add(profile);
+    list.add(profile2);
     profileList = new EncodingProfileList(list);
 
     // Train a mock composer with some known behavior
     ComposerService composer = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composer.encode(videoTrack, profileId)).andReturn(job).anyTimes();
+    EasyMock.expect(composer.multiEncode(videoTrack, profileIdsList)).andReturn(job).anyTimes();
     EasyMock.expect(composer.mux(videoTrack, audioTrack, profileId)).andReturn(job).anyTimes();
     EasyMock.expect(composer.listProfiles()).andReturn(list.toArray(new EncodingProfile[list.size()]));
     EasyMock.expect(composer.getProfile(profileId)).andReturn(profile);
+    EasyMock.expect(composer.getProfile(profileId2)).andReturn(profile2);
     EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)), EasyMock.anyBoolean(),
             (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
     EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
@@ -132,6 +146,13 @@ public class ComposerRestServiceTest {
   @Test
   public void testMux() throws Exception {
     Response response = restService.mux(generateAudioTrack(), generateVideoTrack(), profileId);
+    Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+    Assert.assertEquals(new JaxbJob(job), response.getEntity());
+  }
+
+  @Test
+  public void testMultiEncode() throws Exception {
+    Response response = restService.multiEncode(generateVideoTrack(), profileIds);
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     Assert.assertEquals(new JaxbJob(job), response.getEntity());
   }

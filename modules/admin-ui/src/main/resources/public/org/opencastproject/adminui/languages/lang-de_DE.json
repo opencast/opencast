@@ -74,7 +74,8 @@
       "HELP": "Hilfe",
       "USERS_GUIDE": "Benutzerrichtlinie",
       "DOCUMENTATION": "Dokumentation",
-      "REST_DOC": "REST-API-Docs"
+      "REST_DOC": "REST-API-Docs",
+      "HOTKEY_CHEAT_SHEET": "Tastenkürzel"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Die Zugriffsrichtlinie wurde erstellt",
@@ -146,7 +147,7 @@
       "EMAIL_SENT": "Die Nachricht wurde gesendet",
       "EMAIL_NOT_SENT": "Die Nachricht konnte nicht gesendet werden",
       "CONFLICT_DETECTED": "Planungskonflikt: Die neue Aufzeichnung überlappt zeitlich mit einer bereits bestehenden Aufzeichnung. Bitte Ort, Datum oder Zeit anpassen.",
-      "CONFLICT_BULK_DETECTED":   "Planungskonflikt: Die Änderungen führen zu Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
+      "CONFLICT_BULK_DETECTED": "Konflikt: Das Ändern der Aufzeichnungsdaten resultiert in Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
       "CONFLICT_ALREADY_ENDED": "Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
       "CONFLICT_END_BEFORE_START": "Planungskonflikt: Der Endzeitpunkt der Aufzeichnung muss nach dem Anfangszeitpunkt liegen.",
       "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
@@ -240,27 +241,29 @@
          }
       },
       "EDIT_EVENTS": {
-          "CAPTION": "Geplante Aufzeichnungen bearbeiten",
-          "GENERAL": {
-              "CAPTION": "Allgemein",
-              "CANNOTSTART": "Markierte Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
-              "NOCHANGES": "Es wurden keine Änderungen an den Aufzeichnungen festgestellt!"
-          },
-          "METADATA": {
-              "EDIT": "Metadaten bearbeiten"
-          },
-          "SUMMARY": {
-              "CAPTION": "Zusammenfassung",
-              "SINGLE_EVENT_CAPTION": "Aufzeichnung “{{ title }}”",
-              "TYPE": "Typ",
-              "PREVIOUS": "Alter Wert",
-              "NEXT": "Neuer Wert"
-          },
-          "EDIT": {
-              "CAPTION": "Bearbeiten",
-              "METADATA": "Metadaten",
-              "SCHEDULING": "Planung"
-          }
+         "CAPTION": "Geplante Aufzeichnungen bearbeiten",
+         "GENERAL": {
+            "CAPTION": "Allgemein",
+            "CANNOTSTART": "Hervorgehobene Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
+            "NOCHANGES": "Keine Änderungen der Events!",
+            "CONFLICT_FIRST_EVENT": "Geänderte Aufzeichnung",
+            "CONFLICT_SECOND_EVENT": "Kollidierende Aufzeichnung"
+         },
+         "METADATA": {
+            "EDIT": "Metadaten bearbeiten"
+         },
+         "SUMMARY": {
+            "CAPTION": "Zusammenfassung",
+            "SINGLE_EVENT_CAPTION": "Event \"{{ title }}\"",
+            "TYPE": "Typ",
+            "PREVIOUS": "Alter Wert",
+            "NEXT": "Neuer Wert"
+         },
+         "EDIT": {
+            "CAPTION": "Bearbeiten",
+            "METADATA": "Metadaten",
+            "SCHEDULING": "Planung"
+         }
       }
    },
    "DATES": {
@@ -450,7 +453,10 @@
                "ACL": "Zugriffsrichtlinie"
             },
             "SUMMARY": {
-               "CAPTION": "Zusammenfassung"
+               "CAPTION": "Zusammenfassung",
+               "SOURCE": {
+                  "INPUT": "Eingang"
+               }
             },
             "WEEKDAYS": {
                "MO": "Mo",
@@ -460,6 +466,15 @@
                "FR": "Fr",
                "SA": "Sa",
                "SU": "So"
+            },
+            "WEEKDAYSLONG": {
+               "MO": "Montag",
+               "TU": "Dienstag",
+               "WE": "Mittwoch",
+               "TH": "Donnerstag",
+               "FR": "Freitag",
+               "SA": "Samstag",
+               "SU": "Sonntag"
             }
          },
          "NAVIGATION": {
@@ -501,8 +516,8 @@
                "LOCATION": "Nach diesem Raum filtern",
                "DETAILS": "Aufzeichnungsdetails anzeigen",
                "DELETE": "Aufzeichnung löschen",
-               "PREVIEW": "Vorschau Player öffnen",
                "EDITOR": "Video Editor öffnen",
+               "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
                "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen"
             }
@@ -530,22 +545,22 @@
          "DETAILS": {
             "HEADER": "Aufzeichnungs-Details - {{resourceId}}",
             "TABS": {
-               "GENERAL": "Allgemein",
                "METADATA": "Metadaten",
                "EXTENDED-METADATA": "Metadaten II",
                "ASSETS": "Anlagen",
+               "PUBLICATIONS": "Veröffentlichungen",
                "SCHEDULING": "Planung",
                "WORKFLOWS": "Workflows",
                "ACCESS": "Zugriffsrechte",
                "COMMENTS": "Kommentare"
             },
-            "GENERAL": {
-               "PUBLICATION_STATUS": "Veröffentlichungen",
+            "PUBLICATIONS": {
+               "CAPTION": "Veröffentlichungen",
                "NO_PUBLICATIONS_AVAILABLE": "Diese Aufzeichnung wurde noch nicht publiziert",
                "PUBLICATION_DESCRIPTION": "Diese Aufzeichnung wurde zu folgenden Kanälen publiziert:",
                "LIVE_EVENT_NOT_IN_PROGRESS": "Diese Aufzeichnung ist momentan nicht verfügbar",
                "SCHEDULING_STATUS": "Status",
-               "READY_FOR_RECORDING": "Bereit zur Aufnahme",
+               "READY_FOR_RECORDING": "Bereit für die Aufnahme",
                "OPTED_OUT": "Wird nicht aufgezeichnet",
                "CUSTOM": "Benutzerdefiniert",
                "ENGAGE": "Engage",
@@ -1630,7 +1645,6 @@
          "ADD_COMMENT": "Kommentar hinzufügen"
       },
       "TABS": {
-         "PLAY": "Abspielen",
          "EDIT": "Editor",
          "CAPTIONS": "Untertitel",
          "ANNOTATIONS": "Anmerkungen"
@@ -1930,5 +1944,75 @@
       "FINISHED_WITH_COMMENTS": "Offen",
       "SCHEDULED": "Geplant",
       "RECORDING": "Aufnahme"
+   },
+   "HOTKEYS": {
+      "CHEAT_SHEET": {
+         "TITLE": "Tastenkürzel",
+         "HINT": "Diese Seite listet die aktuell verfügbaren Tastenkürzel auf. Man beachte, dass diese mit der aktuell besuchten Seite variieren können."
+      },
+      "KEYS": {
+         "CTRL": "Strg",
+         "ALT": "Alt",
+         "OPTION": "⌥",
+         "SPACE": "Leertaste",
+         "BACKSPACE": "⌫",
+         "LEFT": "←",
+         "RIGHT": "→",
+         "UP": "↑",
+         "DOWN": "↓",
+         "COMMAND": "⌘",
+         "SHIFT": "⇧",
+         "RETURN": "⏎",
+         "ENTER": "⏎",
+         "PLUS": "+",
+         "TAB": "↹",
+         "CAPSLOCK": "⇪",
+         "ESC": "Esc",
+         "ESCAPE": "Esc",
+         "PAGEUP": "Bild↑",
+         "PAGEDOWN": "Bild↓",
+         "END": "Ende",
+         "HOME": "Pos1",
+         "INS": "Einfg",
+         "DEL": "Entf"
+      },
+      "GROUPS": {
+         "GENERAL": "Allgemein",
+         "PLAYER": "Player",
+         "EDITOR": "Editor"
+      },
+      "DESCRIPTIONS": {
+         "GENERAL": {
+            "MAIN_MENU": "Hauptmenü",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Nächsten Dashboard-Filter auswählen",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Vorherigen Dashboard-Filter auswählen",
+            "REMOVE_FILTERS": "Alle Filter löschen",
+            "EVENT_VIEW": "Aufzeichnungen",
+            "SERIES_VIEW": "Serien",
+            "NEW_EVENT": "Aufzeichnung hinzufügen",
+            "NEW_SERIES": "Serie hinzufügen",
+            "CHEAT_SHEET": "Tastenkürzel"
+         },
+         "PLAYER": {
+            "PLAY_PAUSE": "Wiedergabe/Pause",
+            "PREVIOUS_FRAME": "Vorheriges Bild",
+            "NEXT_FRAME": "Nächstes Bild",
+            "STEP_BACKWARD": "10s zurück springen",
+            "STEP_FORWARD": "10s vorwärts springen",
+            "PREVIOUS_SEGMENT": "Vorheriges Segment/zum Start springen",
+            "NEXT_SEGMENT": "Nächstes Segment/zum Ende springen",
+            "VOLUME_UP": "Lautstärke erhöhen",
+            "VOLUME_DOWN": "Lautstärke senken",
+            "MUTE": "Ton ein-/ausschalten"
+         },
+         "EDITOR": {
+            "SPLIT_AT_CURRENT_TIME": "Auftrennen",
+            "CUT_SELECTED_SEGMENT": "Schneiden",
+            "PLAY_CURRENT_SEGMENT": "Aktuelles Segment abspielen",
+            "CLEAR_LIST": "Segmente löschen",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Segment mit Vorlauf abspielen",
+            "PLAY_ENDING_OF_CURRENT_SEGMENT": "Segmentende"
+         }
+      }
    }
 }

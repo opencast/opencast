@@ -27,7 +27,9 @@
  * Generates a stats bar from the given resource.
  */
 angular.module('adminNg.directives')
-.directive('adminNgStats', ['Storage', 'HotkeysService', function (Storage, HotkeysService) {
+.directive('adminNgStats', ['Storage', 'HotkeysService', 'RelativeDatesService',
+  function (Storage, HotkeysService, RelativeDatesService) {
+
     var calculateWidth, setWidth;
 
     calculateWidth = function (label, element) {
@@ -71,7 +73,16 @@ angular.module('adminNg.directives')
                 scope.statsFilterNumber = index;
 
                 angular.forEach(scope.stats.stats[index].filters, function (filter) {
-                  filters.push({namespace: scope.stats.resource, key: filter.name, value: filter.value});
+
+                  var value = filter.value;
+                  var name = filter.name;
+
+                  if (value.hasOwnProperty('relativeDateSpan')) {
+                    value = RelativeDatesService.relativeDateSpanToFilterValue(value.relativeDateSpan.from,
+                                                                               value.relativeDateSpan.to,
+                                                                               value.relativeDateSpan.unit);
+                  }
+                  filters.push({namespace: scope.stats.resource, key: name, value: value});
                 });
                 Storage.replace(filters, 'filter');
             };
