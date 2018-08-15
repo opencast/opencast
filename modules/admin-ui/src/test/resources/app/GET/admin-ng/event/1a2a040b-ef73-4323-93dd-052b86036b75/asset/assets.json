@@ -1,6 +1,6 @@
 {
-  "attachments": 2,
-  "catalogs": 1,
-  "media": 1,
-  "publications": 1
+    "attachments"  : 2,
+    "catalogs"     : 12,
+    "media"        : 3,
+    "publications" : 6    
 }

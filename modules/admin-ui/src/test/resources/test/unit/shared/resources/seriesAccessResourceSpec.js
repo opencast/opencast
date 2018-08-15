@@ -54,7 +54,7 @@ describe('Series Access API Resource', function () {
                 ]},
                 override: true
             };
-            $httpBackend.expectPOST('/admin-ng/series/40518/access', function (data) {
+            $httpBackend.expectPOST('/admin-ng/series/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access', function (data) {
                 var expected = {
                     acl: angular.toJson({acl: accessRequest.acl}),
                     override: 'true'
@@ -62,7 +62,7 @@ describe('Series Access API Resource', function () {
                 expect(angular.fromJson($.deparam(data))).toEqual(expected);
                 return true;
             }).respond(200);
-            SeriesAccessResource.save({ id: '40518' }, accessRequest);
+            SeriesAccessResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, accessRequest);
             $httpBackend.flush();
         });
 

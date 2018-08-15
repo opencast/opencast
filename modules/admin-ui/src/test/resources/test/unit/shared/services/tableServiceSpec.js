@@ -98,7 +98,7 @@ describe('Table', function () {
                 .respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
             Table.fetch();
             $httpBackend.flush();
-            expect(Table.rows.length).toBe(6);
+            expect(Table.rows.length).toBe(5);
         });
 
         describe('with a table filter', function () {
@@ -168,7 +168,7 @@ describe('Table', function () {
         describe('#getSelected', function () {
             it ('returns all selected rows', function () {
                 Table.rows[0].selected = true;
-                Table.rows[5].selected = true;
+                Table.rows[4].selected = true;
                 expect(Table.getSelected().length).toEqual(2);
             });
 

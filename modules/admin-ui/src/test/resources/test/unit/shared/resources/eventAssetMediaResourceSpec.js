@@ -16,8 +16,8 @@ describe('Event Asset Media API Resource', function () {
             }, {
                 id: 'series'
             }];
-            $httpBackend.expectGET('/admin-ng/event/40518/asset/media/media.json').respond(JSON.stringify(mediaResponse));
-            result = EventAssetMediaResource.get({ id0: 40518 });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/asset/media/media.json').respond(JSON.stringify(mediaResponse));
+            result = EventAssetMediaResource.get({ id0: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
             expect(result.length).toBe(2);
         });

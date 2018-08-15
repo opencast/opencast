@@ -1,23 +1,24 @@
 {
-  "bestLanguage":{
-    "code":"en_GB",
-    "dateFormats":{
-      "dateTime":{
-        "short":"dd\/MM\/yy HH:mm",
-        "medium":"dd-MMM-yyyy HH:mm:ss",
-        "full":"EEEE, d MMMM yyyy HH:mm:ss 'o''clock' z"
-      },
-      "date":{
-        "short":"dd\/MM\/yy",
-        "medium":"dd-MMM-yyyy",
-        "full":"EEEE, d MMMM yyyy"
-      },
-      "time":{
-        "short":"HH:mm",
-        "medium":"HH:mm:ss",
-        "full":"HH:mm:ss 'o''clock' z"
-      }
+  "bestLanguage":
+  {
+  "code":"en_US",
+  "dateFormats":{
+    "dateTime":{
+      "short":"M\/d\/yy h:mm a",
+      "medium":"MMM d, yyyy h:mm:ss a",
+      "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
     },
+    "date":{
+      "short":"M\/d\/yy",
+      "medium":"MMM d, yyyy",
+      "full":"EEEE, MMMM d, yyyy"
+    },
+    "time":{
+      "short":"h:mm a",
+      "medium":"h:mm:ss a",
+      "full":"h:mm:ss a z"
+    }
+  },
     "displayLanguage":"English"
   },
   "availableLanguages":[

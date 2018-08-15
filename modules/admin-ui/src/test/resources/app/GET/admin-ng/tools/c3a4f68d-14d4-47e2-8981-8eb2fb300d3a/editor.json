@@ -1,6 +1,6 @@
 {
   "date": "2018-08-10T11:22:51Z",
-  "duration": 23857,
+  "duration": 52125,
   "series": {
     "id": "",
     "title": ""
@@ -25,12 +25,24 @@
     }
   ],
   "title": "Mock Event Processing",
-  "tracks": [
-    {
-      "flavor": "presenter",
-      "id": "77e17373-2154-44d9-aa3a-48aa5f0263b5",
-      "waveform": "/admin-ng/resources/img/waveform.png"
-    }
-  ],
-  "segments": []
+  "tracks": [{
+    "id": "id-1",
+    "flavor": "presenter\/audio",
+    "mimetype": "audio\/mp3",
+    "waveform": "img\/waveform.jpg"
+  }, {
+    "id": "id-2",
+    "flavor": "presenter\/video",
+    "mimetype": "video\/mpeg"
+  }],
+  "segments": [{
+    "start": 0,
+    "end": 17003
+  }, {
+    "start": 17003,
+    "end": 28009
+  }, {
+    "start": 28009,
+    "end": 52125
+  }]
 }

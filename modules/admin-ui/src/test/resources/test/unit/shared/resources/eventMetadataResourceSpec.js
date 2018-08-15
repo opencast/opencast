@@ -20,8 +20,8 @@ describe('Event Metadata API Resource', function () {
                 flavor: 'dublincore/extended',
                 fields: [{ id: 'title' }, { id: 'series' }]
             }];
-            $httpBackend.expectGET('/admin-ng/event/40518/metadata.json').respond(JSON.stringify(metadataResponse));
-            result = EventMetadataResource.get({ id: 40518 });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/metadata.json').respond(JSON.stringify(metadataResponse));
+            result = EventMetadataResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
             expect(result.entries).toEqual(metadataResponse);
         });
@@ -32,12 +32,12 @@ describe('Event Metadata API Resource', function () {
             var metadataRequest = {
                 fields: [{ id: 'title' }, { id: 'series' }]
             };
-            $httpBackend.expectPUT('/admin-ng/event/40518/metadata', function (data) {
+            $httpBackend.expectPUT('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/metadata', function (data) {
                 var expected = [{ fields : [ { id : 'title' }, { id : 'series' } ] }];
                 expect(angular.fromJson($.deparam(data).metadata)).toEqual(expected);
                 return true;
             }).respond(200);
-            EventMetadataResource.save({ id: '40518' }, metadataRequest);
+            EventMetadataResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, metadataRequest);
             $httpBackend.flush();
         });
 
@@ -46,12 +46,12 @@ describe('Event Metadata API Resource', function () {
                 attributeToSend : 'series',
                 fields          : [{ id: 'title' }, { id: 'series' }]
             };
-            $httpBackend.expectPUT('/admin-ng/event/40518/metadata', function (data) {
+            $httpBackend.expectPUT('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/metadata', function (data) {
                 var expected = [{fields: [{'id': 'series'}]}];
                 expect(angular.fromJson($.deparam(data).metadata)).toEqual(expected);
                 return true;
             }).respond(200);
-            EventMetadataResource.save({ id: '40518' }, metadataRequest);
+            EventMetadataResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, metadataRequest);
             $httpBackend.flush();
         });
     });

@@ -12,22 +12,22 @@ describe('Event Workflow Operation API Resource', function () {
     describe('#get', function () {
         beforeEach(function () {
             jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-            $httpBackend.whenGET('/admin-ng/event/40518/workflows/8695/operations/1')
-                .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json')));
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/1')
+                .respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/516.json')));
         });
 
         it('queries the API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json')));
-            EventWorkflowOperationDetailsResource.get({ id0: '40518', id1: '8695', id2: 1 });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/516.json')));
+            EventWorkflowOperationDetailsResource.get({ id0: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a', id1: '1676', id2: 1 });
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695/operations/1303.json')));
-            var data = EventWorkflowOperationDetailsResource.get({ id0: '40518', id1: '8695', id2: 1 });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/1').respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676/operations/516.json')));
+            var data = EventWorkflowOperationDetailsResource.get({ id0: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a', id1: '1676', id2: 1 });
             $httpBackend.flush();
             expect(data).toBeDefined();
-            expect(data.id).toEqual(1303);
+            expect(data.id).toEqual(516);
         });
     });
 });

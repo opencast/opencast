@@ -2,6 +2,7 @@
   {
     "flavor": "dublincore/episode",
     "title": "EVENTS.EVENTS.DETAILS.CATALOG.EPISODE",
+    "locked": "EVENTS.EVENTS.DETAILS.METADATA.LOCKED.RUNNING",
     "fields": [
       {
         "readOnly": false,
@@ -190,6 +191,44 @@
         "type": "text",
         "value": "1a2a040b-ef73-4323-93dd-052b86036b75",
         "required": false
+      }
+    ]
+  },
+  {
+    "flavor": "dublincore/extended-1",
+    "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-1",
+    "fields": [
+      {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.VISIBILITY",
+        "value": "To everyone.",
+        "type": "text",
+        "readOnly": false
+      }, {
+        "id": "uid",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+        "value": "Students",
+        "type": "text",
+        "readOnly": true
+      }, {
+        "id": "iid",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.PUBLIC",
+        "value": "Lectures",
+        "type": "text_long",
+        "readOnly": false
+      }
+    ]
+  },
+  {
+    "flavor": "dublincore/extended-2",
+    "title" : "EVENTS.EVENTS.DETAILS.CATALOG.EXTENDED-2",
+    "fields": [
+      {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.OS",
+        "value": "CentOS 7",
+        "type": "text",
+        "readOnly": false
       }
     ]
   }

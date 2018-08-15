@@ -34,7 +34,7 @@ describe('adminNg.directives.timelineDirective', function () {
             }
         };
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $rootScope.video = angular.copy(getJSONFixture('admin-ng/tools/40518/editor.json'));
+        $rootScope.video = angular.copy(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json'));
         element = $compile('<div data-admin-ng-timeline="" data-video="video" data-player="player"/></div>')($rootScope);
         element.find('.timeline-track').css({ width: '1000px' });
         $rootScope.$digest();
@@ -249,7 +249,7 @@ describe('adminNg.directives.timelineDirective', function () {
 
         beforeEach(function () {
             $rootScope.video = angular.
-                copy(getJSONFixture('admin-ng/tools/40518/editor.json'));
+                copy(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json'));
             $rootScope.$digest();
             element.find('.timeline-track').css({ width: '1000px' });
         });

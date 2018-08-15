@@ -23,8 +23,8 @@ describe('Series Participation API Resource', function () {
                   'creation_date': '12.12.12'
                 }]
             };
-            $httpBackend.expectGET('/admin-ng/series/40518/participation.json').respond(JSON.stringify(metadataResponse));
-            result = SeriesParticipationResource.get({ id: 40518 });
+            $httpBackend.expectGET('/admin-ng/series/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/participation.json').respond(JSON.stringify(metadataResponse));
+            result = SeriesParticipationResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
 
             expect(result.opt_out).toEqual('' + metadataResponse.opt_out);
