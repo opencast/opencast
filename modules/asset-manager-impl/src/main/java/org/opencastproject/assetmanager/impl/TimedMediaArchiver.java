@@ -28,6 +28,7 @@ import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NeedleEye;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
 
@@ -48,8 +49,8 @@ import java.util.Dictionary;
 public class TimedMediaArchiver extends AbstractScanner implements ManagedService {
   private static final Log logger = new Log(LoggerFactory.getLogger(TimedMediaArchiver.class));
 
-  public static final String PARAM_KEY_STORE_TYPE = "store-type";
-  public static final String PARAM_KEY_ARCHIVE_MAX_AGE = "max-age";
+  public static final String PARAM_KEY_STORE_ID = "store-id";
+  public static final String PARAM_KEY_MAX_AGE = "max-age";
   public static final String JOB_GROUP = "oc-asset-manager-timed-media-archiver-group";
   public static final String JOB_NAME = "oc-asset-manager-timed-media-archive-job";
   public static final String SCANNER_NAME = "Timed media archive offloader";
@@ -58,7 +59,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
 
   private TieredStorageAssetManager assetManager;
   private WorkflowService workflowService;
-  private String storeType;
+  private String storeId;
   private long ageModifier;
 
   public TimedMediaArchiver() {
@@ -98,19 +99,19 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
       setCronExpression(cronExpression);
       logger.debug("Timed media offload cron expression: '" + cronExpression + "'");
 
-      storeType = (String) properties.get(PARAM_KEY_STORE_TYPE);
-      if (StringUtils.isBlank(storeType)) {
-        throw new ConfigurationException(PARAM_KEY_STORE_TYPE, "Store type is missing");
+      storeId = (String) properties.get(PARAM_KEY_STORE_ID);
+      if (StringUtils.isBlank(storeId)) {
+        throw new ConfigurationException(PARAM_KEY_STORE_ID, "Store type is missing");
       }
-      logger.debug("Remote media store type: " + storeType);
+      logger.debug("Remote media store type: " + storeId);
 
       try {
-        ageModifier = Long.parseLong((String) properties.get(PARAM_KEY_ARCHIVE_MAX_AGE));
+        ageModifier = Long.parseLong((String) properties.get(PARAM_KEY_MAX_AGE));
       } catch (NumberFormatException e) {
-        throw new ConfigurationException(PARAM_KEY_ARCHIVE_MAX_AGE, "Invalid max age");
+        throw new ConfigurationException(PARAM_KEY_MAX_AGE, "Invalid max age");
       }
       if (ageModifier < 0) {
-        throw new ConfigurationException(PARAM_KEY_ARCHIVE_MAX_AGE, "Max age must be greater than zero");
+        throw new ConfigurationException(PARAM_KEY_MAX_AGE, "Max age must be greater than zero");
       }
     }
 
@@ -141,15 +142,16 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
   public void scan() {
     Date maxAge = Calendar.getInstance().getTime();
     maxAge.setTime(maxAge.getTime() - (ageModifier * CaptureParameters.HOURS * CaptureParameters.MILLISECONDS));
-    /*if (!archive.isStoreAvailable(storeType)) {
-      throw new RuntimeException("Store type " + storeType + " is not available to the archive");
+    if (assetManager.getAssetStore(storeId).isNone()) {
+      throw new RuntimeException("Store " + storeId + " is not available to the asset manager");
     }
 
     try {
-      archive.archiveByInterval(null, maxAge, true, storeType);
-    } catch (ArchiveException e) {
-      throw new RuntimeException("Unable to offload archive data", e);
-    }*/
+      // Hardcoded date of zero.  Assumption: there is nothing with a date older than 0 which needs to be auto moved.
+      assetManager.moveSnapshotsByDate(new Date(0), maxAge, storeId);
+    } catch (NotFoundException e) {
+      throw new RuntimeException("Unable to offload asset manager data", e);
+    }
   }
 
   @Override
@@ -161,7 +163,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
     this.assetManager = am;
   }
 
-  /** Quartz job to which offloads old mediapackages from the archive to remote storage */
+  /** Quartz job to which offloads old mediapackages from the asset manager to remote storage */
   public static class Runner extends TypedQuartzJob<AbstractScanner> {
     private static final NeedleEye eye = new NeedleEye();
 
