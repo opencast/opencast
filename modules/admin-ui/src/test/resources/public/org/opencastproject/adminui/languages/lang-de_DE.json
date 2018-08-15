@@ -1,0 +1,259 @@
+{
+   "APP_HEADLINE": "Großartige AngularJS App",
+   "NAV_HOME":     "Zur Startseite",
+   "NAV_ABOUT":    "Über",
+   "APP_TEXT":     "Irgendein Text über eine großartige AngularJS App.",
+   "SUBMIT":       "Speichern",
+   "CANCEL":       "Abbrechen",
+   "SAVE":         "Speichern",
+   "EVENTS": {
+     "EVENT": {
+       "TABLE": {
+         "CAPTION":  "Event Übersicht",
+         "TITLE":    "Titel",
+         "CREATORS": "Dozent(en)",
+         "DATE":     "Datum",
+         "START":    "Anfang",
+         "STOP":     "Ende",
+         "STATUS":   "Status",
+         "LOCATION": "Raum",
+         "AGENT":    "Aufnahmegerät",
+         "ACTION":   "Aktionen",
+         "FILTER": {
+           "STATUS": {
+             "LABEL":      "Status",
+             "SCHEDULED":  "Scheduled",
+             "RECORDING":  "Recording",
+             "INGESTING":  "Ingesting",
+             "PROCESSING": "Processing",
+             "ARCHIVE":    "Archive",
+             "WAITINGFOR": "Waiting for",
+             "UPLOAD":     "upload",
+             "ONHOLD":     "On hold"
+           },
+           "SOURCE": {
+             "LABEL":    "Quelle",
+             "TWITTER":  "Twitter",
+             "GITHUB":   "Github",
+             "FACEBOOK": "Facebook"
+           },
+           "LOCATION": {
+             "LABEL":     "Ort",
+             "LOCATION1": "Location 1",
+             "LOCATION2": "Location 2",
+             "LOCATION3": "Location 3"
+           }
+         }
+       },
+       "DETAILS": {
+         "HEADER": "Event Details",
+         "TABS": {
+           "OVERVIEW":  "Übersicht",
+           "METADATA":  "Metadaten",
+           "MEDIA":     "Medien",
+           "WORKFLOWS": "Workflows",
+           "OPERATIONS": "Operationen",
+           "COMMENTS": "Kommentare"
+         },
+         "OVERVIEW": {
+           "STATUS":                    "Status",
+           "PUBLICATION_STATUS":        "Publikations-Status",
+           "CUSTOM":                    "Custom",
+           "ENGAGE":                    "Engage",
+           "YOUTUBE":                   "Youtube",
+           "QUICK_ACTIONS":             "Quick Actions",
+           "PUBLISH_RECORDING":         "Publikation veröffentlichen",
+           "RETRACT":                   "Widerrufen",
+           "MEDIA_PACKAGE":             "Media Package",
+           "DELETE_DISTRIBUTION_FILES": "Verteilte Dateien löschen",
+           "DELETE_MASTER_FILES":       "Master Files löschen",
+           "DUPLICATE":                 "Duplizieren"
+         },
+         "COMMENTS": {
+           "CAPTION":     "Kommentare",
+           "PLACEHOLDER": "Kommentieren...",
+           "SELECTPLACEHOLDER": "Gründe auswählen...",
+           "RESOLVED": "Gelöst",
+           "REPLY":       "Antworten",
+           "DELETE":      "Löschen",
+           "REASON":      "Grund",
+           "REASONS" : {
+             "LABEL": "Grund",
+             "ONE":   "Grund 1",
+             "TWO":   "Grund 2",
+             "THREE": "Grund 3"
+           }
+         },
+         "METADATA": {
+           "TITLE":          "Titel",
+           "UID":            "UID",
+           "SERIES":         "Serien",
+           "RECORDING_DATE": "Aufnahmedatum",
+           "SUBJECT":        "Betreff",
+           "DESCRIPTION":    "Beschreibung",
+           "START_DATE":     "Startdatum",
+           "START_TIME":     "Startzeit",
+           "DURATION":       "Dauer",
+           "AGENT":          "Agent",
+           "SOURCE":         "Quelle",
+           "CREATED":        "Erstellt am",
+           "CREATED_BY":     "Author",
+           "LICENSE":        "Lizenz",
+           "CONTRIBUTORS":   "Author(en)",
+           "PRESENTER":      "Sprecher",
+           "LANGUAGE":       "Sprache"
+         }
+       }
+     },
+     "SERIES": {
+       "TABLE": {
+         "CAPTION":      "Ereignisserien",
+         "TITLE":        "Serie",
+         "CREATORS":     "Organisator(en)",
+         "CONTRIBUTORS": "Kontributoren(s)",
+         "CREATED":      "Erstellt",
+         "EVENTS":       "Events",
+         "ACTION":       "Aktion"
+       },
+       "DETAILS": {
+         "TABS": {
+           "OVERVIEW":  "Übersicht",
+           "METADATA":  "Metadaten",
+           "MEDIA":     "Medien",
+           "WORKFLOWS": "Workflows",
+           "OPERATIONS": "Operations",
+           "COMMENTS":  "Kommentare"
+         }
+       }
+     }
+   },
+   "RECORDINGS": {
+     "RECORDING": {
+       "TABLE": {
+         "CAPTION":   "Capture Agents",
+         "TITLE":     "UID",
+         "NAME":      "Name",
+         "LOCATION":  "Ort",
+         "UPDATED":   "Letztes Update",
+         "NEXT_DATE": "Nächstes Ereignis",
+         "NEXT_NAME": "Titel des nächsten Ereignis",
+         "STATUS":    "Status",
+         "VERSION":   "Version",
+         "ACTION":    "Aktion"
+       }
+     }
+   },
+   "USERS": {
+     "ACTIONS": {
+       "ADD_USER":  "Benutzer hinzufügen",
+       "ADD_GROUP": "Gruppe hinzufügen",
+       "ADD_ACL":   "ACL hinzufügen"
+     },
+     "NAVIGATION": {
+       "USERS":       "Benutzer",
+       "GROUPS":      "Gruppen",
+       "PERMISSIONS": "Berechtigungen"
+     },
+     "USER": {
+       "TABLE": {
+         "CAPTION":  "Benutzer",
+         "NAME":     "Name",
+         "USERNAME": "Benutzername",
+         "ROLES":    "Rollen",
+         "TYPE":     "Typ",
+         "ACTION":   "Aktion"
+       },
+       "DETAILS": {
+         "NEWCAPTION": "Neuen Benutzer anlegen...",
+         "EDITCAPTION": "Benutzer bearbeiten...",
+         "TABS": {
+           "USER":   "Benutzer",
+           "GROUPS": "Gruppen"
+         },
+         "FORM": {
+            "FIRSTNAME":       "Vorname ",
+            "LASTNAME":        "Nachname",
+            "EMAIL":           "Email",
+            "PASSWORD":        "Passwort",
+            "REPEAT_PASSWORD": "Password"
+         },
+         "GROUPS": {
+           "LEFT":    "Gruppen",
+           "RIGHT":   "Ausgewählte Gruppen",
+           "CAPTION": "<strong>Note:</strong> Yellow highlighted users are external to Matterhorn",
+           "ADD":     "Gruppe hinzufügen",
+           "REMOVE":  "Gruppe entfernen"
+         }
+       }
+     },
+     "GROUP": {
+       "TABLE": {
+         "CAPTION":     "Gruppen",
+         "NAME":        "Name",
+         "DESCRIPTION": "Beschreibung",
+         "ROLE":        "Rolle",
+         "ACTION":      "Aktion"
+       },
+       "DETAILS": {
+         "CAPTION": "Neue Gruppe anlegen...",
+         "TABS": {
+           "GROUP": "Gruppe",
+           "ROLES": "Rollen",
+           "USERS": "Benutzer"
+         },
+         "FORM": {
+           "NAME":        "Name",
+           "DESCRIPTION": "Beschreibung"
+         },
+         "USERS": {
+           "LEFT":    "Benutzer",
+           "RIGHT":   "Ausgewählte Benutzer",
+           "CAPTION": "<strong>Note:</strong> Yellow highlighted users are external to Matterhorn",
+           "REMOVE":  "Benutzer entfernen",
+           "ADD":     "Benutzer hinzufügen"
+         },
+         "ROLES": {
+           "LEFT":   "Rollen",
+           "RIGHT":  "Ausgewählte Rollen",
+           "REMOVE": "Rolle entfernen",
+           "ADD":    "Rolle hinzufügen"
+         }
+       }
+     },
+     "ACL": {
+       "TABLE": {
+         "CAPTION": "Berechtigungen",
+         "NAME":    "ACL Name",
+         "CREATED": "Erstellt",
+         "CREATOR": "Author",
+         "IN_USE":  "In Benutzung",
+         "ACTION":  "Aktion"
+       }
+     }
+   },
+   "SYSTEMS": {
+     "NAVIGATION": {
+       "JOBS":     "Jobs",
+       "SERVERS":  "Server",
+       "SERVICES": "Services",
+       "METRICS":  "Metrics"
+     },
+     "SERVER": {
+       "TABLE": {
+         "CAPTION": "Server",
+         "NAME":    "Name",
+         "DOMAIN":  "Domainname",
+         "IP":      "IP-Adresse",
+         "TYPE":    "Typ",
+         "MEMORY":  "Speicher",
+         "CORES":   "Kerne",
+         "ACTION":  "Aktion"
+       }
+     }
+   },
+   "LOGIN": {
+     "WELCOME":  "Willkommen bei Matterhorn",
+     "REMEMBER": "Automatisch anmelden",
+     "LOGIN":    "anmelden"
+   }
+}
