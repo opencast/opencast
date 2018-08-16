@@ -327,23 +327,23 @@
             vertical-align: top;
         }
 
-        span[data-status=offline]:before {
+        span[data-status="AGENTS.STATUS.OFFLINE"]:before {
             background: black;
         }
 
-        span[data-status=idle]:before {
+        span[data-status="AGENTS.STATUS.IDLE"]:before {
             background: $green;
         }
 
-        span[data-status="shutting_down"]:before,span[data-status=unknown]:before {
+        span[data-status="AGENTS.STATUS.SHUTTING_DOWN"]:before,span[data-status="AGENTS.STATUS.UNKNOWN"]:before {
             background: $yellow;
         }
 
-        span[data-status="capturing"]:before,span[data-status="uploading"]:before {
+        span[data-status="AGENTS.STATUS.CAPTURING"]:before,span[data-status="AGENTS.STATUS.UPLOADING"]:before {
             background: $l-blue;
         }
 
-        span[data-status="error"]:before {
+        span[data-status="AGENTS.STATUS.ERROR"]:before {
             background: $red;
         }
 

@@ -2031,5 +2031,16 @@
                "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
            }
        }
-   }
+   },
+  "AGENTS": {
+    "STATUS": {
+      "CAPTURING": "Capturing",
+      "ERROR": "Error",
+      "IDLE": "Idle",
+      "OFFLINE": "Offline",
+      "SHUTTING_DOWN": "Shutting down",
+      "UNKNOWN": "Unknown",
+      "UPLOADING": "Uploading"
+    }
+  }
 }

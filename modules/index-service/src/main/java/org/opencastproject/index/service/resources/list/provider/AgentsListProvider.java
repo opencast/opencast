@@ -67,7 +67,7 @@ public class AgentsListProvider implements ResourceListProvider {
 
     if (STATUS.equals(listName)) {
       for (String state : AgentState.KNOWN_STATES) {
-        result.put(state, state);
+        result.put(state, STATUS + "." + state.toUpperCase());
       }
     } else {
       Map<String, Agent> knownAgents = agentsService.getKnownAgents();
