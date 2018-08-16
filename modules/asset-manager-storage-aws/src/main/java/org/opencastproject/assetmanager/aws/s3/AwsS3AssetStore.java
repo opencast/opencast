@@ -28,10 +28,14 @@ import org.opencastproject.assetmanager.impl.storage.AssetStore;
 import org.opencastproject.assetmanager.impl.storage.AssetStoreException;
 import org.opencastproject.assetmanager.impl.storage.RemoteAssetStore;
 import org.opencastproject.util.ConfigurationException;
+import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.data.Option;
 
 import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
@@ -97,14 +101,24 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionName);
 
-      String accessKeyId = getAWSConfigKey(cc, AWS_S3_ACCESS_KEY_ID_CONFIG);
-      String accessKeySecret = getAWSConfigKey(cc, AWS_S3_SECRET_ACCESS_KEY_CONFIG);
+      // Explicit credentials are optional.
+      AWSCredentialsProvider provider = null;
+      Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
+      Option<String> accessKeySecretOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_SECRET_ACCESS_KEY_CONFIG);
+
+      // Keys not informed so use default credentials provider chain, which
+      // will look at the environment variables, java system props, credential files, and instance
+      // profile credentials
+      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone())
+        provider = new DefaultAWSCredentialsProviderChain();
+      else
+        provider = new AWSStaticCredentialsProvider(
+                new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
 
       // Create AWS client.
-      BasicAWSCredentials awsCreds = new BasicAWSCredentials(accessKeyId, accessKeySecret);
       s3 = AmazonS3ClientBuilder.standard()
               .withRegion(regionName)
-              .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+              .withCredentials(provider)
               .build();
 
       s3TransferManager = new TransferManager(s3);
