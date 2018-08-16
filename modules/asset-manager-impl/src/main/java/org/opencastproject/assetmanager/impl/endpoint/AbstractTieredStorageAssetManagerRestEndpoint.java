@@ -53,8 +53,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends AbstractAssetManagerRestEndpoint {
+  public static final String SDF_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-  private DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
   protected TieredStorageAssetManagerJobProducer tsamjp = null;
   protected ServiceRegistry serviceRegistry = null;
 
@@ -230,6 +230,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
   public Response moveByDate(@FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
+    DateFormat sdf = new SimpleDateFormat(SDF_FORMAT);
     Date start;
     Date end;
     try {
@@ -300,6 +301,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                           responseCode = SC_INTERNAL_SERVER_ERROR)},
           returnDescription = "The Job created")
   public Response moveByIdAndDate(@FormParam("id") final String id, @FormParam("start") final String startString, @FormParam("end") final String endString, @FormParam("target") final String target) {
+    DateFormat sdf = new SimpleDateFormat(SDF_FORMAT);
     final String mpid = StringUtils.trimToNull(id);
     if (null == mpid) {
       return badRequest("Invalid mediapackage ID: " + mpid);
