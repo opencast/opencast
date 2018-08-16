@@ -150,7 +150,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
 
   public String buildObjectName(File origin, StoragePath storagePath) {
     // origin file name from workspace will be called
-    // WORKSPACE/http_ADMIN_HOST/episode/archive/mediapackage/MP_ID/EL_ID/VERSION/EL_TYPE.EXTENSION
+    // WORKSPACE/http_ADMIN_HOST/assets/assets/MP_ID/EL_ID/VERSION/filename.EXTENSION
     // while the actual file is in ARCHIVE/ORG/MP_ID/VERSION/EL_ID.EXTENSION
 
     // Create object key - S3 style but works for Glacier as well
@@ -171,7 +171,7 @@ public abstract class AwsAbstractArchive implements AssetStore {
    * @see org.opencastproject.assetmanager.impl.storage.AssetStore#put(StoragePath, Source)
    */
   public void put(StoragePath storagePath, Source source) throws AssetStoreException {
-    // If the workspace x archive hack is in place (hard-linking between the two), then this is just a
+    // If the workspace  to asset manager hard-linking is enabled then this is just a
     // hard-link. If not, this will be a download + hard-link
     final File origin = getFileFromWorkspace(source);
 
