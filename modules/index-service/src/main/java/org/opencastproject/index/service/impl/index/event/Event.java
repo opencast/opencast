@@ -36,7 +36,6 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLStreamReader;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
-import org.joda.time.DateTime;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -44,7 +43,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1174,13 +1172,22 @@ public class Event implements IndexObject {
     eventStatus = "EVENTS.EVENTS.STATUS.PROCESSED";
   }
 
+  /**
+   * Check whether or not the start time of the recording of this event has passed, yet.
+   *
+   * This method treats non-scheduled (i.e.) uploaded events as always having
+   * a recording start time in the pase, because for the video to be able
+   * to be uploaded, it obviously must have been recorded, already.
+   *
+   * @return <code>true</code> if the start ime of the recording of this event
+   *         is in the past, and <code>false</code> otherwise
+   */
   public boolean hasRecordingStarted() {
-    if (getSchedulingStatus() == null)
-      return true;
-
-    Date startDate = new DateTime(getTechnicalStartTime()).toDate();
-    Date now = new DateTime().toDate();
-    return startDate.before(now);
+    return
+            // handle uploaded events
+            getSchedulingStatus() == null
+            // handle scheduled events
+            || getRecordingStatus() != null;
   }
 
   /**
