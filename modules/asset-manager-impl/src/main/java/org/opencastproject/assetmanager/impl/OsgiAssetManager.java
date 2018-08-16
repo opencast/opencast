@@ -84,7 +84,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   private TieredStorageAssetManager delegate;
 
   /** OSGi callback. */
-  public void activate(ComponentContext cc) {
+  public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager");
     final Database db = new Database(PersistenceEnvs.mk(emf));
     final String systemUserName = SecurityUtil.getSystemUserName(cc);
@@ -238,7 +238,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     this.assetStore = assetStore;
   }
 
-  public void addRemoteAssetStore(RemoteAssetStore assetStore) {
+  public synchronized void addRemoteAssetStore(RemoteAssetStore assetStore) {
     if (null == delegate) {
       remotes.add(assetStore);
     } else {
@@ -246,7 +246,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
     }
   }
 
-  public void removeRemoteAssetStore(RemoteAssetStore assetStore) {
+  public synchronized void removeRemoteAssetStore(RemoteAssetStore assetStore) {
     if (null != delegate) {
       delegate.removeRemoteAssetStore(assetStore);
     } else {
