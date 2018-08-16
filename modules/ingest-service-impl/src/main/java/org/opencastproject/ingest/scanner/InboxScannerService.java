@@ -25,7 +25,6 @@ package org.opencastproject.ingest.scanner;
 import static org.opencastproject.security.util.SecurityUtil.getUserAndOrganization;
 import static org.opencastproject.util.data.Collections.dict;
 import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
@@ -41,7 +40,6 @@ import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
@@ -104,6 +102,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
   /** The configuration key to use for determining the polling interval in ms. */
   public static final String INBOX_POLL = "inbox.poll";
 
+  public static final String INBOX_THREADS = "inbox.threads";
+  public static final String INBOX_TRIES = "inbox.tries";
+  public static final String INBOX_TRIES_BETWEEN_SEC = "inbox.tries.between.sec";
+
   private IngestService ingestService;
   private WorkingFileRepository workingFileRepository;
   private SecurityService securityService;
@@ -134,9 +136,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     final String orgId = getCfg(properties, USER_ORG);
     final String userId = getCfg(properties, USER_NAME);
     final String mediaFlavor = getCfg(properties, MEDIA_FLAVOR);
-    final String workflowDefinition = getCfg(properties, WORKFLOW_DEFINITION);
+    final String workflowDefinition = getCfgOrDefault(properties, WORKFLOW_DEFINITION, null);
     final Map<String, String> workflowConfig = getCfgAsMap(properties, WORKFLOW_CONFIG);
-    final int interval = getCfgAsInt(properties, INBOX_POLL);
+    final int interval = getCfgAsIntOrDefault(properties, INBOX_POLL, 5000);
     final File inbox = new File(getCfg(properties, INBOX_PATH));
     if (!inbox.isDirectory()) {
       try {
@@ -154,8 +156,9 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     if (!inbox.canWrite()) {
       throw new ConfigurationException(INBOX_PATH, String.format("Cannot write to %s", inbox.getAbsolutePath()));
     }
-    final int maxthreads = option(cc.getBundleContext().getProperty("org.opencastproject.inbox.threads")).bind(
-            Strings.toInt).getOrElse(1);
+    final int maxthreads = getCfgAsIntOrDefault(properties, INBOX_THREADS, 1);
+    final int maxTries = getCfgAsIntOrDefault(properties, INBOX_TRIES, 3);
+    final int secondesBetweenTries = getCfgAsIntOrDefault(properties, INBOX_TRIES_BETWEEN_SEC, 300);
     final Option<SecurityContext> secCtx = getUserAndOrganization(securityService, orgDir, orgId, userDir, userId)
             .bind(new Function<Tuple<User, Organization>, Option<SecurityContext>>() {
               @Override
@@ -170,8 +173,10 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
       // set up new file install config
       fileInstallCfg = some(configureFileInstall(cc.getBundleContext(), inbox, interval));
       // create new scanner
-      ingestor = some(new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
-            workflowConfig, mediaFlavor, inbox, maxthreads, seriesService));
+      Ingestor ingestor = new Ingestor(ingestService, workingFileRepository, secCtx.get(), workflowDefinition,
+              workflowConfig, mediaFlavor, inbox, maxthreads, seriesService, maxTries, secondesBetweenTries);
+      this.ingestor = some(ingestor);
+      new Thread(ingestor).start();
       logger.info("Now watching inbox {}", inbox.getAbsolutePath());
     } else {
       logger.warn("Cannot create security context for user {}, organization {}. "
@@ -231,6 +236,7 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   @Override
   public void install(final File artifact) throws Exception {
+    logger.trace("install(): {}", artifact.getName());
     ingestor.foreach(new Effect<Ingestor>() {
       @Override
       protected void run(Ingestor ingestor) {
@@ -241,12 +247,18 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
   @Override
   public void update(File artifact) throws Exception {
-    // To change body of implemented methods use File | Settings | File Templates.
+    logger.trace("update(): {}", artifact.getName());
   }
 
   @Override
   public void uninstall(File artifact) throws Exception {
-    // To change body of implemented methods use File | Settings | File Templates.
+    logger.trace("uninstall(): {}", artifact.getName());
+    ingestor.foreach(new Effect<Ingestor>() {
+      @Override
+      protected void run(Ingestor ingestor) {
+        ingestor.cleanup(artifact);
+      }
+    });
   }
 
   // --
@@ -292,8 +304,18 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     return ps;
   }
 
+  public static String getCfgOrDefault(Dictionary d, String key, String defaultValue) throws ConfigurationException {
+    Object p = d.get(key);
+    if (p == null)
+      return defaultValue;
+    if (p instanceof String)
+      return (String) p;
+    return p.toString();
+  }
+
   public static Map<String, String> getCfgAsMap(Dictionary<String, String> d, String key) throws ConfigurationException {
     HashMap<String, String> config = new HashMap<String, String>();
+    if (d == null) return config;
     for (Enumeration<String> e = d.keys(); e.hasMoreElements();) {
       String dKey = (String) e.nextElement();
       if (dKey.startsWith(key))
@@ -308,12 +330,25 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    * @throws ConfigurationException
    *           key does not exist or is not an integer
    */
-  public static int getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
+  public static Integer getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
     try {
       return Integer.parseInt(getCfg(d, key));
     } catch (NumberFormatException e) {
       throw new ConfigurationException(key, "not an integer");
     }
+  }
+
+  public static int getCfgAsIntOrDefault(Dictionary d, String key, int defaultValue) throws ConfigurationException {
+    String valStr = getCfgOrDefault(d, key, null);
+    if (StringUtils.isEmpty(valStr))
+      return defaultValue;
+    try {
+      return Integer.parseInt(valStr);
+    } catch (Exception e) {
+      logger.warn("The inbox configuration {} value {} is not an integer. Use default value of {}", key, valStr,
+              defaultValue);
+    }
+    return defaultValue;
   }
 
   public void setSeriesService(SeriesService seriesService) {
