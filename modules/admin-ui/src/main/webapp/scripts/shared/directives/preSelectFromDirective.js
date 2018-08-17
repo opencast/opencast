@@ -44,7 +44,14 @@ function (_) {
                     }
 
                     if (_.size(options) === 1 && _.size(ngModel) > 0) { // supports objects and arrays
-                        ngModel[0].$setViewValue(options[_.keys(options)[0]], 'myevent');
+                        var valueToSet = options[_.keys(options)[0]];
+                        // There's an additional attribute you can set: "pre-select-from-value", which
+                        // sets the value not to the "v" in the array itself, but to "v.value". This
+                        // is currently used in the metadata fields for certain dialogs.
+                        if (!angular.isUndefined($attr.preSelectFromValue)) {
+                            valueToSet = valueToSet.value;
+                        }
+                        ngModel[0].$setViewValue(valueToSet, 'myevent');
                         unregister();
                     }
                 }
