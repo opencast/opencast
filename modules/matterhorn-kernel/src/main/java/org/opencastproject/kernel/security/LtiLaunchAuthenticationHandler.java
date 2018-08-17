@@ -173,12 +173,16 @@ public class LtiLaunchAuthenticationHandler
     if (highlyTrustedKeys.contains(oaAuthKey)) {
       logger.debug("{} is a trusted key", oaAuthKey);
 
-      // If supplied we use the human readable name
+      // If supplied we use the human readable name coming from:
+      //   1. ext_user_username    (optional Moodle-only field)
+      //   2. lis_person_sourcedid (optional standard field)
       String ltiUsername = request.getParameter("ext_user_username");
-      // This is an optional field it could be null
       if (StringUtils.isBlank(ltiUsername)) {
-        // if no eid is set we use the supplied ID
-        ltiUsername = userIdFromConsumer;
+        ltiUsername = request.getParameter("lis_person_sourcedid");
+        if (StringUtils.isBlank(ltiUsername)) {
+          // If no eid is set we use the supplied ID
+          ltiUsername = userIdFromConsumer;
+        }
       }
 
       // Check if the provided username should be trusted
