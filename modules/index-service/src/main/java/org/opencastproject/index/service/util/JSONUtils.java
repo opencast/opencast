@@ -199,6 +199,64 @@ public final class JSONUtils {
   }
 
   /**
+   * Generate JSON presentation of the given filters
+   *
+   * @param query
+   *          The {@link ResourceListQuery}
+   * @param listProvidersService
+   *          The {@link ListProvidersService} to get the possible values
+   * @param org
+   *          The {@link Organization}
+   * @param series
+   *          The Series with write access
+   * @return
+   * @throws ListProviderException
+   *           if the possible values can not be retrieved correctly from the list provider.
+   */
+  public static JValue filtersToJSONSeriesWriteAccess(ResourceListQuery query, ListProvidersService listProvidersService,
+          Organization org, Map<String, String> series) throws ListProviderException {
+
+    List<Field> filtersJSON = new ArrayList<Field>();
+    List<Field> fields = null;
+    List<ResourceListFilter<?>> filters = query.getAvailableFilters();
+
+    for (ResourceListFilter<?> filter : filters) {
+      fields = new ArrayList<Field>();
+
+      fields.add(f("type", v(filter.getSourceType().toString().toLowerCase())));
+      fields.add(f("label", v(filter.getLabel())));
+
+      Option<String> listProviderName = filter.getValuesListName();
+
+      if (listProviderName.isSome()) {
+        boolean translatable = false;
+        List<Field> valuesJSON = new ArrayList<>();
+
+        if (listProvidersService.hasProvider(listProviderName.get())) {
+          if (listProviderName.get().equals("SERIES")) {
+            for (Entry<String, String> entry : series.entrySet()) {
+              valuesJSON.add(f(entry.getValue(), v(entry.getKey(), Jsons.BLANK)));
+            }
+          } else {
+            Map<String, String> values = listProvidersService.getList(listProviderName.get(), query, org, false);
+            for (Entry<String, String> entry : values.entrySet()) {
+              valuesJSON.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+            }
+          }
+          translatable = listProvidersService.isTranslatable(listProviderName.get());
+        }
+
+        fields.add(f("options", obj(valuesJSON)));
+        fields.add(f("translatable", translatable));
+      }
+
+      filtersJSON.add(f(filter.getName(), obj(fields)));
+    }
+
+    return obj(filtersJSON);
+  }
+
+  /**
    * Format the given period (define by start and end dates) to a JSON value.
    *
    * <pre>

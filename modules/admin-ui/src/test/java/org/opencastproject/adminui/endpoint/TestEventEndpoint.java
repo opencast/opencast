@@ -806,6 +806,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
+  public SeriesEndpoint getSeriesService() {
+    return env.getSeriesService();
+  }
+
+  @Override
   public AclService getAclService() {
     return env.getAclService();
   }
@@ -865,4 +870,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     return false;
   }
 
+  @Override
+  public Boolean getOnlySeriesWithWriteAccessEventModal() {
+    return false;
+  }
 }
