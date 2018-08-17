@@ -210,7 +210,14 @@ public class SeriesEndpoint {
             continue;
           }
           String name = filterTuple[0];
-          String value = filterTuple[1];
+
+          String value;
+          if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // MH-13038 - 1.1.0 and higher support semi-colons in values
+            value = f.substring(name.length() + 1);
+          } else {
+            value = filterTuple[1];
+          }
 
           if ("managedAcl".equals(name)) {
             query.withAccessPolicy(value);
@@ -243,6 +250,22 @@ public class SeriesEndpoint {
             query.withSubject(value);
           } else if ("title".equals(name)) {
             query.withTitle(value);
+          } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+            // add filters only available with Version 1.1.0 or higher
+            if ("identifier".equals(name)) {
+              query.withIdentifier(value);
+            } else if ("description".equals(name)) {
+              query.withDescription(value);
+            } else if ("creator".equals(name)) {
+              query.withCreator(value);
+            } else if ("publishers".equals(name)) {
+              query.withPublisher(value);
+            } else if ("rightsholder".equals(name)) {
+              query.withRightsHolder(value);
+            } else {
+              logger.warn("Unknown filter criteria {}", name);
+              return Response.status(SC_BAD_REQUEST).build();
+            }
           }
         }
       }
@@ -265,7 +288,7 @@ public class SeriesEndpoint {
               query.sortByCreatedDateTime(criterion.getOrder());
               break;
             default:
-              logger.info("Unknown filter criteria {}", criterion.getFieldName());
+              logger.info("Unknown sort criteria {}", criterion.getFieldName());
               return Response.status(SC_BAD_REQUEST).build();
           }
         }

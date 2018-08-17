@@ -16,13 +16,32 @@ Query String Parameter |Type                         | Description
 
 The following filters are available:
 
-Filter Name    | Description
-:--------------|:-----------
-`contributors` | Events where the contributors match
-`location`     | Events based upon the location it is scheduled in
-`series`       | Events based upon which series they are a part of
-`subject`      | Filters events based upon which subject they are a part of
-`textFilter`   | Filters events where any part of the event's metadata fields match this value
+Filter Name       | Description
+:-----------------|:-----------
+`contributors`    | Events where the contributors match. Can occur multiple times
+`location`        | Events based upon the location it is scheduled in
+`series`          | Events based upon which series they are a part of. Use the series identifier here. If using version 1.1.0 or higher, please use `is_part_of` instead
+`subject`         | Filters events based upon which subject they are a part of
+`textFilter`      | Filters events where any part of the event's metadata fields match this value
+`identifier`      | Filters events whose identifiers match this value. Can occur multiple times (version 1.1.0 and higher)
+`title`           | Filters events whose title match this value (version 1.1.0 and higher)
+`description`     | Filters events whose description match this value (version 1.1.0 and higher)
+`series_name`     | Filters events that belong to series with the given name (version 1.1.0 or higher)
+`language`        | Filters events whose language match this value (version 1.1.0 or higher)
+`created`         | Filters events whose created match this value (version 1.1.0 or higher)
+`license`         | Filters events whose license match this value (version 1.1.0 or higher)
+`rightsholder`    | Filters events whose rights holder matches this value (version 1.1.0 or higher)
+`status`          | Filters events based on their status (version 1.1.0 or higher)
+`is_part_of`      | Events based upon which series they are a part of. Use the series identifier here (version 1.1.0 or higher)
+`source`          | Filter events whose source match this value (version 1.1.0 or higher)
+`agent_id`        | Filter events based on the capture agent id (version 1.1.0 or higher)
+`start`           | Filter events based on start date (version 1.1.0 or higer)
+`technical_start` | Filter events based on the technical start date (version 1.1.0 or higher)
+
+Note:
+The filters `start` and `technical_start` expect the following value:
+
+[`datetime`](types.md#date-and-time) + '/' + [`datetime`](types.md#date-and-time)
 
 The list can be sorted by the following criteria:
 
