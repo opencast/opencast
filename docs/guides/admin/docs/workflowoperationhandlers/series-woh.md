@@ -30,9 +30,9 @@ convention, they are written as:
 
 Some examples of expanded names are:
 
-- `{http://purl.org/dc/terms/}title`
-- `{http://mediapackage.opencastproject.org}mediapackage`
-- `{}term-with-an-empty-namespace`
+* `{http://purl.org/dc/terms/}title`
+* `{http://mediapackage.opencastproject.org}mediapackage`
+* `{}term-with-an-empty-namespace`
 
 The value of the `copy-metadata` may contain expanded and non-expanded names. In the latter case, the names will be
 expanded using the provided namespace, if any, or the DublinCore namespace by default.
@@ -54,7 +54,7 @@ namespaces can be used in this operation. The allowed namespaces are:
 
 * DublinCore Terms: `http://purl.org/dc/terms/`
 * DublinCore Elements 1.1: `http://purl.org/dc/elements/1.1/`
-* Opencast Properties: `http://www.opencastproject.org/matterhorn/`
+* Opencast Properties: `http://www.opencastproject.org/`
 
 
 Operation Examples
@@ -98,7 +98,7 @@ Operation Examples
     <configuration key="attach">dublincore/*</configuration>
     <configuration key="apply-acl">false</configuration>
     <configuration key="copy-metadata">{http://purl.org/dc/terms/}contributor custom1 custom2</configuration>
-    <configuration key="default-namespace">http://www.opencastproject.org/matterhorn/</configuration>
+    <configuration key="default-namespace">http://www.opencastproject.org/</configuration>
   </configurations>
 </operation>
 ```

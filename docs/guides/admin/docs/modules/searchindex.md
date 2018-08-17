@@ -37,12 +37,12 @@ Add the solr config files to the solr webapp in tomcat. If you are setting up th
 from the search module.
 
     $ cd apache-tomcat-7.0.5
-    $ cp -R [opencast source]/modules/matterhorn-search-service-impl/src/main/resources/solr solr
+    $ cp -R [opencast source]/modules/search-service-impl/src/main/resources/solr solr
 
 Alternatively, if this is the solr index supporting the workflow service, copy those files instead:
 
     $ cd apache-tomcat-7.0.5
-    $ cp -R [opencast source]/modules/matterhorn-workflow-service-impl/src/main/resources/solr solr
+    $ cp -R [opencast source]/modules/workflow-service-impl/src/main/resources/solr solr
 
 Edit the dataDir setting in solr/conf/solrconfig.xml to specify the directory you want to use for the index files.
 
@@ -50,7 +50,7 @@ Edit the dataDir setting in solr/conf/solrconfig.xml to specify the directory yo
 
 *The index has a dependency on a Opencast class. The easiest way of getting rid of this dependency is providing a .jar
 file with that class within a directory named lib in the solr folder (you may need to create it if it does not exist).
-The .jar file can be the compiled matterhorn-solr bundle. Placing the jar in the main Tomcat lib directory does not
+The .jar file can be the compiled solr bundle. Placing the jar in the main Tomcat lib directory does not
 work.*
 
 ## Start the server

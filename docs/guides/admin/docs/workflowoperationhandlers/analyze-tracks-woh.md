@@ -23,6 +23,7 @@ instance variables may be set:
 |*flavor*\_resolution\_y    |`presenter_source_resolution_y=720`   |Vertical resolution of the video stream        |
 |*flavor*\_aspect           |`presenter_source_aspect=4/3`         |Exact aspect ratio of the video stream         |
 |*flavor*\_aspect\_snap     |`presenter_source_aspect_snap=4/3`    |Nearest specified aspect ratio of the video    |
+|*flavor*\_framerate        |`presenter_source_framerate=30.0`     |Framerate of the video stream                  |
 
 
 Parameter Table
@@ -55,7 +56,7 @@ Operation Example
     <operation
       id="analyze-tracks"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Analyze tracks in media package and set control variables">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
@@ -73,3 +74,4 @@ If a video track with a resolution of 1280x720 and an included audio stream is p
     presentation_source_resolution_x=1280
     presentation_source_resolution_y=720
     presentation_source_video=true
+    presentation_source_framerate=30.0

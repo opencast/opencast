@@ -10,28 +10,30 @@
   <configuration_panel />
 
   <operations>
+
     <!-- Attach caption/transcript -->
 
     <operation id="attach-watson-transcription"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error" 
+      exception-handler-workflow="partial-error"
       description="Attach captions/transcription">
       <configurations>
         <!-- This is filled out by the transcription service when starting this workflow -->
         <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-        <configuration key="target-flavor">captions/timedtext</configuration>
-        <configuration key="target-caption-format">webvtt</configuration>
+        <!-- Caption generated will have the default flavor based on the target-caption-format and language e.g. captions/vtt+en -->
+        <configuration key="target-caption-format">vtt</configuration>
+        <configuration key="target-tag">engage-download</configuration>
       </configurations>
     </operation>
 
     <!-- Merge caption/transcript to existing publication and republish -->
 
-    <operation id="publish-engage" 
-      fail-on-error="true" 
-      exception-handler-workflow="ng-partial-error"
+    <operation id="publish-engage"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
       description="Distribute and publish to engage server">
       <configurations>
-        <configuration key="download-source-flavors">captions/timedtext</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="strategy">merge</configuration>
         <configuration key="check-availability">true</configuration>
       </configurations>
@@ -41,7 +43,7 @@
 
     <operation id="snapshot"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Archive media package">
       <configurations>
         <configuration key="source-flavors">*/*</configuration>
@@ -54,7 +56,7 @@
       id="include"
       description="Remove temporary processing artifacts">
       <configurations>
-        <configuration key="workflow-id">ng-partial-cleanup</configuration>
+        <configuration key="workflow-id">partial-cleanup</configuration>
       </configurations>
     </operation>
 

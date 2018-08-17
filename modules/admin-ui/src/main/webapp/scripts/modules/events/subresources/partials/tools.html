@@ -1,0 +1,254 @@
+<section class="action-nav-bar">
+    <admin-ng-nav></admin-ng-nav>
+    <nav>
+        <a href="#/events/events" ng-class="{active: resource == 'events'}" translate="EVENTS.EVENTS.NAVIGATION.EVENTS" with-role="ROLE_UI_EVENTS_VIEW">
+            <!-- Events -->
+        </a>
+        <a href="#/events/series" ng-class="{active: resource == 'series'}" translate="EVENTS.EVENTS.NAVIGATION.SERIES" with-role="ROLE_UI_SERIES_VIEW">
+            <!-- Series -->
+        </a>
+    </nav>
+</section>
+
+<section class="main-content">
+    <nav id="roll-up-menu"></nav>
+
+    <div class="main-view">
+      <div ng-controller="VideoEditCtrl">
+        <div class="video-header">
+            <div class="main-video-details">
+                <h1 class="video-title">{{ video.title }}</h1>
+                <h4 class="video-details"><span class="video-details-date">{{ video.date | localizeDate : 'date' : 'short'}}</span>
+                  <span class="video-details-presenters">
+                      {{(video.presenters && video.presenters.length > 0)  ?  " - " + video.presenters.join(', ') : "" }}
+                  </span>
+                  <span class="video-details-series">{{(video.series && video.series.title) ? " - " + video.series.title : "" }}</span></h4>
+            </div>
+            <div class="video-save-panel video-more-options video-editor-actions-toolbar" ng-if="tab === 'editor' && player.adapter">
+                <div class="buttons">
+                    <select chosen pre-select-from="video.workflows" class="workflow"
+                        ng-disabled="!video.workflows || video.workflows.length === 0"
+                        data-width="'175px'"
+                        data-disable-search-threshold="8"
+                        ng-model="video.workflow"
+                        ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+
+                    <a ng-click="submit()"
+                        ng-class="{disabled: submitButton}"
+                        class="save-and-close-button"
+                        translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                        <!-- Save and Continue -->
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div data-admin-ng-notifications=""></div>
+        <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
+
+        <div class="tab-menu">
+            <nav class="view-controller">
+                <a ng-class="{active: tab === 'playback'}"
+                    ng-click="openTab('playback')" translate>VIDEO_TOOL.TABS.PLAY</a>
+                <a ng-class="{active: tab === 'editor'}"
+                    ng-click="openTab('editor')" translate>VIDEO_TOOL.TABS.EDIT</a>
+            </nav>
+        </div>
+        <div class="video-container">
+
+            <div data-video-player data-player="player" data-video="video" data-adapter="html5" data-player-ref="player" data-controls="{{ tab === 'playback' }}"/>
+
+            <div ng-if="tab === 'playback'">
+              <!-- nothing to show here yet -->
+            </div>
+
+            <div class="tool-tab" ng-if="tab === 'editor' && player.adapter">
+                <div data-admin-ng-timeline="" data-video="video" data-player="player"></div>
+
+                <div data-admin-ng-notifications="" context="video-tools"></div>
+
+            </div>
+            <!-- captions and annotations to come later
+            <div ng-if="tab === 'captions'">
+            </div>
+            <div ng-if="tab === 'annotations'">
+            </div>-->
+            <div class="event-container" ng-controller="EventCtrl">
+                <div>
+                    <nav class="modal-nav view-controller-secondary">
+                        <a ng-class="{active: area === 'segments'}" ng-if="tab === 'editor'"
+                            ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
+                        <a ng-class="{active: area === 'metadata'}"
+                            ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
+                        <a ng-class="{active: area === 'comments'}"
+                            ng-click="openArea('comments')" translate>VIDEO_TOOL.AREAS.COMMENTS</a>
+                    </nav>
+                </div>
+
+                <div ng-if="area === 'metadata'">
+                  <div class="area-body">
+                      <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
+                      <div class="full-col">
+                          <div class="obj tbl-details">
+                              <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
+                              <div class="obj-container">
+                                  <table class="main-tbl">
+                                      <tr ng-repeat="row in episodeCatalog.fields track by $index">
+                                          <td translate="{{ row.label }}"></td>
+                                          <td admin-ng-editable
+                                              required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                                              params="row" save="getSaveFunction(episodeCatalog.flavor)">
+                                          </td>
+                                      </tr>
+                                  </table>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+                <div ng-if="area === 'comments'">
+                  <div class="area-body">
+                      <div class="full-col">
+                          <div class="obj comments">
+                              <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
+                                  <!-- Comments -->
+                              </header>
+                              <div class="obj-container">
+                                  <div class="comment-container">
+                                    <div class="comment-view">
+                                      <div class="comment" ng-class="{ active : $parent.replyToId === comment.id }"
+                                          ng-repeat="comment in comments track by $index">
+                                          <hr>
+                                          <div class="date">{{ comment.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                          <h4>{{ comment.author.name }}</h4>
+                                          <span class="category">
+                                            <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
+                                          </span>
+                                          <p>{{ comment.text }}</p>
+                                          <a ng-click="deleteComment(comment.id)" class="delete">
+                                             {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                                          </a>
+                                          <a ng-click="replyTo(comment)" class="reply" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_REPLY">
+                                             {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY' | translate }}
+                                          </a>
+                                          <span class="resolve" ng-class="{ resolved : comment.resolvedStatus }">
+                                              {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED' | translate }}
+                                          </span>
+
+                                          <div class="comment is-reply" ng-repeat="reply in comment.replies track by $index">
+                                              <hr>
+                                              <div class="date">{{ reply.creationDate | localizeDate : 'dateTime' : 'short' }}</div>
+                                              <h4>{{ reply.author.name }}</h4>
+                                              <span class="category">
+                                                <strong translate="EVENTS.EVENTS.DETAILS.COMMENTS.REASON">Reason: </strong>: {{ comment.reason | translate }}
+                                              </span>
+                                              <p>
+                                                <span>@{{ comment.author.name }}</span> {{ reply.text }}
+                                              </p>
+                                              <a ng-click="deleteCommentReply(comment.id, reply.id)" class="delete" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE">
+                                                <i class="fa fa-times-circle"></i> {{ 'EVENTS.EVENTS.DETAILS.COMMENTS.DELETE' | translate }}
+                                              </a>
+                                          </div>
+                                      </div>
+                                    </div>
+                                    <div class="comment-creation">
+                                        <form class="add-comment" ng-if="replyToId === null" with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE">
+                                          <textarea ng-model="myComment.text" placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.PLACEHOLDER' | translate }}"></textarea>
+                                          <div class="reasons">
+                                              <select chosen pre-select-from="components.eventCommentReasons"
+                                                  data-width="'200px'"
+                                                  data-disable-search-threshold="8"
+                                                  ng-model="myComment.reason"
+                                                  ng-options="value | translate for (id, value) in components.eventCommentReasons"
+                                                  data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}"
+                                                  >
+                                                <option value=""></option>
+                                              </select>
+                                          </div>
+                                          <button ng-class="{ disabled: !myComment.text.length || !myComment.reason.length || myComment.saving }" class="save green" ng-click="comment()" translate="VIDEO_TOOL.BUTTONS.ADD_COMMENT">
+                                              <!-- Submit -->
+                                          </button>
+                                        </form>
+
+                                        <form class="add-comment reply" ng-if="replyToId !== null">
+                                            <textarea ng-model="myComment.text"
+                                                placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.REPLY_TO' | translate }} @{{ originalComment.author.name }}"></textarea>
+                                            <button ng-class="{ disabled: !myComment.text.length || myComment.saving }" class="save green" ng-click="reply()"
+                                                translate="EVENTS.EVENTS.DETAILS.COMMENTS.REPLY">
+                                                <!-- Reply -->
+                                            </button>
+                                            <button class="save red" ng-click="exitReplyMode()" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CANCEL_REPLY">
+                                                <!-- Cancel -->
+                                            </button>
+                                            <input with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" type="checkbox" ng-model="myComment.resolved" id="resolved-checkbox" class="resolve-select ios "/>
+                                            <label with-role="ROLE_UI_EVENTS_DETAILS_COMMENTS_RESOLVE" class="resolved" for="resolved-checkbox" translate="EVENTS.EVENTS.DETAILS.COMMENTS.RESOLVED">
+                                                <!-- Resolved -->
+                                            </label>
+                                        </form>
+                                    </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+
+                <div ng-if="area === 'segments'">
+                  <div class="area-body">
+                    <div class="segments-area">
+                      <div class="video-toolbar">
+                          <div class="start-column">
+                              <div class="primary-functions function-buttons">
+                                  <a class="split" ng-click="split()" translate>VIDEO_TOOL.ACTIONS.SPLIT</a>
+                                  <a class="cut" ng-click="cut()" translate>VIDEO_TOOL.ACTIONS.CUT</a>
+                                  <a class="replay" ng-click="replay()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT</a>
+                                  <a class="replay-end-of-segment" ng-click="replayEndOfSegment()" translate>VIDEO_TOOL.ACTIONS.REPLAY_END_OF_SEGMENT</a>
+                                  <a class="replay-with-preroll" ng-click="replayPreRoll()" translate>VIDEO_TOOL.ACTIONS.REPLAY_SEGMENT_WITH_PREROLL</a>
+                                  <!--
+                                  <a class="switch-feed" translate>VIDEO_TOOL.ACTIONS.SWITCH_FEED</a>
+                                  -->
+                              </div>
+                          </div>
+                          <div class="end-column">
+                              <div class="destructive-functions function-buttons">
+                                  <a class="clear-segments" ng-click="clearSelectedSegment()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SELECTED_SEGMENT</a>
+                                  <a class="clear-segments" ng-click="clearSegments()" translate>VIDEO_TOOL.ACTIONS.CLEAR_SEGMENTS</a>
+                              </div>
+                          </div>
+                      </div>
+                      <div data-admin-ng-segments="" data-video="video" data-player="player"></div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+
+            <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
+            <div class="video-editor-actions-toolbar">
+
+            <div data-admin-ng-notifications=""></div>
+
+                <div class="video-save-panel" ng-if="tab === 'editor' && player.adapter">
+                    <div class="buttons">
+                        <select chosen pre-select-from="video.workflows" class="workflow"
+                            ng-disabled="!video.workflows || video.workflows.length === 0"
+                            data-width="'175px'"
+                            data-disable-search-threshold="8"
+                            ng-model="video.workflow"
+                            ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+
+                        <a ng-click="submit()"
+                           ng-class="{disabled: submitButton}"
+                           class="save-and-close-button"
+                           translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
+                          <!-- Save and Continue -->
+                        </a>
+
+                        <a class="return-button" ng-click="leave()" translate>VIDEO_TOOL.BUTTONS.CLOSE</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+  </div>
+</section>

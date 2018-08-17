@@ -23,8 +23,8 @@ Setting up MariaDB/MySQL
 
 Before following this guide, you should have:
 
- - Installed the Opencast Core System
- - Followed the [Basic Configuration instructions](basic.md)
+* Installed the Opencast Core System
+* Followed the [Basic Configuration instructions](basic.md)
 
 
 ### Step 0: Set-up MariaDB/MySQL
@@ -43,7 +43,7 @@ Afterward, start the server and set it up to start automatically after each rebo
     systemctl start mariadb.service
     systemctl enable mariadb.service
 
-Now you have a MariaDB running, but without a properly configured root account (no password, etc.) which might pose a
+Now you have MariaDB running, but without a properly configured root account (no password, etc.) which might pose a
 security risk. MariaDB includes a useful tool to secure your database server. You can launch it by executing (yes, it is
 still called mysql…):
 

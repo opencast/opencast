@@ -256,7 +256,7 @@ function AC_AddExtension(src, ext)
             var play = $.getURLParameter('play');
             if ((play === null) || (play !== "true"))
             {
-                str = '<input id="oc_image" type="image" src="" alt="Matterhorn Player" title="Click to start" />';
+                str = '<input id="oc_image" type="image" src="" alt="Opencast Player" title="Click to start" />';
                 $('#oc_flash-player-loading').hide();
                 $('#oc_player_video-dropdown').css('visibility', 'hidden');
                 $('#data').hide();
@@ -376,7 +376,7 @@ function AC_AddExtension(src, ext)
         var MMdoctitle = document.title;
         AC_FL_RunContent("src", "playerProductInstall.swf", "FlashVars", "MMredirectURL=" + MMredirectURL + '&MMplayerType=' + MMPlayerType + '&MMdoctitle=' + MMdoctitle + "", "width", "100%", "height", "100%", "align", "middle", "id", "oc_Videodisplay", "quality", "high", "bgcolor", "#FFFFFF", "name", "Videodisplay", "allowScriptAccess", "sameDomain", "type", "application/x-shockwave-flash", "wmode", "transparent", "pluginspage", "http://www.adobe.com/go/getflashplayer");
     
-		var alternateContent = 'Matterhorn requires Adobe Flash Player.<br>' + 'Please install latest version for your OS.<br>(Version 10.1 or later) ' + '<a href="http://www.adobe.com/go/getflash/">Get Flash</a>';
+		var alternateContent = 'Opencast requires Adobe Flash Player.<br>' + 'Please install latest version for your OS.<br>(Version 10.1 or later) ' + '<a href="http://www.adobe.com/go/getflash/">Get Flash</a>';
         //document.write(alternateContent);  // insert non-flash content
         $("#oc_flash-player").html(alternateContent);
         $('#initializing').html("Please update your Flash version.");
@@ -392,7 +392,7 @@ function AC_AddExtension(src, ext)
     else
     {
 		 // flash is too old or we can't detect the plugin
-        var alternateContent = 'Matterhorn requires Adobe Flash Player.<br>' + 'Please install latest version for your OS.<br>(Version 10.1 or later) ' + '<a href="http://www.adobe.com/go/getflash/">Get Flash</a>';
+        var alternateContent = 'Opencast requires Adobe Flash Player.<br>' + 'Please install latest version for your OS.<br>(Version 10.1 or later) ' + '<a href="http://www.adobe.com/go/getflash/">Get Flash</a>';
         //document.write(alternateContent);  // insert non-flash content
         $("#oc_flash-player").html(alternateContent);
         $('#initializing').html("No Flash plugin found.");

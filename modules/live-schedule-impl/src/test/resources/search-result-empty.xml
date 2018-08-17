@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:search-results xmlns:mp="http://mediapackage.opencastproject.org"
+  xmlns:ns2="http://search.opencastproject.org" offset="0" limit="0"
+  total="0" searchTime="2">
+  <ns2:query>(id:c3d913f6\-9af7\-403a\-91a9\-33b73ee18193) AND
+    -oc_mediatype:Series AND
+    -oc_deleted:[* TO *]
+  </ns2:query>
+</ns2:search-results>

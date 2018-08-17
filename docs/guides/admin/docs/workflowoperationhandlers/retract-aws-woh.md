@@ -9,12 +9,12 @@ There are no configuration keys at this time.
 
 ## Operation Examples
 
-####Retract
+#### Retract
     <!-- Retract from AWS -->
 
     <operation
       id="retract-aws"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Retract recording from AWS">
     </operation>

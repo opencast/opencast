@@ -4,17 +4,21 @@ preserve_hierarchy: true
 
 files:
   -
-    source: '/modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
-    translation: '/modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
+    source: '/modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
+    translation: '/modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
 
   -
-    source: '/modules/matterhorn-engage-theodul-core/src/main/resources/ui/language/en-US.json'
-    translation: '/modules/matterhorn-engage-theodul-core/src/main/resources/ui/language/%locale%.json'
+    source: '/modules/engage-theodul-core/src/main/resources/ui/language/en-US.json'
+    translation: '/modules/engage-theodul-core/src/main/resources/ui/language/%locale%.json'
 
   -
     source: '/modules/**/src/main/resources/static/language/en-US.json'
     translation: '/%original_path%/%locale%.json'
 
   -
-    source: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/en-US.json'
-    translation: '/modules/matterhorn-engage-ui/src/main/resources/ui/language/%locale%.json'
+    source: '/modules/engage-ui/src/main/resources/ui/language/en-US.json'
+    translation: '/modules/engage-ui/src/main/resources/ui/language/%locale%.json'
+
+  -
+    source: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/en-US.json'
+    translation: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/%locale%.json'

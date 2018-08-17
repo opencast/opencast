@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>fast</id>
+  <title>Fast Testing Workflow</title>
+  <tags>
+    <tag>upload</tag>
+    <tag>schedule</tag>
+  </tags>
+  <description>
+    A minimal workflow that transcodes the media into distribution formats, then
+    sends the resulting distribution files, along with their associated metadata,
+    to the distribution channels.
+  </description>
+
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Add a comment that the recording needs:</legend>
+          <ul>
+            <li>
+              <input id="comment" name="comment" type="checkbox" class="configField" value="true" />
+              <label for="comment">Review / Cutting</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend>Immediately distribute the recording to:</legend>
+          <ul>
+            <li>
+              <input id="publishToMediaModule" name="publishToMediaModule" type="checkbox" class="configField" value="true" checked=checked />
+              <label for="publishToMediaModule">Opencast Media Module</label>
+            </li>
+            <li>
+              <input id="publishToOaiPmh" name="publishToOaiPmh" type="checkbox" class="configField" value="true" checked=checked />
+              <label for="publishToOaiPmh">Default OAI-PMH Repository</label>
+            </li>
+          </ul>
+        </fieldset>
+        <fieldset>
+          <legend>Publish live stream:</legend>
+          <ul>
+            <li>
+              <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="false" />
+              <label for="publishLive">Add live event to Opencast Media Module</label>
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="comment">false</configuration>
+        <configuration key="publishToMediaModule">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
+        <configuration key="uploadedSearchPreview">false</configuration>
+        <configuration key="publishLive">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Apply ACL from series to the mediapackage -->
+
+    <operation
+      id="series"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Applying access control entries from series">
+      <configurations>
+        <configuration key="apply-acl">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag all assets to be archived. This is quite unnecessary for this workflow but the default publish workflow
+         expects the assets to be tagged and will fail due to no dublincore/episode catalog being archives which is a
+         requirement of the archive workflow operation. Hence, we do this extra work and get the compatibility in return. -->
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging media package elements for archival">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag any optionally uploaded assets -->
+    <operation
+      id="tag"
+      if="${downloadSourceflavorsExist}"
+      exception-handler-workflow="partial-error"
+      description="Tagging uploaded assets for distribution">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Inspect the media -->
+
+    <operation
+      id="inspect"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Inspecting audio and video streams">
+      <configurations>
+        <configuration key="overwrite">false</configuration>
+        <configuration key="accept-no-media">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode video -->
+
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Encoding video">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/preview</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming,rss,atom</configuration>
+        <configuration key="encoding-profile">fast.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Mark the recording for cutting -->
+
+    <operation
+      id="comment"
+      if="${comment}"
+      description="Mark the recording for review / cutting">
+      <configurations>
+        <configuration key="description">Recording has not been reviewed / cut yet.</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="action">create</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage search result thumbnails -->
+    <!-- skip this when manually uploaded */search+preview -->
+    <operation
+      id="image"
+      if="(NOT (${uploadedSearchPreview})) AND (${publishToMediaModule} OR ${publishToOaiPmh})"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Creating Engage search result thumbnails">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- encode to engage player preview images -->
+
+    <operation
+      id="image"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Creating Engage player preview image">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/player+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-preview.http</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
+    <!-- run the video segmentation -->
+
+    <operation
+      id="segment-video"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Detecting slide transitions in presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate segment preview images -->
+
+    <operation
+      id="segmentpreviews"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Creating presentation segments preview image">
+      <configurations>
+        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="target-flavor">presentation/segment+preview</configuration>
+        <configuration key="reference-flavor">presentation/preview</configuration>
+        <configuration key="reference-tags">engage-download</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">player-slides.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Generate timeline preview images -->
+
+    <operation
+      id="timelinepreviews"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="error"
+      description="Creating timeline preview images">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">*/timeline+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="image-count">100</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Extract text form slide preview images -->
+
+    <operation
+      id="extract-text"
+      if="${publishToMediaModule} OR ${publishToOaiPmh}"
+      fail-on-error="false"
+      exception-handler-workflow="partial-error"
+      description="Extracting text from presentation segments">
+      <configurations>
+        <configuration key="source-flavor">presentation/preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish preview internal -->
+
+    <operation
+      id="publish-configure"
+      exception-handler-workflow="partial-error"
+      description="Publish to preview publication channel">
+      <configurations>
+        <configuration key="source-flavors">*/preview</configuration>
+        <configuration key="channel-id">internal</configuration>
+        <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      if="${publishToMediaModule}"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Publishing to Engage">
+      <configurations>
+        <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="streaming-source-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to OAI-PMH -->
+
+    <operation
+      id="publish-oaipmh"
+      if="${publishToOaiPmh}"
+      exception-handler-workflow="partial-error"
+      description="Publish to OAI-PMH Default Repository">
+      <configurations>
+        <configuration key="download-flavors">dublincore/*,security/*</configuration>
+        <configuration key="download-tags">engage-download</configuration>
+        <configuration key="streaming-tags">engage-streaming</configuration>
+        <configuration key="check-availability">true</configuration>
+        <configuration key="repository">default</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the media package -->
+
+    <operation
+      id="snapshot"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Archiving">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+      <configurations>
+        <configuration key="preserve-flavors">security/*</configuration>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
+

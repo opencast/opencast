@@ -32,9 +32,9 @@ limited to one `source-flavor` and `source-tag`. The operation supports multiple
 multiple source, add different key with the prefix `source-flavor-`/`source-tag-` and an incremental number starting
 with 0. For example:
 
- - `source-flavor-part-0`
- - `source-flavor-part-1`
- - `source-flavor-part-..`
+* `source-flavor-part-0`
+* `source-flavor-part-1`
+* `source-flavor-part-..`
 
 
 Configuration Keys

@@ -19,9 +19,9 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
- - CentOS 7.x (x86\_64)
- - Red Hat Enterprise Linux 7.x (x86\_64)
- - Scientific Linux 7.x (x86\_64)
+* CentOS 7.x (x86\_64)
+* Red Hat Enterprise Linux 7.x (x86\_64)
+* Scientific Linux 7.x (x86\_64)
 
 > *Other architectures like i386, i686, arm, … are not supported!*
 
@@ -41,7 +41,7 @@ Activate Repository
 
 First you have to install the necessary repositories so that your package manager can access them:
 
- - Add Opencast repository:
+* Add Opencast repository:
 
         cd /etc/yum.repos.d
         curl -O https://pkg.opencast.org/opencast.repo \
@@ -99,11 +99,11 @@ This will install the default distribution of Opencast and all its dependencies,
 
 Now you can start Opencast:
 
- - On a SysV-init based system
+* On a SysV-init based system
 
         service opencast start
 
- - On a Systemd based system
+* On a Systemd based system
 
         systemctl start opencast.service
 
@@ -124,10 +124,10 @@ This will list all available Opencast distributions in the form `opencast<versio
 
 Some available distributions are:
 
- - opencastX-allinone
- - opencastX-admin
- - opencastX-presentation
- - opencastX-worker
+* opencastX-allinone
+* opencastX-admin
+* opencastX-presentation
+* opencastX-worker
 
 …where `X` stands for a specific Opencast version.
 
@@ -140,7 +140,7 @@ from the repository, all necessary dependencies will be installed automatically.
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    yum install ffmpeg tesseract hunspell sox
+    yum install ffmpeg tesseract hunspell sox synfig
 
 
 Upgrading Major Versions
@@ -150,11 +150,11 @@ While these packages will automatically upgrade you to the latest point version 
 automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
 latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
 
- - On a SysV-init based system
+* On a SysV-init based system
 
         service opencast stop
 
- - On a Systemd based system
+* On a Systemd based system
 
         systemctl stop opencast.service
 

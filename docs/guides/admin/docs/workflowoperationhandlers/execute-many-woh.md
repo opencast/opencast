@@ -1,7 +1,8 @@
 Execute Many Workflow Operation
 -------------------------------
 
-This operation handler filters a set of MediaPackageElements that match certain input conditions and runs a command on each of them.
+This operation handler filters a set of MediaPackageElements that match certain input conditions and runs a command on
+each of them.
 
 To run a command only once for the whole mediapackage, use the [Execute Once](execute-once-woh.md) operation.
 

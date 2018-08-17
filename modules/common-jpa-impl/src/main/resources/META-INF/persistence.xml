@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence
+  version="2.1"
+  xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="org.opencastproject.common" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
+    <class>org.opencastproject.job.jpa.JpaJob</class>
+    <class>org.opencastproject.security.impl.jpa.JpaUser</class>
+    <class>org.opencastproject.security.impl.jpa.JpaGroup</class>
+    <class>org.opencastproject.security.impl.jpa.JpaOrganization</class>
+    <class>org.opencastproject.security.impl.jpa.JpaRole</class>
+    <class>org.opencastproject.security.impl.jpa.JpaUser</class>
+    <class>org.opencastproject.security.impl.jpa.JpaUserReference</class>
+    <class>org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl</class>
+    <class>org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl</class>
+    <shared-cache-mode>NONE</shared-cache-mode>
+    <properties>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="eclipselink.logging.logger" value="JavaLogger"/>
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="create-userdirectory.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop-userdirectory.jdbc"/>
+    </properties>
+  </persistence-unit>
+</persistence>

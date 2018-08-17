@@ -600,7 +600,7 @@ Opencast.Annotation_Comment = (function ()
 
     /**
      * @memberOf Opencast.Annotation_Comment
-     * @description set username from matterhorn system
+     * @description set username from opencast system
      */
      function loggedUser(){
         $.ajax(

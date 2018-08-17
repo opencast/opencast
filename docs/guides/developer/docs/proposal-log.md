@@ -9,6 +9,52 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Drop Undocumented Workflow Handler
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Fri, 10 Nov 2017
+
+```no-highlight
+Hi,
+lately I discovered a couple of undocumented and probably unused
+workflow operation handler, for example the 'failing' operation to name
+one of them. All of these are not really useful in their current
+undocumented form. That is why I hereby #propose to
+
+  drop all workflow operation handler still undocumented at the end of
+  the year.
+
+If this proposal passes, I will create and publish a list of all
+operations which would be dropped in their current state. If someone
+still wants to keep any of them, the only thing they need to do is to
+write a short documentation page for those operations. A task easily
+done.
+
+That way we may get rid of some unused, unnecessary old operations
+while ensuring that all of the actually useful ones are documented and
+thus usable without special inner knowledge of Opencast.
+
+Regards,
+Lars
+```
+
+### Changing Translation Sources
+Proposed by Sven Stauber <sven.stauber@switch.ch>, passed on December 20, 2017
+
+```no-highlight
+Dear Opencast Developers
+
+I hereby #propose to add an additional rule to our development process as
+described on [1]:
+
+Adding or changing translation sources is not allowed in release branches
+(implying that pull requests doing so need to be directed to the branch
+develop).
+
+Best regards
+Sven
+
+[1] https://docs.opencast.org/develop/developer/development-process/
+```
+
 ### Crowdin Acceptance Policy
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on November 17, 2017
 

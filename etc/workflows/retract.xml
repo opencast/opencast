@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>retract</id>
+  <title>Retract</title>
+  <tags>
+    <tag>archive</tag>
+    <tag>delete</tag>
+  </tags>
+  <description>Retract a recording</description>
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <legend>Retract the recording from:</legend>
+          <ul>
+            <li>
+              <input id="retractFromEngage" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromEngage">Opencast Media Module</label>
+            </li>
+            <li>
+              <input id="retractFromAws" type="checkbox" class="configField" value="true" disabled="disabled" />
+              <label for="retractFromAws">AWS</label>
+            </li>
+            <li>
+              <input id="retractFromApi" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromApi">External Applications</label>
+            </li>
+            <li>
+              <input id="retractPreview" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractPreview">Preview and Editing Media</label>
+            </li>
+            <li>
+              <input id="retractFromOaiPmh" type="checkbox" checked="checked" class="configField" value="true" />
+              <label for="retractFromOaiPmh">Default OAI-PMH Repository</label>
+            </li>
+            <li>
+              <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
+              <label for="retractFromYouTube">YouTube</label>
+            </li>
+          </ul>
+        </fieldset>
+      </div>
+    ]]>
+  </configuration_panel>
+  <operations>
+
+    <!-- Make sure the workflow contains at least a default configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="retractFromEngage">true</configuration>
+        <configuration key="retractFromAws">true</configuration>
+        <configuration key="retractFromApi">true</configuration>
+        <configuration key="retractPreview">true</configuration>
+        <configuration key="retractFromOaiPmh">true</configuration>
+        <configuration key="retractFromYouTube">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Retract from engage player -->
+
+    <operation
+      id="retract-engage"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      if="${retractFromEngage}"
+      description="Retract recording from Engage">
+    </operation>
+
+    <!-- Retract from AWS -->
+
+    <operation
+      id="retract-aws"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      if="${retractFromAws}"
+      description="Retract recording from AWS">
+    </operation>
+
+    <!-- Retract from external applications -->
+
+    <operation
+      id="retract-configure"
+      if="${retractFromApi}"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Retract recording from external application">
+      <configurations>
+        <configuration key="channel-id">api</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Remove the internal publication if the mediapackage is being deleted. -->
+    <operation
+      id="retract-configure"
+      if="${retractPreview}"
+      exception-handler-workflow="partial-error"
+      description="Retract from internal publication channel">
+      <configurations>
+        <configuration key="channel-id">internal</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Remove from default OAI-PMH repository -->
+
+    <operation
+      id="retract-oaipmh"
+      if="${retractFromOaiPmh}"
+      exception-handler-workflow="partial-error"
+      description="Retract recording from the default OAI-PMH repository">
+      <configurations>
+        <configuration key="repository">default</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Retract from YouTube -->
+
+    <operation
+      id="retract-youtube"
+      if="${retractFromYouTube}"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Retract recording from YouTube">
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="snapshot"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Archiving state of retracted recording">
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <operation
+      id="include"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">partial-cleanup</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

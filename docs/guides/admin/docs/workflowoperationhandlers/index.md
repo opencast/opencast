@@ -17,17 +17,19 @@ definitions consist of a list of workflow operations, which basically map a piec
        ...
     </definition>
 
-##Default Workflow Operations
+## Default Workflow Operations
 
 The following table contains the workflow operations that are available in an out-of-the-box Opencast installation:
 
-|Operation Handler   |Description                              |Details|
+|Operation Handler   |Description                                                    |Details|
 |--------------------|---------------------------------------------------------------|------------------------------------|
 |analyze-audio       |Analyze first audio stream                                     |[Documentation](analyzeaudio-woh.md)|
 |analyze-tracks      |Analyze tracks in media package                                |[Documentation](analyze-tracks-woh.md)|
+|animate             |Create animated video sequence                                 |[Documentation](animate-woh.md)|
 |asset-delete        |Deletes the current mediapackage from the Archive              |[Documentation](asset-delete-woh.md)|
-|attach-watson-transcription|Attaches automated transcripts to mediapackage|[Documentation](attach-watson-transcription-woh.md)|
+|attach-watson-transcription|Attaches automated transcripts to mediapackage          |[Documentation](attach-watson-transcription-woh.md)|
 |cleanup             |Cleanup the working file repository                            |[Documentation](cleanup-woh.md)|
+|clone               |Clone media package elements to another flavor                 |[Documentation](clone-woh.md)|
 |comment             |Add, resolve or delete a comment                               |[Documentation](comment-woh.md)|
 |compose             |Encode media files using FFmpeg                                |[Documentation](compose-woh.md)|
 |composite           |Compose two videos on one canvas.                              |[Documentation](composite-woh.md)|
@@ -36,6 +38,7 @@ The following table contains the workflow operations that are available in an ou
 |copy                |Copy media package elements to target directory                |[Documentation](copy-woh.md)|
 |cover-image         |Generate a cover-image containing metadata                     |[Documentation](coverimage-woh.md)|
 |defaults            |Applies default workflow configuration values                  |[Documentation](defaults-woh.md)|
+|duplicate-event     |Create an event by cloning an existing one                     |[Documentation](duplicate-event-woh.md)|
 |editor              |Waiting for user to review, then cut video based on edit-list  |[Documentation](editor-woh.md)|
 |encode              |Encode media files to differents formats in parallel           |[Documentation](encode-woh.md)|
 |error-resolution    |Internal operation to pause a workflow in error                |[Documentation](error-resolution-woh.md)|
@@ -52,19 +55,20 @@ The following table contains the workflow operations that are available in an ou
 |include             |Include workflow definition in current workflow                |[Documentation](include-woh.md)|
 |ingest-download     |Download files from external URL for ingest                    |[Documentation](ingestdownload-woh.md)|
 |inspect             |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
+|log                 |Log workflow status                                            |[Documentation](log-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
-|publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publishaws-woh.md)|
-|publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publishconfigure-woh.md)|
-|publish-engage      |Distribute and publish media to the engage player              |[Documentation](publishengage-woh.md)|
+|publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publish-aws-woh.md)|
+|publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publish-configure-woh.md)|
+|publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|
 |publish-oaipmh      |Distribute and publish media to a OAI-PMH repository           |[Documentation](publish-oaipmh-woh.md)|
 |publish-youtube     |Distribute and publish media to YouTube                        |[Documentation](publish-youtube-woh.md)|
 |republish-oaipmh    |Update media in a OAI-PMH repository                           |[Documentation](republish-oaipmh-woh.md)|
 |retract-aws         |Retracts media from AWS S3 and Cloudfront publication          |[Documentation](retract-aws-woh.md)|
-|retract-configure   |Retracts media from configured publication                     |[Documentation](retractconfigure-woh.md)|
+|retract-configure   |Retracts media from configured publication                     |[Documentation](retract-configure-woh.md)|
 |retract-engage      |Retracts media from Opencast Media Module publication          |[Documentation](retract-engage-woh.md)|
 |retract-oaipmh      |Retracts media from a OAI-PMH repository                       |[Documentation](retract-oaipmh-woh.md)
 |retract-youtube     |Retracts media from YouTube                                    |[Documentation](retract-youtube-woh.md)|

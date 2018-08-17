@@ -6,7 +6,6 @@ system delivers functionality for scheduling, media encoding, editing and conten
 Opencast provides capture agent software and third party appliances are available. An awesome community provides new
 features and support.
 
-
 The Software
 ------------
 
@@ -14,33 +13,31 @@ Opencast contains everything you need for scheduling captures, trimming, caption
 several formats and our engage components.  The core can be deployed on one (all-in-one deployment) or many (distributed
 deployment) Linux servers so your Opencast installation can grow with the needs of your university.
 
-
 Release Documentation
 ---------------------
 
 The Opencast Release Documentation is the official Opencast documentation for each release. It contains:
 
- - [Release Notes](releasenotes.md)
-    - [Upgrade](upgrade.md)
-    - [Changelog](changelog.md)
- - [Installation Guides](installation/index.md)
- - [Configuration Guides](configuration/index.md)
-    - [Basic Configuration](configuration/basic.md)
-    - [Database Configuration](configuration/database.md)
-    - [Workflow Configuration](configuration/workflow.md)
-    - [Encoding Configuration](configuration/encoding.md)
-    - [more...](configuration/index.md)
- - [Module Documentation](modules/index.md)
-    - [Atom and RSS Feed](modules/atomrss.md)
-    - [AWS S3 Distribution](modules/awss3distribution.md)
-    - [Media Module](modules/mediamodule.configuration.md)
-    - [Stream Security](modules/stream-security.md)
-    - [Text Extraction](modules/textextraction.md)
-    - [Video Segmentation](modules/videosegmentation.md)
-    - [YouTube Publication](modules/youtubepublication.md)
-    - [more...](modules/index.md)
- - [Version Support](version-support.md)
-
+* [Release Notes](releasenotes.md)
+    * [Upgrade](upgrade.md)
+    * [Changelog](changelog.md)
+* [Installation Guides](installation/index.md)
+* [Configuration Guides](configuration/index.md)
+    * [Basic Configuration](configuration/basic.md)
+    * [Database Configuration](configuration/database.md)
+    * [Workflow Configuration](configuration/workflow.md)
+    * [Encoding Configuration](configuration/encoding.md)
+    * [more...](configuration/index.md)
+* [Module Documentation](modules/index.md)
+    * [Atom and RSS Feed](modules/atomrss.md)
+    * [AWS S3 Distribution](modules/awss3distribution.md)
+    * [Media Module](modules/mediamodule.configuration.md)
+    * [Stream Security](modules/stream-security.md)
+    * [Text Extraction](modules/textextraction.md)
+    * [Video Segmentation](modules/videosegmentation.md)
+    * [YouTube Publication](modules/youtubepublication.md)
+    * [more...](modules/index.md)
+* [Version Support](version-support.md)
 
 Further Documentation
 ---------------------

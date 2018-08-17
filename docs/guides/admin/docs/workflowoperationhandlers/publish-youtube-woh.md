@@ -5,10 +5,10 @@ PublishYoutubeWorkflowOperation
 Description
 -----------
 
-The PublishYoutubeWorkflowOperation publishes a single stream to YouTube.  This stream must meet YouTube's format 
+The PublishYoutubeWorkflowOperation publishes a single stream to YouTube.  This stream must meet YouTube's format
 requirements, and may consist of audio and/or video.  If you want to publish both your presenter and presentation
 streams we suggest using the [Composite](composite-woh.md) workflow operation handler to prepare a composite file
-with both streams inside of it.  The default Opencast workflow prepares a video using this method. 
+with both streams inside of it.  The default Opencast workflow prepares a video using this method.
 
 
 Parameter Table

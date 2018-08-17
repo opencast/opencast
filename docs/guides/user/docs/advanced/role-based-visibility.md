@@ -13,7 +13,7 @@ roles that allow the users to access specific parts of the UI.
 
 Please consult the [Groups section](../groups.md) for information about adding new groups.
 
-There is a set of so-called user interface roles, each of them providing access to a specific part of the 
+There is a set of so-called user interface roles, each of them providing access to a specific part of the
 administrative user interface. Those roles can be easily identified by their name prefix *ROLE_UI*.
 
 **Important** *ROLE_ADMIN* implicitly provides full access to the user interface. When working with role-based
@@ -100,6 +100,8 @@ For the individual tabs, it is possible to further provide access:
 |ROLE_UI_EVENTS_DETAILS_METADATA_EDIT    |Allow the user to edit *Metadata*        |
 |ROLE_UI_EVENTS_DETAILS_ACL_EDIT         |Allow the user to edit *Access Policy*   |
 |ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT   |Allow the user to edit *Workflows*       |
+|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_PAUSE  |Allow the user to pause *Workflows*      |
+|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE |Allow the user to delete *Workflows*     |
 |ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT  |Allow the user to edit *Scheduling*      |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE  |Allow the user to create comments        |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE  |Allow the user to delete comments        |

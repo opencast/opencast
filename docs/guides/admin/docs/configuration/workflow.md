@@ -57,8 +57,8 @@ Start by naming the workflow and giving it a meaningful description:
       <title>Encode Mp4, Distribute and Publish</title>
       <tags>
         <!-- Tell the UI where to show this workflow -->
-        <tag>upload-ng</tag>
-        <tag>schedule-ng</tag>
+        <tag>upload</tag>
+        <tag>schedule</tag>
         <tag>archive</tag>
       </tags>
       <description>
@@ -72,14 +72,14 @@ Start by naming the workflow and giving it a meaningful description:
 
     </definition>
 
-- The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
+* The `id` is used in several Opencast endpoints to identify and select this workflow. Make sure that this identifier
   is unique among all endpoints in the system.
-- The `tags` define where the user interfaces may use these workflows. Useful tags are:
-    - *upload-ng*: Usable for uploaded media (new admin ui)
-    - *schedule-ng*: Usable for scheduled events (new admin ui)
-    - *archive-ng*: Usable for archived media (new admin ui)
-    - *delete-ng*: Usable for deletion of events with publications (new admin ui)
-    - *editor*: Usable from the video editor
+* The `tags` define where the user interfaces may use these workflows. Useful tags are:
+    * *upload*: Usable for uploaded media
+    * *schedule*: Usable for scheduled events
+    * *archive*: Usable for archived media
+    * *delete*: Usable for deletion of events with publications
+    * *editor*: Usable from the video editor
 
 ### Inspect the Media
 
@@ -155,9 +155,9 @@ The next operations will encode the media to the Mp4 format:
     </definition>
 
 
-- The `target-tags` attribute causes the resulting media to be tagged. For example, this could be used to define these
+* The `target-tags` attribute causes the resulting media to be tagged. For example, this could be used to define these
   media as input for other operations, using their `source-tags` attribute.
-- The `encoding-profile` attribute refers to an encoding profile defined in `etc/encoding`.
+* The `encoding-profile` attribute refers to an encoding profile defined in `etc/encoding`.
 
 
 ### Encode to Thumbnail
@@ -203,7 +203,7 @@ The next operations will create thumbnails from the media:
 
     </definition>
 
-- The time attribute determines the approximate frame of the source media is used. The time unit is in seconds.
+* The time attribute determines the approximate frame of the source media is used. The time unit is in seconds.
 
 ### Distribute the Media
 
@@ -230,7 +230,7 @@ The next operation copies the encoded media to the Opencast distribution channel
 
     </definition>
 
-- The publish-engage operation uses all media tagged as *rss* or *atom* as input.
+* The publish-engage operation uses all media tagged as *rss* or *atom* as input.
 
 ## Accept User Input
 
@@ -238,8 +238,8 @@ Workflow definitions may optionally include variables to be replaced by user inp
 select optional parts of a workflow. To enable user control of individual workflow instances, the workflow definition
 must:
 
-- use the `${variable}` notation in the workflow definition
-- contain a custom configuration panel.
+* use the `${variable}` notation in the workflow definition
+* contain a custom configuration panel.
 
 Here is an example of a configurable operation:
 

@@ -6,7 +6,8 @@ the corresponding workflow instance variables so that the properties can be use 
 
 In case that no properties are found in `source-flavor`, the workflow operation will just skip.
 
-Note that the [ExportWfPropertiesWorkflowOperationHandler](export-wf-properties-woh.md) can be used to export workflow properties to a Java properties file.
+Note that the [ExportWfPropertiesWorkflowOperationHandler](export-wf-properties-woh.md) can be used to export workflow
+properties to a Java properties file.
 
 ## Parameter Table
 
@@ -17,12 +18,12 @@ Note that the [ExportWfPropertiesWorkflowOperationHandler](export-wf-properties-
 
 \* mandatory configuration key
 
-##Operation Example
+## Operation Example
 
     <operation
       id="import-wf-properties"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Load processing settings">
       <configurations>
         <configuration key="source-flavor">processing/defaults</configuration>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/"
+  xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dcterms:isPartOf>20170119999</dcterms:isPartOf>
+  <dcterms:spatial>fake-ca</dcterms:spatial>
+  <dcterms:temporal xsi:type="dcterms:Period">start=2017-10-12T19:00:00Z;
+    end=2017-10-12T19:01:00Z; scheme=W3C-DTF;
+  </dcterms:temporal>
+  <dcterms:title>Live Test</dcterms:title>
+  <dcterms:type>L01</dcterms:type>
+</dublincore>

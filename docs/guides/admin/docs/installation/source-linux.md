@@ -65,14 +65,18 @@ Required for audio normalization (optional):
 
     sox >= 14.4
 
+Required for animate service (optional):
+
+    synfig
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
 website:
 
- - [Get FFmpeg](http://ffmpeg.org/download.html)
- - [Get Apache Maven](https://maven.apache.org/download.cgi)
- - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
+* [Get FFmpeg](http://ffmpeg.org/download.html)
+* [Get Apache Maven](https://maven.apache.org/download.cgi)
+* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast

@@ -1,6 +1,6 @@
 # YouTube Publication Configuration
 
-This page documents the configuration for Opencast module **matterhorn-publication-service-youtube-v3**.
+This page documents the configuration for Opencast module **publication-service-youtube-v3**.
 
 ## Before you start
 
@@ -84,8 +84,10 @@ workflow or modify an existing one.
 
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
-        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-becomes
+        <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true"
+               disabled="disabled" />
+
+  becomes
 
         <input id="publishToYouTube" name="publishToYouTube" type="checkbox" class="configField" value="true"/>
 
@@ -94,7 +96,8 @@ becomes
 - In the file, modify the `<configuration_panel>` and enable the YouTube option, like this:
 
         <input id="retractFromYouTube" type="checkbox" class="configField" value="true" disabled="disabled" />
-becomes
+
+  becomes
 
         <input id="retractFromYouTube" type="checkbox" checked="checked" class="configField" value="true" />
 

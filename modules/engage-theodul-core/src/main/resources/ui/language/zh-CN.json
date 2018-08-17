@@ -1,0 +1,18 @@
+{
+    "error": "错误",
+    "error_unknown": "时出错误。请刷新该页面。",
+    "reloadPage": "刷新页面",
+    "loginInformation": "使用您的Opencast账户登录",
+    "login": "登入",
+    "enterUsernamePassword": "请输入用户名和密码:",
+    "username": "用户名",
+    "password": "密码",
+    "rememberMe": "记住登入",
+    "cancel": "取消",
+    "loginSuccessful": "成功登录。如果页面不能自动刷新，请手动刷新。",
+    "logoutSuccessful": "已成功注销。如果页面不能自动刷新，请手动刷新。",
+    "loginFailed": "登录失败。",
+    "description": "说明",
+    "slideText": "幻灯片文本",
+    "shortcuts": "快捷键"
+}

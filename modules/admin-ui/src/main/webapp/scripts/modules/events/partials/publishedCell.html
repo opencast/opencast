@@ -1,0 +1,20 @@
+<div class="popover-wrapper">
+    <a class="popover-wrapper__trigger" pop-over data-open-modal="event-details" data-open-tab="general" data-resource-id="{{row.id}}" ng-if="row.publications.length">
+        <span translate="YES"><!-- Yes --></span>
+    </a>
+
+    <div class="js-popover popover is-hidden" ng-if="row.publications.length">
+        <div class="popover__header"></div>
+        <div class="popover__content">
+            <div ng-repeat="publication in row.publications | orderBy:'order'" model="publication" ng-if="!publication.hide">
+                <!-- WARNING! translate directive + ng-include may lead to untranslated codes -->
+                <a data-ng-show="publication.enabled" href="{{publication.url}}" class="popover__list-item" target="_blank">
+                    {{publication.label | translate}}
+                </a>
+                <span data-ng-hide="publication.enabled" class="popover__list-item-disabled">
+                    {{publication.label | translate}}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

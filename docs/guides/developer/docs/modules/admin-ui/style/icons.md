@@ -4,11 +4,15 @@ The icon set is carefully designed for simplicity to convey a clear
 and concise user experience. Having a simple but effective icon set is crucial for ease
 of use within sophisticated software environments.
 
-Some icons are saved as pre-rendered images and can be found in the resource folder (`.../src/main/webapp/img`). Other icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalable vector icons that can be customized by size, color, drop shadow, and anything that is provided by CSS.
+Some icons are saved as pre-rendered images and can be found in the resource folder (`.../src/main/webapp/img`). Other
+icons are based on [Font Awesome](http://fontawesome.io/) which gives us scalable vector icons that can be customized by
+size, color, drop shadow, and anything that is provided by CSS.
 
-For more links and license information refer to [References - Font Awesome](/modules/admin-ui/style/references/#font-awesome).
+For more links and license information refer to [References - Font
+Awesome](/modules/admin-ui/style/references/#font-awesome).
 
-**Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the icons and the corresponding CSS class.
+**Note:** Font Awesome contains over 630 icons, [the cheat sheet of icons](http://fontawesome.io/cheatsheet/) lists the
+icons and the corresponding CSS class.
 
 <div class="row">
   <div class="col-4">
@@ -59,11 +63,20 @@ key in the design of section icons. The user must easily identify
 the icons. Extension of these icons must represent a similar style.
 
 <div class="icons">
-<div>
-<pre><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Inactive ] */</span>
-<span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #C6C6C6</span></span></span>;
-</code></pre>
-</div>
+  <div>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-comment">/* [ Inactive ] */</span>
+        <span class="hljs-rule">
+          <span class="hljs-attribute">color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #C6C6C6</span>
+          </span>
+        </span>;
+      </code>
+    </pre>
+  </div>
   <img src="../../../../img/dashboard_2x.png" alt="Dashboard"/>
   <img src="../../../../img/user-group_2x.png" alt="Users"/>
   <img src="../../../../img/system_2x.png" alt="System"/>
@@ -74,11 +87,20 @@ the icons. Extension of these icons must represent a similar style.
 </div>
 
 <div class="icons">
-<div>
-<pre><code clas="css hljs" class="hljs css"><span class="hljs-comment">/* [ Active ] */</span>
-<span class="hljs-rule"><span class="hljs-attribute">color</span><span class="hljs-rule">:</span><span class="hljs-value"><span class="hljs-hexcolor"> #A1A1A1</span></span></span>;
-</code></pre>
-</div>
+  <div>
+    <pre>
+      <code class="hljs css">
+        <span class="hljs-comment">/* [ Active ] */</span>
+        <span class="hljs-rule">
+          <span class="hljs-attribute">color</span>
+          <span class="hljs-rule">:</span>
+          <span class="hljs-value">
+            <span class="hljs-hexcolor"> #A1A1A1</span>
+          </span>
+        </span>;
+      </code>
+    </pre>
+  </div>
   <img src="../../../../img/dashboard-on_2x.png" alt="Dashboard"/>
   <img src="../../../../img/user-group-on_2x.png" alt="Users"/>
   <img src="../../../../img/system-on_2x.png" alt="System"/>
@@ -98,13 +120,14 @@ represented in.
 
 Each flag should:
 
- - be public domain
- - be an svg image
- - have an aspect ratio of 3:2
- - be named according to the Crowdin languages
- - be without additional decoration (official flags)
+* be public domain
+* be an svg image
+* have an aspect ratio of 3:2
+* be named according to the Crowdin languages
+* be without additional decoration (official flags)
 
-A good source for these flags are the national flag articles of Wikipedia.<br/>E.g. [https://en.wikipedia.org/wiki/Flag_of_Germany](https://en.wikipedia.org/wiki/Flag_of_Germany)
+A good source for these flags are the national flag articles of Wikipedia.<br/>E.g.
+[https://en.wikipedia.org/wiki/Flag_of_Germany](https://en.wikipedia.org/wiki/Flag_of_Germany)
 
 <div class="icons flags">
   <img src="../../../../img/lang/de_DE.svg" alt="de_DE"/>

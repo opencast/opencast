@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+
+<!-- A DublinCore with a non-Opencast root tag -->
+<metadata xmlns="http://institution.org/metadata"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:dcterms="http://purl.org/dc/terms/"
+          xmlns:oc="http://www.opencastproject.org/matterhorn/"
+          xmlns:foo="http://foo.org/metadata"
+          xmlns:lib="http://lib.org/metadata-enc">
+  <dcterms:description xml:lang="en">Introduction lecture from the Institute for Atmospheric and Climate Science.
+  </dcterms:description>
+  <!--  modifying modified value -->
+  <dcterms:modified xsi:type="dcterms:W3CDTF">
+    2018-01-05
+  </dcterms:modified>
+  <!--  not sending type, contributor or title fields
+  <dcterms:type>MovingImage/LectureRecording</dcterms:type>
+  <dcterms:contributor>Harald Juhnke</dcterms:contributor>
+  <dcterms:contributor>Loriot</dcterms:contributor>
+  <dcterms:title xsi:type="lib:PlainTitle">A title</dcterms:title> -->
+  <!-- intentionally emptying out de title and oc:promoted -->
+  <dcterms:title xml:lang="de"></dcterms:title>
+  <oc:promoted></oc:promoted>
+  <foo:id>197011</foo:id>
+  <foo:empty>Not Empty!</foo:empty>
+</metadata>

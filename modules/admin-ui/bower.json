@@ -1,0 +1,28 @@
+{
+  "name": "adminui",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "1.5.11",
+    "angular-route": "1.5.11",
+    "angular-resource": "1.5.11",
+    "angular-animate": "1.5.11",
+    "angular-messages": "1.5.11",
+    "angular-md5": "0.1.8",
+    "angular-translate": "2.17.0",
+    "angular-translate-loader-static-files": "2.17.0",
+    "angular-local-storage": "0.7.1",
+    "angular-wizard": "0.6.0",
+    "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
+    "ng-file-upload": "2.0.5"
+  },
+  "devDependencies": {
+    "angular-mocks": "1.5.11"
+  },
+  "overrides": {
+    "angular-wizard": {
+      "main": "dist/angular-wizard.js"
+    }
+  },
+  "appPath": "src/main/webapp",
+  "moduleName": "adminNg"
+}

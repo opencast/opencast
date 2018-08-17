@@ -37,7 +37,7 @@ Operation Example
     <operation
       id="probe-resolution"
       fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Set control variables based on video resolution">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>

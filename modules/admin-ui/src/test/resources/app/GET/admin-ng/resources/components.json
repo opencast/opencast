@@ -1,0 +1,19 @@
+{
+  "eventCommentReasons": {
+    "One":   "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.ONE",
+    "Two":   "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.TWO",
+    "Three": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.THREE"
+  },
+  "workflowsOperations": {
+    "retract":       "EVENTS.EVENTS.DETAILS.GENERAL.RETRACT",
+    "publish":       "EVENTS.EVENTS.DETAILS.GENERAL.PUBLISH_RECORDING",
+    "delete_dist":   "EVENTS.EVENTS.DETAILS.GENERAL.DELETE_DISTRIBUTION_FILES",
+    "delete_master": "EVENTS.EVENTS.DETAILS.GENERAL.DELETE_MASTER_FILES",
+    "duplicate":     "EVENTS.EVENTS.DETAILS.GENERAL.DUPLICATE"
+  },
+  "repetitionOptions": {
+    "weekly":        "EVENTS.EVENTS.NEW.REPETITION.WEEKLY",
+    "daily":         "EVENTS.EVENTS.NEW.REPETITION.DAILY",
+    "bi-weekly":     "EVENTS.EVENTS.NEW.REPETITION.BIWEEKLY"
+  }
+}

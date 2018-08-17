@@ -21,7 +21,7 @@
   <sec:http pattern="/admin-ng/styles/**" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
-    entry-point-ref="matterhornEntryPoint">
+    entry-point-ref="opencastEntryPoint">
 
     <!-- ################ -->
     <!-- # URL SECURITY # -->
@@ -105,6 +105,9 @@
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/stop" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/retry" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/none" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/admin-ng/event/*/optout/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_STATUS_EDIT" />
@@ -148,6 +151,7 @@
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_GROUPS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/series/*/theme" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
@@ -225,7 +229,7 @@
     <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/app.js" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable anonymous access to the new admin ui -->
+    <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
@@ -371,7 +375,7 @@
   <!-- ######################################## -->
 
   <!-- Differentiates between "normal" user requests and those requesting digest auth -->
-  <bean id="matterhornEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
+  <bean id="opencastEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
     <property name="userEntryPoint" ref="userEntryPoint" />
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
   </bean>
@@ -539,20 +543,20 @@
             <!-- Dn patterns to search for valid users. Multiple "<value>" tags are allowed -->
             <value>uid={0},ou=Group,dc=my-institution,dc=country</value>
           </list>
-	</property>
-	<!-- If your user IDs are not part of the user Dn's, you can use a search filter to find them -->
-	<!-- This property can be used together with the "userDnPatterns" above -->
-	<!--
-	<property name="userSearch">
-	  <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
-	    < ! - - Base Dn from where the users will be searched for - - >
-	    <constructor-arg index="0" value="ou=GroupName,dc=my-institution,dc=country" />
-	    < ! - - Filter to located valid users. Use {0} as a placeholder for the login name - - >
-	    <constructor-arg index="1" value="(uid={0})" />
-	    <constructor-arg ref="contextSource" />
-	  </bean>
         </property>
-	-->
+        <!-- If your user IDs are not part of the user Dn's, you can use a search filter to find them -->
+        <!-- This property can be used together with the "userDnPatterns" above -->
+        <!--
+        <property name="userSearch">
+          <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
+            < ! - - Base Dn from where the users will be searched for - - >
+            <constructor-arg index="0" value="ou=GroupName,dc=my-institution,dc=country" />
+            < ! - - Filter to located valid users. Use {0} as a placeholder for the login name - - >
+            <constructor-arg index="1" value="(uid={0})" />
+            <constructor-arg ref="contextSource" />
+          </bean>
+        </property>
+        -->
       </bean>
     </constructor-arg>
     <!-- Defines how the user attributes are converted to authorities (roles) -->

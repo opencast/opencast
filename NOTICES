@@ -14,16 +14,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Portions of the Matterhorn source code are Copyright (c) University of
-California Berkeley and were originally developed and distributed by University
-of California Berkeley, including contributions it licensed from others under
-one or more contributor license agreements. This source code is licensed by the
-Apereo Foundation under the Educational Community License, Version 2.0, unless
-it is already directly licensed to the Apereo Foundation under one or more
-contributor license agreements by the copyright holder.
-
 Additional third-party dependencies defined in Maven pom.xml files are pulled
-from remote repositories at build-time and then deployed within the Matterhorn
+from remote repositories at build-time and then deployed within the Opencast
 bundle. All third party libraries and tools included in the source code are
 distributed under licenses that are compatible with ECL 2.0.
 
@@ -31,518 +23,523 @@ distributed under licenses that are compatible with ECL 2.0.
 List of Included Third-Party Dependencies
 -----------------------------------------
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/css/vendor/chosen.less
+modules/admin-ui/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
+modules/admin-ui/src/main/webapp/lib/angular/*
   AngularJS v1.3.6
   (c) 2010-2014 Google, Inc. http://angularjs.org
   License: MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-file-upload/*
+modules/admin-ui/src/main/webapp/lib/angular-file-upload/*
   Copyright (c) 2013 danialfarid
   The MIT License (MIT)
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-sortable.js
+modules/admin-ui/src/main/webapp/lib/angular-sortable.js
   UI.Sortable
   https://github.com/angular-ui/ui-sortable
   Copyright (c) 2012 the AngularUI Team, http://angular-ui.github.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/backbone-1.1.0.js
+modules/admin-ui/src/main/webapp/lib/backbone-1.1.0.js
   Backbone.js 1.1.0
   (c) 2010-2011 Jeremy Ashkenas, DocumentCloud Inc.
   (c) 2011-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Backbone may be freely distributed under the MIT license.
   http://backbonejs.org
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.js
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/chosen.jquery.*
+modules/admin-ui/src/main/webapp/lib/chosen.js
+modules/admin-ui/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Version 1.6.2
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.js
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-chosen.min.js
+modules/admin-ui/src/main/webapp/lib/angular-chosen.js
+modules/admin-ui/src/main/webapp/lib/angular-chosen.min.js
   Angular Binding for Harvest Chosen
   Version 1.6.0
   Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/datepicker/*
+modules/admin-ui/src/main/webapp/lib/datepicker/*
   jQuery UI - v1.10.3 - 2013-12-13
   http://jqueryui.com
   Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/timepicker/*
+modules/admin-ui/src/main/webapp/lib/timepicker/*
   jQuery Timepicker Addon - v1.6.3 - 2016-04-20
   http://trentrichardson.com/examples/timepicker
   Copyright (c) 2016 Trent Richardson; Licensed MIT 
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/font-awesome/*
+modules/admin-ui/src/main/webapp/lib/font-awesome/*
   Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
   License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/google-fonts/*
+modules/admin-ui/src/main/webapp/lib/google-fonts/*
   Open Sans
   Steve Matteson
   https://www.google.com/fonts/specimen/Open+Sans
   Apache License, version 2.0
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/javascript-md5/*
+modules/admin-ui/src/main/webapp/lib/javascript-md5/*
   JavaScript MD5
   https://github.com/blueimp/JavaScript-MD5
   Copyright 2011, Sebastian Tschan https://blueimp.net
   Licensed under the MIT license:
   http://www.opensource.org/licenses/MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-1.10.2.js
+modules/admin-ui/src/main/webapp/lib/jquery-1.10.2.js
   jQuery JavaScript Library v1.10.2
   http://jquery.com/
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/jquery-ui.js
+modules/admin-ui/src/main/webapp/lib/jquery-ui.js
   jQuery UI - v1.10.4 - 2014-01-17
   http://jqueryui.com
   Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/moment.min.js
+modules/admin-ui/src/main/webapp/lib/moment.min.js
   version : 2.9.0
   authors : Tim Wood, Iskren Chernev, Moment.js contributors
   license : MIT
   momentjs.com
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/underscore-1.5.2.js
+modules/admin-ui/src/main/webapp/lib/underscore-1.5.2.js
   Underscore.js 1.5.2
   http://underscorejs.org
   (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Underscore may be freely distributed under the MIT license.
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/video-js/*
+modules/admin-ui/src/main/webapp/lib/video-js/*
   Video.js v4.11.2
   Copyright 2014 Brightcove, Inc.
   Licensed under the Apache License, Version 2.0
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
+modules/admin-ui/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
   Adapted from AngularJS Scroll Glue v2.0.6
   https://github.com/Luegg/angularjs-scroll-glue
   (c) 2013 Lukas Wegmann
   Licensed under the MIT license
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/angular/angular-scenario.js
+modules/admin-ui/src/test/resources/test/lib/angular/angular-scenario.js
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jasmine-jquery.js
+modules/admin-ui/src/test/resources/test/lib/jasmine-jquery.js
   Jasmine-jQuery: a set of jQuery helpers for Jasmine tests.
   Version 2.0.5
   https://github.com/velesin/jasmine-jquery
   Copyright (c) 2010-2014 Wojciech Zawistowski, Travis Jeffery
   MIT License
 
-modules/matterhorn-admin-ui-ng/src/test/resources/test/lib/jquery-deparam.js
+modules/admin-ui/src/test/resources/test/lib/jquery-deparam.js
   Deparam is the inverse of jquery's $.param method
   Extracted $.deparam from Ben Alman's jquery-bbq with license info included
   https://github.com/AceMetrix/jquery-deparam
   MIT License
 
-modules/matterhorn-common/src/test/resources/InfusionAll.js
+modules/common/src/test/resources/InfusionAll.js
   jQuery JavaScript Library v1.3.2
   http://jquery.com/
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-distribution-service-aws-s3
+modules/distribution-service-aws-s3
   Amazon AWS SDK for Java
   Version 1.11.49_1
   https://github.com/aws/aws-sdk-java
   Licensed under Apache 2 (https://github.com/aws/aws-sdk-java/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/backbone.js
   Backbone v1.2.3 (http://backbonejs.org)
   Copyright 2010-2016 Jeremy Ashkenas, DocumentCloud
   Licensed under MIT (https://github.com/jashkenas/backbone/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/basil.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/basil.js
   Basil v0.4.0 (http://wisembly.github.io/basil.js)
   Copyright 2014-2015 Wisembly and contributors
   Licensed under MIT (https://github.com/Wisembly/basil.js/blob/master/LICENCE.md)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/bootbox.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/bootbox.js
   Bootbox 4.4.0 (https://github.com/makeusabrew/bootbox)
   Copyright 2011-2015 by Nick Payne
   Licensed under MIT (http://bootboxjs.com/license.txt)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/css/bootstrap/*
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/bootstrap.js
+modules/engage-theodul-core/src/main/resources/ui/css/bootstrap/*
+modules/engage-theodul-core/src/main/resources/ui/js/lib/bootstrap.js
   Bootstrap v3.3.6 (http://getbootstrap.com)
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/bower.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/bower.js
   Bower 1.0.0 (https://github.com/ded/bowser)
   Copyright 2015 Dustin Diaz
   Licensed under MIT (https://github.com/ded/bowser/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/jquery.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/jquery.js
   jQuery v2.2.0 (http://jquery.com)
   Copyright jQuery Foundation and other contributors
   Licensed under MIT (https://github.com/jquery/jquery/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/jquery-ui.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/jquery-ui.js
   jQuery UI v1.11.4 (http://jqueryui.com)
   Copyright jQuery Foundation and other contributors
   Licensed under MIT (https://github.com/jquery/jquery-ui/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/moment.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/moment.js
   Moment v2.11.1 (momentjs.com)
   Copyright 2011-2016 Tim Wood, Iskren Chernev, Moment.js contributors
   Licensed under MIT (https://github.com/jquery/jquery/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/mousetrap.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/mousetrap.js
   Mousetrap v1.5.3 (http://craig.is/killing/mice)
   Copyright 2015 Craig Campbell
   Licensed under MIT
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/require.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/require.js
   RequireJS v2.1.22 (http://requirejs.org)
   Copyright 2010-2015, The Dojo Foundation
   Licensed under the "New" BSD License (https://github.com/jrburke/requirejs/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/require.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/require.js
   RequireJS v1.8.3 (http://underscorejs.org)
   Copyright 2009-2015 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Licensed under MIT (https://github.com/jashkenas/underscore/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-core/src/main/resources/ui/js/lib/mousewheel.js
+modules/engage-theodul-core/src/main/resources/ui/js/lib/mousewheel.js
   Requires: jQuery 1.2.2+
   Copyright (c) 2013 Brandon Aaron (http://brandon.aaron.sh)
   Licensed under the MIT License
 
-modules/matterhorn-engage-theodul-plugin-archetype/src/main/resources/archetype-resources/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-archetype/src/main/resources/archetype-resources/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jqueryui/*
+modules/engage-theodul-plugin-controls/src/main/resources/static/lib/jqueryui/*
   jQuery UI v1.11.4 (http://jqueryui.com)
   Copyright jQuery Foundation and other contributors
   Licensed under MIT (https://github.com/jquery/jquery-ui/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.ui.touch-punch.min.js
+modules/engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.ui.touch-punch.min.js
   jQuery UI Touch Punch 0.2.3
   http://touchpunch.furf.com/
   Copyright 2011–2014, Dave Furfero
   Dual licensed under the MIT or GPL Version 2 licenses.
 
-modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/hammer.min.js
+modules/engage-theodul-plugin-controls/src/main/resources/static/lib/hammer.min.js
   Hammer.JS - v2.0.6 - 2016-01-06
   http://hammerjs.github.io/
   Copyright (c) 2016 Jorik Tangelder
   Licensed under MIT (https://github.com/hammerjs/hammer.js/blob/master/LICENSE.md)
 
-modules/matterhorn-engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.hammer.js
+modules/engage-theodul-plugin-controls/src/main/resources/static/lib/jquery.hammer.js
   jquery.hammer.js - v2.0.0
   https://github.com/hammerjs/jquery.hammer.js
   Copyright (c) 2014 Hammer.js
   Licensed under MIT (https://github.com/hammerjs/jquery.hammer.js/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-controls/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-controls/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-controls/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-controls/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-custom-mhConnection/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-custom-notifications/src/main/resources/static/lib/alertify/alertify.js
+modules/engage-theodul-plugin-custom-notifications/src/main/resources/static/lib/alertify/alertify.js
   AlertifyJS v0.13.12 (https://alertifyjs.org)
   Copyright 2009-2014 Stuart Knightley, David Duponchel, Franz Buchinger, António Afonso
   Licensed under MIT license (https://github.com/alertifyjs/alertify.js/blob/master/LICENSE.md)
 
-modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-custom-notifications/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-custom-usertracking/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-description/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-description/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-description/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-description/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-tab-description/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-tab-description/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-tab-description/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-tab-description/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-tab-shortcuts/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-tab-slidetext/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/main/resources/static/lib/Chart.js
+modules/engage-theodul-plugin-timeline-statistics/src/main/resources/static/lib/Chart.js
   Chart.js
   http://chartjs.org/
   Version: 1.0.1-beta.4
   Copyright 2014 Nick Downie
   Released under the MIT license
 
-modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/Chart.min.js
+modules/engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/Chart.min.js
   Chart.js
   http://chartjs.org/
   Copyright 2013 Nick Downie
   Released under the MIT license
   https://github.com/nnnick/Chart.js
 
-modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-timeline-statistics/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/synchronize.js
+modules/engage-theodul-plugin-video-videojs/src/main/resources/static/lib/synchronize.js
   Synchronize.js v1.2.5 (https://github.com/CallToPower/Synchronize.js)
   Copyright (c) 2013-2016, Denis Meyer
   Licensed under 3-clause BSD License (https://github.com/CallToPower/Synchronize.js/blob/master/LICENSE.txt)
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/video.js
+modules/engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/video.js
   Video.js v5.6.0 (http://videojs.com)
   Copyright Brightcove, Inc.
   Licensed under the Apache License, Version 2.0 (https://github.com/videojs/video.js/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/videojs.hls.min.js
+modules/engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/videojs.hls.min.js
   videojs-contrib-hls v1.3.7 (http://videojs.github.io/videojs-contrib-hls)
   Copyright 2016 Brightcove
   Licensed under the Apache License, Version 2.0 (https://github.com/videojs/videojs-contrib-hls/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/videojs-media-sources.min.js
+modules/engage-theodul-plugin-video-videojs/src/main/resources/static/lib/videojs/videojs-media-sources.min.js
   videojs-media-sources v2.4.5 (https://github.com/videojs/videojs-contrib-media-sources)
   Copyright 2016 Brightcove
   Licensed under the Apache License, Version 2.0 (https://github.com/videojs/videojs-contrib-media-sources)
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/bootstrap.js
+modules/engage-theodul-plugin-video-videojs/src/test/resources/js/lib/bootstrap.js
   Bootstrap v3.2.0 (http://getbootstrap.com)
   Copyright 2011-2014 Twitter, Inc.
   Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/mousetrap.js
+modules/engage-theodul-plugin-video-videojs/src/test/resources/js/lib/mousetrap.js
   Simple keyboard shortcut library for Javascript
   Copyright 2013 Craig Campbell
   Licensed under the Apache License, Version 2.0
   Version 1.4.6
   http://craig.is/killing/mice
 
-modules/matterhorn-engage-theodul-plugin-video-videojs/src/test/resources/js/lib/require.js
+modules/engage-theodul-plugin-video-videojs/src/test/resources/js/lib/require.js
   RequireJS 2.1.5
   Copyright (c) 2010-2012, The Dojo Foundation All Rights Reserved.
   Available via the MIT or new BSD license.
   http://github.com/jrburke/requirejs
 
-modules/matterhorn-engage-ui/src/main/resources/ui/css/bootstrap.*
+modules/engage-ui/src/main/resources/ui/css/bootstrap.*
   Bootstrap v3.3.2 (http://getbootstrap.com)
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT
 
-modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular-wizard/.*
+modules/admin-ui/src/main/webapp/lib/angular-wizard/.*
   angular-wizard 0.6.1 (https://github.com/mgonto/angular-wizard)
   Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
   Licensed under MIT
 
-modules/matterhorn-admin-ui-ng/bower_components/angular-hotkeys/.*
+modules/admin-ui/bower_components/angular-hotkeys/.*
   angular-wizard 0.6.1 (https://github.com/chieffancypants/angular-hotkeys)
   Copyright (c) 2014 Wes Cruver
   Licensed under MIT
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/alertify/alertify.js
+modules/engage-ui/src/main/resources/ui/js/alertify/alertify.js
   AlertifyJS - v0.13.12
   Copyright Fabien Doiron <fabien.doiron@gmail.com>
   MIT license
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/jquery-localize.min.js
+modules/engage-ui/src/main/resources/ui/js/jquery-localize.min.js
   jquery.localize.js
   Copyright (c) Jim Garvin (http://github.com/coderifous), 2008.
   Dual licensed under the GPL (http://dev.jquery.com/browser/trunk/jquery/GPL-LICENSE.txt)
   and MIT (http://dev.jquery.com/browser/trunk/jquery/MIT-LICENSE.txt) licenses.
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
+modules/engage-ui/src/main/resources/ui/js/bootstrap-accessibility.min.js
   bootstrap-accessibility-plugin - v1.0.4 - 2014-11-03
   https://github.com/paypal/bootstrap-accessibility-plugin
   Copyright (c) 2014 PayPal Accessibility Team
   Licensed BSD
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/bootstrap.min.js
+modules/engage-ui/src/main/resources/ui/js/bootstrap.min.js
   Bootstrap v3.3.2 (http://getbootstrap.com)
   Copyright 2011-2015 Twitter, Inc.
   Licensed under MIT
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/jquery.liveSearch.js
+modules/engage-ui/src/main/resources/ui/js/jquery.liveSearch.js
   Live Search 2.0
   http://andreaslagerkvist.com/jquery/live-search/
   2008 Andreas Lagerkvist (andreaslagerkvist.com)
   http://creativecommons.org/licenses/by/3.0/
 
-modules/matterhorn-engage-ui/src/main/resources/ui/js/seedrandom.js
+modules/engage-ui/src/main/resources/ui/js/seedrandom.js
   seedrandom.js version 2.3.4
   Author: David Bau
   Copyright (c)2014 David Bau.
   MIT License
 
-modules/matterhorn-ingest-service-impl/src/test/qunit/qunit/qunit.js
+modules/ingest-service-impl/src/test/qunit/qunit/qunit.js
   QUnit - A JavaScript Unit Testing Framework
   http://docs.jquery.com/QUnit
   Copyright (c) 2009 John Resig, Jörn Zaefferer
   Dual licensed under the MIT and GPL licenses
 
-modules/matterhorn-kernel/src/test/resources/InfusionAll.js
+modules/kernel/src/test/resources/InfusionAll.js
   jQuery JavaScript Library v1.3.2
   http://jquery.com/
   Copyright (c) 2009 John Resig
   Dual licensed under the MIT and GPL licenses.
 
-modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/ObjTree.js
+/modules/runtime-info-ui-ng/src/main/resources/ui/js/jquery/jquery.js
+  jQuery v3.3.1 (http://jquery.com)
+  Copyright jQuery Foundation and other contributors
+  Licensed under MIT (https://github.com/jquery/jquery/blob/master/LICENSE.txt)
+
+modules/videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/ObjTree.js
   XML.ObjTree -- XML source code from/to JavaScript object like E4X
   Author: Yusuke Kawasaki http://www.kawa.net/
   Copyright (c) 2005-2006 Yusuke Kawasaki. All rights reserved.
   Artistic license.
 
-modules/matterhorn-videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/synchronize-min.js
+modules/videoeditor-workflowoperation/src/main/resources/ui/operation/editor/js/synchronize-min.js
   Synchronize.js
   Copyright (c) 2013-2015, Denis Meyer, calltopower88@googlemail.com
   3-clause BSD License
@@ -629,7 +626,7 @@ assemblies
   org.codehaus.mojo                      build-helper-maven-plugin                        MIT License
 
 
-matterhorn-admin-ui-ng
+admin-ui
   GroupId                                ArtifactId                                       License
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.jayway.restassured                 rest-assured                                     Apache 2.0
@@ -640,7 +637,7 @@ matterhorn-admin-ui-ng
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-annotation-impl
+annotation-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -650,36 +647,7 @@ matterhorn-annotation-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-archive-api
-  GroupId                                ArtifactId                                       License
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-archive-base
-  GroupId                                ArtifactId                                       License
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.solr                        solr-core                                        Apache 2
-  org.apache.solr                        solr-solrj                                       Apache 2
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-archive-schema
-  GroupId                                ArtifactId                                       License
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.solr                        solr-core                                        Apache 2
-  org.apache.solr                        solr-solrj                                       Apache 2
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-authorization-manager
+authorization-manager
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -688,7 +656,7 @@ matterhorn-authorization-manager
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
 
 
-matterhorn-authorization-xacml
+authorization-xacml
   GroupId                                ArtifactId                                       License
   com.jayway.restassured                 rest-assured                                     Apache 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -697,18 +665,18 @@ matterhorn-authorization-xacml
   org.jboss.security                     jboss-xacml                                      lgpl
 
 
-matterhorn-caption-api
+caption-api
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-caption-impl
+caption-impl
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-caption-remote
+caption-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -719,12 +687,12 @@ matterhorn-caption-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-capture-admin-service-api
+capture-admin-service-api
   GroupId                                ArtifactId                                       License
   org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
 
 
-matterhorn-capture-admin-service-impl
+capture-admin-service-impl
   GroupId                                ArtifactId                                       License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -736,20 +704,7 @@ matterhorn-capture-admin-service-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-comments
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-common
+common
   GroupId                                ArtifactId                                       License
   c3p0                                   c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
@@ -776,7 +731,7 @@ matterhorn-common
   org.hamcrest                           hamcrest-library                                 New BSD License
 
 
-matterhorn-composer-ffmpeg
+composer-ffmpeg
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -786,14 +741,14 @@ matterhorn-composer-ffmpeg
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-composer-service-api
+composer-service-api
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
 
 
-matterhorn-composer-service-remote
+composer-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -804,18 +759,18 @@ matterhorn-composer-service-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-conductor
+conductor
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-dataloader
+dataloader
   GroupId                                ArtifactId                                       License
   org.apache.commons                     commons-csv                                      The Apache Software License, Version 2.0
 
 
-matterhorn-db
+db
   GroupId                                ArtifactId                                       License
   c3p0                                   c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
   com.h2database                         h2                                               The H2 License, Version 1.0
@@ -824,25 +779,17 @@ matterhorn-db
   postgresql                             postgresql                                       BSD License
 
 
-matterhorn-dictionary-hunspell
+dictionary-hunspell
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-dictionary-regexp
+dictionary-regexp
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-distribution-service-acl
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.ws.rs                            jsr311-api                                       -
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-distribution-service-acl-remote
+distribution-service-acl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -850,7 +797,7 @@ matterhorn-distribution-service-acl-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-distribution-service-download
+distribution-service-acl-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -858,7 +805,7 @@ matterhorn-distribution-service-download
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-distribution-service-download-remote
+distribution-service-download
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -866,7 +813,7 @@ matterhorn-distribution-service-download-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-distribution-service-streaming
+distribution-service-download-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -874,7 +821,7 @@ matterhorn-distribution-service-streaming
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-distribution-service-streaming-remote
+distribution-service-streaming
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -882,82 +829,82 @@ matterhorn-distribution-service-streaming-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-dublincore
+distribution-service-streaming-remote
+  GroupId                                ArtifactId                                       License
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  javax.ws.rs                            jsr311-api                                       -
+  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+dublincore
   GroupId                                ArtifactId                                       License
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-email-template=service-impl
-  GroupId                                ArtifactId                                       License
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-  org.slf4j                              slf4j-log4j12                                    MIT License
-  org.freemarker                         freemarker                                       BSD-style license
-
-
-matterhorn-engage-theodul-api
+engage-theodul-api
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-core
+engage-theodul-core
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
 
 
-matterhorn-engage-theodul-plugin-controls
+engage-theodul-plugin-controls
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-custom-mhConnection
+engage-theodul-plugin-custom-mhConnection
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-custom-notifications
+engage-theodul-plugin-custom-notifications
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-custom-usertracking
+engage-theodul-plugin-custom-usertracking
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-description
+engage-theodul-plugin-description
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-tab-description
+engage-theodul-plugin-tab-description
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-tab-shortcuts
+engage-theodul-plugin-tab-shortcuts
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-tab-slidetext
+engage-theodul-plugin-tab-slidetext
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-timeline-statistics
+engage-theodul-plugin-timeline-statistics
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-theodul-plugin-video-videojs
+engage-theodul-plugin-video-videojs
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
 
 
-matterhorn-engage-ui
+engage-ui
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -965,18 +912,18 @@ matterhorn-engage-ui
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-execute-impl
+execute-impl
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
 
 
-matterhorn-execute-workflowoperation
+execute-workflowoperation
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
 
-matterhorn-external-api
+external-api
   GroupId                                ArtifactId                                       License
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -988,19 +935,19 @@ matterhorn-external-api
   org.slf4j                              slf4j-simple                                     MIT License
 
 
-matterhorn-fileupload
+fileupload
   GroupId                                ArtifactId                                       License
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
 
 
-matterhorn-index-service
+index-service
   GroupId                                ArtifactId                                       License
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
 
 
-matterhorn-ingest-service-impl
+ingest-service-impl
   GroupId                                ArtifactId                                       License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
@@ -1017,7 +964,7 @@ matterhorn-ingest-service-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-inspection-service-ffmpeg
+inspection-service-ffmpeg
   GroupId                                ArtifactId                                       License
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1030,18 +977,12 @@ matterhorn-inspection-service-ffmpeg
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-inspection-service-remote
+inspection-service-remote
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-json
-  GroupId                                ArtifactId                                       License
-  com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-kernel
+kernel
   GroupId                                ArtifactId                                       License
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   com.jayway.restassured                 rest-assured                                     Apache 2.0
@@ -1063,17 +1004,17 @@ matterhorn-kernel
   org.springframework.security.oauth     spring-security-oauth                            -
 
 
-matterhorn-lti
+lti
   GroupId                                ArtifactId                                       License
   org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
 
 
-matterhorn-message-broker-api
+message-broker-api
   GroupId                                ArtifactId                                       License
   org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
 
 
-matterhorn-message-broker-impl
+message-broker-impl
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.apache.activemq                    activemq-all                                     The Apache Software License, Version 2.0
@@ -1081,7 +1022,7 @@ matterhorn-message-broker-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-messages
+messages
   GroupId                                ArtifactId                                       License
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
@@ -1094,12 +1035,12 @@ matterhorn-messages
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-metadata
+metadata
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-migration
+migration
   GroupId                                ArtifactId                                       License
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
@@ -1109,12 +1050,12 @@ matterhorn-migration
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-mpeg7
+mpeg7
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-oaipmh
+oaipmh
   GroupId                                ArtifactId                                       License
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
@@ -1122,17 +1063,7 @@ matterhorn-oaipmh
   org.springframework                    org.springframework.core                         -
 
 
-matterhorn-participation-api
-  GroupId                                ArtifactId                                       License
-  com.google.code.findbugs               findbugs                                         GNU Lesser Public License
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  joda-time                              joda-time                                        Apache 2
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-publication-service-youtube-remote
+publication-service-youtube-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1140,7 +1071,7 @@ matterhorn-publication-service-youtube-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-publication-service-youtube-v3
+publication-service-youtube-v3
   GroupId                                ArtifactId                                       License
   com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0-GNU Lesser General Public License, Version 2.1
   com.google.apis                        google-api-services-plus                         The Apache Software License, Version 2.0
@@ -1158,108 +1089,13 @@ matterhorn-publication-service-youtube-v3
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-runtime-dependencies
-  GroupId                                ArtifactId                                       License
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
-  com.fasterxml.jackson.core             jackson-core                                     The Apache Software License, Version 2.0-GNU Lesser General Public License, Version 2.1
-  com.google.guava                       guava                                            The Apache Software License, Version 2.0
-  commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
-  commons-collections                    commons-collections                              The Apache Software License, Version 2.0
-  commons-dbcp                           commons-dbcp                                     The Apache Software License, Version 2.0
-  commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  org.apache.commons                     commons-lang3                                    The Apache Software License, Version 2.0
-  commons-pool                           commons-pool                                     The Apache Software License, Version 2.0
-  joda-time                              joda-time                                        Apache 2
-  net.sourceforge.nekohtml               com.springsource.org.cyberneko.html              The Apache Software License, Version 2.0
-  org.aopalliance                        com.springsource.org.aopalliance                 -
-  org.apache.commons                     com.springsource.org.apache.commons.beanutils    The Apache Software License, Version 2.0
-  org.apache.commons                     commons-compress                                 The Apache Software License, Version 2.0
-  org.apache.commons                     commons-csv                                      The Apache Software License, Version 2.0
-  org.apache.cxf                         cxf-bundle-jaxrs                                 The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.configadmin                     The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.eventadmin                      The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
-  org.apache.felix                       org.apache.felix.http.bundle                     -
-  org.apache.felix                       org.apache.felix.scr                             The Apache Software License, Version 2.0
-  org.apache.geronimo.specs              geronimo-annotation_1.1_spec                     The Apache Software License, Version 2.0
-  org.apache.geronimo.specs              geronimo-jms_1.1_spec                            The Apache Software License, Version 2.0
-  org.apache.geronimo.specs              geronimo-osgi-registry                           The Apache Software License, Version 2.0
-  org.apache.geronimo.specs              geronimo-servlet_2.5_spec                        The Apache Software License, Version 2.0
-  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.apache.neethi                      neethi                                           The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.asm                The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.bcel               The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.cglib              The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.jakarta-regexp     The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.jaxb-impl          The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.jsr305             The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.quartz             The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.rome               The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.woodstox           The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.wsdl4j             The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xalan              The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xerces             The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xmlbeans           The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xmlresolver        The Apache Software License, Version 2.0
-  org.apache.servicemix.bundles          org.apache.servicemix.bundles.xmlschema          The Apache Software License, Version 2.0
-  org.apache.servicemix.specs            org.apache.servicemix.specs.jaxb-api-2.1         The Apache Software License, Version 2.0
-  org.apache.servicemix.specs            org.apache.servicemix.specs.jaxp-api-1.4         The Apache Software License, Version 2.0
-  org.apache.servicemix.specs            org.apache.servicemix.specs.jsr311-api-1.1.1     The Apache Software License, Version 2.0
-  org.apache.servicemix.specs            org.apache.servicemix.specs.stax-api-1.0         The Apache Software License, Version 2.0
-  org.apache.tika                        tika-bundle                                      The Apache Software License, Version 2.0
-  org.apache.tika                        tika-core                                        The Apache Software License, Version 2.0
-  org.apache.xml                         com.springsource.org.apache.xml.security         The Apache Software License, Version 2.0
-  org.codehaus.jackson                   jackson-core-lgpl                                GNU Lesser General Public License (LGPL), Version 2.1
-  org.codehaus.jackson                   jackson-mapper-lgpl                              GNU Lesser General Public License (LGPL), Version 2.1
-  org.codehaus.jackson                   jackson-xc                                       The Apache Software License, Version 2.0-GNU Lesser General Public License (LGPL), Version 2.1
-  org.codehaus.jettison                  jettison                                         Apache License, Version 2.0
-  org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.antlr                    Eclipse Public License - v 1.0
-  org.eclipse.persistence                org.eclipse.persistence.asm                      Eclipse Public License - v 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License - v 1.0
-  org.eclipse.persistence                org.eclipse.persistence.jpa                      Eclipse Public License - v 1.0
-  org.jasig.cas                          com.springsource.org.jasig.cas.client            -
-  org.jdom                               com.springsource.org.jdom                        -
-  org.jolokia                            jolokia-osgi                                     Apache 2
-  org.opencastproject                    org.springframework.ldap                         -
-  org.openid4java                        com.springsource.org.openid4java                 The Apache Software License, Version 2.0
-  org.opensaml                           com.springsource.org.opensaml                    The Apache Software License, Version 2.0
-  org.ops4j.pax.confman                  pax-confman-propsloader                          ALv2
-  org.ops4j.pax.logging                  pax-logging-api                                  ALv2
-  org.ops4j.pax.logging                  pax-logging-service                              ALv2
-  org.osgi                               org.osgi.compendium                              -
-  org.osgi                               org.osgi.enterprise                              -
-  org.sakaiproject.nakamura              javax.activation-mail                            -
-  org.springframework                    spring-aop                                       The Apache Software License, Version 2.0
-  org.springframework                    spring-asm                                       The Apache Software License, Version 2.0
-  org.springframework                    spring-beans                                     The Apache Software License, Version 2.0
-  org.springframework                    spring-context                                   The Apache Software License, Version 2.0
-  org.springframework                    spring-context-support                           The Apache Software License, Version 2.0
-  org.springframework                    spring-core                                      The Apache Software License, Version 2.0
-  org.springframework                    spring-expression                                The Apache Software License, Version 2.0
-  org.springframework                    spring-tx                                        The Apache Software License, Version 2.0
-  org.springframework                    spring-web                                       The Apache Software License, Version 2.0
-  org.springframework.osgi               spring-osgi-core                                 Apache License, Version 2.0
-  org.springframework.osgi               spring-osgi-extender                             Apache License, Version 2.0
-  org.springframework.osgi               spring-osgi-io                                   Apache License, Version 2.0
-  org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
-  org.springframework.security           spring-security-config                           The Apache Software License, Version 2.0
-  org.springframework.security           spring-security-core                             The Apache Software License, Version 2.0
-  org.springframework.security           spring-security-ldap                             The Apache Software License, Version 2.0
-  org.springframework.security           spring-security-openid                           The Apache Software License, Version 2.0
-  org.springframework.security           spring-security-web                              The Apache Software License, Version 2.0
-
-
-matterhorn-runtime-info
+runtime-info
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-scheduler-impl
+scheduler-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
@@ -1270,19 +1106,19 @@ matterhorn-scheduler-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-scheduler-remote
+scheduler-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-schema
+schema
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-search
+search
   GroupId                                ArtifactId                                       License
   com.sun.jna                            jna                                              null
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -1291,19 +1127,19 @@ matterhorn-search
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-search-service-api
+search-service-api
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-search-service-feeds
+search-service-feeds
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   org.apache.felix                       org.apache.felix.fileinstall                     The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-search-service-impl
+search-service-impl
   GroupId                                ArtifactId                                       License
   com.sun.syndication.feed.module        itunes                                           -
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -1319,7 +1155,7 @@ matterhorn-search-service-impl
   com.rometools                          rome-utils                                       The Apache Software License, Version 2.0
 
 
-matterhorn-search-service-remote
+search-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1327,7 +1163,7 @@ matterhorn-search-service-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-security-cas
+security-cas
   GroupId                                ArtifactId                                       License
   org.jasig.cas                          com.springsource.org.jasig.cas.client            -
   org.opensaml                           com.springsource.org.opensaml                    -
@@ -1337,13 +1173,13 @@ matterhorn-security-cas
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
 
 
-matterhorn-security-openid
+security-openid
   GroupId                                ArtifactId                                       License
   org.openid4java                        com.springsource.org.openid4java                 -
   org.springframework.security           org.springframework.security.openid              -
 
 
-matterhorn-security-shibboleth
+security-shibboleth
   GroupId                                ArtifactId                                       License
   org.springframework.osgi               org.springframework.osgi.core                    -
   org.springframework.security           org.springframework.security.core                -
@@ -1351,7 +1187,7 @@ matterhorn-security-shibboleth
   org.springframework.security           spring-security-cas                              The Apache Software License, Version 2.0
 
 
-matterhorn-series-service-impl
+series-service-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
@@ -1361,7 +1197,7 @@ matterhorn-series-service-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-series-service-remote
+series-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1369,7 +1205,7 @@ matterhorn-series-service-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-serviceregistry
+serviceregistry
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1377,26 +1213,19 @@ matterhorn-serviceregistry
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-serviceregistry-remote
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-silencedetection-impl
+silencedetection-impl
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-smil-impl
+smil-impl
   GroupId                                ArtifactId                                       License
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-log4j12                                    MIT License
   org.opencastproject                    android-mms                                      The Apache Software License, Version 2.0 / W3C License
 
 
-matterhorn-solr
+solr
   GroupId                                ArtifactId                                       License
   org.apache.lucene                      lucene-analyzers                                 Apache 2
   org.apache.lucene                      lucene-core                                      Apache 2
@@ -1407,7 +1236,7 @@ matterhorn-solr
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-sox-impl
+sox-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1417,7 +1246,7 @@ matterhorn-sox-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-sox-remote
+sox-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1427,25 +1256,19 @@ matterhorn-sox-remote
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-speech-recognition-service-api
-  GroupId                                ArtifactId                                       License
-  org.slf4j                              slf4j-api                                        MIT License
-  org.slf4j                              slf4j-log4j12                                    MIT License
-
-
-matterhorn-static
+static
   GroupId                                ArtifactId                                       License
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-static-file-service-api
+static-file-service-api
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-static-file-service-impl
+static-file-service-impl
   GroupId                                ArtifactId                                       License
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   net.sourceforge.htmlunit               htmlunit                                         Apache License, Version 2.0
@@ -1454,27 +1277,27 @@ matterhorn-static-file-service-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-textanalyzer-impl
+textanalyzer-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-textanalyzer-remote
+textanalyzer-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-textextractor-tesseract
+textextractor-tesseract
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-themes
+themes
   GroupId                                ArtifactId                                       License
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-collections                    commons-collections                              The Apache Software License, Version 2.0
@@ -1484,7 +1307,7 @@ matterhorn-themes
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-transcription-service-ibm-watson-impl
+transcription-service-ibm-watson-impl
   GroupId                                ArtifactId                                       License
   com.googlecode.json-simple             json-simple                                      Apache License, Version 2.0
   com.mchange                            c3p0                                             GNU LESSER GENERAL PUBLIC LICENSE
@@ -1501,21 +1324,21 @@ matterhorn-transcription-service-ibm-watson-impl
   org.slf4j                              slf4j-log4j12                                    MIT License
 
 
-matterhorn-transcription-service-workflowoperation
+transcription-service-workflowoperation
   GroupId                                ArtifactId                                       License
   org.osgi                               org.osgi.compendium                              -
   org.osgi                               org.osgi.core                                    -
   org.slf4j                              slf4j-log4j12                                    MIT License
 
 
-matterhorn-userdirectory
+userdirectory
   GroupId                                ArtifactId                                       License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
-  matterhorn-userdirectory-ldap          GroupId                                          Type License
+  userdirectory-ldap          GroupId                                          Type License
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
   org.springframework                    org.springframework.beans                        -
@@ -1529,7 +1352,7 @@ matterhorn-userdirectory
   org.springframework.security           org.springframework.security.web                 -
 
 
-matterhorn-usertracking-impl
+usertracking-impl
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
@@ -1538,33 +1361,33 @@ matterhorn-usertracking-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-videoeditor-ffmpeg-impl
+videoeditor-ffmpeg-impl
   GroupId                                ArtifactId                                       License
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-videosegmenter-ffmpeg
-  GroupId                                ArtifactId                                       License
-  commons-io                             commons-io                                       The Apache Software License, Version 2.0
-  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-matterhorn-videosegmenter-remote
+videosegmenter-ffmpeg
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-workflow-service-api
+videosegmenter-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-workflow-service-impl
+workflow-service-api
+  GroupId                                ArtifactId                                       License
+  commons-io                             commons-io                                       The Apache Software License, Version 2.0
+  javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
+  org.slf4j                              slf4j-api                                        MIT License
+
+
+workflow-service-impl
   GroupId                                ArtifactId                                       License
   com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -1576,12 +1399,12 @@ matterhorn-workflow-service-impl
   org.apache.solr                        solr-solrj                                       Apache 2
 
 
-matterhorn-workflow-service-remote
+workflow-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
 
 
-matterhorn-working-file-repository-service-impl
+working-file-repository-service-impl
   GroupId                                ArtifactId                                       License
   commons-fileupload                     commons-fileupload                               The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
@@ -1592,14 +1415,14 @@ matterhorn-working-file-repository-service-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-working-file-repository-service-remote
+working-file-repository-service-remote
   GroupId                                ArtifactId                                       License
   commons-io                             commons-io                                       The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   org.slf4j                              slf4j-api                                        MIT License
 
 
-matterhorn-workspace-impl
+workspace-impl
   GroupId                                ArtifactId                                       License
   commons-codec                          commons-codec                                    The Apache Software License, Version 2.0
   commons-io                             commons-io                                       The Apache Software License, Version 2.0

@@ -1,6 +1,6 @@
 AWS S3 Distribution Configuration
 =================================
-This page documents the configuration for Opencast module **matterhorn-distribution-service-aws-s3**.  This
+This page documents the configuration for Opencast module **distribution-service-aws-s3**.  This
 configuration is only required on the presentation node, and only if you are using Amazon S3 and/or Cloudfront for
 distributing media to end users.
 
@@ -60,12 +60,12 @@ Using S3 Distribution
 ---------------------
 
 Amazon S3 distribution is already included in the default Opencast workflows, however it must first be enabled.  The
-`ng-schedule-and-upload.xml` and `ng-publish.xml` workflow configuration files both contain lines containing the string
+`schedule-and-upload.xml` and `publish.xml` workflow configuration files both contain lines containing the string
 "Remove this line if you wish to publish to AWS S3".  Both of these lines must be removed before publishing to AWS S3
 will function correctly.
 
 If you wish to use AWS S3 publishing with your own custom workflow, you must add the `publish-aws` workflow operation to
-your workflow.  The operation documentation can be found [here](../workflowoperationhandlers/publishaws-woh.md).
+your workflow.  The operation documentation can be found [here](../workflowoperationhandlers/publish-aws-woh.md).
 
 Publishing to multiple distribution services
 --------------------------------------------
@@ -76,12 +76,12 @@ workflow operation is *last* in the workflow will be the final publication.
 Using this handler in custom workflows
 --------------------------------------
 
-If your workflow contains both `publish-engage` and `publish-aws`, in that order, and without a 
+If your workflow contains both `publish-engage` and `publish-aws`, in that order, and without a
 [conditional](../configuration/workflow.md) you would have publication files stored both locally *and* in AWS.  This is
 likely not what you want, so protect your workflow operations appropriately.  If you really do need these files stored
-in both places (for example, in cases where you need to make the files available immediately, and only push to AWS in 
+in both places (for example, in cases where you need to make the files available immediately, and only push to AWS in
 some cases) then remember to add a [retract-engage](../workflowoperationhandlers/retract-engage-woh.md) in between the
-publication operations.  Note that if this step is omitted the files will remain available locally, but will not be 
+publication operations.  Note that if this step is omitted the files will remain available locally, but will not be
 used.  Of further note, if you retract after publication to AWS then your workflow *will not be available* to users.
 To summarize, this table presents a subset of the various situations that are possible
 

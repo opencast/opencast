@@ -1,7 +1,7 @@
 # ThemeWorkflowOperationHandler
 
 ## Description
-The ThemeWorkflowOperation loads workflow properties and adds elements to the media package if available. 
+The ThemeWorkflowOperation loads workflow properties and adds elements to the media package if available.
 This information can be used within workflow definitions to actually implement themes.
 
 **Bumpers**
@@ -64,7 +64,7 @@ at least one of the properties *theme_\*_active* is true.
 
     <operation
       id="theme"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Apply the theme">
       <configurations>
         <configuration key="bumper-flavor">branding/bumper</configuration>

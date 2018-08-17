@@ -1,0 +1,15 @@
+{
+    "value_locale": "zh",
+    "error_AudioCodecNotSupported": "错误: 此浏览器不支持当前用到的音频编码解码器",
+    "error_AudioElementNotSupported": "错误: 您的浏览器不支持音频元素。",
+    "video": "视频",
+    "video_short": "视频",
+    "openInPlayer": "在播放器中打开",
+    "givenTime": "给定的时间",
+    "hasToBeSmallerThanDuration": "必须小于持续时间",
+    "msg_waitToSetTime": "请等到视频加载完成后设置播放时间。",
+    "msg_startPlayingToSetTime": "请在启动播放视频之前设置回放时间。",
+    "msg_waitToSeek": "视频载入完成后，才能搜寻。",
+    "msg_startPlayingToSeek": "至少要点击一次播放按钮后才能搜寻。",
+    "chromeBuffer": "由于Chrome浏览器局限性，缓冲区检查已被禁用。有可能您会遇到视频播放问题。"
+}

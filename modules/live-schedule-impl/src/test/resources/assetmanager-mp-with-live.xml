@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage xmlns="http://mediapackage.opencastproject.org"
+  id="c3d913f6-9af7-403a-91a9-33b73ee18193" start="2017-10-12T18:10:59Z">
+  <title>Live Test</title>
+  <series>20170119999</series>
+  <seriestitle>Test Fall 2017</seriestitle>
+  <type>L01</type>
+  <media />
+  <metadata>
+    <catalog id="9ad6ebcb-b414-4b15-ab62-5e5ddede447e" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <tags />
+      <url>http://10.10.10.50/assets/assets/c3d913f6-9af7-403a-91a9-33b73ee18193/9ad6ebcb-b414-4b15-ab62-5e5ddede447e/1/dublincore.xml</url>
+      <checksum type="md5">95f603259144c7635d5ccae75eef433c
+      </checksum>
+    </catalog>
+  </metadata>
+  <attachments>
+    <attachment id="security-policy-episode" type="security/xacml+episode">
+      <mimetype>text/xml</mimetype>
+      <tags />
+      <url>http://10.10.10.50/assets/assets/c3d913f6-9af7-403a-91a9-33b73ee18193/security-policy-episode/1/xacml.xml</url>
+      <size>0</size>
+      <checksum type="md5">9c4122a73fecc330be0f95a1bd1502d9
+      </checksum>
+    </attachment>
+  </attachments>
+  <publications>
+    <publication id="8e085db5-814b-4432-87e6-7503279fc9fa"
+      channel="engage-live">
+      <mimetype>text/html</mimetype>
+      <tags />
+      <url>http://10.10.10.50/engage/player/watch.html?id=c3d913f6-9af7-403a-91a9-33b73ee18193</url>
+      <media />
+      <attachments />
+      <metadata />
+    </publication>
+  </publications>
+</mediapackage>

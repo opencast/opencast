@@ -40,7 +40,7 @@ Opencast.Initialize = (function ()
         VIDEOSIZEONLYLEFT = "videoSizeOnlyLeft",
         VIDEOSIZEAUDIO = "videoSizeAudio",
         intvalOnPlayerReady = "",
-        clickMatterhornSearchField = false,
+        clickOpencastSearchField = false,
         clickLecturerSearchField = false,
         playerReady = false,
         locked = false,
@@ -605,10 +605,10 @@ Opencast.Initialize = (function ()
         });
         $('#oc_searchField').click(function ()
         {
-            if (clickMatterhornSearchField === false)
+            if (clickOpencastSearchField === false)
             {
                 $("#oc_searchField").attr('value', '');
-                clickMatterhornSearchField = true;
+                clickOpencastSearchField = true;
             }
         });
         $('#oc_lecturer-search-field').click(function ()

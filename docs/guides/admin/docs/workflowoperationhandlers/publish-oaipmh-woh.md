@@ -1,10 +1,9 @@
 # PublishOaiPmhWorkflowOperation
 
-
 ## Description
 
-The `PublishOaiPmhWorkflowOperation` exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH aware applications.
-
+The Publish OAI-PMH workflow operation exposes your media's metadata in a OAI-PMH repository for harvesting by OAI-PMH
+aware applications.
 
 ## Parameter Table
 
@@ -20,7 +19,8 @@ The `PublishOaiPmhWorkflowOperation` exposes your media's metadata in a OAI-PMH 
 |external-channel   |The optional channel name for the OAI-PMH publication element                                 |
 |external-mime-type |The optional mime type for the OAI-PMH publication element                                    |
 
-Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to be set.
+Note: The all or none of the configuration keys `external-template`, `external-channel` and `external-mime-type` must to
+be set.
 
 ## Customizing the OAI-PMH Publication Element
 
@@ -66,7 +66,7 @@ The configuration key 'external-channel' is used to set the name of the publicat
     <operation
         id="publish-oaipmh"
         fail-on-error="true"
-        exception-handler-workflow="ng-error"
+        exception-handler-workflow="error"
         description="Publish event to the OAI-PMH repository">
         <configurations>
             <configuration key="download-tags">oaipmh-download</configuration>

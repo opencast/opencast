@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<smil version="3.0" baseProfile="Language" xml:id="s-ec404c2a-5092-4cd4-8717-7b7bbc244656"
+  xmlns="http://www.w3.org/ns/SMIL" xmlns:oc="http://smil.opencastproject.org">
+  <head xml:id="h-89e42a27-bcd1-47ca-9119-ddd9a4007e98">
+    <meta content="217650ms" name="track-duration"
+      xml:id="meta-8fe18ea9-9fae-4ec3-9683-dfcd437533fe"/>
+    <paramGroup xml:id="pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f">
+      <param valuetype="data" name="track-id" value="track-1"
+        xml:id="param-e2f41e7d-caba-401b-a03a-e524296cb235"/>
+      <param valuetype="data" name="track-src"
+        value="file:/Users/karendolan/Projects/mh-opencast/matterhorn/modules/videoeditor-ffmpeg-impl/target/test-classes/testresources/testvideo_320x180.mp4"
+        xml:id="param-5336666c-7533-44df-b2b7-8505dee83dec"/>
+      <param valuetype="data" name="track-flavor" value="source/presenter"
+        xml:id="param-1bd5e839-0a74-4310-b1d2-daba07914f79"/>
+    </paramGroup>
+  </head>
+  <body xml:id="b-b13fdd53-57ec-4fdf-b78d-6597788145ab">
+    <par xml:id="par-7ce4cf7a-a2a2-49b8-8cf0-f3d2e5ddb1cf">
+      <video clipBegin="1000ms" clipEnd="12000ms"
+        paramGroup="pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f"
+        src="file:/Users/karendolan/Projects/mh-opencast/matterhorn/modules/videoeditor-ffmpeg-impl/target/test-classes/testresources/testvideo_320x180.mp4"
+        xml:id="v-47e902ee-8707-4f2b-ad97-de0fc1739a81"/>
+      <video clipBegin="1000ms" clipEnd="13000ms"
+        paramGroup="pg-a6d8e576-495f-44c7-8ed7-b5b47c807f0f"
+        src="file:/Users/karendolan/Projects/mh-opencast/matterhorn/modules/videoeditor-ffmpeg-impl/target/test-classes/testresources/testvideo_320x180.mp4"
+        xml:id="v-af0fcf47-a018-48ee-87c4-90b35a69c5a9"/>
+    </par>
+  </body>
+</smil>

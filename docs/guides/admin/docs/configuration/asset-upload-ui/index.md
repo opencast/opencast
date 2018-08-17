@@ -52,7 +52,7 @@ Example of variables in a workflow:
     <operation
       id="tag"
       if="${downloadSourceflavorsExist}"
-      exception-handler-workflow="ng-partial-error"
+      exception-handler-workflow="partial-error"
       description="Tagging uploaded assets for distribution">
       <configurations>
         <configuration key="source-flavors">${download-source-flavors}</configuration>
@@ -66,7 +66,7 @@ How to Enable Preconfigured Asset Options
 
 Catalogs and attachments can be added to new and existing events. Source tracks are uploaded as new events. Some
 predefined catalog and attachment examples are commented out in the properties file. You can uncomment any of these
-to make them upload options in the Admin UI. The workflow `ng-publish-uploaded-assets` will automatically distribute,
+to make them upload options in the Admin UI. The workflow `publish-uploaded-assets` will automatically distribute,
 publish, and archive uploaded assets on existing events.
 
     # Attachments and catalogs upload options are for new and existing events.
@@ -82,7 +82,7 @@ publish, and archive uploaded assets on existing events.
     #      "flavorSubType": "smil", "displayOrder": 5}
     # EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.PREVIEW_IMAGE={"id":"attachment_preview_image",
     #     "type":"attachment", "flavorType": "presenter","flavorSubType": "search+preview", "displayOrder": 6}
-    EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID=ng-publish-uploaded-assets
+    EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID=publish-uploaded-assets
 
     # The video source track upload options are only for new events.
     # Unlike the other assets, multiple source tracks can be uploaded for a single flavor.
@@ -125,14 +125,14 @@ Tasks:
 
 * Modify `etc/listproviders/event.upload.asset.options.properties`
 * Add Admin UI translation for the new asset name
-  `modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/...`
+  `modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...`
 * Modify your workflow from `etc/workflows/...`
 * Test your changes
 
 The following steps describe how to change the properties configuration.
 
 
-###Step 1. Determine your new option type and processing needs
+### Step 1. Determine your new option type and processing needs
 
 There are 3 asset upload types:
 
@@ -146,7 +146,7 @@ update or create  workflows to work with your new track flavor.
 Attachments and Catalogs, such as smil files, can also be used for processing. If you only need to publish manually
 uploaded assets with a unique flavor, this is already built into the default workflows.
 
-###Step 2. Add your new option to the list configuration
+### Step 2. Add your new option to the list configuration
 
 You add your new asset upload configuration as a row to this file:
 
@@ -161,28 +161,35 @@ Underbars are allowed. CONFIGURATION values are in JSON object format.
 Attribute    | Example         | Description
 -------------| ----------------| -----------
 id           | track_presenter | One of "attachment" or "catalog" or "track", underbar (_), unique text (no spaces)
-type         | track           | One of "attachment" or "catalog" or "track" to designate asset type
+type         | track           | One of "attachment" or "catalog" or "track" to designate asset type (must match id prefix)
 flavorType   | presentation    | The primary flavor type. Used to reference asset in workflows, player, and media module
 flavorSubType| source          | The sub flavor type. Used to identify the sub flavor of this flavor type
 multiple     | false           | true or false, used by the admin UI to enable single or multiple file input selection
 displayOrder | 32              | Integer number, used by the admin UI to sort the display of upload options in the UI
+displayOverride | 'My New Catalog'    | A short asset title which overrides all translations
+displayFallback | 'My New Catalog'    | A short asset title which displays when no translation is found
+displayOverride.SHORT | 'Video of a Presenter'    | A short source title which overrides all translations
+displayFallback.SHORT | 'Video of a Presenter'    | A short source title which displays when no translation is found
+displayOverride.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which overrides all translation
+displayFallback.DETAIL | 'A recording that showing the lecturer speaking' | A longer source description which displays when no translation is found
+
 
 The parameter key is internationalized as the display text in the admin UI
-ref: modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/
+ref: modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/
 
 
-###Step 3. Add translation for the new option
+### Step 3. Add translation for the new option
 
 The option property key is internationalized for display in the Admin UI.
 Add a translation for the option property when adding new option, otherwise the Admin UI will display the raw key.
 
 The translation language files are located:
 
-    modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/...
+    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/...
 
 Example of US English translation for `EVENTS.EVENTS.NEW.UPLOAD_ASSET.OPTION.CAPTIONS_WEBVTT`:
 
-    modules/matterhorn-admin-ui-ng/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
+    modules/admin-ui/src/main/resources/public/org/opencastproject/adminui/languages/lang-en_US.json
 
 
 ```json

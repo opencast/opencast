@@ -1,0 +1,14 @@
+<a data-open-modal="series-details" 
+  data-resource-id="{{ row.id }}" 
+  class="more"
+  title="{{ 'EVENTS.SERIES.TABLE.TOOLTIP.DETAILS' | translate }}"
+  with-role="ROLE_UI_SERIES_DETAILS_VIEW">
+</a>
+
+<a class="remove"
+  data-confirmation-modal="confirm-modal"
+  data-callback="table.delete"
+  data-object="row"
+  title="{{ 'EVENTS.SERIES.TABLE.TOOLTIP.DELETE' | translate }}"
+  with-role="ROLE_UI_SERIES_DELETE">
+</a>

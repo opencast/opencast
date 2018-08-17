@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:search-results xmlns:mp="http://mediapackage.opencastproject.org"
+  xmlns:ns2="http://search.opencastproject.org" offset="0" limit="1"
+  total="1" searchTime="1">
+  <ns2:query>(id:c3d913f6\-9af7\-403a\-91a9\-33b73ee18193) AND
+    -oc_mediatype:Series AND
+    -oc_deleted:[* TO *]
+  </ns2:query>
+  <ns2:result id="c3d913f6-9af7-403a-91a9-33b73ee18193" org="mh_default_org">
+    <mp:mediapackage duration="60000"
+      id="c3d913f6-9af7-403a-91a9-33b73ee18193" start="2017-10-12T18:10:59Z">
+      <mp:title>Live Test</mp:title>
+      <mp:series>20170119999</mp:series>
+      <mp:seriestitle>Test Fall 2017</mp:seriestitle>
+      <mp:type>L01</mp:type>
+      <mp:media>
+        <mp:track id="2b014f7f-6dd2-40c2-bf92-c0517e4f07dc"
+          type="presenter/delivery">
+          <mp:mimetype>video/x-flv</mp:mimetype>
+          <mp:tags />
+          <mp:url>rtmp://cp398121.live.edgefcs.net/live/fake-ca-presenter-delivery.stream-1920x540_1_200@
+          </mp:url>
+          <mp:duration>60000</mp:duration>
+          <mp:video id="video-presenter-delivery">
+            <mp:device />
+            <mp:encoder />
+            <mp:resolution>1920x540</mp:resolution>
+          </mp:video>
+          <mp:live>true</mp:live>
+        </mp:track>
+        <mp:track id="4ba1ffd9-c91a-44d5-b1a3-f7baa7cbc147"
+          type="presenter/delivery">
+          <mp:mimetype>video/x-flv</mp:mimetype>
+          <mp:tags />
+          <mp:url>rtmp://cp398121.live.edgefcs.net/live/fake-ca-presenter-delivery.stream-960x270_1_200@
+          </mp:url>
+          <mp:duration>60000</mp:duration>
+          <mp:video id="video-presenter-delivery">
+            <mp:device />
+            <mp:encoder />
+            <mp:resolution>960x270</mp:resolution>
+          </mp:video>
+          <mp:live>true</mp:live>
+        </mp:track>
+      </mp:media>
+      <mp:metadata>
+        <mp:catalog id="9ad6ebcb-b414-4b15-ab62-5e5ddede447e"
+          type="dublincore/episode">
+          <mp:mimetype>text/xml</mp:mimetype>
+          <mp:tags />
+          <mp:url>http://10.10.10.50/static/mh_default_org/engage-live/c3d913f6-9af7-403a-91a9-33b73ee18193/9ad6ebcb-b414-4b15-ab62-5e5ddede447e/c3d913f6_9af7_403a_91a9_33b73ee18193_9ad6ebcb_b414_4b15_ab62_5e5ddede447e_0_Catalog.xml
+          </mp:url>
+          <mp:checksum type="md5">95f603259144c7635d5ccae75eef433c
+          </mp:checksum>
+        </mp:catalog>
+        <mp:catalog id="23113662-1a84-457a-85d5-0b3e32d2413a"
+          type="dublincore/series">
+          <mp:mimetype>text/xml</mp:mimetype>
+          <mp:tags />
+          <mp:url>http://10.10.10.50/static/mh_default_org/engage-live/c3d913f6-9af7-403a-91a9-33b73ee18193/23113662-1a84-457a-85d5-0b3e32d2413a/series.xml
+          </mp:url>
+        </mp:catalog>
+      </mp:metadata>
+      <mp:attachments>
+        <mp:attachment id="security-policy-episode" type="security/xacml+episode">
+          <mp:mimetype>text/xml</mp:mimetype>
+          <mp:tags />
+          <mp:url>http://10.10.10.50/static/mh_default_org/engage-live/c3d913f6-9af7-403a-91a9-33b73ee18193/security-policy-episode/c3d913f6_9af7_403a_91a9_33b73ee18193_security_policy_episode_0_Attachment.xml
+          </mp:url>
+          <mp:size>0</mp:size>
+          <mp:checksum type="md5">9c4122a73fecc330be0f95a1bd1502d9
+          </mp:checksum>
+        </mp:attachment>
+      </mp:attachments>
+      <mp:publications />
+    </mp:mediapackage>
+    <ns2:dcExtent>60000</ns2:dcExtent>
+    <ns2:dcTitle>Live Test</ns2:dcTitle>
+    <ns2:dcCreated>2017-10-12T15:00:00-04:00</ns2:dcCreated>
+    <ns2:dcSpatial>fake-ca</ns2:dcSpatial>
+    <ns2:dcIsPartOf>20170119999</ns2:dcIsPartOf>
+    <ns2:dcType>L01</ns2:dcType>
+    <ns2:mediaType>AudioVisual</ns2:mediaType>
+    <ns2:keywords />
+    <ns2:modified>2017-10-12T14:11:08.215-04:00</ns2:modified>
+    <ns2:score>3.442347</ns2:score>
+  </ns2:result>
+</ns2:search-results>

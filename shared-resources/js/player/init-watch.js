@@ -123,9 +123,9 @@ $(document).ready( function() {
             dataType: 'json',
             success: function(data)
             {
-                if(data !== undefined && data['http://www.opencastproject.org/matterhorn/'] !== undefined) {
+                if(data !== undefined && data['http://www.opencast.org/'] !== undefined) {
                     // no comments plugin when disabled in series
-                    var annotations_module_enabled = data['http://www.opencastproject.org/matterhorn/'].annotation[0].value;
+                    var annotations_module_enabled = data['http://www.opencast.org/'].annotation[0].value;
                     if(annotations_module_enabled)
                     {
                         annotations_module_enabled = (annotations_module_enabled == "true") ? true : false;

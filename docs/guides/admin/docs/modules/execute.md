@@ -25,7 +25,7 @@ job.load.execute = 1.0
 # The list of commands, separated by spaces, which may be run by the Execute Service.
 # A value of * means any command is allowed.
 # Default: empty (no commands allowed)
-#commands.allowed = 
+#commands.allowed =
 ````
 
 If `commands.allowed` is empty or undefined (the default), the service won't be able to run any commands.
@@ -61,11 +61,11 @@ For instance, suppose you use the Execute Service with the following arguments:
 
     "John Doe" xyz #{my.property}
 
-the command run will receive that argument list as-is, because my.property is not a valid placeholder, nor 
+the command run will receive that argument list as-is, because my.property is not a valid placeholder, nor
 is it defined in the Execute Service's configuration file or `custom.properties`.
 
 However, if you define my.property in `custom.properties`:
-  
+
     my.property = foo
 
 then the command will get the following argument list:
@@ -74,7 +74,7 @@ then the command will get the following argument list:
 
 If you define the same variable in the Execute Service's configuration file (regardless of whether the variable
 is defined in `custom.properties` or not):
- 
+
     my.property = bar
 
 then the actual argument list will be:

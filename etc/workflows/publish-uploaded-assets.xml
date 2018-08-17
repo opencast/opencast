@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+  <id>publish-uploaded-assets</id>
+  <title>Publish uploaded assets</title>
+  <tags>
+     <!-- Only launched from add asset in admin-ng, not available for selection by end users via the UI -->
+  </tags>
+  <description>Publish uploaded assets</description>
+  <configuration_panel>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Apply the default workflow configuration -->
+
+    <operation
+      id="defaults"
+      description="Applying default configuration values">
+      <configurations>
+        <configuration key="publishToEngage">true</configuration>
+        <configuration key="publishToOaiPmh">true</configuration>
+        <configuration key="publishToYouTube">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Tag for publish -->
+
+    <operation
+      id="tag"
+      exception-handler-workflow="partial-error"
+      description="Tagging media package elements for archival">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="target-tags">+archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Publish to publication channels                                   -->
+    <!--                                                                   -->
+    <!-- Update the recording metadata in the publication channels.        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="publish-engage"
+      if="${publishToEngage}"
+      exception-handler-workflow="partial-error"
+      description="Update recording in Opencast Media Module">
+      <configurations>
+        <configuration key="download-source-flavors">${download-source-flavors}</configuration>
+        <configuration key="strategy">merge</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Publish to engage player -->
+
+    <operation
+      id="republish-oaipmh"
+      if="${publishToOaiPmh}"
+      exception-handler-workflow="partial-error"
+      description="Update recording metadata in default OAI-PMH repository">
+      <configurations>
+        <configuration key="source-flavors">${download-source-flavors}</configuration>
+        <configuration key="repository">default</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the mediapackage -->
+
+    <operation
+      id="snapshot"
+      description="Archiving new assets">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Cleanup                                                           -->
+    <!--                                                                   -->
+    <!-- Remove work artifacts.                                            -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Clean the system from work artifacts -->
+
+    <operation
+      id="include"
+      description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">partial-cleanup</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

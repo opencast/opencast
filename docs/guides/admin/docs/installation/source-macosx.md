@@ -65,6 +65,10 @@ Required for audio normalization:
 
     sox >= 14.4 (with MP3, FLAC and OGG support)
 
+Required for animate service:
+
+    synfig
+
 ### Dependency Download
 
 You can download Xcode in the Mac App Store. JDK 8 for OS X is available from
@@ -86,18 +90,18 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
 Pre-built versions of most dependencies can be downloaded from the respective project website:
 
- - [Get Apache Maven](https://maven.apache.org/download.cgi)
- - [Get FFmpeg](http://ffmpeg.org/download.html)
- - [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
+* [Get Apache Maven](https://maven.apache.org/download.cgi)
+* [Get FFmpeg](http://ffmpeg.org/download.html)
+* [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
 
 Building Opencast
 -----------------
 
 Switch to the opencast folder. If you downloaded the tarball, this is the folder you just unpacked (called something
-like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd matterhorn`. You can proceed by
+like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd opencast`. You can proceed by
 building opencast (depending on the folder permissions, you might need to start the command with `sudo`):
-       
+
     mvn clean install
 
 > *Please be patient, as building Opencast for the first time will take quite long.*

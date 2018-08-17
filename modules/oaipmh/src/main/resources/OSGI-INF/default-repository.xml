@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.oaipmh.server.DefaultRepository"
+               immediate="true"
+               activate="activate">
+  <implementation class="org.opencastproject.oaipmh.server.DefaultRepository" />
+  <service>
+    <provide interface="org.opencastproject.oaipmh.server.OaiPmhRepository" />
+  </service>
+  <property name="service.description" value="Opencast default OAI-PMH repository" />
+  <property name="service.pid" value="org.opencastproject.oaipmh.server.DefaultRepository" />
+  <reference name="persistence"
+             interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"
+             cardinality="1..1"
+             policy="static"
+             bind="setPersistence" />
+</scr:component>

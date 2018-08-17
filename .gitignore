@@ -1,4 +1,4 @@
-# Ignore file for Opencast Matterhorn project
+# Ignore file for Opencast
 #
 
 # ignore maven target directories
@@ -19,6 +19,9 @@ node/
 */nbproject/*
 */nb-configuration.xml
 
+# ignore VSCode project data
+.vscode/
+
 # ingore OS artifacts
 .DS_Store
 
@@ -37,7 +40,7 @@ docs/guides/*/site
 # Ignore Makefiles
 # Sometimes they help, but they should never be tracked
 Makefile
-/modules/matterhorn-admin-ui-ng/bower_components/
+/modules/admin-ui/bower_components/
 
 # Ignore OS artifacts
 .DS_Store

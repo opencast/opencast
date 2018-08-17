@@ -21,7 +21,7 @@
   <sec:http pattern="/admin-ng/styles/**" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
-    entry-point-ref="matterhornEntryPoint">
+    entry-point-ref="opencastEntryPoint">
 
     <!-- ################ -->
     <!-- # URL SECURITY # -->
@@ -105,6 +105,9 @@
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/stop" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/retry" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/none" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/admin-ng/event/*/optout/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_STATUS_EDIT" />
@@ -132,7 +135,7 @@
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/groups" method="POST" access="ROLE_ADMIN, ROLE_UI_GROUPS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/index/recreateIndex" method="POST" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/index/*" method="POST" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/admin-ng/series/deleteSeries" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/series/new" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_CREATE" />
     <sec:intercept-url pattern="/admin-ng/series/optOutSeries/*" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_STATUS_EDIT" />
@@ -148,6 +151,7 @@
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/event/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_GROUPS_DELETE" />
     <sec:intercept-url pattern="/admin-ng/series/*/theme" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
@@ -202,7 +206,9 @@
     <sec:intercept-url pattern="/api/events/*/comments" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <!-- External API DELETE Endpoints -->
@@ -225,13 +231,18 @@
     <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/app.js" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable anonymous access to the new admin ui -->
+    <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/me.json resource -->
     <sec:intercept-url pattern="/info/me.json" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/info/components.json" method="GET" access="ROLE_ANONYMOUS" />
+
+    <!-- Paella player -->
+    <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
+    <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/paella/config/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
     <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
@@ -337,7 +348,7 @@
         <ref bean="digestFilter" />
 
         <!-- Basic authentication  -->
-        <!-- <ref bean="basicAuthenticationFilter" /> -->
+        <ref bean="basicAuthenticationFilter" />
 
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
@@ -371,7 +382,7 @@
   <!-- ######################################## -->
 
   <!-- Differentiates between "normal" user requests and those requesting digest auth -->
-  <bean id="matterhornEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
+  <bean id="opencastEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
     <property name="userEntryPoint" ref="userEntryPoint" />
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
   </bean>
@@ -388,11 +399,9 @@
     <property name="nonceValiditySeconds" value="300" />
   </bean>
 
-  <!-- Basic authentication
   <bean id="basicEntryPoint" class="org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint">
     <property name="realmName" value="Opencast"/>
   </bean>
-  -->
 
   <bean id="authSuccessHandler" class="org.opencastproject.kernel.security.AuthenticationSuccessHandler">
     <property name="securityService" ref="securityService" />
@@ -429,12 +438,10 @@
   <!-- ############################### -->
 
   <!-- Handles the details of the basic authentication dance -->
-  <!-- Basic authentication
   <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
     <property name="authenticationManager" ref="authenticationManager"/>
     <property name="authenticationEntryPoint" ref="basicEntryPoint"/>
   </bean>
-  -->
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->

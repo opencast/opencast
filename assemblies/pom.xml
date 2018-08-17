@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>4.0-SNAPSHOT</version>
+    <version>5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -131,6 +131,8 @@
                   <replaceregexp file="target/assembly/bin/karaf" match="-Dcom.sun.management.jmxremote" replace="" byline="true"/>
                   <!-- Correct the start script name -->
                   <replaceregexp file="target/assembly/bin/karaf" match="^KARAF_SCRIPT=.*$" replace="KARAF_SCRIPT='start-opencast'" byline="true"/>
+                  <!-- Mitigation for https://issues.apache.org/jira/browse/KARAF-5526 -->
+                  <replaceregexp file="target/assembly/bin/karaf" match=" init$" replace=" [ -z &quot;${TERM##*256color}&quot; ] &amp;&amp; export TERM=xterm-color&#x0A;    init" byline="true"/>
                   <!-- Make sure bundle cache gets cleared by default -->
                   <replaceregexp file="target/assembly/etc/system.properties" match="^karaf.clean.cache .*=.*$" replace="karaf.clean.cache = true" byline="true"/>
                   <!-- Additional config lines to system.properties -->

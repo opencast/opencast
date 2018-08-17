@@ -24,7 +24,7 @@ Install 3rd-party-tools
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    dnf install maven ffmpeg tesseract hunspell sox
+    dnf install maven ffmpeg tesseract hunspell sox synfig
 
 For additional Unicode tests run during the build process, you can also install:
 

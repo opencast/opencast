@@ -9,9 +9,9 @@ Opencast refers to tenants as *organizations*, and an HTTP request to the Openca
 organization using the server name. Therefore, a Opencast instance will usually be set up with multiple DNS names
 pointing to the same IP, for example:
 
- - admin.example.org
- - tenant1-admin.example.org
- - tenant2-admin.example.org
+- admin.example.org
+- tenant1-admin.example.org
+- tenant2-admin.example.org
 
 should all resolve to the same IP.
 
@@ -61,7 +61,8 @@ installation, on each of the nodes.  As an example, this is what the admin node 
     prop.logo_mediamodule=/engage/ui/img/logo/opencast-icon.svg
     prop.logo_player=/engage/ui/img/logo/opencast.svg
 
-There are more options available than in this example. The easiest way of creating that file is probably to create a copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
+There are more options available than in this example. The easiest way of creating that file is probably to create a
+copy of the already existing `org.opencastproject.organization-mh_default_org.cfg`.
 
 Note, the default organization file `org.opencastproject.organization-mh_default_org.org` *must* refer to the actual
 server names:

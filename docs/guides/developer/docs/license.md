@@ -13,9 +13,9 @@ All libraries that are used in Opencast need to be compatible with the Education
 
 In short, if the license is on:
 
- - the Apereo or Apache Category-A list, it is fine to use the library.
- - the Apereo or Apache Category-B list, we may use it unmodified. Please avoid Category-B if possible.
- - the Apereo or Apache Category-X list, we cannot use it.
+* the Apereo or Apache Category-A list, it is fine to use the library.
+* the Apereo or Apache Category-B list, we may use it unmodified. Please avoid Category-B if possible.
+* the Apereo or Apache Category-X list, we cannot use it.
 
 Everything else needs to go to the Apereo foundation for approval.
 
@@ -41,7 +41,7 @@ license. This can usually be taken from the copyright header at the top of the l
 
 Example:
 
-    modules/matterhorn-admin-ui-ng/src/main/webapp/lib/angular/*
+    modules/admin-ui/src/main/webapp/lib/angular/*
       AngularJS v1.3.6
       (c) 2010-2014 Google, Inc. http://angularjs.org
       License: MIT

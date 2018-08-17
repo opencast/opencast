@@ -46,11 +46,11 @@ For example, if you want OCR for German content, you want to run something like 
 
     tesseract in.tif out.txt -l deu -psm 3
 
-- The arguments `in.tif` and `out.txt` are automatically set by Opencast.
-- The argument `-l` specifies the language files used by Tesseract. `deu` specifies the German language. Multiple
+* The arguments `in.tif` and `out.txt` are automatically set by Opencast.
+* The argument `-l` specifies the language files used by Tesseract. `deu` specifies the German language. Multiple
   languages may be specified, separated by plus characters. Please make sure that you have installed the language packs
   you want to use on every worker (E.g. `yum install tesseract-langpack-deu`).
-- Finally `-psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
+* Finally `-psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
   but no orientation and script detection* which is actually the default. Hence in this case, the argument could simply
   be omitted. If you know more about your input videos, you might want to use different options here (not likely).
 
@@ -79,7 +79,7 @@ For this, edit the `/etc/opencast/encoding/opencast-images.properties` and modif
 extraction:
 
     profile.text-analysis.http.ffmpeg.command = -ss #{time} -i #{in.video.path} \
-	    -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
+      -filter:v boxblur=1:1,curves=all=0.4/0#{space}0.6/1 \
       -frames:v 1 -pix_fmt:v gray -r 1 #{out.dir}/#{out.name}#{out.suffix}
 
 This profile will create a gray, high contrast image. The additional light blur will reduce or remove noise and thicken
@@ -99,18 +99,18 @@ errors, for testing and debugging, you want no filtering at all.
 Starting with version 1.6, Opencast provides three different kinds of implementation for filtering which can be just
 swapped out at any time:
 
- - matterhorn-dictionary-none
- - matterhorn-dictionary-regexp (default)
- - matterhorn-dictionary-hunspell
+* dictionary-none
+* dictionary-regexp (default)
+* dictionary-hunspell
 
 
-#### No Filtering (matterhorn-dictionary-none)
+#### No Filtering (dictionary-none)
 
-The `matterhorn-dictionary-none` module is the simplest one. It will just let the recognized texts pass through
+The `dictionary-none` module is the simplest one. It will just let the recognized texts pass through
 unmodified. There is no additional configuration needed or even possible. Of course, this is also the fastest one.
 
 
-#### Using a Regular Expression (matterhorn-dictionary-regexp)
+#### Using a Regular Expression (dictionary-regexp)
 
 Starting with 1.6, this is the default implementation for the DictionaryService. It is quite fast and easy to configure
 but is limited in terms of filtering capabilities as it will not check if a recognized word actually makes sense.
@@ -135,9 +135,9 @@ A similar pattern that could be used for Spanish would be:
     pattern=[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ][\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*
 
 
-#### Using a Spell Checker (matterhorn-dictionary-hunspell)
+#### Using a Spell Checker (dictionary-hunspell)
 
-Last, the `matterhorn-dictionary-hunspell` will check words based on a spell checker and a dictionary. As spell checker,
+Last, the `dictionary-hunspell` will check words based on a spell checker and a dictionary. As spell checker,
 the tool `hunspell` is used which is one of the most common spell checkers on Linux and should be available from the
 system repositories for most common operating systems.
 

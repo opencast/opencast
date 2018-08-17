@@ -3,7 +3,7 @@
 
 ## Description
 
-The RetractOaiPmhWorkflowOperationHandler retracts the published elements from a OAI-PMH repository.
+The Retract OAI-PMH workflow operation retracts the published elements from a OAI-PMH repository.
 
 ## Parameter Table
 
@@ -17,7 +17,7 @@ The RetractOaiPmhWorkflowOperationHandler retracts the published elements from a
     <operation
         id="retract-oaipmh"
         fail-on-error="true"
-        exception-handler-workflow="ng-error"
+        exception-handler-workflow="error"
         description="Retract event from the OAI-PMH repository">
         <configurations>
             <configuration key="repository">default</configuration>

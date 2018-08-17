@@ -6,7 +6,7 @@ External API, you need to configure a user that is authorized to do so.
 
 Perform the following steps to get the External API running:
 
-1. Enable basic authentication (see section Authentication) 
+1. Enable basic authentication (see section Authentication)
 2. Create a new user or choose an existing user (administrative user interface)
 3. Authorize the user to access the External API (see section Authorization)
 4. Test whether access works (see section Testing)
@@ -131,7 +131,7 @@ Accessing Distribution Artefacts
 A major use case of the External API is to provide External Applications secure access to distribution artefacts.
 
 For this purpose, Opencast comes with a special workflow operation: WOH publish-configure
-(see [ConfigurablePublishWorkflowOperationHandler](../workflowoperationhandlers/publishconfigure-woh.md))
+(see [ConfigurablePublishWorkflowOperationHandler](../workflowoperationhandlers/publish-configure-woh.md))
 creates publication elements that do not just contain a single URL to the publication channel,
 but also contain URLs for each of the attachments and tracks that have been published.
 

@@ -52,7 +52,7 @@ Two user providers are available by default:
 
 The set of user and role providers can be configured. If you do not want to keep users and passwords in Opencast's
 database, you can replace the JpaUserAndRoleProvider with the LdapUserProvider by replacing the
-matterhorn-userdirectory-jpa jar with the matterhorn-userdirectory-ldap jar.
+userdirectory-jpa jar with the userdirectory-ldap jar.
 
 ## Further Authentication Configuration
 

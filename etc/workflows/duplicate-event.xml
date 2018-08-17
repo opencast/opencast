@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>duplicate-event</id>
+  <title>Duplicate Event</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description/>
+  <configuration_panel>
+    <![CDATA[
+      <div id="workflow-configuration">
+        <fieldset>
+          <input
+            id="numberOfEvents"
+            name="numberOfEvents"
+            type="number"
+            class="configField"
+            onkeypress="return event.charCode > 47"
+            oninput="checkValueInBounds()"
+            min="1"
+            value="1"
+            max="25"
+            />
+          <label for="numberOfEvents">Number of Events</label>
+        </fieldset>
+      </div>
+
+      <script type="text/javascript">
+        function checkValueInBounds() {
+          var value = $('#numberOfEvents').val();
+          var max = $('#numberOfEvents').attr('max');
+          var min = $('#numberOfEvents').attr('min');
+          if (parseInt(value) < parseInt(min)) $('#numberOfEvents').val(min);
+          if (parseInt(value) > parseInt(max)) $('#numberOfEvents').val(max);
+        }
+      </script>
+    ]]>
+  </configuration_panel>
+
+  <operations>
+
+    <!-- Create the new events -->
+    <operation
+      id="duplicate-event"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Duplicate Event">
+      <configurations>
+        <configuration key="source-flavors">*/*</configuration>
+        <configuration key="number-of-events">${numberOfEvents}</configuration>
+        <configuration key="target-tags"></configuration>
+        <configuration key="property-namespaces">org.opencastproject.assetmanager.security</configuration>
+        <configuration key="copy-number-prefix">copy</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the working file repository -->
+    <operation
+        id="include"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <configuration key="workflow-id">partial-cleanup</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>

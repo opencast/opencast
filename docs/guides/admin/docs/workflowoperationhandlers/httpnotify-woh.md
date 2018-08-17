@@ -1,10 +1,10 @@
-#HttpNotificationWorkflowOperation
+# HttpNotificationWorkflowOperation
 
-##Description
+## Description
 Opencast can through this operation notify any HTTP endpoint about the process of the workflow.
 
-##Parameter Table
-A parameter that is always posted is the workflow instance identifier in the parameter named **workflowInstanceId** containing the current workflow’s identifier.
+## Parameter Table A parameter that is always posted is the workflow instance identifier in the parameter named
+**workflowInstanceId** containing the current workflow’s identifier.
 
 |Key       |Required |Description                                                                              |Example|
 |----------|---------|-------------------------------------------------------------------------------------------|-----|
@@ -15,7 +15,7 @@ A parameter that is always posted is the workflow instance identifier in the par
 |max-retry |false    |The maximal number of notification attempts. The default value is 5                        |5|
 |timeout   |false    |The timeout in seconds for the notification request: The default value is 10               |10|
 
-##Operation Example
+## Operation Example
 
     <operation
       id="http-notify"

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mediapackage duration="60000"
+  id="c3d913f6-9af7-403a-91a9-33b73ee18193" xmlns="http://mediapackage.opencastproject.org"
+  start="2017-10-12T18:10:59Z">
+  <title>Live Test</title>
+  <series>20170119999</series>
+  <seriestitle>Test Fall 2017</seriestitle>
+  <type>L01</type>
+  <media>
+    <track id="2b014f7f-6dd2-40c2-bf92-c0517e4f07dc" type="presenter/delivery">
+      <mimetype>video/x-flv</mimetype>
+      <tags />
+      <url>rtmp://cp999999.live.edgefcs.net/live/c3d913f6-9af7-403a-91a9-33b73ee18193-fake-ca-presenter-delivery-stream-1920x540_suffix</url>
+      <duration>60000</duration>
+      <video id="video-presenter-delivery">
+        <device />
+        <encoder />
+        <resolution>1920x540</resolution>
+      </video>
+      <live>true</live>
+    </track>
+    <track id="4ba1ffd9-c91a-44d5-b1a3-f7baa7cbc147" type="presenter/delivery">
+      <mimetype>video/x-flv</mimetype>
+      <tags />
+      <url>rtmp://cp999999.live.edgefcs.net/live/c3d913f6-9af7-403a-91a9-33b73ee18193-fake-ca-presenter-delivery-stream-960x270_suffix</url>
+      <duration>60000</duration>
+      <video id="video-presenter-delivery">
+        <device />
+        <encoder />
+        <resolution>960x270</resolution>
+      </video>
+      <live>true</live>
+    </track>
+  </media>
+  <metadata>
+    <catalog id="episode-dc-published" type="dublincore/episode">
+      <mimetype>text/xml</mimetype>
+      <tags />
+      <url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url>
+      <checksum type="md5">95f603259144c7635d5ccae75eef433c
+      </checksum>
+    </catalog>
+    <catalog id="23113662-1a84-457a-85d5-0b3e32d2413a" type="dublincore/series">
+      <mimetype>text/xml</mimetype>
+      <tags />
+      <url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url>
+    </catalog>
+  </metadata>
+  <attachments>
+    <attachment id="security-policy-episode" type="security/xacml+episode">
+      <mimetype>text/xml</mimetype>
+      <tags />
+      <url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url>
+      <size>0</size>
+      <checksum type="md5">9c4122a73fecc330be0f95a1bd1502d9
+      </checksum>
+    </attachment>
+  </attachments>
+  <publications />
+</mediapackage>

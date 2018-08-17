@@ -25,9 +25,9 @@ Admin UI NG module and copy the packaged module file into the Opencast assembly.
 
 Example:
 ```bash
-cd modules/matterhorn-admin-ui-ng
+cd modules/admin-ui
 mvn install
-cp ./target/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/matterhorn-admin-ui-ng/2.2-SNAPSHOT/matterhorn-admin-ui-ng-2.2-SNAPSHOT.jar
+cp ./target/admin-ui-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/admin-ui/2.2-SNAPSHOT/admin-ui-2.2-SNAPSHOT.jar
 ```
 
 *Note: Before you run `mvn install` from a module's root directory,
@@ -52,7 +52,7 @@ Prerequisites
 You can also run a local version of [Grunt][1] and [NodeJS][2] from the Opencast module:
 
 ```bash
-cd modules/matterhorn-admin-ui-ng
+cd modules/admin-ui
 export PATH=node:node_modules/grunt-cli/bin:node_modules/karma/bin:$PATH
 ```
 
@@ -66,7 +66,7 @@ Debugging Javascript unit tests
 ------------------------------------
 
 Our Javascript unit tests are built in [Jasmine](http://jasmine.github.io/) (a behavior-driven development framework for
-testing JavaScript code), and live in `modules/matterhorn-admin-ui-ng/src/test/resources/test/unit`.
+testing JavaScript code), and live in `modules/admin-ui/src/test/resources/test/unit`.
 
 Occasionally something breaks, or you need to disable or focus on a single test.
 While reading the Jasmine, Karma and Grunt docs are encouraged, here are a
@@ -125,7 +125,7 @@ This setup may be configured as follows:
 
 1. Change to the Admin UI module directory.
 
-        cd modules/matterhorn-admin-ui-ng
+        cd modules/admin-ui
 
 1. Install project dependencies.
 
@@ -172,7 +172,7 @@ This setup may be configured as follows:
 
 1. Change to the Admin UI module directory.
 
-        cd modules/matterhorn-admin-ui-ng
+        cd modules/admin-ui
 
 1. Install project dependencies.
 

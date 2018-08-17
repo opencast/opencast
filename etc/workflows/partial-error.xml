@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>partial-error</id>
+  <description>Cleanup after a processing failure</description>
+  <operations>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Notify                                                            -->
+    <!--                                                                   -->
+    <!-- Add comments in order to mark the recording for review and send   -->
+    <!-- e-mails to administrators.                                        -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Mark the recording for review -->
+
+    <operation
+      id="comment"
+      fail-on-error="false"
+      description="Mark the recording for cutting">
+      <configurations>
+        <configuration key="description">Processing failed</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
+        <configuration key="action">create</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the media package -->
+
+    <operation
+      id="snapshot"
+      fail-on-error="false"
+      description="Preserve the current recording state">
+      <configurations>
+        <configuration key="source-flavors">*/source,dublincore/*</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Cleanup the temporary files from the working file repository -->
+
+    <operation
+      id="cleanup"
+      fail-on-error="false"
+      description="Cleaning up">
+    </operation>
+
+  </operations>
+
+</definition>

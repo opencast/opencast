@@ -1,0 +1,6 @@
+{
+  "youtube": "{\"icon\":\"img/youtube_2x.png\", \"order\":4}",
+  "engage-player": "{\"icon\":\"img/engage_2x.png\", \"order\":3}",
+  "api": "{\"label\":\"EVENTS.EVENTS.DETAILS.GENERAL.EXTERNAL_API\", \"order\":1}",
+  "oaipmh-default": "{\"label\":\"Default OAI-PMH Repository\", \"order\":2}"
+}

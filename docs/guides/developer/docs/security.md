@@ -55,7 +55,7 @@ Where do we review security patches?
 ------------------------------------
 
 Minor patches can be reviewed on an adhoc basis but larger patches, especially those requring collaboration in private,
-or extensive comment and review, can use the matterhorn-security repository under the opencast-community account. Note
+or extensive comment and review, can use the opencast-security repository under the opencast-community account. Note
 that this repository is private to committers, and reporters. Add the security repository to your remotes with this
 command:
 

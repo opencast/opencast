@@ -155,7 +155,6 @@
       <module>series-service-remote</module>
     </conflict>
     <conflict>
-      <module>serviceregistry-remote</module>
       <module>serviceregistry</module>
     </conflict>
     <conflict>
