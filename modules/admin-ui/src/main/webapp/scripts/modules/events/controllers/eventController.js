@@ -473,6 +473,10 @@ angular.module('adminNg.controllers')
               Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
               me.notificationConflict = undefined;
           }
+          if (me.inThePastNotification) {
+              Notifications.remove(me.inThePastNotification, SCHEDULING_CONTEXT);
+              me.inThePastNotification = undefined;
+          }
         }
 
         this.noConflictsDetected = function () {
@@ -495,17 +499,33 @@ angular.module('adminNg.controllers')
             $scope.checkingConflicts = false;
         };
 
+        this.checkValidity = function () {
+            // check if start is in the past
+            if (SchedulingHelperService.alreadyEnded($scope.source.start, $scope.source.duration)) {
+                me.inThePastNotification = Notifications.add('error', 'CONFLICT_IN_THE_PAST',
+                    SCHEDULING_CONTEXT, -1);
+                $scope.checkingConflicts = false;
+                return false;
+            }
+
+            return true;
+        };
+
         $scope.checkConflicts = function () {
             return new Promise(function(resolve, reject) {
                 $scope.checkingConflicts = true;
                 if (me.readyToPollConflicts()) {
-                    ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
-                        .$promise.then(function() {
-                            resolve();
-                        })
-                        .catch(function(err) {
-                            reject();
-                        });
+                    if (!me.checkValidity()) {
+                      resolve();
+                    } else {
+                        ConflictCheckResource.check($scope.source, me.noConflictsDetected, me.conflictsDetected)
+                            .$promise.then(function() {
+                                resolve();
+                            })
+                            .catch(function(err) {
+                                reject();
+                            });
+                    }
                 } else {
                    $scope.checkingConflicts = false;
                    resolve();
@@ -515,6 +535,10 @@ angular.module('adminNg.controllers')
 
         $scope.saveScheduling = function () {
             if (me.readyToPollConflicts()) {
+                if (!me.checkValidity()) {
+                    return;
+                }
+
                 ConflictCheckResource.check($scope.source, function () {
                     me.clearConflicts();
 
