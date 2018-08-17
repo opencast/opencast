@@ -63,10 +63,6 @@ directly in the Opencast administrative user interface.
 |ROLE_API_EVENTS_ACL_VIEW          |GET         |/api/events/\*/acl                                            |
 |ROLE_API_EVENTS_ACL_EDIT          |PUT<br>POST |/api/events/\*/acl<br>/api/events/\*/acl/\*                   |
 |ROLE_API_EVENTS_ACL_DELETE        |DELETE      |/api/events/\*/acl/\*/\*                                      |
-|ROLE_API_EVENTS_ATTACHMENTS_VIEW  |GET         |/api/events/\*/attachments<br>/api/events/\*/attachments/\*   |
-|ROLE_API_EVENTS_COMMENTS_VIEW     |GET         |/api/events/\*/comments<br>/api/events/\*/comments/\*         |
-|ROLE_API_EVENTS_COMMENTS_EDIT     |PUT<br>POST |/api/events/\*/comments/\*<br>/api/events/\*/comments         |
-|ROLE_API_EVENTS_COMMENTS_DELETE   |DELETE      |/api/events/\*/comments/\*                                    |
 |ROLE_API_EVENTS_MEDIA_VIEW        |GET         |/api/events/\*/media<br>/api/events/\*/media/\*               |
 |ROLE_API_EVENTS_METADATA_VIEW     |GET         |/api/events/\*/metadata<br>/api/events/\*/metadata/\*         |
 |ROLE_API_EVENTS_METADATA_EDIT     |PUT         |/api/events/\*/metadata<br>/api/events/\*/metadata/\*         |
