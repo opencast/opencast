@@ -1,5 +1,5 @@
 {
-  "Status": "idle",
+  "Status": "AGENTS.STATUS.IDLE",
   "capabilities": [
     {
       "value": "defaults",

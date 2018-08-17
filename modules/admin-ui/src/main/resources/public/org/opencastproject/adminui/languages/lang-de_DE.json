@@ -2015,5 +2015,16 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Segmentende"
          }
       }
-   }
+   },
+  "AGENTS": {
+    "STATUS": {
+      "CAPTURING": "Aufzeichnend",
+      "ERROR": "Fehlerhaft",
+      "IDLE": "Untätig",
+      "OFFLINE": "Offline",
+      "SHUTTING_DOWN": "Herunterfahrend",
+      "UNKNOWN": "Unbekannt",
+      "UPLOADING": "Hochladend"
+    }
+  }
 }
