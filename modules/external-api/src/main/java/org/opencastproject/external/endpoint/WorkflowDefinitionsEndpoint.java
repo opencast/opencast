@@ -138,14 +138,13 @@ public class WorkflowDefinitionsEndpoint {
     // Apply filter
     if (StringUtils.isNotBlank(filter)) {
       for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":");
-        if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+        int sepIdx = f.indexOf(':');
+        if (sepIdx < 0 || sepIdx == f.length() - 1) {
+          logger.info("No value for filter {} in filters list: {}", f, filter);
           continue;
         }
-
-        String name = filterTuple[0];
-        String value = filterTuple[1];
+        String name = f.substring(0, sepIdx);
+        String value = f.substring(sepIdx + 1);
 
         if ("tag".equals(name))
           workflowDefinitions = workflowDefinitions.filter(wd -> ArrayUtils.contains(wd.getTags(), value));

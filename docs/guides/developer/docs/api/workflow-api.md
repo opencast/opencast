@@ -29,8 +29,7 @@ Filter Name                      | Description
 `workflow_definition_identifier` | Workflow instances that use this workflow definition
 `event_identifier`               | Workflow instances where the identifier of the processed event matches
 `event_title`                    | Workflow instances where the title of the processed event matches
-`event_created_after`            | Workflow instances where the processed event was created after this date
-`event_created_before`           | Workflow instances where the processed event was created before this date
+`event_created`                  | Workflow instances where the processed event was created between two dates
 `event_creator`                  | Workflow instances where the creator of the processed event matches
 `event_contributor`              | Workflow instances where the contributor of the processed event matches
 `event_language`                 | Workflow instances where the language of the processed event matches
@@ -39,6 +38,11 @@ Filter Name                      | Description
 `series_identifier`              | Workflow instances where the identifier of series of the processed event matches
 `series_title`                   | Workflow instances where the title of series of the processed event matches
 `textFilter`                     | Workflow instances where any part of the Workflow definition's metadata fields match this value
+
+Note:
+
+The filters `event_created` expect the following value:
+[`datetime`](types.md#date-and-time) + '/' + [`datetime`](types.md#date-and-time)
 
 The list can be sorted by the following criteria:
 

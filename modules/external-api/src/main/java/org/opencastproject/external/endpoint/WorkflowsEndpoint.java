@@ -79,9 +79,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -165,17 +163,14 @@ public class WorkflowsEndpoint {
 
     // Apply filter
     if (StringUtils.isNotBlank(filter)) {
-      final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
-
       for (String f : filter.split(",")) {
-        String[] filterTuple = f.split(":");
-        if (filterTuple.length < 2) {
-          logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+        int sepIdx = f.indexOf(':');
+        if (sepIdx < 0 || sepIdx == f.length() - 1) {
+          logger.info("No value for filter {} in filters list: {}", f, filter);
           continue;
         }
-
-        String name = filterTuple[0];
-        String value = filterTuple[1];
+        String name = f.substring(0, sepIdx);
+        String value = f.substring(sepIdx + 1);
 
         switch (name) {
           case "state":
@@ -207,20 +202,14 @@ public class WorkflowsEndpoint {
           case "event_title":
             query.withTitle(value);
             break;
-          case "event_created_after":
-            // FIXME: how to escape :
+          case "event_created":
             try {
-              query.withDateAfter(Date.from(Instant.from(dateFormatter.parse(value))));
-            } catch (DateTimeParseException e) {
-              return RestUtil.R.badRequest("Badly formatted 'event_created_after' datetime");
-            }
-            break;
-          case "event_created_before":
-            // FIXME: how to escape :
-            try {
-              query.withDateBefore(Date.from(Instant.from(dateFormatter.parse(value))));
-            } catch (DateTimeParseException e) {
-              return RestUtil.R.badRequest("Badly formatted 'event_created_before' datetime");
+              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+              query.withDateAfter(fromAndToCreationRange.getA());
+              query.withDateBefore(fromAndToCreationRange.getB());
+            } catch (Exception e) {
+              return RestUtil.R.badRequest(
+                      String.format("Filter 'event_created' could not be parsed: %s", e.getMessage()));
             }
             break;
           case "event_creator":
