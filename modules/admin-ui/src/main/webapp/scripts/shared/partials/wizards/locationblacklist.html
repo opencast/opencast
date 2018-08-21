@@ -6,7 +6,7 @@
                 <select chosen pre-select-from="wizard.step.items"
                     ng-disabled="wizard.step.ud.items.length"
                     data-width="'200px'"
-                    data-disable-search-threshold="8"
+                    data-disable-search-threshold="0"
                     ng-model="wizard.step.ud.itemToAdd"
                     ng-change="wizard.step.addItem()"
                     ng-options="item as item.name for item in wizard.step.items | filter:{ roomId: '!-1' }"
@@ -84,7 +84,7 @@
                 <label translate="RECORDINGS.BLACKLISTS.DETAILS.REASON.REASON"><!-- Reason --></label>
                 <select chosen pre-select-from="wizard.step.reasons"
                     data-width="'200px'"
-                    data-disable-search-threshold="8"
+                    data-disable-search-threshold="0"
                     ng-model="wizard.step.ud.reason"
                     ng-options="reason as reason | translate for (reason, label) in wizard.step.reasons"
                 />

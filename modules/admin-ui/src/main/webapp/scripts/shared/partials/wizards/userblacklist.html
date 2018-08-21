@@ -7,7 +7,7 @@
                     <select chosen pre-select-from="wizard.step.items"
                         ng-disabled="wizard.step.ud.items.length"
                         data-width="'200px'"
-                        data-disable-search-threshold="8"
+                        data-disable-search-threshold="0"
                         ng-model="wizard.step.ud.userToAdd"
                         ng-change="wizard.step.addUser()"
                         ng-options="user as user.name for user in wizard.step.items | filter:provider:'participation'"
@@ -89,7 +89,7 @@
                     <label translate="USERS.BLACKLISTS.DETAILS.REASON.REASON"><!-- Reason --></label>
                     <select chosen pre-select-from="wizard.step.reasons"
                         data-width="'200px'"
-                        data-disable-search-threshold="8"
+                        data-disable-search-threshold="0"
                         ng-model="wizard.step.ud.reason"
                         ng-options="reason as reason | translate for (reason, label) in wizard.step.reasons"
                     />
