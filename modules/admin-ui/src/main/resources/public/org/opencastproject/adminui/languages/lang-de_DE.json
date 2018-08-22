@@ -769,6 +769,8 @@
                "CAPTION": "Kommentare",
                "PLACEHOLDER": "Kommentieren…",
                "SELECTPLACEHOLDER": "Gründe wählen",
+               "NONE": "Keine",
+               "OPEN": "Offen",
                "RESOLVED": "Gelöst",
                "REPLY": "Antworten",
                "REPLY_TO": "Antworten",
