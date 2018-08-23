@@ -228,7 +228,7 @@
                             data-width="'175px'"
                             data-disable-search-threshold="8"
                             ng-model="video.workflow"
-                            ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+                            ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                         <a ng-click="submit()"
                            ng-class="{disabled: submitButton}"

@@ -69,6 +69,30 @@ angular.module('adminNg.services')
             var role = "ROLE_CAPTURE_AGENT_" + agentId.replace(/[^a-zA-Z0-9_]/g, "").toUpperCase();
             return AuthService.userIsAuthorizedAs(role);
         };
+
+        this.alreadyEnded = function(start, duration) {
+            if (angular.isDefined(start) && angular.isDefined(start.hour)
+                && angular.isDefined(start.minute) && angular.isDefined(start.date)
+                && angular.isDefined(duration) && angular.isDefined(duration.hour)
+                && angular.isDefined(duration.minute)) {
+                var startDate = this.parseDate(start.date, start.hour, start.minute);
+                var endDate = new Date(startDate.getTime());
+                endDate.setHours(endDate.getHours() + duration.hour, endDate.getMinutes() + duration.minute, 0, 0);
+                var nowDate = new Date();
+                return endDate < nowDate;
+            }
+            return false;
+        };
+
+        this.endBeforeStart = function(start, end) {
+           if (angular.isDefined(start) && angular.isDefined(start.date) && angular.isDefined(end)
+               && angular.isDefined(end.date)) {
+               var startDate = new Date(start.date);
+               var endDate = new Date(end.date);
+               return endDate < startDate;
+            }
+            return false;
+        };
     };
     return new SchedulingHelperService();
 }]);

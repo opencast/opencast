@@ -166,35 +166,35 @@ describe('adminNg.directives.timelineDirective', function () {
         beforeEach(function () {
         });
 
-        describe('with a previous segment', function () {
+        describe('with a next segment', function () {
 
-            it('merges the previous with the current segment', function () {
+            it('merges the next with the current segment', function () {
                 expect($rootScope.video.segments.length).toBe(3);
-                expect($rootScope.video.segments[0].end).toEqual(17003);
+                expect($rootScope.video.segments[2].start).toEqual(28009);
 
                 element.isolateScope().
                     mergeSegment($.Event(''), $rootScope.video.segments[1]);
 
                 expect($rootScope.video.segments.length).toBe(2);
-                expect($rootScope.video.segments[0].end).toEqual(28009);
+                expect($rootScope.video.segments[1].start).toEqual(17003);
             });
         });
 
-        describe('without a previous but a next segment', function () {
+        describe('without a next but a previous segment', function () {
 
-            it('merges the next with the current segment', function () {
+            it('merges the previous with the current segment', function () {
                 expect($rootScope.video.segments.length).toBe(3);
-                expect($rootScope.video.segments[0].end).toEqual(17003);
+                expect($rootScope.video.segments[2].start).toEqual(28009);
 
                 element.isolateScope().
-                    mergeSegment($.Event(''), $rootScope.video.segments[0]);
+                    mergeSegment($.Event(''), $rootScope.video.segments[2]);
 
                 expect($rootScope.video.segments.length).toBe(2);
-                expect($rootScope.video.segments[0].end).toEqual(28009);
+                expect($rootScope.video.segments[1].start).toEqual(17003);
             });
         });
 
-        describe('without only one segment', function () {
+        describe('with only one segment', function () {
 
             beforeEach(function () {
                 $rootScope.video.segments.splice(1, 2);

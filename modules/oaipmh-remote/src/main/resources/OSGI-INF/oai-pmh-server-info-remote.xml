@@ -2,22 +2,22 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.oaipmh.server.remote.OaiPmhServerInfoRemoteImpl"
                immediate="true">
-  <implementation class="org.opencastproject.oaipmh.server.remote.OaiPmhServerInfoRemoteImpl" />
+  <implementation class="org.opencastproject.oaipmh.server.remote.OaiPmhServerInfoRemoteImpl"/>
   <service>
-    <provide interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo" />
+    <provide interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo"/>
   </service>
   <!-- OSGi properties -->
-  <property name="service.description" value="OAI-PMH server info remote proxy" />
+  <property name="service.description" value="OAI-PMH server info remote proxy"/>
   <!-- Dependencies -->
   <reference name="trustedHttpClient"
              interface="org.opencastproject.security.api.TrustedHttpClient"
              cardinality="1..1"
              policy="static"
-             bind="setTrustedHttpClient" />
+             bind="setTrustedHttpClient"/>
   <reference name="remoteServiceManager"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              cardinality="1..1"
              policy="static"
-             bind="setRemoteServiceManager" />
+             bind="setRemoteServiceManager"/>
 </scr:component>
 

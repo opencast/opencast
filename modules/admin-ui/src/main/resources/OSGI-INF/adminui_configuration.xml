@@ -2,12 +2,12 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.adminui.impl.AdminUIConfiguration"
                immediate="true">
-  <implementation class="org.opencastproject.adminui.impl.AdminUIConfiguration" />
-  <property name="service.description" value="Admin UI - Configuration" />
-  <property name="service.pid" value="org.opencastproject.adminui" />
-  
+  <implementation class="org.opencastproject.adminui.impl.AdminUIConfiguration"/>
+  <property name="service.description" value="Admin UI - Configuration"/>
+  <property name="service.pid" value="org.opencastproject.adminui"/>
+
   <service>
-	<provide interface="org.osgi.service.cm.ManagedService" />
-    <provide interface="org.opencastproject.adminui.impl.AdminUIConfiguration" />
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+    <provide interface="org.opencastproject.adminui.impl.AdminUIConfiguration"/>
   </service>
 </scr:component>

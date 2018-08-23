@@ -23,17 +23,17 @@
 -->
 
 <scr:component
-  xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl"
-  immediate="true"
-  activate="activate">
-    <implementation class="org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl" />
-    <property name="service.description" value="Static Metadata Service, dublin core based" />
-    <property name="metadata.source" value="dublincore" />
-    <property name="priority" value="1" />
-    <service>
-      <provide interface="org.opencastproject.metadata.api.StaticMetadataService" />
-    </service>
-    <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-      cardinality="1..1" policy="static" bind="setWorkspace" />
+    xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+    name="org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl"
+    immediate="true"
+    activate="activate">
+  <implementation class="org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl"/>
+  <property name="service.description" value="Static Metadata Service, dublin core based"/>
+  <property name="metadata.source" value="dublincore"/>
+  <property name="priority" value="1"/>
+  <service>
+    <provide interface="org.opencastproject.metadata.api.StaticMetadataService"/>
+  </service>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+             cardinality="1..1" policy="static" bind="setWorkspace"/>
 </scr:component>

@@ -2,18 +2,18 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.external.endpoint.SecurityEndpoint"
                immediate="true" activate="activate">
-  <implementation class="org.opencastproject.external.endpoint.SecurityEndpoint" />
-  <property name="service.description" value="External API - Security Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.external.security" />
-  <property name="opencast.service.path" value="/api/security" />
+  <implementation class="org.opencastproject.external.endpoint.SecurityEndpoint"/>
+  <property name="service.description" value="External API - Security Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.external.security"/>
+  <property name="opencast.service.path" value="/api/security"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.external.endpoint.SecurityEndpoint" />
-    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.external.endpoint.SecurityEndpoint"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <reference name="UrlSigningService"
-      interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-      cardinality="1..1"
-      policy="static"
-      bind="setUrlSigningService" />
+             interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             cardinality="1..1"
+             policy="static"
+             bind="setUrlSigningService"/>
 </scr:component>

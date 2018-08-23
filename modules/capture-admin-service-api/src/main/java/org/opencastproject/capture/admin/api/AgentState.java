@@ -54,4 +54,6 @@ public interface AgentState {
   /** The collection of all known states. TODO: Remove this when the states are replaced with enums */
   List<String> KNOWN_STATES = Arrays.asList(IDLE, SHUTTING_DOWN, CAPTURING, UPLOADING, ERROR, UNKNOWN, OFFLINE);
 
+  String TRANSLATION_PREFIX = "AGENTS.STATUS.";
+
 }

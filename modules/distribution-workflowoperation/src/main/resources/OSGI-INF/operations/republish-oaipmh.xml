@@ -3,20 +3,20 @@
                name="org.opencastproject.workflow.handler.distribution.RepublishOaiPmhWorkflowOperationHandler"
                immediate="true"
                activate="activate">
-  <implementation class="org.opencastproject.workflow.handler.distribution.RepublishOaiPmhWorkflowOperationHandler" />
-  <property name="service.description" value="Republish OAI-PMH Workflow Operation Handler" />
-  <property name="workflow.operation" value="republish-oaipmh" />
+  <implementation class="org.opencastproject.workflow.handler.distribution.RepublishOaiPmhWorkflowOperationHandler"/>
+  <property name="service.description" value="Republish OAI-PMH Workflow Operation Handler"/>
+  <property name="workflow.operation" value="republish-oaipmh"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference name="oaiPmhPublicationService"
              interface="org.opencastproject.publication.api.OaiPmhPublicationService"
              cardinality="1..1"
              policy="static"
-             bind="setOaiPmhPublicationService" />
+             bind="setOaiPmhPublicationService"/>
   <reference name="serviceRegistry"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              cardinality="1..1"
              policy="static"
-             bind="setServiceRegistry" />
+             bind="setServiceRegistry"/>
 </scr:component>

@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl"
-  immediate="true" activate="activate">
+               name="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl"
+               immediate="true" activate="activate">
   <implementation
-    class="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl" />
-  <property name="service.description" value="Search Service Persistence" />
+      class="org.opencastproject.search.impl.persistence.SearchServiceDatabaseImpl"/>
+  <property name="service.description" value="Search Service Persistence"/>
   <service>
-    <provide interface="org.opencastproject.search.impl.persistence.SearchServiceDatabase" />
+    <provide interface="org.opencastproject.search.impl.persistence.SearchServiceDatabase"/>
   </service>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-      target="(osgi.unit.name=org.opencastproject.search.impl.persistence)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
+             target="(osgi.unit.name=org.opencastproject.search.impl.persistence)" cardinality="1..1" policy="static"
+             bind="setEntityManagerFactory"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
 </scr:component>

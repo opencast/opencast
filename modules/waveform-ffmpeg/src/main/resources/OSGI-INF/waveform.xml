@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
-  <scr:component name="org.opencastproject.waveform.ffmpeg.WaveformServiceImpl" immediate="true" activate="activate" >
-    <implementation class="org.opencastproject.waveform.ffmpeg.WaveformServiceImpl" />
-    <property name="service.description" value="Waveform Service" />
+  <scr:component name="org.opencastproject.waveform.ffmpeg.WaveformServiceImpl" immediate="true" activate="activate">
+    <implementation class="org.opencastproject.waveform.ffmpeg.WaveformServiceImpl"/>
+    <property name="service.description" value="Waveform Service"/>
     <service>
-      <provide interface="org.opencastproject.waveform.api.WaveformService" />
-      <provide interface="org.osgi.service.cm.ManagedService" />
+      <provide interface="org.opencastproject.waveform.api.WaveformService"/>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
     </service>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="userDirectory" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
-      policy="static" bind="setWorkspace" />
+               policy="static" bind="setWorkspace"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" immediate="true">
-    <implementation class="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" />
-    <property name="service.description" value="Waveform Service REST Endpoint" />
+    <implementation class="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint"/>
+    <property name="service.description" value="Waveform Service REST Endpoint"/>
 
-    <property name="opencast.service.type" value="org.opencastproject.waveform" />
-    <property name="opencast.service.path" value="/waveform" />
-    <property name="opencast.service.jobproducer" value="true" />
+    <property name="opencast.service.type" value="org.opencastproject.waveform"/>
+    <property name="opencast.service.path" value="/waveform"/>
+    <property name="opencast.service.jobproducer" value="true"/>
 
     <service>
-      <provide interface="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint" />
+      <provide interface="org.opencastproject.waveform.endpoint.WaveformServiceEndpoint"/>
     </service>
 
     <reference name="WaveformService" interface="org.opencastproject.waveform.api.WaveformService"
-      cardinality="1..1" policy="static" bind="setWaveformService" />
+               cardinality="1..1" policy="static" bind="setWaveformService"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   </scr:component>
 
 </scr:components>

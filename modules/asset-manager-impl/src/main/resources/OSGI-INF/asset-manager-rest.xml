@@ -15,8 +15,8 @@
   -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        immediate="true"
-        name="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint">
+               immediate="true"
+               name="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint">
   <implementation class="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint"/>
 
   <property name="service.description" value="AssetManager REST Endpoint"/>

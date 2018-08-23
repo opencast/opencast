@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-	name="org.opencastproject.security.urlsigning.SigningMediaPackageSerializer"
-	immediate="true"
-	configuration-policy="optional">
-	<implementation
-		class="org.opencastproject.security.urlsigning.SigningMediaPackageSerializer" />
-	<property name="service.description" value="Signing Mediapackage Serializer" />
-	<service>
-		<provide interface="org.opencastproject.mediapackage.MediaPackageSerializer" />
-		<provide interface="org.osgi.service.cm.ManagedService" />
-	</service>
-	 <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
-          cardinality="1..1" policy="static" bind="setSecurityService" />
-	 <reference name="url-signing-service" interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-          cardinality="0..1" policy="dynamic" bind="setUrlSigningService" />
+               name="org.opencastproject.security.urlsigning.SigningMediaPackageSerializer"
+               immediate="true"
+               configuration-policy="optional">
+  <implementation
+      class="org.opencastproject.security.urlsigning.SigningMediaPackageSerializer"/>
+  <property name="service.description" value="Signing Mediapackage Serializer"/>
+  <service>
+    <provide interface="org.opencastproject.mediapackage.MediaPackageSerializer"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+  </service>
+  <reference name="SecurityService" interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
+  <reference name="url-signing-service" interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
+             cardinality="0..1" policy="dynamic" bind="setUrlSigningService"/>
 </scr:component>

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.series.remote.SeriesServiceRemoteImpl" immediate="true">
-  <implementation class="org.opencastproject.series.remote.SeriesServiceRemoteImpl" />
-  <property name="service.description" value="Series Remote Service Proxy" />
-  
-  <property name="opencast.service.type" value="org.opencastproject.series" />
-  <property name="opencast.service.path" value="/series" />
-  <property name="opencast.service.publish" value="false" />
-  
+               name="org.opencastproject.series.remote.SeriesServiceRemoteImpl" immediate="true">
+  <implementation class="org.opencastproject.series.remote.SeriesServiceRemoteImpl"/>
+  <property name="service.description" value="Series Remote Service Proxy"/>
+
+  <property name="opencast.service.type" value="org.opencastproject.series"/>
+  <property name="opencast.service.path" value="/series"/>
+  <property name="opencast.service.publish" value="false"/>
+
   <service>
-    <provide interface="org.opencastproject.series.api.SeriesService" />
-    <provide interface="org.opencastproject.series.remote.SeriesServiceRemoteImpl" />
+    <provide interface="org.opencastproject.series.api.SeriesService"/>
+    <provide interface="org.opencastproject.series.remote.SeriesServiceRemoteImpl"/>
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-    cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
-  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry" 
-    cardinality="1..1" policy="static" bind="setRemoteServiceManager" />  
+             cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>
+  <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             cardinality="1..1" policy="static" bind="setRemoteServiceManager"/>
 </scr:component>

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-	name="org.opencastproject.email.template.impl.EmailTemplateServiceImpl"
-	immediate="true" activate="activate" >
-	<implementation
-		class="org.opencastproject.email.template.impl.EmailTemplateServiceImpl" />
-	<property name="service.description" value="Email Template Service" />
-	<service>
-		<provide interface="org.opencastproject.email.template.api.EmailTemplateService" />
-	</service>
-	<reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-		cardinality="1..1" policy="static" bind="setWorkspace" />
-    <reference name="EmailTemplateScanner" interface="org.opencastproject.email.template.impl.EmailTemplateScanner" 
-    	policy="dynamic" cardinality="0..1" bind="setEmailTemplateScanner" unbind="unsetEmailTemplateScanner" />    
-    <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
-      policy="static" bind="setWorkspace" />
-    <reference name="IncidentService" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.IncidentService"
-      policy="static" bind="setIncidentService" />
+               name="org.opencastproject.email.template.impl.EmailTemplateServiceImpl"
+               immediate="true" activate="activate">
+  <implementation
+      class="org.opencastproject.email.template.impl.EmailTemplateServiceImpl"/>
+  <property name="service.description" value="Email Template Service"/>
+  <service>
+    <provide interface="org.opencastproject.email.template.api.EmailTemplateService"/>
+  </service>
+  <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
+             cardinality="1..1" policy="static" bind="setWorkspace"/>
+  <reference name="EmailTemplateScanner" interface="org.opencastproject.email.template.impl.EmailTemplateScanner"
+             policy="dynamic" cardinality="0..1" bind="setEmailTemplateScanner" unbind="unsetEmailTemplateScanner"/>
+  <reference name="Workspace" cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace"
+             policy="static" bind="setWorkspace"/>
+  <reference name="IncidentService" cardinality="1..1"
+             interface="org.opencastproject.serviceregistry.api.IncidentService"
+             policy="static" bind="setIncidentService"/>
 </scr:component>
 
