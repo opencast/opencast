@@ -58,10 +58,8 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -1134,9 +1132,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Merge scheduled mediapackage with ingested
       mp = mergeScheduledMediaPackage(mp);
 
-      // Set public ACL if empty
-      setPublicAclIfEmpty(mp);
-
       ingestStatistics.successful();
       if (workflowDef != null) {
         logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'",
@@ -1273,16 +1268,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return mp;
     } finally {
       properties.remove(LEGACY_MEDIAPACKAGE_ID_KEY);
-    }
-  }
-
-  private void setPublicAclIfEmpty(MediaPackage mp) {
-    AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
-    if (activeAcl.getEntries().size() == 0) {
-      String anonymousRole = securityService.getOrganization().getAnonymousRole();
-      activeAcl = new AccessControlList(
-              new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true));
-      authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
 
