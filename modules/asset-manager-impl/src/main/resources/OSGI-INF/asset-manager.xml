@@ -8,7 +8,7 @@
   <property name="service.description" value="Opencast Asset Manager"/>
   <service>
     <provide interface="org.opencastproject.assetmanager.api.AssetManager"/>
-    <provide interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManager" />
+    <provide interface="org.opencastproject.assetmanager.impl.TieredStorageAssetManager"/>
   </service>
 
   <reference name="assetStore"

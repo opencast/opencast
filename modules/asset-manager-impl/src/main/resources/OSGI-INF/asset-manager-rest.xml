@@ -22,7 +22,7 @@
   <property name="service.description" value="AssetManager REST Endpoint"/>
   <property name="opencast.service.type" value="org.opencastproject.assetmanager"/>
   <property name="opencast.service.path" value="/assets"/>
-  <property name="opencast.service.jobproducer" value="true" />
+  <property name="opencast.service.jobproducer" value="true"/>
 
   <service>
     <!-- Needed for the RestPublisher to pick up the service. -->
