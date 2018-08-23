@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.messages.MailService" immediate="true">
-    <implementation class="org.opencastproject.messages.MailService" />
-    <property name="service.description" value="Mail Service" />
+    <implementation class="org.opencastproject.messages.MailService"/>
+    <property name="service.description" value="Mail Service"/>
     <service>
-      <provide interface="org.opencastproject.messages.MailService" />
+      <provide interface="org.opencastproject.messages.MailService"/>
     </service>
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
     <reference name="orgDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
     <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-        target="(osgi.unit.name=org.opencastproject.messages)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
+               target="(osgi.unit.name=org.opencastproject.messages)" cardinality="1..1" policy="static"
+               bind="setEntityManagerFactory"/>
   </scr:component>
 </scr:components>

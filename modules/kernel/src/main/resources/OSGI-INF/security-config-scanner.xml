@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller"
-    immediate="true" activate="activate">
+                 immediate="true" activate="activate">
     <implementation
-      class="org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller" />
-    <property name="service.description" value="Security Configuration Scanner" />
+        class="org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller"/>
+    <property name="service.description" value="Security Configuration Scanner"/>
     <service>
-      <provide interface="org.apache.felix.fileinstall.ArtifactInstaller" />
+      <provide interface="org.apache.felix.fileinstall.ArtifactInstaller"/>
     </service>
     <reference name="securityFilter" interface="org.opencastproject.kernel.security.SecurityFilter"
-      cardinality="1..1" policy="static" bind="setSecurityFilter" />
+               cardinality="1..1" policy="static" bind="setSecurityFilter"/>
   </scr:component>
 </scr:components>

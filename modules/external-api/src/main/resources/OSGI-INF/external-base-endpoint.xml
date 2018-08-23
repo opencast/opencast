@@ -2,22 +2,22 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.external.endpoint.BaseEndpoint"
                immediate="true" activate="activate">
-  <implementation class="org.opencastproject.external.endpoint.BaseEndpoint" />
-  <property name="service.description" value="External API - Base Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.external" />
-  <property name="opencast.service.path" value="/api" />
+  <implementation class="org.opencastproject.external.endpoint.BaseEndpoint"/>
+  <property name="service.description" value="External API - Base Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.external"/>
+  <property name="opencast.service.path" value="/api"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.external.endpoint.BaseEndpoint" />
+    <provide interface="org.opencastproject.external.endpoint.BaseEndpoint"/>
   </service>
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1"
              policy="static"
-             bind="setSecurityService" />
+             bind="setSecurityService"/>
   <reference name="ExternalIndex"
              interface="org.opencastproject.external.impl.index.ExternalIndex"
              cardinality="1..1"
              policy="static"
-             bind="setExternalIndex" />
+             bind="setExternalIndex"/>
 </scr:component>

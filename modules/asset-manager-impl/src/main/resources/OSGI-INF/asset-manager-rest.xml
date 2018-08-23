@@ -15,14 +15,14 @@
   -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        immediate="true"
-        name="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint">
+               immediate="true"
+               name="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint">
   <implementation class="org.opencastproject.assetmanager.impl.endpoint.OsgiAssetManagerRestEndpoint"/>
 
   <property name="service.description" value="AssetManager REST Endpoint"/>
   <property name="opencast.service.type" value="org.opencastproject.assetmanager"/>
   <property name="opencast.service.path" value="/assets"/>
-  <property name="opencast.service.jobproducer" value="true" />
+  <property name="opencast.service.jobproducer" value="true"/>
 
   <service>
     <!-- Needed for the RestPublisher to pick up the service. -->

@@ -22,8 +22,8 @@
 
 // Controller for the "edit scheduled events" wizard
 angular.module('adminNg.controllers')
-    .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'SeriesResource', 'CaptureAgentsResource', 'EventsSchedulingResource', 'JsHelper', 'SchedulingHelperService', 'WizardHandler', 'Language', '$translate', 'decorateWithTableRowSelection',
-function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, CaptureAgentsResource, EventsSchedulingResource, JsHelper, SchedulingHelperService, WizardHandler, Language, $translate, decorateWithTableRowSelection) {
+    .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'SeriesResource', 'CaptureAgentsResource', 'EventsSchedulingResource', 'JsHelper', 'SchedulingHelperService', 'WizardHandler', 'Language', '$translate', 'decorateWithTableRowSelection','$timeout', 'Modal',
+function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, CaptureAgentsResource, EventsSchedulingResource, JsHelper, SchedulingHelperService, WizardHandler, Language, $translate, decorateWithTableRowSelection, $timeout, Modal) {
     var me = this;
     var SCHEDULING_CONTEXT = 'event-scheduling';
 
@@ -54,6 +54,21 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
             $scope.seriesResults[row.title] = row.id;
         });
     });
+
+    $scope.keyUp = function (event) {
+        switch (event.keyCode) {
+        case 27:
+            $scope.close();
+            break;
+        }
+    };
+
+    $scope.close = function() {
+        if (me.notificationConflict) {
+            Notifications.remove(me.notificationConflict, SCHEDULING_CONTEXT);
+        }
+        Modal.$scope.close();
+    };
 
     // Given a series id, get me the title (we need this for the summary prettification)
     var seriesTitleForId = function(id) {
@@ -208,6 +223,7 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
     this.noConflictsDetected = function () {
         me.clearConflicts();
         $scope.checkingConflicts = false;
+        $scope.generateEventSummariesAndContinue();
     };
 
     // What we send to the server is slightly different than what we
@@ -236,20 +252,12 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
         if ($scope.conflictCheckingEnabled === false) {
             return;
         }
-        return new Promise(function(resolve, reject) {
-            $scope.checkingConflicts = true;
-            var payload = {
-                events: $scope.getSelectedIds(),
-                scheduling: postprocessScheduling()
-            };
-            EventBulkEditResource.conflicts(payload, me.noConflictsDetected, me.conflictsDetected)
-                .$promise.then(function() {
-                    resolve();
-                })
-                .catch(function(err) {
-                    reject();
-                });
-        });
+        $scope.checkingConflicts = true;
+        var payload = {
+            events: $scope.getSelectedIds(),
+            scheduling: postprocessScheduling()
+        };
+        EventBulkEditResource.conflicts(payload, me.noConflictsDetected, me.conflictsDetected);
     };
 
     $scope.checkingConflicts = false;
@@ -458,7 +466,9 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
                 });
             }
         });
-        nextWizardStep();
+        $timeout(function() {
+            nextWizardStep();
+        });
     };
 
     $scope.noChanges = function() {
@@ -480,6 +490,14 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
         $scope.submitButton = false;
         $scope.close();
         Notifications.add('error', 'EVENTS_NOT_UPDATED', 'global', -1);
+    };
+
+    $scope.nextButtonText = function() {
+        if ($scope.checkingConflicts) {
+            return 'BULK_ACTIONS.EDIT_EVENTS.CONFLICT_CHECK_RUNNING';
+        } else {
+            return 'WIZARD.NEXT_STEP';
+        }
     };
 
     $scope.submitButton = false;

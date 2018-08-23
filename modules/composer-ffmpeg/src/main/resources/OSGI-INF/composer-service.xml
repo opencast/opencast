@@ -2,46 +2,47 @@
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.composer.impl.ComposerServiceImpl" immediate="true"
                  activate="activate" deactivate="deactivate">
-    <implementation class="org.opencastproject.composer.impl.ComposerServiceImpl" />
-    <property name="service.description" value="Composer (Encoder) Local Service" />
-    <property name="service.pid" value="org.opencastproject.composer.impl.ComposerServiceImpl" />
+    <implementation class="org.opencastproject.composer.impl.ComposerServiceImpl"/>
+    <property name="service.description" value="Composer (Encoder) Local Service"/>
+    <property name="service.pid" value="org.opencastproject.composer.impl.ComposerServiceImpl"/>
     <service>
-      <provide interface="org.opencastproject.composer.api.ComposerService" />
-      <provide interface="org.osgi.service.cm.ManagedService" />
+      <provide interface="org.opencastproject.composer.api.ComposerService"/>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
     </service>
     <reference name="inspection-service" interface="org.opencastproject.inspection.api.MediaInspectionService"
-      cardinality="1..1" policy="static" bind="setMediaInspectionService" />
+               cardinality="1..1" policy="static" bind="setMediaInspectionService"/>
     <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
-      policy="static" bind="setWorkspace" />
-    <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService" policy="static" cardinality="1..1" bind="setSmilService" />
+               policy="static" bind="setWorkspace"/>
+    <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService" policy="static"
+               cardinality="1..1" bind="setSmilService"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
     <reference name="profileScanner" policy="static" bind="setProfileScanner" cardinality="1..1"
-      interface="org.opencastproject.composer.impl.EncodingProfileScanner" />
+               interface="org.opencastproject.composer.impl.EncodingProfileScanner"/>
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
     <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
-      interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=encodingprofile)" />
+               interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=encodingprofile)"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.composer.impl.endpoint.ComposerRestService" immediate="true">
-    <implementation class="org.opencastproject.composer.impl.endpoint.ComposerRestService" />
-    <property name="service.description" value="Composer REST Endpoint" />
-    <property name="opencast.service.type" value="org.opencastproject.composer" />
-    <property name="opencast.service.path" value="/composer/ffmpeg" />
-    <property name="opencast.service.jobproducer" value="true" />
+    <implementation class="org.opencastproject.composer.impl.endpoint.ComposerRestService"/>
+    <property name="service.description" value="Composer REST Endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.composer"/>
+    <property name="opencast.service.path" value="/composer/ffmpeg"/>
+    <property name="opencast.service.jobproducer" value="true"/>
     <service>
-      <provide interface="org.opencastproject.composer.impl.endpoint.ComposerRestService" />
+      <provide interface="org.opencastproject.composer.impl.endpoint.ComposerRestService"/>
     </service>
     <reference name="composerService" interface="org.opencastproject.composer.api.ComposerService"
-      cardinality="1..1" policy="static" bind="setComposerService" />
+               cardinality="1..1" policy="static" bind="setComposerService"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
     <reference name="smil-service" interface="org.opencastproject.smil.api.SmilService"
-      policy="static" cardinality="1..1" bind="setSmilService" />
+               policy="static" cardinality="1..1" bind="setSmilService"/>
   </scr:component>
 </scr:components>

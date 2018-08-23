@@ -1,5 +1,5 @@
 {
-  "Status": "error",
+  "Status": "AGENTS.STATUS.ERROR",
   "capabilities": [],
   "configuration": [],
   "inputs": [],
