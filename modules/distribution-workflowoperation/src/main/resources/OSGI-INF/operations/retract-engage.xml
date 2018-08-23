@@ -10,11 +10,13 @@
     <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DownloadDistributionService"
-    name="DownloadDistributionService" policy="static" target="(distribution.channel=download)" bind="setDownloadDistributionService"/>
+             name="DownloadDistributionService" policy="static" target="(distribution.channel=download)"
+             bind="setDownloadDistributionService"/>
   <reference cardinality="1..1" interface="org.opencastproject.distribution.api.DistributionService"
-    name="StreamingDistributionService" policy="static" target="(distribution.channel=streaming)" bind="setStreamingDistributionService"/>
+             name="StreamingDistributionService" policy="static" target="(distribution.channel=streaming)"
+             bind="setStreamingDistributionService"/>
   <reference cardinality="1..1" interface="org.opencastproject.search.api.SearchService"
-    name="SearchService" policy="static" bind="setSearchService"/>
+             name="SearchService" policy="static" bind="setSearchService"/>
   <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-    name="ServiceRegistry" policy="static" bind="setServiceRegistry"/>
+             name="ServiceRegistry" policy="static" bind="setServiceRegistry"/>
 </scr:component>

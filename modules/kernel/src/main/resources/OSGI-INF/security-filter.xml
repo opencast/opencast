@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.kernel.security.SecurityFilter" immediate="true">
-    <implementation class="org.opencastproject.kernel.security.SecurityFilter" />
-    <property name="service.description" value="Security Filter" />
-    <property name="httpContext.id" value="opencast.httpcontext" />
-    <property name="httpContext.shared" value="true" />
+    <implementation class="org.opencastproject.kernel.security.SecurityFilter"/>
+    <property name="service.description" value="Security Filter"/>
+    <property name="httpContext.id" value="opencast.httpcontext"/>
+    <property name="httpContext.shared" value="true"/>
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
-    <property name="service.ranking" value="3" />
-    <property name="urlPatterns" value="*" />
+    <property name="service.ranking" value="3"/>
+    <property name="urlPatterns" value="*"/>
     <service>
-      <provide interface="javax.servlet.Filter" />
-      <provide interface="org.opencastproject.kernel.security.SecurityFilter" />
+      <provide interface="javax.servlet.Filter"/>
+      <provide interface="org.opencastproject.kernel.security.SecurityFilter"/>
     </service>
     <reference name="securityService" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
   </scr:component>
 </scr:components>

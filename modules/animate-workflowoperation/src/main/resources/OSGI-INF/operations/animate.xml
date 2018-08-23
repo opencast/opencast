@@ -2,18 +2,18 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.workflow.handler.animate.AnimateWorkflowOperationHandler"
                immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.animate.AnimateWorkflowOperationHandler" />
-  <property name="service.description" value="Animate Workflow Operation Handler" />
-  <property name="workflow.operation" value="animate" />
+  <implementation class="org.opencastproject.workflow.handler.animate.AnimateWorkflowOperationHandler"/>
+  <property name="service.description" value="Animate Workflow Operation Handler"/>
+  <property name="workflow.operation" value="animate"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             name="ServiceRegistry" bind="setServiceRegistry" />
+             name="ServiceRegistry" bind="setServiceRegistry"/>
   <reference interface="org.opencastproject.animate.api.AnimateService"
-             name="AnimateService" bind="setAnimateService" />
+             name="AnimateService" bind="setAnimateService"/>
   <reference interface="org.opencastproject.inspection.api.MediaInspectionService"
-             name="MediaInspectionService" bind="setMediaInspectionService" />
+             name="MediaInspectionService" bind="setMediaInspectionService"/>
   <reference interface="org.opencastproject.workspace.api.Workspace"
-             name="Workspace" bind="setWorkspace" />
+             name="Workspace" bind="setWorkspace"/>
 </scr:component>

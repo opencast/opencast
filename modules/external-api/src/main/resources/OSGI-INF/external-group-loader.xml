@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.external.userdirectory.ExternalGroupLoader" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.external.userdirectory.ExternalGroupLoader" />
-  <property name="service.description" value="External group loader" />
+               name="org.opencastproject.external.userdirectory.ExternalGroupLoader" immediate="true"
+               activate="activate">
+  <implementation class="org.opencastproject.external.userdirectory.ExternalGroupLoader"/>
+  <property name="service.description" value="External group loader"/>
   <service>
-    <provide interface="org.opencastproject.external.userdirectory.ExternalGroupLoader" />
+    <provide interface="org.opencastproject.external.userdirectory.ExternalGroupLoader"/>
   </service>
   <reference name="groupRoleProvider" interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
-    policy="static" cardinality="1..1" bind="setGroupRoleProvider" />
-  <reference name="organizationDirectoryService" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    policy="static" cardinality="1..1" bind="setOrganizationDirectoryService" />
+             policy="static" cardinality="1..1" bind="setGroupRoleProvider"/>
+  <reference name="organizationDirectoryService"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             policy="static" cardinality="1..1" bind="setOrganizationDirectoryService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
 </scr:component>

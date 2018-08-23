@@ -4,25 +4,25 @@
                immediate="true"
                activate="activate"
                deactivate="deactivate">
-  <implementation class="org.opencastproject.serviceregistry.impl.OsgiIncidentService" />
-  <property name="service.description" value="Incident service" />
+  <implementation class="org.opencastproject.serviceregistry.impl.OsgiIncidentService"/>
+  <property name="service.description" value="Incident service"/>
   <service>
-    <provide interface="org.opencastproject.serviceregistry.api.IncidentService" />
+    <provide interface="org.opencastproject.serviceregistry.api.IncidentService"/>
   </service>
   <reference name="entityManagerFactory"
              interface="javax.persistence.EntityManagerFactory"
              target="(osgi.unit.name=org.opencastproject.serviceregistry)"
              cardinality="1..1"
              policy="static"
-             bind="setEntityManagerFactory" />
+             bind="setEntityManagerFactory"/>
   <reference name="serviceRegistry"
              interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
              cardinality="1..1"
              policy="static"
-             bind="setServiceRegistry" />
+             bind="setServiceRegistry"/>
   <reference name="workflowService"
              interface="org.opencastproject.workflow.api.WorkflowService"
              cardinality="1..1"
              policy="static"
-             bind="setWorkflowService" />
+             bind="setWorkflowService"/>
 </scr:component>

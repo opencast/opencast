@@ -2,18 +2,18 @@
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
 
   <scr:component name="org.opencastproject.kernel.rest.CurrentJobFilter" immediate="true">
-    <implementation class="org.opencastproject.kernel.rest.CurrentJobFilter" />
-    <property name="service.description" value="Current Job Filter" />
-    <property name="httpContext.id" value="opencast.httpcontext" />
-    <property name="httpContext.shared" value="true" />
+    <implementation class="org.opencastproject.kernel.rest.CurrentJobFilter"/>
+    <property name="service.description" value="Current Job Filter"/>
+    <property name="httpContext.id" value="opencast.httpcontext"/>
+    <property name="httpContext.shared" value="true"/>
     <!-- The CleanSessionsFilter must have the highest service.ranking value. See CleanSessionsFilter.java for details. -->
-    <property name="service.ranking" value="4" />
-    <property name="urlPatterns" value="*" />
+    <property name="service.ranking" value="4"/>
+    <property name="urlPatterns" value="*"/>
     <service>
-      <provide interface="javax.servlet.Filter" />
+      <provide interface="javax.servlet.Filter"/>
     </service>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   </scr:component>
 
 </scr:components>

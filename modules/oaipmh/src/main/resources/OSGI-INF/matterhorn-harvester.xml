@@ -30,5 +30,5 @@
              target="(osgi.unit.name=org.opencastproject.oaipmh.harvester)"
              cardinality="1..1"
              policy="static"
-             bind="setEntityManagerFactory" />  
+             bind="setEntityManagerFactory"/>
 </scr:component>

@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.feed.impl.FeedServlet" immediate="true">
-  <implementation class="org.opencastproject.feed.impl.FeedServiceImpl" />
-  <property name="service.description" value="Feed Service" />
-  <property name="opencast.service.type" value="org.opencastproject.feed.impl.FeedServiceImpl" />
-  <property name="opencast.service.path" value="/feeds" />
-  <property name="opencast.service.jobproducer" value="false" />
+               name="org.opencastproject.feed.impl.FeedServlet" immediate="true">
+  <implementation class="org.opencastproject.feed.impl.FeedServiceImpl"/>
+  <property name="service.description" value="Feed Service"/>
+  <property name="opencast.service.type" value="org.opencastproject.feed.impl.FeedServiceImpl"/>
+  <property name="opencast.service.path" value="/feeds"/>
+  <property name="opencast.service.jobproducer" value="false"/>
 
   <service>
-    <provide interface="org.opencastproject.feed.impl.FeedServiceImpl" />
+    <provide interface="org.opencastproject.feed.impl.FeedServiceImpl"/>
   </service>
-  <reference name="feed" interface="org.opencastproject.feed.api.FeedGenerator" cardinality="0..n" policy="dynamic" bind="addFeedGenerator" unbind="removeFeedGenerator"/>
-  <reference name="security" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1" policy="static" bind="setSecurityService"/>
-  <reference name="profilesReadyIndicator" policy="static" cardinality="1..1" interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=feed)" />
+  <reference name="feed" interface="org.opencastproject.feed.api.FeedGenerator" cardinality="0..n" policy="dynamic"
+             bind="addFeedGenerator" unbind="removeFeedGenerator"/>
+  <reference name="security" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1"
+             policy="static" bind="setSecurityService"/>
+  <reference name="profilesReadyIndicator" policy="static" cardinality="1..1"
+             interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=feed)"/>
 </scr:component>
