@@ -170,10 +170,6 @@
     <sec:intercept-url pattern="/api/events" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/attachments" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ATTACHMENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/attachments/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ATTACHMENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/comments" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/comments/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/media" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/media/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_MEDIA_VIEW"/>
     <sec:intercept-url pattern="/api/events/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_VIEW"/>
@@ -196,7 +192,6 @@
     <!-- External API PUT Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/comments/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_EDIT"/>
@@ -210,7 +205,6 @@
     <sec:intercept-url pattern="/api/events" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_CREATE"/>
     <sec:intercept-url pattern="/api/events/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/comments" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_EDIT"/>
     <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
@@ -219,7 +213,6 @@
     <!-- External API DELETE Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_DELETE"/>
     <sec:intercept-url pattern="/api/events/*/acl/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_DELETE"/>
-    <sec:intercept-url pattern="/api/events/*/comments/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_COMMENTS_DELETE"/>
     <sec:intercept-url pattern="/api/events/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_DELETE"/>
