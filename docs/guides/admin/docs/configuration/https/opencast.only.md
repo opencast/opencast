@@ -1,24 +1,5 @@
-HTTPS
-=====
-
-This document will assist you in enabling HTTPS for a new or an existing
-Opencast installation, either via HTTPS termination proxy or directly in
-Opencast.
-
-Changing the domain name of an Opencast installation is a similar procedure.
-
-
-Motivation: HTTPS for Opencast, why?
-------------------------------------
-
-Your site visitor's privacy. While ISPs and public HotSpot operators and those
-who sniff unencrypted WiFi traffic might be able to see your visitors
-connecting to your site, they can't see, which video is watched when HTTPS is
-enabled.
-
-
-Enable HTTPS directly in Opencast – without proxy
--------------------------------------------------
+Enable HTTPS directly in Opencast
+=================================
 
 In `opencast/etc/`, use the `org.ops4j.pax.web.cfg` file for
 configuration:
@@ -52,7 +33,8 @@ org.ops4j.pax.web.ssl.keypassword=<the_key_password>
 ```
 
 
-### Port-Forwarding required
+Port-Forwarding required
+------------------------
 
 Note that Opencast most likely can't bind to port 443. That's why you still
 need to reverse-proxy or port-forward if you want to avoid URLs with port
@@ -63,7 +45,7 @@ Here is a non-comprehensive lists of tools and methods which can be used for
 port forwarding:
 
 
-#### Port-Forwarding with iptables
+### Port-Forwarding with iptables
 
 A rule like
 
@@ -78,14 +60,14 @@ Opencast consumers will connect on. Note that you usually want to persist the
 rule.
 
 
-#### Port-Forwarding with docker(-proxy)
+### Port-Forwarding with docker(-proxy)
 
 When starting a container from an Opencast image, either insert a
 command line argument to docker run: `-p 443:8443` or add a `ports:`
 in `docker-compose.yaml`.
 
 
-#### Port-Forwarding with sniproxy
+### Port-Forwarding with sniproxy
 
 [Sniproxy](https://github.com/dlundquist/sniproxy) can be used as well,
 especially if you have multiple servers running on the same machine that handle
@@ -111,14 +93,15 @@ table https_hosts {
 ```
 
 
-### Creating the keystore
+Creating the keystore
+---------------------
 
 What you need, is the TLS private key and the certificate including the
 whole chain between the root certificate, all intermediates and the
 certificate itself.
 
 
-#### Obtaining the certificate chain
+### Obtaining the certificate chain
 
 If you only have the key and the certificate, I recommend
 [certificatechain.io](https://certificatechain.io/) or
@@ -135,7 +118,7 @@ cert-chain-resolver -s -o "opencast.chain.pem.tmp" "cert.pem"
 openssl verify -crl_download -crl_check -untrusted "opencast.chain.pem.tmp" "cert.pem"
 ```
 
-#### Create the p12 keystore
+### Create the p12 keystore
 
 If the private key (assumed to be `key.pem`) is encrypted
 (password protected), issue the following command. Note that there
@@ -165,7 +148,7 @@ openssl pkcs12 \
 ```
 
 
-#### Import the p12 keystore into a Java keystore:
+### Import the p12 keystore into a Java keystore:
 
 ```bash
 keytool \
@@ -187,7 +170,8 @@ keytool \
 ](https://gist.github.com/pawohl/dd92ff4909e3e2704e36dec747ea238e).
 
 
-### Default to HTTPS
+Default to HTTPS
+----------------
 
 When finished, restarted and verified that HTTPS works as expected,
 you can change Opencast's default URL to the HTTPS one.
@@ -198,54 +182,3 @@ Set `org.opencastproject.server.url` to the  HTTPS-URL in
 ```ini
 org.opencastproject.server.url=https://opencast.example.com
 ```
-
-
-Enable HTTPS using a termination-proxy
---------------------------------------
-
-All you have to do is to set `org.opencastproject.server.url` to the
-HTTPS-URL in `etc/custom.properties`.
-
-```ini
-org.opencastproject.server.url=https://opencast.example.com
-```
-
-
-Upgrading to HTTPS if already-processed media packages exist
-------------------------------------------------------------
-
-1. Backup your database, and the Solr and Elasticsearch indices.
-2. Tell your other Opencast systems to use HTTPS for each other,
-   or at least for the system delivering the videos to the visitors
-   and creating the search indices.
-3. Put all your nodes into maintenance mode, or, at least do
-   not process any videos.
-4. Update the media packages:
-   `find . -type f -name "*.xml" -exec \
-    sed -i 's/http\:\/\/presentation\.opencast\.example\.com\:80/https:\/\/presentation.opencast.example.com/g' {} +`
-5. Update 2 database tables:
-
-        UPDATE opencast.mh_archive_episode
-        SET mediapackage_xml =
-           REPLACE( mediapackage_xml,
-                    'http://presentation.opencast.example.com:80',
-                    'https://presentation.opencast.example.com')
-           WHERE INSTR( mediapackage_xml,
-                        'http://presentation.opencast.example.com:80') > 0;
-        UPDATE opencast.mh_search
-        SET mediapackage_xml =
-           REPLACE( mediapackage_xml,
-                    'http://presentation.opencast.example.com:80',
-                    'https://presentation.opencast.example.com')
-           WHERE INSTR( mediapackage_xml,
-                        'http://presentation.opencast.example.com:80') > 0;
-
-6. Rebuild the Elasticsearch indices.
-   Visit your REST API and push the button:
-   https://admin.opencast.example.com/docs.html?path=/admin-ng/index
-7. Move the search service's old Solr index away. There might be a directory
-   named `solr-indexes/search` but its configuration really depends on
-   `org.opencastproject.solr.dir`, or if set in `custom.properties`,
-   `org.opencastproject.search.solr.dir`
-8. Rebuild the Solr indices by re-starting your Opencast node running the
-   search service (usually presentation).

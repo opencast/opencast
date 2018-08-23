@@ -38,8 +38,7 @@ Configuration Changes
 ---------------------
 
 HTTP Basic authentication is enabled by default (see `etc/security/mh_default_org.xml`). Make sure you've enabled
-HTTPS support in Opencast or your preferred HTTP proxy (see [documentation](configuration/security.https.md)) if you
-plan to use it.
+HTTPS before using it.
 
 Paella Player has been included in Opencast 5.0. So you can choose between the Theodul and Paella player.
 This can be done by setting the `prop.player` property in the tennant's configuration file (for example
