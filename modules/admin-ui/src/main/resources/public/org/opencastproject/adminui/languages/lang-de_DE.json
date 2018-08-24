@@ -769,8 +769,6 @@
                "CAPTION": "Kommentare",
                "PLACEHOLDER": "Kommentieren…",
                "SELECTPLACEHOLDER": "Gründe wählen",
-               "NONE": "Keine",
-               "OPEN": "Offen",
                "RESOLVED": "Gelöst",
                "REPLY": "Antworten",
                "REPLY_TO": "Antworten",
@@ -1739,7 +1737,10 @@
             "LABEL": "Zugriffsrechte"
          },
          "COMMENTS": {
-            "LABEL": "Kommentare"
+            "LABEL": "Kommentare",
+            "NONE": "Keine",
+            "OPEN": "Offen",
+            "RESOLVED": "Gelöst"
          },
          "CONTRIBUTORS": {
             "LABEL": "Mitwirkende"

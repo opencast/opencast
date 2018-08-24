@@ -117,7 +117,7 @@ public class EventsListProvider implements ResourceListProvider {
       }
     } else if (COMMENTS.equals(listName)) {
       for (Comments comments : Comments.values())
-        list.put(comments.toString(), "EVENTS.EVENTS.DETAILS.COMMENTS." + comments.toString());
+        list.put(comments.toString(), "FILTERS.EVENTS.COMMENTS." + comments.toString());
     }
 
     return list;

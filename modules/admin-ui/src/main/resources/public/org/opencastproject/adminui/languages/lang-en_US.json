@@ -785,8 +785,6 @@
            "CAPTION":     "Comments",
            "PLACEHOLDER": "Comment…",
            "SELECTPLACEHOLDER": "Select reasons",
-           "NONE": "None",
-           "OPEN": "Open",
            "RESOLVED":    "Resolved",
            "REPLY":       "Reply",
            "REPLY_TO":       "Reply to",
