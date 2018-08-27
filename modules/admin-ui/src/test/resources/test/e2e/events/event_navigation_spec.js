@@ -17,7 +17,7 @@ describe('event navigation', function () {
     });
 
     it('displays event details', function () {
-        expect(page.modal.header.getText()).toContain('Event Details 40518');
+        expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
     });
 
     describe('navigating to the previous record', function () {
@@ -27,7 +27,7 @@ describe('event navigation', function () {
         });
 
         it('stays on the current record', function () {
-            expect(page.modal.header.getText()).toContain('Event Details 40518');
+            expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
         });
     });
 
@@ -48,7 +48,7 @@ describe('event navigation', function () {
             });
 
             it('loads the original record', function () {
-                expect(page.modal.header.getText()).toContain('Event Details 40518');
+                expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             });
         });
     });

@@ -12,7 +12,7 @@ describe('event metadata', function () {
         if (browser.useMocks) {
             browser.addMockModule('httpBackendMock', mocks.httpBackendMock);
         }
-        page.getDetails('40518');
+        page.getDetails('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
         page.waitFor(page.modal.header);
         page.modal.metadataTab.click();
     });

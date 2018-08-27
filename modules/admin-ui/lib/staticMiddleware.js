@@ -10,8 +10,16 @@ module.exports = function (grunt, appPath) {
                 serveStatic('./src/test/resources/app/GET/admin-ng')
               ),
               connect().use(
+                '/app/styles',
+                serveStatic('./app/styles')
+              ),
+              connect().use(
                 '/blacklist',
                 serveStatic('./src/test/resources/app/GET/blacklist')
+              ),
+              connect().use(
+                '/bower_components',
+                serveStatic('./bower_components')
               ),
               connect().use(
                 '/capture-agents',
@@ -30,12 +38,36 @@ module.exports = function (grunt, appPath) {
                 serveStatic('./src/test/resources/app/GET/i18n')
               ),
               connect().use(
+                '/img',
+                serveStatic('src/main/webapp/img/')
+              ),
+              connect().use(
                 '/info',
                 serveStatic('./src/test/resources/app/GET/info')
               ),
               connect().use(
+                '/lib',
+                serveStatic('src/main/webapp/scripts/lib')
+              ),
+              connect().use(
+                '/modules',
+                serveStatic('src/main/webapp/scripts/modules')
+              ),
+              connect().use(
+                '/public',
+                serveStatic('src/main/resources/public/')
+              ),
+              connect().use(
                 '/roles',
                 serveStatic('./src/test/resources/app/GET/roles')
+              ),
+              connect().use(
+                '/services',
+                serveStatic('./src/test/resources/app/GET/services')
+              ),
+              connect().use(
+                '/shared',
+                serveStatic('src/main/webapp/scripts/shared')
               ),
               connect().use(
                 '/sysinfo',
@@ -44,34 +76,6 @@ module.exports = function (grunt, appPath) {
               connect().use(
                 '/workflow',
                 serveStatic('./src/test/resources/app/GET/workflow')
-              ),
-              connect().use(
-                '/bower_components',
-                serveStatic('./bower_components')
-              ),
-              connect().use(
-                '/app/styles',
-                serveStatic('./app/styles')
-              ),
-              connect().use(
-                '/modules',
-                serveStatic('src/main/webapp/scripts/modules')
-              ),
-              connect().use(
-                '/shared',
-                serveStatic('src/main/webapp/scripts/shared')
-              ),
-              connect().use(
-                '/public',
-                serveStatic('src/main/resources/public/')
-              ),
-              connect().use(
-                '/img',
-                serveStatic('src/main/webapp/img/')
-              ),
-              connect().use(
-                '/lib',
-                serveStatic('src/main/webapp/scripts/lib')
               ),
               serveStatic(appPath)
             ];

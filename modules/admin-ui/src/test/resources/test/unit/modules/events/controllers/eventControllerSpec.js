@@ -15,7 +15,7 @@ describe('Event controller', function () {
 
     beforeEach(inject(function ($rootScope, _$controller_, _$httpBackend_, _UsersResource_, _EventAccessResource_, _EventMetadataResource_, _Notifications_) {
         $scope = $rootScope.$new();
-        $scope.resourceId = '40518';
+        $scope.resourceId = '1a2a040b-ef73-4323-93dd-052b86036b75';
         $controller = _$controller_;
         UsersResource = _UsersResource_;
         EventAccessResource = _EventAccessResource_;
@@ -27,21 +27,21 @@ describe('Event controller', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
 
-        $httpBackend.whenGET('/admin-ng/event/40518/comments')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
-        $httpBackend.whenGET('/admin-ng/event/40518/metadata.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/metadata.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/publications.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/media/media.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/attachment/attachments.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/catalog/catalogs.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/publication/publications.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/asset/assets.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/scheduling.json').respond(JSON.stringify({"metadata": {"start":"","end":""}}));
-        $httpBackend.whenGET('/admin-ng/event/40518/workflows.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/event/40518/access.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
-        $httpBackend.whenGET('/admin-ng/event/40518/participation.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')));
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata.json')));
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/publications.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/asset/media/media.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/asset/attachment/attachments.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/asset/catalog/catalogs.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/asset/publication/publications.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/asset/assets.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/scheduling.json').respond(JSON.stringify({"metadata": {"start":"","end":""}}));
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/workflows.json').respond('{}');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/access.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/access.json')));
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/participation.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/components.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/eventUploadAssetOptions.json')
             .respond(JSON.stringify(getJSONFixture('admin-ng/resources/eventUploadAssetOptions.json')));
@@ -52,7 +52,7 @@ describe('Event controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/PUBLICATION.CHANNELS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/event/new/processing?tags=schedule')
             .respond(JSON.stringify(getJSONFixture('admin-ng/event/new/processing')));
-        $httpBackend.whenGET('/admin-ng/event/40518/hasActiveTransaction').respond('false');
+        $httpBackend.whenGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/hasActiveTransaction').respond('false');
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json').respond(JSON.stringify({"results":[],"total":0}));
         $httpBackend.whenGET('/admin-ng/capture-agents/agents.json?inputs=true')
             .respond(JSON.stringify({"results":[],"total":0}));
@@ -69,7 +69,7 @@ describe('Event controller', function () {
 
     describe('deleting a comment', function () {
         it('sends a DELETE request', function () {
-            $httpBackend.expectDELETE('/admin-ng/event/40518/comment/2').respond('{}');
+            $httpBackend.expectDELETE('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comment/2').respond('{}');
             $scope.deleteComment('2');
             $httpBackend.flush();
         });
@@ -83,7 +83,7 @@ describe('Event controller', function () {
         });
 
         it('sends a POST request', function () {
-            $httpBackend.expectPOST('/admin-ng/event/40518/comment', function (data) {
+            $httpBackend.expectPOST('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comment', function (data) {
                 if (data === $.param({ text: 'Please help', reason: 'Emergency' })) {
                     return true;
                 } else {
@@ -96,9 +96,9 @@ describe('Event controller', function () {
         });
 
         it('updates existing comments', function () {
-            $httpBackend.whenPOST('/admin-ng/event/40518/comment').respond('{}');
-            $httpBackend.expectGET('/admin-ng/event/40518/comments')
-                .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/comments')));
+            $httpBackend.whenPOST('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comment').respond('{}');
+            $httpBackend.expectGET('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')
+                .respond(JSON.stringify(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')));
             $scope.comment();
             $httpBackend.flush();
         });
@@ -106,12 +106,12 @@ describe('Event controller', function () {
 
     describe('replying to a comment', function () {
         beforeEach(function () {
-            $scope.replyTo(getJSONFixture('admin-ng/event/40518/comments')[0]);
+            $scope.replyTo(getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comments')[0]);
             $scope.myComment.text = 'My response';
         });
 
         it('enters reply mode', function () {
-            expect($scope.replyToId).toBe(1);
+            expect($scope.replyToId).toBe(1902);
         });
 
         it('allows exiting the reply mode', function () {
@@ -120,7 +120,7 @@ describe('Event controller', function () {
         });
 
         it('sends a POST request resolving the issue', function () {
-            $httpBackend.expectPOST('/admin-ng/event/40518/comment/1/reply', function (data) {
+            $httpBackend.expectPOST('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comment/1902/reply', function (data) {
                 if (data === $.param({ text: 'My response', resolved: false })) {
                     return true;
                 } else {
@@ -135,7 +135,7 @@ describe('Event controller', function () {
         it('sends a POST request keeing the issue unresolved', function () {
             $scope.myComment.resolved = false;
 
-            $httpBackend.expectPOST('/admin-ng/event/40518/comment/1/reply', function (data) {
+            $httpBackend.expectPOST('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/comment/1902/reply', function (data) {
                 if (data === $.param({ text: 'My response', resolved: false })) {
                     return true;
                 } else {
@@ -152,9 +152,9 @@ describe('Event controller', function () {
         var catalogs;
 
         beforeEach(function () {
-            catalogs = getJSONFixture('admin-ng/event/40518/metadata.json');
+            catalogs = getJSONFixture('admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata.json');
             $httpBackend.flush();
-            $scope.$broadcast('change', 40518);
+            $scope.$broadcast('change', '1a2a040b-ef73-4323-93dd-052b86036b75');
         });
 
         it('isolates dublincore/episode catalog', function () {
@@ -196,12 +196,12 @@ describe('Event controller', function () {
             $scope.metadataSave('title', undefined, catalog);
 
             expect(EventMetadataResource.save)
-                .toHaveBeenCalledWith({ id: '40518'}, catalog, jasmine.any(Function));
+                .toHaveBeenCalledWith({ id: '1a2a040b-ef73-4323-93dd-052b86036b75'}, catalog, jasmine.any(Function));
         });
 
         it('marks the saved attribute as saved', function () {
             $scope.metadataSave('title', undefined, catalog);
-            $httpBackend.whenPUT('/admin-ng/event/40518/metadata')
+            $httpBackend.whenPUT('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata')
                 .respond(JSON.stringify(
                     [{'flavor': 'dublincore/episode',
                          'title': 'EVENTS.EVENTS.DETAILS.CATALOG.EPISODE',
@@ -218,7 +218,7 @@ describe('Event controller', function () {
         it('calls the provided callback on success', function () {
             var callback = jasmine.createSpy();
             $scope.metadataSave('title', callback, catalog);
-            $httpBackend.whenPUT('/admin-ng/event/40518/metadata').respond(200);
+            $httpBackend.whenPUT('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata').respond(200);
             $httpBackend.flush();
 
             expect(callback).toHaveBeenCalled();
@@ -234,7 +234,7 @@ describe('Event controller', function () {
                 spyOn($scope, 'metadataSave').and.callThrough();
                 spyOn(callbackObject, 'callback');
                 spyOn(EventMetadataResource, 'save').and.callThrough();
-                $httpBackend.expectPUT('/admin-ng/event/40518/metadata').respond(200);
+                $httpBackend.expectPUT('/admin-ng/event/1a2a040b-ef73-4323-93dd-052b86036b75/metadata').respond(200);
             });
 
             it('saves fields in the dublincore/series catalog', function () {

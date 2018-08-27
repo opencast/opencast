@@ -24,12 +24,12 @@ describe('event details', function () {
         });
 
         it('displays event details', function () {
-            expect(page.modal.header.getText()).toContain('Event Details 40518');
+            expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             expect(page.modal.content.getText()).toContain('Publication Status');
         });
 
         it('changes the URL', function () {
-            expect(page.currentUrl()).toContain('40518');
+            expect(page.currentUrl()).toContain('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
         });
 
         describe('navigating modal tabs', function () {
@@ -64,7 +64,7 @@ describe('event details', function () {
 
             it('changes the URL', function () {
                 page.modal.closeButton.click();
-                expect(page.currentUrl()).not.toContain('40518');
+                expect(page.currentUrl()).not.toContain('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             });
         });
     });
@@ -72,12 +72,12 @@ describe('event details', function () {
     describe('direct access via URL', function () {
 
         beforeEach(function () {
-            page.getDetails('40518');
+            page.getDetails('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             page.waitFor(page.modal.header);
         });
 
         it('displays event details', function () {
-            expect(page.modal.header.getText()).toContain('Event Details 40518');
+            expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             expect(page.modal.content.getText()).toContain('Publication Status');
         });
     });
