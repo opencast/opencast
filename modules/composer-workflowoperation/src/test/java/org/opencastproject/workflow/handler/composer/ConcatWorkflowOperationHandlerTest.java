@@ -37,7 +37,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -444,7 +443,6 @@ public class ConcatWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     EasyMock.replay(profile);
 
     // set up mock composer service

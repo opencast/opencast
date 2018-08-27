@@ -27,11 +27,8 @@ import org.opencastproject.composer.api.EncodingProfile;
 import org.opencastproject.composer.api.EncodingProfile.MediaType;
 import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.util.ConfigurationException;
-import org.opencastproject.util.MimeType;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.ReadinessIndicator;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -65,7 +62,6 @@ public class EncodingProfileScanner implements ArtifactInstaller {
   private static final String PROP_APPLICABLE = ".input";
   private static final String PROP_OUTPUT = ".output";
   private static final String PROP_SUFFIX = ".suffix";
-  private static final String PROP_MIMETYPE = ".mimetype";
   private static final String PROP_JOBLOAD = ".jobload";
 
   /** OSGi bundle context */
@@ -135,13 +131,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
    */
   Map<String, EncodingProfile> loadFromProperties(File artifact) throws IOException {
     // Format name
-    FileInputStream in = null;
     Properties properties = new Properties();
-    try {
-      in = new FileInputStream(artifact);
+    try (FileInputStream in = new FileInputStream(artifact)) {
       properties.load(in);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
 
     // Find list of formats in properties
@@ -160,7 +152,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     }
 
     // Load the formats
-    Map<String, EncodingProfile> profiles = new HashMap<String, EncodingProfile>();
+    Map<String, EncodingProfile> profiles = new HashMap<>();
     for (String profileId : profileNames) {
       logger.debug("Enabling media format " + profileId);
       EncodingProfile profile = loadProfile(profileId, properties, artifact);
@@ -184,9 +176,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     List<String> defaultProperties = new ArrayList<>(10);
 
     String name = getDefaultProperty(profile, PROP_NAME, properties, defaultProperties);
-    if (name == null || "".equals(name))
-      throw new ConfigurationException("Distribution profile '" + profile + "' is missing a name (" + PROP_NAME
-              + "). (Check web.xml profiles.)");
+    if (StringUtils.isBlank(name)) {
+      throw new ConfigurationException("Distribution profile '" + profile + "' is missing a name (" + PROP_NAME + ").");
+    }
 
     EncodingProfileImpl df = new EncodingProfileImpl(profile, name, artifact);
 
@@ -198,7 +190,7 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       df.setOutputType(MediaType.parseString(StringUtils.trimToEmpty(type)));
     } catch (IllegalArgumentException e) {
       throw new ConfigurationException("Output type (" + PROP_OUTPUT + ") '" + type + "' of profile '" + profile
-              + "' is unknwon");
+              + "' is unknown");
     }
 
     //Suffixes with tags?
@@ -215,19 +207,6 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       if (StringUtils.isBlank(suffixObj))
         throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
       df.setSuffix(StringUtils.trim(suffixObj));
-    }
-
-    // Mimetype
-    String mimeTypeObj = getDefaultProperty(profile, PROP_MIMETYPE, properties, defaultProperties);
-    if (StringUtils.isNotBlank(mimeTypeObj)) {
-      MimeType mimeType;
-      try {
-        mimeType = MimeTypes.parseMimeType(mimeTypeObj);
-      } catch (Exception e) {
-        throw new ConfigurationException("Mime type (" + PROP_MIMETYPE + ") " + mimeTypeObj
-                + " could not be parsed as a mime type! Expressions are not allowed!");
-      }
-      df.setMimeType(mimeType.toString());
     }
 
     // Applicable to the following track categories

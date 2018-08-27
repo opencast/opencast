@@ -46,6 +46,7 @@ import org.opencastproject.metadata.mpeg7.Video;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -311,8 +312,11 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
             }
 
             // Set the mimetype
-            if (profile.getMimeType() != null)
-              composedImage.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
+            try {
+              composedImage.setMimeType(MimeTypes.fromURI(composedImage.getURI()));
+            } catch (UnknownFileTypeException e) {
+              logger.warn("Mime type unknown for file {}. Setting none.", composedImage.getURI(), e);
+            }
 
             // Add tags
             for (String tag : asList(targetImageTags)) {

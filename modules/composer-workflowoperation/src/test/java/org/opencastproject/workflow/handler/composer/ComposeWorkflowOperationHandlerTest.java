@@ -31,7 +31,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -120,7 +119,6 @@ public class ComposeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 
@@ -157,7 +155,6 @@ public class ComposeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.Stream);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 

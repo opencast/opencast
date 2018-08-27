@@ -55,6 +55,7 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -248,8 +249,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         logger.debug("Resulting image has flavor '{}'", image.getFlavor());
       }
       // Set the mime type
-      for (final String mimeType : Opt.nul(extraction.profile.getMimeType())) {
-        image.setMimeType(MimeTypes.parseMimeType(mimeType));
+      try {
+        image.setMimeType(MimeTypes.fromURI(image.getURI()));
+      } catch (UnknownFileTypeException e) {
+        logger.warn("Mime type unknown for file {}. Setting none.", image.getURI(), e);
       }
       // Add tags
       for (final String tag : cfg.targetImageTags) {

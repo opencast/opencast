@@ -31,7 +31,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -143,19 +142,16 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andStubReturn(PROFILE1_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andStubReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andStubReturn(MediaType.AudioVisual);
-    EasyMock.expect(profile.getMimeType()).andStubReturn(MimeTypes.MPEG4.toString());
     EasyMock.expect(profile.getSuffix()).andStubReturn(SUFFIX1);
     profile2 = EasyMock.createNiceMock(EncodingProfile.class);
     EasyMock.expect(profile2.getIdentifier()).andStubReturn(PROFILE2_ID);
     EasyMock.expect(profile2.getApplicableMediaType()).andStubReturn(MediaType.Stream);
     EasyMock.expect(profile2.getOutputType()).andStubReturn(MediaType.Visual);
-    EasyMock.expect(profile2.getMimeType()).andStubReturn(MimeTypes.MPEG4.toString());
     EasyMock.expect(profile2.getSuffix()).andStubReturn(SUFFIX2);
     profile3 = EasyMock.createNiceMock(EncodingProfile.class);
     EasyMock.expect(profile3.getIdentifier()).andStubReturn(PROFILE3_ID);
     EasyMock.expect(profile3.getApplicableMediaType()).andStubReturn(MediaType.Stream);
     EasyMock.expect(profile3.getOutputType()).andStubReturn(MediaType.Visual);
-    EasyMock.expect(profile3.getMimeType()).andStubReturn(MimeTypes.MPEG4.toString());
     EasyMock.expect(profile3.getSuffix()).andStubReturn(SUFFIX3);
     profileList = new EncodingProfile[] { profile, profile2, profile3 };
     EasyMock.replay(profile, profile2, profile3);
@@ -435,7 +431,6 @@ public class MultiEncodeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE1_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.Stream);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 
