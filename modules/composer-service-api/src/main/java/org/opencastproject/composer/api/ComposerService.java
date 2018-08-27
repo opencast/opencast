@@ -232,19 +232,19 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
-   * Converts the given image to a different image format using the specified image profile.
+   * Converts the given image to a different image format using the specified image profiles.
    *
    * @param image
    *          the image
-   * @param profileId
-   *          the profile to use for conversion
+   * @param profileIds
+   *          the profiles to use for conversion
    * @return the job for the image conversion
    * @throws EncoderException
    *           if image conversion fails
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException;
+  Job convertImage(Attachment image, String... profileIds) throws EncoderException, MediaPackageException;
 
 
   /**

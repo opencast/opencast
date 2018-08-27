@@ -668,7 +668,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "convertimage", description = "Starts an image conversion process, based on the specified encoding profile ID and the source image", restParameters = {
           @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
+          @RestParameter(description = "A comma separated list of encoding profiles to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response convertImage(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
@@ -684,7 +684,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
 
     try {
       // Asynchronously convert the specified image
-      Job job = composerService.convertImage((Attachment) sourceImage, profileId);
+      Job job = composerService.convertImage((Attachment) sourceImage, StringUtils.split(profileId, ','));
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to convert image: " + e.getMessage());
