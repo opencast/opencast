@@ -1041,7 +1041,7 @@ public class SchedulerRestService {
   @Path("recordings.{type:xml|json}")
   @RestQuery(name = "recordingsaslist", description = "Searches recordings and returns result as XML or JSON", returnDescription = "XML or JSON formated results",
        pathParameters = {
-          @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]", defaultValue = "xml", type = Type.STRING), },
+          @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]", type = Type.STRING) },
        restParameters = {
           @RestParameter(name = "agent", description = "Search by device", isRequired = false, type = Type.STRING),
           @RestParameter(name = "startsfrom", description = "Search by when does event start", isRequired = false, type = Type.INTEGER),
@@ -1088,7 +1088,7 @@ public class SchedulerRestService {
   @Path("conflicts.{type:xml|json}")
   @RestQuery(name = "conflictingrecordings", description = "Searches for conflicting recordings based on parameters and returns result as XML or JSON", returnDescription = "Returns NO CONTENT if no recordings are in conflict within specified period or list of conflicting recordings in XML or JSON",
        pathParameters = {
-           @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]", defaultValue = "xml", type = Type.STRING), },
+           @RestParameter(name = "type", isRequired = true, description = "The media type of the response [xml|json]", type = Type.STRING) },
        restParameters = {
            @RestParameter(name = "agent", description = "Device identifier for which conflicts will be searched", isRequired = true, type = Type.STRING),
            @RestParameter(name = "start", description = "Start time of conflicting period, in milliseconds", isRequired = true, type = Type.INTEGER),
