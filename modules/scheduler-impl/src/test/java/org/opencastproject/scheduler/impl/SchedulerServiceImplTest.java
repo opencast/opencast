@@ -2298,6 +2298,16 @@ public class SchedulerServiceImplTest {
     assertEquals(orgList.size(), dublincoreCatalogs.size());
   }
 
+  public void testGetJsonMpSchedulerRestEndpoint() throws MediaPackageException, SchedulerException {
+    SchedulerRestService restService = new SchedulerRestService();
+    List<MediaPackage> mpList = new ArrayList();
+    mpList.add(generateEvent(Opt.some("mp1")));
+    mpList.add(generateEvent(Opt.some("mp2")));
+    String jsonStr = restService.getEventListAsJsonString(mpList);
+    Assert.assertTrue(jsonStr.contains("mp1"));
+    Assert.assertTrue(jsonStr.contains("mp2"));
+  }
+
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)
           throws URISyntaxException, IOException {
     String catalogId = UUID.randomUUID().toString();
