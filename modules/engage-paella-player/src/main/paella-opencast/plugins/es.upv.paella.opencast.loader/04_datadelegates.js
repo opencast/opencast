@@ -4,8 +4,6 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
     super();
   }
 
-  getName() { return "es.upv.paella.opencast.MHAnnotationServiceDefaultDataDelegate"; }
-
   read(context,params,onSuccess) {
     var episodeId = params.id;
     paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: "paella/"+context}},
@@ -107,8 +105,6 @@ class MHAnnotationServiceTrimmingDataDelegate extends MHAnnotationServiceDefault
     super();
   }
 
-  getName() { return "es.upv.paella.opencast.MHAnnotationServiceTrimmingDataDelegate"; }
-
   read(context,params,onSuccess) {
     super.read(context, params, function(data,success) {
       if (success){
@@ -130,126 +126,11 @@ class MHAnnotationServiceTrimmingDataDelegate extends MHAnnotationServiceDefault
   }
 }
 
-class MHAnnotationServiceVideoExportDelegate extends MHAnnotationServiceDefaultDataDelegate {
-  constructor(){
-    super();
-  }
-
-  getName() { return "es.upv.paella.opencast.MHAnnotationServiceVideoExportDelegate"; }
-
-  read(context, params, onSuccess) {
-    var ret = {};
-
-    super.read(context, params, function(data, success) {
-      if (success){
-        ret.trackItems = data.trackItems;
-        ret.metadata = data.metadata;
-
-        this.super.read(context+"#sent", params, function(dataSent, successSent) {
-          if (successSent){
-            ret.sent = dataSent.sent;
-          }
-          this.super.read(context+"#inprogress", params, function(dataInProgress, successInProgress) {
-            if (successInProgress) {
-              ret.inprogress = dataInProgress.inprogress;
-            }
-
-            if (onSuccess) { onSuccess(ret, true); }
-          });
-        });
-      }
-      else {
-        if (onSuccess) { onSuccess({}, false); }
-      }
-    });
-  }
-
-  write(context, params, value, onSuccess) {
-    var thisClass = this;
-
-    var valInprogress = { inprogress: value.inprogres };
-    var valSent = { sent: value.sent };
-    var val = { trackItems:value.trackItems, metadata: value.metadata };
-    if (val.trackItems.length > 0) {
-      super.write(context, params, val, function(data, success) {
-        if (success) {
-          if (valSent.sent) {
-            thisClass.remove(context+"#inprogress", params, function(data, success){
-              this.super.write(context+"#sent", params, valSent, function(dataSent, successSent) {
-                if (successSent) {
-                  if (onSuccess) { onSuccess({}, true); }
-                }
-                else { if (onSuccess) { onSuccess({}, false); } }
-              });
-            });
-          }
-          else {
-            //if (onSuccess) { onSuccess({}, true); }
-            thisClass.remove(context+"#sent", params, function(data, success){
-              if (onSuccess) { onSuccess({}, success); }
-            });
-          }
-        }
-        else { if (onSuccess) { onSuccess({}, false); } }
-      });
-    }
-    else {
-      this.remove(context, params, function(data, success){
-        if (onSuccess) { onSuccess({}, success); }
-      });
-    }
-  }
-
-  remove(context, params, onSuccess) {
-
-    super.remove(context, params, function(data, success) {
-      if (success) {
-        this.super.remove(context+"#sent", params, function(dataSent, successSent) {
-          if (successSent) {
-            this.super.remove(context+"#inprogress", params, function(dataInProgress, successInProgress) {
-              if (successInProgress) {
-                if (onSuccess) { onSuccess({}, true); }
-              }
-              else { if (onSuccess) { onSuccess({}, false); } }
-            });
-          }
-          else { if (onSuccess) { onSuccess({}, false); } }
-        });
-      }
-      else { if (onSuccess) { onSuccess({}, false); } }
-    });
-  }
-}
-
-
-class UserDataDelegate extends paella.DataDelegate {
-  constructor(){
-    super();
-  }
-
-  getName() { return "es.upv.paella.opencast.UserDataDelegate"; }
-
-  initialize() {
-  }
-
-  read(context, params, onSuccess) {
-    var value = {
-    userName: params.username,
-    name: params.username,
-    lastname: '',
-    avatar:"plugins/silhouette32.png"
-  };
-
-      if (typeof(onSuccess)=='function') { onSuccess(value,true); }
-  }
-}
 
 class MHFootPrintsDataDelegate extends paella.DataDelegate {
   constructor(){
     super();
   }
-
-  getName() { return "es.upv.paella.opencast.MHFootPrintsDataDelegate"; }
 
   read(context,params,onSuccess) {
     var episodeId = params.id;
@@ -296,8 +177,6 @@ class MHFootPrintsDataDelegate extends paella.DataDelegate {
 }
 
 class OpencastTrackCameraDataDelegate extends paella.DataDelegate {
-
-  getName() { return "es.upv.paella.opencast.OpencastTrackCameraDataDelegate"; }
 
   read(context,params,onSuccess) {
     let attachments = paella.opencast._episode.mediapackage.attachments.attachment;

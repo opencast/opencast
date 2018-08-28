@@ -1,0 +1,9 @@
+{
+	"Error loading video! No video traks found": "¡Error Cargando el video! No se han encontrado pistas de video",
+	"Error loading video {0}": "Error cargando el video {0}",
+	
+	"CAPTIONS_undefined": "Idioma desconocido",
+	"CAPTIONS_es": "Español",
+	"CAPTIONS_en": "Inglés",
+	"CAPTIONS_de": "Alemán"
+}

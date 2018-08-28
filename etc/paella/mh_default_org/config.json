@@ -9,14 +9,13 @@
       "max": 800,
       "minWindowSize": 500
     },
-
-
-    "deprecated-methods":[{"name":"streaming","enabled":true},
-           {"name":"html","enabled":true},
-           {"name":"flash","enabled":true},
-                   {"name":"image","enabled":true}],
-
-     "methods":[
+    "deprecated-methods":[
+      {"name":"streaming","enabled":true},
+      {"name":"html","enabled":true},
+      {"name":"flash","enabled":true},
+      {"name":"image","enabled":true}
+    ],
+    "methods":[
       { "factory":"ChromaVideoFactory", "enabled":true },
       { "factory":"WebmVideoFactory", "enabled":true },
       { "factory":"Html5VideoFactory", "enabled":true },
@@ -46,12 +45,8 @@
     "dataDelegates": {
       "default": "MHAnnotationServiceDefaultDataDelegate",
       "trimming": "MHAnnotationServiceTrimmingDataDelegate",
-      "userInfo": "UserDataDelegate",
       "metadata": "VideoManifestMetadataDataDelegate",
       "footprints": "MHFootPrintsDataDelegate",
-      "captions": "MHCaptionsDataDelegate",
-      "SingleVideoExport": "MHAnnotationServiceVideoExportDelegate",
-      "MultipleVideoExport": "MHAnnotationServiceVideoExportDelegate",
       "cameraTrack":"OpencastTrackCameraDataDelegate"
     }
   },
@@ -92,23 +87,22 @@
       "es.upv.paella.playPauseButtonPlugin": {"enabled":true},
       "es.upv.paella.searchPlugin": {"enabled":true, "sortType":"time", "colorSearch":false},
       "es.upv.paella.socialPlugin": {"enabled":true},
-      "es.upv.paella.themeChooserPlugin":  {"enabled":true},
+      "es.upv.paella.themeChooserPlugin":  {"enabled":false},
       "es.upv.paella.viewModePlugin": { "enabled": true },
       "es.upv.paella.volumeRangePlugin":{"enabled":true, "showMasterVolume": true, "showSlaveVolume": false },
       "es.upv.paella.pipModePlugin": { "enabled":true },
-      "es.upv.paella.ratePlugin": { "enabled":true },
-      "es.upv.paella.videoZoomPlugin": { "enabled":true },
+      "es.upv.paella.ratePlugin": { "enabled":false },
       "es.upv.paella.audioLanguage": { "enabled":true },
+      "es.upv.paella.videoZoomPlugin": { "enabled":true },
       "es.upv.paella.videoZoomToolbarPlugin": { "enabled":false, "targetStreamIndex":0 },
       "es.upv.paella.videoZoomTrack4kPlugin": { "enabled":true, "targetStreamIndex":0, "autoModeByDefault":false },
       "es.upv.paella.airPlayPlugin": { "enabled":true },
 
       "//****": "Video Overlay Button Plugins",
       "es.upv.paella.liveStreamingIndicatorPlugin":  { "enabled": true },
-      "es.upv.paella.showEditorPlugin":{"enabled":true,"alwaysVisible":true},
       "es.upv.paella.arrowSlidesNavigatorPlugin": {"enabled": true, "showArrowsIn": "slave"},
       "es.upv.paella.videoDataPlugin": {
-        "enabled": true,
+        "enabled": false,
         "excludeLocations":[
           "paellaplayer.upv.es"
         ],
@@ -159,13 +153,9 @@
       "es.upv.paella.opencast.downloadsPlugin": { "enabled": true },
       "es.upv.paella.opencast.episodesFromSeries": { "enabled": true },
       "es.upv.paella.opencast.logIn": { "enabled": true },
-      "es.upv.paella.opencast.publishPlugin": {
-        "enabled": false,
-        "defaultValue": false
-      },
       "es.upv.paella.opencast.searchPlugin": { "enabled": true },
-      "es.upv.paella.opencast.userTrackingSaverPlugIn": { "enabled": true },
-      "es.upv.paella.opencast.transcriptionTabBarPlugin": { "enabled": true }
+      "es.upv.paella.opencast.transcriptionTabBarPlugin": { "enabled": true },
+      "es.upv.paella.opencast.userTrackingSaverPlugIn": { "enabled": true }
     }
   }
 }
