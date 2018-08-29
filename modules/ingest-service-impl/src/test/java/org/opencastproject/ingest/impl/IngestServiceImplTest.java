@@ -295,7 +295,13 @@ public class IngestServiceImplTest {
             }).anyTimes();
     EasyMock.replay(mediaInspectionService);
 
-    service = new IngestServiceImpl();
+    class MockedIngestServicve extends IngestServiceImpl {
+      protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+        return httpClient;
+      }
+    }
+
+    service = new MockedIngestServicve();
     service.setHttpClient(httpClient);
     service.setAuthorizationService(authorizationService);
     service.setWorkingFileRepository(wfr);

@@ -64,6 +64,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -199,6 +200,15 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The approximate load placed on the system by ingesting a zip file */
   private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
 
+  /** The User for Download from external sources */
+  private static String downloadUser = "opencast_system_account";
+
+  /** The Password for Download from external sources */
+  private static String downloadPassword = "CHANGE_ME";
+
+  /** The external source dns name */
+  private static String downloadSource = "localhost";
+
   /** The JMX business object for ingest statistics */
   private IngestStatistics ingestStatistics = new IngestStatistics();
 
@@ -297,6 +307,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("No configuration available, using defaults");
       return;
     }
+
+    downloadPassword = StringUtils.trimToNull((String) properties.get("download.password"));
+    downloadUser = StringUtils.trimToNull(((String) properties.get("download.user")));
+    downloadSource = StringUtils.trimToNull(((String) properties.get("download.source")));
 
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
             serviceRegistry);
@@ -1481,13 +1495,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Sucessful discarded mediapackage {}", mp);
   }
 
+  /**
+   * Creates a StandAloneTrustedHttpClientImpl
+   *
+   * @param user
+   * @param password
+   * @return
+   */
+  protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+    return new StandAloneTrustedHttpClientImpl(this.downloadUser, this.downloadPassword, none(), none(), none());
+  }
+
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
+    TrustedHttpClient httpClientStandAlone = httpClient;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        response = httpClient.execute(get);
+
+        if (uri.getHost().contains(this.downloadSource)) {
+          httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
+        }
+        response = httpClientStandAlone.execute(get);
+
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
@@ -1505,7 +1536,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
       IOUtils.closeQuietly(in);
-      httpClient.close(response);
+      httpClientStandAlone.close(response);
     }
   }
 
