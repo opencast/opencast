@@ -1770,7 +1770,10 @@
             "LABEL": "Zugriffsrechte"
          },
          "COMMENTS": {
-            "LABEL": "Kommentare"
+            "LABEL": "Kommentare",
+            "NONE": "Keine",
+            "OPEN": "Offen",
+            "RESOLVED": "Gelöst"
          },
          "CONTRIBUTORS": {
             "LABEL": "Mitwirkende"

@@ -1787,7 +1787,10 @@
          "LABEL": "Access policy"
        },
        "COMMENTS": {
-         "LABEL": "Comments"
+         "LABEL": "Comments",
+         "NONE": "None",
+         "OPEN": "Open",
+         "RESOLVED": "Resolved"
        },
        "CONTRIBUTORS": {
          "LABEL": "Contributors"
