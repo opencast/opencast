@@ -58,7 +58,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
 public interface IndexService {
-
   enum Source {
     ARCHIVE, WORKFLOW, SCHEDULE
   };
@@ -572,5 +571,7 @@ public interface IndexService {
    * @return <code>true</code> if the event has snapshots, <code>false</code> otherwise
    */
   boolean hasSnapshots(String eventId);
+
+  Map<String,Map<String,String>> getEventWorkflowProperties(List<String> eventIds);
 
 }

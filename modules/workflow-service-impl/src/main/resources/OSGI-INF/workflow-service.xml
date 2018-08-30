@@ -27,6 +27,8 @@
              cardinality="1..1" policy="static" bind="setAuthorizationService"/>
   <reference name="series" interface="org.opencastproject.series.api.SeriesService"
              cardinality="1..1" policy="static" bind="setSeriesService"/>
+  <reference name="assetManager" interface="org.opencastproject.assetmanager.api.AssetManager"
+             cardinality="1..1" policy="static" bind="setAssetManager"/>
   <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
              cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   <reference name="scanner" interface="org.opencastproject.workflow.impl.WorkflowDefinitionScanner"

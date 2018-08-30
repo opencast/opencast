@@ -24,6 +24,8 @@ package org.opencastproject.index.service.impl;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataCollection;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
@@ -362,6 +364,8 @@ public class IndexServiceImplTest {
     EasyMock.expectLastCall();
     EasyMock.replay(mediapackage);
 
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+
     IngestService ingestService = setupIngestService(mediapackage, Capture.<InputStream> newInstance());
 
     // Setup Authorization Service
@@ -380,6 +384,7 @@ public class IndexServiceImplTest {
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setWorkspace(workspace);
+    indexServiceImpl.setAssetManager(assetManager);
     indexServiceImpl.createEvent(metadataJson, mediapackage);
 
     assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
@@ -450,6 +455,13 @@ public class IndexServiceImplTest {
             EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue);
     EasyMock.replay(authorizationService);
 
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(
+            assetManager.takeSnapshot(EasyMock.eq(AssetManager.DEFAULT_OWNER), EasyMock.anyObject(MediaPackage.class)))
+            .andReturn(null);
+    EasyMock.expect(assetManager.setProperty(EasyMock.anyObject(Property.class))).andReturn(true).anyTimes();
+    EasyMock.replay(assetManager);
+
     // Run Test
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setAuthorizationService(setupAuthorizationService(mediapackage));
@@ -459,6 +471,7 @@ public class IndexServiceImplTest {
     indexServiceImpl.setUserDirectoryService(noUsersUserDirectoryService);
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setWorkspace(workspace);
+    indexServiceImpl.setAssetManager(assetManager);
     indexServiceImpl.createEvent(metadataJson, mediapackage);
 
     assertTrue("The catalog must be added to the mediapackage", result.hasCaptured());
