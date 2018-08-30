@@ -1032,6 +1032,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           UnauthorizedException, NotFoundException {
     logger.info("Removing temporary files for workflow %s", workflowInstance);
     for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
+      if (null == elem.getURI()) {
+        // should never pass here but just in case
+        continue;
+      }
       try {
         logger.debug("Removing temporary file %s for workflow %s", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
