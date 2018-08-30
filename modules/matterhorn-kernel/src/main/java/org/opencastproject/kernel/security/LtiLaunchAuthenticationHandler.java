@@ -115,7 +115,7 @@ public class LtiLaunchAuthenticationHandler
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
           List<String> highlyTrustedkeys) {
-    this(userDetailsService, null, new ArrayList<String>(), null);
+    this(userDetailsService, securityService, highlyTrustedkeys, null);
   }
 
   /**
