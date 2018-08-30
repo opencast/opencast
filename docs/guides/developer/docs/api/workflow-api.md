@@ -84,7 +84,7 @@ Field                            | Type                                         
 `identifier`                     | [`integer`](types.md#basic)                                | The unique identifier of this workflow instance
 `title`                          | [`string`](types.md#basic)                                 | The title of this workflow instance
 `description`                    | [`string`](types.md#basic)                                 | The description of this workflow instance
-`state`                          | [`string`](#basic)                                         | The state of this workflow instance ("instantiated", "running", "stopped", "paused", "succeeded", "failed", "failing")
+`state`                          | [`workflow_state`](types.md#workflow_state)                | The state of this workflow instance
 `operations`                     | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 `configuration`                  | [`property`](types.md#property)                            | The configuration for this workflow instance
 `workflow_definition_identifier` | [`string`](types.md#basic)                                 | The template of this workflow instance (i.e. the unique identifier of the workflow definition)
@@ -327,10 +327,10 @@ __Example__
 
 Updates a workflow instance.
 
-Form Parameters         | Required |Type                             | Description
-:-----------------------|:---------|:--------------------------------|:-----------
-`state`                 | no       | [`string`](types.md#basic)      | The optional state transition for this workflow
-`configuration`         | no       | [`property`](types.md#property) | The optional configuration for this workflow
+Form Parameters         | Required |Type                                         | Description
+:-----------------------|:---------|:--------------------------------------------|:-----------
+`state`                 | no       | [`workflow_state`](types.md#workflow_state) | The optional state transition for this workflow
+`configuration`         | no       | [`property`](types.md#property)             | The optional configuration for this workflow
 
 This request additionally supports the following query string parameters to include additional information directly in
 the response:
@@ -358,9 +358,9 @@ configuration:
 }
 ```
 
-__Allowed state transitions__
+__Allowed workflow state transitions__
 
-The following state transitions are allowed:
+The following workflow state transitions are allowed:
 
 Current state     | Allowed new state
 :-----------------|:-----------------
@@ -387,7 +387,8 @@ Field                 | Type                                                    
 
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
-`404 (NOT FOUND)`: The workflow instance could not be found.
+`404 (NOT FOUND)`: The workflow instance could not be found.<br/>
+`409 (CONFLICT)`: The workflow instance cannot transition to this state.
 
 ### DELETE /api/workflows/{workflow_instance_id}
 
@@ -396,9 +397,9 @@ Deletes a workflow instance.
 __Response__
 
 `204 (NO CONTENT)`: The workflow instance has been deleted.<br/>
-`400 (BAD REQUEST)`: The workflow instance cannot be deleted in this state.<br/>
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
-`404 (NOT FOUND)`: The specified workflow instance does not exist.
+`404 (NOT FOUND)`: The specified workflow instance does not exist.<br/>
+`409 (CONFLICT)`: The workflow instance cannot be deleted in this state.
 
 # Workflow definitions
 

@@ -311,7 +311,7 @@ public class WorkflowsEndpointTest {
     given().pathParam("workflowInstanceId", STOPPED_WORKFLOW_ID)
            .formParam("state", "running")
            .expect()
-           .statusCode(SC_BAD_REQUEST)
+           .statusCode(SC_CONFLICT)
            .when()
            .put(env.host("/{workflowInstanceId}"));
   }
@@ -359,7 +359,7 @@ public class WorkflowsEndpointTest {
   public void testDeleteWorkflowWithRunningWorkflow() {
     given().pathParam("workflowInstanceId", RUNNING_WORKFLOW_ID)
            .expect()
-           .statusCode(SC_BAD_REQUEST)
+           .statusCode(SC_CONFLICT)
            .when()
            .delete(env.host("/{workflowInstanceId}"));
   }

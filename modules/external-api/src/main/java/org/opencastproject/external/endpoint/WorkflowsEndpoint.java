@@ -418,7 +418,8 @@ public class WorkflowsEndpoint {
           @RestResponse(description = "The workflow instance is updated.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The workflow instance could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "The workflow instance could not be found.", responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The workflow instance cannot transition to this state.", responseCode = HttpServletResponse.SC_CONFLICT) })
   public Response updateWorkflowInstance(@HeaderParam("Accept") String acceptHeader,
           @PathParam("workflowInstanceId") Long id, @FormParam("configuration") String configuration,
           @FormParam("state") String stateStr, @QueryParam("withoperations") boolean withOperations,
@@ -482,12 +483,12 @@ public class WorkflowsEndpoint {
                       || currentState == WorkflowInstance.WorkflowState.PAUSED) {
                 workflowService.resume(wi.getId());
               } else {
-                return RestUtil.R.badRequest(
+                return RestUtil.R.conflict(
                         String.format("Cannot resume from workflow state '%s'", currentState.toString().toLowerCase()));
               }
               break;
             default:
-              return RestUtil.R.badRequest(
+              return RestUtil.R.conflict(
                       String.format("Cannot transition state from '%s' to '%s'", currentState.toString().toLowerCase(),
                               stateStr));
           }
@@ -511,15 +512,15 @@ public class WorkflowsEndpoint {
   @RestQuery(name = "deleteworkflowinstance", description = "Deletes a workflow instance.", returnDescription = "", pathParameters = {
           @RestParameter(name = "workflowInstanceId", description = "The workflow instance id", isRequired = true, type = INTEGER) }, reponses = {
           @RestResponse(description = "The workflow instance has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-          @RestResponse(description = "The workflow instance cannot be deleted in this state.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The specified workflow instance does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "The specified workflow instance does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The workflow instance cannot be deleted in this state.", responseCode = HttpServletResponse.SC_CONFLICT) })
   public Response deleteWorkflowInstance(@HeaderParam("Accept") String acceptHeader,
           @PathParam("workflowInstanceId") Long id) {
     try {
       workflowService.remove(id);
     } catch (WorkflowStateException e) {
-      return RestUtil.R.badRequest("Cannot delete workflow instance in this workflow state");
+      return RestUtil.R.conflict("Cannot delete workflow instance in this workflow state");
     } catch (NotFoundException e) {
       return ApiResponses.notFound("Cannot find workflow instance with id '%d'.", id);
     } catch (UnauthorizedException e) {
