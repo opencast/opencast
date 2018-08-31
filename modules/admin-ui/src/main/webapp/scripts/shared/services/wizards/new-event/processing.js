@@ -34,8 +34,7 @@ angular.module('adminNg.services')
             isWorkflowSet = function () {
                 return angular.isDefined(me.ud.workflow) && angular.isDefined(me.ud.workflow.id);
             },
-            idConfigElement = '#new-event-workflow-configuration',
-            workflowConfigEl = angular.element(idConfigElement);
+            idConfigElement = '#new-event-workflow-configuration';
 
         this.isProcessingState = true;
         this.ud = {};
@@ -87,7 +86,6 @@ angular.module('adminNg.services')
         // Listener for the workflow selection
         this.changeWorkflow = function () {
             me.changingWorkflow = true;
-            workflowConfigEl = angular.element(idConfigElement);
             if (angular.isDefined(me.ud.workflow)) {
                 updateConfigurationPanel(me.ud.workflow.configuration_panel);
             } else {
@@ -99,7 +97,10 @@ angular.module('adminNg.services')
 
         // Get the workflow configuration
         this.getWorkflowConfig = function () {
-            var workflowConfig = {}, element, isRendered = workflowConfigEl.find('.configField').length > 0;
+            var workflowConfig = {},
+                element,
+                workflowConfigEl = angular.element(idConfigElement),
+                isRendered = workflowConfigEl.find('.configField').length > 0;
 
             if (!isRendered) {
                 element = angular.element(me.ud.workflow.configuration_panel).find('.configField');
