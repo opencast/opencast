@@ -25,6 +25,8 @@ angular.module('adminNg.controllers')
 .controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
     function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
 
+        var LOCAL_CONTEXT = 'video-tools';
+
         $scope.navigateTo = function (path) {
             $location.path(path).replace();
         };
@@ -85,7 +87,7 @@ angular.module('adminNg.controllers')
                 $scope.unsavedChanges = false;
             }, function () {
                 $scope.submitButton = false;
-                Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
+                Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
             });
         };
 
@@ -93,5 +95,9 @@ angular.module('adminNg.controllers')
             Storage.put('pagination', $scope.resource, 'resume', true);
             $location.url('/events/' + $scope.resource);
         };
+
+        $scope.$on('$destroy', function () {
+            Notifications.removeAll(LOCAL_CONTEXT);
+         });
     }
 ]);

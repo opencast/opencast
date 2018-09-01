@@ -35,7 +35,6 @@ angular.module('adminNg.services')
                 return angular.isDefined(me.ud.workflow) && angular.isDefined(me.ud.workflow.id);
             },
             idConfigElement = '#new-event-workflow-configuration',
-            workflowConfigEl = angular.element(idConfigElement),
             originalValues = {};
 
         this.isProcessingState = true;
@@ -228,7 +227,10 @@ angular.module('adminNg.services')
         this.applyWorkflowProperties = function(workflowProperties, selectedIds) {
             // Timeout because manipulating the just assigned HTML doesn't work otherwise.
             $timeout(function() {
-                var element, isRendered = workflowConfigEl.find('.configField').length > 0;
+                var workflowConfig = {},
+                    element,
+                    workflowConfigEl = angular.element(idConfigElement),
+                    isRendered = workflowConfigEl.find('.configField').length > 0;
                 if (!isRendered) {
                     element = angular.element(me.ud.workflow.configuration_panel).find('.configField');
                 } else {
@@ -288,7 +290,6 @@ angular.module('adminNg.services')
         this.changeWorkflow = function (workflowProperties, selectedIds) {
             originalValues = {};
             me.changingWorkflow = true;
-            workflowConfigEl = angular.element(idConfigElement);
             if (angular.isDefined(me.ud.workflow)) {
                 updateConfigurationPanel(me.ud.workflow.configuration_panel);
             } else {
@@ -302,7 +303,10 @@ angular.module('adminNg.services')
 
         // This is used for the new task post request
         this.getWorkflowConfigs = function () {
-            var workflowConfigs = {}, element, isRendered = workflowConfigEl.find('.configField').length > 0;
+            var workflowConfig = {},
+                element,
+                workflowConfigEl = angular.element(idConfigElement),
+                isRendered = workflowConfigEl.find('.configField').length > 0;
 
             if (!isRendered) {
                 element = angular.element(me.ud.workflow.configuration_panel).find('.configField');
@@ -330,7 +334,10 @@ angular.module('adminNg.services')
 
         // Get the workflow configuration (used for the final value table in the wizard)
         this.getWorkflowConfig = function () {
-            var workflowConfig = {}, element, isRendered = workflowConfigEl.find('.configField').length > 0;
+            var workflowConfig = {},
+                element,
+                workflowConfigEl = angular.element(idConfigElement),
+                isRendered = workflowConfigEl.find('.configField').length > 0;
 
             if (!isRendered) {
                 element = angular.element(me.ud.workflow.configuration_panel).find('.configField');
