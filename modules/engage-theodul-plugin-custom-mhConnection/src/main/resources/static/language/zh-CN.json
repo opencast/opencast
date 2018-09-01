@@ -2,7 +2,7 @@
     "value_locale": "zh",
     "error_mediaPackageInformationNotLoaded": "此错误有两个可能的原因：<ul><li>媒体请稍后再试<\/li> <li>媒体是受保护的，您需要登录<\/li> <\/ul>",
     "error_mediaPackageInformationNotLoaded_reason1": "The media is not available any more",
-    "error_mediaPackageInformationNotLoaded_reason2": "The media is protected and you need to log in",
+    "error_mediaPackageInformationNotLoaded_reason2": "媒体受到保护, 您需要登录以使用",
     "error_noMediaInformationAvailable": "无可用的媒体信息。",
     "error_endpointNotAvailable": "搜索服务目前不可用。"
 }
