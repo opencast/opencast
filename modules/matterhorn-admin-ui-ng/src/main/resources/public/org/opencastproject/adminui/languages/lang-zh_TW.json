@@ -485,7 +485,7 @@
          "DETAILS": {
             "HEADER": "事件的細節 - {{resourceId}}",
             "TABS": {
-               "GENERAL": "一般",
+               "GENERAL": "常規",
                "METADATA": "後設資料",
                "EXTENDED-METADATA": "後設資料II",
                "ASSETS": "媒體資源",
@@ -538,7 +538,7 @@
                   "END_DATE": "年-月-日"
                },
                "UPLOAD": {
-                  "CAPTION": "上傳",
+                  "CAPTION": "上載",
                   "RECORDING_ELEMENTS": "錄製內容",
                   "SEGMENTABLE": {
                      "SHORT": "投影片",
@@ -661,7 +661,7 @@
                   "TYPE": "類型",
                   "MIMETYPE": "Mime 型態",
                   "TAGS": "標籤",
-                  "LINK": "連結",
+                  "LINK": "鏈接",
                   "DETAILS": {
                      "TITLE": "出版物的詳細資訊",
                      "CAPTION": "出版物的詳細資訊",
@@ -982,7 +982,7 @@
                "MODIFIED": "修改於",
                "STATUS": "狀態",
                "LOCATION": "位置",
-               "LINK": "連結"
+               "LINK": "鏈接"
             }
          }
       }
@@ -1001,7 +1001,7 @@
          "TABLE": {
             "CAPTION": "位置",
             "TITLE": "UID",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "LOCATION": "位置",
             "UPDATED": "最近更新",
             "NEXT_DATE": "下一個事件",
@@ -1039,7 +1039,7 @@
       "BLACKLISTS": {
          "TABLE": {
             "CAPTION": "位置黑名單",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "ACTIONS": "操作"
          },
          "DETAILS": {
@@ -1064,7 +1064,7 @@
             "REASON": {
                "SELECT_REASON": "選擇",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             },
             "SUMMARY": {
                "SUMMARY": "摘要",
@@ -1138,7 +1138,7 @@
          },
          "TABLE": {
             "CAPTION": "群組",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "DESCRIPTION": "說明",
             "ROLE": "角色",
             "ACTION": "操作"
@@ -1177,7 +1177,7 @@
       "ACLS": {
          "TABLE": {
             "CAPTION": "存取權限",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "CREATED": "建立於",
             "CREATOR": "建立者",
             "IN_USE": "使用中",
@@ -1193,7 +1193,7 @@
             "METADATA": {
                "TITLE": "後設資料",
                "NAME": {
-                  "CAPTION": "名稱",
+                  "CAPTION": "姓名",
                   "PLACEHOLDER": "名稱..."
                }
             },
@@ -1205,7 +1205,7 @@
                "ACCESS_POLICY": {
                   "TITLE": "存取權限",
                   "LABEL": "選擇樣板",
-                  "EMPTY": "沒有在樣板中找到",
+                  "EMPTY": "沒有找到樣板",
                   "ROLE": "角色",
                   "WRITE": "寫",
                   "READ": "讀",
@@ -1231,7 +1231,7 @@
             "METADATA": {
                "TITLE": "後設資料",
                "NAME": {
-                  "CAPTION": "名稱",
+                  "CAPTION": "姓名",
                   "PLACEHOLDER": "名稱..."
                }
             },
@@ -1243,7 +1243,7 @@
                "ACCESS_POLICY": {
                   "TITLE": "存取權限",
                   "LABEL": "選擇樣板",
-                  "EMPTY": "沒有在樣板中找到",
+                  "EMPTY": "沒有找到樣板",
                   "ROLE": "角色",
                   "WRITE": "寫",
                   "READ": "讀",
@@ -1291,7 +1291,7 @@
             "REASON": {
                "SELECT_REASON": "選擇",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             },
             "SUMMARY": {
                "SUMMARY": "摘要",
@@ -1299,7 +1299,7 @@
                "DATE_FROM": "從",
                "DATE_TO": "直到",
                "REASON": "理由",
-               "COMMENTS": "評論"
+               "COMMENTS": "註解"
             }
          }
       }
@@ -1318,8 +1318,8 @@
                "USAGE": "用法"
             },
             "GENERAL": {
-               "CAPTION": "一般",
-               "NAME": "名稱",
+               "CAPTION": "常規",
+               "NAME": "姓名",
                "DESCRIPTION": "說明",
                "DEFAULT": "預設值",
                "SET_DEFAULT_INFO": "設置為所有系列和事件的預設主題",
@@ -1379,7 +1379,7 @@
                "SUMMARY": "摘要"
             },
             "MESSAGE": {
-               "NAME": "名稱",
+               "NAME": "姓名",
                "SUBJECT": "主題",
                "MESSAGE": "信息"
             },
@@ -1391,7 +1391,7 @@
       "THEMES": {
          "TABLE": {
             "CAPTION": "主題",
-            "NAME": "名稱",
+            "NAME": "姓名",
             "DESCRIPTION": "說明",
             "CREATOR": "建立者",
             "CREATED": "建立於",
@@ -1403,8 +1403,8 @@
             "NEWCAPTION": "創建主題",
             "EDITCAPTION": "編輯主題",
             "GENERAL": {
-               "CAPTION": "一般",
-               "NAME": "名稱",
+               "CAPTION": "常規",
+               "NAME": "姓名",
                "DESCRIPTION": "說明",
                "DEFAULT": "預設值",
                "SET_DEFAULT_INFO": "設置為預設主題的所有系列活動",
@@ -1418,7 +1418,7 @@
                "ENABLE": "啟用BUMPER",
                "SELECT": "選擇",
                "UPLOAD_LABEL": "上傳視頻",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "TRAILER": {
                "CAPTION": "Bumper（結束）",
@@ -1427,19 +1427,19 @@
                "ACTIVE": "啟動",
                "ENABLE": "啟用BUMPER",
                "UPLOAD_LABEL": "上傳視頻",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "TITLE": {
                "CAPTION": "標題",
-               "FILE_UPLOADED": "文件上傳: ",
+               "FILE_UPLOADED": "文件上傳 ",
                "DESCRIPTION": "預定義的投影片包括附加到一個記錄的開始或結束的說明性後設資料。",
                "ACTIVE": "啟動",
                "ENABLE": "啟用標題投影片",
                "BACKGROUND": "背景",
                "EXTRACT": "提取背景",
-               "UPLOAD": "上傳",
+               "UPLOAD": "上載",
                "UPLOAD_LABEL": "上傳圖片",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "WATERMARK": {
                "CAPTION": "浮水印",
@@ -1455,7 +1455,7 @@
                "POSITION": "浮水印位置和預覽",
                "FILEUPLOAD_DESCRIPTION": "文件應該有一個alpha通道（透明背景）可接受的文件類型有：.PNG,.GIF,.SVG,.WEBP",
                "UPLOAD_LABEL": "上傳圖片",
-               "UPLOAD_BUTTON": "上傳"
+               "UPLOAD_BUTTON": "上載"
             },
             "SUMMARY": {
                "CAPTION": "摘要"
@@ -1491,7 +1491,7 @@
          "DETAILS": {
             "HEADER": "工作信息 {{resourceId}}",
             "TABS": {
-               "GENERAL": "一般",
+               "GENERAL": "常規",
                "OPERATIONS": "操作",
                "INCIDENTS": "事故"
             }

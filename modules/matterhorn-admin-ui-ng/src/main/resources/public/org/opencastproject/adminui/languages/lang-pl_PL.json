@@ -604,7 +604,7 @@
                   "TYPE": "Typ",
                   "MIMETYPE": "Właściwość MIMEType",
                   "TAGS": "Tagi",
-                  "LINK": "Link",
+                  "LINK": "Odnośnik",
                   "DETAILS": {
                      "TITLE": "Szczegóły katalogu",
                      "CAPTION": "Szczegóły katalogu",
@@ -612,7 +612,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "Właściwość MIMEType",
                      "TAGS": "Tagi",
-                     "URL": "Adres URL",
+                     "URL": "URL",
                      "SIZE": "Rozmiar",
                      "CHECKSUM": "Suma kontrolna",
                      "REFERENCE": "Odnośnik"
@@ -735,7 +735,7 @@
                "CAPTION": "Szczegóły wydarzenia",
                "TITLE": "Tytuł",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Seria",
                "RECORDING_DATE": "Data nagrania",
                "SUBJECT": "Temat",
                "DESCRIPTION": "Opis",
@@ -780,7 +780,7 @@
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Actions",
+               "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "",
                "ID": "Identyfikator",
@@ -788,7 +788,7 @@
                "TITLE": "Tytuł",
                "STATE": "Stan",
                "STARTED": "Rozpoczęte",
-               "SERIES": "Serie",
+               "SERIES": "Seria",
                "SUBMITTED": "Wysłano",
                "MIMETYPE": "Właściwość MIMEType",
                "URL": "URL",
@@ -899,7 +899,7 @@
             }
          },
          "TABLE": {
-            "CAPTION": "Serie",
+            "CAPTION": "Seria",
             "TITLE": "Seria",
             "CREATORS": "Organizator(rzy)",
             "CONTRIBUTORS": "Współpracownik(cy)",
@@ -1015,19 +1015,19 @@
          "DETAILS": {
             "HEADER": "Location details - {{resourceId}}",
             "TAB": {
-               "GENERAL": "General",
-               "CONFIGURATION": "Configuration",
+               "GENERAL": "Ogólne",
+               "CONFIGURATION": "Konfiguracja",
                "CAPABILITIES": "Capabilities"
             },
             "GENERAL": {
-               "CAPTION": "General",
-               "NAME": "Name",
+               "CAPTION": "Ogólne",
+               "NAME": "Imię",
                "URL": "Url",
                "STATUS": "Status",
                "UPDATE": "Last heard from"
             },
             "CONFIGURATION": {
-               "CAPTION": "Configuration",
+               "CAPTION": "Konfiguracja",
                "NO_CONFIGURATION": "No configuration provided"
             },
             "CAPABILITIES": {
@@ -1098,7 +1098,7 @@
             "EMAIL": "Email",
             "ROLES": "Role",
             "TYPE": "Typ",
-            "PROVIDER": "Provider",
+            "PROVIDER": "Dostawca",
             "BLACKLIST_FROM": "Na czarnej liście od",
             "BLACKLIST_TO": "Na czarnej liście do",
             "ACTION": "Działania"
@@ -1437,7 +1437,7 @@
                "ENABLE": "Włącz tytuły slajdów",
                "BACKGROUND": "Tło",
                "EXTRACT": "Wyodrębnij tło",
-               "UPLOAD": "Wysyłanie",
+               "UPLOAD": "Prześlij",
                "UPLOAD_LABEL": "Przesyłanie zdjęć",
                "UPLOAD_BUTTON": "Prześlij"
             },
@@ -1533,11 +1533,11 @@
    "VIDEO_TOOL": {
       "TIMELINE": "Oś czasu",
       "ZOOMLEVEL": "Zoom Level",
-      "ZOOM": "Zoom",
+      "ZOOM": "Powiększenie",
       "BUTTONS": {
          "CLOSE": "Zamknij",
          "SAVE": "Zapisz",
-         "PROCESS": "Save & Continue",
+         "PROCESS": "Zapisz & przetwarzaj",
          "ADD_COMMENT": "Add Comment"
       },
       "TABS": {
@@ -1547,8 +1547,8 @@
          "ANNOTATIONS": "Adnotacje"
       },
       "AREAS": {
-         "METADATA": "Metadata",
-         "COMMENTS": "Comments",
+         "METADATA": "Metadane",
+         "COMMENTS": "Komentarze",
          "SEGMENTS": "Segments"
       },
       "ACTIONS": {
@@ -1834,7 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "W toku",
       "FINISHED": "Zakończone",
-      "PAUSED": "Wstrzymane",
+      "PAUSED": "Zatrzymane",
       "FAILED": "Zakończone niepowodzeniem",
       "FINISHED_WITH_COMMENTS": "Do zrobienia",
       "SCHEDULED": "Zaplanowane",

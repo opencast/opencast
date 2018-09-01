@@ -613,7 +613,7 @@
                      "MIMETYPE": "Mimetype",
                      "TAGS": "Tags",
                      "URL": "URL",
-                     "SIZE": "Grootte",
+                     "SIZE": "Formaat",
                      "CHECKSUM": "Checksum",
                      "REFERENCE": "Referentie"
                   }
@@ -735,7 +735,7 @@
                "CAPTION": "Evenement details",
                "TITLE": "Titel",
                "ID": "UID",
-               "SERIES": "Reeks",
+               "SERIES": "Seriën",
                "RECORDING_DATE": "Opname datum",
                "SUBJECT": "Onderwerp",
                "DESCRIPTION": "Omschrijving",
@@ -899,8 +899,8 @@
             }
          },
          "TABLE": {
-            "CAPTION": "Series",
-            "TITLE": "Series",
+            "CAPTION": "Seriën",
+            "TITLE": "Seriën",
             "CREATORS": "Organisator(en)",
             "CONTRIBUTORS": "Bijdrager(s)",
             "CREATED": "Aangemaakt",
@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "Titel",
                "ID": "UID",
-               "SERIES": "Reeks",
+               "SERIES": "Seriën",
                "PUBLISHERS": "Uitgever(s)",
                "ORGANIZERS": "Organisator(en)",
                "CONTRIBUTORS": "Bijdrager(s)",

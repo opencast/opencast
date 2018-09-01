@@ -499,7 +499,7 @@
                "NO_PUBLICATIONS_AVAILABLE": "לאירוע זה אין פרסומים",
                "SCHEDULING_STATUS": "מצב",
                "READY_FOR_RECORDING": "מוכן להקלטה",
-               "OPTED_OUT": "בוטל/ו",
+               "OPTED_OUT": "נבחר להוצאה",
                "CUSTOM": "מותאם אישית",
                "ENGAGE": "לעסוק",
                "EXTERNAL_API": "פרסום API חיצוני",
@@ -672,7 +672,7 @@
                      "URL": "כתובת אינטרנט",
                      "SIZE": "גודל",
                      "CHANNEL": "ערוץ",
-                     "REFERENCE": "הפניה"
+                     "REFERENCE": "יחס"
                   }
                }
             },
@@ -735,7 +735,7 @@
                "CAPTION": "פרטי אירוע",
                "TITLE": "כותרת",
                "ID": "UID",
-               "SERIES": "סדרה",
+               "SERIES": "סדרות",
                "RECORDING_DATE": "תאריך הקלטה",
                "SUBJECT": "נושא",
                "DESCRIPTION": "תאור",
@@ -817,7 +817,7 @@
                "URL": "כתובת אינטרנט",
                "RECORDING_DATE": "תאריך הקלטה",
                "TAGS": "תגיות",
-               "DURATION": "משך זמן",
+               "DURATION": "משך",
                "STREAM_AUDIO": "ערוצי קול",
                "STREAM_VIDEO": "ערוצי וידאו",
                "CHANNELS": "ערוצים",
@@ -860,7 +860,7 @@
                "CAPTION": "מטא-נתונים מורחב",
                "DESCRIPTION": "",
                "METADATA": {
-                  "TITLE": "מטא-נתונים מורחב"
+                  "TITLE": "מטה-נתונים מורחב"
                }
             },
             "ACCESS": {
@@ -895,7 +895,7 @@
                "EMPTY": "לא נמצאו ערכות נושא"
             },
             "SUMMARY": {
-               "CAPTION": "תקציר"
+               "CAPTION": "סיכום"
             }
          },
          "TABLE": {
@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "כותרת",
                "ID": "UID",
-               "SERIES": "סדרה",
+               "SERIES": "סדרות",
                "PUBLISHERS": "מפרסמ(ים)",
                "ORGANIZERS": "אירגונ(ים)",
                "CONTRIBUTORS": "תורמ(ים)",
@@ -961,12 +961,12 @@
                "CAPTION": "תבנית מצב השתתפות",
                "WARNING_TEMPLATE": "מצב השתתפות בסידרה ישמש בתור ערך ברירת המחדל עבור אירועים חדשים בסדרה.",
                "REVIEW_STATUS": {
-                  "CAPTION": "סקור מצב"
+                  "CAPTION": "מצב הסקירה"
                },
                "OPTEDOUT": {
                   "CAPTION": "סטטוס נבחרו להוצאה",
                   "READY": "מוכן להקלטה",
-                  "OPTEDOUT": "נבחר להוצאה"
+                  "OPTEDOUT": "בוטל/ו"
                },
                "MESSAGES": {
                   "CAPTION": "הודעות",
@@ -1186,7 +1186,7 @@
          "NEW": {
             "CAPTION": "הוסף מדיניות גישה",
             "TABS": {
-               "SUMMARY": "תקציר",
+               "SUMMARY": "סיכום",
                "METADATA": "מטא-נתונים",
                "ACCESS": "גישה"
             },
@@ -1224,7 +1224,7 @@
          "DETAILS": {
             "HEADER": "פרטי מדיניות גישה - {{resourceId}}",
             "TABS": {
-               "SUMMARY": "תקציר",
+               "SUMMARY": "סיכום",
                "METADATA": "מטא-נתונים",
                "ACCESS": "גישה"
             },
@@ -1376,7 +1376,7 @@
             "EDITCAPTION": "ערוך תבנית",
             "TABS": {
                "MESSAGE": "הודעה",
-               "SUMMARY": "תקציר"
+               "SUMMARY": "סיכום"
             },
             "MESSAGE": {
                "NAME": "שם",

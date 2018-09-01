@@ -440,7 +440,7 @@
          "ADD_SERIES": "Serie hinzufügen",
          "ADD_EVENT": "Aufzeichnung hinzufügen",
          "TABLE": {
-            "CAPTION": "Aufzeichnungen",
+            "CAPTION": "Ereignisse",
             "CREATORS": "Autoren",
             "TITLE": "Titel",
             "PRESENTERS": "Vortragende(r)",
@@ -708,7 +708,7 @@
                "REPLY": "Antworten",
                "REPLY_TO": "Antworten",
                "CANCEL_REPLY": "Abbrechen",
-               "DELETE": "Löschen",
+               "DELETE": "Entfernen",
                "REASON": "Grund",
                "REASONS": {
                   "CUTTING": "Schneiden erforderlich",
@@ -735,13 +735,13 @@
                "CAPTION": "Aufzeichnungs-Details",
                "TITLE": "Titel",
                "ID": "UID",
-               "SERIES": "Serien",
+               "SERIES": "Serie",
                "RECORDING_DATE": "Aufnahmedatum",
                "SUBJECT": "Betreff",
                "DESCRIPTION": "Beschreibung",
                "START_DATE": "Startdatum",
                "START_TIME": "Startzeit",
-               "DURATION": "Dauer",
+               "DURATION": "Länge",
                "LOCATION": "Raum",
                "SOURCE": "Quelle",
                "CREATED": "Erstellt am",
@@ -788,7 +788,7 @@
                "TITLE": "Titel",
                "STATE": "Status",
                "STARTED": "Gestartet",
-               "SERIES": "Serien",
+               "SERIES": "Serie",
                "SUBMITTED": "Übermittelt",
                "MIMETYPE": "MIME-Type",
                "URL": "URL",
@@ -817,7 +817,7 @@
                "URL": "URL",
                "RECORDING_DATE": "Aufnahmedatum",
                "TAGS": "Stichwörter",
-               "DURATION": "Dauer",
+               "DURATION": "Länge",
                "STREAM_AUDIO": "Audiospuren",
                "STREAM_VIDEO": "Videospuren",
                "CHANNELS": "Kanäle",
@@ -870,7 +870,7 @@
                   "TITLE": "Vorlagen"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Zugriffsrichtlinie",
+                  "TITLE": "Zugriffsrechte",
                   "DESCRIPTION": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich.",
                   "LABEL": "Vorlage auswählen",
                   "EMPTY": "Keine Vorlage gefunden",
@@ -899,13 +899,13 @@
             }
          },
          "TABLE": {
-            "CAPTION": "Serien",
+            "CAPTION": "Serie",
             "TITLE": "Serie",
             "CREATORS": "Organisator(en)",
             "CONTRIBUTORS": "Mitwirkende",
             "CREATED": "Erstellt",
             "MANAGED_ACL": "Zugriffsrechte",
-            "EVENTS": "Aufzeichnungen",
+            "EVENTS": "Ereignisse",
             "ACTION": "Aktionen"
          },
          "DETAILS": {
@@ -914,18 +914,18 @@
                "METADATA": "Metadaten",
                "EXTENDED_METADATA": "Metadaten II",
                "PARTICIPATION": "Beteiligung",
-               "EVENTS": "Aufzeichnungen",
+               "EVENTS": "Ereignisse",
                "PERMISSIONS": "Zugriffsrechte",
                "THEME": "Branding"
             },
             "ACCESS": {
-               "CAPTION": "Zugriffsrichtlinie",
+               "CAPTION": "Zugriffsrechte",
                "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Vorlagen"
                },
                "ACCESS_POLICY": {
-                  "TITLE": "Zugriffs-Richtlinie",
+                  "TITLE": "Zugriffsrechte",
                   "DESCRIPTION": "",
                   "LABEL": "Vorlage auswählen",
                   "EMPTY": "Keine Vorlage gefunden",
@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "Titel",
                "ID": "UID",
-               "SERIES": "Serien",
+               "SERIES": "Serie",
                "PUBLISHERS": "Herausgeber",
                "ORGANIZERS": "Organisator(en)",
                "CONTRIBUTORS": "Mitwirkende",
@@ -1178,7 +1178,7 @@
          "TABLE": {
             "CAPTION": "Zugriffsrechte",
             "NAME": "Name",
-            "CREATED": "Erstellt am",
+            "CREATED": "Erstellt",
             "CREATOR": "Author",
             "IN_USE": "In Benutzung",
             "ACTION": "Aktionen"
@@ -1289,7 +1289,7 @@
                "END_DATE": "Enddatum"
             },
             "REASON": {
-               "SELECT_REASON": "Wählen Sie",
+               "SELECT_REASON": "Auswählen",
                "REASON": "Grund",
                "COMMENTS": "Kommentare"
             },
@@ -1368,7 +1368,7 @@
             "CAPTION": "E-Mail-Vorlagen",
             "NAME": "Name",
             "CREATOR": "Author",
-            "CREATED": "Erstellt am",
+            "CREATED": "Erstellt",
             "ACTION": "Aktionen"
          },
          "DETAILS": {
@@ -1393,8 +1393,8 @@
             "CAPTION": "Brandings",
             "NAME": "Name",
             "DESCRIPTION": "Beschreibung",
-            "CREATOR": "Author",
-            "CREATED": "Erstellt am",
+            "CREATOR": "Autor",
+            "CREATED": "Erstellt",
             "DEFAULT": "Standard",
             "USAGE": "Verwendung",
             "ACTION": "Aktionen"
@@ -1416,7 +1416,7 @@
                "DESCRIPTION": "Video, das an den Anfang einer Aufnahme angefügt wird.",
                "ACTIVE": "Aktiv",
                "ENABLE": "Vorspann aktivieren",
-               "SELECT": "Wählen Sie",
+               "SELECT": "Auswählen",
                "UPLOAD_LABEL": "Video hochladen",
                "UPLOAD_BUTTON": "Hochladen"
             },
@@ -1479,8 +1479,8 @@
             "ID": "Job ID",
             "ACTION": "Aktionen",
             "CAPTION": "Aufgaben",
-            "CREATED": "Erstellt am",
-            "CREATOR": "Author",
+            "CREATED": "Erstellt",
+            "CREATOR": "Autor",
             "HOST_NAME": "Hostname",
             "OPERATION": "Vorgang",
             "STARTED": "Gestartet",

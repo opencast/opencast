@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "Titre",
                "ID": "UID",
-               "SERIES": "Série",
+               "SERIES": "Séries",
                "PUBLISHERS": "Éditeur (s)",
                "ORGANIZERS": "Organisateur(s)",
                "CONTRIBUTORS": "Contributeur(s)",
@@ -972,7 +972,7 @@
                   "CAPTION": "Messages",
                   "CREATION_DATE": "Date de création ",
                   "SENDER": "Expéditeur",
-                  "SUBJECT": "Objet "
+                  "SUBJECT": "Sujet"
                }
             },
             "EVENTS": {
@@ -1052,7 +1052,7 @@
                "SUMMARY": "Résumé"
             },
             "LOCATIONS": {
-               "REMOVE": "Retirer",
+               "REMOVE": "Supprimer",
                "ADD_LOCATION": "Choisir emplacement",
                "ALL_LOCATIONS": "Tous les emplacements",
                "SELECT_LOCATION": "Sélectionner"
@@ -1178,7 +1178,7 @@
          "TABLE": {
             "CAPTION": "Droits d'accès",
             "NAME": "Nom",
-            "CREATED": "Créée",
+            "CREATED": "Créé le",
             "CREATOR": "Auteur",
             "IN_USE": "En cours d'utilisation",
             "ACTION": "Actions"
@@ -1368,7 +1368,7 @@
             "CAPTION": "Modèles de courriel",
             "NAME": "Nom",
             "CREATOR": "Auteur",
-            "CREATED": "Créée",
+            "CREATED": "Créé le",
             "ACTION": "Actions"
          },
          "DETAILS": {
@@ -1418,7 +1418,7 @@
                "ENABLE": "Activer bumper",
                "SELECT": "Sélectionner",
                "UPLOAD_LABEL": "Envoyer vidéo",
-               "UPLOAD_BUTTON": "Envoyer"
+               "UPLOAD_BUTTON": "Envoi"
             },
             "TRAILER": {
                "CAPTION": "Bumper (fin)",
@@ -1427,7 +1427,7 @@
                "ACTIVE": "Actif",
                "ENABLE": "Activer bumper",
                "UPLOAD_LABEL": "Envoyer vidéo",
-               "UPLOAD_BUTTON": "Envoyer"
+               "UPLOAD_BUTTON": "Envoi"
             },
             "TITLE": {
                "CAPTION": "Titre",
@@ -1437,9 +1437,9 @@
                "ENABLE": "Activer la diapositive de titre",
                "BACKGROUND": "Arrière-plan",
                "EXTRACT": "Extraire l'arrière-plan",
-               "UPLOAD": "Envoyer",
+               "UPLOAD": "Envoi",
                "UPLOAD_LABEL": "Envoyer une image",
-               "UPLOAD_BUTTON": "Envoyer"
+               "UPLOAD_BUTTON": "Envoi"
             },
             "WATERMARK": {
                "CAPTION": "Filigrane",
@@ -1451,11 +1451,11 @@
                "TOP_RIGHT": "En haut à droite",
                "BOTTOM_LEFT": "En bas à gauche",
                "BOTTOM_RIGHT": "En Bas à Droite",
-               "UPLOAD": "Envoyer",
+               "UPLOAD": "Envoi",
                "POSITION": "Position du filigrane et aperçu",
                "FILEUPLOAD_DESCRIPTION": "Fichier doit avoir un canal alpha (fond transparent). Les types de fichiers acceptés sont:.PNG.GIF.SVG.WEBP",
                "UPLOAD_LABEL": "Envoyer une image",
-               "UPLOAD_BUTTON": "Envoyer"
+               "UPLOAD_BUTTON": "Envoi"
             },
             "SUMMARY": {
                "CAPTION": "Résumé"
@@ -1479,7 +1479,7 @@
             "ID": "Identifiant de la tâche",
             "ACTION": "Actions",
             "CAPTION": "Tâches",
-            "CREATED": "Créée",
+            "CREATED": "Créé le",
             "CREATOR": "Auteur",
             "HOST_NAME": "Nom d'hôte",
             "OPERATION": "Opération",
@@ -1834,7 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "En cours",
       "FINISHED": "Terminé",
-      "PAUSED": "En pause",
+      "PAUSED": "Suspendu",
       "FAILED": "Echoué",
       "FINISHED_WITH_COMMENTS": "À faire",
       "SCHEDULED": "Programmé",
