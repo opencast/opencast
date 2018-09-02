@@ -227,8 +227,7 @@ angular.module('adminNg.services')
         this.applyWorkflowProperties = function(workflowProperties, selectedIds) {
             // Timeout because manipulating the just assigned HTML doesn't work otherwise.
             $timeout(function() {
-                var workflowConfig = {},
-                    element,
+                var element,
                     workflowConfigEl = angular.element(idConfigElement),
                     isRendered = workflowConfigEl.find('.configField').length > 0;
                 if (!isRendered) {
@@ -303,7 +302,7 @@ angular.module('adminNg.services')
 
         // This is used for the new task post request
         this.getWorkflowConfigs = function () {
-            var workflowConfig = {},
+            var workflowConfigs = {},
                 element,
                 workflowConfigEl = angular.element(idConfigElement),
                 isRendered = workflowConfigEl.find('.configField').length > 0;
