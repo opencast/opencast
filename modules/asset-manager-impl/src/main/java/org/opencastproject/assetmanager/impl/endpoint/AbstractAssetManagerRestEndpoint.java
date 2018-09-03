@@ -50,9 +50,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.P1Lazy;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +57,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -115,12 +111,7 @@ public abstract class AbstractAssetManagerRestEndpoint {
       returnDescription = "No content is returned.")
   @Deprecated
   public Response add(@FormParam("mediapackage") final MediaPackageImpl mediaPackage) {
-    return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
-        getAssetManager().takeSnapshot(DEFAULT_OWNER, mediaPackage);
-        return noContent();
-      }
-    });
+    return snapshot(mediaPackage);
   }
 
   @POST
@@ -145,12 +136,12 @@ public abstract class AbstractAssetManagerRestEndpoint {
               responseCode = SC_INTERNAL_SERVER_ERROR)},
       returnDescription = "No content is returned.")
   public Response snapshot(@FormParam("mediapackage") final MediaPackageImpl mediaPackage) {
-    return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
-        getAssetManager().takeSnapshot(DEFAULT_OWNER, mediaPackage);
-        return noContent();
-      }
-    });
+    try {
+      getAssetManager().takeSnapshot(DEFAULT_OWNER, mediaPackage);
+      return noContent();
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @DELETE
@@ -179,19 +170,18 @@ public abstract class AbstractAssetManagerRestEndpoint {
               responseCode = SC_INTERNAL_SERVER_ERROR)},
       returnDescription = "No content is returned.")
   public Response delete(@PathParam("id") final String mediaPackageId) {
-    return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
-        if (mediaPackageId != null) {
-          final AQueryBuilder q = getAssetManager().createQuery();
-          if (q.delete(AssetManager.DEFAULT_OWNER, q.snapshot()).where(q.mediaPackageId(mediaPackageId)).run() > 0) {
-            return noContent();
-          } else {
-            return notFound();
-          }
-        } else
-          return notFound();
+    if (StringUtils.isEmpty(mediaPackageId)) {
+      return notFound();
+    }
+    try {
+      final AQueryBuilder q = getAssetManager().createQuery();
+      if (q.delete(AssetManager.DEFAULT_OWNER, q.snapshot()).where(q.mediaPackageId(mediaPackageId)).run() > 0) {
+        return noContent();
       }
-    });
+      return notFound();
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @GET
@@ -214,21 +204,20 @@ public abstract class AbstractAssetManagerRestEndpoint {
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
       })
   public Response getMediaPackage(@PathParam("mediaPackageID") final String mediaPackageId) {
-    return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
-        final AQueryBuilder q = getAssetManager().createQuery();
-        final AResult r = q.select(q.snapshot())
-            .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-            .run();
-        if (r.getSize() == 1) {
-          return ok(r.getRecords().head2().getSnapshot().get().getMediaPackage());
-        } else if (r.getSize() == 0) {
-          return notFound();
-        } else {
-          return serverError();
-        }
+    try {
+      final AQueryBuilder q = getAssetManager().createQuery();
+      final AResult r = q.select(q.snapshot())
+              .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
+              .run();
+      if (r.getSize() == 1) {
+        return ok(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+      } else if (r.getSize() == 0) {
+        return notFound();
       }
-    });
+      return serverError();
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @GET
@@ -272,51 +261,42 @@ public abstract class AbstractAssetManagerRestEndpoint {
               responseCode = SC_INTERNAL_SERVER_ERROR)})
   public Response getAsset(@PathParam("mediaPackageID") final String mediaPackageID,
                            @PathParam("mediaPackageElementID") final String mediaPackageElementID,
-                           @PathParam("version") final String version,
-                           @HeaderParam("If-None-Match") final String ifNoneMatch) {
-    return handleException(new P1Lazy<Response>() {
-      @Override public Response get1() {
-        if (StringUtils.isNotBlank(ifNoneMatch)) {
-          return Response.notModified().build();
+                           @PathParam("version") final String version) {
+    try {
+      for (final Version v : getAssetManager().toVersion(version)) {
+        for (Asset asset : getAssetManager().getAsset(v, mediaPackageID, mediaPackageElementID)) {
+          final String fileName = mediaPackageElementID
+                  .concat(".")
+                  .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+          asset.getMimeType().map(MimeTypeUtil.Fns.toString);
+          // Write the file contents back
+          Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
+          return ok(asset.getInputStream(),
+                  Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
+                  length,
+                  Option.some(fileName));
         }
-        for (final Version v : getAssetManager().toVersion(version)) {
-          for (Asset asset : getAssetManager().getAsset(v, mediaPackageID, mediaPackageElementID)) {
-            final String fileName = mediaPackageElementID
-                .concat(".")
-                .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
-            asset.getMimeType().map(MimeTypeUtil.Fns.toString);
-            // Write the file contents back
-            return ok(asset.getInputStream(),
-                      Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
-                      asset.getSize() > 0
-                          ? Option.some(asset.getSize())
-                          : Option.<Long>none(),
-                      Option.some(fileName));
-          }
-          // none
-          return notFound();
-        }
-        // cannot parse version
-        return badRequest("malformed version");
+        // none
+        return notFound();
       }
-    });
+      // cannot parse version
+      return badRequest("malformed version");
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   /** Unify exception handling. */
-  public static Response handleException(final P1<Response> p) {
-    try {
-      return p.get1();
-    } catch (Exception e) {
-      logger.debug("Error calling REST method", e);
-      Throwable cause = e;
-      if (e instanceof RuntimeException && e.getCause() != null) {
-        cause = ((RuntimeException)e).getCause();
-      }
-      if (cause instanceof UnauthorizedException) {
-        return forbidden();
-      }
-
-      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+  public static Response handleException(Exception e) {
+    logger.debug("Error calling REST method", e);
+    Throwable cause = e;
+    if (e.getCause() != null) {
+      cause = e.getCause();
     }
+    if (cause instanceof UnauthorizedException) {
+      return forbidden();
+    }
+
+    throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
   }
 }
