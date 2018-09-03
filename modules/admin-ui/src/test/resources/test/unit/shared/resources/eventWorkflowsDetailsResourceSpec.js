@@ -12,23 +12,23 @@ describe('Event Workflow Details API Resource', function () {
     describe('#get', function () {
         beforeEach(function () {
             jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-            $httpBackend.whenGET('/admin-ng/events/40518/workflows/8695.json')
-                .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695.json')));
+            $httpBackend.whenGET('/admin-ng/events/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')
+                .respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')));
         });
 
         it('queries the group API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695.json')
-                .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695.json')));
-            EventWorkflowDetailsResource.get({ id0: '40518', id1: '8695' });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')
+                .respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')));
+            EventWorkflowDetailsResource.get({ id0: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a', id1: '1676' });
             $httpBackend.flush();
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows/8695.json')
-                .respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/workflows/8695.json')));
-            var data = EventWorkflowDetailsResource.get({ id0: '40518', id1: '8695' });
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')
+                .respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows/1676.json')));
+            var data = EventWorkflowDetailsResource.get({ id0: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a', id1: '1676' });
             $httpBackend.flush();
-            expect(data.duration).toEqual('472089');
+            expect(data.duration).toEqual(179169);
         });
     });
 });

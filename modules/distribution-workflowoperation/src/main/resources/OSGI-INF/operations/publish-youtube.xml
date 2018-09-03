@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler" immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler" />
-  <property name="service.description" value="YouTube Publication Workflow Handler" />
-  <property name="workflow.operation" value="publish-youtube" />
+               name="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.distribution.PublishYouTubeWorkflowOperationHandler"/>
+  <property name="service.description" value="YouTube Publication Workflow Handler"/>
+  <property name="workflow.operation" value="publish-youtube"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference cardinality="1..1" interface="org.opencastproject.publication.api.YouTubePublicationService"
-    name="PublicationService" policy="static" bind="setPublicationService"/>
+             name="PublicationService" policy="static" bind="setPublicationService"/>
   <reference cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-    name="ServiceRegistry" policy="static" bind="setServiceRegistry" />
+             name="ServiceRegistry" policy="static" bind="setServiceRegistry"/>
 </scr:component>

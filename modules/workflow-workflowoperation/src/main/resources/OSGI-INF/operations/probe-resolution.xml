@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.workflow.ProbeResolutionWorkflowOperationHandler" immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.workflow.ProbeResolutionWorkflowOperationHandler" />
-  <property name="service.description" value="Probe Resolution Operation Handler" />
-  <property name="workflow.operation" value="probe-resolution" />
+               name="org.opencastproject.workflow.handler.workflow.ProbeResolutionWorkflowOperationHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.workflow.ProbeResolutionWorkflowOperationHandler"/>
+  <property name="service.description" value="Probe Resolution Operation Handler"/>
+  <property name="workflow.operation" value="probe-resolution"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
 </scr:component>

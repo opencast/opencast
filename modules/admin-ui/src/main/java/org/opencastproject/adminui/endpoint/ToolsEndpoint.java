@@ -39,6 +39,7 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
+import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
@@ -114,6 +115,7 @@ import java.util.Dictionary;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -284,8 +286,6 @@ public class ToolsEndpoint implements ManagedService {
                   @RestResponse(description = "Media package not found", responseCode = SC_NOT_FOUND) })
   public Response getVideoEditor(@PathParam("mediapackageid") final String mediaPackageId)
           throws IndexServiceException, NotFoundException {
-    if (!isEditorAvailable(mediaPackageId))
-      return R.notFound();
 
     // Select tracks
     final Event event = getEvent(mediaPackageId).get();
@@ -366,7 +366,8 @@ public class ToolsEndpoint implements ManagedService {
     // Get workflows
     List<JValue> jWorkflows = new ArrayList<>();
     for (WorkflowDefinition workflow : getEditingWorkflows()) {
-      jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK))));
+      jWorkflows.add(obj(f("id", v(workflow.getId())), f("name", v(workflow.getTitle(), Jsons.BLANK)),
+              f("displayOrder", v(workflow.getDisplayOrder()))));
     }
 
     return RestUtils.okJson(obj(f("title", v(mp.getTitle(), Jsons.BLANK)),
@@ -428,9 +429,12 @@ public class ToolsEndpoint implements ManagedService {
       if (editingInfo.getPostProcessingWorkflow().isSome()) {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
         try {
+          final Map<String, String> workflowParameters = WorkflowPropertiesUtil
+            .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().compact());
           final Workflows workflows = new Workflows(assetManager, workspace, workflowService);
           workflows.applyWorkflowToLatestVersion($(mediaPackage.getIdentifier().toString()),
-                  ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId))).run();
+            ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
+            .run();
         } catch (AssetManagerException e) {
           logger.warn("Unable to start workflow '{}' on archived media package '{}': {}",
                   workflowId, mediaPackage, getStackTrace(e));

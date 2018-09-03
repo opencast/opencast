@@ -58,9 +58,9 @@
 
                 <div ng-switch-when="period">
                     <input type="text" class="small-search start-date" datepicker ng-model="filter.period.from"
-                        select="selectFilterPeriodValue(filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
+                        select="selectFilterPeriodValue(filter, 'from', 'to')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
                     <input type="text" class="small-search end-date" datepicker ng-model="filter.period.to"
-                        select="selectFilterPeriodValue(filter)" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
+                        select="selectFilterPeriodValue(filter, 'to', 'from')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
                 </div>
             </div>
 

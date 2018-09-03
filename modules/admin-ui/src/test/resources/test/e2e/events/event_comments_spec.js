@@ -23,16 +23,16 @@ describe('event details', function () {
         });
 
         it('displays comments and changes the URL', function () {
-            expect(page.modal.header.getText()).toContain('Event Details 40518');
+            expect(page.modal.header.getText()).toContain('Event Details c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             expect(page.modal.content.getText()).toContain('Existing comment');
-            expect(page.currentUrl()).toContain('40518');
+            expect(page.currentUrl()).toContain('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             expect(page.currentUrl()).toContain('comments');
         });
     });
 
     describe('comment', function () {
         beforeEach(function () {
-            page.getDetails('40518');
+            page.getDetails('c3a4f68d-14d4-47e2-8981-8eb2fb300d3a');
             page.waitFor(page.modal.header);
             page.modal.commentsTab.click();
         });

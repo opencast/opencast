@@ -38,8 +38,9 @@ import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -91,9 +92,17 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
       }
     }
 
-    Opt<Date> startDate = MetadataUtils.getUpdatedDateMetadata(abstractMetadata, "startDate");
-    if (startDate != null && startDate.isSome())
-      mediaPackage.setDate(startDate.get());
+    MetadataField<?> startDate = abstractMetadata.getOutputFields().get("startDate");
+    if (startDate != null && startDate.getValue().isSome() && startDate.isUpdated()
+            && isNotBlank(startDate.getValue().get().toString())) {
+      try {
+        SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
+        mediaPackage.setDate(sdf.parse((String) startDate.getValue().get()));
+      } catch (ParseException e) {
+        logger.warn("Not able to parse start date {} to update media package {} because {}", startDate.getValue(),
+                mediaPackage.getIdentifier(), e);
+      }
+    }
 
     // Update all the metadata related to the episode dublin core catalog
     MetadataField<?> title = abstractMetadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());

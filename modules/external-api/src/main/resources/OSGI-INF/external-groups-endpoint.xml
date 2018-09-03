@@ -2,22 +2,22 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.external.endpoint.GroupsEndpoint"
                immediate="true" activate="activate">
-  <implementation class="org.opencastproject.external.endpoint.GroupsEndpoint" />
-  <property name="service.description" value="External API - Groups Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.external.groups" />
-  <property name="opencast.service.path" value="/api/groups" />
+  <implementation class="org.opencastproject.external.endpoint.GroupsEndpoint"/>
+  <property name="service.description" value="External API - Groups Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.external.groups"/>
+  <property name="opencast.service.path" value="/api/groups"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.external.endpoint.GroupsEndpoint" />
+    <provide interface="org.opencastproject.external.endpoint.GroupsEndpoint"/>
   </service>
   <reference name="ExternalIndex"
-			interface="org.opencastproject.external.impl.index.ExternalIndex"
-			cardinality="1..1"
-			policy="static"
-			bind="setExternalIndex" />
+             interface="org.opencastproject.external.impl.index.ExternalIndex"
+             cardinality="1..1"
+             policy="static"
+             bind="setExternalIndex"/>
   <reference name="IndexService"
-			interface="org.opencastproject.index.service.api.IndexService"
-			cardinality="1..1"
-			policy="static"
-			bind="setIndexService" />
+             interface="org.opencastproject.index.service.api.IndexService"
+             cardinality="1..1"
+             policy="static"
+             bind="setIndexService"/>
 </scr:component>

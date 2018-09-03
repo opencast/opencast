@@ -1,23 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"
-  immediate="true" activate="activate" deactivate="deactivate">
+               name="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"
+               immediate="true" activate="activate" deactivate="deactivate">
   <implementation
-    class="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl" />
-  <property name="service.description" value="Themes Database Service" />
+      class="org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl"/>
+  <property name="service.description" value="Themes Database Service"/>
   <service>
-    <provide interface="org.opencastproject.themes.ThemesServiceDatabase" />
+    <provide interface="org.opencastproject.themes.ThemesServiceDatabase"/>
   </service>
   <reference name="messageReceiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-    cardinality="1..1" policy="static" bind="setMessageReceiver" />
+             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="messageSender" interface="org.opencastproject.message.broker.api.MessageSender"
-    cardinality="1..1" policy="static" bind="setMessageSender" />
-  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+             cardinality="1..1" policy="static" bind="setMessageSender"/>
+  <reference name="organization-directory-service"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-    target="(osgi.unit.name=org.opencastproject.themes)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
+             target="(osgi.unit.name=org.opencastproject.themes)" cardinality="1..1" policy="static"
+             bind="setEntityManagerFactory"/>
   <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
-    cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+             cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
 </scr:component>

@@ -62,11 +62,11 @@ angular.module('adminNg.controllers')
 
                     var index = $scope.video.segments.indexOf(segment);
 
-                    if ($scope.video.segments[index - 1]) {
-                        $scope.video.segments[index - 1].end = segment.end;
-                        $scope.video.segments.splice(index, 1);
-                    } else if ($scope.video.segments[index + 1]) {
+                    if ($scope.video.segments[index + 1]) {
                         $scope.video.segments[index + 1].start = segment.start;
+                        $scope.video.segments.splice(index, 1);
+                    } else if ($scope.video.segments[index - 1]) {
+                        $scope.video.segments[index - 1].end = segment.end;
                         $scope.video.segments.splice(index, 1);
                     }
                 }

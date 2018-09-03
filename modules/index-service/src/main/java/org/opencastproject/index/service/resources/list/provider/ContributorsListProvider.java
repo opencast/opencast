@@ -21,7 +21,6 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import static org.opencastproject.index.service.util.ListProviderUtil.splitStringList;
 
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;
@@ -125,16 +124,16 @@ public class ContributorsListProvider implements ResourceListProvider {
         contributorsList.add(u.getName());
     }
 
-    contributorsList.addAll(splitStringList(searchIndex.getTermsForField(EventIndexSchema.CONTRIBUTOR,
-            Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    contributorsList.addAll(splitStringList(searchIndex.getTermsForField(EventIndexSchema.PRESENTER,
-            Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    contributorsList.addAll(splitStringList(searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE }))));
-    contributorsList.addAll(splitStringList(searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE }))));
-    contributorsList.addAll(splitStringList(searchIndex.getTermsForField(SeriesIndexSchema.PUBLISHERS,
-            Option.some(new String[] { Series.DOCUMENT_TYPE }))));
+    contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.CONTRIBUTOR,
+            Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.PRESENTER,
+            Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
+            Option.some(new String[] { Series.DOCUMENT_TYPE })));
+    contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,
+            Option.some(new String[] { Series.DOCUMENT_TYPE })));
+    contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.PUBLISHERS,
+            Option.some(new String[] { Series.DOCUMENT_TYPE })));
 
     // TODO: TThis is not a good idea.
     // TODO: The search index can handle limit and offset.
@@ -186,16 +185,16 @@ public class ContributorsListProvider implements ResourceListProvider {
       }
     }
 
-    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
-            .getTermsForField(EventIndexSchema.PRESENTER, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
-            .getTermsForField(EventIndexSchema.CONTRIBUTOR, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
-            .getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
-            .getTermsForField(SeriesIndexSchema.ORGANIZERS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
-    addIndexNamesToMap(labels, contributorsList, splitStringList(searchIndex
-            .getTermsForField(SeriesIndexSchema.PUBLISHERS, Option.some(new String[] { Event.DOCUMENT_TYPE }))));
+    addIndexNamesToMap(labels, contributorsList, searchIndex
+            .getTermsForField(EventIndexSchema.PRESENTER, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    addIndexNamesToMap(labels, contributorsList, searchIndex
+            .getTermsForField(EventIndexSchema.CONTRIBUTOR, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    addIndexNamesToMap(labels, contributorsList, searchIndex
+            .getTermsForField(SeriesIndexSchema.CONTRIBUTORS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    addIndexNamesToMap(labels, contributorsList, searchIndex
+            .getTermsForField(SeriesIndexSchema.ORGANIZERS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    addIndexNamesToMap(labels, contributorsList, searchIndex
+            .getTermsForField(SeriesIndexSchema.PUBLISHERS, Option.some(new String[] { Event.DOCUMENT_TYPE })));
 
     Collections.sort(contributorsList, new Comparator<Contributor>() {
       @Override

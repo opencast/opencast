@@ -297,6 +297,16 @@ public interface Workspace extends StorageUsage {
   void cleanup(Id mediaPackageId) throws IOException;
 
   /**
+   * Clean up elements of one media package from the local workspace, not touching the working file repository.
+   *
+   * @param mediaPackageId
+   *          Id specifying the media package to remove files for.
+   * @param filesOnly
+   *          Boolean specifying whether only files or also directories (including the root directory) are deleted.
+   */
+  void cleanup(Id mediaPackageId, boolean filesOnly) throws IOException;
+
+  /**
    * Returns the workspace's root directory
    *
    * @return Path to the workspace root directory

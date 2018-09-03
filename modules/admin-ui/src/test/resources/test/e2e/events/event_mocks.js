@@ -4,7 +4,7 @@ exports.httpBackendMock = function () {
         .run(function ($httpBackend) {
             var workflows = {
                 results: [{
-                    id:       '8695',
+                    id:       '1676',
                     mimetype: 'image\/png',
                     tags:     'archive, engage',
                     type:     'Attachment',
@@ -52,13 +52,13 @@ exports.httpBackendMock = function () {
                 }
             };
 
-            $httpBackend.whenGET('/admin-ng/event/40518/workflows')
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows')
             .respond(JSON.stringify(workflows));
 
-            $httpBackend.whenGET('/admin-ng/event/40518/media')
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/media')
             .respond(JSON.stringify(media));
 
-            $httpBackend.whenGET('/admin-ng/event/40518/media/track-1')
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/media/track-1')
             .respond(JSON.stringify(track));
 
             $httpBackend.whenGET(/.*/).passThrough();

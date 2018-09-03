@@ -29,6 +29,7 @@ import static org.junit.Assert.fail;
 
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.Event.SchedulingStatus;
+import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.util.DateTimeSupport;
 
@@ -208,10 +209,12 @@ public class EventTest {
 
     event.setSchedulingStatus(SchedulingStatus.READY_FOR_RECORDING.toString());
     event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() - (3 * 60 * 1000)));
+    event.setRecordingStatus(RecordingState.CAPTURING);
     assertTrue(event.hasRecordingStarted());
 
     event.setSchedulingStatus(SchedulingStatus.OPTED_OUT.toString());
     event.setTechnicalStartTime(DateTimeSupport.toUTC(now.getTime() + (3 * 60 * 1000)));
+    event.setRecordingStatus(null);
     assertFalse(event.hasRecordingStarted());
   }
 

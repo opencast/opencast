@@ -8,8 +8,8 @@
     "angular-animate": "1.5.11",
     "angular-messages": "1.5.11",
     "angular-md5": "0.1.8",
-    "angular-translate": "2.17.0",
-    "angular-translate-loader-static-files": "2.17.0",
+    "angular-translate": "2.18.1",
+    "angular-translate-loader-static-files": "2.18.1",
     "angular-local-storage": "0.7.1",
     "angular-wizard": "0.6.0",
     "angular-hotkeys": "chieffancypants/angular-hotkeys#^1.7.0",
@@ -24,5 +24,8 @@
     }
   },
   "appPath": "src/main/webapp",
-  "moduleName": "adminNg"
+  "moduleName": "adminNg",
+  "resolutions": {
+    "angular-translate": "2.18.1"
+  }
 }

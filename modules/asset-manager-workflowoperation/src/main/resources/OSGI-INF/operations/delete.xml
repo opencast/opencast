@@ -3,14 +3,14 @@
                name="org.opencastproject.workflow.handler.assetmanager.AssetManagerDeleteWorkflowOperationHandler"
                immediate="true" activate="activate">
   <implementation
-    class="org.opencastproject.workflow.handler.assetmanager.AssetManagerDeleteWorkflowOperationHandler" />
-  <property name="service.description" value="Asset Manager Delete Workflow Operation Handler" />
-  <property name="workflow.operation" value="asset-delete" />
+      class="org.opencastproject.workflow.handler.assetmanager.AssetManagerDeleteWorkflowOperationHandler"/>
+  <property name="service.description" value="Asset Manager Delete Workflow Operation Handler"/>
+  <property name="workflow.operation" value="asset-delete"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager" cardinality="1..1"
-             policy="static" bind="setAssetManager" />
+             policy="static" bind="setAssetManager"/>
   <reference name="ServiceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-             cardinality="1..1" policy="static" bind="setServiceRegistry" />
+             cardinality="1..1" policy="static" bind="setServiceRegistry"/>
 </scr:component>

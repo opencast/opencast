@@ -327,11 +327,6 @@ angular.module('adminNg.services')
             }
         };
 
-        this.getStartDate = function() {
-            var start = self.ud[getType()].start;
-            return SchedulingHelperService.parseDate(start.date, start.hour, start.minute);
-        };
-
         this.checkValidity = function () {
             var data = self.ud[getType()];
 
@@ -339,34 +334,20 @@ angular.module('adminNg.services')
                 Notifications.remove(self.alreadyEndedNotification, NOTIFICATION_CONTEXT);
             }
             // check if start is in the past and has already ended
-            if (angular.isDefined(data.start) && angular.isDefined(data.start.hour)
-                && angular.isDefined(data.start.minute) && angular.isDefined(data.start.date)
-                && angular.isDefined(data.duration) && angular.isDefined(data.duration.hour)
-                && angular.isDefined(data.duration.minute)) {
-                var startDate = self.getStartDate();
-                var endDate = new Date(startDate.getTime());
-                endDate.setHours(endDate.getHours() + data.duration.hour, endDate.getMinutes() + data.duration.minute, 0, 0);
-                var nowDate = new Date();
-                if (endDate < nowDate) {
-                    self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
-                        NOTIFICATION_CONTEXT, -1);
-                    self.hasConflicts = true;
-                }
+            if (SchedulingHelperService.alreadyEnded(data.start, data.duration)) {
+                self.alreadyEndedNotification = Notifications.add('error', 'CONFLICT_ALREADY_ENDED',
+                    NOTIFICATION_CONTEXT, -1);
+                self.hasConflicts = true;
             }
 
             if (self.endBeforeStartNotification) {
                 Notifications.remove(self.endBeforeStartNotification, NOTIFICATION_CONTEXT);
             }
             // check if end date is before start date
-            if (angular.isDefined(data.start) && angular.isDefined(data.start.date)
-                && angular.isDefined(data.end.date)) {
-                var startDate = new Date(data.start.date);
-                var endDate = new Date(data.end.date);
-                if (endDate < startDate) {
-                    self.endBeforeStartNotification = Notifications.add('error', 'CONFLICT_END_BEFORE_START',
-                        NOTIFICATION_CONTEXT, -1);
-                    self.hasConflicts = true;
-                }
+            if (SchedulingHelperService.endBeforeStart(data.start, data.end)) {
+                self.endBeforeStartNotification = Notifications.add('error', 'CONFLICT_END_BEFORE_START',
+                    NOTIFICATION_CONTEXT, -1);
+                self.hasConflicts = true;
             }
         };
 

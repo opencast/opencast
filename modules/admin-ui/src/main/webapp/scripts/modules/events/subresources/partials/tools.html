@@ -42,7 +42,8 @@
                 </div>
             </div>
         </div>
-        <div data-admin-ng-notifications=""></div>
+        <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
+
         <!-- Currently, the editor is the only supported tool. Therefore we don't show the tool selection.
              Uncomment this to see how tool selection works.
         <div class="tab-menu">
@@ -78,7 +79,6 @@
 
                 <div ng-if="area === 'metadata'">
                   <div class="area-body">
-                      <div data-admin-ng-notifications="" context="events-access"></div>
                       <div data-admin-ng-notification="" data-type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
                       <div class="full-col">
                           <div class="obj tbl-details">
@@ -100,7 +100,6 @@
                 </div>
                 <div ng-if="area === 'comments'">
                   <div class="area-body">
-                      <div data-admin-ng-notifications="" context="events-access"></div>
                       <div class="full-col">
                           <div class="obj comments">
                               <header class="no-expand" translate="EVENTS.EVENTS.DETAILS.COMMENTS.CAPTION">
@@ -228,7 +227,7 @@
                             data-width="'175px'"
                             data-disable-search-threshold="8"
                             ng-model="video.workflow"
-                            ng-options="workflow.id as workflow.name for workflow in video.workflows" />
+                            ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                         <a ng-click="submit()"
                            ng-class="{disabled: submitButton}"

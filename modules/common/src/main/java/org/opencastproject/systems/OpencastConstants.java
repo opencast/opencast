@@ -50,4 +50,5 @@ public interface OpencastConstants {
   /** The property key for the Working File Repository URL defined in the organization properties */
   String WFR_URL_ORG_PROPERTY = "org.opencastproject.file.repo.url";
 
+  String WORKFLOW_PROPERTIES_NAMESPACE = "org.opencastproject.workflow.configuration";
 }

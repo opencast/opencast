@@ -1,0 +1,20 @@
+[
+  {
+    "mimetype": "text/xml",
+    "id": "security-policy-episode",
+    "type": "security/xacml+episode",
+    "url": "http://localhost:8080/assets/assets/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/security-policy-episode/1/xacml.xml",
+    "tags": [
+      "archive"
+    ]
+  },
+  {
+    "mimetype": "text/xml",
+    "id": "33b0fbc5-2891-46b4-95b3-bb3aed0c598b",
+    "type": "processing/defaults",
+    "url": "http://localhost:8080/assets/assets/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/33b0fbc5-2891-46b4-95b3-bb3aed0c598b/1/processing_properties.xml",
+    "tags": [
+      "archive"
+    ]
+  }
+]

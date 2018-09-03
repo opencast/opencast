@@ -105,6 +105,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -195,6 +196,32 @@ public class WorkflowServiceImplTest {
             .anyTimes();
     replay(userDirectoryService);
     service.setUserDirectoryService(userDirectoryService);
+
+    {
+      // This is the asset manager the workflow service itself uses. Further below is the asset manager for the solr
+      // index.
+      final AssetManager assetManager = createNiceMock(AssetManager.class);
+      final AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
+      final Target t = EasyMock.createNiceMock(Target.class);
+      final Predicate p = EasyMock.createNiceMock(Predicate.class);
+      EasyMock.expect(p.and(EasyMock.anyObject(Predicate.class))).andReturn(p).anyTimes();
+      EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
+      EasyMock.expect(query.propertiesOf(EasyMock.anyString())).andReturn(t).anyTimes();
+      final VersionField v = EasyMock.createNiceMock(VersionField.class);
+      EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
+      EasyMock.expect(query.version()).andReturn(v).anyTimes();
+      EasyMock.expect(query.mediaPackageId(EasyMock.anyString())).andReturn(p).anyTimes();
+      final ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
+      EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
+      final AResult r = EasyMock.createNiceMock(AResult.class);
+      EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
+      final Stream<ARecord> recStream = Stream.mk();
+      EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
+      EasyMock.expect(query.select(EasyMock.anyObject(Target.class), EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
+      EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
+      EasyMock.replay(query, t, r, selectQuery, assetManager, p, v);
+      service.setAssetManager(assetManager);
+    }
 
     AuthorizationService authzService = createNiceMock(AuthorizationService.class);
     expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
@@ -402,7 +429,7 @@ public class WorkflowServiceImplTest {
 
     // Create a child workflow with a wrong parent id
     try {
-      service.start(workingDefinition, mediapackage1, new Long(1876234678), null);
+      service.start(workingDefinition, mediapackage1, new Long(1876234678), Collections.emptyMap());
       Assert.fail("Workflows should not be started with bad parent IDs");
     } catch (NotFoundException e) {
     } // the exception is expected
@@ -546,7 +573,7 @@ public class WorkflowServiceImplTest {
       if (parentId == null) {
         instance = service.start(definition, mp);
       } else {
-        instance = service.start(definition, mp, parentId, null);
+        instance = service.start(definition, mp, parentId, Collections.emptyMap());
       }
       stateListener.wait();
     }
@@ -885,7 +912,7 @@ public class WorkflowServiceImplTest {
     for (int i = 0; i < count; i++) {
       MediaPackage mp = i % 2 == 0 ? mediapackage1 : mediapackage2;
       mp.setIdentifier(new UUIDIdBuilderImpl().createNew());
-      instances.add(service.start(workingDefinition, mp, null));
+      instances.add(service.start(workingDefinition, mp, Collections.emptyMap()));
     }
 
     while (stateListener.countStateChanges() < count) {

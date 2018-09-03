@@ -117,7 +117,7 @@ public class EventsListProvider implements ResourceListProvider {
       }
     } else if (COMMENTS.equals(listName)) {
       for (Comments comments : Comments.values())
-        list.put(comments.toString(), comments.toString());
+        list.put(comments.toString(), "FILTERS.EVENTS.COMMENTS." + comments.toString());
     }
 
     return list;
@@ -125,7 +125,7 @@ public class EventsListProvider implements ResourceListProvider {
 
   @Override
   public boolean isTranslatable(String listName) {
-    return STATUS.equals(listName);
+    return STATUS.equals(listName) || COMMENTS.equals(listName);
   }
 
   @Override

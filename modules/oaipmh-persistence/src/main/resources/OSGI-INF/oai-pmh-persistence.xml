@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.oaipmh.persistence.OaiPmhDatabaseImpl" immediate="true" activate="activate">
-  <implementation class="org.opencastproject.oaipmh.persistence.impl.OaiPmhDatabaseImpl" />
-  <property name="service.description" value="OAI-PMH Service Persistence" />
+               name="org.opencastproject.oaipmh.persistence.OaiPmhDatabaseImpl" immediate="true" activate="activate">
+  <implementation class="org.opencastproject.oaipmh.persistence.impl.OaiPmhDatabaseImpl"/>
+  <property name="service.description" value="OAI-PMH Service Persistence"/>
   <service>
-    <provide interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase" />
+    <provide interface="org.opencastproject.oaipmh.persistence.OaiPmhDatabase"/>
   </service>
   <reference name="entityManagerFactory"
-      interface="javax.persistence.EntityManagerFactory"
-      target="(osgi.unit.name=org.opencastproject.oaipmh)"
-      cardinality="1..1"
-      policy="static"
-      bind="setEntityManagerFactory" />    
+             interface="javax.persistence.EntityManagerFactory"
+             target="(osgi.unit.name=org.opencastproject.oaipmh)"
+             cardinality="1..1"
+             policy="static"
+             bind="setEntityManagerFactory"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-    cardinality="1..1" policy="static" bind="setWorkspace" />
+             cardinality="1..1" policy="static" bind="setWorkspace"/>
 </scr:component>

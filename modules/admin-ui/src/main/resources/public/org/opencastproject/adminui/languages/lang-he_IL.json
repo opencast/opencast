@@ -64,7 +64,13 @@
          "NAME": "שם"
       },
       "ACTIONS": {
-         "CONFIRMATION": "נדרש אישור"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "מודול מדיה",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "לא ניתן לשמור אף אחד מהסדרות",
       "EVENTS_DELETED": "הארוע נמחק",
       "EVENTS_NOT_DELETED": "לא ניתן למחוק את הארוע\\ים",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "הסדרה נמחקה",
       "SERIES_NOT_DELETED": "לא ניתן היה למחוק את הסידרה",
       "USER_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "לא ניתן למחוק את הרשימה השחורה",
       "LOCATION_DELETED": "המיקום נמחק",
       "LOCATION_NOT_DELETED": "לא ניתן למחוק את המיקום",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "הרשימה השחורה נוצרה",
       "LOCATION_BLACKLIST_NOT_CREATED": "הרשימה השחורה לא יכולה להיווצר",
       "LOCATION_BLACKLIST_SAVED": "הרשימה השחורה נשמרה",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "התנגשות בתזמון: שינוי האירועים יוצר התנגשויות. אנא שנה את המיקום, תאריכים או שעות.",
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
       "CONFLICT_END_BEFORE_START": "שגיאה בתזמון: תזמון הסיום חייב להיות אחרי תזמון ההתחלה.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "חוקים חייבים להכיל תפקיד חוקי ו/או הרשאות קריאה/כתיבה.",
       "MISSING_ACL_RULES": "לפחות תפקיד אחד עם הרשאות קריאה וכתיבה נדרש!",
       "SAVED_ACL_RULES": "חוקי הגישה נשמרו.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "שם זה נמצא כבר בשימוש",
       "THEME_NAME_EMPTY": "השם אינו יכול להשאר ריק",
       "BUMPER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
       "TITLE_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
       "LICENSE_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
       "WATERMARK_UPLOAD_ERROR": "שגיאה בזמן האלעת מדיה",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "המדיה מועלת…",
       "THEME_CREATED": "ערכת הנושא נוצרה",
       "THEME_NOT_CREATED": "לא ניתן ליצור את ערכת הנושא",
@@ -195,7 +206,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "מחק",
-            "BUTTON": "מחק"
+            "BUTTON": "מחק",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "מחק",
@@ -211,6 +223,7 @@
                "EVENTS_RETRACTED": "אירועים ייתבטלו/יימחקו",
                "RETRACT_WORKFLOW": "תהליך לביטול אירועים"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "אף אחד מהאירועים שנבחרו ניתן למחיקה מבלי להשאיר קבצים מיותמים."
             },
@@ -242,12 +255,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "עריכת אירועים מתוזמנים",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "כללי",
             "CANNOTSTART": "לא ניתן לעבד את האירוע(ים) המסומנים, רק אירועים מתוזמנים נתמכים.",
             "NOCHANGES": "לא זוהה שינויים לאירוע!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "לערוך מטא-נתונים"
@@ -269,7 +284,10 @@
    "DATES": {
       "TODAY": "היום",
       "TOMORROW": "מחר",
-      "YESTERDAY": "אתמול"
+      "YESTERDAY": "אתמול",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "היום בשעה {{ time }}",
@@ -438,6 +456,7 @@
                "CAPTION": "האלעת נכסים",
                "SELECT_TYPE": "בחר סוג נכס",
                "ADD": "הוסף נכס",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "הערות בכתב יד",
                   "CAPTIONS_DFXP": "כתוביות DFXP",
@@ -640,6 +659,8 @@
                "TYPE": "סוג",
                "SIZE": "גודל",
                "DETAILS": "פרטים",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "קבצים מצורפים",
                   "CAPTION": "קבצים מצורפים",
@@ -847,6 +868,7 @@
                "ACTIONS": "פעולות",
                "DETAILS": "פרטים",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "מזהה",
                "TYPE": "סוג",
                "TITLE": "כותרת",
@@ -866,15 +888,39 @@
                   "DELETE": "מחק מופע של תהליך עבודה"
                }
             },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
+            },
             "WORKFLOW_DETAILS": {
                "TITLE": "פרטי מהלך-עבודה",
                "CONFIGURATION": "הגדרות מהלך-עבודה"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "פעולות מהלך-עבודה"
+               "TITLE": "פעולות מהלך-עבודה",
+               "DETAILS_LINK": "תהליכים",
+               "TABLE_HEADERS": {
+                  "TITLE": "כותרת",
+                  "STATUS": "מצב",
+                  "DESCRIPTION": "תאור"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "פרטי פעולה"
+               "TITLE": "פרטי פעולה",
+               "TABLE_HEADERS": {
+                  "TITLE": "כותרת",
+                  "STATE": "מצב",
+                  "DESCRIPTION": "תאור",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "החל",
+                  "FINISHED": "הסתיים",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "פרטי מהלך-עבודה"
@@ -973,6 +1019,7 @@
          "TABLE": {
             "CAPTION": "סדרות",
             "TITLE": "סדרות",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "אירגונ(ים)",
             "CONTRIBUTORS": "תורמ(ים)",
             "CREATED": "נוצר",
@@ -1525,7 +1572,8 @@
                "ACTIVE": "פעיל",
                "ENABLE": "לאפשר באמפר",
                "UPLOAD_LABEL": "טעינת וידאו",
-               "UPLOAD_BUTTON": "העלאה"
+               "UPLOAD_BUTTON": "העלאה",
+               "SELECT": "בחר"
             },
             "TITLE": {
                "CAPTION": "כותרת",
@@ -1667,7 +1715,9 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "הסר מקטע",
-         "USE_SEGMENT": "השתמש במקטע זה"
+         "USE_SEGMENT": "השתמש במקטע זה",
+         "START": "התחל",
+         "END": "End"
       },
       "PLAYER": {
          "PLAY": "הפעל",
@@ -1736,7 +1786,10 @@
             "LABEL": "מדיניות גישה"
          },
          "COMMENTS": {
-            "LABEL": "הערות"
+            "LABEL": "הערות",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "נפתר"
          },
          "CONTRIBUTORS": {
             "LABEL": "תורמים"
@@ -2013,6 +2066,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "סוף קטע"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "שגיאה",
+         "IDLE": "Idle",
+         "OFFLINE": "מנותק",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "מעלה"
       }
    }
 }

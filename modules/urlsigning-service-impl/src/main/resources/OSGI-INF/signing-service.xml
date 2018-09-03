@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" name="org.opencastproject.security.urlsigning.service.impl.UrlSigningServiceImpl" immediate="true">
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.security.urlsigning.service.impl.UrlSigningServiceImpl" immediate="true">
   <service>
-    <provide interface="org.opencastproject.security.urlsigning.service.UrlSigningService" />
+    <provide interface="org.opencastproject.security.urlsigning.service.UrlSigningService"/>
   </service>
-  <implementation class="org.opencastproject.security.urlsigning.service.impl.UrlSigningServiceImpl" />
+  <implementation class="org.opencastproject.security.urlsigning.service.impl.UrlSigningServiceImpl"/>
 
   <reference bind="registerSigningProvider"
              unbind="unregisterSigningProvider"
              cardinality="0..n"
              interface="org.opencastproject.security.urlsigning.provider.UrlSigningProvider"
              name="urlSigningProviders"
-             policy="dynamic" />
+             policy="dynamic"/>
 
 </scr:component>

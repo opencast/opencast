@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.oaipmh.server.OaiPmhServer" immediate="true" activate="activate">
-    <implementation class="org.opencastproject.oaipmh.server.OaiPmhServer" />
+    <implementation class="org.opencastproject.oaipmh.server.OaiPmhServer"/>
     <service>
-      <provide interface="org.osgi.service.cm.ManagedService" />
-      <provide interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo" />
-      <provide interface="org.opencastproject.oaipmh.server.OaiPmhServer" />
+      <provide interface="org.osgi.service.cm.ManagedService"/>
+      <provide interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo"/>
+      <provide interface="org.opencastproject.oaipmh.server.OaiPmhServer"/>
     </service>
     <!-- OSGi properties -->
-    <property name="service.description" value="OAI-PMH server" />
+    <property name="service.description" value="OAI-PMH server"/>
     <!-- Dependencies -->
     <reference name="securityService"
                interface="org.opencastproject.security.api.SecurityService"
                cardinality="1..1"
                policy="static"
-               bind="setSecurityService" />
+               bind="setSecurityService"/>
     <reference name="repository"
                interface="org.opencastproject.oaipmh.server.OaiPmhRepository"
                cardinality="0..n"
                policy="dynamic"
                bind="setRepository"
-               unbind="unsetRepository" />
+               unbind="unsetRepository"/>
   </scr:component>
   <!-- REST endpoint for the OAI-PMH server -->
   <scr:component name="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint" immediate="true">
-    <implementation class="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint" />
+    <implementation class="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint"/>
     <!-- provide service interface otherwise the rest endpoint will not be registered by the RestPublisher -->
     <service>
-      <provide interface="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint" />
+      <provide interface="org.opencastproject.oaipmh.server.OsgiOaiPmhServerInfoRestEndpoint"/>
     </service>
-    <property name="service.description" value="OAI-PMH server REST endpoint" />
+    <property name="service.description" value="OAI-PMH server REST endpoint"/>
     <!-- Opencast properties -->
-    <property name="opencast.service.type" value="org.opencastproject.oaipmhinfo" />
-    <property name="opencast.service.path" value="/oaipmhinfo" />
-    <property name="opencast.service.jobproducer" value="false" />
+    <property name="opencast.service.type" value="org.opencastproject.oaipmhinfo"/>
+    <property name="opencast.service.path" value="/oaipmhinfo"/>
+    <property name="opencast.service.jobproducer" value="false"/>
     <!-- Dependencies -->
     <reference name="oaiPmhServerInfo"
                interface="org.opencastproject.oaipmh.server.OaiPmhServerInfo"
                cardinality="1..1"
                policy="static"
-               bind="setOaiPmhServerInfo" />
+               bind="setOaiPmhServerInfo"/>
   </scr:component>
 </scr:components>

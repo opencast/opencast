@@ -1,5 +1,5 @@
 {
-  "Status": "uploading",
+  "Status": "AGENTS.STATUS.UPLOADING",
   "capabilities": [
     {
       "value": "defaults",

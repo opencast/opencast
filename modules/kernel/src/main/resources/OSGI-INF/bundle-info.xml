@@ -3,41 +3,41 @@
   <scr:component name="org.opencastproject.kernel.bundleinfo.BundleInfoLogger"
                  activate="activate" deactivate="deactivate"
                  immediate="true">
-    <implementation class="org.opencastproject.kernel.bundleinfo.BundleInfoLogger" />
+    <implementation class="org.opencastproject.kernel.bundleinfo.BundleInfoLogger"/>
     <reference name="bundleInfoDb"
                interface="org.opencastproject.kernel.bundleinfo.BundleInfoDb"
                cardinality="1..1"
                policy="static"
                bind="setDb"
-               unbind="unsetDb" />
+               unbind="unsetDb"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoDb" activate="activate" immediate="true">
-    <implementation class="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoDb" />
+    <implementation class="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoDb"/>
     <service>
-      <provide interface="org.opencastproject.kernel.bundleinfo.BundleInfoDb" />
+      <provide interface="org.opencastproject.kernel.bundleinfo.BundleInfoDb"/>
     </service>
     <reference name="entityManagerFactory"
-        interface="javax.persistence.EntityManagerFactory"
-        target="(osgi.unit.name=org.opencastproject.kernel)"
-        cardinality="1..1"
-        policy="static"
-        bind="setEntityManagerFactory" />
+               interface="javax.persistence.EntityManagerFactory"
+               target="(osgi.unit.name=org.opencastproject.kernel)"
+               cardinality="1..1"
+               policy="static"
+               bind="setEntityManagerFactory"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" immediate="true">
-    <implementation class="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" />
-    <property name="service.description" value="System BundleInfo REST Endpoint" />
-    <property name="opencast.service.type" value="org.opencastproject.kernel.bundleinfo" />
-    <property name="opencast.service.path" value="/sysinfo" />
+    <implementation class="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint"/>
+    <property name="service.description" value="System BundleInfo REST Endpoint"/>
+    <property name="opencast.service.type" value="org.opencastproject.kernel.bundleinfo"/>
+    <property name="opencast.service.path" value="/sysinfo"/>
     <service>
       <!-- Needed for the RestPublisher to pick up the service. -->
-      <provide interface="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint" />
+      <provide interface="org.opencastproject.kernel.bundleinfo.OsgiBundleInfoRestEndpoint"/>
     </service>
     <reference name="bundleInfoDb"
                interface="org.opencastproject.kernel.bundleinfo.BundleInfoDb"
                cardinality="1..1"
                policy="static"
-               bind="setDb" />
+               bind="setDb"/>
   </scr:component>
 </scr:components>

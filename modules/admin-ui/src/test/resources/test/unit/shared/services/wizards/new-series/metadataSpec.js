@@ -32,7 +32,7 @@ describe('Metadata Step in New Series Wizard', function () {
 
     it('fetches the metadata for the metadata tab', function () {
         expect(NewSeriesMetadata).toBeDefined();
-        expect(NewSeriesMetadata.metadata['dublincore/series'].fields.length).toEqual(7);
+        expect(NewSeriesMetadata.metadata['dublincore/series'].fields.length).toEqual(9);
     });
 
     setParams = function (ctrl, id, value) {

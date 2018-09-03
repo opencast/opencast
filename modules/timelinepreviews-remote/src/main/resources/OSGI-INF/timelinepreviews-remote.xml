@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.timelinepreviews.remote.TimelinePreviewsServiceRemote" immediate="true">
+               name="org.opencastproject.timelinepreviews.remote.TimelinePreviewsServiceRemote" immediate="true">
   <implementation
-    class="org.opencastproject.timelinepreviews.remote.TimelinePreviewsServiceRemote" />
-  <property name="service.description" value="Timeline Previews Remote Service Proxy" />
+      class="org.opencastproject.timelinepreviews.remote.TimelinePreviewsServiceRemote"/>
+  <property name="service.description" value="Timeline Previews Remote Service Proxy"/>
   <service>
-    <provide interface="org.opencastproject.timelinepreviews.api.TimelinePreviewsService" />
+    <provide interface="org.opencastproject.timelinepreviews.api.TimelinePreviewsService"/>
   </service>
   <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-    cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
+             cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>
   <reference name="remoteServiceManager" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-    cardinality="1..1" policy="static" bind="setRemoteServiceManager" />
+             cardinality="1..1" policy="static" bind="setRemoteServiceManager"/>
 </scr:component>

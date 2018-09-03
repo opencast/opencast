@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.distribution.download.DownloadDistributionServiceImpl" immediate="true"
-    activate="activate">
-    <implementation class="org.opencastproject.distribution.download.DownloadDistributionServiceImpl" />
-    <property name="service.description" value="Distribution Service (Local)" />
-    <property name="service.pid" value="org.opencastproject.distribution.download.DownloadDistributionServiceImpl" />
-    <property name="distribution.channel" value="download" />
+                 activate="activate">
+    <implementation class="org.opencastproject.distribution.download.DownloadDistributionServiceImpl"/>
+    <property name="service.description" value="Distribution Service (Local)"/>
+    <property name="service.pid" value="org.opencastproject.distribution.download.DownloadDistributionServiceImpl"/>
+    <property name="distribution.channel" value="download"/>
     <service>
-      <provide interface="org.opencastproject.distribution.api.DistributionService" />
-      <provide interface="org.opencastproject.distribution.api.DownloadDistributionService" />
-      <provide interface="org.osgi.service.cm.ManagedService" />
+      <provide interface="org.opencastproject.distribution.api.DistributionService"/>
+      <provide interface="org.opencastproject.distribution.api.DownloadDistributionService"/>
+      <provide interface="org.osgi.service.cm.ManagedService"/>
     </service>
     <reference name="WORKSPACE" interface="org.opencastproject.workspace.api.Workspace" cardinality="1..1"
-      policy="static" bind="setWorkspace" />
+               policy="static" bind="setWorkspace"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
     <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1" policy="static" bind="setSecurityService" />
+               cardinality="1..1" policy="static" bind="setSecurityService"/>
     <reference name="user-directory" interface="org.opencastproject.security.api.UserDirectoryService"
-      cardinality="1..1" policy="static" bind="setUserDirectoryService" />
+               cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
     <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-      cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+               cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
     <reference name="trustedHttpClient" interface="org.opencastproject.security.api.TrustedHttpClient"
-      cardinality="1..1" policy="static" bind="setTrustedHttpClient" />
+               cardinality="1..1" policy="static" bind="setTrustedHttpClient"/>
   </scr:component>
 
   <scr:component name="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService"
-    immediate="true" activate="activate">
-    <implementation class="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService" />
-    <property name="service.description" value="Download Distribution REST Endpoint" />
+                 immediate="true" activate="activate">
+    <implementation class="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService"/>
+    <property name="service.description" value="Download Distribution REST Endpoint"/>
 
-    <property name="opencast.service.type" value="org.opencastproject.distribution.download" />
-    <property name="opencast.service.path" value="/distribution/download" />
-    <property name="opencast.service.jobproducer" value="true" />
+    <property name="opencast.service.type" value="org.opencastproject.distribution.download"/>
+    <property name="opencast.service.path" value="/distribution/download"/>
+    <property name="opencast.service.jobproducer" value="true"/>
 
     <service>
-      <provide interface="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService" />
+      <provide interface="org.opencastproject.distribution.download.endpoint.DownloadDistributionRestService"/>
     </service>
 
-    <reference name="distributionService" interface="org.opencastproject.distribution.api.DownloadDistributionService"
-      cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setService" />
+    <reference name="distributionService"
+               interface="org.opencastproject.distribution.api.DownloadDistributionService"
+               cardinality="1..1" policy="static" target="(distribution.channel=download)" bind="setService"/>
     <reference name="serviceRegistry" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-      cardinality="1..1" policy="static" bind="setServiceRegistry" />
+               cardinality="1..1" policy="static" bind="setServiceRegistry"/>
   </scr:component>
 
 </scr:components>

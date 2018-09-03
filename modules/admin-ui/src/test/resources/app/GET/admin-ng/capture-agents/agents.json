@@ -5,7 +5,7 @@
   "results": [
     {
       "Name": "agent1",
-      "Status": "idle",
+      "Status": "AGENTS.STATUS.IDLE",
       "Update": "2014-05-26T15:37:02Z",
       "blacklist": {
         "start": "2014-08-10T22:00:00Z",
@@ -25,7 +25,7 @@
     },
     {
       "Name": "agent2",
-      "Status": "error",
+      "Status": "AGENTS.STATUS.ERROR",
       "Update": "2016-03-11T15:15:38Z",
       "blacklist": {
         "start": "2014-08-10T22:00:00Z",
@@ -36,7 +36,7 @@
     },
     {
       "Name": "agent3",
-      "Status": "uploading",
+      "Status": "AGENTS.STATUS.UPLOADING",
       "Update": "2014-05-26T15:37:02Z",
       "blacklist": {
         "start": "2014-08-10T22:00:00Z",

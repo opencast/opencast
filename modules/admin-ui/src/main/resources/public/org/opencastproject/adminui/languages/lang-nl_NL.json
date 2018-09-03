@@ -64,7 +64,13 @@
          "NAME": "Naam"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Bevestiging vereist"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "Mediamodule",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "Geen van de series konden opgeslagen worden",
       "EVENTS_DELETED": "Het event werd verwijderd",
       "EVENTS_NOT_DELETED": "Het/De event(s) konden niet verwijderd worden",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "De serie werd verwijderd",
       "SERIES_NOT_DELETED": "De serie kon niet verwijderd worden",
       "USER_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "De zwarte lijst kon niet verwijderd worden",
       "LOCATION_DELETED": "De locatie werd verwijderd",
       "LOCATION_NOT_DELETED": "De locatie kon niet verwijderd worden",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "De zwarte lijst werd aangemaakt",
       "LOCATION_BLACKLIST_NOT_CREATED": "De zwarte lijst kon niet aangemaakt worden",
       "LOCATION_BLACKLIST_SAVED": "De zwarte lijst werd opgeslagen",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Planningsconflict: de wijzigingen aan de gebeurtenis resulteert in conflicten. Wijzig de locatie, datums of tijden.",
       "CONFLICT_ALREADY_ENDED": "Planningsfout: het evenement is reeds beëindigd.",
       "CONFLICT_END_BEFORE_START": "Planningsfout: eindtijd moet later zijn dan het begin.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees en / of schrijf rechten hebben.",
       "MISSING_ACL_RULES": "Ten minste 1 rol met schrijf en lees rechten is vereist!",
       "SAVED_ACL_RULES": "De toegangsregels zijn opgeslagen.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "Deze naam is reeds in gebruik",
       "THEME_NAME_EMPTY": "De naam kan niet leeg zijn",
       "BUMPER_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Fout tijdens uploaden media",
       "TITLE_UPLOAD_ERROR": "Fout tijdens uploaden media",
       "LICENSE_UPLOAD_ERROR": "Fout tijdens uploaden media",
       "WATERMARK_UPLOAD_ERROR": "Fout tijdens uploaden media",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "De media wordt geüpload…",
       "THEME_CREATED": "Het thema werd aangemaakt",
       "THEME_NOT_CREATED": "Het thema kon niet aangemaakt worden",
@@ -195,7 +206,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Verwijderen",
-            "BUTTON": "Verwijder"
+            "BUTTON": "Verwijder",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "Verwijderen",
@@ -211,6 +223,7 @@
                "EVENTS_RETRACTED": "Evenementen die ingetrokken worden",
                "RETRACT_WORKFLOW": "Workflow om evenementen in te trekken"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "Geen van de geselecteerde gebeurtenissen kunnen worden verwijderd zonder het achterlaten van niet-gekoppelde bestanden."
             },
@@ -242,12 +255,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Geplande gebeurtenissen bewerken",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Algemeen",
             "CANNOTSTART": "Gemarkeerde Event (s) kunnen niet worden verwerkt, alleen geplande gebeurtenissen worden ondersteund.",
             "NOCHANGES": "Geen veranderingen in de gebeurtenissen gedetecteerd!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Metagegevens bewerken"
@@ -269,7 +284,10 @@
    "DATES": {
       "TODAY": "Vandaag",
       "TOMORROW": "Morgen",
-      "YESTERDAY": "Gisteren"
+      "YESTERDAY": "Gisteren",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "Vandaag om {{ time }}",
@@ -438,6 +456,7 @@
                "CAPTION": "Asset upload",
                "SELECT_TYPE": "Selecteer asset type",
                "ADD": "Asset toevoegen",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Hand-out aantekeningen",
                   "CAPTIONS_DFXP": "Ondertitels DFXP",
@@ -640,6 +659,8 @@
                "TYPE": "Type",
                "SIZE": "Grootte",
                "DETAILS": "Details",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Bijlagen",
                   "CAPTION": "Bijlagen",
@@ -847,6 +868,7 @@
                "ACTIONS": "Acties",
                "DETAILS": "Details",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
@@ -866,15 +888,39 @@
                   "DELETE": "Werkstroom instantie verwijderen"
                }
             },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
+            },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflow details",
                "CONFIGURATION": "Workflow configuratie"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Workflow operaties"
+               "TITLE": "Workflow operaties",
+               "DETAILS_LINK": "Operaties",
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATUS": "Status",
+                  "DESCRIPTION": "Omschrijving"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Operatie details"
+               "TITLE": "Operatie details",
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATE": "Status",
+                  "DESCRIPTION": "Omschrijving",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "Gestart",
+                  "FINISHED": "Voltooid",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Workflow details"
@@ -973,6 +1019,7 @@
          "TABLE": {
             "CAPTION": "Seriën",
             "TITLE": "Seriën",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "Organisator(en)",
             "CONTRIBUTORS": "Bijdrager(s)",
             "CREATED": "Aangemaakt",
@@ -1525,7 +1572,8 @@
                "ACTIVE": "Actief",
                "ENABLE": "Bumper activeren",
                "UPLOAD_LABEL": "Video uploaden",
-               "UPLOAD_BUTTON": "Upload"
+               "UPLOAD_BUTTON": "Upload",
+               "SELECT": "Selecteer"
             },
             "TITLE": {
                "CAPTION": "Titel",
@@ -1667,7 +1715,9 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment verwijderen",
-         "USE_SEGMENT": "Gebruik dit segment"
+         "USE_SEGMENT": "Gebruik dit segment",
+         "START": "Start",
+         "END": "End"
       },
       "PLAYER": {
          "PLAY": "Afspelen",
@@ -1736,7 +1786,10 @@
             "LABEL": "Toegangspolicy"
          },
          "COMMENTS": {
-            "LABEL": "Commentaren"
+            "LABEL": "Commentaren",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "Opgelost"
          },
          "CONTRIBUTORS": {
             "LABEL": "Bijdragers"
@@ -2013,6 +2066,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Einde van segment"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "Fout",
+         "IDLE": "Idle",
+         "OFFLINE": "Offline",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "Uploaden"
       }
    }
 }

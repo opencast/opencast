@@ -930,9 +930,21 @@ public final class WorkspaceImpl implements Workspace {
 
   @Override
   public void cleanup(Id mediaPackageId) throws IOException {
-    final File f = workspaceFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
-    logger.debug("Clean workspace media package directory {}", f);
-    FileUtils.deleteDirectory(f);
+    cleanup(mediaPackageId, false);
+  }
+
+  @Override
+  public void cleanup(Id mediaPackageId, boolean filesOnly) throws IOException {
+    final File mediaPackageDir = workspaceFile(WorkingFileRepository.MEDIAPACKAGE_PATH_PREFIX, mediaPackageId.toString());
+
+    if (filesOnly) {
+      logger.debug("Clean workspace media package directory {} (files only)", mediaPackageDir);
+      FileSupport.delete(mediaPackageDir, FileSupport.DELETE_FILES);
+    }
+    else {
+      logger.debug("Clean workspace media package directory {}", mediaPackageDir);
+      FileUtils.deleteDirectory(mediaPackageDir);
+    }
   }
 
   @Override

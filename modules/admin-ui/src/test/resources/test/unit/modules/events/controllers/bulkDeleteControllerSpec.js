@@ -4,9 +4,9 @@ describe('Bulk Delete controller', function () {
 
     // Both published and unpublished selected, workflow selected, is valid
     sampleRows = function () {
-       return [ { id: 1, selected: true, 'publications': { 'Engage': 'http://engage.localdomain' } },
+       return [ { id: 1, selected: true, 'publications': [{ 'id': 'engage-player', 'url': 'http://engage.localdomain' }] },
             { id: 2, selected: true },
-            { id: 3, selected: false, 'publications': { 'Engage': 'http://engage.localdomain' } },
+            { id: 3, selected: false, 'publications': [{ 'id': 'engage-player', 'url': 'http://engage.localdomain' }] },
             { id: 4, selected: false }];
     };
 
