@@ -1,0 +1,20 @@
+{
+  "configuration": {
+    "publishToYouTube": "false",
+    "publishLive": "false",
+    "publishToOaiPmh": "true",
+    "flagQuality1080p": "false",
+    "publishToEngage": "true",
+    "straightToPublishing": "true",
+    "flagQuality360p": "false",
+    "flagQuality480p": "false",
+    "publishToSearch": "true",
+    "flagForCutting": "false",
+    "flagQuality720p": "true",
+    "flagForReview": "false",
+    "flagQuality2160p": "false",
+    "publishToApi": "true",
+    "publishToAws": "false"
+  },
+  "workflowId": "schedule-and-upload"
+}

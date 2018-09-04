@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.userdirectory.JpaGroupRoleProvider" 
-  immediate="true" activate="activate">
-  <implementation class="org.opencastproject.userdirectory.JpaGroupRoleProvider" />
-  <property name="service.description" value="Provides a group role directory" />
-  
+               name="org.opencastproject.userdirectory.JpaGroupRoleProvider"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.userdirectory.JpaGroupRoleProvider"/>
+  <property name="service.description" value="Provides a group role directory"/>
+
   <!-- Also register as a REST endpoint -->
-  <property name="opencast.service.type" value="org.opencastproject.groups" />
-  <property name="opencast.service.jobproducer" value="false" />
-  <property name="opencast.service.path" value="/groups" />
+  <property name="opencast.service.type" value="org.opencastproject.groups"/>
+  <property name="opencast.service.jobproducer" value="false"/>
+  <property name="opencast.service.path" value="/groups"/>
 
   <service>
-    <provide interface="org.opencastproject.security.api.RoleProvider" />
-    <provide interface="org.opencastproject.userdirectory.JpaGroupRoleProvider" />
+    <provide interface="org.opencastproject.security.api.RoleProvider"/>
+    <provide interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"/>
   </service>
-  
+
   <reference name="message-broker-sender" interface="org.opencastproject.message.broker.api.MessageSender"
-    cardinality="1..1" policy="static" bind="setMessageSender" />
+             cardinality="1..1" policy="static" bind="setMessageSender"/>
   <reference name="message-broker-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-    cardinality="1..1" policy="static" bind="setMessageReceiver" />
+             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-      target="(osgi.unit.name=org.opencastproject.common)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
+             target="(osgi.unit.name=org.opencastproject.common)" cardinality="1..1" policy="static"
+             bind="setEntityManagerFactory"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-    cardinality="1..1" policy="static" bind="setSecurityService" />
-  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-    cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
+  <reference name="organization-directory-service"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
   <reference name="userDirectoryService" interface="org.opencastproject.security.api.UserDirectoryService"
-    cardinality="1..1" policy="static" bind="setUserDirectoryService" />
-  
+             cardinality="1..1" policy="static" bind="setUserDirectoryService"/>
+
 </scr:component>

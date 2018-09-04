@@ -1,0 +1,16 @@
+{
+  "total": 3,
+  "offset": 0,
+  "count": 1,
+  "limit": 1,
+  "results": [
+    {
+      "submitted": "2018-08-10T12:37:36Z",
+      "workflow": "Process upon upload and schedule",
+      "series": "",
+      "id": 2110,
+      "title": "Mock Event Published",
+      "status": "SUCCEEDED"
+    }
+  ]
+}

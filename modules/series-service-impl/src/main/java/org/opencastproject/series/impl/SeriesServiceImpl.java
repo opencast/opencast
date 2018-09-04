@@ -161,43 +161,46 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     }
 
     logger.info("The series index is empty. Populating it now with series");
+    List<SeriesEntity> allSeries = null;
     try {
-      List<SeriesEntity> allSeries = persistence.getAllSeries();
-      final int total = allSeries.size();
-      if (total == 0) {
-        logger.info("No series found. Repopulating index finished.");
-        return;
-      }
+      allSeries = persistence.getAllSeries();
+    } catch (SeriesServiceDatabaseException ex) {
+      throw new ServiceException("Unable to get all series from the database", ex);
+    }
+    final int total = allSeries.size();
+    if (total == 0) {
+      logger.info("No series found. Repopulating index finished.");
+      return;
+    }
 
-      int current = 0;
-      for (SeriesEntity series: allSeries) {
-        current++;
+    int current = 0;
+    for (SeriesEntity series: allSeries) {
+      current++;
+      try {
         // Run as the superuser so we get all series, regardless of organization or role
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
         securityService.setOrganization(organization);
         securityService.setUser(SecurityUtil.createSystemUser(systemUserName, organization));
 
         index.updateIndex(DublinCoreXmlFormat.read(series.getDublinCoreXML()));
-        String id = series.getSeriesId();
-        AccessControlList acl = AccessControlParser.parseAcl(series.getAccessControl());
-        if (acl != null) {
-          index.updateSecurityPolicy(id, acl);
+        index.updateOptOutStatus(series.getSeriesId(), series.isOptOut());
+        String aclStr = series.getAccessControl();
+        if (StringUtils.isNotBlank(aclStr)) {
+          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+          index.updateSecurityPolicy(series.getSeriesId(), acl);
         }
-        index.updateOptOutStatus(id, series.isOptOut());
-
-        // log progress
-        if (current % 100 == 0) {
-          logger.info("Indexing series {}/{} ({} percent done)", current, total, current * 100 / total);
-        }
+      } catch (Exception ex) {
+        logger.error("Unable to repopulate index for series {}", series.getSeriesId(), ex);
+      } finally {
+        securityService.setOrganization(null);
+        securityService.setUser(null);
       }
-      logger.info("Finished populating series search index");
-    } catch (Exception e) {
-      logger.warn("Unable to index series instances", e);
-      throw new ServiceException(e.getMessage());
-    } finally {
-      securityService.setOrganization(null);
-      securityService.setUser(null);
+      // log progress
+      if (current % 100 == 0) {
+        logger.info("Indexing series {}/{} ({} percent done)", current, total, current * 100 / total);
+      }
     }
+    logger.info("Finished populating series search index");
   }
 
   @Override
@@ -588,10 +591,15 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             SeriesItem.updateCatalog(catalog));
 
-                    AccessControlList acl = AccessControlParser.parseAcl(series.getAccessControl());
-                    if (acl != null) {
-                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                              SeriesItem.updateAcl(id, acl));
+                    String aclStr = series.getAccessControl();
+                    if (StringUtils.isNotBlank(aclStr)) {
+                      try {
+                          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                                  SeriesItem.updateAcl(id, acl));
+                      } catch (Exception ex) {
+                        logger.error("Unable to parse series {} access control list", id, ex);
+                      }
                     }
                     messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                             SeriesItem.updateOptOut(id, series.isOptOut()));

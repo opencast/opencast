@@ -12,20 +12,20 @@ describe('Event Access API Resource', function () {
     describe('#get', function () {
         beforeEach(function () {
             jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-            $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json')));
         });
 
         it('queries the group API', function () {
-            $httpBackend.expectGET('/admin-ng/event/40518/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
-            EventAccessResource.get({ id: '40518'});
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json')));
+            EventAccessResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a'});
         });
 
         it('returns the parsed JSON', function () {
-            $httpBackend.whenGET('/admin-ng/event/40518/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/40518/access.json')));
-            var data = EventAccessResource.get({ id: '40518' });
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access.json')));
+            var data = EventAccessResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
             expect(data).toBeDefined();
-            expect(data.system_acls.length).toBe(2);
+            expect(data.system_acls.length).toBe(3);
         });
     });
 
@@ -44,11 +44,11 @@ describe('Event Access API Resource', function () {
                 acl: angular.toJson({acl: accessRequest.acl}),
                 override: 'true'
             };
-            $httpBackend.expectPOST('/admin-ng/event/40518/access', function (data) {
+            $httpBackend.expectPOST('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/access', function (data) {
                 expect($.deparam(data)).toEqual(expectedTransformation);
                 return true;
             }).respond(200);
-            EventAccessResource.save({ id: '40518' }, accessRequest);
+            EventAccessResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, accessRequest);
             $httpBackend.flush();
         });
 

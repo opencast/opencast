@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        name="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory" immediate="true" activate="activate" deactivate="deactivate">
-  <implementation class="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory" />
-  <property name="service.description" value="Factory to create ACL services for storage and scheduling on a per organization basis" />
+               name="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory" immediate="true"
+               activate="activate" deactivate="deactivate">
+  <implementation class="org.opencastproject.authorization.xacml.manager.impl.OsgiAclServiceFactory"/>
+  <property name="service.description"
+            value="Factory to create ACL services for storage and scheduling on a per organization basis"/>
   <service>
-    <provide interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory" />
+    <provide interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"/>
   </service>
   <reference name="acl-db" interface="org.opencastproject.authorization.xacml.manager.impl.AclDb"
-          cardinality="1..1" policy="static" bind="setAclDb"/>
+             cardinality="1..1" policy="static" bind="setAclDb"/>
   <reference name="authorization-service" interface="org.opencastproject.security.api.AuthorizationService"
-          cardinality="1..1" policy="static" bind="setAuthorizationService"/>
+             cardinality="1..1" policy="static" bind="setAuthorizationService"/>
   <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
-          cardinality="1..1" policy="dynamic" bind="setAssetManager"/>
+             cardinality="1..1" policy="dynamic" bind="setAssetManager"/>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-          cardinality="1..1" policy="static" bind="setSecurityService"/>
+             cardinality="1..1" policy="static" bind="setSecurityService"/>
   <reference name="series-service" interface="org.opencastproject.series.api.SeriesService"
-          cardinality="1..1" policy="static" bind="setSeriesService"/>
+             cardinality="1..1" policy="static" bind="setSeriesService"/>
   <reference name="transition-db" interface="org.opencastproject.authorization.xacml.manager.impl.AclTransitionDb"
-    	  cardinality="1..1" policy="static" bind="setTransitionDb" />
+             cardinality="1..1" policy="static" bind="setTransitionDb"/>
   <reference name="workflow-service" interface="org.opencastproject.workflow.api.WorkflowService"
-    	  cardinality="1..1" policy="static" bind="setWorkflowService" />
+             cardinality="1..1" policy="static" bind="setWorkflowService"/>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
-    	  cardinality="1..1" policy="static" bind="setWorkspace" />
+             cardinality="1..1" policy="static" bind="setWorkspace"/>
   <reference name="message-receiver" interface="org.opencastproject.message.broker.api.MessageReceiver"
-          cardinality="1..1" policy="static" bind="setMessageReceiver"/>
+             cardinality="1..1" policy="static" bind="setMessageReceiver"/>
   <reference name="message-sender" interface="org.opencastproject.message.broker.api.MessageSender"
-          cardinality="1..1" policy="static" bind="setMessageSender"/>
-  <reference name="organization-directory-service" interface="org.opencastproject.security.api.OrganizationDirectoryService"
-          cardinality="1..1" policy="static" bind="setOrganizationDirectoryService" />
+             cardinality="1..1" policy="static" bind="setMessageSender"/>
+  <reference name="organization-directory-service"
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             cardinality="1..1" policy="static" bind="setOrganizationDirectoryService"/>
 </scr:component>

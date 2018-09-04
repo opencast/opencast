@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.engage.paella.PaellaConfigRest" immediate="true">
-  <implementation class="org.opencastproject.engage.paella.PaellaConfigRest" />
-  <property name="service.description" value="Paella config REST Endpoint" />
+  <implementation class="org.opencastproject.engage.paella.PaellaConfigRest"/>
+  <property name="service.description" value="Paella config REST Endpoint"/>
 
-  <property name="opencast.service.type" value="org.opencastproject.engage.paella.config" />
-  <property name="opencast.service.path" value="/paella/config" />
+  <property name="opencast.service.type" value="org.opencastproject.engage.paella.config"/>
+  <property name="opencast.service.path" value="/paella/config"/>
 
   <service>
-    <provide interface="org.opencastproject.engage.paella.PaellaConfigRest" />
+    <provide interface="org.opencastproject.engage.paella.PaellaConfigRest"/>
   </service>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-             bind="setSecurityService" />
+             bind="setSecurityService"/>
 </scr:component>

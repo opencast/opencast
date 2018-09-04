@@ -1,20 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
-  <OCD description="MoodleProvider" name="org.opencastproject.userdirectory.moodle" id="org.opencastproject.userdirectory.moodle">
+  <OCD description="MoodleProvider" name="org.opencastproject.userdirectory.moodle"
+       id="org.opencastproject.userdirectory.moodle">
 
-    <AD name="Organization ID" id="org.opencastproject.userdirectory.moodle.org" required="true" type="String" default="mh_default_org" />
-    <AD name="Moodle REST webservice URL" id="org.opencastproject.userdirectory.moodle.url" required="true" type="String" default="" />
-    <AD name="Moodle User Token" id="org.opencastproject.userdirectory.moodle.token" required="true" type="String" default="" />
-    <AD name="Cache size" id="org.opencastproject.userdirectory.moodle.cache.size" required="false" type="Integer" default="1000" />
-    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.moodle.cache.expiration" required="false" type="Integer" default="60" />
-    <AD name="Moodle Course ID pattern (regular expression)" id="org.opencastproject.userdirectory.moodle.course.pattern" required="false" type="String" default="" />
-    <AD name="Moodle User ID pattern (regular expression)" id="org.opencastproject.userdirectory.moodle.user.pattern" required="false" type="String" default="" />
+    <AD name="Organization ID" id="org.opencastproject.userdirectory.moodle.org" required="true" type="String"
+        default="mh_default_org"/>
+    <AD name="Moodle REST webservice URL" id="org.opencastproject.userdirectory.moodle.url" required="true"
+        type="String" default=""/>
+    <AD name="Moodle User Token" id="org.opencastproject.userdirectory.moodle.token" required="true" type="String"
+        default=""/>
+    <AD name="Cache size" id="org.opencastproject.userdirectory.moodle.cache.size" required="false" type="Integer"
+        default="1000"/>
+    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.moodle.cache.expiration"
+        required="false" type="Integer" default="60"/>
+    <AD name="Moodle Course ID pattern (regular expression)"
+        id="org.opencastproject.userdirectory.moodle.course.pattern" required="false" type="String" default=""/>
+    <AD name="Moodle User ID pattern (regular expression)"
+        id="org.opencastproject.userdirectory.moodle.user.pattern" required="false" type="String" default=""/>
 
   </OCD>
 
   <Designate pid="org.opencastproject.userdirectory.moodle">
-    <Object ocdref="org.opencastproject.userdirectory.moodle" />
+    <Object ocdref="org.opencastproject.userdirectory.moodle"/>
   </Designate>
 
 </metatype:MetaData>

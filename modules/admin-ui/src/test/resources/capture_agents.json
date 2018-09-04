@@ -5,7 +5,7 @@
    "limit":0,
    "results":[
       {
-         "Status":"ok",
+         "Status":"AGENTS.STATUS.OK",
          "inputs":[
             {
                "id":"microphone",
@@ -18,7 +18,7 @@
          "Name":"agent4"
       },
       {
-         "Status":"ok",
+         "Status":"AGENTS.STATUS.OK",
          "inputs":[
             {
                "id":"microphone",
@@ -31,7 +31,7 @@
          "Name":"agent3"
       },
       {
-         "Status":"ok",
+         "Status":"AGENTS.STATUS.OK",
          "inputs":[
             {
                "id":"microphone",
@@ -44,7 +44,7 @@
          "Name":"agent2"
       },
       {
-         "Status":"ok",
+         "Status":"AGENTS.STATUS.OK",
          "inputs":[
             {
                "id":"microphone",

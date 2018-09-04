@@ -32,6 +32,8 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.RU
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.STOPPED;
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
@@ -71,7 +73,7 @@ import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
 import org.opencastproject.workflow.api.RetryStrategy;
@@ -241,6 +243,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   /** The series service */
   protected SeriesService seriesService;
+
+  /** The asset manager */
+  protected AssetManager assetManager = null;
 
   /** The message broker receiver service */
   protected MessageReceiver messageReceiver;
@@ -599,10 +604,21 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public WorkflowInstance start(WorkflowDefinition workflowDefinition, MediaPackage sourceMediaPackage,
-          Long parentWorkflowId, Map<String, String> properties) throws WorkflowDatabaseException,
+          Long parentWorkflowId, Map<String, String> originalProperties) throws WorkflowDatabaseException,
           WorkflowParsingException, NotFoundException {
+    final String mediaPackageId = sourceMediaPackage.getIdentifier().compact();
+
+    final Map<String, String> properties;
+    // Currently, the only place where the asset manager isn't involved is in the tests. But it might change.
+    if (assetManager != null) {
+      WorkflowPropertiesUtil.storeProperties(assetManager, sourceMediaPackage, originalProperties);
+      properties = WorkflowPropertiesUtil.getLatestWorkflowProperties(assetManager, mediaPackageId);
+    } else {
+      properties = originalProperties;
+    }
+
     // We have to synchronize per media package to avoid starting multiple simultaneous workflows for one media package.
-    final Lock lock = mediaPackageLocks.get(sourceMediaPackage.getIdentifier().toString());
+    final Lock lock = mediaPackageLocks.get(mediaPackageId);
     lock.lock();
 
     try {
@@ -1021,13 +1037,22 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
           UnauthorizedException, NotFoundException {
-    logger.info("Removing temporary files for workflow %s", workflowInstance);
+    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    if (null == workflowInstance.getMediaPackage()) {
+      logger.warn("Workflow instance {} does not have an media package set", workflowInstance.getId());
+      return;
+    }
     for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
+      if (null == elem.getURI()) {
+        logger.warn("Mediapackage element {} from the media package {} does not have an URI set",
+                elem.getIdentifier(), workflowInstance.getMediaPackage().getIdentifier().compact());
+        continue;
+      }
       try {
-        logger.debug("Removing temporary file %s for workflow %s", elem.getURI(), workflowInstance);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element ", e);
+        logger.warn("Unable to delete mediapackage element", e);
       } catch (NotFoundException e) {
         // File was probably already deleted before...
       }
@@ -1324,8 +1349,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           // mediapackage
 
           AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage, AclScope.Series);
-          if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
+          Tuple<AccessControlList, AclScope> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
+                  AclScope.Series);
+          if (!AclScope.Series.equals(activeSeriesAcl.getB()) || !AccessControlUtil.equals(activeSeriesAcl.getA(), acl))
             authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
         }
       } catch (SeriesException e) {
@@ -2132,6 +2158,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   public void setSeriesService(SeriesService seriesService) {
     this.seriesService = seriesService;
+  }
+
+  /**
+   * Sets the asset manager
+   *
+   * @param assetManager
+   *          the assetManager to set
+   */
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
   }
 
   /**

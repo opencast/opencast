@@ -35,6 +35,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.adminui.util.TextFilter;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentAdminRoleProvider;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.resources.list.query.AgentsListQuery;
@@ -273,7 +274,7 @@ public class CaptureAgentsEndpoint {
    */
   private JValue generateJsonAgent(Agent agent, boolean withInputs, boolean details) {
     List<Field> fields = new ArrayList<>();
-    fields.add(f("Status", v(agent.getState(), Jsons.BLANK)));
+    fields.add(f("Status", v(AgentState.TRANSLATION_PREFIX + agent.getState().toUpperCase(), Jsons.BLANK)));
     fields.add(f("Name", v(agent.getName())));
     fields.add(f("Update", v(toUTC(agent.getLastHeardFrom()), Jsons.BLANK)));
     fields.add(f("URL", v(agent.getUrl(), Jsons.BLANK)));

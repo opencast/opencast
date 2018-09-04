@@ -20,6 +20,7 @@
  */
 package org.opencastproject.composer.impl;
 
+import static org.easymock.EasyMock.capture;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.composer.api.EncoderException;
@@ -28,6 +29,7 @@ import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -42,13 +44,13 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
+import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -67,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -127,7 +130,7 @@ public class ComplexCmdsEncoderEngineTest {
 
   @Before
   public void setUp() throws Exception {
- // Skip tests if FFmpeg is not installed
+    // Skip tests if FFmpeg is not installed
     Assume.assumeTrue(ffmpegInstalled);
     BasicConfigurator.configure();
     engine = new EncoderEngine(FFMPEG_BINARY);
@@ -136,7 +139,7 @@ public class ComplexCmdsEncoderEngineTest {
     sourceVideoOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp4", workingDirectory);
     FileUtils.copyFile(f, sourceVideoOnly);
 
-    // Create another audio only file f = getFile("/audio.mp3"); sourceAudioOnly =
+    // Create another audio only file
     f = getFile("/audio.mp3");
     sourceAudioOnly = File.createTempFile(FilenameUtils.getBaseName(f.getName()), ".mp3", workingDirectory);
     FileUtils.copyFile(f, sourceAudioOnly);
@@ -170,7 +173,7 @@ public class ComplexCmdsEncoderEngineTest {
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
 
-    /* Workspace */ workspace = EasyMock.createNiceMock(Workspace.class);
+    workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
       @Override
       public File answer() throws Throwable {
@@ -229,14 +232,12 @@ public class ComplexCmdsEncoderEngineTest {
 
       @Override
       public Job inspect(URI uri, Map<String, String> options) throws MediaInspectionException {
-        // TODO Auto-generated method stub
         return null;
       }
 
       @Override
       public Job enrich(MediaPackageElement original, boolean override, Map<String, String> options)
               throws MediaInspectionException, MediaPackageException {
-        // TODO Auto-generated method stub
         return null;
       }
     };
@@ -249,6 +250,21 @@ public class ComplexCmdsEncoderEngineTest {
             + " id='f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a'>" + " <mimetype>video/avi</mimetype>"
             + " <url>muxed.avi</url>" + "       </track>";
     inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
+
+    ServiceRegistry serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
+    final Capture<String> type = EasyMock.newCapture();
+    final Capture<String> operation = EasyMock.newCapture();
+    final Capture<List<String>> args = EasyMock.newCapture();
+    EasyMock.expect(serviceRegistry.createJob(capture(type), capture(operation), capture(args), EasyMock.anyFloat()))
+            .andAnswer(() -> {
+              Job job = new JobImpl(0);
+              job.setJobType(type.getValue());
+              job.setOperation(operation.getValue());
+              job.setArguments(args.getValue());
+              job.setPayload(composerService.process(job));
+              return job;
+            }).anyTimes();
+    EasyMock.replay(serviceRegistry);
 
     // Create and populate the composer service
     composerService = new ComposerServiceImpl() {
@@ -263,7 +279,6 @@ public class ComplexCmdsEncoderEngineTest {
     };
 
     IncidentService incidents = EasyMock.createNiceMock(IncidentService.class);
-    serviceRegistry = new ServiceRegistryInMemoryImpl(composerService, securityService, userDirectory, orgDirectory, incidents);
     composerService.setOrganizationDirectoryService(orgDirectory);
     composerService.setSecurityService(securityService);
     composerService.setServiceRegistry(serviceRegistry);
@@ -318,7 +333,6 @@ public class ComplexCmdsEncoderEngineTest {
       assertTrue(outputs.get(i).exists());
       assertTrue(outputs.get(i).length() > 0);
     }
-    // TODO: inspect the file
   }
 
   @Test
@@ -361,7 +375,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // When edit points are out of order in the SMIL
@@ -435,7 +448,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // Single input, Single output, No Filter
@@ -463,7 +475,6 @@ public class ComplexCmdsEncoderEngineTest {
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
-    // TODO: inspect the file
   }
 
   // Single input, Two outputs, No Edit, No transition
@@ -475,15 +486,83 @@ public class ComplexCmdsEncoderEngineTest {
     EncodingProfile[] eprofiles = { profileScanner.getProfile("h264-low.http"),
             profileScanner.getProfile("h264-medium.http")};
     File[] files = { sourceFile1 };
-    Map<String, String> params = new HashMap<String, String>();
-    String outDir = sourceFile1.getAbsoluteFile().getParent();
-    String outFileName = FilenameUtils.getBaseName(sourceFile1.getName());
-    params.put("out.file.basename", outFileName);
-    params.put("out.dir", outDir);
     List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), null, Arrays.asList(eprofiles), 0, true, true);
     assertTrue(outputs.size() == eprofiles.length);
     for (int i = 0; i < eprofiles.length; i++)
       assertTrue(outputs.get(i).length() > 0);
   }
 
+  @Test
+  public void testRawMultiEncode() throws EncoderException {
+    if (!ffmpegInstalled)
+      return;
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("flash.rtmp"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, true);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+}
+
+  @Test
+  public void testRawMultiEncodeNoAudio() throws EncoderException {
+    if (!ffmpegInstalled)
+      return;
+    // EncodingProfile profile = profileScanner.getProfile(multiProfile);
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    profiles.add(profileScanner.getProfile("flash.rtmp"));
+    profiles.add(profileScanner.getProfile("h264-medium.http"));
+    // create encoder process.
+    // no special working dir is set which means the working dir of the
+    // current java process is used
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, false);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+  }
+
+  @Test
+  public void testMultiEncodeSingleProfile() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    assertTrue(sourceAudioVideo.isFile());
+    // Set up workspace
+    List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
+    profiles.add(profileScanner.getProfile("h264-low.http"));
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(sourceAudioVideo), null, profiles, 0, true, false);
+    assertTrue(outputs.size() == profiles.size());
+    for (int i = 0; i < profiles.size(); i++) {
+      assertTrue(outputs.get(i).exists());
+      assertTrue(outputs.get(i).length() > 0);
+    }
+  }
+
+  @Test
+  public void testMultiEncodeJob() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+    String[] profiles = { "h264-low.http", "flash.rtmp", "h264-medium.http" };
+    Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(
+            IOUtils.toString(ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_video.xml"),
+                    Charset.defaultCharset()));
+
+    Job multiencode = composerService.multiEncode(sourceTrack, Arrays.asList(profiles));
+    @SuppressWarnings("unchecked")
+    List<Track> processedTracks = (List<Track>) MediaPackageElementParser.getArrayFromXml(multiencode.getPayload());
+    Assert.assertNotNull(processedTracks);
+    Assert.assertEquals(profiles.length, processedTracks.size()); // Same number of outputs as profiles
+    for (Track processedTrack : processedTracks) {
+      Assert.assertNotNull(processedTrack.getIdentifier());
+    }
+  }
 }

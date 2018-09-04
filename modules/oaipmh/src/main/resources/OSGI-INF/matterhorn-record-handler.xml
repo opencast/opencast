@@ -3,7 +3,8 @@
                name="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"
                immediate="true">
   <implementation class="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"/>
-  <property name="service.description" value="Record handler for feeding Opencast MediaPackages into the search index."/>
+  <property name="service.description"
+            value="Record handler for feeding Opencast MediaPackages into the search index."/>
   <property name="service.pid" value="org.opencastproject.oaipmh.matterhorn.MatterhornRecordHandler"/>
   <service>
     <provide interface="org.opencastproject.oaipmh.harvester.RecordHandler"/>

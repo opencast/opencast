@@ -57,11 +57,13 @@ The following table contains the workflow operations that are available in an ou
 |ingest-download     |Download files from external URL for ingest                    |[Documentation](ingestdownload-woh.md)|
 |inspect             |Inspect the media (check if it is valid)                       |[Documentation](inspect-woh.md)|
 |log                 |Log workflow status                                            |[Documentation](log-woh.md)|
+|multiencode         |Encode to multiple profiles in one operation                   |[Documentation](multiencode-woh.md)|
 |normalize-audio     |Normalize first audio stream                                   |[Documentation](normalizeaudio-woh.md)|
 |partial-import      |Import partial tracks and process according to a SMIL document |[Documentation](partial-import-woh.md)|
 |post-mediapackage   |Send mediapackage to remote service                            |[Documentation](postmediapackage-woh.md)|
 |prepare-av          |Preparing audio and video work versions                        |[Documentation](prepareav-woh.md)|
 |probe-resolution    |Set workflow instance variables based on video resolution      |[Documentation](probe-resolution-woh.md)|
+|process-smil        |Edit and Encode media defined by a SMIL file                   |[Documentation](process-smil-woh.md)|
 |publish-aws         |Distribute and publish media to Amazon S3 and Cloudfront       |[Documentation](publish-aws-woh.md)|
 |publish-configure   |Distribute and publish media to the configured publication     |[Documentation](publish-configure-woh.md)|
 |publish-engage      |Distribute and publish media to the engage player              |[Documentation](publish-engage-woh.md)|

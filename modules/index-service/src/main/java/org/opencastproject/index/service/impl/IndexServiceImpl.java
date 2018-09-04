@@ -31,6 +31,7 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -147,6 +148,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -829,6 +831,7 @@ public class IndexServiceImpl implements IndexService {
     MetadataCollection eventMetadata = eventHttpServletRequest.getMetadataList().get()
             .getMetadataByAdapter(eventCatalogUIAdapter).get();
 
+    Date currentStartDate = null;
     JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
@@ -839,13 +842,20 @@ public class IndexServiceImpl implements IndexService {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
         throw new IllegalArgumentException("Unable to parse device");
       }
+      if (StringUtils.isNotEmpty((String) sourceMetadata.get("start"))) {
+        currentStartDate = EncodingSchemeUtils.decodeDate((String) sourceMetadata.get("start"));
+      }
     }
 
-    Date currentStartDate = null;
-    MetadataField<?> starttime = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_TEMPORAL.getLocalName());
-    if (starttime != null && starttime.isUpdated() && starttime.getValue().isSome()) {
-      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod((DublinCoreValue)starttime.getValue().get());
-      currentStartDate = period.getStart();
+    MetadataField<?> startDate = eventMetadata.getOutputFields().get("startDate");
+    if (startDate != null && startDate.isUpdated() && startDate.getValue().isSome()) {
+      SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern().get());
+      currentStartDate = sdf.parse((String) startDate.getValue().get());
+    } else if (currentStartDate != null) {
+      eventMetadata.removeField(startDate);
+      MetadataField<String> newStartDate = MetadataUtils.copyMetadataField(startDate);
+      newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
+      eventMetadata.addField(newStartDate);
     }
 
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
@@ -925,6 +935,7 @@ public class IndexServiceImpl implements IndexService {
     Map<String, String> configuration = new HashMap<>();
     if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
       configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
+
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());
@@ -1367,6 +1378,11 @@ public class IndexServiceImpl implements IndexService {
   public boolean hasSnapshots(String eventId) {
     AQueryBuilder q = assetManager.createQuery();
     return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
+  }
+
+  @Override
+  public Map<String, Map<String, String>> getEventWorkflowProperties(final List<String> eventIds) {
+    return WorkflowPropertiesUtil.getLatestWorkflowPropertiesForEvents(assetManager, eventIds);
   }
 
   @Override

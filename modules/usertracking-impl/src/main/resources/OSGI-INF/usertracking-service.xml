@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-  name="org.opencastproject.usertracking.impl.UserTrackingServiceImpl"
-  immediate="true" activate="activate">
-  <implementation class="org.opencastproject.usertracking.impl.UserTrackingServiceImpl" />
-  <property name="service.description" value="User Tracking Service" />
-  <property name="service.pid" value="org.opencastproject.usertracking.impl.UserTrackingServiceImpl" />
+               name="org.opencastproject.usertracking.impl.UserTrackingServiceImpl"
+               immediate="true" activate="activate">
+  <implementation class="org.opencastproject.usertracking.impl.UserTrackingServiceImpl"/>
+  <property name="service.description" value="User Tracking Service"/>
+  <property name="service.pid" value="org.opencastproject.usertracking.impl.UserTrackingServiceImpl"/>
   <service>
-    <provide interface="org.opencastproject.usertracking.api.UserTrackingService" />
-    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.usertracking.api.UserTrackingService"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <reference name="entityManagerFactory" interface="javax.persistence.EntityManagerFactory"
-      target="(osgi.unit.name=org.opencastproject.usertracking)" cardinality="1..1" policy="static" bind="setEntityManagerFactory" />
+             target="(osgi.unit.name=org.opencastproject.usertracking)" cardinality="1..1" policy="static"
+             bind="setEntityManagerFactory"/>
 </scr:component>

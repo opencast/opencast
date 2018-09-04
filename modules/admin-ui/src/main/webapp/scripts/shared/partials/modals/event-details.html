@@ -399,7 +399,7 @@
                 <ul>
                     <li>
                         <div class="obj tbl-container" ng-if="!workflows.scheduling">
-                            <header>Workflow Instances</header>
+                            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_INSTANCES.TITLE"><!-- Workflow instances --></header>
                             <div class="obj-container">
                                 <table class="main-tbl">
                                     <thead>
@@ -457,7 +457,7 @@
                         </div>
 
                         <div class="obj list-obj" ng-if="workflows.scheduling">
-                            <header>Workflow configuration</header>
+                            <header translate="EVENTS.EVENTS.DETAILS.WORKFLOW_DETAILS.CONFIGURATION"><!-- Workflow configuration --></header>
                             <div class="obj-container">
                                 <div class="obj list-obj quick-actions">
 
@@ -1267,7 +1267,7 @@
                 </div>
 
                 <div class="obj tbl-container media-stream-details">
-                    <header>Streams</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.STREAMS"><!-- Streams --></header>
                     <div class="obj-container">
                         <div class="table-series">
                             <div class="wrapper">
@@ -1376,7 +1376,7 @@
                     </div>
                 </div>
                 <div class="obj tbl-container media-stream-details">
-                    <header>Preview</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.ASSETS.PREVIEW"><!-- Preview --></header>
                          <div class="obj-container">
 
                             <div ng-if="subTab == 'media-details'" data-video-player data-player="{}" data-video="subNavData.video" data-adapter="html5" data-player-ref="player" data-controls="true" data-sub-controls="false"/>
@@ -1503,17 +1503,23 @@
                 </div>
 
                 <div class="obj tbl-container more-info-actions">
-                    <header>More Information &amp; Actions</header>
+                    <header translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.MORE_INFO">
+                      <!-- More Information &amp; Actions -->
+                    </header>
                     <div class="obj-container">
                         <ul>
                             <li>
-                                Operations
+                                <span translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.DETAILS_LINK">
+                                  <!-- Operations -->
+                                </span>
                                 <a class="details-link" ng-click="openSubTab('workflow-operations', 'EventWorkflowOperationsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
                                     <!-- Details -->
                                 </a>
                             </li>
                             <li>
-                                Errors & Warnings
+                                <span translate="EVENTS.EVENTS.DETAILS.ERRORS_AND_WARNINGS.TITLE">
+                                  <!-- Errors & Warnings -->
+                                </span>
                                 <a class="details-link" ng-click="openSubTab('errors-and-warnings', 'EventErrorsResource', subNavData.id, true)" translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.DETAILS">
                                     <!-- Details -->
                                 </a>
@@ -1537,9 +1543,9 @@
                         <table class="main-tbl">
                             <thead>
                                 <tr>
-                                    <th>Status</th>
-                                    <th>Title <i></i></th>
-                                    <th>Description <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.STATUS"><!-- Status --></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.TITLE"><!-- Title --> <i></i></th>
+                                    <th translate="EVENTS.EVENTS.DETAILS.WORKFLOW_OPERATIONS.TABLE_HEADERS.DESCRIPTION"><!-- Description --> <i></i></th>
                                     <th class="medium"></th>
                                 </tr>
                             </thead>
@@ -1573,55 +1579,81 @@
                     <div class="obj-container">
                         <table class="main-tbl">
                              <tr>
-                                <td>Title</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TITLE">
+                                  <!-- Title -->
+                                </td>
                                 <td>{{ subNavData.name}}</td>
                             </tr>
                             <tr>
-                                <td>Description</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.DESCRIPTION">
+                                  <!-- Description -->
+                                </td>
                                 <td>{{ subNavData.description }}</td>
                             </tr>
                             <tr>
-                                <td>State</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STATE">
+                                  <!-- State -->
+                                </td>
                                 <td>{{ subNavData.state }}</td>
                             </tr>
                             <tr>
-                                <td>Execution Host</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXECUTION_HOST">
+                                  <!-- Execution Host -->
+                                </td>
                                 <td>{{ subNavData.execution_host }}</td>
                             </tr>
                             <tr>
-                                <td>Job</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.JOB">
+                                  <!-- Job -->
+                                </td>
                                 <td>{{ subNavData.job }}</td>
                             </tr>
                             <tr>
-                                <td>Time in Queue</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.TIME_IN_QUEUE">
+                                  <!-- Time in Queue -->
+                                </td>
                                 <td>{{ subNavData.time_in_queue }}ms</td>
                             </tr>
                             <tr>
-                                <td>Started</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STARTED">
+                                  <!-- Started -->
+                                </td>
                                 <td>{{ subNavData.started | localizeDate : 'dateTime' : 'medium'}}</td>
                             </tr>
                             <tr>
-                                <td>Finished</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FINISHED">
+                                  <!-- Finished -->
+                                </td>
                                 <td>{{ subNavData.completed | localizeDate : 'dateTime' : 'medium'}}</td>
                             </tr>
-                                                        <tr>
-                                <td>Retry Strategy</td>
+                          <tr>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.RETRY_STRATEGY">
+                                  <!-- Retry Strategy -->
+                                </td>
                                 <td>{{ subNavData.retry_strategy }}</td>
                             </tr>
                             <tr>
-                                <td>Failed Attempts</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAILED_ATTEMPTS">
+                                  <!-- Failed Attempts -->
+                                </td>
                                 <td>{{ subNavData.failed_attempts }}</td>
                             </tr>
                             <tr>
-                                <td>Max</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.MAX_ATTEMPTS">
+                                  <!-- Max -->
+                                </td>
                                 <td>{{ subNavData.max_attempts }}</td>
                             </tr>
                             <tr>
-                                <td>Exception Handler Workflow</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXCEPTION_HANDLER_WORKFLOW">
+                                  <!-- Exception Handler Workflow -->
+                                </td>
                                 <td>{{ subNavData.exception_handler_workflow }}</td>
                             </tr>
                             <tr>
-                                <td>Fail on Error</td>
+                                <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.FAIL_ON_ERROR">
+                                  <!-- Fail on Error -->
+                                </td>
                                 <td>{{ subNavData.fail_on_error }}</td>
                             </tr>
                         </table>

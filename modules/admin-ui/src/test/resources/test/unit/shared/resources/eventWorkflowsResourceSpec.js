@@ -16,10 +16,10 @@ describe('Event Workflows API Resource', function () {
                     results: [{ id: 'title' }, { id: 'series' }]
                 };
 
-            $httpBackend.expectGET('/admin-ng/event/40518/workflows.json')
+            $httpBackend.expectGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows.json')
                 .respond(JSON.stringify(workflowsResponse));
 
-            result = EventWorkflowsResource.get({ id: 40518 });
+            result = EventWorkflowsResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
             expect(result.entries.length).toBe(2);
         });
@@ -29,8 +29,8 @@ describe('Event Workflows API Resource', function () {
         it('sends an array of workflows', function () {
             var workflowsRequest = { id: 'title', configuration: {}};
 
-            $httpBackend.expectPUT('/admin-ng/event/40518/workflows').respond(200);
-            EventWorkflowsResource.save({ id: '40518' }, workflowsRequest);
+            $httpBackend.expectPUT('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/workflows').respond(200);
+            EventWorkflowsResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, workflowsRequest);
             $httpBackend.flush();
         });
     });

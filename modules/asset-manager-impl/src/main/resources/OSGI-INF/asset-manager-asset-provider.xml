@@ -15,9 +15,9 @@
   -->
 
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-        immediate="true"
-        activate="activate"
-        name="org.opencastproject.assetmanager.impl.endpoint.OsgiEndpointHttpAssetProvider">
+               immediate="true"
+               activate="activate"
+               name="org.opencastproject.assetmanager.impl.endpoint.OsgiEndpointHttpAssetProvider">
   <implementation class="org.opencastproject.assetmanager.impl.endpoint.OsgiEndpointHttpAssetProvider"/>
 
   <property name="service.description" value="HttpAssetProvider for the AssetManager"/>
@@ -28,9 +28,9 @@
   </service>
 
   <reference name="orgDir"
-          interface="org.opencastproject.security.api.OrganizationDirectoryService"
-          cardinality="1..1"
-          policy="static"
-          bind="setOrgDir"/>
+             interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             cardinality="1..1"
+             policy="static"
+             bind="setOrgDir"/>
 
 </scr:component>

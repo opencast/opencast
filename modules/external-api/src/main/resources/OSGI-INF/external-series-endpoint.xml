@@ -2,32 +2,32 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.external.endpoint.SeriesEndpoint"
                immediate="true" activate="activate">
-  <implementation class="org.opencastproject.external.endpoint.SeriesEndpoint" />
-  <property name="service.description" value="External API - Series Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.external" />
-  <property name="opencast.service.path" value="/api/series" />
+  <implementation class="org.opencastproject.external.endpoint.SeriesEndpoint"/>
+  <property name="service.description" value="External API - Series Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.external"/>
+  <property name="opencast.service.path" value="/api/series"/>
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.external.endpoint.SeriesEndpoint" />
+    <provide interface="org.opencastproject.external.endpoint.SeriesEndpoint"/>
   </service>
   <reference name="ExternalIndex"
-      interface="org.opencastproject.external.impl.index.ExternalIndex"
-      cardinality="1..1"
-      policy="static"
-      bind="setExternalIndex" />
+             interface="org.opencastproject.external.impl.index.ExternalIndex"
+             cardinality="1..1"
+             policy="static"
+             bind="setExternalIndex"/>
   <reference name="IndexService"
-      interface="org.opencastproject.index.service.api.IndexService"
-      cardinality="1..1"
-      policy="static"
-      bind="setIndexService" />
+             interface="org.opencastproject.index.service.api.IndexService"
+             cardinality="1..1"
+             policy="static"
+             bind="setIndexService"/>
   <reference name="SecurityService"
-      interface="org.opencastproject.security.api.SecurityService"
-      cardinality="1..1"
-      policy="static"
-      bind="setSecurityService" />
+             interface="org.opencastproject.security.api.SecurityService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSecurityService"/>
   <reference name="SeriesService"
-      interface="org.opencastproject.series.api.SeriesService"
-      cardinality="1..1"
-      policy="static"
-      bind="setSeriesService" />
+             interface="org.opencastproject.series.api.SeriesService"
+             cardinality="1..1"
+             policy="static"
+             bind="setSeriesService"/>
 </scr:component>

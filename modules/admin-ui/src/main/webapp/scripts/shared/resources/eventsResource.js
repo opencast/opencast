@@ -39,7 +39,7 @@ angular.module('adminNg.resources')
 
     // We are live and are getting the real thing.
     return $resource('/admin-ng/event/:id', { id: '@id' }, {
-        query: {method: 'GET', params: { id: 'events.json' }, isArray: false, transformResponse: function (data) {
+        query: {method: 'GET', params: { id: 'events.json' }, isArray: false, cancellable: true, transformResponse: function (data) {
             return ResourceHelper.parseResponse(data, function (r) {
                 var row = {};
                 row.id = r.id;
@@ -68,7 +68,7 @@ angular.module('adminNg.resources')
                 if (typeof(r.publications) != 'undefined' && r.publications != null) {
                 	var now = new Date();
                 	for (var i = 0; i < row.publications.length; i++)
-                		if (row.publications[i].id == "engage-live" && 
+                		if (row.publications[i].id == "engage-live" &&
                 				(now < new Date(r.start_date) || now > new Date(r.end_date)))
                 			row.publications[i].enabled = false;
                 		else row.publications[i].enabled = true;

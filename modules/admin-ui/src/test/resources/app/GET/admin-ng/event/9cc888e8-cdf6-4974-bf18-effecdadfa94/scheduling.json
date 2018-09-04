@@ -1,0 +1,29 @@
+{
+  "eventId": "9cc888e8-cdf6-4974-bf18-effecdadfa94",
+  "optOut": false,
+  "agentId": "F300.1",
+  "agentConfiguration": {
+    "org.opencastproject.workflow.config.flagQuality1080p": "false",
+    "org.opencastproject.workflow.config.publishToAws": "false",
+    "org.opencastproject.workflow.config.flagForReview": "false",
+    "org.opencastproject.workflow.config.publishLive": "false",
+    "org.opencastproject.workflow.config.publishToSearch": "true",
+    "org.opencastproject.workflow.config.flagQuality720p": "true",
+    "org.opencastproject.workflow.definition": "schedule-and-upload",
+    "org.opencastproject.workflow.config.publishToApi": "true",
+    "org.opencastproject.workflow.config.flagForCutting": "false",
+    "org.opencastproject.workflow.config.publishToYouTube": "false",
+    "event.location": "F300.1",
+    "org.opencastproject.workflow.config.flagQuality480p": "false",
+    "org.opencastproject.workflow.config.flagQuality360p": "false",
+    "org.opencastproject.workflow.config.publishToEngage": "true",
+    "org.opencastproject.workflow.config.flagQuality2160p": "false",
+    "capture.device.names": "",
+    "org.opencastproject.workflow.config.straightToPublishing": "true",
+    "org.opencastproject.workflow.config.publishToOaiPmh": "true",
+    "event.title": "Mock Event Planned"
+  },
+  "presenters": [],
+  "start": "2018-08-31T12:00:00Z",
+  "end": "2018-08-31T12:55:00Z"
+}

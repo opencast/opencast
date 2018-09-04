@@ -302,7 +302,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     // If the snapshot version is in our local cache, it means that this snapshot was created by us so
     // nothing to do. Note that this is just to save time; if the entry has already been deleted, the mp
     // will be compared below.
-    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier()))) {
+    if (snapshot.getVersion().equals(snapshotVersionCache.getIfPresent(previousMp.getIdentifier().toString()))) {
       logger.debug("Snapshot version {} was created by us so this change is ignored.", snapshot.getVersion());
       return false;
     }
@@ -454,11 +454,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       }
 
       // Capture agent did not pass any CA_PROPERTY_RESOLUTION_URL_PREFIX property when registering
-      // so use the service configuration, including stream overrides (temporary)
-      if (liveStreamingUrl == null)
-        throw new LiveScheduleException(
-                "Cannot build live tracks because '" + LIVE_STREAMING_URL + "' configuration was not set.");
+      // so use the service configuration
       if (mp.getTracks().length == 0) {
+        if (liveStreamingUrl == null)
+          throw new LiveScheduleException(
+                  "Cannot build live tracks because '" + LIVE_STREAMING_URL + "' configuration was not set.");
+
         for (MediaPackageElementFlavor flavor : liveFlavors) {
           for (int i = 0; i < streamResolution.length; i++) {
             String uri = replaceVariables(mpId, caName, UrlSupport.concat(liveStreamingUrl.toString(), streamName),

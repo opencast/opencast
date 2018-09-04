@@ -1,0 +1,12 @@
+{
+  "RECORDING": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.RECORDING\"}],\"description\": \"DASHBOARD.RECORDING\",\"order\":7}",
+  "PAUSED": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.PAUSED\"}],\"description\": \"DASHBOARD.PAUSED\",\"order\":9}",
+  "FINISHED_WITH_COMMENTS": "{\"filters\": [{\"name\": \"comments\", \"filter\": \"FILTERS.EVENTS.COMMENTS.LABEL\", \"value\": \"OPEN\"},{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.PROCESSED\"}],\"description\": \"DASHBOARD.FINISHED_WITH_COMMENTS\",\"order\":11}",
+  "FAILED": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.PROCESSING_FAILURE\"}],\"description\": \"DASHBOARD.FAILED\",\"order\":10}",
+  "RUNNING": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.PROCESSING\"}],\"description\": \"DASHBOARD.RUNNING\",\"order\":8}",
+  "TODAY": "{\"filters\": [{\"name\": \"startDate\", \"filter\":\"FILTERS.EVENTS.START_DATE\", \"value\": {\"relativeDateSpan\": {\"from\": \"0\", \"to\": \"0\", \"unit\": \"day\"}}}],\"description\": \"DATES.TODAY\",\"order\":1}",
+  "TOMORROW": "{\"filters\": [{\"name\": \"startDate\", \"filter\":\"FILTERS.EVENTS.START_DATE\", \"value\": {\"relativeDateSpan\": {\"from\": \"1\", \"to\": \"1\", \"unit\": \"day\"}}}],\"description\": \"DATES.TOMORROW\",\"order\":2}",
+  "YESTERDAY": "{\"filters\": [{\"name\": \"startDate\", \"filter\":\"FILTERS.EVENTS.START_DATE\", \"value\": {\"relativeDateSpan\": {\"from\": \"-1\", \"to\": \"-1\", \"unit\": \"day\"}}}],\"description\": \"DATES.YESTERDAY\",\"order\":0}",
+  "FINISHED": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.PROCESSED\"}],\"description\": \"DASHBOARD.FINISHED\",\"order\":12}",
+  "SCHEDULED": "{\"filters\": [{\"name\": \"status\", \"filter\": \"FILTERS.EVENTS.STATUS.LABEL\", \"value\": \"EVENTS.EVENTS.STATUS.SCHEDULED\"}], \"description\": \"DASHBOARD.SCHEDULED\",\"order\":6}"
+}

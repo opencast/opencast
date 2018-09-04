@@ -267,7 +267,7 @@ snippet.  A simple configuration panel could look like this:
     </configuration_panel>
 
 The checkbox in this `<configuration_panel>` will now be displayed in the administrative tools, and the user's
-selection will be used to replace the `${review.hold}` variable in the workflow.
+selection will be used to replace the `${someaction}` variable in the workflow.
 
 This input can also be sent by capture agents, using the ingest endpoints. Please note that capture agents usually do
 not load the configuration panel. Hence defaults set in the user interface will not apply to ingests. To circumvent

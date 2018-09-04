@@ -1,22 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
-  <OCD description="SakaiProvider" name="org.opencastproject.userdirectory.sakai" id="org.opencastproject.userdirectory.sakai">
+  <OCD description="SakaiProvider" name="org.opencastproject.userdirectory.sakai"
+       id="org.opencastproject.userdirectory.sakai">
 
-    <AD name="Sakai Server URL" id="org.opencastproject.userdirectory.sakai.url" required="true" type="String" default="" />
-    <AD name="Organization ID" id="org.opencastproject.userdirectory.sakai.org" required="true" type="String" default="mh_default_org" />
-    <AD name="Sakai User" id="org.opencastproject.userdirectory.sakai.user" required="false" type="String" default="" />
-    <AD name="Sakai User Password" id="org.opencastproject.userdirectory.sakai.password" required="false" type="String" default="" />
-    <AD name="Cache size" id="org.opencastproject.userdirectory.sakai.cache.size" required="false" type="Integer" default="1000" />
-    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.sakai.cache.expiration" required="false" type="Integer" default="60" />
-    <AD name="Sakai Site ID pattern (regular expression)" id="org.opencastproject.userdirectory.sakai.site.pattern" required="false" type="String" default="" />
-    <AD name="Sakai User ID (EID) pattern (regular expression)" id="org.opencastproject.userdirectory.sakai.user.pattern" required="false" type="String" default="" />
-    <AD name="Sakai roles mapped to Instructor (comma-separated list)" id="org.opencastproject.userdirectory.sakai.instructor.roles" required="false" type="String" default="Instructor,Site owner,maintain" />
-    
+    <AD name="Sakai Server URL" id="org.opencastproject.userdirectory.sakai.url" required="true" type="String"
+        default=""/>
+    <AD name="Organization ID" id="org.opencastproject.userdirectory.sakai.org" required="true" type="String"
+        default="mh_default_org"/>
+    <AD name="Sakai User" id="org.opencastproject.userdirectory.sakai.user" required="false" type="String"
+        default=""/>
+    <AD name="Sakai User Password" id="org.opencastproject.userdirectory.sakai.password" required="false"
+        type="String" default=""/>
+    <AD name="Cache size" id="org.opencastproject.userdirectory.sakai.cache.size" required="false" type="Integer"
+        default="1000"/>
+    <AD name="Cache expiration (minutes)" id="org.opencastproject.userdirectory.sakai.cache.expiration"
+        required="false" type="Integer" default="60"/>
+    <AD name="Sakai Site ID pattern (regular expression)" id="org.opencastproject.userdirectory.sakai.site.pattern"
+        required="false" type="String" default=""/>
+    <AD name="Sakai User ID (EID) pattern (regular expression)"
+        id="org.opencastproject.userdirectory.sakai.user.pattern" required="false" type="String" default=""/>
+    <AD name="Sakai roles mapped to Instructor (comma-separated list)"
+        id="org.opencastproject.userdirectory.sakai.instructor.roles" required="false" type="String"
+        default="Instructor,Site owner,maintain"/>
+
   </OCD>
 
   <Designate pid="org.opencastproject.userdirectory.sakai">
-    <Object ocdref="org.opencastproject.userdirectory.sakai" />
+    <Object ocdref="org.opencastproject.userdirectory.sakai"/>
   </Designate>
 
 </metatype:MetaData>

@@ -52,12 +52,12 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
     $scope.submitButton = false;
     $scope.submit = function () {
         $scope.submitButton = true;
-        var eventIds = [], payload;
-        eventIds.push($scope.$parent.resourceId);
-        payload = {
+        var finalConfiguration = {};
+        var eventId = $scope.$parent.resourceId;
+        finalConfiguration[eventId] = $scope.processing.ud.workflow.selection.configuration;
+        var payload = {
             workflow: $scope.processing.ud.workflow.id,
-            configuration: $scope.processing.ud.workflow.selection.configuration,
-            eventIds: eventIds
+            configuration: finalConfiguration
         };
         TaskResource.save(payload, onSuccess, onFailure);
     };

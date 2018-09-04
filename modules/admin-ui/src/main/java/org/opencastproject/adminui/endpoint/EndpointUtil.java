@@ -111,6 +111,11 @@ public final class EndpointUtil {
    * @throws JsonCreationException
    */
   public static <T> JSONObject generateJSONObject(Map<String, T> list) throws JsonCreationException {
+
+    if (list == null) {
+      throw new JsonCreationException("List is null");
+    }
+
     JSONObject jsonList = new JSONObject();
 
     for (Entry<String, T> entry : list.entrySet()) {
@@ -125,7 +130,7 @@ public final class EndpointUtil {
         jsonArray.addAll(collection);
         jsonList.put(entry.getKey(), jsonArray);
       } else {
-        throw new JsonCreationException("could not deal with " + value);
+        throw new JsonCreationException("Could not deal with " + value);
       }
     }
 

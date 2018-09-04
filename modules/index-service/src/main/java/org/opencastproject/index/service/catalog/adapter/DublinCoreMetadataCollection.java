@@ -37,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
@@ -159,8 +158,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
-          List<String> valueList = Arrays.asList(StringUtils.split(value, ","));
-          iterableTextField.setValue(valueList);
+          iterableTextField.setValue(Arrays.asList(value));
         }
         addField(iterableTextField);
         break;
@@ -173,8 +171,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
                 metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
-          List<String> valueList = Arrays.asList(StringUtils.split(value, ","));
-          mixedIterableTextField.setValue(valueList);
+          mixedIterableTextField.setValue(Arrays.asList(value));
         }
         addField(mixedIterableTextField);
         break;

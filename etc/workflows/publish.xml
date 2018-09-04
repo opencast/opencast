@@ -74,9 +74,9 @@
 
       <!-- Show or hide the hold and publication configuration panel -->
       <script type="text/javascript">
-        <!-- Remove the line below if you wish to publish to AWS S3 -->
+        // Remove the line below if you wish to publish to AWS S3
         $('#publishToAws').prop('disabled', true);
-        <!-- Remove the line above if you wish to publish to AWS S3 -->
+        // Remove the line above if you wish to publish to AWS S3
 
         awsWasDisabled = $('#publishToAws').prop('disabled');
         awsWasChecked = $('#publishToAws').prop('checked');
@@ -105,16 +105,6 @@
   <operations>
 
     <!-- Apply the default workflow configuration -->
-
-    <operation
-      id="import-wf-properties"
-      fail-on-error="true"
-      exception-handler-workflow="ng-partial-error"
-      description="Import workflow settings to Java properties file">
-      <configurations>
-        <configuration key="source-flavor">processing/defaults</configuration>
-      </configurations>
-    </operation>
 
     <operation
       id="defaults"

@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
- name="org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler" immediate="true">
-  <implementation class="org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler" />
-  <property name="service.description" value="Duplicate Event Workflow Handler" />
-  <property name="workflow.operation" value="duplicate-event" />
+               name="org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler"
+               immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.workflow.DuplicateEventWorkflowOperationHandler"/>
+  <property name="service.description" value="Duplicate Event Workflow Handler"/>
+  <property name="workflow.operation" value="duplicate-event"/>
   <service>
-    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler"/>
   </service>
   <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" name="Workspace"
-             policy="static" bind="setWorkspace" />
-  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
-    policy="static" bind="setServiceRegistry" />
+             policy="static" bind="setWorkspace"/>
+  <reference name="ServiceRegistry" cardinality="1..1"
+             interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+             policy="static" bind="setServiceRegistry"/>
   <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
-    cardinality="1..1" policy="static" bind="setAssetManager" />
-  <reference name="distributionService" target="(distribution.channel=download)" interface="org.opencastproject.distribution.api.DistributionService"
-    cardinality="1..1" policy="static" bind="setDistributionService"/>
+             cardinality="1..1" policy="static" bind="setAssetManager"/>
+  <reference name="distributionService" target="(distribution.channel=download)"
+             interface="org.opencastproject.distribution.api.DistributionService"
+             cardinality="1..1" policy="static" bind="setDistributionService"/>
 </scr:component>

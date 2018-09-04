@@ -2,74 +2,74 @@
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
                name="org.opencastproject.adminui.endpoint.OsgiEventEndpoint"
                immediate="true" activate="activate">
-  <implementation class="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
-  <property name="service.description" value="Admin UI - Event facade Endpoint" />
-  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.event" />
-  <property name="opencast.service.path" value="/admin-ng/event" />
-  
+  <implementation class="org.opencastproject.adminui.endpoint.OsgiEventEndpoint"/>
+  <property name="service.description" value="Admin UI - Event facade Endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.adminui.endpoint.event"/>
+  <property name="opencast.service.path" value="/admin-ng/event"/>
+
   <service>
     <!-- expose interface for MH REST publisher! -->
-    <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint" />
-    <provide interface="org.osgi.service.cm.ManagedService" />
+    <provide interface="org.opencastproject.adminui.endpoint.OsgiEventEndpoint"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <reference bind="setAdminUIConfiguration"
              cardinality="1..1"
              interface="org.opencastproject.adminui.impl.AdminUIConfiguration"
              name="adminUIConfiguration"
-             policy="static" />
+             policy="static"/>
   <reference bind="setWorkflowService"
              cardinality="1..1"
              interface="org.opencastproject.workflow.api.WorkflowService"
              name="workflowService"
-             policy="static" />
+             policy="static"/>
   <reference name="jobService"
              interface="org.opencastproject.adminui.endpoint.JobEndpoint"
              cardinality="1..1"
              policy="static"
-             bind="setJobService" />
+             bind="setJobService"/>
   <reference name="AclServiceFactory"
              interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
              cardinality="1..1"
              policy="static"
-             bind="setAclServiceFactory" />
+             bind="setAclServiceFactory"/>
   <reference name="EventCommentService"
              interface="org.opencastproject.event.comment.EventCommentService"
              cardinality="1..1"
              policy="static"
-             bind="setEventCommentService" />
+             bind="setEventCommentService"/>
   <reference name="SecurityService"
              interface="org.opencastproject.security.api.SecurityService"
              cardinality="1..1"
              policy="static"
-             bind="setSecurityService" />
+             bind="setSecurityService"/>
   <reference name="AuthorizationService"
              interface="org.opencastproject.security.api.AuthorizationService"
              cardinality="1..1"
              policy="static"
-             bind="setAuthorizationService" />
+             bind="setAuthorizationService"/>
   <reference name="SchedulerService"
              interface="org.opencastproject.scheduler.api.SchedulerService"
              cardinality="1..1"
              policy="static"
-             bind="setSchedulerService" />
+             bind="setSchedulerService"/>
   <reference name="CaptureAgentStateService"
              interface="org.opencastproject.capture.admin.api.CaptureAgentStateService"
              cardinality="1..1"
              policy="static"
-             bind="setCaptureAgentStateService" />
+             bind="setCaptureAgentStateService"/>
   <reference name="IndexService"
              interface="org.opencastproject.index.service.api.IndexService"
              cardinality="1..1"
              policy="static"
-             bind="setIndexService" />
- <reference name="AdminUISearchIndex" 
+             bind="setIndexService"/>
+  <reference name="AdminUISearchIndex"
              interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
-             cardinality="1..1" 
-             policy="static" 
-             bind="setIndex" />
- <reference name="UrlSigningService" 
+             cardinality="1..1"
+             policy="static"
+             bind="setIndex"/>
+  <reference name="UrlSigningService"
              interface="org.opencastproject.security.urlsigning.service.UrlSigningService"
-             cardinality="1..1" 
-             policy="static" 
-             bind="setUrlSigningService" />
+             cardinality="1..1"
+             policy="static"
+             bind="setUrlSigningService"/>
 </scr:component>

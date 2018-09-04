@@ -1,0 +1,32 @@
+{
+  "reference":"",
+  "duration":23857,
+  "size":13405007,
+  "has_audio":false,
+  "streams":{
+    "audio":[
+
+    ],
+    "video":[
+      {
+        "framecount":715,
+        "scanorder":"",
+        "framerate":29.97003,
+        "bitrate":4491648.0,
+        "id":"video-1",
+        "type":"H.264 \/ AVC \/ MPEG-4 AVC \/ MPEG-4 part 10",
+        "resolution":"1920x1080",
+        "scantype":""
+      }
+    ]
+  },
+  "checksum":"70ec2daa7eac91e048a6356b760e17fe",
+  "mimetype":"video\/mp4",
+  "id":"c403981a-da35-408a-862b-8d5e84d1ce40",
+  "type":"presenter\/source",
+  "url":"/admin-ng/resources/video/sunrise.mp4",
+  "has_video":true,
+  "tags":[
+    "archive"
+  ]
+}

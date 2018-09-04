@@ -25,7 +25,7 @@ describe('Events API Resource', function () {
         var sampleJSON = {
             results: [{
                 source: 'archive',
-                id: '40518',
+                id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a',
                 title: 'Test Title',
                 presenters: ['Matt Smith', 'Chuck Norris'],
                 technical_presenters: ['Matt Smith', 'Chuck Norris'],
@@ -111,7 +111,7 @@ describe('Events API Resource', function () {
             $httpBackend.whenGET('/admin-ng/event/events.json').respond(JSON.stringify({
                 results: {
                     source: 'archive',
-                    id: '40518',
+                    id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a',
                     title: 'Test Title',
                     presenters: ['Matt Smith', 'Chuck Norris'],
                     technical_presenters: ['Matt Smith', 'Chuck Norris'],

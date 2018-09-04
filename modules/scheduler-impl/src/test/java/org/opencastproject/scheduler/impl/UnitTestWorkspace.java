@@ -191,6 +191,11 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
+  public void cleanup(Id mediaPackageId, boolean filesOnly) throws IOException {
+    // Nothing to do
+  }
+
+  @Override
   public String rootDirectory() {
     return null;
   }

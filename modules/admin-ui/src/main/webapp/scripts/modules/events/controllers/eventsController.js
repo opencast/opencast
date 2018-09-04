@@ -22,57 +22,25 @@
 
 // Controller for all event screens.
 angular.module('adminNg.controllers')
-.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource',
-    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications, ResourceModal, ConfirmationModal, EventHasSnapshotsResource) {
-        // Configure the table service
-        $scope.dateToFilterValue = function(dateString) {
-          var date = new Date(dateString);
-          var from = new Date(date.setHours(0, 0, 0, 0));
-          var to = new Date(date.setHours(23, 59, 59, 999));
-          return from.toISOString() + "/" + to.toISOString();
-        };
+.controller('EventsCtrl', ['$scope', 'Stats', 'Table', 'EventsResource', 'ResourcesFilterResource', 'ResourcesListResource', 'Notifications', 'ResourceModal', 'ConfirmationModal', 'EventHasSnapshotsResource', 'RelativeDatesService',
+    function ($scope, Stats, Table, EventsResource, ResourcesFilterResource, ResourcesListResource, Notifications, ResourceModal, ConfirmationModal, EventHasSnapshotsResource, RelativeDatesService) {
+
         $scope.stats = Stats;
-        $scope.stats.configure({
-            stats: [
-            {filters: [{name: 'status',
-                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.SCHEDULED'}],
-             description: 'DASHBOARD.SCHEDULED'},
-            {filters: [{name: 'startDate',
-                        filter:'FILTERS.EVENTS.START_DATE',
-                        value: $scope.dateToFilterValue(new Date().toISOString())}],
-             description: 'DATES.TODAY'},
-            {filters: [{name: 'status',
-                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.RECORDING'}],
-             description: 'DASHBOARD.RECORDING'},
-            {filters: [{name: 'status',
-                        filter:'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PROCESSING'}],
-             description: 'DASHBOARD.RUNNING'},
-            {filters: [{name: 'status',
-                        filter:'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PAUSED'}],
-             description: 'DASHBOARD.PAUSED'},
-            {filters: [{name: 'status',
-                        filter:'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PROCESSING_FAILURE'}],
-             description: 'DASHBOARD.FAILED'},
-            {filters: [{name: 'comments',
-                        filter:'FILTERS.EVENTS.COMMENTS.LABEL',
-                        value: 'OPEN'},
-                       {name: 'status',
-                        filter: 'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
-             description: 'DASHBOARD.FINISHED_WITH_COMMENTS'},
-            {filters: [{name: 'status',
-                        filter:'FILTERS.EVENTS.STATUS.LABEL',
-                        value: 'EVENTS.EVENTS.STATUS.PROCESSED'}],
-             description: 'DASHBOARD.FINISHED'}
-            ],
-            resource:   'events',
-            apiService: EventsResource
+
+        var statsConfiguration = ResourcesListResource.queryRecursive({ resource: 'STATS' });
+        statsConfiguration.$promise.then(function (configuration) {
+
+             var statsConfigurationValues = configuration.map(function(element) {
+                 return element.value;
+             });
+
+             $scope.stats.configure({
+                 stats: statsConfigurationValues,
+                 resource:   'events',
+                 apiService: EventsResource
+            });
         });
+
         $scope.table = Table;
         $scope.table.configure({
             columns: [{
@@ -134,7 +102,7 @@ angular.module('adminNg.controllers')
                 });
                 row.checkedDelete = function() {
                   EventHasSnapshotsResource.get({id: row.id},function(o) {
-                    if ((angular.isUndefined(row.publications) || row.publications.length <= 0 || !o.hasSnapshots) && !row.has_preview )
+                    if ((angular.isUndefined(row.publications) || row.publications.length <= 0 || (row.publications.length == 1 && row.publications[0].id == "engage-live") || !o.hasSnapshots) && !row.has_preview )
                           // Works, opens simple modal
                           ConfirmationModal.show('confirm-modal',Table.delete,row);
                       else
@@ -148,7 +116,12 @@ angular.module('adminNg.controllers')
         $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
         $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' });
 
-        $scope.table.dateToFilterValue = $scope.dateToFilterValue;
+        $scope.table.dateToFilterValue = function(dateString) {
+
+            var from = RelativeDatesService.relativeToAbsoluteDate(0, 'days', true);
+            var to = RelativeDatesService.relativeToAbsoluteDate(0, 'days', false);
+            return from.toISOString() + "/" + to.toISOString();
+        };
 
         $scope.table.delete = function (row) {
             EventsResource.delete({id: row.id}, function () {

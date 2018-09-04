@@ -30,7 +30,8 @@ angular.module('adminNg.controllers')
             columns: [{
                 name:  'status',
                 template: 'modules/recordings/partials/recordingStatusCell.html',
-                label: 'RECORDINGS.RECORDINGS.TABLE.STATUS'
+                label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
+                translate: true
             }, {
                 template: 'modules/recordings/partials/recordingsNameCell.html',
                 name:  'name',

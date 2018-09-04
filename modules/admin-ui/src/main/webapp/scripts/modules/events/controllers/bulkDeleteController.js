@@ -24,8 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('BulkDeleteCtrl', ['$scope', 'Modal', 'FormNavigatorService', 'Table', 'Notifications',
     'BulkDeleteResource', 'NewEventProcessing', 'TaskResource', 'decorateWithTableRowSelection',
+    'SeriesHasEventsResource', 'SeriesConfigurationResource',
         function ($scope, Modal, FormNavigatorService, Table, Notifications, BulkDeleteResource, NewEventProcessing,
-                  TaskResource, decorateWithTableRowSelection) {
+                  TaskResource, decorateWithTableRowSelection, SeriesHasEventsResource, SeriesConfigurationResource) {
 
     var hasPublishedElements = function (currentEvent) {
         var publicationCount = 0;
@@ -33,11 +34,7 @@ angular.module('adminNg.controllers')
             publicationCount++;
         });
 
-        if (publicationCount > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return publicationCount > 0 && currentEvent.publications[0].id != "engage-live";
     },
     tableByPublicationStatus = function(isPublished) {
         var result = {
@@ -107,6 +104,18 @@ angular.module('adminNg.controllers')
         }
     };
 
+    $scope.allowed = function () {
+        var allowed = true;
+        if (Table.resource.indexOf('series') >= 0 && !$scope.deleteSeriesWithEventsAllowed) {
+            angular.forEach($scope.rows, function (row) {
+                if (allowed && row.selected && row.hasEvents) {
+                    allowed = false;
+                }
+            });
+        }
+        return allowed;
+    };
+
     $scope.submitButton = false;
     $scope.submit = function () {
         if ($scope.valid()) {
@@ -148,10 +157,16 @@ angular.module('adminNg.controllers')
                 });
                 if (retractEventIds.length > 0) {
                     resetSubmitButton = false;
+                    var configuration = $scope.processing.ud.workflow.selection.configuration;
+                    var finalConfiguration = {};
+                    // We have to duplicate the configuration for each event, since the "bulk start task"
+                    // event wants per-event configuration since MH-12826.
+                    for (var i = 0; i < retractEventIds.length; i++) {
+                        finalConfiguration[retractEventIds[i]] = configuration;
+                    }
                     payload = {
                         workflow: $scope.processing.ud.workflow.id,
-                        configuration: $scope.processing.ud.workflow.selection.configuration,
-                        eventIds: retractEventIds
+                        configuration: finalConfiguration
                     };
                     TaskResource.save(payload, $scope.onSuccess, $scope.onFailure);
                 }
@@ -200,5 +215,16 @@ angular.module('adminNg.controllers')
         $scope.events.unpublished = {};
         $scope.events.unpublished.has = $scope.unpublished.rows.length > 0;
         $scope.events.unpublished.selected = true;
+    }
+    else {
+        SeriesConfigurationResource.get(function (data) {
+            $scope.deleteSeriesWithEventsAllowed = data.deleteSeriesWithEventsAllowed;
+        });
+        angular.forEach($scope.rows, function(row) {
+            SeriesHasEventsResource.get({id: row.id}, function (data) {
+                row.hasEvents = data.hasEvents;
+            });
+
+        });
     }
 }]);

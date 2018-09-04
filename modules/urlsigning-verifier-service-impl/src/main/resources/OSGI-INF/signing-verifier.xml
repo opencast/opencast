@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-    name="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"
-    immediate="true">
-  <implementation class="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl" />
-  <property name="service.description" value="Url Signing Verifier" />
-  <property name="service.pid" value="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl" />
+               name="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"
+               immediate="true">
+  <implementation class="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"/>
+  <property name="service.description" value="Url Signing Verifier"/>
+  <property name="service.pid" value="org.opencastproject.security.urlsigning.verifier.impl.UrlSigningVerifierImpl"/>
   <service>
-    <provide interface="org.osgi.service.cm.ManagedService" />
-    <provide interface="org.opencastproject.security.urlsigning.verifier.UrlSigningVerifier" />
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+    <provide interface="org.opencastproject.security.urlsigning.verifier.UrlSigningVerifier"/>
   </service>
 </scr:component>

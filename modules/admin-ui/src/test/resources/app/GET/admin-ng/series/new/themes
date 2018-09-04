@@ -1,5 +1,34 @@
 {
-    "1": "Heinz das Pferd",
-    "2": "Full Fledged",
-    "3": "Doc Test"
+   "438054":{
+      "name":"Watermark only",
+      "description":null
+   },
+   "92451":{
+      "name":"Only Introduction (delete?)",
+      "description":"Shows only Intro movie"
+   },
+   "438053":{
+      "name":"Only Title slide (no Introduction movie)",
+      "description":"This Theme shows a title slide for 2 seconds"
+   },
+   "673551":{
+      "name":"Intro with title",
+      "description":null
+   },
+   "438051":{
+      "name":"Introduction video only",
+      "description":"This them shows only an introduction video only"
+   },
+   "730003":{
+      "name":"Test3 nur Titel",
+      "description":null
+   },
+   "730002":{
+      "name":"Test2 nur Abspann",
+      "description":null
+   },
+   "730001":{
+      "name":"Test1 nur Vorspann",
+      "description":null
+   }
 }

@@ -14,7 +14,7 @@
                         data-disable-search-threshold="10"
                         ng-model="zoomSelected"
                         ng-change="changeZoomSelected($event)"
-                        ng-options="y.name for (x, y) in ZoomSelectOptions">
+                        ng-options="y.name for (x, y) in ZoomSelectOptions track by y.name">
                     <option value=""></option>
                 </select>
             </div>

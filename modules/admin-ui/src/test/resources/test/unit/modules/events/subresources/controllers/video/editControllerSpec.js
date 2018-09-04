@@ -26,7 +26,7 @@ describe('Video Edit controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $scope.video = angular.copy(getJSONFixture('admin-ng/tools/40518/editor.json'));
+        $scope.video = angular.copy(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json'));
         $scope.player = { adapter: {} };
     });
 

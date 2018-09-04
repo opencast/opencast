@@ -2421,7 +2421,7 @@ define(['require', 'jquery', 'underscore', 'backbone', 'basil', 'bowser', 'engag
       }
     });
 
-    Engage.on(plugin.events.focusVideo.getName(), function (data) {
+    Engage.on(plugin.events.captionsFound.getName(), function (data) {
       var captionMode = activeCaption.mode;
       activeCaption.mode = "hidden";
       activeCaption = videojs("videojs_videodisplay_" + data).textTracks()[0];

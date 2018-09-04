@@ -114,6 +114,7 @@ public class DemuxWorkflowOperationHandlerTest {
     operationHandler = new DemuxWorkflowOperationHandler();
     operationHandler.setWorkspace(workspace);
     operationHandler.setServiceRegistry(serviceRegistry);
+    operationHandler.setJobBarrierPollingInterval(0);
   }
 
   @Test
