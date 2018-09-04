@@ -21,7 +21,7 @@
 paella.addPlugin(function() {
 	return class TranscriptionTabBarPlugin extends paella.TabBarPlugin {
     get divContainer() { return this._divContainer; }
-    set dicContainer(v) { this._divContainer = v; }
+    set divContainer(v) { this._divContainer = v; }
     get divSearchBar() { return this._divSearchBar; }
     set divSearchBar(v) { this._divSearchBar = v; }
     get divLoading() { return this._divLoading; }
@@ -29,7 +29,7 @@ paella.addPlugin(function() {
     get divResults() { return this._divResults; }
     set divResults(v) { this._divResults = v; }
     get divSearch() { return this._divSearch; }
-    set divSearch(v) { this.d_ivSearch = v; }
+    set divSearch(v) { this._divSearch = v; }
     get divSearchBarRelevance() { return this._divSearchBarRelevance; }
     set divSearchBarRelevance(v) { this._divSearchBarRelevance = v; }
 
