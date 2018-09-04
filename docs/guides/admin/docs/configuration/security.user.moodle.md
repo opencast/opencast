@@ -31,9 +31,10 @@ The values can be arbitrary, if only the Moodle User Provider should be
 configured.
 
 After the installation, a new user with the capabilities
-`webservice/rest:use`, `tool/opencast:externalapi`, `moodle/user:viewalldetails`
-and `moodle/user:viewdetails` has to be created. Then generate a new web service
-token and add that user to the "Opencast web service" service.
+`webservice/rest:use`, `tool/opencast:externalapi`, `moodle/user:viewalldetails`,
+`moodle/user:viewdetails` and `moodle/site:accessallgroups` has to be created.
+Then generate a new web service token and add that user to the "Opencast web
+service" service.
 
 ### Step 1
 

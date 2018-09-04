@@ -86,6 +86,11 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
   private static final String CACHE_EXPIRATION = "org.opencastproject.userdirectory.moodle.cache.expiration";
 
   /**
+   * The key to look up whether to activate group roles
+   */
+  private static final String GROUP_ROLES_KEY = "org.opencastproject.userdirectory.moodle.group.roles.enabled";
+
+  /**
    * The key to look up the regular expression used to validate courses
    */
   private static final String COURSE_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.course.pattern";
@@ -94,6 +99,11 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
    * The key to look up the regular expression used to validate users
    */
   private static final String USER_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.user.pattern";
+
+  /**
+   * The key to look up the regular expression used to validate groups
+   */
+  private static final String GROUP_PATTERN_KEY = "org.opencastproject.userdirectory.moodle.group.pattern";
 
   /**
    * The OSGI bundle context
@@ -176,8 +186,14 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     if (StringUtils.isBlank(token))
       throw new ConfigurationException(MOODLE_TOKEN_KEY, "is not set");
 
+    boolean groupRoles = false;
+    String groupRolesStr = (String) properties.get(GROUP_ROLES_KEY);
+    if ("true".equals(groupRolesStr))
+      groupRoles = true;
+
     String coursePattern = (String) properties.get(COURSE_PATTERN_KEY);
     String userPattern = (String) properties.get(USER_PATTERN_KEY);
+    String groupPattern = (String) properties.get(GROUP_PATTERN_KEY);
 
     int cacheSize = 1000;
     try {
@@ -210,7 +226,7 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
 
     logger.debug("creating new MoodleUserProviderInstance for pid=" + pid);
     MoodleUserProviderInstance provider = new MoodleUserProviderInstance(pid, new MoodleWebServiceImpl(url, token), org,
-            coursePattern, userPattern, cacheSize, cacheExpiration);
+            coursePattern, userPattern, groupPattern, groupRoles, cacheSize, cacheExpiration);
 
     providerRegistrations.put(pid, bundleContext.registerService(UserProvider.class.getName(), provider, null));
     providerRegistrations.put(pid, bundleContext.registerService(RoleProvider.class.getName(), provider, null));
