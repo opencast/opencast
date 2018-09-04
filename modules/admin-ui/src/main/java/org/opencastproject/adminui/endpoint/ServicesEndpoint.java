@@ -78,6 +78,9 @@ public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
 
+  private static final String SERVICE_STATUS_TRANSLATION_PREFIX = "SYSTEMS.SERVICES.STATUS.";
+
+
   @GET
   @Path("services.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -291,7 +294,7 @@ public class ServicesEndpoint {
               f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
               f(NAME_NAME, v(getName(), Jsons.BLANK)), f(QUEUED_NAME, v(getQueuedJobs())),
               f(RUNNING_NAME, v(getRunningJobs())),
-              f(STATUS_NAME, v(getStatus().name(), Jsons.BLANK)));
+              f(STATUS_NAME, v(SERVICE_STATUS_TRANSLATION_PREFIX + getStatus().name(), Jsons.BLANK)));
     }
   }
 

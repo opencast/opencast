@@ -117,6 +117,8 @@ public class JobEndpoint {
   }
 
   private static final String NEGATE_PREFIX = "-";
+  private static final String WORKFLOW_STATUS_TRANSLATION_PREFIX = "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.";
+  private static final String JOB_STATUS_TRANSLATION_PREFIX = "SYSTEMS.JOBS.STATUS.";
 
   private WorkflowService workflowService;
   private ServiceRegistry serviceRegistry;
@@ -363,7 +365,7 @@ public class JobEndpoint {
       jsonList.add(obj(f("id", v(id)),
               f("type", v(jobType)),
               f("operation", v(operation)),
-              f("status", v(status.toString())),
+              f("status", v(JOB_STATUS_TRANSLATION_PREFIX + status.toString())),
               f("submitted", v(created, Jsons.BLANK)),
               f("started", v(started, Jsons.BLANK)),
               f("creator", v(creator, Jsons.BLANK)),
@@ -413,7 +415,7 @@ public class JobEndpoint {
 
       jsonList.add(obj(f("id", v(instanceId)), f("title", v(nul(instance.getMediaPackage().getTitle()).getOr(""))),
               f("series", v(series, Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
-              f("status", v(instance.getState().toString())),
+              f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
               f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
     }
 
@@ -456,7 +458,8 @@ public class JobEndpoint {
       fields.add(f(key, v(instance.getConfiguration(key), Jsons.BLANK)));
     }
 
-    return obj(f("start", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)), f("state", v(instance.getState(), Jsons.BLANK)),
+    return obj(f("start", v(created != null ? toUTC(created.getTime()) : "", Jsons.BLANK)),
+               f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState(), Jsons.BLANK)),
                f("description", v(instance.getDescription(), Jsons.BLANK)), f("duration", v(duration, Jsons.BLANK)),
                f("id", v(instance.getId(), Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
                f("workflowId", v(instance.getTemplate(), Jsons.BLANK)), f("title", v(mp.getTitle(), Jsons.BLANK)),
@@ -484,7 +487,7 @@ public class JobEndpoint {
       for (String key : wflOp.getConfigurationKeys()) {
         fields.add(f(key, v(wflOp.getConfiguration(key), Jsons.BLANK)));
       }
-      operationsJSON.add(obj(f("status", v(wflOp.getState(), Jsons.BLANK)), f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
+      operationsJSON.add(obj(f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)), f("title", v(wflOp.getTemplate(), Jsons.BLANK)),
               f("description", v(wflOp.getDescription(), Jsons.BLANK)), f("id", v(wflOp.getId(), Jsons.BLANK)), f("configuration", obj(fields))));
     }
 
@@ -517,7 +520,7 @@ public class JobEndpoint {
               f("exception_handler_workflow", v(wflOp.getExceptionHandlingWorkflow(), Jsons.BLANK)),
               f("fail_on_error", v(wflOp.isFailWorkflowOnException())),
               f("description", v(wflOp.getDescription(), Jsons.BLANK)),
-              f("state", v(wflOp.getState(), Jsons.BLANK)),
+              f("state", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + wflOp.getState(), Jsons.BLANK)),
               f("job", v(wflOp.getId(), Jsons.BLANK)),
               f("name", v(wflOp.getTemplate(), Jsons.BLANK)),
               f("time_in_queue", v(wflOp.getTimeInQueue(), v(0))),
