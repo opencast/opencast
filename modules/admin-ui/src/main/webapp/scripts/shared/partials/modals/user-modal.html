@@ -1,8 +1,9 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="user-modal" ng-controller="UserCtrl">
 
-    <header>
+    <header ng-switch="action">
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="{{ caption }}"><!-- Create New User --></h2>
+        <h2 ng-switch-when="add" translate="USERS.USERS.DETAILS.NEWCAPTION"><!-- Create user --></h2>
+        <h2 ng-switch-when="edit" translate="USERS.USERS.DETAILS.EDITCAPTION" translate-values="{{user}}"><!-- User details - {{name}} --></h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
