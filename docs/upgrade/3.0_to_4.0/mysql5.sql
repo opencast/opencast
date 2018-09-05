@@ -43,11 +43,11 @@ UPDATE mh_assets_snapshot SET availability = 'ONLINE';
 ##
 
 # drop indices and constraints
-DROP INDEX UNQ_mh_archive_asset ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_mediapackage ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_checksum ON mh_archive_asset;
 DROP INDEX IX_mh_archive_asset_uri ON mh_archive_asset;
 ALTER TABLE mh_archive_asset DROP FOREIGN KEY FK_mh_archive_asset_organization;
+DROP INDEX UNQ_mh_archive_asset ON mh_archive_asset;
 
 # rename table; rename/add/drop columns
 ALTER TABLE mh_archive_asset
