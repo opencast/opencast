@@ -29,7 +29,7 @@
                     <select chosen pre-select-from="video.workflows" class="workflow"
                         ng-disabled="!video.workflows || video.workflows.length === 0"
                         data-width="'175px'"
-                        data-disable-search-threshold="8"
+                        data-disable-search-threshold="0"
                         ng-model="video.workflow"
                         ng-options="workflow.id as workflow.name for workflow in video.workflows" />
 
@@ -156,7 +156,7 @@
                                           <div class="reasons">
                                               <select chosen pre-select-from="components.eventCommentReasons"
                                                   data-width="'200px'"
-                                                  data-disable-search-threshold="8"
+                                                  data-disable-search-threshold="0"
                                                   ng-model="myComment.reason"
                                                   ng-options="value | translate for (id, value) in components.eventCommentReasons"
                                                   data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}"
@@ -232,7 +232,7 @@
                         <select chosen pre-select-from="video.workflows" class="workflow"
                             ng-disabled="!video.workflows || video.workflows.length === 0"
                             data-width="'175px'"
-                            data-disable-search-threshold="8"
+                            data-disable-search-threshold="0"
                             ng-model="video.workflow"
                             ng-options="workflow.id as workflow.name for workflow in video.workflows" />
 
