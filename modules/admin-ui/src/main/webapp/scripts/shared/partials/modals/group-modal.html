@@ -18,6 +18,9 @@
         </a>
     </nav>
 
+    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+
     <form name="groupForm">
         <div class="modal-content" data-modal-tab-content="group">
             <div class="modal-body">

@@ -27,6 +27,9 @@
             {{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}
         </a>
     </nav>
+
+    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
     
     <div class="modal-content" ng-class="{active: currentForm === 'generalForm'}" data-modal-tab-content="general" data-level="1">
         <div class="modal-body">
