@@ -20,12 +20,15 @@
  */
 package org.opencastproject.assetmanager.impl.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
+import static org.opencastproject.systems.OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE;
 import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.forbidden;
@@ -37,9 +40,13 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeTypeUtil;
@@ -50,9 +57,15 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -81,7 +94,12 @@ import javax.ws.rs.core.Response;
     },
     abstractText = "This service indexes and queries available (distributed) episodes.")
 public abstract class AbstractAssetManagerRestEndpoint {
+
   protected static final Logger logger = LoggerFactory.getLogger(AbstractAssetManagerRestEndpoint.class);
+
+  private final Gson gson = new Gson();
+
+  private final java.lang.reflect.Type stringMapType = new TypeToken<Map<String, String>>() { }.getType();
 
   public abstract AssetManager getAssetManager();
 
@@ -284,6 +302,156 @@ public abstract class AbstractAssetManagerRestEndpoint {
     } catch (Exception e) {
       return handleException(e);
     }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{mediaPackageID}/properties.json")
+  @RestQuery(name = "getProperties",
+          description = "Get stored properties for an episode.",
+          returnDescription = "Properties as JSON",
+          pathParameters = {
+                  @RestParameter(
+                          name = "mediaPackageID",
+                          description = "the media package ID",
+                          isRequired = true,
+                          type = STRING)
+          }, restParameters = {
+                  @RestParameter(
+                          name = "namespace",
+                          description = "property namespace",
+                          isRequired = false,
+                          type = STRING)
+          },
+          reponses = {
+                  @RestResponse(responseCode = SC_OK, description = "Media package returned"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
+                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
+          })
+  public Response getProperties(@PathParam("mediaPackageID") final String mediaPackageId,
+          @FormParam("namespace") final String namespace) {
+    try {
+      final AQueryBuilder queryBuilder = getAssetManager().createQuery();
+      ASelectQuery query;
+      if (StringUtils.isEmpty(namespace)) {
+        query = queryBuilder.select(queryBuilder.properties());
+      } else {
+        query = queryBuilder.select(queryBuilder.propertiesOf(namespace));
+      }
+      query = query.where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest()));
+      final AResult result = query.run();
+
+      // we expect exactly one result when specifying a media package id
+      if (result.getSize() < 1) {
+        return notFound();
+      } else if (result.getSize() > 1) {
+        return serverError();
+      }
+
+      // build map from properties
+      HashMap<String, HashMap<String, String>> properties = new HashMap<>();
+      if (result.getRecords().head().isSome()) {
+        for (final Property property : result.getRecords().head().get().getProperties()) {
+          final String key = property.getId().getNamespace() + "." + property.getId().getName();
+          final HashMap<String, String> val = new HashMap<>();
+          val.put("type", property.getValue().getType().getClass().getSimpleName());
+          val.put("value", property.getValue().get().toString());
+          properties.put(key, val);
+        }
+      }
+      return ok(gson.toJson(properties));
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("{mediaPackageID}/workflowProperties.json")
+  @RestQuery(name = "getWorkflowProperties",
+          description = "Get stored workflow properties for an episode.",
+          returnDescription = "Properties as JSON",
+          pathParameters = {
+                  @RestParameter(
+                          name = "mediaPackageID",
+                          description = "the media package ID",
+                          isRequired = true,
+                          type = STRING)
+          },
+          reponses = {
+                  @RestResponse(responseCode = SC_OK, description = "Media package returned"),
+                  @RestResponse(responseCode = SC_OK, description = "Invalid parameters"),
+                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found"),
+                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not allowed to read media package."),
+                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
+          })
+  public Response getWorkflowProperties(@PathParam("mediaPackageID") final String mediaPackageId) {
+    try {
+      final AQueryBuilder queryBuilder = getAssetManager().createQuery();
+      final AResult result = queryBuilder.select(queryBuilder.propertiesOf(WORKFLOW_PROPERTIES_NAMESPACE))
+              .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
+
+      // we expect exactly one result when specifying a media package id
+      if (result.getSize() < 1) {
+        return notFound();
+      } else if (result.getSize() > 1) {
+        return serverError();
+      }
+
+      // build map from properties
+      HashMap<String, String> properties = new HashMap<>();
+      if (result.getRecords().head().isSome()) {
+        for (final Property property : result.getRecords().head().get().getProperties()) {
+          properties.put(property.getId().getName(), property.getValue().get(Value.STRING));
+        }
+      }
+      return ok(gson.toJson(properties));
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+
+  @POST
+  @Path("{mediaPackageID}/workflowProperties")
+  @RestQuery(name = "setWorkflowProperties",
+          description = "Set additional workflow properties",
+          pathParameters = {
+                  @RestParameter(
+                          name = "mediaPackageID",
+                          description = "the media package ID",
+                          isRequired = true,
+                          type = STRING)
+          },
+          restParameters = {
+                  @RestParameter(
+                          name = "properties",
+                          isRequired = true,
+                          type = STRING,
+                          description = "JSON object containing new properties")
+          },
+          reponses = {
+                  @RestResponse(description = "Properties successfully set", responseCode = SC_CREATED),
+                  @RestResponse(description = "Invalid data", responseCode = SC_BAD_REQUEST),
+                  @RestResponse(description = "Internal error", responseCode = SC_INTERNAL_SERVER_ERROR) },
+          returnDescription = "Returned status code indicates success")
+  public Response setWorkflowProperties(@PathParam("mediaPackageID") final String mediaPackageId,
+          @FormParam("properties") final String propertiesJSON) {
+    Map<String, String> properties;
+    try {
+      properties = gson.fromJson(propertiesJSON, stringMapType);
+    } catch (Exception e) {
+      return badRequest();
+    }
+    for (final Map.Entry<String, String> entry : properties.entrySet()) {
+      final PropertyId propertyId = PropertyId.mk(mediaPackageId, WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
+      final Property property = Property.mk(propertyId, Value.mk(entry.getValue()));
+      if (!getAssetManager().setProperty(property)) {
+        return notFound();
+      }
+    }
+    return noContent();
   }
 
   /** Unify exception handling. */
