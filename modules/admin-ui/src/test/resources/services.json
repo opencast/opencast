@@ -11,7 +11,7 @@
       "hostname": "host1",
       "name": "service1",
       "completed": 0,
-      "status": "NORMAL"
+      "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 0,
       "meanQueueTime": 456,
@@ -20,7 +20,7 @@
       "hostname": "host1",
       "name": "service2",
       "completed": 5,
-      "status": "ERROR"
+      "status": "SYSTEMS.SERVICES.STATUS.ERROR"
     }, {
       "running": 2,
       "meanQueueTime": 10,
@@ -29,7 +29,7 @@
       "hostname": "host2",
       "name": "service3",
       "completed": 20,
-      "status": "NORMAL"
+      "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 1,
       "meanQueueTime": 30,
@@ -38,7 +38,7 @@
       "hostname": "host3",
       "name": "service4",
       "completed": 0,
-      "status": "WARNING"
+      "status": "SYSTEMS.SERVICES.STATUS.WARNING"
     }, {
       "running": 0,
       "meanQueueTime": 0,
@@ -47,7 +47,7 @@
       "hostname": "host2",
       "name": "service5",
       "completed": 10,
-      "status": "NORMAL"
+      "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 0,
       "meanQueueTime": 60,
@@ -56,6 +56,6 @@
       "hostname": "host4",
       "name": "service6",
       "completed": 0,
-      "status": "NORMAL"
+      "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }]
 }

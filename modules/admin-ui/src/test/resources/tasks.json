@@ -6,7 +6,7 @@
         {
             "id": 1,
             "series": "Serie 1",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "",
             "title": "Mediapackage 1",
             "workflow": "Full"
@@ -14,7 +14,7 @@
         {
             "id": 2,
             "series": "Serie 1",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "",
             "title": "",
             "workflow": "Full"
@@ -22,7 +22,7 @@
         {
             "id": 3,
             "series": "Serie 1",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "",
             "title": "Mediapackage 3",
             "workflow": "Full"
