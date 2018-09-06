@@ -104,18 +104,7 @@ public class LtiLaunchAuthenticationHandler
    *          the user details service used to map user identifiers to more detailed information
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService) {
-    this(userDetailsService, null, new ArrayList<String>());
-  }
-
-  /**
-   * Constructor for a LTI authentication handler that includes a list of highly trusted keys
-   *
-   * @param userDetailsService
-   * @param highlyTrustedkeys
-   */
-  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
-          List<String> highlyTrustedkeys) {
-    this(userDetailsService, securityService, highlyTrustedkeys, null);
+    this(userDetailsService, null, new ArrayList<String>(), null);
   }
 
   /**
