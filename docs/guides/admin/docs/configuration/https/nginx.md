@@ -104,8 +104,8 @@ http {
             proxy_set_header        X-Forwarded-Proto $scheme;
 
             # Pass requests to this location. This expects Opencast to be
-            # running on localhost port 8080 which should be the default set-up.
-            proxy_pass              http://localhost:8080;
+            # running locally on port 8080 which should be the default set-up.
+            proxy_pass              http://127.0.0.1:8080;
 
             # Make sure to redirect location headers to HTTPS. This is just a
             # precaution and shouldn't strictly be necessary but it did prevent
