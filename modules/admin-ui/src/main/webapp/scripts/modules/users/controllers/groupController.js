@@ -86,13 +86,10 @@ angular.module('adminNg.controllers')
         };
 
         if ($scope.action === 'edit') {
-            $scope.caption = 'USERS.GROUPS.DETAILS.EDITCAPTION';
             $scope.group = GroupResource.get({ id: $scope.resourceId }, function () {
                 reloadSelectedRoles();
                 reloadSelectedUsers();
             });
-        } else {
-            $scope.caption = 'USERS.GROUPS.DETAILS.NEWCAPTION';
         }
 
         $scope.submit = function () {

@@ -105,7 +105,6 @@ angular.module('adminNg.controllers')
         };
 
         if ($scope.action === 'edit') {
-            $scope.caption = 'USERS.USERS.DETAILS.EDITCAPTION';
             $scope.user = UserResource.get({ username: $scope.resourceId });
             $scope.user.$promise.then(function () {
                 $scope.manageable = $scope.user.manageable;
@@ -135,9 +134,6 @@ angular.module('adminNg.controllers')
                     $scope.role.available = _.filter($scope.role.available, function(role){ return !_.findWhere($scope.role.selected, {name: role.name}); });
                 });
             });
-        }
-        else {
-            $scope.caption = 'USERS.USERS.DETAILS.NEWCAPTION';
         }
 
 
