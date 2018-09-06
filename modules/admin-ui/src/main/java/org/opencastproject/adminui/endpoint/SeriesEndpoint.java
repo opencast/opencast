@@ -444,20 +444,20 @@ public class SeriesEndpoint implements ManagedService {
 
     MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<String> newOrganizers = MetadataUtils.copyMetadataField(organizers);
-    newOrganizers.setValue(StringUtils.join(series.getOrganizers(), ", "));
+    MetadataField<List<String>> newOrganizers = MetadataUtils.copyMetadataField(organizers);
+    newOrganizers.setValue(series.getOrganizers());
     metadata.addField(newOrganizers);
 
     MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<String> newContributors = MetadataUtils.copyMetadataField(contributors);
-    newContributors.setValue(StringUtils.join(series.getContributors(), ", "));
+    MetadataField<List<String>> newContributors = MetadataUtils.copyMetadataField(contributors);
+    newContributors.setValue(series.getContributors());
     metadata.addField(newContributors);
 
     MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<String> newPublishers = MetadataUtils.copyMetadataField(publishers);
-    newPublishers.setValue(StringUtils.join(series.getPublishers(), ", "));
+    MetadataField<List<String>> newPublishers = MetadataUtils.copyMetadataField(publishers);
+    newPublishers.setValue(series.getPublishers());
     metadata.addField(newPublishers);
 
     // Admin UI only field
