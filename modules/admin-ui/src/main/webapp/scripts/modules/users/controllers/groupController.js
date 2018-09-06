@@ -125,6 +125,13 @@ angular.module('adminNg.controllers')
           }
         };
 
+        $scope.$on('change', function (event, id) {
+          $scope.group = GroupResource.get({ id: id }, function () {
+            reloadSelectedRoles();
+            reloadSelectedUsers();
+          })
+        });
+
         $scope.getSubmitButtonState = function () {
           return $scope.groupForm.$valid ? 'active' : 'disabled';
         };

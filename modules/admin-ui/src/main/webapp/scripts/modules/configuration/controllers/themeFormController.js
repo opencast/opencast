@@ -74,17 +74,8 @@ angular.module('adminNg.controllers')
         }
 
         if (action === 'edit') {
-            // load resource
-            ThemeResource.get({id: $scope.resourceId, format: '.json'}, function (response) {
-                angular.forEach(response, function (obj, name) {
-                    $scope[name] = obj;
-                });
-                $scope.themeLoaded = true;
-            });
-
-
-            $scope.usage = ThemeUsageResource.get({themeId:$scope.resourceId});
-
+          // load resource
+          fetchChildResources($scope.resourceId);
         }
 
         $scope.submit = function () {
@@ -121,6 +112,26 @@ angular.module('adminNg.controllers')
             // close will not fetch content yet....
             $scope.close(false);
         };
+
+        /**
+         * This private function updates the scope with the data of a given theme.
+         *
+         * @param id the id of the theme
+         */
+        function fetchChildResources(id) {
+          ThemeResource.get({id: id, format: '.json'}, function (response) {
+            angular.forEach(response, function (obj, name) {
+              $scope[name] = obj;
+            });
+            $scope.themeLoaded = true;
+          });
+
+          $scope.usage = ThemeUsageResource.get({themeId: id});
+        }
+
+        $scope.$on('change', function (event, id) {
+          fetchChildResources(id);
+        });
 
     }]);
 

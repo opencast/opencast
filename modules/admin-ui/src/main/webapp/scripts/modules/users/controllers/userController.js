@@ -105,35 +105,7 @@ angular.module('adminNg.controllers')
         };
 
         if ($scope.action === 'edit') {
-            $scope.user = UserResource.get({ username: $scope.resourceId });
-            $scope.user.$promise.then(function () {
-                $scope.manageable = $scope.user.manageable;
-                if (!$scope.manageable) {
-                    Notifications.add('warning', 'USER_NOT_MANAGEABLE', 'user-form');
-                }
-
-                $scope.role.available.$promise.then(function() {
-
-                    // Now that we have the user roles and the available roles populate the selected and available
-                    angular.forEach($scope.user.roles, function (role) {
-
-                        if (role.type == "INTERNAL" || role.type == "GROUP") {
-                            $scope.role.selected.push({name: role.name, value: role.name, type: role.type});
-                        }
-
-                        if (role.type == "EXTERNAL" || role.type == "EXTERNAL_GROUP") {
-                            $scope.role.external.push({name: role.name, value: role.name, type: role.type});
-                        }
-
-                        if (role.type == "SYSTEM" || role.type == "DERIVED") {
-                            $scope.role.derived.push({name: role.name, value: role.name, type: role.type});
-                        }
-                    });
-
-                    // Filter the selected from the available list
-                    $scope.role.available = _.filter($scope.role.available, function(role){ return !_.findWhere($scope.role.selected, {name: role.name}); });
-                });
-            });
+            fetchChildResources($scope.resourceId);
         }
 
 
@@ -162,6 +134,47 @@ angular.module('adminNg.controllers')
                 });
             }
         };
+
+      /**
+       * This private function updates the scope with the data of a given user.
+       *
+       * @param id the id of the user
+       */
+      function fetchChildResources(id) {
+        $scope.user = UserResource.get({ username: id });
+        $scope.user.$promise.then(function () {
+          $scope.manageable = $scope.user.manageable;
+          if (!$scope.manageable) {
+            Notifications.add('warning', 'USER_NOT_MANAGEABLE', 'user-form');
+          }
+
+          $scope.role.available.$promise.then(function() {
+
+            // Now that we have the user roles and the available roles populate the selected and available
+            angular.forEach($scope.user.roles, function (role) {
+
+              if (role.type == "INTERNAL" || role.type == "GROUP") {
+                $scope.role.selected.push({name: role.name, value: role.name, type: role.type});
+              }
+
+              if (role.type == "EXTERNAL" || role.type == "EXTERNAL_GROUP") {
+                $scope.role.external.push({name: role.name, value: role.name, type: role.type});
+              }
+
+              if (role.type == "SYSTEM" || role.type == "DERIVED") {
+                $scope.role.derived.push({name: role.name, value: role.name, type: role.type});
+              }
+            });
+
+            // Filter the selected from the available list
+            $scope.role.available = _.filter($scope.role.available, function(role){ return !_.findWhere($scope.role.selected, {name: role.name}); });
+          });
+        });
+        }
+
+        $scope.$on('change', function (event, id) {
+          fetchChildResources(id);
+        });
 
         $scope.getHeight = function () {
 
