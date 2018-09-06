@@ -1,6 +1,6 @@
 {
   "time_in_queue": 0,
-  "state": "INSTANTIATED",
+  "state": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
   "max_attempts": 1,
   "job": 5,
   "retry_strategy": "NONE",

@@ -418,26 +418,29 @@
                                         <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
                                             <td>{{ item.id }}</td>
                                             <td>{{ item.workflow }}</td>
-                                            <td>{{ item.status }}</td>
+                                            <td>{{ item.status | translate }}</td>
                                             <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                                             <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" >
-                                                <a ng-show="item.status == 'RUNNING'" ng-click="workflowAction(item.id, 'STOP')"
+                                                <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING'" ng-click="workflowAction(item.id, 'STOP')"
                                                    class="stop fa-fw"
                                                    title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.STOP' | translate }}">
                                                   <!-- STOP -->
                                                 </a>
-                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'NONE')"
+                                                <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.PAUSED'" ng-click="workflowAction(item.id, 'NONE')"
                                                    class="fa fa-hand-stop-o fa-fw" style="color:red"
                                                    title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.ABORT' | translate }}">
                                                   <!-- Abort -->
                                                 </a>
-                                                <a ng-show="item.status == 'PAUSED'" ng-click="workflowAction(item.id, 'RETRY')"
+                                                <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.PAUSED'" ng-click="workflowAction(item.id, 'RETRY')"
                                                    class="fa fa-refresh fa-fw"
                                                    title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.RETRY' | translate }}">
                                                   <!-- Retry -->
                                                 </a>
                                                 <a ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')"
-                                                   ng-show="(item.status == 'SUCCEEDED' || item.status == 'FAILED' || item.status == 'STOPPED') && !isCurrentWorkflow(item.id)"
+                                                   ng-show="(item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.SUCCEEDED'
+                                                   || item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.FAILED'
+                                                   || item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.STOPPED')
+                                                   && !isCurrentWorkflow(item.id)"
                                                    ng-click="deleteWorkflow(item.id)"
                                                    class="remove fa-fw"
                                                    title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.DELETE' | translate }}">
@@ -1478,7 +1481,7 @@
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATE"><!-- State --></td>
-                                <td>{{ subNavData.state }}</td>
+                                <td>{{ subNavData.state | translate }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STARTED"><!-- Started --></td>
@@ -1551,7 +1554,7 @@
                             </thead>
                             <tbody>
                                 <tr ng-repeat="item in subNavData.entries track by $index">
-                                    <td>{{ item.status }}</td>
+                                    <td>{{ item.status | translate }}</td>
                                     <td>{{ item.title }}</td>
                                     <td>{{ item.description }}</td>
                                     <td>
@@ -1594,7 +1597,7 @@
                                 <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.STATE">
                                   <!-- State -->
                                 </td>
-                                <td>{{ subNavData.state }}</td>
+                                <td>{{ subNavData.state | translate }}</td>
                             </tr>
                             <tr>
                                 <td translate="EVENTS.EVENTS.DETAILS.OPERATION_DETAILS.TABLE_HEADERS.EXECUTION_HOST">

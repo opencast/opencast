@@ -6,7 +6,8 @@ angular.module('adminNg.controllers')
         $scope.table.configure({
             columns: [{
                 name:  'status',
-                label: 'SYSTEMS.SERVICES.TABLE.STATUS'
+                label: 'SYSTEMS.SERVICES.TABLE.STATUS',
+                translate: true
             }, {
                 name:  'name',
                 label: 'SYSTEMS.SERVICES.TABLE.NAME'

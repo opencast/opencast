@@ -2,13 +2,13 @@
   {
     "id": 4,
     "title": "ingest",
-    "status": "INSTANTIATED",
+    "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
     "description": "Ingest"
   },
   {
     "id": 5,
     "title": "archive",
-    "status": "INSTANTIATED",
+    "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
     "description": "Archive"
   }
 ]
