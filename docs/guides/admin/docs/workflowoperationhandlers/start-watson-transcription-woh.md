@@ -55,6 +55,5 @@ profile.audio-opus.name = audio-opus
 profile.audio-opus.input = stream
 profile.audio-opus.output = audio
 profile.audio-opus.suffix = -audio.opus
-profile.audio-opus.mimetype = audio/ogg
 profile.audio-opus.ffmpeg.command = -i /#{in.video.path} -c:a libvorbis -ac 1 -ar 16k -b:a 64k #{out.dir}/#{out.name}#{out.suffix}
 ```

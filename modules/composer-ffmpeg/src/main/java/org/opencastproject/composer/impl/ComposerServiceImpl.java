@@ -68,7 +68,6 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
@@ -393,9 +392,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Have the encoded track inspected and return the result
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
-
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
     return some(inspectedTrack);
   }
@@ -748,9 +744,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       Track inspectedTrack = inspect(job, workspaceURI);
       inspectedTrack.setIdentifier(targetTrackId);
 
-      if (profile.getMimeType() != null)
-        inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
@@ -905,9 +898,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-
     return some(inspectedTrack);
   }
 
@@ -983,9 +973,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Have the compound track inspected and return the result
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
-
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
     return some(inspectedTrack);
   }

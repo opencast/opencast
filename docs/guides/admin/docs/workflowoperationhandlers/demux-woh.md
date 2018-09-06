@@ -47,7 +47,6 @@ profile.demux.name = demux
 profile.demux.input = visual
 profile.demux.output = visual
 profile.demux.suffix = .mp4
-profile.demux.mimetype = video/mp4
 profile.demux.ffmpeg.command = -i #{in.video.path} -c copy \
   -map 0:a:0 -map 0:v:0 #{out.dir}/#{out.name}_presenter#{out.suffix} \
   -map 0:a:1 -map 0:v:1 #{out.dir}/#{out.name}_presentation#{out.suffix}

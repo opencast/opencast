@@ -45,5 +45,4 @@ Tags and flavors can be used in combination. But combined they should match one 
     profile.image-movie.input = image
     profile.image-movie.output = visual
     profile.image-movie.suffix = -image-video.mp4
-    profile.image-movie.mimetype = video/mp4
     profile.image-movie.ffmpeg.command = -loop 1 -i #{in.video.path} -c:v libx264 -r 25 -t #{time} -pix_fmt yuv420p #{out.dir}/#{out.name}#{out.suffix}

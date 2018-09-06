@@ -37,7 +37,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -290,7 +289,6 @@ public class CompositeWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     EasyMock.replay(profile);
 
     // set up mock composer service
