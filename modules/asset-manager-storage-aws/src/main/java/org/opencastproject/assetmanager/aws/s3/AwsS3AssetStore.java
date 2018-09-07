@@ -60,6 +60,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   private static final Logger logger = LoggerFactory.getLogger(AwsS3AssetStore.class);
 
   // Service configuration
+  public static final String AWS_S3_ENABLED = "org.opencastproject.assetmanager.aws.s3.enabled";
   public static final String AWS_S3_ACCESS_KEY_ID_CONFIG = "org.opencastproject.assetmanager.aws.s3.access.id";
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.assetmanager.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.assetmanager.aws.s3.region";
@@ -85,6 +86,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     if (cc != null) {
       @SuppressWarnings("rawtypes")
       Dictionary properties = cc.getProperties();
+
+      boolean enabled = Boolean.parseBoolean(StringUtils.trimToEmpty((String) properties.get(AWS_S3_ENABLED)));
+      if (!enabled) {
+        logger.info("AWS S3 asset store is disabled");
+        return;
+      }
 
       // Store type: "aws-s3"
       storeType = StringUtils.trimToEmpty((String) properties.get(AssetStore.STORE_TYPE_PROPERTY));
