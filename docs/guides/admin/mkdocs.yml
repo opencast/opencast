@@ -121,6 +121,7 @@ pages:
    - Ingest-Download: 'workflowoperationhandlers/ingestdownload-woh.md'
    - Inspect: 'workflowoperationhandlers/inspect-woh.md'
    - Log: 'workflowoperationhandlers/log-woh.md'
+   - Move Storage: 'workflowoperationhandlers/move-storage-woh.md'
    - Multiencode: 'workflowoperationhandlers/multiencode-woh.md'
    - Normalize Audio: 'workflowoperationhandlers/normalizeaudio-woh.md'
    - Partial Import: 'workflowoperationhandlers/partial-import-woh.md'

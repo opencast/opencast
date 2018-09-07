@@ -22,6 +22,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-asset-manager-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -50,7 +55,8 @@
             </Export-Package>
             <Service-Component>
               OSGI-INF/operations/snapshot.xml,
-              OSGI-INF/operations/delete.xml
+              OSGI-INF/operations/delete.xml,
+              OSGI-INF/operations/move-storage.xml
             </Service-Component>
           </instructions>
         </configuration>
