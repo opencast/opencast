@@ -640,7 +640,7 @@ public class EventsEndpoint implements ManagedService {
         } else if ("subject".equals(name)) {
           query.withSubject(value);
         } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
-          // add filters only available with Version 1.1.0 or higher
+          // additional filters only available with Version 1.1.0 or higher
           if ("identifier".equals(name)) {
             query.withIdentifier(value);
           } else if ("title".equals(name)) {
