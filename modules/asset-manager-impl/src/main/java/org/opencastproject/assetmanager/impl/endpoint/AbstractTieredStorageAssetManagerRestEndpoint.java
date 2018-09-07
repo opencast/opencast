@@ -90,13 +90,13 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "id",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The mediapackage ID to move."),
                   @RestParameter(
                           name = "target",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
           reponses = {
@@ -139,19 +139,19 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "id",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The mediapackage ID to move."),
                   @RestParameter(
                           name = "version",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The version to move."),
                   @RestParameter(
                           name = "target",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
           reponses = {
@@ -215,7 +215,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "target",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
           reponses = {
@@ -268,7 +268,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "id",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The mediapackage ID to move."),
                   @RestParameter(
@@ -286,7 +286,7 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
                   @RestParameter(
                           name = "target",
                           isRequired = true,
-                          type = RestParameter.Type.TEXT,
+                          type = RestParameter.Type.STRING,
                           defaultValue = "",
                           description = "The target storage to move the mediapackage to.")},
           reponses = {
