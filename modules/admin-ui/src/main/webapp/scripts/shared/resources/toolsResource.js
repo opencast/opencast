@@ -78,6 +78,12 @@ angular.module('adminNg.resources')
             data.workflows.splice(0, 0, { name: 'No Workflow' });
         }
 
+        // Reasonable default in case there is no information about thumbnails available
+        if (!data.thumbnail) {
+          data.thumbnail = {};
+          data.thumbnail['type'] = "DEFAULT";
+        }
+
         return data;
     };
     return $resource('/admin-ng/tools/:id/:tool.json', { id: '@id' }, {

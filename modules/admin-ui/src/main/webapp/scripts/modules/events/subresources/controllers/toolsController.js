@@ -116,7 +116,8 @@ angular.module('adminNg.controllers')
         $scope.activeTransaction = false;
         $scope.submit = function () {
             $scope.activeTransaction = true;
-            $scope.video.thumbnail.loading = $scope.video.thumbnail.type === 'DEFAULT';
+            $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
+              ($scope.video.thumbnail.type === 'DEFAULT');
             $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
                 $scope.activeTransaction = false;
                 if ($scope.video.workflow) {
