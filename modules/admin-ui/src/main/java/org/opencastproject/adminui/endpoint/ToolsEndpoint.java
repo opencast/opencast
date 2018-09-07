@@ -491,7 +491,7 @@ public class ToolsEndpoint implements ManagedService {
               f("position", thumbnail.getDefaultPosition()),
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
-              f("url", distElement.getURI().toString())))));
+              f("url", signUrl(distElement.getURI().toString()))))));
         } else if (current.isFormField() && "TRACK".equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           if (!"DEFAULT".equalsIgnoreCase(value)) {
@@ -520,7 +520,7 @@ public class ToolsEndpoint implements ManagedService {
         f("type", thumbnailSource.name()),
         f("position", position.getAsDouble()),
         f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", distributedElement.getURI().toString())
+        f("url", signUrl(distributedElement.getURI().toString()))
       ))));
     } catch (IOException | FileUploadException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));
@@ -961,6 +961,25 @@ public class ToolsEndpoint implements ManagedService {
       }
     }
     return segments;
+  }
+
+  private String signUrl(String baseUrl) {
+    if (urlSigningService.accepts(baseUrl)) {
+      logger.trace("URL signing service has accepted '{}'", baseUrl);
+      try {
+        URI signedUrl = new URI(urlSigningService.sign(baseUrl, expireSeconds, null, null));
+        return signedUrl.toString();
+      } catch (URISyntaxException e) {
+        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+      } catch (UrlSigningException e) {
+        logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
+        throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+      }
+    } else {
+      logger.trace("URL signing service did not accept '{}'", baseUrl);
+      return baseUrl;
+    }
   }
 
   /** Provides access to the parsed editing information */
