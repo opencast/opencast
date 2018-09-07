@@ -22,6 +22,7 @@ package org.opencastproject.adminui.impl;
 
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -52,6 +53,7 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_THUMBNAIL_DEFAULT_POSITION = "thumbnail.default.position";
   public static final String OPT_THUMBNAIL_DEFAULT_TRACK_PRIMARY = "thumbnail.default.track.primary";
   public static final String OPT_THUMBNAIL_DEFAULT_TRACK_SECONDARY = "thumbnail.default.track.secondary";
+  public static final String OPT_THUMBNAIL_AUTO_DISTRIBUTION = "thumbnail.auto.distribution";
   public static final String OPT_OAIPMH_CHANNEL = "oaipmh.channel";
   public static final String OPT_SOURCE_TRACK_LEFT_FLAVOR = "sourcetrack.left.flavor";
   public static final String OPT_SOURCE_TRACK_RIGHT_FLAVOR = "sourcetrack.right.flavor";
@@ -70,6 +72,7 @@ public class AdminUIConfiguration implements ManagedService {
   private static final Double DEFAULT_THUMBNAIL_DEFAULT_POSITION = 1.0;
   private static final String DEFAULT_THUMBNAIL_DEFAULT_TRACK_PRIMARY = "presenter";
   private static final String DEFAULT_THUMBNAIL_DEFAULT_TRACK_SECONDARY = "presentation";
+  private static final Boolean DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION = false;
   private static final String DEFAULT_OAIPMH_CHANNEL = "default";
   private static final String DEFAULT_SOURCE_TRACK_LEFT_FLAVOR = "presenter/source";
   private static final String DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR = "presentation/source";
@@ -88,6 +91,7 @@ public class AdminUIConfiguration implements ManagedService {
   private Double thumbnailDefaultPosition = DEFAULT_THUMBNAIL_DEFAULT_POSITION;
   private String thumbnailDefaultTrackPrimary = DEFAULT_THUMBNAIL_DEFAULT_TRACK_PRIMARY;
   private String thumbnailDefaultTrackSecondary = DEFAULT_THUMBNAIL_DEFAULT_TRACK_SECONDARY;
+  private boolean thumbnailAutoDistribution = DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION;
   private String oaipmhChannel = DEFAULT_OAIPMH_CHANNEL;
   private MediaPackageElementFlavor sourceTrackLeftFlavor = MediaPackageElementFlavor.parseFlavor(
     DEFAULT_SOURCE_TRACK_LEFT_FLAVOR);
@@ -148,6 +152,10 @@ public class AdminUIConfiguration implements ManagedService {
 
   public String getThumbnailDefaultTrackSecondary() {
     return thumbnailDefaultTrackSecondary;
+  }
+
+  public boolean getThumbnailAutoDistribution() {
+    return thumbnailAutoDistribution;
   }
 
   public String getOaipmhChannel() {
@@ -238,6 +246,10 @@ public class AdminUIConfiguration implements ManagedService {
     thumbnailDefaultTrackSecondary = StringUtils.defaultString(
       (String) properties.get(OPT_THUMBNAIL_DEFAULT_TRACK_SECONDARY), DEFAULT_THUMBNAIL_DEFAULT_TRACK_SECONDARY);
     logger.debug("Thumbnail default track secondary set to '{}'", thumbnailDefaultTrackSecondary);
+
+    thumbnailAutoDistribution = BooleanUtils.toBoolean(StringUtils.defaultString(
+      (String) properties.get(OPT_THUMBNAIL_AUTO_DISTRIBUTION), DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION.toString()));
+    logger.debug("Thumbnail auto distribution: {}", thumbnailAutoDistribution);
 
     // OAI-PMH channel
     oaipmhChannel = StringUtils.defaultString(

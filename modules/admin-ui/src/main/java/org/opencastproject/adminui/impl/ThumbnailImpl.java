@@ -152,6 +152,8 @@ public final class ThumbnailImpl {
   private URI tempThumbnail;
   private MimeType tempThumbnailMimeType;
 
+  private boolean thumbnailAutoDistribution;
+
   public ThumbnailImpl(final AdminUIConfiguration config, final Workspace workspace,
     final OaiPmhPublicationService oaiPmhPublicationService,
     final ConfigurablePublicationService configurablePublicationService, final AssetManager assetManager,
@@ -174,6 +176,7 @@ public final class ThumbnailImpl {
     this.tempThumbnailId = null;
     this.tempThumbnailMimeType = null;
     this.tempThumbnailFileName = null;
+    this.thumbnailAutoDistribution = config.getThumbnailAutoDistribution();
   }
 
   private Optional<Attachment> getThumbnailPreviewForMediaPackage(final MediaPackage mp) {
@@ -243,8 +246,10 @@ public final class ThumbnailImpl {
 
       final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, true);
       deletionUris.add(internalPublicationResult.getA());
-      deletionUris.add(updateExternalPublication(mp, trackFlavor));
-      deletionUris.add(updateOaiPmh(mp, trackFlavor));
+      if (thumbnailAutoDistribution) {
+        deletionUris.add(updateExternalPublication(mp, trackFlavor));
+        deletionUris.add(updateOaiPmh(mp, trackFlavor));
+      }
 
       assetManager.takeSnapshot(mp);
 
@@ -435,8 +440,10 @@ public final class ThumbnailImpl {
 
       final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, false);
       deletionUris.add(internalPublicationResult.getA());
-      deletionUris.add(updateExternalPublication(mp, track.getFlavor()));
-      deletionUris.add(updateOaiPmh(mp, track.getFlavor()));
+      if (thumbnailAutoDistribution) {
+        deletionUris.add(updateExternalPublication(mp, track.getFlavor()));
+        deletionUris.add(updateOaiPmh(mp, track.getFlavor()));
+      }
 
       assetManager.takeSnapshot(mp);
 
