@@ -30,6 +30,7 @@ The Opencast AWS S3 Archive service has four configuration keys which can be fou
 `org.opencastproject.assetmanager.aws.s3.AwsS3ArchiveElementStore.cfg` configuration file.
 
 |Key name|Value|Example|
+|:--------|:-----|:-------:|
 |org.opencastproject.archive.aws.s3.region|The AWS region to set|us-west-2|
 |org.opencastproject.archive.aws.s3.bucket|The S3 bucket name|example-org-archive|
 |org.opencastproject.archive.aws.s3.access.id|Your access ID|20 alphanumeric characters|
