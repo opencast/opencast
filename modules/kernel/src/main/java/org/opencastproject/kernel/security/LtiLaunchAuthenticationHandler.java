@@ -108,6 +108,18 @@ public class LtiLaunchAuthenticationHandler
   }
 
   /**
+   * Constructor for a LTI authentication handler that includes a list of highly trusted keys
+   *
+   * @param userDetailsService
+   * @param highlyTrustedkeys
+   */
+  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
+          List<String> highlyTrustedkeys) {
+    this(userDetailsService, securityService, highlyTrustedkeys, "^(admin|opencast_system_account)$");
+    logger.warn("No untrusted users pattern configured - using default \"" + this.untrustedUsersPattern + "\"");
+  }
+
+  /**
    * Full constructor for a LTI authentication handler that includes a list of highly trusted keys with exceptions.
    *
    * @param userDetailsService
