@@ -1,8 +1,8 @@
-[img_select_events]: media/img/select_events.png
-[img_confirm_events]: media/img/confirm_events.png
-[img_offload_task]: media/img/offload_task.png
-[img_offload_s3_1]: media/img/offload_s3_1.png
-[img_offload_s3_2]: media/img/offload_s3_2.png
+[img_select_events]: ../media/img/select_events.png
+[img_confirm_events]: ../media/img/confirm_events.png
+[img_offload_task]: ../media/img/offload_task.png
+[img_offload_s3_1]: ../media/img/offload_s3_1.png
+[img_offload_s3_2]: ../media/img/offload_s3_2.png
 
 # Offloading to S3
 

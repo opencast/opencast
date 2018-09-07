@@ -1,8 +1,8 @@
-[img_select_events]: media/img/select_events.png
-[img_confirm_events]: media/img/confirm_events.png
-[img_restore_task]: media/img/restore_task.png
-[img_restore_1]: media/img/restore_1.png
-[img_restore_2]: media/img/restore_2.png
+[img_select_events]: ../media/img/select_events.png
+[img_confirm_events]: ../media/img/confirm_events.png
+[img_restore_task]: ../media/img/restore_task.png
+[img_restore_1]: ../media/img/restore_1.png
+[img_restore_2]: ../media/img/restore_2.png
 
 # Restoring to local storage
 
