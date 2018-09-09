@@ -376,6 +376,17 @@ public class SeriesServiceImplTest {
   }
 
   @Test
+  public void testACLEquality5() {
+    AccessControlList a = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), false));
+    assertFalse(AccessControlUtil.equals(a, b));
+  }
+
+  @Test
   public void testSeriesElements() throws Exception {
     seriesService.updateSeries(testCatalog);
     final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);

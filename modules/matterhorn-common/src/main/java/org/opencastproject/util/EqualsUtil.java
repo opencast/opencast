@@ -25,6 +25,7 @@ package org.opencastproject.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Utility function helping to implement equality. */
 public final class EqualsUtil {
@@ -53,7 +54,12 @@ public final class EqualsUtil {
 
   /** Compare the elements of two lists for equality treating the lists as sets. */
   public static boolean eqListUnsorted(List<?> as, List<?> bs) {
-    if (as != null && bs != null && as.size() == bs.size()) {
+    if (as != null && bs != null) {
+      as = as.stream().distinct().collect(Collectors.toList());
+
+      if (as.size() != bs.size()) {
+        return false;
+      }
       for (Object a : as) {
         if (!bs.contains(a))
           return false;
