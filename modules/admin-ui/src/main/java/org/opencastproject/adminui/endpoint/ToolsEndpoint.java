@@ -180,8 +180,17 @@ public class ToolsEndpoint implements ManagedService {
   /** The Json key for the tracks array. */
   private static final String TRACKS_KEY = "tracks";
 
+  /** The Json key for the default thumbnail position. */
+  private static final String DEFAULT_THUMBNAIL_POSITION_KEY = "defaultThumbnailPosition";
+
   /** Tag that marks workflow for being used from the editor tool */
   private static final String EDITOR_WORKFLOW_TAG = "editor";
+
+  /** Field names in thumbnail request. */
+  private static final String THUMBNAIL_FILE = "FILE";
+  private static final String THUMBNAIL_TRACK = "TRACK";
+  private static final String THUMBNAIL_POSITION = "POSITION";
+  private static final String THUMBNAIL_DEFAULT = "DEFAULT";
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
@@ -431,11 +440,13 @@ public class ToolsEndpoint implements ManagedService {
     final List<JValue> sourceTracks = Arrays.stream(mp.getTracks(sourceTracksFlavor))
           .map(MediaPackageElement::getFlavor)
           .map(e -> {
-            String side = null;
+            String side;
             if (e.equals(this.adminUIConfiguration.getSourceTrackLeftFlavor())) {
               side = "left";
             } else if (e.equals(this.adminUIConfiguration.getSourceTrackRightFlavor())) {
               side = "right";
+            } else {
+              side = "unknown";
             }
             return obj(f("flavor", obj(f("type" ,e.getType()), f("subtype", e.getSubtype()))), f("side", side));
           })
@@ -484,7 +495,7 @@ public class ToolsEndpoint implements ManagedService {
       final FileItemIterator iter = new ServletFileUpload().getItemIterator(request);
       while (iter.hasNext()) {
         final FileItemStream current = iter.next();
-        if (!current.isFormField() && "FILE".equalsIgnoreCase(current.getFieldName())) {
+        if (!current.isFormField() && THUMBNAIL_FILE.equalsIgnoreCase(current.getFieldName())) {
           final MediaPackageElement distElement = thumbnail.upload(mp, current.openStream(), current.getContentType());
           return RestUtils.okJson(obj(f("thumbnail",
             obj(
@@ -492,12 +503,12 @@ public class ToolsEndpoint implements ManagedService {
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
               f("url", signUrl(distElement.getURI().toString()))))));
-        } else if (current.isFormField() && "TRACK".equalsIgnoreCase(current.getFieldName())) {
+        } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
-          if (!"DEFAULT".equalsIgnoreCase(value)) {
+          if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
             track = Optional.of(value);
           }
-        } else if (current.isFormField() && "POSITION".equalsIgnoreCase(current.getFieldName())) {
+        } else if (current.isFormField() && THUMBNAIL_POSITION.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           position = OptionalDouble.of(Double.parseDouble(value));
         }
@@ -1027,7 +1038,7 @@ public class ToolsEndpoint implements ManagedService {
       }
 
       OptionalDouble defaultThumbnailPosition = OptionalDouble.empty();
-      final Object defaultThumbnailPositionObj = obj.get("defaultThumbnailPosition");
+      final Object defaultThumbnailPositionObj = obj.get(DEFAULT_THUMBNAIL_POSITION_KEY);
       if (defaultThumbnailPositionObj != null) {
         defaultThumbnailPosition = OptionalDouble.of(Double.parseDouble(defaultThumbnailPositionObj.toString()));
       }

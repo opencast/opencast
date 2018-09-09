@@ -21,6 +21,7 @@
 package org.opencastproject.publication.oaipmh.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.publication.api.OaiPmhPublicationService.SEPARATOR;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -72,7 +73,6 @@ public class OaiPmhPublicationRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhPublicationRestService.class);
-  private static final String SEPARATOR = ";;";
   private static final Pattern SEPARATE_PATTERN = Pattern.compile(SEPARATOR);
 
   /** The OAI-PMH publication service */

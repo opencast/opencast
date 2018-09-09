@@ -58,7 +58,6 @@ public class OaiPmhPublicationServiceRemoteImpl extends RemoteBase implements Oa
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhPublicationServiceRemoteImpl.class);
-  private static final String SEPARATOR = ";;";
 
   public OaiPmhPublicationServiceRemoteImpl() {
     super(JOB_TYPE);

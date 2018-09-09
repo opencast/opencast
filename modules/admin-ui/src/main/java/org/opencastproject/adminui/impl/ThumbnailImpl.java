@@ -369,7 +369,7 @@ public final class ThumbnailImpl {
     final Collection<MediaPackageElement> addElements = Collections.singleton(attachment);
     final Set<String> removeElementsIds = Arrays.stream(pub.getAttachments()).filter(priorFilter)
       .map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
-    final Publication newPublication = replaceIgnoreExceptions(mp, channelId, addElements, removeElementsIds);
+    final Publication newPublication = this.configurablePublicationService.replaceSync(mp, channelId, addElements, removeElementsIds);
     mp.remove(pub);
     mp.add(newPublication);
     //noinspection ConstantConditions
@@ -416,13 +416,6 @@ public final class ThumbnailImpl {
 
   private Optional<Publication> getPublication(final MediaPackage mp, final String channelId) {
     return Arrays.stream(mp.getPublications()).filter(p -> p.getChannel().equalsIgnoreCase(channelId)).findAny();
-  }
-
-  private Publication replaceIgnoreExceptions(final MediaPackage mp, final String channelId,
-    final Collection<? extends MediaPackageElement> addElements, final Set<String> retractElementIds)
-    throws MediaPackageException, PublicationException {
-
-    return this.configurablePublicationService.replaceSync(mp, channelId, addElements, retractElementIds);
   }
 
   private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)

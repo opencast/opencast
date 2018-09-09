@@ -47,6 +47,11 @@ public interface OaiPmhPublicationService {
   String PUBLICATION_CHANNEL_PREFIX = "oaipmh-";
 
   /**
+   * Separator used to separate strings when serializing arrays of strings.
+   */
+  String SEPARATOR = ";;";
+
+  /**
    * Publishes some media package elements.
    * 
    * @param mediaPackage

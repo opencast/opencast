@@ -20,7 +20,7 @@
         description="Applying default configuration values">
         <configurations>
           <configuration key="thumbnailType">0</configuration>
-          <configuration key="thumbnailPosition">1</configuration>  
+          <configuration key="thumbnailPosition">1</configuration>
         </configurations>
       </operation>
 

@@ -88,8 +88,6 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(OaiPmhPublicationServiceImpl.class);
 
-  public static final String SEPARATOR = ";;";
-
   public enum Operation {
     Publish, Retract, UpdateMetadata, Replace
   }
