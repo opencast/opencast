@@ -359,7 +359,7 @@ workflows for further processing as media package attachment with a configurable
 
 If you need another flavor for the thumbnail in your specific environment, be sure to adapt the value of
 `thumbnail.source.flavor.type` and `thumbnail.source.flavor.subtype` in `etc/org.opencastproject.adminui.cfg`
-so that the Admin UI addes the thumbnail images with the expected flavour.
+so that the Admin UI adds the thumbnail images with the expected flavour.
 
 ### Snapshot Thumbnail
 

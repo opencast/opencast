@@ -13,7 +13,7 @@
     <operation
         id="analyze-tracks"
         exception-handler-workflow="partial-error"
-        description="Analyze tracks in media package an set control variables">
+        description="Analyze tracks in media package a set control variables">
       <configurations>
         <configuration key="source-flavor">*/work</configuration>
       </configurations>
