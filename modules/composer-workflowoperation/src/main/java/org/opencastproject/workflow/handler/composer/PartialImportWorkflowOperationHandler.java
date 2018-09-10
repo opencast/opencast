@@ -32,7 +32,6 @@ import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
@@ -44,10 +43,9 @@ import org.opencastproject.mediapackage.MediaPackageSupport.Filters;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
-import org.opencastproject.mediapackage.selector.CatalogSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
@@ -61,7 +59,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.android.mms.dom.smil.parser.SmilXmlParser;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
@@ -78,6 +75,7 @@ import org.w3c.dom.smil.SMILDocument;
 import org.w3c.dom.smil.SMILElement;
 import org.w3c.dom.smil.SMILMediaElement;
 import org.w3c.dom.smil.SMILParElement;
+import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -85,7 +83,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -233,7 +230,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     // read config options
     final Opt<String> presenterFlavor = getOptConfig(operation, SOURCE_PRESENTER_FLAVOR);
     final Opt<String> presentationFlavor = getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR);
-    final String smilFlavor = getConfig(operation, SOURCE_SMIL_FLAVOR);
+    final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(getConfig(operation, SOURCE_SMIL_FLAVOR));
     final String concatEncodingProfile = getConfig(operation, CONCAT_ENCODING_PROFILE);
     final Opt<String> concatOutputFramerate = getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE);
     final String trimEncodingProfile = getConfig(operation, TRIM_ENCODING_PROFILE);
@@ -296,7 +293,12 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     // flavor_type -> job
     final Map<String, Job> jobs = new HashMap<String, Job>();
     // get SMIL catalog
-    final SMILDocument smilDocument = getSmilDocumentFromMediaPackage(mediaPackage, smilFlavor);
+    final SMILDocument smilDocument;
+    try {
+      smilDocument = SmilUtil.getSmilDocumentFromMediaPackage(mediaPackage, smilFlavor, workspace);
+    } catch (SAXException e) {
+      throw new WorkflowOperationException(e);
+    }
     final SMILParElement parallel = (SMILParElement) smilDocument.getBody().getChildNodes().item(0);
     final NodeList sequences = parallel.getTimeChildren();
     final float trackDurationInSeconds = parallel.getDur();
@@ -649,39 +651,6 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new WorkflowOperationException(format("Target %s flavor '%s' is malformed", flavorType, flavor));
     }
     return targetFlavor;
-  }
-
-  private SMILDocument getSmilDocumentFromMediaPackage(MediaPackage mp, String smilFlavor)
-          throws WorkflowOperationException {
-    final AbstractMediaPackageElementSelector<Catalog> smilSelector = new CatalogSelector();
-    try {
-      smilSelector.addFlavor(MediaPackageElementFlavor.parseFlavor(smilFlavor));
-    } catch (IllegalArgumentException e) {
-      throw new WorkflowOperationException("Smil flavor '" + smilFlavor + "' is malformed");
-    }
-    final Collection<Catalog> smilCatalog = smilSelector.select(mp, false);
-    if (smilCatalog.size() == 1) {
-      return getSmilDocument(smilCatalog.iterator().next());
-    } else {
-      logger.error("More or less than one smil catalog found: {}", smilCatalog);
-      throw new WorkflowOperationException("More or less than one smil catalog found!");
-    }
-  }
-
-  /** Get the SMIL document from a catalog. */
-  private SMILDocument getSmilDocument(final Catalog smilCatalog) throws WorkflowOperationException {
-    FileInputStream in = null;
-    try {
-      File smilXmlFile = workspace.get(smilCatalog.getURI());
-      SmilXmlParser smilParser = new SmilXmlParser();
-      in = new FileInputStream(smilXmlFile);
-      return smilParser.parse(in);
-    } catch (Exception e) {
-      logger.error("Unable to parse smil catalog {}! {}", smilCatalog.getURI(), e);
-      throw new WorkflowOperationException(e);
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
   }
 
   /** Create a derived audio flavor by appending {@link #FLAVOR_AUDIO_SUFFIX} to the flavor type. */

@@ -203,6 +203,28 @@ public abstract class AbstractJobProducer implements JobProducer {
     }
   }
 
+
+  /**
+   * Private utility to update and optionally fail job, called from a finally block.
+   *
+   * @param job
+   *          to be updated, may be null
+   */
+  protected void finallyUpdateJob(Job job)  {
+    if (job == null) {
+      return;
+    }
+
+    if (!Job.Status.FINISHED.equals(job.getStatus())) {
+      job.setStatus(Job.Status.FAILED);
+    }
+    try {
+      getServiceRegistry().updateJob(job);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   /** Shorthand for {@link #getServiceRegistry()}.incident() */
   public Incidents incident() {
     return getServiceRegistry().incident();

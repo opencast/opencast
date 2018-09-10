@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.Opt.some;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
@@ -63,6 +62,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /** Test class for {@link ToolsEndpoint} */
@@ -264,7 +264,7 @@ public class ToolsEndpointTest {
     final List<String> tracks = editingInfo.getConcatTracks();
     assertEquals(1, tracks.size());
 
-    assertEquals(some("cut-workflow"), editingInfo.getPostProcessingWorkflow());
+    assertEquals(Optional.of("cut-workflow"), editingInfo.getPostProcessingWorkflow());
   }
 
   /** Test method for {@link ToolsEndpoint#addSmilToArchive(org.opencastproject.mediapackage.MediaPackage, Smil)} */

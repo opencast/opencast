@@ -20,6 +20,7 @@
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
+        <configuration key="thumbnailType">0</configuration>
       </configurations>
     </operation>
 

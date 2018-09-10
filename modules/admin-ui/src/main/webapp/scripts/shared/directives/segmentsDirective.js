@@ -138,6 +138,7 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
                 if (scope.isRemovalAllowed(segment)) {
                     segment.deleted = !segment.deleted;
+                    scope.$root.$broadcast("segmentToggled");
                 }
             };
 
@@ -182,15 +183,52 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
             scope.$root.$on("segmentTimesUpdated", function () {
               scope.setHumanReadableTimes();
               scope.$parent.setChanges(scope.segmentsChanged());
+              scope.video.thumbnail.defaultThumbnailPositionChanged = scope.defaultThumbnailPositionChanged();
+            });
+
+            scope.$root.$on("segmentToggled", function () {
+              scope.$parent.setChanges(scope.segmentsChanged());
+              scope.video.thumbnail.defaultThumbnailPositionChanged = scope.defaultThumbnailPositionChanged();
             });
 
             scope.segmentsChanged = function() {
-                if (scope.video.segments.length !== scope.originalSegments.length) return true;
-                return !scope.originalSegments.every(function(curr, idx) {
+                if (scope.video.segments.length !== scope.$root.originalSegments.length) return true;
+                return !scope.$root.originalSegments.every(function(curr, idx) {
                   return curr.start === scope.video.segments[idx].start
                       && curr.end === scope.video.segments[idx].end
-                      && curr.selected === scope.video.segments[idx].selected;
+                      && !curr.deleted === !scope.video.segments[idx].deleted;
                 });
+            };
+
+            scope.defaultThumbnailPositionChanged = function () {
+              if (!scope.video.thumbnail || !scope.video.thumbnail.type === 'DEFAULT') {
+                return false;
+              }
+              var currentPosition = scope.$root.calculateDefaultThumbnailPosition(scope.video.segments, scope.video.thumbnail);
+              var result = Math.abs(currentPosition - scope.$root.originalDefaultThumbnailPosition) > 0.001;
+              if (result) {
+                 scope.video.thumbnail.position = currentPosition;
+              }
+              return result;
+            };
+
+            // Position of the the default thumbnail within the uncut "source" video has to change upon cutting
+            scope.$root.calculateDefaultThumbnailPosition = function (segments, thumbnail) {
+              var duration = 0;
+              for (var idx = 0; idx < segments.length; idx++) {
+                var segment = segments[idx];
+                if (segment.deleted) {
+                  continue;
+                }
+                var start = segment.start / 1000.0;
+                var end = segment.end / 1000.0;
+                var segmentDuration = end - start;
+                if (duration + segmentDuration > thumbnail.defaultPosition) {
+                  return start + thumbnail.defaultPosition - duration;
+                }
+                duration += segmentDuration;
+              }
+              return thumbnail.defaultPosition;
             };
 
             /**
@@ -314,7 +352,13 @@ function (PlayerAdapter, $document, VideoService, $timeout) {
 
             scope.video.$promise.then(function () {
               // Take a snapshot of the original segments to track if we have changes
-              scope.originalSegments = angular.copy(scope.video.segments);
+              scope.$root.originalSegments = angular.copy(scope.video.segments);
+
+              // In case the default thumbnail is used, store the original position, to be able to check if the
+              // thumbnail position has to be adjusted when cutting changes
+              if (scope.video.thumbnail && scope.video.thumbnail.type === 'DEFAULT') {
+                scope.$root.originalDefaultThumbnailPosition = scope.video.thumbnail.position;
+              }
 
               scope.$root.$broadcast("segmentTimesUpdated");
             });

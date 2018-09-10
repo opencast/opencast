@@ -63,6 +63,8 @@ public interface Publication extends MediaPackageElement {
    */
   void addAttachment(Attachment attachment);
 
+  void removeAttachmentById(String attachmentId);
+
   /**
    * Returns the catalogs associated with this publication.
    *

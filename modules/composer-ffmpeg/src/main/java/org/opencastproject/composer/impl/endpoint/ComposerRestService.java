@@ -396,6 +396,57 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   }
 
   /**
+   * Encodes a track in a media package.
+   *
+   * @param sourceTrackXml
+   *          The source track
+   * @param profileId
+   *          The profile to use in encoding this track
+   * @param times
+   *          one or more times in seconds separated by comma
+   * @return A {@link Response} with the resulting track in the response body
+   * @throws Exception
+   */
+  @POST
+  @Path("imagesync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "imagesync", description = "Synchronously extracts an image, based on the specified encoding profile ID and the source track", restParameters = {
+      @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+      @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http"),
+      @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = false, name = "time", type = Type.STRING)}, reponses = {
+      @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "The extracted image")
+  public Response imageSync(@FormParam("sourceTrack") String sourceTrackXml, @FormParam("profileId") String profileId,
+                        @FormParam("time") String times) throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceTrackXml) || StringUtils.isBlank(profileId) || StringUtils.isBlank(times)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack, times, and profileId must not be null").build();
+    }
+
+    // Deserialize the source track
+    MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(sourceTrackXml);
+    if (!Track.TYPE.equals(sourceTrack.getElementType())) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceTrack element must be of type track").build();
+    }
+
+    double[] timeArray = null;
+    // parse time codes
+    try {
+      timeArray = parseTimeArray(times);
+    } catch (Exception e) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("could not parse times: invalid format").build();
+    }
+
+    try {
+      List<Attachment> result = composerService.imageSync((Track) sourceTrack, profileId, timeArray);
+      return Response.ok().entity(MediaPackageElementParser.getArrayAsXml(result)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to extract image(s): " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
    * Compose two videos into one with an optional watermark.
    *
    * @param compositeSizeJson
@@ -757,6 +808,44 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to encode the track: ", e);
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  /**
+   * Synchronously converts an image to another format.
+   *
+   * @param sourceImageXml
+   *          The source image
+   * @param profileId
+   *          The profile to use in image conversion
+   * @return A {@link Response} with the resulting image in the response body
+   * @throws Exception
+   */
+  @POST
+  @Path("convertimagesync")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "convertimagesync", description = "Synchronously converts an image, based on the specified encoding profile ID and the source image", restParameters = {
+      @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
+      @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
+      @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response convertImageSync(@FormParam("sourceImage") String sourceImageXml, @FormParam("profileId") String profileId)
+      throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(sourceImageXml) || StringUtils.isBlank(profileId))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage and profileId must not be null").build();
+
+    // Deserialize the source track
+    MediaPackageElement sourceImage = MediaPackageElementParser.getFromXml(sourceImageXml);
+    if (!Attachment.TYPE.equals(sourceImage.getElementType()))
+      return Response.status(Response.Status.BAD_REQUEST).entity("sourceImage element must be of type track").build();
+
+    try {
+      Attachment result = composerService.convertImageSync((Attachment) sourceImage, profileId);
+      return Response.ok().entity(MediaPackageElementParser.getAsXml(result)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to convert image: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

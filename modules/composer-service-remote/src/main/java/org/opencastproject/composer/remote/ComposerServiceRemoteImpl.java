@@ -40,6 +40,7 @@ import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.util.data.Option;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -52,12 +53,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
@@ -262,6 +265,36 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
             + " using the remote composer service proxy");
   }
 
+  @Override
+  public List<Attachment> imageSync(Track sourceTrack, String profileId, double... times) throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/imagesync");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      params.add(new BasicNameValuePair("time", buildTimeArray(times)));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        final String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
+        return MediaPackageElementParser.getArrayFromXml(xml)
+            .stream().map(e -> (Attachment)e)
+            .collect(Collectors.toList());
+      }
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to compose an image from track " + sourceTrack
+        + " using the remote composer service proxy");
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -322,6 +355,32 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
         Job r = JobParser.parseJob(response.getEntity().getContent());
         logger.info("Image conversion job {} started on a remote composer", r.getId());
         return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to convert image at " + image + " using the remote composer service proxy");
+  }
+
+  @Override
+  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/convertimagesync");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      post.setEntity(new UrlEncodedFormEntity(params));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        final String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
+        return (Attachment) MediaPackageElementParser.getFromXml(xml);
       }
     } catch (Exception e) {
       throw new EncoderException(e);

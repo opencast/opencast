@@ -35,6 +35,9 @@
     "flavor": "presenter\/video",
     "mimetype": "video\/mpeg"
   }],
+  "thumbnail": {
+    "type": "DEFAULT"
+  },
   "segments": [{
     "start": 0,
     "end": 17003

@@ -530,6 +530,7 @@ function (AuthService, PlayerAdapter, $document, VideoService, $timeout) {
 
                 segment.deleted = !segment.deleted;
                 scope.setWrapperClasses();
+                scope.$root.$broadcast("segmentToggled");
             };
 
             /**

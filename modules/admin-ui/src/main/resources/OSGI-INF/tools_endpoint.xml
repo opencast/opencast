@@ -25,6 +25,11 @@
              interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
              name="AdminUISearchIndex"
              policy="static"/>
+  <reference bind="setComposerService"
+             cardinality="1..1"
+             interface="org.opencastproject.composer.api.ComposerService"
+             name="composerService"
+             policy="static"/>
   <reference bind="setIndexService"
              cardinality="1..1"
              interface="org.opencastproject.index.service.api.IndexService"
@@ -59,5 +64,15 @@
              cardinality="1..1"
              interface="org.opencastproject.workflow.api.WorkflowService"
              name="WorkflowService"
+             policy="static"/>
+  <reference bind="setOaiPmhPublicationService"
+             cardinality="1..1"
+             interface="org.opencastproject.publication.api.OaiPmhPublicationService"
+             name="oaiPmhPublicationService"
+             policy="static"/>
+  <reference bind="setConfigurablePublicationService"
+             cardinality="1..1"
+             interface="org.opencastproject.publication.api.ConfigurablePublicationService"
+             name="configurablePublicationService"
              policy="static"/>
 </scr:component>
