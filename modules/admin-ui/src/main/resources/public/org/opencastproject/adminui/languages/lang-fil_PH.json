@@ -886,6 +886,15 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Ang Pagpapatakbo",
+                  "PAUSED": "Natigil",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Ang nabigo",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "Mga operasyon",
                "INCIDENTS": "Mga insidente"
             }
+         },
+         "STATUS": {
+            "QUEUED": "I-queued",
+            "PAUSED": "Natigil",
+            "RUNNING": "Ang Pagpapatakbo",
+            "FINISHED": "Tapos na",
+            "FAILED": "Ang nabigo",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Ang paghihintay"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Ang karaniwan",
+            "WARNING": "Babala",
+            "ERROR": "Ang mali"
          }
       }
    },

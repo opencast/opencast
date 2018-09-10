@@ -886,6 +886,15 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "運行中",
+                  "PAUSED": "暫停",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "失敗",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "操作",
                "INCIDENTS": "事故"
             }
+         },
+         "STATUS": {
+            "QUEUED": "已排入佇列",
+            "PAUSED": "暫停",
+            "RUNNING": "運行中",
+            "FINISHED": "已完成",
+            "FAILED": "失敗",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "等待中"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "正常",
+            "WARNING": "警告",
+            "ERROR": "錯誤"
          }
       }
    },

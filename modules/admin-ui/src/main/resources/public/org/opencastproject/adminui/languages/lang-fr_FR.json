@@ -886,6 +886,15 @@
                   "ABORT": "Interrompre l'exécution de l'instance du flux de travail (ne réessayez pas l'opération ayant échoué)",
                   "RETRY": "Réessayer l'exécution de l'instance du flux de travail",
                   "DELETE": "Supprimer l’instance du flux de travail"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Traitement en cours",
+                  "PAUSED": "Suspendu",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Echoué",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "Opérations",
                "INCIDENTS": "Incidents"
             }
+         },
+         "STATUS": {
+            "QUEUED": "En attente",
+            "PAUSED": "Suspendu",
+            "RUNNING": "Traitement en cours",
+            "FINISHED": "Terminé",
+            "FAILED": "Echoué",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "En Attente"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Désinfecter le service (remettre le service à l'état normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Avertissement",
+            "ERROR": "Erreur"
          }
       }
    },

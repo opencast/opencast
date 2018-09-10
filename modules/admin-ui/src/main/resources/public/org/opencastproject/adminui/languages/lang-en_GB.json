@@ -886,6 +886,15 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Running",
+                  "PAUSED": "Paused",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Failed",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "Operations",
                "INCIDENTS": "Incidents"
             }
+         },
+         "STATUS": {
+            "QUEUED": "Queued",
+            "PAUSED": "Paused",
+            "RUNNING": "Running",
+            "FINISHED": "Finished",
+            "FAILED": "Failed",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Waiting"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Warning",
+            "ERROR": "Error"
          }
       }
    },

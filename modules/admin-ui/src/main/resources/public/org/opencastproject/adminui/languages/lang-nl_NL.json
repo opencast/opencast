@@ -886,6 +886,15 @@
                   "ABORT": "Uitvoering van de workflow instantie afbreken (mislukte bewerking niet opnieuw proberen)",
                   "RETRY": "Uitvoering van de workflow instantie opnieuw proberen",
                   "DELETE": "Werkstroom instantie verwijderen"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "In uitvoering",
+                  "PAUSED": "Gepauseerd",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Mislukt",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "Operaties",
                "INCIDENTS": "Incidenten"
             }
+         },
+         "STATUS": {
+            "QUEUED": "In wachtrij",
+            "PAUSED": "Gepauseerd",
+            "RUNNING": "In uitvoering",
+            "FINISHED": "Voltooid",
+            "FAILED": "Mislukt",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Wachtend"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize dienst (zet dienst terug naar staat normaal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normaal",
+            "WARNING": "Let op",
+            "ERROR": "Fout"
          }
       }
    },

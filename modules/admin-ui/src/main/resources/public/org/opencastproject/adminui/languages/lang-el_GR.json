@@ -886,6 +886,15 @@
                   "ABORT": "Ματαίωση της εκτέλεσης της εν ενεργεία ροής εργασίας (να μην επαναληφθεί η αποτυχημένη λειτουργία ξανά)",
                   "RETRY": "Επανάληψη εκτέλεσης της εν ενεργεία ροής εργασίας",
                   "DELETE": "Διαγραφή ροής εργασίας"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Εκτελείται",
+                  "PAUSED": "Σε παύση",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Απέτυχε",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1641,6 +1650,19 @@
                "OPERATIONS": "Λειτουργίες",
                "INCIDENTS": "Περιστατικά"
             }
+         },
+         "STATUS": {
+            "QUEUED": "Στην ουρά",
+            "PAUSED": "Σε παύση",
+            "RUNNING": "Εκτελείται",
+            "FINISHED": "Ολοκληρώθηκε",
+            "FAILED": "Απέτυχε",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Αναμονή"
          }
       },
       "SERVERS": {
@@ -1676,6 +1698,11 @@
             "TOOLTIP": {
                "SANITIZE": "Επανεκκίνηση υπηρεσίας ( ορίζει την υπηρεσία στην κανονική κατάσταση)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Κανονική",
+            "WARNING": "Προειδοποίηση",
+            "ERROR": "Σφάλμα"
          }
       }
    },
