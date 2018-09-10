@@ -3,7 +3,7 @@
 
   <feature name="query-dsl">
     <bundle>mvn:com.google.guava/guava/18.0</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
+    <bundle>mvn:joda-time/joda-time/2.10</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-sql/3.6.5</bundle>
