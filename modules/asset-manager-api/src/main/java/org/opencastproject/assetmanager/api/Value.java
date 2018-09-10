@@ -69,7 +69,7 @@ public abstract class Value {
   }
 
   /** Get the wrapped value. */
-  protected abstract Object get();
+  public abstract Object get();
 
   /**
    * Get the wrapped value in a type safe way. Use this method if you are
