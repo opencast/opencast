@@ -2,9 +2,24 @@
   "name": "paella-opencast",
   "private": true,
   "devDependencies": {
+    "glob-all": "^3.1.0",
     "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-connect": "^3.1.0",
+    "gulp-flatten": "^0.3.1",
+    "gulp-less": "^3.1.0",
+    "gulp-merge-json": "^0.3.0",
+    "gulp-nightwatch": "^0.3.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-sourcemaps": "^1.6.0",
     "merge-stream": "^1.0.1",
-    "paellaplayer": "github:polimediaupv/paella#5.2.13"
+    "traceur": "0.0.111",
+    "gulp-traceur": "^0.17.2",
+    "gulp-uglify-es": "^1.0.0",
+    "gulp-minify": "^1.0.0",
+    "run-sequence": "^1.2.2",
+    "nightwatch": "^0.9.14",
+    "paellaplayer": "github:polimediaupv/paella#5.3.10"
   }
 }
