@@ -52,7 +52,7 @@ public final class EqualsUtil {
     return bothNotNull(a, b) && a.getClass().equals(b.getClass());
   }
 
-  /** Compare the elements of two lists for equality treating the lists as sets. */
+  /** Compare the (distinct) elements of two lists for equality treating the lists as sets. */
   public static boolean eqListUnsorted(List<?> as, List<?> bs) {
     if (as == null || bs == null) {
       return eqObj(as, bs);
