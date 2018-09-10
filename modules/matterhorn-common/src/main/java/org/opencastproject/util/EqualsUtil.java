@@ -54,20 +54,22 @@ public final class EqualsUtil {
 
   /** Compare the elements of two lists for equality treating the lists as sets. */
   public static boolean eqListUnsorted(List<?> as, List<?> bs) {
-    if (as != null && bs != null) {
-      as = as.stream().distinct().collect(Collectors.toList());
-
-      if (as.size() != bs.size()) {
-        return false;
-      }
-      for (Object a : as) {
-        if (!bs.contains(a))
-          return false;
-      }
-      return true;
-    } else {
+    if (as == null || bs == null) {
       return eqObj(as, bs);
     }
+
+    as = as.stream().distinct().collect(Collectors.toList());
+    bs = bs.stream().distinct().collect(Collectors.toList());
+
+    if (as.size() != bs.size()) {
+      return false;
+    }
+    for (Object a : as) {
+      if (!bs.contains(a))
+        return false;
+    }
+
+    return true;
   }
 
   /**
