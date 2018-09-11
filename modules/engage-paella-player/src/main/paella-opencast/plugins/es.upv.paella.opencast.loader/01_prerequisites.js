@@ -79,20 +79,30 @@ class Opencast {
     return this.getEpisode()
     .then(function(episode) {
       return new Promise((resolve, reject)=>{
-        var serie = episode.mediapackage.series;
-        if (serie != undefined) {
-          base.ajax.get({url:'/series/'+serie+'.json'},
-            function(data,contentType,code) {
-              self._series = data;
-              resolve(self._series);
-            },
-            function(data, contentType, code) {
-              reject();
-            }
-          );
-        }
-        else {
-          reject();
+        if (self._series) {
+	  resolve(self.series);
+	}
+	else {
+          var serie = episode.mediapackage.series;
+          if (serie != undefined) {
+            base.ajax.get({url:'/search/series.json', params:{'id': serie}},
+              function(data, contentType, code) {
+                if (data['search-results'].result) {
+                  self._series = data['search-results'].result;
+                  resolve(self._series);
+                }
+                else {
+                  reject();
+                }
+              },
+              function(data, contentType, code) {
+                reject();
+              }
+            );
+          }
+          else {
+            reject();
+          }
         }
       });
     });
