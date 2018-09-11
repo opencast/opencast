@@ -79,13 +79,14 @@ public class LanguageServiceEndpoint implements ManagedService {
   /** OSGi callback if properties file is present */
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    excludedLocales = new HashSet<>();
     if (properties == null) {
       logger.info("No configuration available, using defaults");
       return;
     }
 
     String excludes = StringUtils.trimToEmpty((String) properties.get(EXCLUDE_CONFIG_KEY));
-    excludedLocales = new HashSet<>(Arrays.asList(excludes.split(",")));
+    excludedLocales.addAll(Arrays.asList(StringUtils.split(excludes, ", ")));
   }
 
   @GET
