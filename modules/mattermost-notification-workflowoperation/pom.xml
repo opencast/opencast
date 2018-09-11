@@ -17,17 +17,17 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-common</artifactId>
+      <artifactId>opencast-common</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-kernel</artifactId>
+      <artifactId>opencast-kernel</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>matterhorn-workflow-service-api</artifactId>
+      <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
