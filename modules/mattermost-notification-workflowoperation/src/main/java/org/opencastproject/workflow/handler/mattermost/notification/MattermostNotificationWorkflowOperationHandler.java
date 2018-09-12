@@ -150,8 +150,8 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     // Optional configuration
     String notificationMessage = getConfig(workflowInstance, OPT_NOTIFICATION_MESSAGE, null);
     String method = getConfig(workflowInstance, OPT_METHOD, POST);
-    String maxRetryOpt = getConfig(workflowInstance, OPT_MAX_RETRY, DEFAULT_MAX_RETRY);
-    String timeoutOpt = getConfig(workflowInstance, OPT_TIMEOUT, DEFAULT_TIMEOUT);
+    String maxRetryOpt = getConfig(workflowInstance, OPT_MAX_RETRY, null);
+    String timeoutOpt = getConfig(workflowInstance, OPT_TIMEOUT, null);
 
     // If set, convert the timeout to milliseconds
     if (timeoutOpt != null) {
