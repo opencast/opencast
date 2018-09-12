@@ -39,7 +39,6 @@
                                                 ng-model="metadata.name"
                                                 ng-model-options="{ debounce: {'default': 500} }"
                                                 ng-required="true"
-                                                ng-change="save()"
                                                 placeholder="{{ 'USERS.ACLS.DETAILS.METADATA.NAME.PLACEHOLDER' | translate }}">
                                             </td>
                                         </tr>
@@ -132,15 +131,14 @@
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
-                                                        ng-change="save(policy)"
                                                         ng-options="id as id for (id, type) in roles"
                                                         ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
                                                         no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                                     />
                                                 </td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.read" ng-change="save(policy)"/></td>
-                                                <td class="fit"><input type="checkbox" ng-model="policy.write" ng-change="save(policy)"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.read"/></td>
+                                                <td class="fit"><input type="checkbox" ng-model="policy.write"/></td>
                                                 <td class="fit editable" ng-if="hasActions">
                                                     <div ng-if="$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')" save="save" admin-ng-editable-multi-select mixed="false" params="policy.actions" collection="actions"></div>
                                                     <div ng-if="(!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT'))" ng-repeat="customAction in policy.actions.value">{{ customAction }}</div>
@@ -165,4 +163,12 @@
     </div>
 
     <div class="btm-spacer"></div>
+    <footer>
+      <a ng-click="submit()" class="submit {{ getSubmitButtonState() }}" translate="SUBMIT">
+        <!-- Submit -->
+      </a>
+      <a ng-click="close()" class="cancel" translate="CANCEL">
+        <!-- Cancel -->
+      </a>
+    </footer>
 </section>
