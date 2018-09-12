@@ -35,6 +35,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -236,7 +237,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   private String checkIfNull(Object o, String s) {
 
-    if(o == null) {
+    if (o == null) {
       return s + "not defined";
     }
     if (o instanceof String[]) {
