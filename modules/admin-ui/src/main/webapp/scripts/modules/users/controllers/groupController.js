@@ -126,10 +126,11 @@ angular.module('adminNg.controllers')
         };
 
         $scope.$on('change', function (event, id) {
+          $scope.$broadcast('clear');
           $scope.group = GroupResource.get({ id: id }, function () {
             reloadSelectedRoles();
             reloadSelectedUsers();
-          })
+          });
         });
 
         $scope.getSubmitButtonState = function () {

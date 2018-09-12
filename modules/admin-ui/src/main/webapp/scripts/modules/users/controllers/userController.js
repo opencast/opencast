@@ -40,7 +40,7 @@ angular.module('adminNg.controllers')
         });
 
         $scope.role = {
-            available: UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'}), // Load the first rolesSlice internal roles
+            available: [],
             external: [],
             selected:  [],
             derived: [],
@@ -141,6 +141,8 @@ angular.module('adminNg.controllers')
        * @param id the id of the user
        */
       function fetchChildResources(id) {
+        console.log($scope.searchField);
+        $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
         $scope.user = UserResource.get({ username: id });
         $scope.user.$promise.then(function () {
           $scope.manageable = $scope.user.manageable;
@@ -173,7 +175,20 @@ angular.module('adminNg.controllers')
         }
 
         $scope.$on('change', function (event, id) {
+          // empty arrays that are going to be repopulated
+          $scope.role.selected = [];
+          $scope.role.derived = [];
+          $scope.role.external = [];
+          // clear search fields and notifications when navigating between users
+          $scope.$broadcast('clear');
+          Notifications.removeAll('user-form');
+
           fetchChildResources(id);
+        });
+
+        $scope.$on('clear', function () {
+          $scope.searchFieldExternal = '';
+          $scope.searchFieldEffective = '';
         });
 
         $scope.getHeight = function () {
