@@ -80,9 +80,9 @@ class Opencast {
     .then(function(episode) {
       return new Promise((resolve, reject)=>{
         if (self._series) {
-	  resolve(self.series);
-	}
-	else {
+	        resolve(self.series);
+	      }
+	      else {
           var serie = episode.mediapackage.series;
           if (serie != undefined) {
             base.ajax.get({url:'/search/series.json', params:{'id': serie}},
