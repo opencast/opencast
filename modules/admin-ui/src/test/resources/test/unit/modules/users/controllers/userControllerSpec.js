@@ -75,17 +75,6 @@ describe('User controller', function () {
         });
     });
 
-    describe('when creating', function () {
-        beforeEach(function () {
-            $scope.action = 'add';
-            $controller('UserCtrl', {$scope: $scope});
-        });
-
-        it('sets the appropriate caption', function () {
-            expect($scope.caption).toContain('NEW');
-        });
-    });
-
     describe('#submit', function () {
 
         beforeEach(function () {
