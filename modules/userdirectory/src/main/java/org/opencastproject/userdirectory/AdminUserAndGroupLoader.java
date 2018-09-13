@@ -68,6 +68,12 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
   /** The administrator password configuration option */
   public static final String OPT_ADMIN_PASSWORD = "org.opencastproject.security.admin.pass";
 
+  /**
+   * The administrator password set by default in the configuration file.
+   * Note that this is not set if it is not defined in the configuration file.
+   **/
+  private static final String DEFAULT_ADMIN_PASSWORD_CONFIGURATION = "opencast";
+
   /** The administrator email configuration option */
   public static final String OPT_ADMIN_EMAIL = "org.opencastproject.admin.email";
 
@@ -124,7 +130,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
     adminEmail = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_EMAIL));
     adminRoles = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_ROLES));
 
-    if ("opencast".equals(adminPassword)) {
+    if (DEFAULT_ADMIN_PASSWORD_CONFIGURATION.equals(adminPassword)) {
     logger.warn("\n"
             + "######################################################\n"
             + "#                                                    #\n"
