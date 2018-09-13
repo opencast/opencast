@@ -66,8 +66,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -218,6 +220,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
           + originalEpisodeDc.length + " episode dublin cores while it is expected to have exactly 1. Aborting.");
     }
 
+    Map<String, String> properties = new HashMap<>();
+
     for (int i = 0; i < numberOfEvents; i++) {
       final List<URI> temporaryFiles = new ArrayList<>();
       MediaPackage newMp = null;
@@ -248,11 +252,14 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         for (String namespace : propertyNamespaces) {
           copyProperties(namespace, mediaPackage, newMp);
         }
+
+        // Store media package ID as workflow property
+        properties.put("duplicate_media_package_" + (i + 1) + "_id", newMp.getIdentifier().toString());
       } finally {
         cleanup(temporaryFiles, Optional.ofNullable(newMp));
       }
     }
-    return createResult(mediaPackage, Action.CONTINUE);
+    return createResult(mediaPackage, properties, Action.CONTINUE, 0);
   }
 
   private void cleanup(List<URI> temporaryFiles, Optional<MediaPackage> newMp) {

@@ -12,6 +12,12 @@ seperate events for each presentation, the original recording can be copied and 
 one presentation. If the original event was already published, the duplicate won't be published right away. The user will
 have to publish it manually when he is done editing it.
 
+For each duplicated event the new media package ID is stored as a workflow property:
+
+|Name                                    |Example                                                             |Description                                    |
+|----------------------------------------|--------------------------------------------------------------------|-----------------------------------------------|
+|duplicate\_media\_package\_*number*\_id |`duplicate_media_package_1_id=e72f2265-472a-49ae-bc04-8301d94b4b1a` |Media package ID of the duplicated event       |
+
 Parameter Table
 ---------------
 
