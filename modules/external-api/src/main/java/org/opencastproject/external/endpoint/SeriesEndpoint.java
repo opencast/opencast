@@ -31,6 +31,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
+import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiMediaType;
@@ -128,11 +129,8 @@ public class SeriesEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
 
-  /** Default server URL */
-  protected String serverUrl = "http://localhost:8080";
-
-  /** Service url */
-  protected String serviceUrl = null;
+  /** Base URL of this endpoint */
+  protected String endpointBaseUrl;
 
   /* OSGi service references */
   private ExternalIndex externalIndex;
@@ -162,19 +160,12 @@ public class SeriesEndpoint {
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
-    if (cc == null) {
-      this.serverUrl = "http://localhost:8080";
-    } else {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
-      logger.debug("Configured server url is {}", ccServerUrl);
-      if (ccServerUrl == null)
-        this.serverUrl = "http://localhost:8080";
-      else {
-        this.serverUrl = ccServerUrl;
-      }
-    }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    logger.info("Activated External API - Series Endpoint");
+    logger.info("Activating External API - Series Endpoint");
+
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
+            RestConstants.SERVICE_PATH_PROPERTY);
+    endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
+    logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }
 
   @GET
@@ -1060,7 +1051,6 @@ public class SeriesEndpoint {
   }
 
   private String getSeriesUrl(String seriesId) {
-    return UrlSupport.concat(serverUrl, serviceUrl, seriesId);
+    return UrlSupport.concat(endpointBaseUrl, seriesId);
   }
-
 }

@@ -31,6 +31,7 @@ import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
+import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -184,11 +185,8 @@ public class EventsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
 
-  /** Default server URL */
-  protected String serverUrl = "http://localhost:8080";
-
-  /** Service url */
-  protected String serviceUrl = null;
+  /** Base URL of this endpoint */
+  protected String endpointBaseUrl;
 
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
@@ -290,16 +288,12 @@ public class EventsEndpoint implements ManagedService {
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
-    this.serverUrl = "http://localhost:8080";
-    if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
-      if (ccServerUrl != null) {
-        logger.debug("Configured server url is {}", ccServerUrl);
-        this.serverUrl = ccServerUrl;
-      }
-    }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    logger.info("Activated External API - Events Endpoint");
+    logger.info("Activating External API - Events Endpoint");
+
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
+            RestConstants.SERVICE_PATH_PROPERTY);
+    endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
+    logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }
 
   /** OSGi callback if properties file is present */
@@ -1694,7 +1688,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private String getEventUrl(String eventId) {
-    return UrlSupport.concat(serverUrl, serviceUrl, eventId);
+    return UrlSupport.concat(endpointBaseUrl, eventId);
   }
 
   @GET

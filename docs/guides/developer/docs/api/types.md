@@ -315,7 +315,7 @@ Depending on the configuration of Opencast, there can be additional ACL actions.
 
 ### ace
 
-The access control entries are represented as JSON object with the following fields:
+The access control entries are represented as JSON objects with the following fields:
 
 ACE field  | Required | Type                | Description
 :----------|:---------|:--------------------|:-----------
@@ -335,7 +335,7 @@ __Example__
 
 ### acl
 
-The access control lists are represented as JSON array with element type [`ace`](#ace).
+The access control lists are represented as JSON arrays with element type [`ace`](#ace).
 
 __Example__
 
@@ -353,3 +353,82 @@ __Example__
   }
 ]
 ```
+
+## Workflow
+
+### workflow_retry_strategy
+
+The retry strategy of a workflow operation definition in case of an error. The following values are possible:
+
+Value   | Description
+:-------|:-----------
+`none`  | no retry
+`retry` | restart the operation
+`hold`  | keep the operation in hold state
+
+### workflow_state
+
+The state the workflow instance is currently in. The following values are possible:
+
+Value          | Description
+:--------------|:-----------
+`instantiated` | The workflow instance was instantiated, but is not yet running
+`running`      | The workflow instance is running
+`stopped`      | The workflow instance was stopped
+`paused`       | The workflow instance was paused
+`succeeded`    | The workflow instance has succeeded
+`failed`       | The workflow instance has failed
+`failing`      | The workflow instance has failed and is currently running the error handling workflow
+
+### workflow_operation_state
+
+The state the workflow operation instance is currently in. The following values are possible:
+
+Value          | Description
+:--------------|:-----------
+`instantiated` | The workflow operation instance was instantiated, but is not yet running
+`running`      | The workflow operation instance is running
+`paused`       | The workflow operation instance was paused
+`succeeded`    | The workflow operation instance has succeeded
+`failed`       | The workflow operation instance has failed
+`skipped`      | The workflow operation instance was skipped
+`retry`        | The workflow operation instance has failed and a retry is currently running
+
+### operation_definition
+
+The workflow operation_definition entries are represented as JSON objects with the following fields:
+
+Field                    | Type                                                  | Description
+:------------------------|:------------------------------------------------------|:-----------
+`operation`              | [`string`](#basic)                                    | The operation of this workflow operation definition
+`description`            | [`string`](#basic)                                    | The description of this workflow operation definition
+`configuration`          | [`property`](#property)                               | The configuration for this workflow operation definition
+`if`                     | [`string`](#basic)                                    | The condition of this workflow operation definition that is required to be true for this operation to be executed
+`unless`                 | [`string`](#basic)                                    | The condition of this workflow operation definition that is required to be false for this operation to be executed
+`fail_workflow_on_error` | [`boolean`](#basic)                                   | Whether an error during this workflow operation definition fails the workflow
+`error_handler_workflow` | [`string`](#basic)                                    | The identifier of the exception handler workflow of this workflow operation definition
+`retry_strategy`         | [`workflow_retry_strategy`](#workflow_retry_strategy) | The retry strategy of this workflow operation definition in case of an error
+`max_attempts`           | [`integer`](#basic)                                   | The number of attempts made to execute this workflow operation definition
+
+### operation_instance
+
+The workflow operation_instance entries are represented as JSON objects with the following fields:
+
+Field                    | Type                                                    | Description
+:------------------------|:--------------------------------------------------------|:-----------
+`identifier`             | [`integer`](#basic)                                     | The unique identifier of this workflow operation instance (equals the job identifier)
+`operation`              | [`string`](#basic)                                      | The operation of this workflow operation instance
+`description`            | [`string`](#basic)                                      | The description of this workflow operation instance
+`configuration`          | [`property`](#property)                                 | The configuration for this workflow operation instance
+`state`                  | [`workflow_operation_state`](#workflow_operation_state) | The state of this workflow operation instance
+`start`                  | [`datetime`](#date-and-time)                            | The start date and time of this workflow operation instance
+`completion`             | [`datetime`](#date-and-time)                            | The completion date and time of this workflow operation instance
+`time_in_queue`          | [`integer`](#basic)                                     | The number of milliseconds this workflow operation instance waited in a service queue
+`host`                   | [`string`](#basic)                                      | The host that executed this workflow operation instance
+`if`                     | [`string`](#basic)                                      | The condition of this workflow operation instance that is required to be true for this operation to be executed
+`unless`                 | [`string`](#basic)                                      | The condition of this workflow operation instance that is required to be false for this operation to be executed
+`fail_workflow_on_error` | [`boolean`](#basic)                                     | Whether an error during this workflow operation instance fails the workflow
+`error_handler_workflow` | [`string`](#basic)                                      | The identifier of the exception handler workflow of this workflow operation instance
+`retry_strategy`         | [`workflow_retry_strategy`](#workflow_retry_strategy)   | The retry strategy of this workflow operation instance in case of an error
+`max_attempts`           | [`integer`](#basic)                                     | The number of attempts made to execute this workflow operation instance
+`failed_attempts`        | [`integer`](#basic)                                     | The number of failed attempts to execute this workflow operation instance
