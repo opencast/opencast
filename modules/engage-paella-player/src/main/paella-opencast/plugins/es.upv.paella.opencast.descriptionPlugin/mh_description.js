@@ -110,8 +110,8 @@ paella.addPlugin(function() {
       divViews.innerHTML = paella.dictionary.translate("Views")+': <span class="showMHDescriptionTabBarValue">'+this.desc.views+'</span>';
       divTitle.innerHTML = paella.dictionary.translate("Title")+': <span class="showMHDescriptionTabBarValue">'+this.desc.title+'</span>';
       divSubject.innerHTML = paella.dictionary.translate("Subject")+': <span class="showMHDescriptionTabBarValue">'+this.desc.subject+'</span>';
-      divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="index.html?q='+this.desc.presenter+'">'+this.desc.presenter+'</a></span>';
-      divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="index.html?series='+this.desc.serieId+'">'+this.desc.serie+'</a></span>';
+      divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="/engage/ui/index.html?q='+this.desc.presenter+'">'+this.desc.presenter+'</a></span>';
+      divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="/engage/ui/index.html?epForm='+this.desc.serieId+'">'+this.desc.serie+'</a></span>';
       divDescription.innerHTML = paella.dictionary.translate("Description")+': <span class="showMHDescriptionTabBarValue">'+this.desc.description+'</span>';
 
       //---------------------------//
