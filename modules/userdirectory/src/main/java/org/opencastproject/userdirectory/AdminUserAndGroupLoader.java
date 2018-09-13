@@ -124,6 +124,20 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
     adminEmail = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_EMAIL));
     adminRoles = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_ROLES));
 
+    if ("opencast".equals(adminPassword)) {
+    logger.warn("\n"
+            + "######################################################\n"
+            + "#                                                    #\n"
+            + "# WARNING: Opencast still uses the default admin     #\n"
+            + "#          credentials. Never do this in production. #\n"
+            + "#                                                    #\n"
+            + "#          To change the password, edit the key      #\n"
+            + "#          org.opencastproject.security.admin.pass   #\n"
+            + "#          in custom.properties.                     #\n"
+            + "#                                                    #\n"
+            + "######################################################");
+    }
+
     // Keep a reference to the component context
     componentCtx = cc;
 

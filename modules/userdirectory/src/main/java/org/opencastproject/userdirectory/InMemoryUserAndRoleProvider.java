@@ -99,11 +99,26 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   protected void activate(ComponentContext cc) {
     digestUsername = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_USER_KEY));
-    if (digestUsername == null)
+    if (digestUsername == null) {
       logger.warn("Digest username has not been configured ({})", DIGEST_USER_KEY);
+    }
+
     digestUserPass = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_PASSWORD_KEY));
-    if (digestUsername == null)
+    if (digestUserPass == null) {
       logger.warn("Digest password has not been configured ({})", DIGEST_PASSWORD_KEY);
+    } else if ("CHANGE_ME".equals(digestUserPass)) {
+      logger.warn("\n"
+              + "######################################################\n"
+              + "#                                                    #\n"
+              + "# WARNING: Opencast still uses the default system    #\n"
+              + "#          credentials. Never do this in production. #\n"
+              + "#                                                    #\n"
+              + "#          To change the password, edit the key      #\n"
+              + "#          org.opencastproject.security.digest.pass  #\n"
+              + "#          in custom.properties.                     #\n"
+              + "#                                                    #\n"
+              + "######################################################");
+    }
 
     // Create the digest user
     createSystemUsers();
