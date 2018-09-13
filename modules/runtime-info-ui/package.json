@@ -2,8 +2,14 @@
   "name": "opencast-runtime-info-ui",
   "version": "1.0.0",
   "license": "ECL-2.0",
+  "scripts": {
+    "eslint": "eslint src/main/resources/ui/"
+  },
   "dependencies": {
     "angular": "^1.3.20",
     "angular-route": "^1.3.6"
+  },
+  "devDependencies": {
+    "eslint": "^5.5.0"
   }
 }
