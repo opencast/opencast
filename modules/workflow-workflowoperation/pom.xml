@@ -154,6 +154,7 @@
               OSGI-INF/operations/include.xml,
               OSGI-INF/operations/probe-resolution.xml,
               OSGI-INF/operations/series.xml,
+              OSGI-INF/operations/start-workflow.xml,
               OSGI-INF/operations/tag.xml,
               OSGI-INF/operations/tag-by-dcterm.xml,
               OSGI-INF/operations/zip.xml
