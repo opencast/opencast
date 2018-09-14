@@ -66,6 +66,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
   static final String SUBJECT_PROPERTY = "subject";
   static final String BODY_PROPERTY = "body";
   static final String BODY_TEMPLATE_FILE_PROPERTY = "body-template-file";
+  static final String IS_HTML = "use-html";
 
   /*
    * (non-Javadoc)
@@ -82,6 +83,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     addConfigurationOption(SUBJECT_PROPERTY, "The subject line");
     addConfigurationOption(BODY_PROPERTY, "The email body text (or email template)");
     addConfigurationOption(BODY_TEMPLATE_FILE_PROPERTY, "The file name of the Freemarker template for the email body");
+    addConfigurationOption(IS_HTML, "Is the body text (or email template) in HTML");
   }
 
   /**
@@ -104,6 +106,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText = null;
     String body = operation.getConfiguration(BODY_PROPERTY);
+    boolean isHTML = "true".equals(operation.getConfiguration(IS_HTML));
     // If specified, templateFile is a file that contains the Freemarker template
     String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
     // Body informed? If not, use the default.
@@ -121,7 +124,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
               "Sending e-mail notification with subject {} and body {} to {}, CC addresses {} and BCC addresses {}",
               subject, bodyText, to, cc, bcc);
       // "To", "CC" and "BCC" can be comma- or space-separated lists of emails
-      smtpService.send(to, cc, bcc, subject, bodyText);
+      smtpService.send(to, cc, bcc, subject, bodyText, isHTML);
       logger.info("E-mail notification sent to {}, CC addresses {} and BCC addresses {}", to, cc, bcc);
     } catch (MessagingException e) {
       throw new WorkflowOperationException(e);
