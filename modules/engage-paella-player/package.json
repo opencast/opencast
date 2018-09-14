@@ -3,7 +3,6 @@
   "private": true,
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-clean": "^0.4.0",
     "merge-stream": "^1.0.1",
     "paellaplayer": "github:polimediaupv/paella#5.3.10"
   }
