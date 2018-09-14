@@ -84,7 +84,7 @@
                 <goals>
                   <goal>exec</goal>
                 </goals>
-                <phase>test</phase>
+                <phase>validate</phase>
                 <configuration>
                   <executable>npm</executable>
                   <arguments>
@@ -157,22 +157,16 @@
                   <arguments>install</arguments>
                 </configuration>
               </execution>
-              
               <execution>
-                <id>esline</id>
+                <phase>validate</phase>
+                <id>eslint</id>
                 <goals>
-                  <goal>exec</goal>
+                  <goal>npm</goal>
                 </goals>
-                <phase>test</phase>
                 <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>run</argument>
-                    <argument>eslint</argument>
-                  </arguments>
+                  <arguments>run eslint</arguments>
                 </configuration>
-              </execution>
-              
+              </execution>     
               <execution>
                 <phase>process-resources</phase>
                 <id>gulp build</id>
