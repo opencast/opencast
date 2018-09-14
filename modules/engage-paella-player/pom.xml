@@ -80,6 +80,20 @@
                 </configuration>
               </execution>
               <execution>
+                <id>esline</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>eslint</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
                 <id>frontend build</id>
                 <goals>
                   <goal>exec</goal>
@@ -143,7 +157,22 @@
                   <arguments>install</arguments>
                 </configuration>
               </execution>
-
+              
+              <execution>
+                <id>esline</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>eslint</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              
               <execution>
                 <phase>process-resources</phase>
                 <id>gulp build</id>

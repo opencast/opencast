@@ -23,12 +23,12 @@
 // OCR Segments Search
 /////////////////////////////////////////////////
 paella.addPlugin(function() {
-	return class searchPlugin extends paella.SearchServicePlugIn {
+  return class searchPlugin extends paella.SearchServicePlugIn {
     constructor() {
       super();
     }
 
-    getName() { return "es.upv.paella.opencast.searchPlugin"; }
+    getName() { return 'es.upv.paella.opencast.searchPlugin'; }
 
     search(text, next) {
 
@@ -40,13 +40,13 @@ paella.addPlugin(function() {
 
         paella.ajax.get({url:'/search/episode.json', params:{id:episodeId, q:text, limit:1000}},
           function(data, contentType, returnCode) {
-            paella.debug.log("Searching episode=" + episodeId + " q="+text);
-                    var segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
+            paella.debug.log('Searching episode=' + episodeId + ' q='+text);
+            var segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                         (data['search-results'].result !== undefined) &&
                         (data['search-results'].result.segments !== undefined) &&
                         (data['search-results'].result.segments.segment.length > 0);
 
-                    var searchResult = [];
+            var searchResult = [];
 
             if (segmentsAvailable) {
               var segments = data['search-results'].result.segments;
@@ -67,7 +67,7 @@ paella.addPlugin(function() {
               next(false, searchResult);
             }
             else {
-              paella.debug.log("No Revelance");
+              paella.debug.log('No Revelance');
               next(false, []);
             }
           },
@@ -77,5 +77,5 @@ paella.addPlugin(function() {
         );
       }
     }
-  }
+  };
 });

@@ -3,7 +3,7 @@ class OpencastToPaellaConverter {
   constructor() {
   }
 
-  getName() { return "es.upv.paella.opencast.OpencastToPaellaConverter"; }
+  getName() { return 'es.upv.paella.opencast.OpencastToPaellaConverter'; }
 
   isStreaming(track) {
     return /rtmps?:\/\//.test(track.url);
@@ -11,12 +11,12 @@ class OpencastToPaellaConverter {
 
   getStreamSource(track) {
     var res = new Array(0,0);
-        if (track.video instanceof Object) {
-        res = track.video.resolution.split('x');
-        }
+    if (track.video instanceof Object) {
+      res = track.video.resolution.split('x');
+    }
 
     var src = track.url;
-    var urlSplit = /^(rtmps?:\/\/[^\/]*\/[^\/]*)\/(.*)$/.exec(track.url);
+    var urlSplit = /^(rtmps?:\/\/[^/]*\/[^/]*)\/(.*)$/.exec(track.url);
     if (urlSplit != null) {
       var rtmp_server =  urlSplit[1];
       var rtmp_stream =  urlSplit[2];
@@ -37,15 +37,15 @@ class OpencastToPaellaConverter {
   }
 
   isSupportedStreamingTrack(track) {
-    if (/^(rtmps?:\/\/[^\/]*\/[^\/]*)\/(.*)$/.test(track.url) == true) {
+    if (/^(rtmps?:\/\/[^/]*\/[^/]*)\/(.*)$/.test(track.url) == true) {
       switch (track.mimetype) {
-        case 'video/mp4':
-        case 'video/ogg':
-        case 'video/webm':
-        case 'video/x-flv':
-          return true;
-        default:
-          return false;
+      case 'video/mp4':
+      case 'video/ogg':
+      case 'video/webm':
+      case 'video/x-flv':
+        return true;
+      default:
+        return false;
       }
     }
     return false;
@@ -79,24 +79,24 @@ class OpencastToPaellaConverter {
       else{
         var videotype = null;
         switch (currentTrack.mimetype) {
-          case 'video/mp4':
-          case 'video/ogg':
-          case 'video/webm':
-            videotype = currentTrack.mimetype.split("/")[1];
-            break;
-          case 'video/x-flv':
-            videotype = 'flv';
-            break;
-          case 'application/x-mpegURL':
-            videotype = 'hls';
-            break;
-          case 'application/dash+xml':
-            videotype = 'mpd';
-            break;
+        case 'video/mp4':
+        case 'video/ogg':
+        case 'video/webm':
+          videotype = currentTrack.mimetype.split('/')[1];
+          break;
+        case 'video/x-flv':
+          videotype = 'flv';
+          break;
+        case 'application/x-mpegURL':
+          videotype = 'hls';
+          break;
+        case 'application/dash+xml':
+          videotype = 'mpd';
+          break;
 
-          default:
-            paella.debug.log('OpencastToPaellaConverter: MimeType ('+currentTrack.mimetype+') not recognized!');
-            break;
+        default:
+          paella.debug.log('OpencastToPaellaConverter: MimeType ('+currentTrack.mimetype+') not recognized!');
+          break;
         }
         if (videotype){
           if ( !(currentStream.sources[videotype]) || !(currentStream.sources[videotype] instanceof Array)){
@@ -110,18 +110,18 @@ class OpencastToPaellaConverter {
     });
 
     var duration = parseInt(episode.mediapackage.duration/1000);
-    var presenter = opencastStreams["presenter/delivery"] || opencastStreams["presenter/preview"];
-    var presentation = opencastStreams["presentation/delivery"] || opencastStreams["presentation/preview"];
-    var imageSource =   {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:320, h:180}};
-    var imageSourceHD = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
-    var blackboardSource = {type:"image/jpeg", frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
+    var presenter = opencastStreams['presenter/delivery'] || opencastStreams['presenter/preview'];
+    var presentation = opencastStreams['presentation/delivery'] || opencastStreams['presentation/preview'];
+    var imageSource =   {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:320, h:180}};
+    var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
+    var blackboardSource = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
     var captions = [];
 
     // Read the attachments
     attachments.forEach(function(currentAttachment){
       try {
-          let captions_regex = /^captions\/([^\+]+)(\+(.+))?/g;
-          let captions_match = captions_regex.exec(currentAttachment.type);
+        let captions_regex = /^captions\/([^+]+)(\+(.+))?/g;
+        let captions_match = captions_regex.exec(currentAttachment.type);
 
         if (captions_match) {
           let captions_format = captions_match[1];
@@ -135,14 +135,14 @@ class OpencastToPaellaConverter {
               currentAttachment.tags.tag = [currentAttachment.tags.tag];
             }
             currentAttachment.tags.tag.forEach((tag)=>{
-              if (tag.startsWith("lang:")){
-                let split = tag.split(":");
+              if (tag.startsWith('lang:')){
+                let split = tag.split(':');
                 captions_lang = split[1];
               }
             });
           }
 
-          let captions_label = captions_lang || "unknown language"; //base.dictionary.translate("CAPTIONS_" + captions_lang);
+          let captions_label = captions_lang || 'unknown language'; //base.dictionary.translate("CAPTIONS_" + captions_lang);
 
           captions.push({
             id: currentAttachment.id,
@@ -152,53 +152,53 @@ class OpencastToPaellaConverter {
             format: captions_format
           });
         }
-        else if (currentAttachment.type == "blackboard/image") {
+        else if (currentAttachment.type == 'blackboard/image') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
             time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
 
-            blackboardSource.frames["frame_"+time] = currentAttachment.url;
+            blackboardSource.frames['frame_'+time] = currentAttachment.url;
             blackboardSource.count = blackboardSource.count +1;
           }
 
         }
-        else if (currentAttachment.type == "presentation/segment+preview+hires") {
+        else if (currentAttachment.type == 'presentation/segment+preview+hires') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
             time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
-            imageSourceHD.frames["frame_"+time] = currentAttachment.url;
+            imageSourceHD.frames['frame_'+time] = currentAttachment.url;
             imageSourceHD.count = imageSourceHD.count +1;
 
-                if (!(opencastFrameList[time])){
-                    opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
-                }
-                opencastFrameList[time].url = currentAttachment.url;
+            if (!(opencastFrameList[time])){
+              opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
+            }
+            opencastFrameList[time].url = currentAttachment.url;
           }
         }
-        else if (currentAttachment.type == "presentation/segment+preview") {
+        else if (currentAttachment.type == 'presentation/segment+preview') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
             var time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
-            imageSource.frames["frame_"+time] = currentAttachment.url;
+            imageSource.frames['frame_'+time] = currentAttachment.url;
             imageSource.count = imageSource.count +1;
 
-                if (!(opencastFrameList[time])){
-                    opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
-                }
-                opencastFrameList[time].thumb = currentAttachment.url;
+            if (!(opencastFrameList[time])){
+              opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
+            }
+            opencastFrameList[time].thumb = currentAttachment.url;
           }
         }
-        else if (currentAttachment.type == "presentation/player+preview") {
+        else if (currentAttachment.type == 'presentation/player+preview') {
           presentation.preview = currentAttachment.url;
         }
-        else if (currentAttachment.type == "presenter/player+preview") {
+        else if (currentAttachment.type == 'presenter/player+preview') {
           presenter.preview = currentAttachment.url;
         }
-        else if (currentAttachment.type == "presenter/trackhd") {
+        else if (currentAttachment.type == 'presenter/trackhd') {
           presenter.trackhd = currentAttachment.url;
         }
-        else if (currentAttachment.type == "presentation/trackhd") {
+        else if (currentAttachment.type == 'presentation/trackhd') {
           presentation.trackhd = currentAttachment.url;
         }
       }
-      catch (err) {}
+      catch (err) {/**/}
     });
 
     // Read the catalogs
@@ -206,7 +206,7 @@ class OpencastToPaellaConverter {
       try {
         // backwards compatibility:
         // Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
-        if (currentCatalog.type == "captions/timedtext") {
+        if (currentCatalog.type == 'captions/timedtext') {
           let captions_lang;
 
           if (currentCatalog.tags && currentCatalog.tags.tag) {
@@ -214,25 +214,25 @@ class OpencastToPaellaConverter {
               currentCatalog.tags.tag = [currentCatalog.tags.tag];
             }
             currentCatalog.tags.tag.forEach((tag)=>{
-              if (tag.startsWith("lang:")){
-                let split = tag.split(":");
+              if (tag.startsWith('lang:')){
+                let split = tag.split(':');
                 captions_lang = split[1];
               }
             });
           }
 
-          let captions_label = captions_lang || "unknown language";
+          let captions_label = captions_lang || 'unknown language';
 
           captions.push({
             id: currentCatalog.id,
             lang: captions_lang,
             text: captions_label,
             url: currentCatalog.url,
-            format: "dfxp"
+            format: 'dfxp'
           });
         }
       }
-      catch (err) {}
+      catch (err) {/**/}
     });
 
 

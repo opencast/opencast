@@ -19,7 +19,7 @@
  *
  */
 paella.addPlugin(function() {
-	return class TranscriptionTabBarPlugin extends paella.TabBarPlugin {
+  return class TranscriptionTabBarPlugin extends paella.TabBarPlugin {
     get divContainer() { return this._divContainer; }
     set divContainer(v) { this._divContainer = v; }
     get divSearchBar() { return this._divSearchBar; }
@@ -53,11 +53,11 @@ paella.addPlugin(function() {
       this._useJsonp = false;
     }
 
-    getSubclass() { return "searchTabBar"; }
+    getSubclass() { return 'searchTabBar'; }
     getName() { return 'es.upv.paella.opencast.transcriptionTabBarPlugin'; }
     getTabName() { return paella.dictionary.translate('Transcription'); }
     getIndex() { return 20; }
-    getDefaultToolTip() { return paella.dictionary.translate("Transcription"); }
+    getDefaultToolTip() { return paella.dictionary.translate('Transcription'); }
 
 
     checkEnabled(onSuccess) {
@@ -109,12 +109,12 @@ paella.addPlugin(function() {
 
     setLoading(b) {
       if (b == true){
-        this.divLoading.style.display="block";
-        this.divResults.style.display="none";
+        this.divLoading.style.display='block';
+        this.divResults.style.display='none';
       }
       else{
-        this.divLoading.style.display="none";
-        this.divResults.style.display="block";
+        this.divLoading.style.display='none';
+        this.divResults.style.display='block';
       }
     }
 
@@ -131,14 +131,14 @@ paella.addPlugin(function() {
 
       // -------  Left
       var inputElement = document.createElement('input');
-      inputElement.type = "text";
-      inputElement.value = paella.dictionary.translate("Search in this event");
+      inputElement.type = 'text';
+      inputElement.value = paella.dictionary.translate('Search in this event');
       inputElement.setAttribute('size', '30');
       inputElement.setAttribute('dir','lrt');
       inputElement.setAttribute('spellcheck','true');
       inputElement.setAttribute('x-webkit-speech','');
       inputElement.setAttribute('tabindex','4000');
-      inputElement.onfocus = function(){this.value=""; this.onfocus=undefined;};
+      inputElement.onfocus = function(){this.value=''; this.onfocus=undefined;};
       inputElement.onkeyup = function(){thisClass.doSearch(this.value);};
 
       divSearchBarLeft.appendChild(inputElement);
@@ -153,10 +153,10 @@ paella.addPlugin(function() {
       r3.className = 'lt70';
       r4.className = 'gt70';
 
-      r1.innerHTML = paella.dictionary.translate("Search relevance:");
-      r2.innerHTML = "&lt; 30%";
-      r3.innerHTML = "&lt; 70%";
-      r4.innerHTML = "&gt; 70%";
+      r1.innerHTML = paella.dictionary.translate('Search relevance:');
+      r2.innerHTML = '&lt; 30%';
+      r3.innerHTML = '&lt; 70%';
+      r4.innerHTML = '&gt; 70%';
 
       this.divSearchBarRelevance.appendChild(r1);
       this.divSearchBarRelevance.appendChild(r2);
@@ -170,10 +170,10 @@ paella.addPlugin(function() {
     loadSegmentText() {
       var self = this;
       this.setLoading(true);
-      this.divResults.innerHTML = "";
+      this.divResults.innerHTML = '';
 
       if (self._episode.segments === undefined) {
-        paella.debug.log("Segment Text data not available");
+        paella.debug.log('Segment Text data not available');
       }
       else {
         var segments = self._episode.segments;
@@ -186,13 +186,9 @@ paella.addPlugin(function() {
     }
 
     appendSegmentTextEntry(segment) {
-      var thisClass = this;
-      var rootID = thisClass.resultsEntryID+segment.index;
-
-
       var divEntry = document.createElement('div');
-      divEntry.className="searchTabBarResultEntry";
-      divEntry.id="searchTabBarResultEntry_" + segment.index;
+      divEntry.className='searchTabBarResultEntry';
+      divEntry.id='searchTabBarResultEntry_' + segment.index;
       divEntry.setAttribute('tabindex', 4100 + parseInt(segment.index));
       $(divEntry).click(function(event){
         $(document).trigger( paella.events.seekToTime, {time: segment.time/1000});
@@ -202,7 +198,7 @@ paella.addPlugin(function() {
       });
 
       var divPreview = document.createElement('div');
-      divPreview.className = "searchTabBarResultEntryPreview";
+      divPreview.className = 'searchTabBarResultEntryPreview';
       if (segment && segment.previews && segment.previews.preview) {
         var imgPreview = document.createElement('img');
         imgPreview.src = segment.previews.preview.$;
@@ -212,11 +208,11 @@ paella.addPlugin(function() {
 
 
       var divResultText  = document.createElement('div');
-      divResultText.className = "searchTabBarResultEntryText";
+      divResultText.className = 'searchTabBarResultEntryText';
 
 
       var textResultText = document.createElement('a');
-      textResultText.innerHTML = "<span class='time'>" + paella.utils.timeParse.secondsToTime(segment.time/1000) + "</span> " + segment.text;
+      textResultText.innerHTML = '<span class=\'time\'>' + paella.utils.timeParse.secondsToTime(segment.time/1000) + '</span> ' + segment.text;
       divResultText.appendChild(textResultText);
       divEntry.appendChild(divResultText);
 
@@ -226,10 +222,10 @@ paella.addPlugin(function() {
     doSearch(value) {
       var thisClass = this;
       if (value != '') {
-        this.divSearchBarRelevance.style.display="none"; //"block";
+        this.divSearchBarRelevance.style.display='none'; //"block";
       }
       else {
-        this.divSearchBarRelevance.style.display="none";
+        this.divSearchBarRelevance.style.display='none';
       }
       this.setLoading(true);
 
@@ -237,19 +233,19 @@ paella.addPlugin(function() {
       var segmentsAvailable = false;
       paella.ajax.get({url:'/search/episode.json', params:{id:thisClass._episode.id, q:value, limit:1000}},
         function(data, contentType, returnCode) {
-          paella.debug.log("Searching episode="+thisClass._episode.id + " q="+value);
+          paella.debug.log('Searching episode='+thisClass._episode.id + ' q='+value);
 
-                  segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
+          segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                       (data['search-results'].result !== undefined) &&
                       (data['search-results'].result.segments !== undefined) &&
                       (data['search-results'].result.segments.segment.length > 0);
 
-                  if (value === '') {
-                    thisClass.setNotSearch();
-                  }
-                  else {
-                    thisClass.setResultAvailable(value);
-                  }
+          if (value === '') {
+            thisClass.setNotSearch();
+          }
+          else {
+            thisClass.setResultAvailable(value);
+          }
 
           if (segmentsAvailable) {
             var segments = data['search-results'].result.segments;
@@ -262,7 +258,7 @@ paella.addPlugin(function() {
                 maxRelevance = parseInt(segment.relevance);
               }
             }
-            paella.debug.log("Search Max Revelance " + maxRelevance);
+            paella.debug.log('Search Max Revelance ' + maxRelevance);
 
 
             for (i =0; i < segments.segment.length; ++i ){
@@ -292,7 +288,7 @@ paella.addPlugin(function() {
             thisClass.lastHit = value;
           }
           else {
-            paella.debug.log("No Revelance");
+            paella.debug.log('No Revelance');
             if (thisClass.foundAlready){
               thisClass.setNoActualResultAvailable(value);
             }
@@ -307,16 +303,16 @@ paella.addPlugin(function() {
 
 
     setNoActualResultAvailable(searchValue) {
-      this.divSearch.innerHTML = paella.dictionary.translate("Results for '{0}' (no actual results for '{1}' found)").replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
+      this.divSearch.innerHTML = paella.dictionary.translate('Results for \'{0}\' (no actual results for \'{1}\' found)').replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
 
     }
 
     setResultAvailable(searchValue) {
-      this.divSearch.innerHTML =  paella.dictionary.translate("Results for '{0}'").replace(/\{0\}/g,searchValue);
+      this.divSearch.innerHTML =  paella.dictionary.translate('Results for \'{0}\'').replace(/\{0\}/g,searchValue);
     }
 
     setNotSearch() {
-      this.divSearch.innerHTML="";
+      this.divSearch.innerHTML='';
     }
-  }
+  };
 });
