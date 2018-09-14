@@ -19,22 +19,22 @@
  *
  */
 paella.addPlugin(function() {
-	return class MHDescriptionPlugin extends paella.TabBarPlugin {
-    get domElement() { return this._domElement };
-    set domElement(v) { this._domElement = v };
-    get desc() { return this._desc };
-    set desc(v) { this._desc = v };
+  return class MHDescriptionPlugin extends paella.TabBarPlugin {
+    get domElement() { return this._domElement; }
+    set domElement(v) { this._domElement = v; }
+    get desc() { return this._desc; }
+    set desc(v) { this._desc = v; }
 
     constructor() {
       super();
       this._desc = { date:'', contributor:'', language:'', views:'', serie:'', serieId:'', presenter:'', description:'', title:'', subject:'' };
     }
 
-    getSubclass() { return "showMHDescriptionTabBar"; }
-    getName() { return "es.upv.paella.opencast.descriptionPlugin"; }
-    getTabName() { return paella.dictionary.translate("Description"); }
+    getSubclass() { return 'showMHDescriptionTabBar'; }
+    getName() { return 'es.upv.paella.opencast.descriptionPlugin'; }
+    getTabName() { return paella.dictionary.translate('Description'); }
     getIndex() { return 10; }
-    getDefaultToolTip() { return paella.dictionary.translate("Description"); }
+    getDefaultToolTip() { return paella.dictionary.translate('Description'); }
 
 
     checkEnabled(onSuccess) {
@@ -69,7 +69,7 @@ paella.addPlugin(function() {
         this.desc.serie = thisClass._episode.mediapackage.seriestitle;
         this.desc.serieId = thisClass._episode.mediapackage.series;
       }
-      this.desc.date = "n.a.";
+      this.desc.date = 'n.a.';
       var dcCreated = thisClass._episode.dcCreated;
       if (dcCreated) {
         var sd = new Date();
@@ -104,25 +104,25 @@ paella.addPlugin(function() {
       var divPresenter = document.createElement('div'); divPresenter.className = 'showMHDescriptionTabBarElement';
       var divDescription = document.createElement('div'); divDescription.className = 'showMHDescriptionTabBarElement';
 
-      divDate.innerHTML = paella.dictionary.translate("Date")+': <span class="showMHDescriptionTabBarValue">'+this.desc.date+'</span>';
-      divContributor.innerHTML = paella.dictionary.translate("Contributor")+': <span class="showMHDescriptionTabBarValue">'+this.desc.contributor+'</span>';
-      divLanguage.innerHTML = paella.dictionary.translate("Language")+': <span class="showMHDescriptionTabBarValue">'+this.desc.language+'</span>';
-      divViews.innerHTML = paella.dictionary.translate("Views")+': <span class="showMHDescriptionTabBarValue">'+this.desc.views+'</span>';
-      divTitle.innerHTML = paella.dictionary.translate("Title")+': <span class="showMHDescriptionTabBarValue">'+this.desc.title+'</span>';
-      divSubject.innerHTML = paella.dictionary.translate("Subject")+': <span class="showMHDescriptionTabBarValue">'+this.desc.subject+'</span>';
+      divDate.innerHTML = paella.dictionary.translate('Date')+': <span class="showMHDescriptionTabBarValue">'+this.desc.date+'</span>';
+      divContributor.innerHTML = paella.dictionary.translate('Contributor')+': <span class="showMHDescriptionTabBarValue">'+this.desc.contributor+'</span>';
+      divLanguage.innerHTML = paella.dictionary.translate('Language')+': <span class="showMHDescriptionTabBarValue">'+this.desc.language+'</span>';
+      divViews.innerHTML = paella.dictionary.translate('Views')+': <span class="showMHDescriptionTabBarValue">'+this.desc.views+'</span>';
+      divTitle.innerHTML = paella.dictionary.translate('Title')+': <span class="showMHDescriptionTabBarValue">'+this.desc.title+'</span>';
+      divSubject.innerHTML = paella.dictionary.translate('Subject')+': <span class="showMHDescriptionTabBarValue">'+this.desc.subject+'</span>';
       if (this.desc.presenter == '') {
-        divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"></span>';
+        divPresenter.innerHTML = paella.dictionary.translate('Presenter')+': <span class="showMHDescriptionTabBarValue"></span>';
       }
       else {
-        divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="/engage/ui/index.html?q='+this.desc.presenter+'">'+this.desc.presenter+'</a></span>';
+        divPresenter.innerHTML = paella.dictionary.translate('Presenter')+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="/engage/ui/index.html?q='+this.desc.presenter+'">'+this.desc.presenter+'</a></span>';
       }
       if (this.desc.serieId == '') {
-        divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"></span>';
+        divSeries.innerHTML = paella.dictionary.translate('Series')+': <span class="showMHDescriptionTabBarValue"></span>';
       }
       else {
-        divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="/engage/ui/index.html?epFrom='+this.desc.serieId+'">'+this.desc.serie+'</a></span>';
+        divSeries.innerHTML = paella.dictionary.translate('Series')+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="/engage/ui/index.html?epFrom='+this.desc.serieId+'">'+this.desc.serie+'</a></span>';
       }
-      divDescription.innerHTML = paella.dictionary.translate("Description")+': <span class="showMHDescriptionTabBarValue">'+this.desc.description+'</span>';
+      divDescription.innerHTML = paella.dictionary.translate('Description')+': <span class="showMHDescriptionTabBarValue">'+this.desc.description+'</span>';
 
       //---------------------------//
       var divLeft = document.createElement('div');

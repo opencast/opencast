@@ -1,3 +1,11 @@
+/*global Opencast 
+         MHAnnotationServiceDefaultDataDelegate
+         MHAnnotationServiceTrimmingDataDelegate
+         MHFootPrintsDataDelegate
+         OpencastTrackCameraDataDelegate
+         OpencastToPaellaConverter
+         OpencastAccessControl
+*/
 
 function initPaellaOpencast() {
   if (!paella.opencast) {

@@ -18,6 +18,8 @@
  * the License.
  *
  */
+
+/*global Class*/
 paella.addPlugin(function() {
   return class EpisodesFromSeries extends paella.ButtonPlugin {
     getSubclass() { return 'EpisodesFromSeries'; }

@@ -8,19 +8,10 @@ module.exports = {
       'ecmaVersion': 2015
     },
     'globals': {
-      'base': true,
-      'Class': true,
+      'base': true,      
       '$': true,
       'jQuery': true,
-      'paella': true,
-      'paella_DeferredResolved': true,
-      'Opencast': true,
-      'MHAnnotationServiceDefaultDataDelegate': true,
-      'MHAnnotationServiceTrimmingDataDelegate': true,
-      'MHFootPrintsDataDelegate': true,
-      'OpencastTrackCameraDataDelegate': true,
-      'OpencastToPaellaConverter': true,
-      'OpencastAccessControl': true
+      'paella': true
     },
     'rules': {
       'indent': [

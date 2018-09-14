@@ -5,6 +5,7 @@ User login, data and permissions: paella.AccessControl
 Extend paella.AccessControl and implement the checkAccess method:
 
 */
+/*global paella_DeferredResolved*/
 
 class OpencastAccessControl extends paella.AccessControl {
 
