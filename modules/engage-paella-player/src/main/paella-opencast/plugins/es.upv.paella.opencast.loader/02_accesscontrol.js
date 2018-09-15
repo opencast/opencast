@@ -5,6 +5,7 @@ User login, data and permissions: paella.AccessControl
 Extend paella.AccessControl and implement the checkAccess method:
 
 */
+/*global paella_DeferredResolved*/
 
 class OpencastAccessControl extends paella.AccessControl {
 
@@ -15,7 +16,7 @@ class OpencastAccessControl extends paella.AccessControl {
     this._userData = undefined;
   }
 
-  getName() { return "es.upv.paella.opencast.OpencastAccessControl"; }
+  getName() { return 'es.upv.paella.opencast.OpencastAccessControl'; }
 
   canRead() {
     return paella.opencast.getEpisode()
@@ -43,7 +44,7 @@ class OpencastAccessControl extends paella.AccessControl {
             else {
               aces.some(function(currentAce) {
                 if (currentRole == currentAce.role) {
-                  if (currentAce.action == "write") {canWrite = true;}
+                  if (currentAce.action == 'write') {canWrite = true;}
                 }
                 return (canWrite==true);
               });
@@ -68,7 +69,7 @@ class OpencastAccessControl extends paella.AccessControl {
             var isAnonymous = ((me.roles.length == 1) && (me.roles[0] == me.org.anonymousRole));
             self._userData = {
               username: me.user.username,
-              name: me.user.name || me.user.username || "",
+              name: me.user.name || me.user.username || '',
               avatar: paella.utils.folders.resources() + '/images/default_avatar.png',
               isAnonymous: isAnonymous
             };
@@ -83,6 +84,6 @@ class OpencastAccessControl extends paella.AccessControl {
   }
 
   getAuthenticationUrl(callbackParams) {
-    return "auth.html?redirect="+encodeURIComponent(window.location.href);
+    return 'auth.html?redirect='+encodeURIComponent(window.location.href);
   }
 }

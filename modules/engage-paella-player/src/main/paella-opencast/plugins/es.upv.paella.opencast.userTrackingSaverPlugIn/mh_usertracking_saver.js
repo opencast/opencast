@@ -19,8 +19,8 @@
  *
  */
 paella.addPlugin(function() {
-	return class userTrackingSaverPlugIn extends paella.userTracking.SaverPlugIn{
-    getName() { return "es.upv.paella.opencast.userTrackingSaverPlugIn"; }
+  return class userTrackingSaverPlugIn extends paella.userTracking.SaverPlugIn{
+    getName() { return 'es.upv.paella.opencast.userTrackingSaverPlugIn'; }
 
     checkEnabled(onSuccess) {
       paella.ajax.get({url:'/usertracking/detailenabled'},
@@ -51,36 +51,36 @@ paella.addPlugin(function() {
         };
 
         switch (event) {
-          case paella.events.play:
-            opencastLog.type = 'PLAY';
-            break;
-          case paella.events.pause:
-            opencastLog.type = 'PAUSE';
-            break;
-          case paella.events.seekTo:
-          case paella.events.seekToTime:
-            opencastLog.type = 'SEEK';
-            break;
-          case paella.events.resize:
-            opencastLog.type = "RESIZE-TO-" + params.width + "x" + params.height;
-            break;
-          case "paella:searchService:search":
-            opencastLog.type = "SEARCH-" + params;
-            break;
-          default:
-            opencastLog.type = event;
-            var opt = params;
-            if (opt != undefined) {
-              if (typeof(params) == "object") {
-                opt = JSON.stringify(params);
-              }
-              opencastLog.type = event + ';' + opt;
+        case paella.events.play:
+          opencastLog.type = 'PLAY';
+          break;
+        case paella.events.pause:
+          opencastLog.type = 'PAUSE';
+          break;
+        case paella.events.seekTo:
+        case paella.events.seekToTime:
+          opencastLog.type = 'SEEK';
+          break;
+        case paella.events.resize:
+          opencastLog.type = 'RESIZE-TO-' + params.width + 'x' + params.height;
+          break;
+        case 'paella:searchService:search':
+          opencastLog.type = 'SEARCH-' + params;
+          break;
+        default:
+          opencastLog.type = event;
+          var opt = params;
+          if (opt != undefined) {
+            if (typeof(params) == 'object') {
+              opt = JSON.stringify(params);
             }
-            break;
+            opencastLog.type = event + ';' + opt;
+          }
+          break;
         }
         opencastLog.type = opencastLog.type.substr(0, 128);
         paella.ajax.get( {url: '/usertracking/', params: opencastLog});
       });
     }
-  }
+  };
 });

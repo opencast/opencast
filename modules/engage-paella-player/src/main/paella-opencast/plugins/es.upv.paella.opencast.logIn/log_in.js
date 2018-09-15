@@ -19,18 +19,18 @@
  *
  */
 paella.addPlugin(function() {
-	return class logIn extends paella.VideoOverlayButtonPlugin {
+  return class logIn extends paella.VideoOverlayButtonPlugin {
     constructor() {
       super();
     }
 
     getName() {
-      return "es.upv.paella.opencast.logIn";
+      return 'es.upv.paella.opencast.logIn';
     }
-    getSubclass() { return "logIn"; }
+    getSubclass() { return 'logIn'; }
     getAlignment() { return 'right'; }
     getIndex() {return 10;}
-    getDefaultToolTip() { return base.dictionary.translate("Log in"); }
+    getDefaultToolTip() { return base.dictionary.translate('Log in'); }
 
     checkEnabled(onSuccess) {
       paella.initDelegate.initParams.accessControl.userData()
@@ -42,5 +42,5 @@ paella.addPlugin(function() {
     action(button) {
       window.location.href = paella.initDelegate.initParams.accessControl.getAuthenticationUrl();
     }
-  }
+  };
 });

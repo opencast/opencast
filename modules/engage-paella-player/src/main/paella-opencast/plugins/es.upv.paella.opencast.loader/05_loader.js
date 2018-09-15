@@ -1,3 +1,11 @@
+/*global Opencast 
+         MHAnnotationServiceDefaultDataDelegate
+         MHAnnotationServiceTrimmingDataDelegate
+         MHFootPrintsDataDelegate
+         OpencastTrackCameraDataDelegate
+         OpencastToPaellaConverter
+         OpencastAccessControl
+*/
 
 function initPaellaOpencast() {
   if (!paella.opencast) {
@@ -21,7 +29,7 @@ function loadOpencastPaella(containerId) {
           var converter = new OpencastToPaellaConverter();
           var data = converter.convertToDataJson(episode);
           if (data.streams.length < 1) {
-            paella.messageBox.showError(paella.dictionary.translate("Error loading video! No video traks found"));
+            paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video traks found'));
           }
           else {
             resolve(data);
@@ -34,7 +42,7 @@ function loadOpencastPaella(containerId) {
               window.location.href = oacl.getAuthenticationUrl();
             }
             else {
-              var errMsg = paella.dictionary.translate("Error loading video {id}").replace(/\{id\}/g, paella.utils.parameters.get('id') || "");
+              var errMsg = paella.dictionary.translate('Error loading video {id}').replace(/\{id\}/g, paella.utils.parameters.get('id') || '');
               paella.messageBox.showError(errMsg);
             }
           });

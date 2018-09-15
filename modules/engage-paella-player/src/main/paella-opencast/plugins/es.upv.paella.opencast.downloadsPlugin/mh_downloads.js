@@ -19,7 +19,7 @@
  *
  */
 paella.addPlugin(function() {
-	return class DownloadsPlugin extends paella.TabBarPlugin {
+  return class DownloadsPlugin extends paella.TabBarPlugin {
     getSubclass() { return 'downloadsTabBar'; }
     getName() { return 'es.upv.paella.opencast.downloadsPlugin'; }
     getTabName() { return paella.dictionary.translate('Downloads'); }
@@ -60,14 +60,14 @@ paella.addPlugin(function() {
       if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
       for (var i = 0; i < tracks.length; ++i) {
-          var track = tracks[i];
+        var track = tracks[i];
         var download = false;
         if (track.tags != undefined && track.tags.tag != undefined
-            && track.mimetype.indexOf("video") >= 0
-            && track.url.indexOf("rtmp://") < 0) {
+            && track.mimetype.indexOf('video') >= 0
+            && track.url.indexOf('rtmp://') < 0) {
           for (var j = 0; j < track.tags.tag.length; j++) {
-            if (track.tags.tag[j] === "engage-download") {
-            download = true;
+            if (track.tags.tag[j] === 'engage-download') {
+              download = true;
               break;
             }
           }
@@ -131,6 +131,6 @@ paella.addPlugin(function() {
 
       return text;
     }
-  }
+  };
 });
 

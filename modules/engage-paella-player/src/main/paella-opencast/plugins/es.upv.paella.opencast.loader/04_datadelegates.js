@@ -6,7 +6,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
 
   read(context,params,onSuccess) {
     var episodeId = params.id;
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: "paella/"+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if (!(annotations instanceof Array)) { annotations = [annotations]; }
@@ -16,7 +16,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
             try {
               value = JSON.parse(value);
             }
-            catch(err) {}
+            catch(err) {/**/}
             if (onSuccess) onSuccess(value, true);
           }
           else{
@@ -36,7 +36,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
     var episodeId = params.id;
     if (typeof(value)=='object') value = JSON.stringify(value);
 
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: "paella/"+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if (annotations == undefined) {annotations = [];}
@@ -50,8 +50,8 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
               value: value,
               'in': 0
             }},
-            function(data, contentType, returnCode) { onSuccess({}, true); },
-            function(data, contentType, returnCode) { onSuccess({}, false); }
+          function(data, contentType, returnCode) { onSuccess({}, true); },
+          function(data, contentType, returnCode) { onSuccess({}, false); }
           );
         }
         else if (annotations.length == 1 ) {
@@ -79,7 +79,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
   remove(context,params,onSuccess) {
     var episodeId = params.id;
 
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: "paella/"+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if(annotations) {
@@ -87,7 +87,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
           var asyncLoader = new paella.AsyncLoader();
           for ( var i=0; i< annotations.length; ++i) {
             var annotationId = data.annotations.annotation.annotationId;
-            asyncLoader.addCallback(new paella.JSONCallback({url:'/annotation/'+annotationId}, "DELETE"));
+            asyncLoader.addCallback(new paella.JSONCallback({url:'/annotation/'+annotationId}, 'DELETE'));
           }
           asyncLoader.load(function(){ if (onSuccess) { onSuccess({}, true); } }, function() { onSuccess({}, false); });
         }
@@ -139,7 +139,7 @@ class MHFootPrintsDataDelegate extends paella.DataDelegate {
       function(data, contentType, returnCode) {
         if ((returnCode == 200) && (contentType == 'application/json')) {
           var footPrintsData = data.footprints.footprint;
-          if (data.footprints.total == "1"){
+          if (data.footprints.total == '1'){
             footPrintsData = [footPrintsData];
           }
           if (onSuccess) { onSuccess(footPrintsData, true); }
@@ -154,24 +154,23 @@ class MHFootPrintsDataDelegate extends paella.DataDelegate {
     );
   }
 
-  write(context,params,value,onSuccess) {
-    var thisClass = this;
+  write(context,params,value,onSuccess) {    
     var episodeId = params.id;
     paella.ajax.get({url: '/usertracking/', params: {
-          _method: 'PUT',
-          id: episodeId,
-          type:'FOOTPRINT',
-          in:value.in,
-          out:value.out }
-      },
-      function(data, contentType, returnCode) {
-        var ret = false;
-        if (returnCode == 201) { ret = true; }
-        if (onSuccess) { onSuccess({}, ret); }
-      },
-      function(data, contentType, returnCode) {
-        if (onSuccess) { onSuccess({}, false); }
-      }
+      _method: 'PUT',
+      id: episodeId,
+      type:'FOOTPRINT',
+      in:value.in,
+      out:value.out }
+    },
+    function(data, contentType, returnCode) {
+      var ret = false;
+      if (returnCode == 201) { ret = true; }
+      if (onSuccess) { onSuccess({}, ret); }
+    },
+    function(data, contentType, returnCode) {
+      if (onSuccess) { onSuccess({}, false); }
+    }
     );
   }
 }
@@ -185,23 +184,23 @@ class OpencastTrackCameraDataDelegate extends paella.DataDelegate {
       return;
     }
     for (let i = 0; i < attachments.length; i++) {
-      if (attachments[i].type.indexOf("trackhd") > 0) {
+      if (attachments[i].type.indexOf('trackhd') > 0) {
         trackhdUrl = attachments[i].url;
       }
     }
     if (trackhdUrl) {
       paella.utils.ajax.get({ url:trackhdUrl },
         (data) => {
-          if (typeof(data)=="string") {
+          if (typeof(data)=='string') {
             try {
               data = JSON.parse(data);
             }
-            catch(err) {}
+            catch(err) {/**/}
           }
           data.positions.sort((a,b) => {
             return a.time-b.time;
-          })
-          onSuccess(data)
+          });
+          onSuccess(data);
         },
         () => onSuccess(null) );
     }
@@ -209,4 +208,4 @@ class OpencastTrackCameraDataDelegate extends paella.DataDelegate {
       onSuccess(null);
     }
   }
-};
+}
