@@ -1688,7 +1688,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       if (hasAudio) {
         for (int i = 0; i < files.size(); i++) {
           if (!tracks.get(i).hasAudio())
-            sb.append("aevalsrc=0::d=1[silent").append(i + 1).append("];");
+            sb.append("aevalsrc=0:d=1[silent").append(i + 1).append("];");
         }
       }
     }

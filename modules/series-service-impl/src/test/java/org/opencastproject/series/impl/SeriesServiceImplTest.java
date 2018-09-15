@@ -376,6 +376,44 @@ public class SeriesServiceImplTest {
   }
 
   @Test
+  public void testACLEquality5() {
+    AccessControlList a = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), false));
+    assertFalse(AccessControlUtil.equals(a, b));
+  }
+
+  @Test
+  public void testACLEquality6() {
+    AccessControlList a = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), true));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), true));
+    assertTrue(AccessControlUtil.equals(a, b));
+  }
+
+  @Test
+  public void testACLEquality7() {
+    // It is possible to apply this contradictory ACL to a series or event in OC,
+    // where "a" is allowed AND disallowed from writing to the resource.
+    // See MH-13089
+    AccessControlList a = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), true),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), true));
+    AccessControlList b = new AccessControlList(
+            new AccessControlEntry("a", Permissions.Action.WRITE.toString(), false),
+            new AccessControlEntry("b", Permissions.Action.READ.toString(), true));
+    assertFalse(AccessControlUtil.equals(a, b));
+  }
+
+  @Test
   public void testSeriesElements() throws Exception {
     seriesService.updateSeries(testCatalog);
     final String seriesId = testCatalog.getFirst(DublinCoreCatalog.PROPERTY_IDENTIFIER);

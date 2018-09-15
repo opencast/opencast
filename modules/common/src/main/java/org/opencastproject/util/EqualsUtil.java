@@ -25,6 +25,7 @@ package org.opencastproject.util;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /** Utility function helping to implement equality. */
 public final class EqualsUtil {
@@ -51,17 +52,34 @@ public final class EqualsUtil {
     return bothNotNull(a, b) && a.getClass().equals(b.getClass());
   }
 
-  /** Compare the elements of two lists for equality treating the lists as sets. */
+  /**
+   * Compare the (distinct) elements of two lists for equality treating the lists as sets.
+   * <p>
+   * Sets by definition do not allow multiplicity of elements; a set is a (possibly empty) collection of distinct elements.
+   * As Lists may contain non-unique entries, this method removes duplicates before continuing with the comparison check.
+   *
+   * Examples of
+   * 1. equality: {1, 2} = {2, 1} = {1, 1, 2} = {1, 2, 2, 1, 2}, null = null
+   * 2. unequal: {1, 2, 2} != {1, 2, 3}, null != {}
+   */
   public static boolean eqListUnsorted(List<?> as, List<?> bs) {
-    if (as != null && bs != null && as.size() == bs.size()) {
-      for (Object a : as) {
-        if (!bs.contains(a))
-          return false;
-      }
-      return true;
-    } else {
+    if (as == null || bs == null) {
       return eqObj(as, bs);
     }
+
+    as = as.stream().distinct().collect(Collectors.toList());
+    bs = bs.stream().distinct().collect(Collectors.toList());
+
+    if (as.size() != bs.size()) {
+      return false;
+    }
+    for (Object a : as) {
+      if (!bs.contains(a)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
