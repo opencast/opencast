@@ -190,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "Non se puideron gardar os datos de edición",
       "VIDEO_CUT_SAVED": "Datos de edición gardados",
       "VIDEO_CUT_PROCESSING": "Estase a procesar o vídeo…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
@@ -1726,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Metadatos",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Comentarios",
          "SEGMENTS": "Segmentos"
       },
@@ -1745,6 +1747,42 @@
          "USE_SEGMENT": "Usar este segmento",
          "START": "Inicio",
          "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Subir imaxe",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Reproducir",
