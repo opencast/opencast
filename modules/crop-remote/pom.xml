@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>crop-remote</artifactId>
+  <artifactId>opencast-crop-remote</artifactId>
   <packaging>bundle</packaging>
-  <name>crop-remote</name>
+  <name>Opencast :: crop-remote</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -21,13 +21,12 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common</artifactId>
-      <version>5-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>crop-api</artifactId>
-      <version>5-SNAPSHOT</version>
-      <scope>compile</scope>
+      <artifactId>opencast-crop-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

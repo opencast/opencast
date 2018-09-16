@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
-  <artifactId>crop-ffmpeg</artifactId>
+  <artifactId>opencast-crop-ffmpeg</artifactId>
   <packaging>bundle</packaging>
-  <name>crop-ffmpeg</name>
+  <name>Opencast :: crop-ffmpeg</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -18,7 +18,7 @@
     <!-- Opencast dependencies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>crop-api</artifactId>
+      <artifactId>opencast-crop-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -32,24 +32,19 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-inspection-service-ffmpeg</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.easymock</groupId>
-      <artifactId>easymock</artifactId>
-      <scope>test</scope>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-mpeg7</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <!--  Thirdparty dependencies -->
     <dependency>
@@ -81,23 +76,28 @@
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-common</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>javax.ws.rs</groupId>
       <artifactId>jsr311-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-mpeg7</artifactId>
-      <version>${project.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-inspection-service-ffmpeg</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
