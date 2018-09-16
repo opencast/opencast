@@ -338,7 +338,7 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
     };
 
     $scope.nonScheduleSelected = function() {
-        return JsHelper.filter($scope.getSelected(),function (r) { return r.event_status_raw !== 'EVENTS.EVENTS.STATUS.SCHEDULED'; }).length > 0;
+        return JsHelper.filter($scope.getSelected(), $scope.nonSchedule).length > 0;
     };
 
     $scope.rowsValid = function() {
