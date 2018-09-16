@@ -7,11 +7,18 @@ module.exports = {
   'parserOptions': {
     'ecmaVersion': 2015
   },
+  "plugins": [
+    "header"
+  ],
   'rules': {
+    'header/header': [
+      2,
+      '../../docs/checkstyle/opencast-header.txt'
+    ],
     'indent': [
       'error',
       2,
-      { 
+      {
         "VariableDeclarator": {
           "var": 2,
           "let": 2,
