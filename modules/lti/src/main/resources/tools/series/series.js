@@ -1,4 +1,6 @@
-"use strict";
+/* global $, Mustache */
+
+'use strict';
 
 var player,
     currentpage;
@@ -41,7 +43,7 @@ function loadPage(page) {
   $('main').html($('#template-loading').html());
 
   $.getJSON(url, function( data ) {
-    data = data['search-results']
+    data = data['search-results'];
     var rendered = '',
         results = [],
         total = parseInt(data.total);
@@ -75,7 +77,7 @@ function loadPage(page) {
 
     // render episode view
     $('main').html(rendered);
-  
+
     // render result information
     var resultTemplate = $('#template-results').html(),
         resultTplData = {
@@ -84,7 +86,7 @@ function loadPage(page) {
             begin: Math.min(offset + 1, total),
             end: offset + parseInt(data.limit)
           }
-        }
+        };
     $('header').html(Mustache.render(resultTemplate, resultTplData));
 
     // render pagination
