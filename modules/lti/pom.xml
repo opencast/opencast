@@ -86,6 +86,21 @@
                   </arguments>
                 </configuration>
               </execution>
+
+              <execution>
+                <id>html-linter</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>html-linter</argument>
+                  </arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -135,6 +150,17 @@
                 </goals>
                 <configuration>
                   <arguments>run eslint</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <phase>test</phase>
+                <id>html-linter</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run html-linter</arguments>
                 </configuration>
               </execution>
             </executions>
