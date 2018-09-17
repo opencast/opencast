@@ -76,6 +76,12 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   public static final String DIGEST_PASSWORD_KEY = "org.opencastproject.security.digest.pass";
   public static final String CAPTURE_AGENT_PASSWORD_KEY = "org.opencastproject.security.capture_agent.pass";
 
+  /**
+   * System password set by default in the configuration file.
+   * Note that this is not set if it is not defined in the configuration file.
+   * */
+  private static final String DIGEST_PASSWORD_DEFAULT_CONFIGURATION = "CHANGE_ME";
+
   /** Configuration key for optional additional roles for the capture agent user */
   public static final String CAPTURE_AGENT_EXTRA_ROLES_KEY = "org.opencastproject.security.capture_agent.roles";
 
@@ -99,11 +105,26 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   protected void activate(ComponentContext cc) {
     digestUsername = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_USER_KEY));
-    if (digestUsername == null)
+    if (digestUsername == null) {
       logger.warn("Digest username has not been configured ({})", DIGEST_USER_KEY);
+    }
+
     digestUserPass = StringUtils.trimToNull(cc.getBundleContext().getProperty(DIGEST_PASSWORD_KEY));
-    if (digestUsername == null)
+    if (digestUserPass == null) {
       logger.warn("Digest password has not been configured ({})", DIGEST_PASSWORD_KEY);
+    } else if (DIGEST_PASSWORD_DEFAULT_CONFIGURATION.equals(digestUserPass)) {
+      logger.warn("\n"
+              + "######################################################\n"
+              + "#                                                    #\n"
+              + "# WARNING: Opencast still uses the default system    #\n"
+              + "#          credentials. Never do this in production. #\n"
+              + "#                                                    #\n"
+              + "#          To change the password, edit the key      #\n"
+              + "#          org.opencastproject.security.digest.pass  #\n"
+              + "#          in custom.properties.                     #\n"
+              + "#                                                    #\n"
+              + "######################################################");
+    }
 
     // Create the digest user
     createSystemUsers();
