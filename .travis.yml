@@ -14,6 +14,7 @@ cache:
 # Do not cache the opencast artifacts to detect dependency problems
 before_cache:
   - rm -rf ~/.m2/repository/org/opencastproject
+  - sudo chown -R travis:travis ~/.m2 ~/.cache/pip docs/guides/node_modules/
 
 # Shorten some commands
 # - A simple download command for synfig packages
