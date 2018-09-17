@@ -40,7 +40,6 @@ import com.google.gson.JsonObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
@@ -130,11 +129,6 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
   public static final int SLEEP_SCALE_FACTOR = 2;
 
   /**
-   * The http client to use when connecting to remote servers
-   */
-  protected HttpClient client = null;
-
-  /**
    * {@inheritDoc}
    */
   @Override
@@ -164,7 +158,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     }
 
     // Figure out which request method to use
-    HttpEntityEnclosingRequestBase request = null;
+    HttpEntityEnclosingRequestBase request;
     if (StringUtils.equalsIgnoreCase(POST, method)) {
       request = new HttpPost(urlPath);
     } else if (StringUtils.equalsIgnoreCase(PUT, method)) {
@@ -185,8 +179,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
       request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
-      throw new WorkflowOperationException(
-              "Error happened during the encoding of the event parameter as form parameter: {}", e);
+      throw new WorkflowOperationException("Error encoding the event parameter as form parameter", e);
     }
 
     // Execute the request
@@ -241,8 +234,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
       return s + "not defined";
     }
     if (o instanceof String[]) {
-      String tmp = join((String[]) o, ',');
-      return tmp;
+      return join((String[]) o, ',');
     }
     return o.toString();
 
@@ -270,10 +262,10 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     try {
       response = httpClient.execute(request);
     } catch (ClientProtocolException e) {
-      logger.error("Protocol error during execution of query on target {}: {} ", request.getURI(), e);
+      logger.error("Protocol error during execution of query on target {}", request.getURI(), e);
       return false;
     } catch (IOException e) {
-      logger.error("I/O error during execution of query on target {}: {}", request.getURI(), e);
+      logger.error("I/O error during execution of query on target {}", request.getURI(), e);
       return false;
     }
 
@@ -288,7 +280,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
         Thread.sleep(sleepTime);
         return executeRequest(request, --maxAttempts, timeout, sleepTime * SLEEP_SCALE_FACTOR);
       } catch (InterruptedException e) {
-        logger.error("Error during sleep time before new notification request try: {}", e);
+        logger.error("Error during sleep time before new notification request try", e);
         return false;
       }
     } else {
