@@ -25,15 +25,10 @@ import org.opencastproject.crop.api.CropException;
 import org.opencastproject.crop.api.CropService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.UnsupportedElementException;
-import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
-import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.mpeg7.Mpeg7CatalogService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -55,11 +50,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
@@ -71,7 +63,7 @@ import java.util.List;
  * <pre>
  *     ffmpeg -i input.file -vf cropdetect=24:16:0 -max_muxing_qurue_size 2000 -f null -
  *
- *     ffmpeg -i input.file -vf crop=wi-2*x:hi:x:0 -max_muxing_queue_size 2000 -y output.file
+ *     ffmpeg -i input.file -vf startCropping=wi-2*x:hi:x:0 -max_muxing_queue_size 2000 -y output.file
  * </pre>
  */
 public class CropServiceImpl extends AbstractJobProducer implements CropService, ManagedService {
@@ -94,10 +86,10 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   protected String binary;
 
   public static final String FFMPEG_BINARY_CONFIG = "org.opencastproject.composer.ffmpeg.path";
-  public static final String FFMEG_BINARY_DEFAULT = "ffmpeg";
+  public static final String FFMPEG_BINARY_DEFAULT = "ffmpeg";
 
   /**
-   * The load intorduced on the system by creating a caption job
+   * The load introduced on the system by creating a caption job
    */
   public static final float DEFAULT_CROP_JOB_LOAD = 1.0f;
 
@@ -129,97 +121,80 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
   /**
    * The counter that determines after how many frames cropdetect will be executed again
    */
-  public static final String CROP_FFMEG_RESET = "org.opencastproject.ffmpeg.cropping.reset";
-  public static final String DEFAULT_CROP_FFMEG_RESET  = "240";
+  public static final String CROP_FFMPEG_RESET = "org.opencastproject.ffmpeg.cropping.reset";
+  public static final String DEFAULT_CROP_FFMPEG_RESET = "240";
 
-  private String reset = DEFAULT_CROP_FFMEG_RESET;
+  private String reset = DEFAULT_CROP_FFMPEG_RESET;
 
   /**
    * The logging facility
    */
-  protected static final Logger logger = LoggerFactory.getLogger(CropServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(CropServiceImpl.class);
 
   /**
    * Reference to the receipt service
    */
-  protected ServiceRegistry serviceRegistry = null;
+  private ServiceRegistry serviceRegistry = null;
 
   /**
    * The mpeg7 service
    */
-  protected Mpeg7CatalogService mpeg7CatalogService = null;
+  private Mpeg7CatalogService mpeg7CatalogService = null;
 
   /**
    * The workspace to use when retrieving remote media files
    */
-  protected Workspace workspace = null;
+  private Workspace workspace = null;
 
-  protected SecurityService securityService = null;
+  private SecurityService securityService = null;
 
-  protected OrganizationDirectoryService organizationDirectoryService = null;
+  private OrganizationDirectoryService organizationDirectoryService = null;
 
-  protected UserDirectoryService userDirectoryService = null;
+  private UserDirectoryService userDirectoryService = null;
 
   /**
-   * Creates a new instance of the crop service.
+   * Creates a new instance of the startCropping service.
    */
   public CropServiceImpl() {
     super(JOB_TYPE);
-    this.binary = FFMEG_BINARY_DEFAULT;
+    this.binary = FFMPEG_BINARY_DEFAULT;
   }
 
   @Override
   public void activate(ComponentContext cc) {
     super.activate(cc);
     final String path = cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG);
-    this.binary = StringUtils.defaultIfBlank(path, FFMEG_BINARY_DEFAULT);
+    this.binary = StringUtils.defaultIfBlank(path, FFMPEG_BINARY_DEFAULT);
     logger.debug("Configuration {}: {}", FFMPEG_BINARY_CONFIG, binary);
   }
 
-  protected Track crop(Job job, Track track) throws CropException, MediaPackageException {
+  private Track startCropping(Track track) throws CropException {
 
     if (!track.hasVideo()) {
       throw new CropException("Element is not a video track");
     }
+
+    File mediaFile;
     try {
-      Track croppedTrack;
-
-      File mediaFile;
-      try {
-        mediaFile = workspace.get(track.getURI());
-      } catch (NotFoundException e) {
-        throw new CropException("Error finding the video file in the workspace", e);
-      } catch (IOException e) {
-        throw new CropException("Error reading the video file in the workspace", e);
-      }
-
-      logger.info("starting cropping of {} ", track);
-
-      croppedTrack = cropFfmpeg(mediaFile, track);
-
-      Track cropTrack = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-              .newElement(Track.TYPE, track.getFlavor());
-      URI uri;
-      try {
-        uri = croppedTrack.getURI();
-      } catch (Exception e) {
-        throw new CropException("Unable to get URI of cropped track", e);
-      }
-      cropTrack.setURI(uri);
-
-      logger.info("Finished video cropping of {}", track.getURI());
-
-      return cropTrack;
-
-    } catch (IOException e) {
-      logger.warn("Error cropping video", e);
-      throw new CropException(e);
+      mediaFile = workspace.get(track.getURI());
+    } catch (NotFoundException | IOException e) {
+      throw new CropException("Error loading the video file into the workspace", e);
     }
 
+    logger.info("Starting cropping of {}", track);
+
+    File croppedMedia = cropFFmpeg(mediaFile);
+
+    Track cropTrack = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
+            .newElement(Track.TYPE, track.getFlavor());
+    cropTrack.setURI(croppedMedia.toURI());
+
+    logger.info("Finished video cropping of {}", track.getURI());
+    return cropTrack;
   }
 
-  protected Track cropFfmpeg(File mediafile, Track track) throws IOException, CropException {
-    String[] command = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf", "cropdetect="
+  private File cropFFmpeg(File mediaFile) throws CropException {
+    String[] command = new String[] { binary, "-i", mediaFile.getAbsolutePath(), "-vf", "cropdetect="
             + greyScaleLimit + ":" + round + ":" + reset,
             "-max_muxing_queue_size", "2000", "-f", "null", "-"};
     String commandline = StringUtils.join(command, " ");
@@ -232,89 +207,63 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     String crop = null;
     pbuilder.redirectErrorStream(true);
     int exitCode = 1;
-    Process process = pbuilder.start();
-    try (BufferedReader errStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-      String line = errStream.readLine();
-      while (null != line) {
-        if (line.startsWith("[Parsed_cropdetect")) {
-          // [Parsed_cropdetect_0 @ 0x8f6620] x1:120 x2:759 y1:0 y2:399 w:640 h:400 x:120 y:0 pts:639356 t:39.023193 crop=640:400:120:0
-          String[] lineSplitted = line.split(" ");
-          widthVideo = Integer.valueOf(lineSplitted[7].substring(2));
-          int x = Integer.valueOf(lineSplitted[9].substring(2));
-          if (cropValue == 0 || cropValue > x) {
-            cropValue = x;
-            crop = lineSplitted[13];
-          }
+    Process process;
+    try {
+      process = pbuilder.start();
+      try (BufferedReader errStream = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        String line = errStream.readLine();
+        while (null != line) {
+          if (line.startsWith("[Parsed_cropdetect")) {
+            // [Parsed_cropdetect_0 @ 0x8f6620] x1:120 x2:759 y1:0 y2:399 w:640 h:400 x:120 y:0 pts:639356 t:39.023193 startCropping=640:400:120:0
+            String[] lineSplitted = line.split(" ");
+            widthVideo = Integer.valueOf(lineSplitted[7].substring(2));
+            int x = Integer.valueOf(lineSplitted[9].substring(2));
+            if (cropValue == 0 || cropValue > x) {
+              cropValue = x;
+              crop = lineSplitted[13];
+            }
 
+          }
+          line = errStream.readLine();
         }
-        line = errStream.readLine();
       }
       exitCode = process.waitFor();
 
     } catch (IOException e) {
-      logger.error("Error executing ffmeg: {}", e);
+      logger.error("Error executing FFmpeg", e);
     } catch (InterruptedException e) {
-      logger.error("Waiting for encoder process exited was interrupted unexpected: {}", e);
+      logger.error("Waiting for encoder process exited was interrupted unexpected", e);
     }
 
     if (exitCode != 0) {
       throw new CropException("The encoder process exited abnormally with exit code " + exitCode);
     }
     if (cropValue > widthVideo / 3) {
-      return track;
+      return mediaFile;
     }
-    // FFMPEG-command for cropping video
-    logger.info("String for crop command: {}", crop);
-    String croppedOutputPath = FilenameUtils.removeExtension(mediafile.getAbsolutePath()).concat(RandomStringUtils
+    // FFmpeg command for cropping video
+    logger.info("String for startCropping command: {}", crop);
+    String croppedOutputPath = FilenameUtils.removeExtension(mediaFile.getAbsolutePath()).concat(RandomStringUtils
             .randomAlphanumeric(8) + ".mp4");
-    String[] cropCommand = new String[] { binary, "-i", mediafile.getAbsolutePath(), "-vf", crop,
-            "-max_muxing_queue_size", "2000", "-y", croppedOutputPath };
+    String[] cropCommand = new String[] { binary, "-i", mediaFile.getAbsolutePath(), "-vf", crop,
+            "-max_muxing_queue_size", "2000", croppedOutputPath };
     String cropCommandline = StringUtils.join(cropCommand, " ");
 
-    logger.info("running {}", cropCommandline);
+    logger.info("Running {}", cropCommandline);
 
     try {
       pbuilder = new ProcessBuilder(cropCommand);
       process = pbuilder.start();
       //wait until the task is finished
-      process.waitFor();
-      int eCode = process.exitValue();
-      if (eCode != 0) {
-        throw new CropException("Ffmpeg exited abnormally with status " + eCode);
-      }
-
-    } catch (Exception e) {
-      logger.error("Error executing ffmeg: {}", e);
+      exitCode = process.waitFor();
+    } catch (InterruptedException | IOException e) {
+      throw new CropException("Ffmpeg process interrupted", e);
     }
-    // put output file into workspace
-    URI outputFileUri = null;
-    try (FileInputStream outputFileStream = new FileInputStream(croppedOutputPath)) {
-      outputFileUri = workspace
-              .putInCollection(COLLECTION_ID, FilenameUtils.getName(croppedOutputPath), outputFileStream);
-      logger.info("Copied the created outputfile to the workspace {}", outputFileUri.toString());
-    } catch (FileNotFoundException e) {
-      throw new CropException("Output file " + croppedOutputPath + " not found", e);
-    } catch (IOException e) {
-      throw new CropException("Can't write output file " + croppedOutputPath + " to workspace", e);
-    } catch (IllegalArgumentException e) {
-      throw new CropException(e);
+    if (exitCode != 0) {
+      throw new CropException("Ffmpeg exited abnormally with status " + exitCode);
     }
 
-    // create media package element
-    MediaPackageElementBuilder mpElementBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-
-    // create catalog from media package element
-    TrackImpl outputFileTrack = null;
-    try {
-      outputFileTrack = (TrackImpl) mpElementBuilder
-              .elementFromURI(outputFileUri, MediaPackageElement.Type.Track, track.getFlavor());
-      outputFileTrack.setIdentifier(IdBuilderFactory.newInstance().newIdBuilder().createNew().compact());
-    } catch (UnsupportedElementException e) {
-      throw new CropException("Unable to create track element from " + outputFileUri, e);
-    }
-
-    outputFileTrack.setDuration(track.getDuration());
-    return outputFileTrack;
+    return new File(croppedOutputPath);
   }
 
   @Override
@@ -327,7 +276,7 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       switch (op) {
         case Crop:
           Track track = (Track) MediaPackageElementParser.getFromXml(arguments.get(0));
-          Track croppedTrack = crop(job, track);
+          Track croppedTrack = startCropping(track);
           return MediaPackageElementParser.getAsXml(croppedTrack);
         default:
           throw new IllegalStateException("Don't know how to handle operations '" + operation + "'");
@@ -390,8 +339,8 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
       }
     }
 
-    if (dictionary.get(CROP_FFMEG_RESET) != null) {
-      String re = (String) dictionary.get(CROP_FFMEG_RESET);
+    if (dictionary.get(CROP_FFMPEG_RESET) != null) {
+      String re = (String) dictionary.get(CROP_FFMPEG_RESET);
       try {
         reset = re;
         logger.info("Changes reset to {}", reset);

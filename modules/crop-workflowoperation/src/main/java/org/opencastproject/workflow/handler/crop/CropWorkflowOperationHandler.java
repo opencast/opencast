@@ -44,13 +44,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * The workflow definition will run recordings to crop them from 4:3 to 16:9.
@@ -66,18 +63,8 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_TARGET_TAGS = "target-tags";
 
-  /** The configuration options for this handler */
-  private static final SortedMap<String, String> CONFIG_OPTIONS;
-
   /** Id builder used to create ids for cropped tracks */
   private final IdBuilder idBuilder = IdBuilderFactory.newInstance().newIdBuilder();
-
-  static {
-    CONFIG_OPTIONS = new TreeMap<>();
-    CONFIG_OPTIONS.put(PROP_ANALYSIS_TRACK_FLAVOR,
-            "The flavor of the track to analyze. If multiple tracks match this flavor, the first will be used.");
-    CONFIG_OPTIONS.put(PROP_TARGET_TAGS, "The tags to apply to the resulting mpeg-7 catalog");
-  }
 
   /** The composer service */
   private CropService cropService = null;
