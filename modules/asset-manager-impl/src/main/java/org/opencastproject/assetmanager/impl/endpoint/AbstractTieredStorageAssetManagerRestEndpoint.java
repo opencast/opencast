@@ -36,8 +36,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import com.entwinemedia.fn.P1Lazy;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.DateFormat;
@@ -122,13 +120,13 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
     } else if (!tsamjp.datastoreExists(trimmedTarget)) {
       return badRequest("Target store " + trimmedTarget + " not found");
     }
-    return handleException(new P1Lazy<Response>() {
-      @Override
-      public Response get1() {
-        Job j = tsamjp.moveById(mpid, trimmedTarget);
-        return Response.ok(new JaxbJob(j)).build();
-      }
-    });
+
+    try {
+      Job j = tsamjp.moveById(mpid, trimmedTarget);
+      return Response.ok(new JaxbJob(j)).build();
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @POST
@@ -186,13 +184,12 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
       return badRequest("Target store " + trimmedTarget + " not found");
     }
 
-    return handleException(new P1Lazy<Response>() {
-      @Override
-      public Response get1() {
-        Job j = tsamjp.moveByIdAndVersion(v, mpid, trimmedTarget);
-        return ok(new JaxbJob(j));
-      }
-    });
+    try {
+      Job j = tsamjp.moveByIdAndVersion(v, mpid, trimmedTarget);
+      return ok(new JaxbJob(j));
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @POST
@@ -251,13 +248,12 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
       return badRequest("Target store " + trimmedTarget + " not found");
     }
 
-    return handleException(new P1Lazy<Response>() {
-      @Override
-      public Response get1() {
-        Job j = tsamjp.moveByDate(start, end, trimmedTarget);
-        return ok(new JaxbJob(j));
-      }
-    });
+    try {
+      Job j = tsamjp.moveByDate(start, end, trimmedTarget);
+      return ok(new JaxbJob(j));
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 
   @POST
@@ -327,12 +323,11 @@ public abstract class AbstractTieredStorageAssetManagerRestEndpoint extends Abst
       return badRequest("Target store " + trimmedTarget + " not found");
     }
 
-    return handleException(new P1Lazy<Response>() {
-      @Override
-      public Response get1() {
-        Job j = tsamjp.moveByIdAndDate(mpid, start, end, trimmedTarget);
-        return ok(new JaxbJob(j));
-      }
-    });
+    try {
+      Job j = tsamjp.moveByIdAndDate(mpid, start, end, trimmedTarget);
+      return ok(new JaxbJob(j));
+    } catch (Exception e) {
+      return handleException(e);
+    }
   }
 }
