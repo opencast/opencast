@@ -31,6 +31,7 @@ import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
+import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.capture.CaptureParameters;
@@ -97,6 +98,7 @@ import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -183,11 +185,8 @@ public class EventsEndpoint implements ManagedService {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);
 
-  /** Default server URL */
-  protected String serverUrl = "http://localhost:8080";
-
-  /** Service url */
-  protected String serviceUrl = null;
+  /** Base URL of this endpoint */
+  protected String endpointBaseUrl;
 
   private static long expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
@@ -289,16 +288,12 @@ public class EventsEndpoint implements ManagedService {
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
-    this.serverUrl = "http://localhost:8080";
-    if (cc != null) {
-      String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
-      if (ccServerUrl != null) {
-        logger.debug("Configured server url is {}", ccServerUrl);
-        this.serverUrl = ccServerUrl;
-      }
-    }
-    serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    logger.info("Activated External API - Events Endpoint");
+    logger.info("Activating External API - Events Endpoint");
+
+    final Tuple<String, String> endpointUrl = getEndpointUrl(cc, OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY,
+            RestConstants.SERVICE_PATH_PROPERTY);
+    endpointBaseUrl = UrlSupport.concat(endpointUrl.getA(), endpointUrl.getB());
+    logger.debug("Configured service endpoint is {}", endpointBaseUrl);
   }
 
   /** OSGi callback if properties file is present */
@@ -617,20 +612,80 @@ public class EventsEndpoint implements ManagedService {
         }
 
         String name = filterTuple[0];
-        String value = filterTuple[1];
+        String value;
 
-        if ("presenters".equals(name))
+        if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+          // MH-13038 - 1.1.0 and higher support semi-colons in values
+          value = f.substring(name.length() + 1);
+        } else {
+          value = filterTuple[1];
+        }
+
+        if ("presenters".equals(name)) {
           query.withPresenter(value);
-        if ("contributors".equals(name))
+        } else if ("contributors".equals(name)) {
           query.withContributor(value);
-        if ("location".equals(name))
+        } else if ("location".equals(name)) {
           query.withLocation(value);
-        if ("textFilter".equals(name))
+        } else if ("textFilter".equals(name)) {
           query.withText("*" + value + "*");
-        if ("series".equals(name))
+        } else if ("series".equals(name)) {
           query.withSeriesId(value);
-        if ("subject".equals(name))
+        } else if ("subject".equals(name)) {
           query.withSubject(value);
+        } else if (!requestedVersion.isSmallerThan(ApiVersion.VERSION_1_1_0)) {
+          // additional filters only available with Version 1.1.0 or higher
+          if ("identifier".equals(name)) {
+            query.withIdentifier(value);
+          } else if ("title".equals(name)) {
+            query.withTitle(value);
+          } else if ("description".equals(name)) {
+            query.withDescription(value);
+          } else if ("series_name".equals(name)) {
+            query.withSeriesName(value);
+          } else if ("language".equals(name)) {
+            query.withLanguage(value);
+          } else if ("created".equals(name)) {
+            query.withCreated(value);
+          } else if ("license".equals(name)) {
+            query.withLicense(value);
+          } else if ("rightsholder".equals(name)) {
+            query.withRights(value);
+          } else if ("is_part_of".equals(name)) {
+            query.withSeriesId(value);
+          } else if ("source".equals(name)) {
+            query.withSource(value);
+          } else if ("status".equals(name)) {
+            query.withEventStatus(value);
+          } else if ("agent_id".equals(name)) {
+            query.withAgentId(value);
+          } else if ("start".equals(name)) {
+            try {
+              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+              query.withStartFrom(fromAndToCreationRange.getA());
+              query.withStartTo(fromAndToCreationRange.getB());
+            } catch (Exception e) {
+              return RestUtil.R
+                      .badRequest(String.format("Filter 'start' could not be parsed: %s", e.getMessage()));
+
+            }
+          } else if ("technical_start".equals(name)) {
+            try {
+              Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(value);
+              query.withTechnicalStartFrom(fromAndToCreationRange.getA());
+              query.withTechnicalStartTo(fromAndToCreationRange.getB());
+            } catch (Exception e) {
+              return RestUtil.R
+                      .badRequest(String.format("Filter 'technical_start' could not be parsed: %s", e.getMessage()));
+
+            }
+          } else {
+            logger.warn("Unknown filter criteria {}", name);
+            return RestUtil.R
+                    .badRequest(String.format("Unknown filter criterion in request: %s", name));
+
+          }
+        }
       }
     }
 
@@ -676,7 +731,7 @@ public class EventsEndpoint implements ManagedService {
             break;
           default:
             return RestUtil.R
-                    .badRequest(String.format("Unknown search criterion in request: %s", criterion.getFieldName()));
+                    .badRequest(String.format("Unknown sort criterion in request: %s", criterion.getFieldName()));
         }
       }
     }
@@ -1633,7 +1688,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private String getEventUrl(String eventId) {
-    return UrlSupport.concat(serverUrl, serviceUrl, eventId);
+    return UrlSupport.concat(endpointBaseUrl, eventId);
   }
 
   @GET

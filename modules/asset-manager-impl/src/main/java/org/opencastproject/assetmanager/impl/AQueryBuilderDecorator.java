@@ -53,6 +53,11 @@ public class AQueryBuilderDecorator implements AQueryBuilder {
     return delegate.delete(owner, target);
   }
 
+  @Override
+  public Predicate mediaPackageIds(String... mpIds) {
+    return this.delegate.mediaPackageIds(mpIds);
+  }
+
   @Override public Predicate mediaPackageId(String mpId) {
     return delegate.mediaPackageId(mpId);
   }

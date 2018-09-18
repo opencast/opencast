@@ -31,6 +31,7 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
@@ -934,6 +935,7 @@ public class IndexServiceImpl implements IndexService {
     Map<String, String> configuration = new HashMap<>();
     if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
       configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
+
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());
@@ -1376,6 +1378,11 @@ public class IndexServiceImpl implements IndexService {
   public boolean hasSnapshots(String eventId) {
     AQueryBuilder q = assetManager.createQuery();
     return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
+  }
+
+  @Override
+  public Map<String, Map<String, String>> getEventWorkflowProperties(final List<String> eventIds) {
+    return WorkflowPropertiesUtil.getLatestWorkflowPropertiesForEvents(assetManager, eventIds);
   }
 
   @Override

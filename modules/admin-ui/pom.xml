@@ -14,7 +14,6 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <skipTests>false</skipTests>
-    <nexus.npm>${opencast.nexus.url}/nexus/content/repositories/npmjs/</nexus.npm>
   </properties>
   <dependencies>
     <!-- osgi support -->
@@ -100,6 +99,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-distribution-workflowoperation</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-event-comment</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -157,6 +161,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-common-jpa-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-composer-service-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -309,8 +318,6 @@
                   <executable>npm</executable>
                   <arguments>
                     <argument>install</argument>
-                    <argument>--registry</argument>
-                    <argument>${nexus.npm}</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -362,7 +369,7 @@
                   <goal>npm</goal>
                 </goals>
                 <configuration>
-                  <arguments>install --registry ${nexus.npm}</arguments>
+                  <arguments>install</arguments>
                 </configuration>
               </execution>
               <execution>

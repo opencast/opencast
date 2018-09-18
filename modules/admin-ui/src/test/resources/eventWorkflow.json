@@ -6,7 +6,7 @@
   "start": "2014-06-05T15:00:00Z",
   "workflowId": "full",
   "description": "",
-  "state": "INSTANTIATED",
+  "state": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
   "license": "",
   "series_title": "Serie 1",
   "workflow": "Full"

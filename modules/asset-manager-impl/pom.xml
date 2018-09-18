@@ -41,6 +41,11 @@
       <artifactId>opencast-message-broker-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-asset-manager-util</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- -->
     <dependency>
       <groupId>org.osgi</groupId>
@@ -148,6 +153,10 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
     </dependency>
   </dependencies>
   <build>

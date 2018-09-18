@@ -9,6 +9,29 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Automate translation merges
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Wed, 29 Sept 2018
+
+```no-highlight
+Hi everyone,
+a few weeks ago we discussed on the technical meeting that it would be
+great if we could automatically merge back translations on a regular
+basis.
+
+That is why I hereby #propose:
+
+  Updates to translations for existing languages may be pushed into
+  Opencast's repository automatically.
+
+Note that adding or removing languages will still need a regular pull
+request and a review
+
+If this proposal passes, I can implement the automation.
+
+–Lars
+```
+
+
 ### No more merge tickets
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Thu, 17 May 2018
 

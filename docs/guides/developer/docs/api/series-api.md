@@ -19,16 +19,21 @@ The following filters are available:
 
 Filter Name    | Description
 :--------------|:-----------
-`contributors` | Series where the contributors specified in the metadata field match
-`creator`      | Series where the creator specified in the metadata field match
+`contributors` | Series where the contributors specified in the metadata field match. Can occur multiple times
+`Creator`      | Series where the creator specified in the metadata field match (please use `creator` for version 1.1.0 and higher instead)
 `creationDate` | Series that were created between two dates. The two dates are in UTC format to the second i.e. yyyy-MM-ddTHH:mm:ssZ e.g. 2014-09-27T16:25Z. They are seperated by a forward slash (url encoded or not) so an example of the full filter would be CreationDate:2015-05-08T00:00:00.000Z/2015-05-10T00:00:00.000Z
 `language`     | Series based upon the language specified
 `license`      | Series based upon the license specified
-`organizers`   | Series where the organizers specified in the metadata field match
+`organizers`   | Series where the organizers specified in the metadata field match. Can occur multiple times
 `managedAcl`   | Series who have the same managed acl name
-`subject`      | By the subject they are a part of
+`subject`      | By the subject they are a part of. Can occur multiple times
 `textFilter`   | Filters series where any part of the series' metadata fields match this value
 `title`        | By the title of the series
+`identifier`   | By the technical identifiers of the series. Can occur multiple times (version 1.1.0 and higher)
+`desription`   | By the description of the series (version 1.1.0 and higher)
+`creator`      | Series where the creator specified in the metadata field match (version 1.1.0 and higher)
+`publishers`   | Series where the publishers specified in the metadata field match. Can occur multiple times (version 1.1.0 and higher)
+`rightsholder` | By the rights holder of the series (version 1.1.0 and higher)
 
 The list can be sorted by the following criteria:
 

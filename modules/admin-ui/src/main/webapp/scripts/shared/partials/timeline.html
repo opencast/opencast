@@ -11,10 +11,10 @@
                         data-width="'85px'"
                         data-placeholder="{{ 'VIDEO_TOOL.ZOOM' | translate }}"
                         data-translated="{{ 'VIDEO_TOOL.ZOOM' | translate }}"
-                        data-disable-search-threshold="10"
+                        data-disable-search-threshold="0"
                         ng-model="zoomSelected"
                         ng-change="changeZoomSelected($event)"
-                        ng-options="y.name for (x, y) in ZoomSelectOptions">
+                        ng-options="y.name for (x, y) in ZoomSelectOptions track by y.name">
                     <option value=""></option>
                 </select>
             </div>

@@ -64,7 +64,13 @@
          "NAME": "Name"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmation required"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "Media Module",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "None of the series could be saved",
       "EVENTS_DELETED": "The event has been deleted",
       "EVENTS_NOT_DELETED": "The event(s) could not be deleted",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "The series has been deleted",
       "SERIES_NOT_DELETED": "The series could not be deleted",
       "USER_BLACKLIST_CREATED": "The blacklist has been created",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "The blacklist could not be deleted",
       "LOCATION_DELETED": "The location has been deleted",
       "LOCATION_NOT_DELETED": "The location could not be deleted",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "The blacklist has been created",
       "LOCATION_BLACKLIST_NOT_CREATED": "The blacklist could not be created",
       "LOCATION_BLACKLIST_SAVED": "The blacklist has been saved",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
       "CONFLICT_END_BEFORE_START": "Scheduling error: Schedule end has to be later than the start.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
       "MISSING_ACL_RULES": "At least one role with Read and Write permissions is required!",
       "SAVED_ACL_RULES": "The access rules have been saved.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "This name is already in use",
       "THEME_NAME_EMPTY": "The name cannot be empty",
       "BUMPER_UPLOAD_ERROR": "Error while uploading media",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Error while uploading media",
       "TITLE_UPLOAD_ERROR": "Error while uploading media",
       "LICENSE_UPLOAD_ERROR": "Error while uploading media",
       "WATERMARK_UPLOAD_ERROR": "Error while uploading media",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "The media is being uploaded…",
       "THEME_CREATED": "The theme has been created",
       "THEME_NOT_CREATED": "The theme could not be created",
@@ -179,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "The editing information could not be saved",
       "VIDEO_CUT_SAVED": "The editing information has been saved",
       "VIDEO_CUT_PROCESSING": "The video is being processed…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Oops! The server seems to be unresponsive. Please try again later.",
       "SERVICE_UNAVAILABLE": "Oops! The server seems to be unresponsive. Please try again later.",
       "ACTIVE_TRANSACTION": "This event can not be edited while there is an active workflow or transaction."
@@ -195,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Delete",
-            "BUTTON": "Delete"
+            "BUTTON": "Delete",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "Delete",
@@ -211,6 +224,7 @@
                "EVENTS_RETRACTED": "Events to be Retracted",
                "RETRACT_WORKFLOW": "Workflow to Retract Events"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "None of the selected events can be deleted without leaving orphan files."
             },
@@ -242,12 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Edit scheduled events",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "General",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
             "NOCHANGES": "No changes to the events detected!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Edit metadata"
@@ -269,7 +285,10 @@
    "DATES": {
       "TODAY": "Today",
       "TOMORROW": "Tomorrow",
-      "YESTERDAY": "Yesterday"
+      "YESTERDAY": "Yesterday",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "Today at {{ time }}",
@@ -438,6 +457,7 @@
                "CAPTION": "Asset Upload",
                "SELECT_TYPE": "Select asset type",
                "ADD": "Add Asset",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Class handout notes",
                   "CAPTIONS_DFXP": "Captions DFXP",
@@ -640,6 +660,8 @@
                "TYPE": "Type",
                "SIZE": "Size",
                "DETAILS": "Details",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Attachments",
                   "CAPTION": "Attachments",
@@ -847,6 +869,7 @@
                "ACTIONS": "Actions",
                "DETAILS": "Details",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Title",
@@ -864,17 +887,50 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Running",
+                  "PAUSED": "Paused",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Failed",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflow details",
                "CONFIGURATION": "Workflow configuration"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Workflow operations"
+               "TITLE": "Workflow operations",
+               "DETAILS_LINK": "Operations",
+               "TABLE_HEADERS": {
+                  "TITLE": "Title",
+                  "STATUS": "Status",
+                  "DESCRIPTION": "Description"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Operation details"
+               "TITLE": "Operation details",
+               "TABLE_HEADERS": {
+                  "TITLE": "Title",
+                  "STATE": "State",
+                  "DESCRIPTION": "Description",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "Started",
+                  "FINISHED": "Finished",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Workflow details"
@@ -973,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "Series",
             "TITLE": "Series",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "Organizer(s)",
             "CONTRIBUTORS": "Contributor(s)",
             "CREATED": "Created",
@@ -1525,7 +1582,8 @@
                "ACTIVE": "Active",
                "ENABLE": "Enable bumper",
                "UPLOAD_LABEL": "Upload video",
-               "UPLOAD_BUTTON": "Upload"
+               "UPLOAD_BUTTON": "Upload",
+               "SELECT": "Select"
             },
             "TITLE": {
                "CAPTION": "Title",
@@ -1593,6 +1651,19 @@
                "OPERATIONS": "Operations",
                "INCIDENTS": "Incidents"
             }
+         },
+         "STATUS": {
+            "QUEUED": "Queued",
+            "PAUSED": "Paused",
+            "RUNNING": "Running",
+            "FINISHED": "Finished",
+            "FAILED": "Failed",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Waiting"
          }
       },
       "SERVERS": {
@@ -1628,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Warning",
+            "ERROR": "Error"
          }
       }
    },
@@ -1651,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Metadata",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Comments",
          "SEGMENTS": "Segments"
       },
@@ -1667,7 +1744,45 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Remove Segment",
-         "USE_SEGMENT": "Use this Segment"
+         "USE_SEGMENT": "Use this Segment",
+         "START": "Start",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Upload image",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Play",
@@ -1736,7 +1851,10 @@
             "LABEL": "Access policy"
          },
          "COMMENTS": {
-            "LABEL": "Comments"
+            "LABEL": "Comments",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "Resolved"
          },
          "CONTRIBUTORS": {
             "LABEL": "Contributors"
@@ -2013,6 +2131,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "Error",
+         "IDLE": "Idle",
+         "OFFLINE": "Offline",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "Uploading"
       }
    }
 }

@@ -193,6 +193,26 @@ public interface ComposerService {
   Job image(Track sourceTrack, String profileId, double... time) throws EncoderException, MediaPackageException;
 
   /**
+   * Synchronously extracts images from the source track. The images are taken at the given timepoints (seconds into
+   * the movie). Please note that synchronously doing this means, that the workload cannot be distributed amongst all
+   * nodes. This should be used rarely.
+   *
+   * @param sourceTrack
+   *          the source video track
+   * @param profileId
+   *          identifier of the encoding profile
+   * @param time
+   *          number of seconds into the video
+   * @return the extracted images as attachments
+   * @throws EncoderException
+   *           if image extraction fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  List<Attachment> imageSync(Track sourceTrack, String profileId, double... time) throws EncoderException,
+      MediaPackageException;
+
+  /**
    * Extracts an image from the media package element identified by <code>sourceTrack</code>. The image is taken by the
    * given properties and the corresponding encoding profile.
    *
@@ -225,6 +245,24 @@ public interface ComposerService {
    *           if the mediapackage is invalid
    */
   Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException;
+
+
+  /**
+   * Synchronously converts the given image to a different image format using the specified image profile. Please note that
+   * synchronously doing this means, that the workload cannot be distributed amongst all nodes.
+   *
+   * @param image
+   *          the image
+   * @param profileId
+   *          the profile to use for conversion
+   * @return the converted image
+   * @throws EncoderException
+   *           if image conversion fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException;
+
 
   /**
    * @return All registered {@link EncodingProfile}s.

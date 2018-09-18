@@ -33,6 +33,7 @@ import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.rest.ErrorCodeException;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
@@ -61,14 +62,34 @@ public final class RestUtil {
    * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
    * ComponentContext.
    *
+   * @param cc
+   *          ComponentContext to get configuration from
    * @return (serverUrl, servicePath)
    * @throws Error
    *           if the service path is not configured for this component
    */
   public static Tuple<String, String> getEndpointUrl(ComponentContext cc) {
-    final String serverUrl = option(cc.getBundleContext().getProperty("org.opencastproject.server.url")).getOrElse(
+    return getEndpointUrl(cc, OpencastConstants.SERVER_URL_PROPERTY, RestConstants.SERVICE_PATH_PROPERTY);
+  }
+
+  /**
+   * Return the endpoint's server URL and the service path by extracting the relevant parameters from the
+   * ComponentContext.
+   *
+   * @param cc
+   *          ComponentContext to get configuration from
+   * @param serverUrlKey
+   *          Configuration key for the server URL
+   * @param servicePathKey
+   *          Configuration key for the service path
+   * @return (serverUrl, servicePath)
+   * @throws Error
+   *           if the service path is not configured for this component
+   */
+  public static Tuple<String, String> getEndpointUrl(ComponentContext cc, String serverUrlKey, String servicePathKey) {
+    final String serverUrl = option(cc.getBundleContext().getProperty(serverUrlKey)).getOrElse(
             UrlSupport.DEFAULT_BASE_URL);
-    final String servicePath = option((String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY)).getOrElse(
+    final String servicePath = option((String) cc.getProperties().get(servicePathKey)).getOrElse(
             Option.<String> error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
     return tuple(serverUrl, servicePath);
   }
@@ -276,6 +297,10 @@ public final class RestUtil {
 
     public static Response notFound(Object entity, MediaType type) {
       return Response.status(Response.Status.NOT_FOUND).entity(entity).type(type).build();
+    }
+
+    public static Response locked() {
+      return Response.status(423).build();
     }
 
     public static Response serverError() {

@@ -267,7 +267,7 @@ snippet.  A simple configuration panel could look like this:
     </configuration_panel>
 
 The checkbox in this `<configuration_panel>` will now be displayed in the administrative tools, and the user's
-selection will be used to replace the `${review.hold}` variable in the workflow.
+selection will be used to replace the `${someaction}` variable in the workflow.
 
 This input can also be sent by capture agents, using the ingest endpoints. Please note that capture agents usually do
 not load the configuration panel. Hence defaults set in the user interface will not apply to ingests. To circumvent
@@ -315,6 +315,82 @@ Example:
       …
     </operation>
 
+
+## Thumbnail Support
+
+The Admin UI comes with explicit support for thumbnails that are supposed to represent events visually, e.g. in lists
+of events as commonly used in video portals and other similar systems.
+To make it possible to implement the required processing and retain flexibility, the Admin UI will store the following
+information in variables of workflow instances:
+
+Variable          | Description
+:-----------------|:-----------
+thumbnailType     | The type of the thumbnail as number (see table below)
+thumbnailPosition | The time position in case of snapshot thumbnails
+thumbnailTrack    | The source track in case of snapshot thumbnails
+
+Thumbnail Type | Description
+:--------------|:-----------
+0              | The default thumbnail shall be extracted at a configured time position
+1              | The thumbnail has been uploaded and is stored in the asset manager as media package attachment
+2              | The thumbnail shall be extracted at a given time position from a given track
+
+At any given point of time, there is exactly one thumbnail available for each published event.
+There are three different kinds of thumbnails:
+
+* Default thumbnail
+* Uploaded thumbnail
+* Snapshot thumbnail
+
+### Default Thumbnail
+
+This thumbnail is supposed to be automatically generated without user interaction. It is extracted from the time
+position as you define it in your workflow.
+
+If you are not using the default time position, be sure to adapt the value of `thumbnail.default.position` in
+`etc/org.opencastproject.adminui.cfg`. This is required to allow the Admin UI to dynamically generate a preview
+image for the default thumbnail.
+
+### Uploaded Thumbnail
+
+The Admin UI supports the upload of an image to be used as thumbnail. This thumbnail image will available to
+workflows for further processing as media package attachment with a configurable flavour
+(default: `thumbnail/source`).
+
+If you need another flavor for the thumbnail in your specific environment, be sure to adapt the value of
+`thumbnail.source.flavor.type` and `thumbnail.source.flavor.subtype` in `etc/org.opencastproject.adminui.cfg`
+so that the Admin UI adds the thumbnail images with the expected flavour.
+
+### Snapshot Thumbnail
+
+As a balance between the quality of the thumbnail (default) and the effort to create a thumbnail (upload), the Admin UI
+supports thumbnails that are be extracted from existing tracks. This allows users to take a snapshot at an arbitrary
+time position from a source track by simply selecting the position and pressing a button.
+
+The variable `thumbnailPosition` holds the time value (in seconds as floating point) and the variable `thumbnailTrack`
+holds the flavour type of the track where that thumbnail is supposed to be extracted.
+
+Please note that `thumbnailPosition` refers to the (unmodified) track identified by  `thumbnailTrack`.
+
+### Thumbnail Preview
+
+The Admin UI is capable of presenting a preview image of the currently used thumbnail which a) must be
+created by the workflow that generates previews for the Admin UI initially and b) will be created and re-distributed
+by the Admin UI each time the thumbnail is changed.
+
+The Admin UI manages this preview image of the thumbnail in the publication channel `internal`. To make this thumbnail
+preview work in environments that use custom flavors, a number of configuration options are available in
+`etc/org.opencastproject.adminui.cfg`:
+
+Option                            | Default           | Description
+:---------------------------------|:------------------|:-----------
+thumbnail.preview.flavor          | thumbnail/preview | The flavor of the thumbnail preview image
+thumbnail.default.position        | 1.0               | The time position where the default thumbnail is extracted at
+thumbnail.default.track.primary   | presenter         | The flavor type of the track where the default thumbnail is extracted
+thumbnail.default.track.secondary | presentation      | The flavor type of the track where the default thumbnail is extracted in case no track with flavor type thumbnail.default.track.primary is available
+
+Note that the preview image for the default thumbnail needs to be initially created and published which usually is done
+in the workflow definition responsible for creating the previews required by the Admin UI.
 
 ## Test the Workflow
 

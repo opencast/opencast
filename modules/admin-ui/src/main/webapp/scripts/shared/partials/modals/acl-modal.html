@@ -53,7 +53,7 @@
                                                 </p>
                                                 <select chosen pre-select-from="wizard.step.acls"
                                                     data-width="'200px'"
-                                                    data-disable-search-threshold="8"
+                                                    data-disable-search-threshold="0"
                                                     data-search_contains="true"
                                                     ng-change="wizard.step.changeBaseAcl()"
                                                     ng-model="wizard.step.ud.id"
@@ -97,7 +97,7 @@
                                             <td>
                                                 <select chosen pre-select-from="wizard.step.roles"
                                                     data-width="'200px'"
-                                                    data-disable-search-threshold="8"
+                                                    data-disable-search-threshold="0"
                                                     data-search_contains="true"
                                                     ng-model="policy.role"
                                                     ng-options="id as id for (id, type) in wizard.step.roles"

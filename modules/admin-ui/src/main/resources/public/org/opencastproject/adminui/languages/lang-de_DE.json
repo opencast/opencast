@@ -64,7 +64,13 @@
          "NAME": "Name"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Bestätigung erforderlich"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "Medienübersicht",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "Keine der Serien konnte gespeichert werden",
       "EVENTS_DELETED": "Die Aufzeichnung wurde gelöscht",
       "EVENTS_NOT_DELETED": "Die Aufzeichnung(en) konnten nicht gelöscht werden",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
       "USER_BLACKLIST_CREATED": "Die Sperrliste wurde erstellt",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "Die Sperrliste konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Das Aufzeichnungsgerät wurde entfernt",
       "LOCATION_NOT_DELETED": "Das Aufzeichnungsgerät konnte nicht entfernt werden",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "Die Sperrliste wurde erstellt",
       "LOCATION_BLACKLIST_NOT_CREATED": "Die Sperrliste konnte nicht erstellt werden",
       "LOCATION_BLACKLIST_SAVED": "Die Sperrliste wurde gespeichert",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Konflikt: Das Ändern der Aufzeichnungsdaten resultiert in Konflikten. Bitte Ort, Datum oder Zeit anpassen.",
       "CONFLICT_ALREADY_ENDED": "Planungskonflikt: Aufzeichnungen können nicht in der Vergangenheit geplant werden.",
       "CONFLICT_END_BEFORE_START": "Planungskonflikt: Der Endzeitpunkt der Aufzeichnung muss nach dem Anfangszeitpunkt liegen.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
       "MISSING_ACL_RULES": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
       "SAVED_ACL_RULES": "Die Zugriffsregeln wurden gespeichert.",
@@ -165,12 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "Dieser Name wird bereits verwendet",
       "THEME_NAME_EMPTY": "Der Name darf nicht leer sein",
       "BUMPER_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
-      "BUMPER_REQUIRED": "Bumper wird vorausgesetzt",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
       "TITLE_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
       "LICENSE_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
       "WATERMARK_UPLOAD_ERROR": "Fehler beim Hochladen von Medien",
-      "WATERMARK_REQUIRED": "Ein Branding wird vorausgesetzt",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "Die Medien werden hochgeladen…",
       "THEME_CREATED": "Das Branding wurde erstellt",
       "THEME_NOT_CREATED": "Das Branding konnte nicht erstellt werden",
@@ -181,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "Die Bearbeitungsinformationen konnten nicht gespeichert werden",
       "VIDEO_CUT_SAVED": "Die Bearbeitungsinformationen wurden gespeichert",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "SERVICE_UNAVAILABLE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "ACTIVE_TRANSACTION": "Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind."
@@ -197,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Löschen",
-            "BUTTON": "Entfernen"
+            "BUTTON": "Entfernen",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "Löschen",
@@ -213,6 +224,7 @@
                "EVENTS_RETRACTED": "Zurückzuziehende Aufzeichnungen",
                "RETRACT_WORKFLOW": "Workflow zum Zurückziehen von Aufzeichnungen"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "Keine der ausgewählten Veranstaltungen kann gelöscht werden, ohne dass verwaiste Dateien übrig bleiben."
             },
@@ -244,13 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Geplante Aufzeichnungen bearbeiten",
-         "CONFLICT_CHECK_RUNNING": "Konfliktprüfung läuft…",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Allgemein",
             "CANNOTSTART": "Hervorgehobene Aufzeichnungen können nicht verarbeitet werden, nur geplante Aufzeichnungen werden unterstützt.",
             "NOCHANGES": "Keine Änderungen der Events!",
             "CONFLICT_FIRST_EVENT": "Geänderte Aufzeichnung",
-            "CONFLICT_SECOND_EVENT": "Kollidierende Aufzeichnung"
+            "CONFLICT_SECOND_EVENT": "Kollidierende Aufzeichnung",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Metadaten bearbeiten"
@@ -272,7 +285,10 @@
    "DATES": {
       "TODAY": "Heute",
       "TOMORROW": "Morgen",
-      "YESTERDAY": "Gestern"
+      "YESTERDAY": "Gestern",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "Heute um {{ time }}",
@@ -441,7 +457,7 @@
                "CAPTION": "Anlagen Hochladen",
                "SELECT_TYPE": "Anlagetyp auswählen",
                "ADD": "Anlage hinzufügen",
-               "NO_OPTIONS": "Es wurde keine Assetliste übergeben!",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Unterrichtsnotizen",
                   "CAPTIONS_DFXP": "Untertitel (DFXP)",
@@ -644,8 +660,8 @@
                "TYPE": "Typ",
                "SIZE": "Größe",
                "DETAILS": "Details",
-              "STREAMS": "Spuren",
-              "PREVIEW": "Vorschau",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Anhänge",
                   "CAPTION": "Anhänge",
@@ -853,7 +869,7 @@
                "ACTIONS": "Aktionen",
                "DETAILS": "Details",
                "DESCRIPTION": "",
-               "MORE_INFO": "Mehr Informationen",
+               "MORE_INFO": "More Information & Actions",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
@@ -871,11 +887,20 @@
                   "ABORT": "Ausführung der Workflowinstanz unterbrechen (fehlgeschlagene Operationen nicht wiederholen)",
                   "RETRY": "Ausführung der Workflowinstanz wieder aufnehmen",
                   "DELETE": "Workflowinstanz löschen"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "In Verarbeitung",
+                  "PAUSED": "Pausiert",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Fehlgeschlagen",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
             },
-           "WORKFLOW_INSTANCES": {
-             "TITLE": "Workflow Instanzen"
-           },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
+            },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflow-Details",
                "CONFIGURATION": "Workflow Konfiguration"
@@ -883,29 +908,29 @@
             "WORKFLOW_OPERATIONS": {
                "TITLE": "Workflow-Operationen",
                "DETAILS_LINK": "Operationen",
-              "TABLE_HEADERS": {
-                "TITLE": "Titel",
-                "STATUS": "Status",
-                "DESCRIPTION": "Beschreibung"
-              }
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATUS": "Status",
+                  "DESCRIPTION": "Beschreibung"
+               }
             },
             "OPERATION_DETAILS": {
                "TITLE": "Operations-Details",
-              "TABLE_HEADERS": {
-                "TITLE": "Titel",
-                "STATE": "Zustand",
-                "DESCRIPTION": "Beschreibung",
-                "EXECUTION_HOST": "Ausführungshost",
-                "JOB": "Auftrag",
-                "TIME_IN_QUEUE": "Zeit in Warteschlange",
-                "STARTED": "Gestartet",
-                "FINISHED": "Beendet",
-                "RETRY_STRATEGY": "Wiederholversuch-Strategie",
-                "FAILED_ATTEMPTS": "Fehlgeschlagene Versuche",
-                "MAX_ATTEMPTS": "Maximale Versuche",
-                "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                "FAIL_ON_ERROR": "Abbruch bei Fehler"
-              }
+               "TABLE_HEADERS": {
+                  "TITLE": "Titel",
+                  "STATE": "Status",
+                  "DESCRIPTION": "Beschreibung",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "Gestartet",
+                  "FINISHED": "Verarbeitet",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Workflow-Details"
@@ -1004,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "Serie",
             "TITLE": "Serie",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "Organisator(en)",
             "CONTRIBUTORS": "Mitwirkende",
             "CREATED": "Erstellt",
@@ -1557,7 +1583,7 @@
                "ENABLE": "Abspann aktivieren",
                "UPLOAD_LABEL": "Video hochladen",
                "UPLOAD_BUTTON": "Hochladen",
-               "SELECT": "Auswählen"
+               "SELECT": "Wählen Sie"
             },
             "TITLE": {
                "CAPTION": "Titel",
@@ -1625,6 +1651,19 @@
                "OPERATIONS": "Operationen",
                "INCIDENTS": "Vorfälle"
             }
+         },
+         "STATUS": {
+            "QUEUED": "In Warteschlange",
+            "PAUSED": "Pausiert",
+            "RUNNING": "In Verarbeitung",
+            "FINISHED": "Verarbeitet",
+            "FAILED": "Fehlgeschlagen",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Wartend"
          }
       },
       "SERVERS": {
@@ -1660,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Service reparieren (setzt den Servicestatus auf normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Achtung",
+            "ERROR": "Fehler"
          }
       }
    },
@@ -1683,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Metadaten",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Kommentare",
          "SEGMENTS": "Segmente"
       },
@@ -1700,8 +1745,44 @@
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
          "USE_SEGMENT": "Dieses Segment nutzen",
-         "START": "Start",
-         "END": "Ende"
+         "START": "Zur Startseite",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Bild hochladen",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Abspielen",
@@ -1770,7 +1851,10 @@
             "LABEL": "Zugriffsrechte"
          },
          "COMMENTS": {
-            "LABEL": "Kommentare"
+            "LABEL": "Kommentare",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "Gelöst"
          },
          "CONTRIBUTORS": {
             "LABEL": "Mitwirkende"
@@ -2049,15 +2133,15 @@
          }
       }
    },
-  "AGENTS": {
-    "STATUS": {
-      "CAPTURING": "Aufzeichnend",
-      "ERROR": "Fehlerhaft",
-      "IDLE": "Untätig",
-      "OFFLINE": "Offline",
-      "SHUTTING_DOWN": "Herunterfahrend",
-      "UNKNOWN": "Unbekannt",
-      "UPLOADING": "Hochladend"
-    }
-  }
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "Fehler",
+         "IDLE": "Idle",
+         "OFFLINE": "Offline",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "Lädt hoch"
+      }
+   }
 }

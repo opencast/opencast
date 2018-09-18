@@ -22,7 +22,6 @@
 package org.opencastproject.ingest.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
@@ -59,10 +58,8 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -1135,9 +1132,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       // Merge scheduled mediapackage with ingested
       mp = mergeScheduledMediaPackage(mp);
 
-      // Set public ACL if empty
-      setPublicAclIfEmpty(mp);
-
       ingestStatistics.successful();
       if (workflowDef != null) {
         logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'",
@@ -1274,17 +1268,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return mp;
     } finally {
       properties.remove(LEGACY_MEDIAPACKAGE_ID_KEY);
-    }
-  }
-
-  private void setPublicAclIfEmpty(MediaPackage mp) {
-    AccessControlList activeAcl = authorizationService.getActiveAcl(mp).getA();
-    if (activeAcl.getEntries().size() == 0) {
-      String anonymousRole = securityService.getOrganization().getAnonymousRole();
-      activeAcl = new AccessControlList(
-              new AccessControlEntry(anonymousRole, Permissions.Action.READ.toString(), true),
-              new AccessControlEntry(GLOBAL_CAPTURE_AGENT_ROLE, Permissions.Action.WRITE.toString(), true));
-      authorizationService.setAcl(mp, AclScope.Series, activeAcl);
     }
   }
 
@@ -1810,29 +1793,4 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
     };
   }
-
-  /**
-   * Private utility to update and optionally fail job, called from a finally block.
-   *
-   * @param job
-   *          to be updated, may be null
-   * @throws IngestException
-   *           when unable to update ingest job
-   */
-  private void finallyUpdateJob(Job job) throws IngestException {
-    if (job == null) {
-      logger.debug("Not updating null job.");
-      return;
-    }
-
-    if (!Job.Status.FINISHED.equals(job.getStatus()))
-      job.setStatus(Job.Status.FAILED);
-
-    try {
-      serviceRegistry.updateJob(job);
-    } catch (Exception e) {
-      throw new IngestException("Unable to update ingest job", e);
-    }
-  }
-
 }

@@ -76,8 +76,20 @@
                   <executable>npm</executable>
                   <arguments>
                     <argument>install</argument>
-                    <argument>--registry</argument>
-                    <argument>${nexus.npm}</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>esline</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>eslint</argument>
                   </arguments>
                 </configuration>
               </execution>
@@ -145,7 +157,16 @@
                   <arguments>install</arguments>
                 </configuration>
               </execution>
-
+              <execution>
+                <phase>validate</phase>
+                <id>eslint</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run eslint</arguments>
+                </configuration>
+              </execution>
               <execution>
                 <phase>process-resources</phase>
                 <id>gulp build</id>

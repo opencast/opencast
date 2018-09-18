@@ -29,7 +29,6 @@ import org.opencastproject.assetmanager.impl.TieredStorageAssetManagerJobProduce
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -75,7 +74,7 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
     logger.debug("Working on mediapackage {}", mp.getIdentifier().toString());
 
     String targetStorage = StringUtils.trimToNull(operation.getConfiguration("target-storage"));
-    if (tsamjp.datastoreExists(targetStorage)) {
+    if (!tsamjp.datastoreExists(targetStorage)) {
       throw new WorkflowOperationException("Target storage type " + targetStorage + " is not available!");
     }
     logger.debug("Target storage set to {}", targetStorage);
@@ -95,7 +94,6 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
 
     logger.debug("Beginning moving process");
     //Note that a null version implies *all* versions
-    Job fakejob = new JobImpl(workflowInstance.getId());
     Job job = tsamjp.moveByIdAndVersion(version, mp.getIdentifier().compact(), targetStorage);
     if (waitForStatus(job).isSuccess()) {
       return createResult(WorkflowOperationResult.Action.CONTINUE);

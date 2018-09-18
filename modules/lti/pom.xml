@@ -48,6 +48,129 @@
       <artifactId>jsr311-api</artifactId>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>frontend-no-prebuilt</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>npm install</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>initialize</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>install</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>esline</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>eslint</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>html-linter</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>html-linter</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <profile>
+      <id>frontend</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.eirslett</groupId>
+            <artifactId>frontend-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>install node and npm</id>
+                <phase>validate</phase>
+                <goals>
+                  <goal>install-node-and-npm</goal>
+                </goals>
+                <configuration>
+                  <nodeVersion>v8.1.4</nodeVersion>
+                  <npmVersion>5.2.0</npmVersion>
+                </configuration>
+              </execution>
+
+              <execution>
+                <phase>validate</phase>
+                <id>npm install</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>install</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <phase>test</phase>
+                <id>eslint</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run eslint</arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <phase>test</phase>
+                <id>html-linter</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run html-linter</arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+
   <build>
     <plugins>
       <plugin>
@@ -55,178 +178,23 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-player</id>
-            <phase>validate</phase>
+            <id>copy-libs</id>
+            <phase>compile</phase>
             <goals>
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared/</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/tools/lib/</outputDirectory>
               <resources>
                 <resource>
-                  <directory>../../shared-resources/player/</directory>
+                  <directory>node_modules/</directory>
                   <includes>
-                    <include>engage-hybrid-player/**</include>
-                    <include>style/**</include>
-                    <include>embed.html</include>
-                    <include>preview.xml</include>
-                    <include>playerProductInstall.swf/</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-player2</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/player/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/player/</directory>
-                  <includes>
-                    <include>Videodisplay.swf/</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-resources</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/</directory>
-                  <includes>
-                    <include>jquery/**</include>
-                    <include>trimpath/**</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-img</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared/img</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/img/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-css</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared/css</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/css/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-js</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared/js</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/js/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <excludes>
-                    <exclude> servicedata.json </exclude>
-                  </excludes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-js2</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/player/js</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/js/</directory>
-                  <includes>
-                    <include> servicedata.json </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-xsl</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/shared/xsl</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/xsl/</directory>
-                  <includes>
-                    <include> **/** </include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-json</id>
-            <phase>validate</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/tools/player/json</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>../../shared-resources/json/</directory>
-                  <includes>
-                    <include> **/** </include>
+                    <include>font-awesome/css/font-awesome.min.css</include>
+                    <include>font-awesome/fonts/**</include>
+                    <include>jquery/dist/jquery.min.js</include>
+                    <include>mustache/mustache.min.js</include>
+                    <include>paginationjs/dist/pagination.css</include>
+                    <include>paginationjs/dist/pagination.min.js</include>
                   </includes>
                   <filtering>false</filtering>
                 </resource>

@@ -1,0 +1,236 @@
+[
+  {
+    "flavor": "dublincore/series",
+    "title": "Opencast Series DublinCore",
+    "fields": [
+      {
+        "readOnly": false,
+        "id": "title",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.TITLE",
+        "type": "text",
+        "value": "Mock Series",
+        "required": true
+      },
+      {
+        "readOnly": false,
+        "id": "subject",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
+        "type": "text",
+        "value": "mocking beautiful",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "description",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.DESCRIPTION",
+        "type": "text",
+        "value": "just a mock",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "language",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LANGUAGE",
+        "collection": {
+          "LANGUAGES.SLOVENIAN": "slv",
+          "LANGUAGES.PORTUGESE": "por",
+          "LANGUAGES.ROMANSH": "roh",
+          "LANGUAGES.ARABIC": "ara",
+          "LANGUAGES.POLISH": "pol",
+          "LANGUAGES.ITALIAN": "ita",
+          "LANGUAGES.CHINESE": "zho",
+          "LANGUAGES.FINNISH": "fin",
+          "LANGUAGES.DANISH": "dan",
+          "LANGUAGES.UKRAINIAN": "ukr",
+          "LANGUAGES.FRENCH": "fra",
+          "LANGUAGES.SPANISH": "spa",
+          "LANGUAGES.GERMAN_CH": "gsw",
+          "LANGUAGES.NORWEGIAN": "nor",
+          "LANGUAGES.RUSSIAN": "rus",
+          "LANGUAGES.JAPANESE": "jpx",
+          "LANGUAGES.DUTCH": "nld",
+          "LANGUAGES.TURKISH": "tur",
+          "LANGUAGES.HINDI": "hin",
+          "LANGUAGES.SWEDISH": "swa",
+          "LANGUAGES.ENGLISH": "eng",
+          "LANGUAGES.GERMAN": "deu"
+        },
+        "type": "text",
+        "value": "eng",
+        "required": false
+      },
+      {
+        "readOnly": false,
+        "id": "rightsHolder",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.RIGHTS",
+        "type": "text",
+        "value": "",
+        "required": false
+      },
+      {
+        "translatable": true,
+        "readOnly": false,
+        "id": "license",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.LICENSE",
+        "collection": {
+          "{\"label\":\"EVENTS.LICENSE.CC0\", \"order\":8, \"selectable\": true}": "CC0",
+          "{\"label\":\"EVENTS.LICENSE.CCBYND\", \"order\":4, \"selectable\": true}": "CC-BY-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCND\", \"order\":7, \"selectable\": true}": "CC-BY-NC-ND",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNCSA\", \"order\":6, \"selectable\": true}": "CC-BY-NC-SA",
+          "{\"label\":\"EVENTS.LICENSE.ALLRIGHTS\", \"order\":1, \"selectable\": true}": "ALLRIGHTS",
+          "{\"label\":\"EVENTS.LICENSE.CCBYSA\", \"order\":3, \"selectable\": true}": "CC-BY-SA",
+          "{\"label\":\"EVENTS.LICENSE.CCBYNC\", \"order\":5, \"selectable\": true}": "CC-BY-NC",
+          "{\"label\":\"EVENTS.LICENSE.CCBY\", \"order\":2, \"selectable\": true}": "CC-BY"
+        },
+        "type": "ordered_text",
+        "value": "CC0",
+        "required": false
+      },
+      {
+        "translatable": false,
+        "readOnly": false,
+        "id": "creator",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.ORGANIZERS",
+        "collection": {
+          "Peter Processor": "Peter Processor",
+          "Paul Publisher": "Paul Publisher",
+          "Ophelia Organizer": "Ophelia Organizer",
+          "Usain Unpublished": "Usain Unpublished",
+          "Olaf Organizer": "Olaf Organizer",
+          "Opencast Project Administrator": "Opencast Project Administrator",
+          "Carl Contributor": "Carl Contributor",
+          "Pamela Published": "Pamela Published",
+          "Peter Planner": "Peter Planner",
+          "Pat Publisher": "Pat Publisher",
+          "Carmen Contributor": "Carmen Contributor",
+          "Charles Contributor": "Charles Contributor",
+          "Cecil Contributor": "Cecil Contributor",
+          "System User": "System User"
+        },
+        "type": "mixed_text",
+        "value": [
+          "Ophelia Organizer"
+        ],
+        "required": false
+      },
+      {
+        "translatable": false,
+        "readOnly": false,
+        "id": "contributor",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.CONTRIBUTORS",
+        "collection": {
+          "Peter Processor": "Peter Processor",
+          "Paul Publisher": "Paul Publisher",
+          "Ophelia Organizer": "Ophelia Organizer",
+          "Usain Unpublished": "Usain Unpublished",
+          "Olaf Organizer": "Olaf Organizer",
+          "Opencast Project Administrator": "Opencast Project Administrator",
+          "Carl Contributor": "Carl Contributor",
+          "Pamela Published": "Pamela Published",
+          "Peter Planner": "Peter Planner",
+          "Pat Publisher": "Pat Publisher",
+          "Carmen Contributor": "Carmen Contributor",
+          "Charles Contributor": "Charles Contributor",
+          "Cecil Contributor": "Cecil Contributor",
+          "System User": "System User"
+        },
+        "type": "mixed_text",
+        "value": [
+          "Carl Contributor",
+          " Carmen Contributor"
+        ],
+        "required": false
+      },
+      {
+        "translatable": false,
+        "readOnly": false,
+        "id": "publisher",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.PUBLISHERS",
+        "collection": {
+          "Peter Processor": "Peter Processor",
+          "Paul Publisher": "Paul Publisher",
+          "Ophelia Organizer": "Ophelia Organizer",
+          "Usain Unpublished": "Usain Unpublished",
+          "Olaf Organizer": "Olaf Organizer",
+          "Opencast Project Administrator": "Opencast Project Administrator",
+          "Carl Contributor": "Carl Contributor",
+          "Pamela Published": "Pamela Published",
+          "Peter Planner": "Peter Planner",
+          "Pat Publisher": "Pat Publisher",
+          "Carmen Contributor": "Carmen Contributor",
+          "Charles Contributor": "Charles Contributor",
+          "Cecil Contributor": "Cecil Contributor",
+          "System User": "System User"
+        },
+        "type": "mixed_text",
+        "value": [
+          "Paul Publisher"
+        ],
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "createdBy",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+        "type": "text",
+        "value": "Opencast Project Administrator",
+        "required": false
+      },
+      {
+        "readOnly": true,
+        "id": "identifier",
+        "label": "EVENTS.SERIES.DETAILS.METADATA.ID",
+        "type": "text",
+        "value": "edf05757-34b1-42b8-8821-e3302b663972",
+        "required": false
+      }
+    ]
+  },
+  {
+    "flavor": "dublincore/extended-1",
+    "title" : "EVENTS.SERIES.DETAILS.CATALOG.EXTENDED-1",
+    "fields": [
+      {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "value": "•mock• Test Title",
+        "type": "text",
+        "readOnly": false
+      }, {
+        "id": "uid",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
+        "value": "78753d04-18a4-4327-9a61-b6d93816a7d2",
+        "type": "text",
+        "readOnly": true
+      }
+    ]
+  },
+  {
+    "flavor": "dublincore/extended-2",
+    "title" : "EVENTS.SERIES.DETAILS.CATALOG.EXTENDED-2",
+    "fields": [
+      {
+        "id": "title",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.TITLE",
+        "value": "•mock• Test Title",
+        "type": "text",
+        "readOnly": false
+      }, {
+        "id": "uid",
+        "label": "EVENTS.EVENTS.DETAILS.METADATA.ID",
+        "value": "78753d04-18a4-4327-9a61-b6d93816a7d2",
+        "type": "text",
+        "readOnly": true
+      },
+      {
+        "id": "wantsEmail",
+        "label": "Do you want email updates?",
+        "readOnly": false,
+        "required": true,
+        "type": "boolean",
+        "value": "true"
+      }
+    ]
+  }
+]

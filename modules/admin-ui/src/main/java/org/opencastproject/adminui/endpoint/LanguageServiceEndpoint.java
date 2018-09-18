@@ -24,17 +24,24 @@ package org.opencastproject.adminui.endpoint;
 import org.opencastproject.adminui.api.LanguageService;
 import org.opencastproject.adminui.util.Language;
 import org.opencastproject.adminui.util.LocaleFormattingStringProvider;
+import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -52,7 +59,7 @@ import javax.ws.rs.core.MediaType;
               + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
               + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
               + "DO NOT use this for integration of third-party applications.<em>"})
-public class LanguageServiceEndpoint {
+public class LanguageServiceEndpoint implements ManagedService {
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LanguageServiceEndpoint.class);
@@ -63,6 +70,23 @@ public class LanguageServiceEndpoint {
   /** OSGi callback to bind a {@link LanguageService} instance. */
   void setLanguageService(LanguageService languageSrv) {
     this.languageSrv = languageSrv;
+  }
+
+  private static Set<String> excludedLocales;
+
+  public static final String EXCLUDE_CONFIG_KEY = "org.opencastproject.adminui.languages.exclude";
+
+  /** OSGi callback if properties file is present */
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    excludedLocales = new HashSet<>();
+    if (properties == null) {
+      logger.info("No configuration available, using defaults");
+      return;
+    }
+
+    String excludes = StringUtils.trimToEmpty((String) properties.get(EXCLUDE_CONFIG_KEY));
+    excludedLocales.addAll(Arrays.asList(StringUtils.split(excludes, ", ")));
   }
 
   @GET
@@ -80,7 +104,11 @@ public class LanguageServiceEndpoint {
     JSONObject json = new JSONObject();
     JSONArray availableLanguages = new JSONArray();
     for (Language serverLang : serversAvailableLanguages) {
-      availableLanguages.add(languageToJson(serverLang));
+      if (!excludedLocales.contains(serverLang.getCode())) {
+        availableLanguages.add(languageToJson(serverLang));
+      } else {
+        logger.debug("Filtering out " + serverLang.getCode() + " because it is excluded");
+      }
     }
     json.put("availableLanguages", availableLanguages);
 

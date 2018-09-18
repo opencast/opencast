@@ -84,6 +84,7 @@
     <sec:intercept-url pattern="/admin-ng/themes/*/usage.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/themes/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_DETAILS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/tools/*/editor.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
     <sec:intercept-url pattern="/admin-ng/tools/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
     <sec:intercept-url pattern="/admin-ng/users/users.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />

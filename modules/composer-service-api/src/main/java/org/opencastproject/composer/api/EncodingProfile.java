@@ -120,13 +120,6 @@ public interface EncodingProfile {
   List<String> getTags();
 
   /**
-   * Returns the media type's mime type.
-   *
-   * @return the mime type
-   */
-  String getMimeType();
-
-  /**
    * Returns the media format that can be used with this encoding profile.
    *
    * @return the applicable input format

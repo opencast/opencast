@@ -20,17 +20,7 @@
         <configuration key="publishToEngage">true</configuration>
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Import properties -->
-    <operation
-        id="import-wf-properties"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Load processing settings">
-      <configurations>
-      <configuration key="source-flavor">processing/defaults</configuration>
+        <configuration key="thumbnailType">0</configuration>
       </configurations>
     </operation>
 

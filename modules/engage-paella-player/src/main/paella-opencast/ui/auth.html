@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8;">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-		<title>Paella Auth</title>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8;">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-		<script type="text/javascript">
-			function onLoad() {
-			
-				var search={};
-				window.location.search.slice(1).split("&").forEach(function(x){
-					var p = x.split("=");
-					search[p[0]]=p[1];
-				});			
-			
-				var redirect = search['redirect'];
-				var id = search['id'];
-				var series = search['series'] || search['sid'];
-				if (redirect != undefined) {
-					window.location.href = decodeURIComponent(redirect);
-				}
-				else if (id != undefined) {
-					window.location.href = "watch.html?id=" + id;
-				}
-				else if (series != undefined) {
-					window.location.href = "index.html?series=" + series;
-				}
-				else {
-					window.location.href = "index.html";
-				}
+	<title>Paella Auth</title>
+
+	<script type="text/javascript">
+		function onLoad() {
+
+			var search = {};
+			window.location.search.slice(1).split("&").forEach(function (x) {
+				var p = x.split("=");
+				search[p[0]] = p[1];
+			});
+
+			var redirect = search['redirect'];
+			var id = search['id'];
+			var series = search['series'] || search['sid'];
+			if (redirect != undefined) {
+				window.location.href = decodeURIComponent(redirect);
 			}
-		</script>
-	</head>
-	<body id="body" onload="onLoad();">
-	</body>
+			else if (id != undefined) {
+				window.location.href = "watch.html?id=" + id;
+			}
+			else if (series != undefined) {
+				window.location.href = "index.html?series=" + series;
+			}
+			else {
+				window.location.href = "index.html";
+			}
+		}
+	</script>
+</head>
+
+<body id="body" onload="onLoad();">
+</body>
+
 </html>

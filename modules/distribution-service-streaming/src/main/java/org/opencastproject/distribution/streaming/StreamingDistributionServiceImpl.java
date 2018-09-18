@@ -335,7 +335,51 @@ public class StreamingDistributionServiceImpl extends AbstractDistributionServic
     }
   }
 
-   /**
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+      throws DistributionException {
+    Job job = null;
+    try {
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Distribute.toString(), null, null, false, distributeJobLoad);
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      final MediaPackageElement[] mediaPackageElements = this.distributeElements(channelId, mediapackage, elementIds);
+      job.setStatus(Job.Status.FINISHED);
+      return Arrays.asList(mediaPackageElements);
+    } catch (ServiceRegistryException e) {
+      throw new DistributionException(e);
+    } catch (NotFoundException e) {
+      throw new DistributionException("Unable to update distribution job", e);
+    } finally {
+      finallyUpdateJob(job);
+    }
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+      throws DistributionException {
+    Job job = null;
+    try {
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Retract.toString(), null, null, false, retractJobLoad);
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      final MediaPackageElement[] mediaPackageElements = this.retractElements(channelId, mediaPackage, elementIds);
+      job.setStatus(Job.Status.FINISHED);
+      return Arrays.asList(mediaPackageElements);
+    } catch (ServiceRegistryException e) {
+      throw new DistributionException(e);
+    } catch (NotFoundException e) {
+      throw new DistributionException("Unable to update retraction job", e);
+    } finally {
+      finallyUpdateJob(job);
+    }
+  }
+
+  /**
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
    * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
    * you are able to retract elements by providing the "original" element here.

@@ -4,21 +4,6 @@
   "offset": 0,
   "results": [
     {
-      "blacklist": {
-        "end": "2025-12-24T12:12:12Z",
-        "start": "2012-12-12T12:12:12Z"
-      },
-      "email": "xavier.butty@example.com",
-      "manageable": true,
-      "name": "•mock• Xavier Butty",
-      "provider": "",
-      "roles": [
-        {"name": "•mock• ROLE_USER", "type": "INTERNAL"},
-        {"name": "•mock• ROLE_ANONYMOUS", "type": "INTERNAL"}
-      ],
-      "username": "xavier_butty"
-    },
-    {
       "blacklist": "",
       "email": "mh_admin@example.com",
       "manageable": false,
@@ -100,5 +85,5 @@
       "username": "pm.user.3"
     }
   ],
-  "total": 6
+  "total": 5
 }

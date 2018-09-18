@@ -1,16 +1,11 @@
 "use strict"
 var gulp = require('gulp');
-var clean = require('gulp-clean');
 var spawn = require('child_process').spawn;
 var mergeStream = require('merge-stream');
 
 
 var buildPath = "target/gulp";
 var paellaSrc = "src/main/paella-opencast"
-
-gulp.task('paella-opencast:clean', function () {
-	return gulp.src(buildPath, {read: false}).pipe(clean());
-});
 
 
 gulp.task('paella-opencast:prepare:source', function(){

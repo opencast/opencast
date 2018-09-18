@@ -26,6 +26,18 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.velocity</groupId>
+      <artifactId>velocity</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.santuario</groupId>
+      <artifactId>xmlsec</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.owasp.esapi</groupId>
+      <artifactId>esapi</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
     </dependency>
@@ -47,9 +59,42 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              org.opensaml;version=1.1,
-              org.opensaml.provider;version=1.1,
-              org.opensaml.artifact;version=1.1,
+              org.owasp.esapi;version=2.1.0.1,
+              org.opensaml;version=2.6.4,
+              org.opensaml.provider;version=2.6.4,
+              org.opensaml.artifact;version=2.6.4,
+              org.opensaml.util;version=2.6.4,
+              org.opensaml.util.resource;version=2.6.4,
+              org.opensaml.util.storage;version=2.6.4,
+              org.opensaml.ws.message;version=2.6.4,
+              org.opensaml.ws.message.decoder;version=2.6.4,
+              org.opensaml.ws.message.encoder;version=2.6.4,
+              org.opensaml.ws.message.handler;version=2.6.4,
+              org.opensaml.ws.security;version=2.6.4,
+              org.opensaml.ws.security.provider;version=2.6.4,
+              org.opensaml.ws.soap.client.http;version=2.6.4,
+              org.opensaml.ws.soap.common;version=2.6.4,
+              org.opensaml.ws.soap.soap11;version=2.6.4,
+              org.opensaml.ws.transport;version=2.6.4,
+              org.opensaml.ws.transport.http;version=2.6.4,
+              org.opensaml.xml;version=2.6.4,
+              org.opensaml.xml.encryption;version=2.6.4,
+              org.opensaml.xml.encryption.impl;version=2.6.4,
+              org.opensaml.xml.io;version=2.6.4,
+              org.opensaml.xml.parse;version=2.6.4,
+              org.opensaml.xml.schema;version=2.6.4,
+              org.opensaml.xml.schema.impl;version=2.6.4,
+              org.opensaml.xml.security;version=2.6.4,
+              org.opensaml.xml.security.credential;version=2.6.4,
+              org.opensaml.xml.security.criteria;version=2.6.4,
+              org.opensaml.xml.security.keyinfo;version=2.6.4,
+              org.opensaml.xml.security.trust;version=2.6.4,
+              org.opensaml.xml.security.x509;version=2.6.4,
+              org.opensaml.xml.security.x509.tls;version=2.6.4,
+              org.opensaml.xml.signature;version=2.6.4,
+              org.opensaml.xml.signature.impl;version=2.6.4,
+              org.opensaml.xml.util;version=2.6.4,
+              org.opensaml.xml.validation;version=2.6.4,
               org.jasig.cas.client.authentication;resolution:=optional,
               org.jasig.cas.client.proxy;resolution:=optional,
               org.jasig.cas.client.session;resolution:=optional,
@@ -58,9 +103,42 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opensaml;version=1.1,
-              org.opensaml.provider;version=1.1,
-              org.opensaml.artifact;version=1.1,
+              org.owasp.esapi;version=2.1.0.1,
+              org.opensaml;version=2.6.4,
+              org.opensaml.provider;version=2.6.4,
+              org.opensaml.artifact;version=2.6.4,
+              org.opensaml.util;version=2.6.4,
+              org.opensaml.util.resource;version=2.6.4,
+              org.opensaml.util.storage;version=2.6.4,
+              org.opensaml.ws.message;version=2.6.4,
+              org.opensaml.ws.message.decoder;version=2.6.4,
+              org.opensaml.ws.message.encoder;version=2.6.4,
+              org.opensaml.ws.message.handler;version=2.6.4,
+              org.opensaml.ws.security;version=2.6.4,
+              org.opensaml.ws.security.provider;version=2.6.4,
+              org.opensaml.ws.soap.client.http;version=2.6.4,
+              org.opensaml.ws.soap.common;version=2.6.4,
+              org.opensaml.ws.soap.soap11;version=2.6.4,
+              org.opensaml.ws.transport;version=2.6.4,
+              org.opensaml.ws.transport.http;version=2.6.4,
+              org.opensaml.xml;version=2.6.4,
+              org.opensaml.xml.encryption;version=2.6.4,
+              org.opensaml.xml.encryption.impl;version=2.6.4,
+              org.opensaml.xml.io;version=2.6.4,
+              org.opensaml.xml.parse;version=2.6.4,
+              org.opensaml.xml.schema;version=2.6.4,
+              org.opensaml.xml.schema.impl;version=2.6.4,
+              org.opensaml.xml.security;version=2.6.4,
+              org.opensaml.xml.security.credential;version=2.6.4,
+              org.opensaml.xml.security.criteria;version=2.6.4,
+              org.opensaml.xml.security.keyinfo;version=2.6.4,
+              org.opensaml.xml.security.trust;version=2.6.4,
+              org.opensaml.xml.security.x509;version=2.6.4,
+              org.opensaml.xml.security.x509.tls;version=2.6.4,
+              org.opensaml.xml.signature;version=2.6.4,
+              org.opensaml.xml.signature.impl;version=2.6.4,
+              org.opensaml.xml.util;version=2.6.4,
+              org.opensaml.xml.validation;version=2.6.4,
               org.jasig.cas.client.authentication;version=3.1.12,
               org.jasig.cas.client.jaas;version=3.1.12,
               org.jasig.cas.client.proxy;version=3.1.12,

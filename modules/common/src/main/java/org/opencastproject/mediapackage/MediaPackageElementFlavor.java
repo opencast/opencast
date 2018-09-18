@@ -194,6 +194,27 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   }
 
   /**
+   * "Applies" this flavor to the given target flavor. E.g. applying '*\/preview' to 'presenter/source' yields
+   * 'presenter/preview', applying 'presenter/*' to 'foo/source' yields 'presenter/source', and applying 'foo/bar' to
+   * 'presenter/source' yields 'foo/bar'.
+   *
+   * @param target The target flavor to apply this flavor to.
+   *
+   * @return The resulting flavor.
+   */
+  public MediaPackageElementFlavor applyTo(MediaPackageElementFlavor target) {
+    String subtype = this.subtype;
+    String type = this.type;
+    if ("*".equals(this.subtype)) {
+      subtype = target.getSubtype();
+    }
+    if ("*".equals(this.type)) {
+      type = target.getType();
+    }
+    return MediaPackageElementFlavor.flavor(type, subtype);
+  }
+
+  /**
    * @see java.lang.Object#clone()
    */
   @Override

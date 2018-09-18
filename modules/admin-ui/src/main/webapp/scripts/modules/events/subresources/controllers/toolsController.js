@@ -24,6 +24,9 @@
 angular.module('adminNg.controllers')
 .controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
     function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
+        var thumbnailErrorMessageId = null;
+
+        var LOCAL_CONTEXT = 'video-tools';
 
         $scope.navigateTo = function (path) {
             $location.path(path).replace();
@@ -43,6 +46,45 @@ angular.module('adminNg.controllers')
 
         $scope.setChanges = function(changed) {
             $scope.unsavedChanges = changed;
+        };
+
+        $scope.calculateDefaultThumbnailPosition = function () {
+            return $scope.$root.calculateDefaultThumbnailPosition($scope.video.segments, $scope.video.thumbnail);
+        }
+
+        $scope.getTrackFlavorType = function (selector) {
+            if (selector === 'single') {
+              return $scope.video.source_tracks[0].flavor.type;
+            }
+            var track = $scope.video.source_tracks.find(function (track) {
+              return track.side === selector;
+            });
+            if (track) {
+              return track.flavor.type;
+            }
+            return undefined;
+        }
+
+        $scope.changeThumbnail = function (file, track, position) {
+            $scope.video.thumbnail.loading = true;
+            ToolsResource.thumbnail(
+              { id: $scope.id, tool: 'thumbnail' },
+              { file: file, track: $scope.getTrackFlavorType(track), position: position },
+              function(response) {
+                $scope.video.thumbnail = response.thumbnail;
+                $scope.video.thumbnail.defaultThumbnailPositionChanged = false;
+                if (response.thumbnail && response.thumbnail.type === 'DEFAULT') {
+                    $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
+                }
+                if (thumbnailErrorMessageId !== null) {
+                  Notifications.remove(thumbnailErrorMessageId, LOCAL_CONTEXT);
+                  thumbnailErrorMessageId = null;
+                }
+                $scope.video.thumbnail.loading = false;
+              }, function() {
+                thumbnailErrorMessageId = Notifications.add('error', 'THUMBNAIL_CHANGE_FAILED', LOCAL_CONTEXT);
+                $scope.video.thumbnail.loading = false;
+              });
         };
 
         $scope.openTab = function (tab) {
@@ -71,11 +113,13 @@ angular.module('adminNg.controllers')
         $scope.player = {};
         $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
 
-        $scope.submitButton = false;
+        $scope.activeTransaction = false;
         $scope.submit = function () {
-            $scope.submitButton = true;
-            $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function () {
-                $scope.submitButton = false;
+            $scope.activeTransaction = true;
+            $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
+              ($scope.video.thumbnail.type === 'DEFAULT');
+            $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
+                $scope.activeTransaction = false;
                 if ($scope.video.workflow) {
                     Notifications.add('success', 'VIDEO_CUT_PROCESSING');
                     $location.url('/events/' + $scope.resource);
@@ -83,9 +127,18 @@ angular.module('adminNg.controllers')
                     Notifications.add('success', 'VIDEO_CUT_SAVED');
                 }
                 $scope.unsavedChanges = false;
+                if (response.segments) {
+                    $scope.$root.originalSegments = angular.copy(response.segments);
+                }
+                $scope.video.thumbnail.defaultThumbnailPositionChanged = false;
+                if (response.thumbnail && response.thumbnail.type === 'DEFAULT') {
+                    $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
+                }
+                $scope.video.thumbnail.loading = false;
             }, function () {
-                $scope.submitButton = false;
-                Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', 'video-tools');
+                $scope.activeTransaction = false;
+                $scope.video.thumbnail.loading = false;
+                Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
             });
         };
 
@@ -93,5 +146,9 @@ angular.module('adminNg.controllers')
             Storage.put('pagination', $scope.resource, 'resume', true);
             $location.url('/events/' + $scope.resource);
         };
+
+        $scope.$on('$destroy', function () {
+            Notifications.removeAll(LOCAL_CONTEXT);
+         });
     }
 ]);

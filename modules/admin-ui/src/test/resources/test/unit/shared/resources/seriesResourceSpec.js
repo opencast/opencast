@@ -34,10 +34,10 @@ describe('Series API Resource', function () {
             var data = SeriesResource.query();
             $httpBackend.flush();
             expect(data.rows.length).toBe(2);
-            expect(data.rows[0].title).toEqual('•mock• serie 1');
-            expect(data.rows[0].creator).toEqual('Teaching Assistant');
-            expect(data.rows[0].contributors).toEqual('Heinz Heinzmann, Lars Larsson');
-            expect(data.rows[0].createdDateTime).toEqual('2012-12-01T08:59:00Z');
+            expect(data.rows[0].title).toEqual('Mock Series');
+            expect(data.rows[0].creator).toEqual('Ophelia Organizer');
+            expect(data.rows[0].contributors).toEqual('Carl Contributor, Carmen Contributor');
+            expect(data.rows[0].createdDateTime).toEqual('2018-08-13T07:20:41Z');
         });
     });
 

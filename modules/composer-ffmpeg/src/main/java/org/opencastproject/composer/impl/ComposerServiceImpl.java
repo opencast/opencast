@@ -68,7 +68,6 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
@@ -393,9 +392,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Have the encoded track inspected and return the result
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
-
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
 
     return some(inspectedTrack);
   }
@@ -748,9 +744,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       Track inspectedTrack = inspect(job, workspaceURI);
       inspectedTrack.setIdentifier(targetTrackId);
 
-      if (profile.getMimeType() != null)
-        inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-
       return some(inspectedTrack);
     } catch (Exception e) {
       if (upperLaidOutElement.isSome()) {
@@ -905,9 +898,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-
     return some(inspectedTrack);
   }
 
@@ -984,9 +974,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     Track inspectedTrack = inspect(job, workspaceURI);
     inspectedTrack.setIdentifier(targetTrackId);
 
-    if (profile.getMimeType() != null)
-      inspectedTrack.setMimeType(MimeTypes.parseMimeType(profile.getMimeType()));
-
     return some(inspectedTrack);
   }
 
@@ -1016,6 +1003,27 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       return serviceRegistry.createJob(JOB_TYPE, Operation.Image.toString(), parameters, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
+    }
+  }
+
+  @Override
+  public List<Attachment> imageSync(Track sourceTrack, String profileId, double... time) throws EncoderException,
+      MediaPackageException {
+    Job job = null;
+    try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      final List<Attachment> images = image(job, sourceTrack, profileId, time);
+      job.setStatus(Job.Status.FINISHED);
+      return images;
+    } catch (ServiceRegistryException | NotFoundException e) {
+      throw new EncoderException("Unable to create a job", e);
+    } finally {
+      finallyUpdateJob(job);
     }
   }
 
@@ -1214,6 +1222,26 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
+    }
+  }
+
+  @Override
+  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+    Job job = null;
+    try {
+      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      job = serviceRegistry
+          .createJob(
+              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+      job.setStatus(Job.Status.RUNNING);
+      job = serviceRegistry.updateJob(job);
+      Option<Attachment> result = convertImage(job, image, profileId);
+      job.setStatus(Job.Status.FINISHED);
+      return result.getOrElseNull();
+    } catch (ServiceRegistryException | NotFoundException e) {
+      throw new EncoderException("Unable to create a job", e);
+    } finally {
+      finallyUpdateJob(job);
     }
   }
 
@@ -1660,7 +1688,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       if (hasAudio) {
         for (int i = 0; i < files.size(); i++) {
           if (!tracks.get(i).hasAudio())
-            sb.append("aevalsrc=0::d=1[silent").append(i + 1).append("];");
+            sb.append("aevalsrc=0:d=1[silent").append(i + 1).append("];");
         }
       }
     }

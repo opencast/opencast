@@ -9,7 +9,7 @@
             "operation": "test",
             "processingHost": "host1",
             "started": "2014-06-05T09:10:00Z",
-            "status": "RUNNING",
+            "status": "SYSTEMS.JOBS.STATUS.RUNNING",
             "submitted": "2014-06-05T09:10:00Z",
             "type": "org.opencastproject.composer"
         }

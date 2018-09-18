@@ -6,6 +6,7 @@
 
   <service>
     <provide interface="org.opencastproject.adminui.endpoint.LanguageServiceEndpoint"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
 
   <property name="service.description" value="Translation File information, utilities about languages"/>

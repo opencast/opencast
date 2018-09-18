@@ -16,9 +16,9 @@ describe('Series Events API Resource', function () {
             }, {
                 id: 'series'
             }];
-            $httpBackend.expectGET('/admin-ng/series/40518/events.json')
+            $httpBackend.expectGET('/admin-ng/series/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/events.json')
                 .respond(JSON.stringify(eventsResponse));
-            result = SeriesEventsResource.get({ id: 40518 });
+            result = SeriesEventsResource.get({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' });
             $httpBackend.flush();
             expect(result.entries.length).toBe(2);
         });
@@ -29,9 +29,9 @@ describe('Series Events API Resource', function () {
             var eventsRequest = {
                 entries: [{ id: 'title' }, { id: 'series' }]
             };
-            $httpBackend.expectPUT('/admin-ng/series/40518/events.json', eventsRequest.entries)
+            $httpBackend.expectPUT('/admin-ng/series/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/events.json', eventsRequest.entries)
                 .respond(200);
-            SeriesEventsResource.save({ id: '40518' }, eventsRequest);
+            SeriesEventsResource.save({ id: 'c3a4f68d-14d4-47e2-8981-8eb2fb300d3a' }, eventsRequest);
             $httpBackend.flush();
         });
     });

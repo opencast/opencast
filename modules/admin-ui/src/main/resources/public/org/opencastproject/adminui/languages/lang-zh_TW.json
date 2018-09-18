@@ -64,7 +64,13 @@
          "NAME": "名稱"
       },
       "ACTIONS": {
-         "CONFIRMATION": "需要確認"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "媒體模組",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "無可儲存的系列",
       "EVENTS_DELETED": "事件已刪除",
       "EVENTS_NOT_DELETED": "事件無法刪除",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "該系列已被刪除",
       "SERIES_NOT_DELETED": "該系列無法刪除",
       "USER_BLACKLIST_CREATED": "黑名單已創建",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "黑名單無法刪除",
       "LOCATION_DELETED": "位置已被刪除",
       "LOCATION_NOT_DELETED": "無法刪除位置",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "黑名單已創建",
       "LOCATION_BLACKLIST_NOT_CREATED": "黑名單無法創建",
       "LOCATION_BLACKLIST_SAVED": "黑名單已儲存",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
       "CONFLICT_END_BEFORE_START": "排程有誤: 排程結束的時間，必須晚於開始時間。",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "規則必須包含一個有效的角色，讀 或/和 寫的權利。",
       "MISSING_ACL_RULES": "至少有一個角色必須具有讀取和寫入權限。",
       "SAVED_ACL_RULES": "存取權限已儲存",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "這個名稱已被使用",
       "THEME_NAME_EMPTY": "這個名稱不能為空白",
       "BUMPER_UPLOAD_ERROR": "上傳時發生錯誤",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "上傳時發生錯誤",
       "TITLE_UPLOAD_ERROR": "上傳時發生錯誤",
       "LICENSE_UPLOAD_ERROR": "上傳時發生錯誤",
       "WATERMARK_UPLOAD_ERROR": "上傳時發生錯誤",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "正在上載媒體......",
       "THEME_CREATED": "主題已創建",
       "THEME_NOT_CREATED": "主題無法創建",
@@ -179,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "視訊剪輯無法儲存",
       "VIDEO_CUT_SAVED": "視訊剪輯已儲存",
       "VIDEO_CUT_PROCESSING": "正在處理的視頻...",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "伺服器沒有回應，請稍後再試。",
       "SERVICE_UNAVAILABLE": "哎呀! 伺服器似乎沒有反應。請稍後再試。",
       "ACTIVE_TRANSACTION": "現有事件正在程序轉換中，無法編輯。"
@@ -195,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "刪除",
-            "BUTTON": "刪除"
+            "BUTTON": "刪除",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "刪除",
@@ -211,6 +224,7 @@
                "EVENTS_RETRACTED": "多個事件將被撤銷",
                "RETRACT_WORKFLOW": "撤銷事件的工作流程"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "欲刪除選定事件，必須先確認該事件是否為孤立的檔案。"
             },
@@ -242,12 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Edit scheduled events",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "一般",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
             "NOCHANGES": "No changes to the events detected!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Edit metadata"
@@ -269,7 +285,10 @@
    "DATES": {
       "TODAY": "今天",
       "TOMORROW": "明天",
-      "YESTERDAY": "昨天"
+      "YESTERDAY": "昨天",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "今天在 {{ time }}",
@@ -438,6 +457,7 @@
                "CAPTION": "資源上傳",
                "SELECT_TYPE": "選擇資源類型",
                "ADD": "添加資源",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "類別講義備註",
                   "CAPTIONS_DFXP": "字幕 DFXP",
@@ -640,6 +660,8 @@
                "TYPE": "類型",
                "SIZE": "檔案大小",
                "DETAILS": "詳細信息",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "附件",
                   "CAPTION": "附件",
@@ -847,6 +869,7 @@
                "ACTIONS": "操作",
                "DETAILS": "詳細信息",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "ID",
                "TYPE": "類型",
                "TITLE": "標題",
@@ -864,17 +887,50 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "運行中",
+                  "PAUSED": "暫停",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "失敗",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "工作流程細節",
                "CONFIGURATION": "工作流程配置"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "工作流程操作"
+               "TITLE": "工作流程操作",
+               "DETAILS_LINK": "操作",
+               "TABLE_HEADERS": {
+                  "TITLE": "標題",
+                  "STATUS": "狀態",
+                  "DESCRIPTION": "說明"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "操作信息"
+               "TITLE": "操作信息",
+               "TABLE_HEADERS": {
+                  "TITLE": "標題",
+                  "STATE": "狀態",
+                  "DESCRIPTION": "說明",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "已啟動",
+                  "FINISHED": "已完成",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "工作流程細節"
@@ -973,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "系列",
             "TITLE": "系列",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "主辦單位",
             "CONTRIBUTORS": "貢獻者",
             "CREATED": "建立於",
@@ -1525,7 +1582,8 @@
                "ACTIVE": "啟動",
                "ENABLE": "啟用BUMPER",
                "UPLOAD_LABEL": "上傳視頻",
-               "UPLOAD_BUTTON": "上載"
+               "UPLOAD_BUTTON": "上載",
+               "SELECT": "選擇"
             },
             "TITLE": {
                "CAPTION": "標題",
@@ -1593,6 +1651,19 @@
                "OPERATIONS": "操作",
                "INCIDENTS": "事故"
             }
+         },
+         "STATUS": {
+            "QUEUED": "已排入佇列",
+            "PAUSED": "暫停",
+            "RUNNING": "運行中",
+            "FINISHED": "已完成",
+            "FAILED": "失敗",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "等待中"
          }
       },
       "SERVERS": {
@@ -1628,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "正常",
+            "WARNING": "警告",
+            "ERROR": "錯誤"
          }
       }
    },
@@ -1651,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "後設資料",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "評論",
          "SEGMENTS": "區段"
       },
@@ -1667,7 +1744,45 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "刪除區段",
-         "USE_SEGMENT": "使用此區段"
+         "USE_SEGMENT": "使用此區段",
+         "START": "開始",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "上傳圖片",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "開始",
@@ -1736,7 +1851,10 @@
             "LABEL": "存取權限"
          },
          "COMMENTS": {
-            "LABEL": "評論"
+            "LABEL": "評論",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "已解決"
          },
          "CONTRIBUTORS": {
             "LABEL": "貢獻者"
@@ -2013,6 +2131,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "區段結束"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "錯誤",
+         "IDLE": "Idle",
+         "OFFLINE": "離線",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "正在上傳"
       }
    }
 }

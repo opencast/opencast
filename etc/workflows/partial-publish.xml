@@ -10,6 +10,15 @@
 
   <operations>
 
+    <operation
+        id="analyze-tracks"
+        exception-handler-workflow="partial-error"
+        description="Analyze tracks in media package a set control variables">
+      <configurations>
+        <configuration key="source-flavor">*/work</configuration>
+      </configurations>
+    </operation>
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Cut the video according the SMIL file                             -->
     <!--                                                                   -->
@@ -73,16 +82,69 @@
 
     <operation
       id="image"
-      if="NOT (${uploadedSearchPreview})"
+      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==0 AND ${presenter_work_video}"
       exception-handler-workflow="partial-error"
-      description="Creating search result thumbnails">
+      description="Creating search result default thumbnails">
       <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="source-tags"></configuration>
+        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="target-flavor">presenter/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="image"
+      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==0 AND (${presentation_work_video} AND NOT (${presenter_work_video}))"
+      exception-handler-workflow="partial-error"
+      description="Creating search result default thumbnails">
+      <configurations>
+        <configuration key="source-flavor">presentation/work</configuration>
+        <configuration key="target-flavor">presentation/search+preview</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="encoding-profile">search-cover.http</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="image"
+      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==2"
+      exception-handler-workflow="partial-error"
+      description="Creating search result thumbnail from saved position">
+      <configurations>
+        <configuration key="source-flavor">${thumbnailTrack}/work</configuration>
         <configuration key="target-flavor">*/search+preview</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">search-cover.http</configuration>
-        <configuration key="time">1</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="tag"
+      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presenter_work_video}"
+      exception-handler-workflow="partial-error"
+      description="Tagging uploaded thumbnail for presenter track">
+      <configurations>
+        <configuration key="source-flavors">thumbnail/source</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="target-flavor">presenter/search+preview</configuration>
+        <configuration key="copy">true</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presentation_work_video}"
+        exception-handler-workflow="partial-error"
+        description="Tagging uploaded thumbnail for presentation track">
+      <configurations>
+        <configuration key="source-flavors">thumbnail/source</configuration>
+        <configuration key="target-tags">engage-download</configuration>
+        <configuration key="target-flavor">presentation/search+preview</configuration>
+        <configuration key="copy">true</configuration>
       </configurations>
     </operation>
 

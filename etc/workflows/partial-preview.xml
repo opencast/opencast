@@ -5,8 +5,7 @@
   <title>Prepare preview artifacts</title>
   <tags/>
   <description/>
-
-  <configuration_panel></configuration_panel>
+  <configuration_panel/>
 
   <operations>
 
@@ -76,6 +75,81 @@
         <configuration key="source-flavor">*/preview</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
         <configuration key="target-tags">preview</configuration>
+      </configurations>
+    </operation>
+
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+    <!-- Extract the thumbnail preview image for the video editor          -->
+    <!-- Depending on the processing settings of the event, this might be  -->
+    <!-- either the default thumbnail, an uploaded thumbnail or a          -->
+    <!-- snapshot thumbnail.                                               -->
+    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
+    <!-- Default Thumbnail (0)
+         The default thumbnail needs to be extracted from fixed offset (in seconds) relative to the cutted media.
+         The variable thumbnailPosition contains the respective absolute position relative to the uncutted media
+         so we don't need access to the cutted media for extraction here. -->
+
+    <!-- If we have a presenter track, we extract the default thumbnail from the presenter track -->
+
+    <operation id="image"
+               if="${thumbnailType} == 0 AND ${presenter_work_video}"
+               exception-handler-workflow="partial-error"
+               description="Extract default thumbnail preview image from presenter track">
+      <configurations>
+        <configuration key="source-flavor">presenter/work</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+      </configurations>
+    </operation>
+
+    <!-- If we don't have a presenter track, but we do have a presentation track, we extract the thumbnail from the
+         presentation track -->
+
+    <operation id="image"
+               if="${thumbnailType} == 0 AND ${presentation_work_video} AND NOT (${presenter_work_video})"
+              exception-handler-workflow="partial-error"
+              description="Extract thumbnail preview image from presentation track">
+      <configurations>
+        <configuration key="source-flavor">presentation/work</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
+        </configurations>
+    </operation>
+
+    <!-- Upload thumbnail (1)
+         The uploaded thumbnail is archived in the media package. We just need to convert the image
+         to a resolution optimized for the video editor here -->
+
+    <operation
+      id="tag"
+      description="Tag uploaded thumbnail for publication">
+      <configurations>
+        <configuration key="source-flavors">thumbnail/source</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="copy">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Snapshot Thumbnail (2)
+         The snapshot thumbnail is extracted from the flavor type as provided by the variable
+         thumbnailTrack at position thumbnailPosition relative to the uncutted media. -->
+
+    <operation id="image"
+               if="${thumbnailType} == 2"
+               exception-handler-workflow="partial-error"
+               description="Extract snapshot thumbnail preview image">
+      <configurations>
+        <configuration key="source-flavor">${thumbnailTrack}/source</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">${thumbnailPosition}</configuration>
       </configurations>
     </operation>
 

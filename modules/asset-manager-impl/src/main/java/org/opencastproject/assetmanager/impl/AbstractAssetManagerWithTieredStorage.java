@@ -346,6 +346,12 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
       }
       logger.debug(format("Moving %s to store %s", e.getIdentifier(), store.getStoreType()));
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
+      if (store.contains(storagePath)) {
+        logger.debug(format("Element %s (version %s) is already in store %s so skipping it", e.getIdentifier(),
+                version.toString(),
+                store.getStoreType()));
+        continue;
+      }
       final Opt<StoragePath> existingAssetOpt = findAssetInVersionsAndStores(e.getChecksum().toString(), store.getStoreType());
       if (existingAssetOpt.isSome()) {
         final StoragePath existingAsset = existingAssetOpt.get();
@@ -360,6 +366,7 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
         final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
         store.put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
       }
+      getDb().setAssetStorageLocation(VersionImpl.mk(version), mpId, e.getIdentifier(), store.getStoreType());
     }
   }
 
@@ -370,14 +377,7 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
 
   /** Check if element <code>e</code> is already part of the history and in a specific store */
   private Opt<StoragePath> findAssetInVersionsAndStores(final String checksum, final String storeId) throws Exception {
-    return getDb().findAssetByChecksum(checksum).filter(new Fn<AssetDtos.Full, Boolean>() {
-      @Override public Boolean apply(AssetDtos.Full dto) {
-        if (storeId.equals(dto.getStorageId())) {
-          return true;
-        }
-        return false;
-      }
-    }).map(new Fn<AssetDtos.Full, StoragePath>() {
+    return getDb().findAssetByChecksumAndStore(checksum, storeId).map(new Fn<AssetDtos.Full, StoragePath>() {
       @Override public StoragePath apply(AssetDtos.Full dto) {
         return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
       }

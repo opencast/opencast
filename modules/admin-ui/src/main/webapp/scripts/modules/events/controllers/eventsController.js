@@ -102,7 +102,7 @@ angular.module('adminNg.controllers')
                 });
                 row.checkedDelete = function() {
                   EventHasSnapshotsResource.get({id: row.id},function(o) {
-                    if ((angular.isUndefined(row.publications) || row.publications.length <= 0 || !o.hasSnapshots) && !row.has_preview )
+                    if ((angular.isUndefined(row.publications) || row.publications.length <= 0 || (row.publications.length == 1 && row.publications[0].id == "engage-live") || !o.hasSnapshots) && !row.has_preview )
                           // Works, opens simple modal
                           ConfirmationModal.show('confirm-modal',Table.delete,row);
                       else

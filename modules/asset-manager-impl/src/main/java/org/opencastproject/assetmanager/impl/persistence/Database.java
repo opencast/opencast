@@ -244,6 +244,21 @@ public class Database implements EntityPaths {
     }.toFn());
   }
 
+  public void setAssetStorageLocation(final VersionImpl version, final String mpId, final String mpeId,
+          final String storageId) {
+    penv.tx(new Fx<EntityManager>() {
+      @Override
+      public void apply(EntityManager em) {
+        final QAssetDto a = QAssetDto.assetDto;
+        Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
+        // Update the asset store id
+        new JPAUpdateClause(em, a, TEMPLATES)
+                .where(a.snapshotId.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
+                .set(a.storageId, storageId).execute();
+      }
+    }.toFn());
+  }
+
   public void setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
     penv.tx(new Fx<EntityManager>() {
       @Override public void apply(EntityManager em) {
@@ -297,6 +312,18 @@ public class Database implements EntityPaths {
     return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
       @Override public Opt<AssetDtos.Full> apply(EntityManager em) {
         final Tuple result = AssetDtos.baseJoin(em).where(QAssetDto.assetDto.checksum.eq(checksum)).singleResult(Full.select);
+        return Opt.nul(result).map(Full.fromTuple);
+      }
+    });
+  }
+
+  public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
+    return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
+      @Override
+      public Opt<AssetDtos.Full> apply(EntityManager em) {
+        final Tuple result = AssetDtos.baseJoin(em)
+                .where(QAssetDto.assetDto.checksum.eq(checksum).and(QAssetDto.assetDto.storageId.eq(storeId)))
+                .singleResult(Full.select);
         return Opt.nul(result).map(Full.fromTuple);
       }
     });

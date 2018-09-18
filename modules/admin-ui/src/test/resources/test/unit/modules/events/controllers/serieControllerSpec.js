@@ -14,7 +14,7 @@ describe('Serie controller', function () {
 
     beforeEach(inject(function ($rootScope, _$controller_, _$timeout_, _$httpBackend_, _SeriesMetadataResource_, _SeriesAccessResource_, _SeriesThemeResource_, _Notifications_) {
         $scope = $rootScope.$new();
-        $scope.resourceId = '4581';
+        $scope.resourceId = '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c';
         $controller = _$controller_;
         $httpBackend = _$httpBackend_;
         $timeout = _$timeout_;
@@ -26,21 +26,21 @@ describe('Serie controller', function () {
 
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
-        $httpBackend.whenGET('/admin-ng/series/4581/metadata.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/metadata.json')));
-        $httpBackend.whenGET('/admin-ng/series/4581/events.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/events.json')));
-        $httpBackend.whenGET('/admin-ng/series/4581/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/access.json')));
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json')));
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/events.json')
+            .respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/events.json')));
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/access.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/access.json')));
         $httpBackend.whenGET('/admin-ng/themes/themes.json').respond('{}');
-        $httpBackend.whenGET('/admin-ng/series/4581/theme.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/theme.json')));
-        $httpBackend.whenGET('/admin-ng/series/4581/participation.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/4581/participation.json')));
-        $httpBackend.whenPUT('/admin-ng/series/4581/theme').respond('{}');
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme.json')));
+        $httpBackend.whenGET('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/participation.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/participation.json')));
+        $httpBackend.whenPUT('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/theme').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/THEMES.NAME.json').respond({1001: 'Heinz das Pferd', 1002: 'Full Fledged', 401: 'Doc Test'});
         $httpBackend.whenGET('/admin-ng/resources/THEMES.DESCRIPTION.json').respond({901: 'theme1 description', 902: 'theme2 desc\nsecond line'});
         $httpBackend.whenGET('/admin-ng/resources/ACL.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
-        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=3').respond('{}');
+        $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=2').respond('{}');
 
         $controller('SerieCtrl', {$scope: $scope});
     });
@@ -64,9 +64,9 @@ describe('Serie controller', function () {
         var catalogs;
 
         beforeEach(function () {
-            catalogs = getJSONFixture('admin-ng/series/4581/metadata.json');
+            catalogs = getJSONFixture('admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata.json');
             $httpBackend.flush();
-            $scope.$broadcast('change', 4581);
+            $scope.$broadcast('change', '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c');
         });
 
         it('isolates dublincore/series catalog', function () {
@@ -93,7 +93,7 @@ describe('Serie controller', function () {
 
         beforeEach(function () {
             $httpBackend.flush();
-            $scope.$broadcast('change', 4581);
+            $scope.$broadcast('change', '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c');
         });
 
         it('adds external roles appropriately', function() {
@@ -116,7 +116,7 @@ describe('Serie controller', function () {
             spyOn(SeriesMetadataResource, 'save');
             $scope.metadataSave('test', function () {}, {fields: []});
 
-            expect(SeriesMetadataResource.save).toHaveBeenCalledWith({id: '4581'}, {fields: [], attributeToSend: 'test'}, jasmine.any(Function));
+            expect(SeriesMetadataResource.save).toHaveBeenCalledWith({id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c'}, {fields: [], attributeToSend: 'test'}, jasmine.any(Function));
         });
 
         describe('catalog selection', function () {
@@ -128,7 +128,7 @@ describe('Serie controller', function () {
                 spyOn($scope, 'metadataSave').and.callThrough();
                 spyOn(callbackObject, 'callback');
                 spyOn(SeriesMetadataResource, 'save').and.callThrough();
-                $httpBackend.expectPUT('/admin-ng/series/4581/metadata').respond(200);
+                $httpBackend.expectPUT('/admin-ng/series/73f9b7ab-1d8f-4c75-9da1-ceb06736d82c/metadata').respond(200);
             });
 
             it('saves fields in the dublincore/series catalog', function () {
@@ -171,7 +171,7 @@ describe('Serie controller', function () {
             spyOn(SeriesAccessResource, 'save');
             $scope.accessSave.call(this);
 
-            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '4581' },
+            expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c' },
                 {
                     acl : { ace : [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
                     override: true
@@ -200,7 +200,7 @@ describe('Serie controller', function () {
 
             $scope.themeSave();
 
-            expect(SeriesThemeResource.save).toHaveBeenCalledWith({ id: '4581' }, {theme: 17}, jasmine.any(Function));
+            expect(SeriesThemeResource.save).toHaveBeenCalledWith({ id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c' }, {theme: 17}, jasmine.any(Function));
         });
     });
 });

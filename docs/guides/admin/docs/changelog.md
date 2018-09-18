@@ -4,6 +4,76 @@ Changelog
 Opencast 5
 ------------
 
+### Opencast 5.1
+
+*Released on September 3, 2018*
+
+- [[MH-13067](https://opencast.jira.com/browse/MH-13067)][[#404](https://github.com/opencast/opencast/pull/404)] -
+  Configuration panel does not work for default workflow
+- [[MH-13049](https://opencast.jira.com/browse/MH-13049)][[#400](https://github.com/opencast/opencast/pull/400)] -
+  Fix video editor zoom dropdown showing wrong value
+- [[MH-13055](https://opencast.jira.com/browse/MH-13055)][[#396](https://github.com/opencast/opencast/pull/396)] -
+  Stop making events with no ACL public on ingest
+- [[MH-13048](https://opencast.jira.com/browse/MH-13048)][[#394](https://github.com/opencast/opencast/pull/394)] -
+  Improve stability of the series index rebuild
+- [[MH-13047](https://opencast.jira.com/browse/MH-13047)][[#393](https://github.com/opencast/opencast/pull/393)] -
+  Document using Nginx for HTTPS
+- [[MH-13044](https://opencast.jira.com/browse/MH-13044)][[#390](https://github.com/opencast/opencast/pull/390)] -
+  Organization server configuration documentation
+- [[MH-12016](https://opencast.jira.com/browse/MH-12016)][[#379](https://github.com/opencast/opencast/pull/379)] -
+  Scrolling role fetch
+- [[MH-13031](https://opencast.jira.com/browse/MH-13031)][[#377](https://github.com/opencast/opencast/pull/377)] -
+  Active transaction notification on top
+- [[MH-13029](https://opencast.jira.com/browse/MH-13029)][[#375](https://github.com/opencast/opencast/pull/375)] -
+  Don't show old notifications
+- [[MH-13023](https://opencast.jira.com/browse/MH-13023)][[#370](https://github.com/opencast/opencast/pull/370)] -
+  Let default value fulfill requirement
+- [[MH-13018](https://opencast.jira.com/browse/MH-13018)][[#367](https://github.com/opencast/opencast/pull/367)] -
+  re-add recordings json to 5x (includes MH-12828 re-add conflicts.json)
+- [[MH-13020](https://opencast.jira.com/browse/MH-13020)][[#366](https://github.com/opencast/opencast/pull/366)] -
+  Read listproviders as UTF-8
+- [[MH-13017](https://opencast.jira.com/browse/MH-13017)][[#363](https://github.com/opencast/opencast/pull/363)] -
+  JS syntax error in publish workflow
+- [[MH-13015](https://opencast.jira.com/browse/MH-13015)][[#361](https://github.com/opencast/opencast/pull/361)] -
+  5.x database upgrade scripts
+- [[MH-13014](https://opencast.jira.com/browse/MH-13014)][[#360](https://github.com/opencast/opencast/pull/360)] -
+  Don't show stale search results
+- [[MH-13006](https://opencast.jira.com/browse/MH-13006)][[#353](https://github.com/opencast/opencast/pull/353)] -
+  Waveform operation cleanup creates problem with asynchronous NFS
+- [[MH-13003](https://opencast.jira.com/browse/MH-13003)][[#352](https://github.com/opencast/opencast/pull/352)] -
+  Implement detection of already recorded (as opposed to yet to be recorded, scheduled) events by the index service
+- [[MH-13005](https://opencast.jira.com/browse/MH-13005)][[#351](https://github.com/opencast/opencast/pull/351)] -
+  Skip waveform operation when no tracks
+- [[MH-13001](https://opencast.jira.com/browse/MH-13001)][[#347](https://github.com/opencast/opencast/pull/347)] -
+  Fixed live scheduler service pom
+- [[MH-12988](https://opencast.jira.com/browse/MH-12988)][[#337](https://github.com/opencast/opencast/pull/337)] -
+  delete-scheduled-live Fix for scheduled live event not deleted
+- [[MH-12986](https://opencast.jira.com/browse/MH-12986)][[#333](https://github.com/opencast/opencast/pull/333)] -
+  Admin UI deployed debugging: include source in SourceMap files
+- [[MH-12981](https://opencast.jira.com/browse/MH-12981)][[#331](https://github.com/opencast/opencast/pull/331)] -
+  fix for local admin-ui develop finding main.css
+- [[MH-12979](https://opencast.jira.com/browse/MH-12979)][[#325](https://github.com/opencast/opencast/pull/325)] -
+  Automatically test ddl scripts
+- [[MH-12978](https://opencast.jira.com/browse/MH-12978)][[#324](https://github.com/opencast/opencast/pull/324)] -
+  Fix data-placeholder in add event wizard
+- [[MH-12974](https://opencast.jira.com/browse/MH-12974)][[#318](https://github.com/opencast/opencast/pull/318)] -
+  Access denial to event for unprivileged user
+- [[MH-12970](https://opencast.jira.com/browse/MH-12970)][[#315](https://github.com/opencast/opencast/pull/315)] -
+  Senseless XACML parsing
+- [[MH-12966](https://opencast.jira.com/browse/MH-12966)][[#312](https://github.com/opencast/opencast/pull/312)] -
+  Do not pre-select-from option in metadata property sheets
+- [[MH-12963](https://opencast.jira.com/browse/MH-12963)][[#310](https://github.com/opencast/opencast/pull/310)] -
+  Localize dates/times in add-event summary
+- [[MH-12950](https://opencast.jira.com/browse/MH-12950)][[#309](https://github.com/opencast/opencast/pull/309)] -
+  Fix for workflow with no acl in solr index
+- [NOJIRA: Skip install of Crowdin if it is already installed
+  ](https://github.com/opencast/opencast/pull/304)
+- [[MH-12957](https://opencast.jira.com/browse/MH-12957)][[#300](https://github.com/opencast/opencast/pull/300)] -
+  Defaults on tab Source in Add Event wizards are broken
+- [[MH-12954](https://opencast.jira.com/browse/MH-12954)][[#297](https://github.com/opencast/opencast/pull/297)] -
+  wrong date format in coverimage file
+
+
 ### Opencast 5.0
 
 *Released on June 12, 2018*

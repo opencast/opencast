@@ -1,196 +1,49 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html lang="en">
-  <!------------------------- HEAD ------------------------->
-  <head>
-    <title>Search Media | Opencast</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="shortcut icon" href="img/favicon.ico">
-    <!-- styles -->
-    <link rel="stylesheet" type="text/css" href="../shared/css/player-multi-hybrid/opencast-reset.css" />
-    <link rel="stylesheet" type="text/css" href="css/oc.search.browse.css" />
-    <link rel="stylesheet" type="text/css" href="css/oc.pager.css" />
-    <!-- scripts -->
-    <script type="text/javascript" src="../shared/js/jquery/jquery.js">
-    </script>
-    <script type="text/javascript" src="../shared/js/jquery/plugins/jquery.xslt.js">
-    </script>
-    <script type="text/javascript" src="../shared/js/jquery/plugins/jquery.utils.js">
-    </script>
-    <script type="text/javascript" src="../shared/js/oc-pager.js">
-    </script>
-    <script type="text/javascript">
-    var urlParams = {};
-    (function () {
-        var e,
-            a = /\+/g,  // Regex for replacing addition symbol with a space
-            r = /([^&=]+)=?([^&]*)/g,
-            d = function (s) { return decodeURIComponent(s.replace(a, " ")); },
-            q = window.location.search.substring(1);
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv=content-type content="text/html; charset=utf-8" />
+<meta name=author content="Opencast" />
+<meta name=viewport content="width=device-width, initial-scale=1">
+<link rel=stylesheet type=text/css href=series.css />
+<link rel=stylesheet href=/ltitools/lib/font-awesome/css/font-awesome.min.css />
+<link rel=stylesheet href=/ltitools/lib/paginationjs/dist/pagination.css />
+<script type=text/javascript src=/ltitools/lib/jquery/dist/jquery.min.js></script>
+<script type=text/javascript src=/ltitools/lib/mustache/mustache.min.js></script>
+<script type=text/javascript src=/ltitools/lib/paginationjs/dist/pagination.min.js></script>
+<script type=text/javascript src=series.js></script>
 
-        while (e = r.exec(q))
-           urlParams[d(e[1])] = d(e[2]);
-    })();
+<title>Opencast: Series</title>
+</head>
+<body>
 
+<header></header>
+<main></main>
+<footer></footer>
 
+<!-- Template for number of results -->
+<script id=template-results type=x-tmpl-mustache>
+  Results {{range.begin}}-{{range.end}} of {{total}}
+</script>
 
-      $(document).ready(function(){
+<!-- Template for episodes -->
+<script id=template-episode type=x-tmpl-mustache>
+  <a class=episode href={{player}}>
+    <div class=preview><img alt=Preview src={{image}} /></div>
+    <div class=desc>
+      <h2>{{title}}</h2>
+      by {{creator}}<br />
+      {{created}}
+    </div>
+  </a>
+</script>
 
-        var page = Opencast.pager.getCurrentPageID();
-        var searchQuery = urlParams["series"];
-        var restEndpoint = "../../search/episode.xml?";
+<!-- Template for spinner -->
+<script id=template-loading type=x-tmpl-mustache>
+  <div class=loading>
+    <i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>
+    <span class="sr-only">Loading...</span>
+  </div>
+</script>
 
-        var keywordString = "";
-
-        if (searchQuery != null && searchQuery != "") {
-          restEndpoint = restEndpoint + "q=" + searchQuery + "&";
-
-          // replace all occurences of + by a space
-          searchQuery = searchQuery.replace(/\+/g, " ");
-
-          keywordString = " for “" + unescape(searchQuery) + "”";
-
-          $('#searchField').attr("value", unescape(searchQuery));
-
-        }
-
-        // get configuration
-        var defaultPlayer = '/engage/theodul/ui/core.html';
-        $.ajax({
-          url: '/info/me.json',
-          type: 'GET',
-          dataType: 'json',
-          success: function(data)
-          {
-            if(data.username != "anonymous")
-            {
-                $('#logout').show();
-            }
-            defaultPlayer = data.org.properties.player;
-
-            restEndpoint = restEndpoint + "limit=10";
-
-            restEndpoint = restEndpoint + "&offset=" + (page - 1) * 10;
-
-            restEndpoint = restEndpoint + "&_=" + new Date().getTime(); // workaround for IE ajax caching problem
-            $('#stage').xslt(restEndpoint, "xsl/episodes.xsl", function(){
-              Opencast.pager.renderPager();
-
-              var total = $('#oc-episodes-total').html();
-              var toIndex = parseInt($('#oc-episodes-limit').html()) + (page - 1) * 10;
-              var fromIndex = Math.min(parseInt($('#oc-episodes-offset').html()) + 1, toIndex);
-
-              if (total > 0) {
-                $('.title').text("Results " + fromIndex + "-" + toIndex + " of " + total + keywordString).html();
-
-                $('.timeDate').each(function(){
-                  var timeDate = $(this).text();
-                  if (timeDate) {
-                    //JavaScript parseInt(string, radix)
-                    var sd = new Date();
-                    sd.setFullYear(parseInt(timeDate.substring(0, 4), 10));
-                    sd.setMonth(parseInt(timeDate.substring(5, 7), 10) - 1);
-                    sd.setDate(parseInt(timeDate.substring(8, 10), 10));
-                    sd.setHours(parseInt(timeDate.substring(11, 13), 10));
-                    sd.setMinutes(parseInt(timeDate.substring(14, 16), 10));
-                    sd.setSeconds(parseInt(timeDate.substring(17, 19), 10));
-                    $(this).html(sd.toLocaleString());
-                  }
-                  else {
-                    $(this).html("n.a.");
-                  }
-                });
-                $(".thumb").each(function(index){
-                  var src = $(this).attr("src");
-                  if (src === undefined || src === "") {
-                    $(this).attr("src", "img/thumbnail.png");
-                  }
-                });
-                $("a.player").each(function(index){
-                  var href = $(this).attr('href');
-                  $(this).attr('href', defaultPlayer + href);
-                });
-                $(".search-item").each(function(index){
-                  if (index % 2 == 1) {
-                    $(this).css('background-color', '#F7FBFC');
-                  }
-                  else {
-                    $(this).css('background-color', '#EFF7F9');
-                  }
-                });
-              }
-              else {
-                if (Opencast.pager.getCurrentSearchQuery() != null) {
-                  $('.title').text('No recordings found for : "' + searchQuery + '"');
-                }
-                else {
-                  $('.title').text("No recordings published yet.");
-
-                }
-              }
-
-            });
-
-            if (searchQuery != null && searchQuery != "") {
-              $('#rsslink').attr("href", "/feeds/rss/2.0/custom/" + searchQuery);
-              $('#atomlink').attr("href", "/feeds/atom/0.3/custom/" + searchQuery);
-            }
-            else {
-              $('#rsslink').attr("href", "/feeds/rss/2.0/latest");
-              $('#atomlink').attr("href", "/feeds/atom/0.3/latest");
-            }
-          }
-        });
-      });
-    </script>
-  </head>
-  <!------------------------- BODY ------------------------->
-  <body style="overflow-x: hidden;">
-    <!-- If no Javascript is activated -->
-    <noscript>
-      <center>
-        <div class="noJSAlert-outer">
-          <div class="noJSAlert-inner-up">
-            <div class="icon icon-error noJSAlert-inner-image">&nbsp;</div>
-            JavaScript is disabled
-          </div>
-          <div class="noJSAlert-inner-down">
-            JavaScript is turned off in your web browser, so this site won't work properly! <br />
-            <strong>
-              Please turn JavaScript on to use this site, then refresh the page.
-            </strong>
-          </div>
-        </div>
-      </center>
-    </noscript>
-
-    <!-- START: Hide when no Javascript is activated -->
-    <script type="text/javascript">
-      document.write('</div>');
-      document.write('<div class="oc-search-result-header">');
-      document.write('<div class="oc-sort-controls">');
-      document.write('</div>');
-      document.write('</div>');
-      document.write('<div>');
-      document.write('<span class="title" style="float:left">Recordings</span>');
-      document.write('<span style="float:right">');
-      document.write('<ul class="navigation">');
-      document.write('</ul>');
-      document.write('</span>');
-      document.write('</div>');
-      document.write('<div style="clear:both" class="oc-search-result-items">');
-      document.write('<div id="stage">');
-      document.write('loading recordings...');
-      document.write('</div>');
-      document.write('</div>');
-      document.write('<div>');
-      document.write('<span class="title" style="float:left">Recordings</span>');
-      document.write('<span style="float:right">');
-      document.write('<ul class="navigation">');
-      document.write('</ul>');
-      document.write('</span>');
-      document.write('</div>');
-      document.write('</div>');
-    </script>
-    <!-- END: Hide when no Javascript is activated -->
-  </body>
+</body>
 </html>

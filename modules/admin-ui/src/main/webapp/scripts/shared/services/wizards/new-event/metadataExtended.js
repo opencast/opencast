@@ -29,6 +29,14 @@ angular.module('adminNg.services')
 
         me.isMetadataExtendedState = true;
 
+        this.updateRequiredMetadata = function(fieldId, value) {
+            if (angular.isDefined(value) && value.length > 0) {
+                me.requiredMetadata[fieldId] = true;
+            } else {
+                me.requiredMetadata[fieldId] = false;
+            }
+        };
+
         // As soon as the required metadata fields arrive from the backend,
         // we check which are mandatory.
         // This information will be needed in order to tell if we can move
@@ -51,7 +59,7 @@ angular.module('adminNg.services')
             if (fields.length > 0) {
                 for (i = 0; i < fields.length; i++) {
                     if (fields[i].required) {
-                        me.requiredMetadata[fields[i].id] = false;
+                        me.updateRequiredMetadata(fields[i].id, fields[i].value);
                         if (fields[i].type === 'boolean') {
                             // set all boolean fields to false by default
                             fields[i].value = false;
@@ -103,14 +111,8 @@ angular.module('adminNg.services')
 
             me.ud[target].fields[fieldId] = params;
 
-            if (!angular.isUndefined(me.requiredMetadata[fieldId])) {
-                if (angular.isDefined(value) && value.length > 0) {
-                    // we have received a required value
-                    me.requiredMetadata[fieldId] = true;
-                } else {
-                    // the user has deleted the value
-                    me.requiredMetadata[fieldId] = false;
-                }
+            if (angular.isDefined(me.requiredMetadata[fieldId])) {
+                me.updateRequiredMetadata(fieldId, value);
             }
         };
 

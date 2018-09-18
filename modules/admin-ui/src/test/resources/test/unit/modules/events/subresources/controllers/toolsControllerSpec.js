@@ -32,7 +32,7 @@ describe('Tools Edit controller', function () {
     beforeEach(function () {
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         $httpBackend.whenGET('/admin-ng/tools/5681/editor.json')
-            .respond(JSON.stringify(getJSONFixture('admin-ng/tools/40518/editor.json')));
+            .respond(JSON.stringify(getJSONFixture('admin-ng/tools/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/editor.json')));
     });
 
     it('instantiates', function () {

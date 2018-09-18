@@ -79,8 +79,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.parsers.DocumentBuilder;
@@ -859,7 +861,32 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
     }
   }
 
-   /**
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds)
+      throws DistributionException {
+    MediaPackageElement[] result = distributeElements(channelId, mediapackage, elementIds);
+    if (result == null) {
+      return null;
+    }
+    return Arrays.stream(result)
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
+      throws DistributionException {
+    if (distributionDirectory == null || streamingUri == null && adaptiveStreamingUri == null) {
+      return null;
+    }
+    MediaPackageElement[] result = retractElements(channelId, mediaPackage, elementIds);
+    if (result == null) {
+      return null;
+    }
+    return Arrays.stream(result).filter(Objects::nonNull).collect(Collectors.toList());
+  }
+
+  /**
    * Retract a media package element from the distribution channel. The retracted element must not necessarily be the
    * one given as parameter <code>elementId</code>. Instead, the element's distribution URI will be calculated. This way
    * you are able to retract elements by providing the "original" element here.

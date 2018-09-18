@@ -12,7 +12,7 @@
       "id": 5,
       "type": "org.opencastproject.composer",
       "operation": "Encode",
-      "status": "RUNNING"
+      "status": "SYSTEMS.JOBS.STATUS.RUNNING"
     },
     {
       "creator": "testuser1",
@@ -22,7 +22,7 @@
       "id": 1,
       "type": "org.opencastproject.composer",
       "operation": "test",
-      "status": "RUNNING"
+      "status": "SYSTEMS.JOBS.STATUS.RUNNING"
     },
     {
       "creator": "testuser2",
@@ -32,7 +32,7 @@
       "id": 3,
       "type": "org.opencastproject.workflow",
       "operation": "RESUME",
-      "status": "RUNNING"
+      "status": "SYSTEMS.JOBS.STATUS.RUNNING"
     },
     {
       "creator": "testuser1",
@@ -42,7 +42,7 @@
       "id": 4,
       "type": "org.opencastproject.inspection",
       "operation": "Inspect",
-      "status": "RUNNING"
+      "status": "SYSTEMS.JOBS.STATUS.RUNNING"
     }
   ]
 }

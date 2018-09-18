@@ -171,6 +171,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -298,6 +299,47 @@ public abstract class AbstractEventEndpoint {
     }
 
   }
+
+  /* As the list of event ids can grow large, we use a POST request to avoid problems with too large query strings */
+  @POST
+  @Path("workflowProperties")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "workflowProperties", description = "Returns workflow properties for the specified events",
+             returnDescription = "The workflow properties for every event as JSON", restParameters = {
+                @RestParameter(name = "eventIds", description = "A JSON array of ids of the events", isRequired = true, type = RestParameter.Type.STRING)},
+             reponses = {
+                @RestResponse(description = "Returns the workflow properties for the events as JSON", responseCode = HttpServletResponse.SC_OK),
+                @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+              })
+  public Response getEventWorkflowProperties(@FormParam("eventIds") String eventIds) throws UnauthorizedException {
+    if (StringUtils.isBlank(eventIds)) {
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    JSONParser parser = new JSONParser();
+    List<String> ids;
+    try {
+      ids = (List<String>) parser.parse(eventIds);
+    } catch (org.json.simple.parser.ParseException e) {
+      logger.error("Unable to parse '{}'", eventIds, e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch (ClassCastException e) {
+      logger.error("Unable to cast '{}'", eventIds, e);
+      return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+
+    final Map<String, Map<String, String>> eventWithProperties = getIndexService().getEventWorkflowProperties(ids);
+    final Map<String, Field> jsonEvents = new HashMap<>();
+    for (Entry<String, Map<String, String>> event : eventWithProperties.entrySet()) {
+      final Collection<Field> jsonProperties = new ArrayList<>();
+      for (Entry<String, String> property : event.getValue().entrySet()) {
+        jsonProperties.add(f(property.getKey(),property.getValue()));
+      }
+      jsonEvents.put(event.getKey(), f(event.getKey(), obj(jsonProperties)));
+    }
+    return okJson(obj(jsonEvents));
+  }
+
 
   @GET
   @Path("catalogAdapters")
@@ -644,7 +686,7 @@ public abstract class AbstractEventEndpoint {
 
     JSONObject json = new JSONObject();
 
-    if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(optEvent.get().getWorkflowState())) {
+    if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
       json.put("active", true);
     } else {
       json.put("active", false);

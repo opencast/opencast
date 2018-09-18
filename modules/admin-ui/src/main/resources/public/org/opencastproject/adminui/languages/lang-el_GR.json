@@ -64,7 +64,13 @@
          "NAME": "Όνομα"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Απαιτείται Επιβεβαίωση"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "Μονάδα πολυμέσων",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "Καμμία από τις σειρές δεν μπορούσε να αποθηκευτεί",
       "EVENTS_DELETED": "Η εκδήλωση έχει διαγραφεί",
       "EVENTS_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της/των εκδήλωσης/εων",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Η σειρά έχει διαγραφεί",
       "SERIES_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της σειράς",
       "USER_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της μαύρης λίστας",
       "LOCATION_DELETED": "Η τοποθεσία έχει διαγραφεί",
       "LOCATION_NOT_DELETED": "Δεν ήταν δυνατή η διαγραφή της τοποθεσίας",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "Δημιουργήθηκε η μαύρη λίστα",
       "LOCATION_BLACKLIST_NOT_CREATED": "Δεν μπορεί να δημιουργηθεί η μαύρη λίστα",
       "LOCATION_BLACKLIST_SAVED": "Η μαύρη λίστα έχει αποθηκευτεί",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Προγραμματισμός σε σύγκρουση: η αλλαγή στις εκδηλώσεις οδηγεί σε συγκρούση. Παρακαλώ να αλλάξετε την τοποθεσία, τις ημερομηνίες ή τις ώρες.",
       "CONFLICT_ALREADY_ENDED": "Σφάλμα στον προγραμματισμό. Η εκδήλωση έχει ήδη λήξει.",
       "CONFLICT_END_BEFORE_START": "Σφάλμα στον προγραμματισμό. Η προγραμματισμένη λήξη πρέπει να είναι μεταγενέστερη από την προγραμματισμένη έναρξη.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "Οι κανόνες πρέπει να περιέχουν έναν έγκυρο ρόλο και δικαίωμα(τα) ανάγνωσης ή/και εγγραφής.",
       "MISSING_ACL_RULES": "Απαιτείται τουλάχιστον ένας ρόλος με δικαιώματα ανάγνωσης και εγγραφής!",
       "SAVED_ACL_RULES": "Οι κανόνες πρόσβασης έχουν αποθηκευτεί.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "Αυτό το όνομα είναι ήδη σε χρήση",
       "THEME_NAME_EMPTY": "Το όνομα δεν είναι δυνατό να είναι κενό",
       "BUMPER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση των αρχείων πολυμέσων",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή αρχείων πολυμέσων",
       "TITLE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την αποστολή των αρχείων πολυμέσων",
       "LICENSE_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
       "WATERMARK_UPLOAD_ERROR": "Παρουσιάστηκε σφάλμα κατά την μεταφόρτωση του αρχείου πολυμέσων",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "Το αρχείο πολυμέσων μεταφορτώθηκε…",
       "THEME_CREATED": "Το θέμα έχει δημιουργηθεί",
       "THEME_NOT_CREATED": "Το θέμα δεν μπορεί να δημιουργηθεί",
@@ -179,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "Δεν ήταν δυνατή η αποθήκευση των πληροφοριών επεξεργασίας",
       "VIDEO_CUT_SAVED": "Η επεξεργασία πληροφοριών έχει αποθηκευτεί",
       "VIDEO_CUT_PROCESSING": "Επεξεργάζεται το βίντεο…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
       "SERVICE_UNAVAILABLE": "Ωχ! Ο server φαίνεται να μην ανταποκρίνεται. Παρακαλώ δοκιμάστε ξανά αργότερα.",
       "ACTIVE_TRANSACTION": "Δεν μπορεί να επεξεργαστεί αυτή την εκδήλωση, ενώ υπάρχει μια ενεργή ροή εργασίας ή συναλλαγή."
@@ -195,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Διαγραφή",
-            "BUTTON": "Διαγραφή"
+            "BUTTON": "Διαγραφή",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "Delete",
@@ -211,6 +224,7 @@
                "EVENTS_RETRACTED": "Εκδηλώσεις που θα ανακληθούν",
                "RETRACT_WORKFLOW": "Ροή εργασίας για την ανάκληση εκδηλώσεων"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "Καμμία από τις παρακάτω εκδηλώσεις δεν μπορεί να διαγραφεί χωρίς να αφήσει ορφανά αρχεία."
             },
@@ -242,12 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Επεξεργασία προγραμματισμένων εκδηλώσεων",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Γενικά",
             "CANNOTSTART": "Επισημανθείσα(ες) εκδήλωση(εις) δεν μπορούν να επεξεργαστούν, μόνο οι προγραμματισμένες εκδηλώσεις υποστηρίζονται.",
             "NOCHANGES": "Καμία αλλαγή στις εκδηλώσεις δεν ανιχνεύεται!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Επεξεργασία μεταδεδομένων"
@@ -269,7 +285,10 @@
    "DATES": {
       "TODAY": "Σήμερα",
       "TOMORROW": "Αύριο",
-      "YESTERDAY": "Χθες"
+      "YESTERDAY": "Χθες",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "Σήμερα στις {{ time }}",
@@ -438,6 +457,7 @@
                "CAPTION": "Μεταφόρτωση αντικειμένου",
                "SELECT_TYPE": "Επιλέξτε τύπο αντικειμένου",
                "ADD": "Προσθήκη αντικειμένου",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
                   "CAPTIONS_DFXP": "Υπότιτλοι DFXP",
@@ -640,6 +660,8 @@
                "TYPE": "Τύπος",
                "SIZE": "Μέγεθος",
                "DETAILS": "Λεπτομέρειες",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Συνημμένα",
                   "CAPTION": "Συνημμένα",
@@ -847,6 +869,7 @@
                "ACTIONS": "Ενέργειες",
                "DETAILS": "Λεπτομέρειες",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "Αναγνωριστικό",
                "TYPE": "Τύπος",
                "TITLE": "Τίτλος",
@@ -864,17 +887,50 @@
                   "ABORT": "Ματαίωση της εκτέλεσης της εν ενεργεία ροής εργασίας (να μην επαναληφθεί η αποτυχημένη λειτουργία ξανά)",
                   "RETRY": "Επανάληψη εκτέλεσης της εν ενεργεία ροής εργασίας",
                   "DELETE": "Διαγραφή ροής εργασίας"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Εκτελείται",
+                  "PAUSED": "Σε παύση",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Απέτυχε",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Λεπτομέρειες ροής εργασίας",
                "CONFIGURATION": "Ρύθμισεις παραμέτρων ροής εργασίας"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Λειτουργίες ροής εργασίας"
+               "TITLE": "Λειτουργίες ροής εργασίας",
+               "DETAILS_LINK": "Λειτουργίες",
+               "TABLE_HEADERS": {
+                  "TITLE": "Τίτλος",
+                  "STATUS": "Κατάσταση",
+                  "DESCRIPTION": "Περιγραφή"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Λεπτομέρειες λειτουργίας"
+               "TITLE": "Λεπτομέρειες λειτουργίας",
+               "TABLE_HEADERS": {
+                  "TITLE": "Τίτλος",
+                  "STATE": "Κατάσταση",
+                  "DESCRIPTION": "Περιγραφή",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "Ξεκίνησε",
+                  "FINISHED": "Ολοκληρώθηκε",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Λεπτομέρειες ροής εργασίας"
@@ -973,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "Σειρές",
             "TITLE": "Σειρές",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "Οργανωτής(ες)",
             "CONTRIBUTORS": "Χορηγός(οι)",
             "CREATED": "Δημιουργήθηκε",
@@ -1525,7 +1582,8 @@
                "ACTIVE": "Ενεργό",
                "ENABLE": "Ενεργοποίηση βίντεο εισαγωγής",
                "UPLOAD_LABEL": "Μεταφόρτωση βίντεο",
-               "UPLOAD_BUTTON": "Μεταφόρτωση"
+               "UPLOAD_BUTTON": "Μεταφόρτωση",
+               "SELECT": "Επιλέξτε"
             },
             "TITLE": {
                "CAPTION": "Τίτλος",
@@ -1593,6 +1651,19 @@
                "OPERATIONS": "Λειτουργίες",
                "INCIDENTS": "Περιστατικά"
             }
+         },
+         "STATUS": {
+            "QUEUED": "Στην ουρά",
+            "PAUSED": "Σε παύση",
+            "RUNNING": "Εκτελείται",
+            "FINISHED": "Ολοκληρώθηκε",
+            "FAILED": "Απέτυχε",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Αναμονή"
          }
       },
       "SERVERS": {
@@ -1628,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Επανεκκίνηση υπηρεσίας ( ορίζει την υπηρεσία στην κανονική κατάσταση)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Κανονική",
+            "WARNING": "Προειδοποίηση",
+            "ERROR": "Σφάλμα"
          }
       }
    },
@@ -1651,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Μεταδεδομένα",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Σχόλια",
          "SEGMENTS": "Τμήματα"
       },
@@ -1667,7 +1744,45 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Αφαίρεση τμήματος",
-         "USE_SEGMENT": "Χρησιμοποίηση αυτού του τμήματος"
+         "USE_SEGMENT": "Χρησιμοποίηση αυτού του τμήματος",
+         "START": "Έναρξη",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Μεταφόρτωση εικόνας",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Αναπαραγωγή",
@@ -1736,7 +1851,10 @@
             "LABEL": "Πολιτική πρόσβασης"
          },
          "COMMENTS": {
-            "LABEL": "Σχόλια"
+            "LABEL": "Σχόλια",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "Επιλυμένο"
          },
          "CONTRIBUTORS": {
             "LABEL": "Χορηγοί"
@@ -2013,6 +2131,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Τέλος του τμήματος"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "Σφάλμα",
+         "IDLE": "Idle",
+         "OFFLINE": "Αποσυνδεδεμένος",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "Μεταφόρτωση"
       }
    }
 }
