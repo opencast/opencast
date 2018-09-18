@@ -159,7 +159,7 @@ exports.httpBackendMock = function () {
                 readOnly: false
             }];
 
-            $httpBackend.whenPOST('/admin-ng/event/40518/comment')
+            $httpBackend.whenPOST('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/comment')
             .respond(function (method, url, data) {
                 comment.push({
                     id: 2,
@@ -177,7 +177,7 @@ exports.httpBackendMock = function () {
                 return [200, data, {}];
             });
 
-            $httpBackend.whenPOST('/admin-ng/event/40518/comment/1/reply')
+            $httpBackend.whenPOST('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/comment/1/reply')
             .respond(function (method, url, data) {
                 if (data.indexOf('resolved=true') > -1) {
                     comment[0].resolvedStatus = true;
@@ -188,13 +188,13 @@ exports.httpBackendMock = function () {
                 return [200, data, {}];
             });
 
-            $httpBackend.whenDELETE('/admin-ng/event/40518/comment/1')
+            $httpBackend.whenDELETE('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/comment/1')
             .respond(function (method, url, data) {
                 comment.splice(0, 1);
                 return [200, data, {}];
             });
 
-            $httpBackend.whenGET('/admin-ng/event/40518/comments')
+            $httpBackend.whenGET('/admin-ng/event/c3a4f68d-14d4-47e2-8981-8eb2fb300d3a/comments')
             .respond(function () {
                 return [200, JSON.stringify(comment), {}];
             });

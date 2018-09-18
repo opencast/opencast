@@ -55,6 +55,7 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -85,6 +86,7 @@ import java.net.URI;
 import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 /**
  * The workflow definition for handling "image" operations
@@ -213,6 +215,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
             // post process images
             for (final P2<Attachment, MediaPosition> image : $(images).zip(extraction.positions)) {
               adjustMetadata(extraction, image.get1());
+              if (image.get1().getIdentifier() == null) image.get1().setIdentifier(UUID.randomUUID().toString());
               mp.addDerived(image.get1(), extraction.track);
               final String fileName = createFileName(
                       extraction.profile.getSuffix(), extraction.track.getURI(), image.get2());
@@ -248,8 +251,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         logger.debug("Resulting image has flavor '{}'", image.getFlavor());
       }
       // Set the mime type
-      for (final String mimeType : Opt.nul(extraction.profile.getMimeType())) {
-        image.setMimeType(MimeTypes.parseMimeType(mimeType));
+      try {
+        image.setMimeType(MimeTypes.fromURI(image.getURI()));
+      } catch (UnknownFileTypeException e) {
+        logger.warn("Mime type unknown for file {}. Setting none.", image.getURI(), e);
       }
       // Add tags
       for (final String tag : cfg.targetImageTags) {

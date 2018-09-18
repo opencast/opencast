@@ -25,6 +25,7 @@ The Opencast Release Documentation is the official Opencast documentation for ea
 * [Configuration Guides](configuration/index.md)
     * [Basic Configuration](configuration/basic.md)
     * [Database Configuration](configuration/database.md)
+    * [HTTPS Configuration](configuration/https/index.md)
     * [Workflow Configuration](configuration/workflow.md)
     * [Encoding Configuration](configuration/encoding.md)
     * [more...](configuration/index.md)

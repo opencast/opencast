@@ -1,137 +1,404 @@
 {
-   "bestLanguage": {
-      "code": "en_US",
-      "displayLanguage":"English",
-      "dateFormats": {
-        "dateTime": {
-            "short": "M/d/yy h:mm a",
-            "medium": "MMM d, yyyy h:mm:ss a",
-            "full": "EEEE, MMMM d, yyyy h:mm:ss a z"
+  "bestLanguage":
+  {
+  "code":"en_US",
+  "dateFormats":{
+    "dateTime":{
+      "short":"M\/d\/yy h:mm a",
+      "medium":"MMM d, yyyy h:mm:ss a",
+      "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+    },
+    "date":{
+      "short":"M\/d\/yy",
+      "medium":"MMM d, yyyy",
+      "full":"EEEE, MMMM d, yyyy"
+    },
+    "time":{
+      "short":"h:mm a",
+      "medium":"h:mm:ss a",
+      "full":"h:mm:ss a z"
+    }
+  },
+    "displayLanguage":"English"
+  },
+  "availableLanguages":[
+    {
+      "code":"de_DE",
+      "dateFormats":{
+        "dateTime":{
+          "short":"dd.MM.yy HH:mm",
+          "medium":"dd.MM.yyyy HH:mm:ss",
+          "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z"
         },
-        "date": {
-            "short": "M/d/yy",
-            "medium": "MMM d, yyyy h:mm:ss a",
-            "full": "EEEE, MMMM d, yyyy"
+        "date":{
+          "short":"dd.MM.yy",
+          "medium":"dd.MM.yyyy",
+          "full":"EEEE, d. MMMM yyyy"
         },
-        "time": {
-            "short": "h:mm a",
-            "medium": "h:mm:ss a",
-            "full": "h:mm:ss a z"
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH:mm' Uhr 'z"
         }
+      },
+      "displayLanguage":"Deutsch"
+    },
+    {
+      "code":"el_GR",
+      "dateFormats":{
+        "dateTime":{
+          "short":"d\/M\/yyyy h:mm a",
+          "medium":"d MMM yyyy h:mm:ss a",
+          "full":"EEEE, d MMMM yyyy h:mm:ss a z"
+        },
+        "date":{
+          "short":"d\/M\/yyyy",
+          "medium":"d MMM yyyy",
+          "full":"EEEE, d MMMM yyyy"
+        },
+        "time":{
+          "short":"h:mm a",
+          "medium":"h:mm:ss a",
+          "full":"h:mm:ss a z"
+        }
+      },
+      "displayLanguage":"Ελληνικά"
+    },
+    {
+      "code":"en_GB",
+      "dateFormats":{
+        "dateTime":{
+          "short":"dd\/MM\/yy HH:mm",
+          "medium":"dd-MMM-yyyy HH:mm:ss",
+          "full":"EEEE, d MMMM yyyy HH:mm:ss 'o''clock' z"
+        },
+        "date":{
+          "short":"dd\/MM\/yy",
+          "medium":"dd-MMM-yyyy",
+          "full":"EEEE, d MMMM yyyy"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH:mm:ss 'o''clock' z"
+        }
+      },
+      "displayLanguage":"English"
+    },
+    {
+      "code":"en_US",
+      "dateFormats":{
+        "dateTime":{
+          "short":"M\/d\/yy h:mm a",
+          "medium":"MMM d, yyyy h:mm:ss a",
+          "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+        },
+        "date":{
+          "short":"M\/d\/yy",
+          "medium":"MMM d, yyyy",
+          "full":"EEEE, MMMM d, yyyy"
+        },
+        "time":{
+          "short":"h:mm a",
+          "medium":"h:mm:ss a",
+          "full":"h:mm:ss a z"
+        }
+      },
+      "displayLanguage":"English"
+    },
+    {
+      "code":"es_ES",
+      "dateFormats":{
+        "dateTime":{
+          "short":"d\/MM\/yy H:mm",
+          "medium":"dd-MMM-yyyy H:mm:ss",
+          "full":"EEEE d' de 'MMMM' de 'yyyy HH'H'mm'' z"
+        },
+        "date":{
+          "short":"d\/MM\/yy",
+          "medium":"dd-MMM-yyyy",
+          "full":"EEEE d' de 'MMMM' de 'yyyy"
+        },
+        "time":{
+          "short":"H:mm",
+          "medium":"H:mm:ss",
+          "full":"HH'H'mm'' z"
+        }
+      },
+      "displayLanguage":"Español"
+    },
+    {
+      "code":"fil_PH",
+      "dateFormats":{
+        "dateTime":{
+          "short":"M\/d\/yy h:mm a",
+          "medium":"MMM d, yyyy h:mm:ss a",
+          "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+        },
+        "date":{
+          "short":"M\/d\/yy",
+          "medium":"MMM d, yyyy",
+          "full":"EEEE, MMMM d, yyyy"
+        },
+        "time":{
+          "short":"h:mm a",
+          "medium":"h:mm:ss a",
+          "full":"h:mm:ss a z"
+        }
+      },
+      "displayLanguage":"Filipino"
+    },
+    {
+      "code":"fr_FR",
+      "dateFormats":{
+        "dateTime":{
+          "short":"dd\/MM\/yy HH:mm",
+          "medium":"d MMM yyyy HH:mm:ss",
+          "full":"EEEE d MMMM yyyy HH' h 'mm z"
+        },
+        "date":{
+          "short":"dd\/MM\/yy",
+          "medium":"d MMM yyyy",
+          "full":"EEEE d MMMM yyyy"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH' h 'mm z"
+        }
+      },
+      "displayLanguage":"Français"
+    },
+    {
+      "code":"gl_ES",
+      "dateFormats":{
+        "dateTime":{
+          "short":"M\/d\/yy h:mm a",
+          "medium":"MMM d, yyyy h:mm:ss a",
+          "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+        },
+        "date":{
+          "short":"M\/d\/yy",
+          "medium":"MMM d, yyyy",
+          "full":"EEEE, MMMM d, yyyy"
+        },
+        "time":{
+          "short":"h:mm a",
+          "medium":"h:mm:ss a",
+          "full":"h:mm:ss a z"
+        }
+      },
+      "displayLanguage":"Gallegan"
+    },
+    {
+      "code":"he_IL",
+      "dateFormats":{
+        "dateTime":{
+          "short":"HH:mm dd\/MM\/yy",
+          "medium":"HH:mm:ss dd\/MM\/yyyy",
+          "full":"HH:mm:ss z EEEE d MMMM yyyy"
+        },
+        "date":{
+          "short":"dd\/MM\/yy",
+          "medium":"dd\/MM\/yyyy",
+          "full":"EEEE d MMMM yyyy"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH:mm:ss z"
+        }
+      },
+      "displayLanguage":"עברית"
+    },
+    {
+      "code":"nl_NL",
+      "dateFormats":{
+        "dateTime":{
+          "short":"d-M-yy H:mm",
+          "medium":"d-MMM-yyyy H:mm:ss",
+          "full":"EEEE d MMMM yyyy H:mm:ss' uur' z"
+        },
+        "date":{
+          "short":"d-M-yy",
+          "medium":"d-MMM-yyyy",
+          "full":"EEEE d MMMM yyyy"
+        },
+        "time":{
+          "short":"H:mm",
+          "medium":"H:mm:ss",
+          "full":"H:mm:ss' uur' z"
+        }
+      },
+      "displayLanguage":"Nederlands"
+    },
+    {
+      "code":"pl_PL",
+      "dateFormats":{
+        "dateTime":{
+          "short":"dd.MM.yy HH:mm",
+          "medium":"yyyy-MM-dd HH:mm:ss",
+          "full":"EEEE, d MMMM yyyy HH:mm:ss z"
+        },
+        "date":{
+          "short":"dd.MM.yy",
+          "medium":"yyyy-MM-dd",
+          "full":"EEEE, d MMMM yyyy"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH:mm:ss z"
+        }
+      },
+      "displayLanguage":"Polski"
+    },
+    {
+      "code":"sl_SI",
+      "dateFormats":{
+        "dateTime":{
+          "short":"d.M.y H:mm",
+          "medium":"d.M.yyyy H:mm:ss",
+          "full":"EEEE, dd. MMMM y H:mm:ss z"
+        },
+        "date":{
+          "short":"d.M.y",
+          "medium":"d.M.yyyy",
+          "full":"EEEE, dd. MMMM y"
+        },
+        "time":{
+          "short":"H:mm",
+          "medium":"H:mm:ss",
+          "full":"H:mm:ss z"
+        }
+      },
+      "displayLanguage":"Slovenščina"
+    },
+    {
+      "code":"sv_SE",
+      "dateFormats":{
+        "dateTime":{
+          "short":"yyyy-MM-dd HH:mm",
+          "medium":"yyyy-MMM-dd HH:mm:ss",
+          "full":"'den 'd MMMM yyyy 'kl 'H:mm z"
+        },
+        "date":{
+          "short":"yyyy-MM-dd",
+          "medium":"yyyy-MMM-dd",
+          "full":"'den 'd MMMM yyyy"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"'kl 'H:mm z"
+        }
+      },
+      "displayLanguage":"Svenska"
+    },
+    {
+      "code":"tl_PH",
+      "dateFormats":{
+        "dateTime":{
+          "short":"M\/d\/yy h:mm a",
+          "medium":"MMM d, yyyy h:mm:ss a",
+          "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+        },
+        "date":{
+          "short":"M\/d\/yy",
+          "medium":"MMM d, yyyy",
+          "full":"EEEE, MMMM d, yyyy"
+        },
+        "time":{
+          "short":"h:mm a",
+          "medium":"h:mm:ss a",
+          "full":"h:mm:ss a z"
+        }
+      },
+      "displayLanguage":"Tagalog"
+    },
+    {
+      "code":"tr_TR",
+      "dateFormats":{
+        "dateTime":{
+          "short":"dd.MM.yyyy HH:mm",
+          "medium":"dd.MMM.yyyy HH:mm:ss",
+          "full":"dd MMMM yyyy EEEE HH:mm:ss z"
+        },
+        "date":{
+          "short":"dd.MM.yyyy",
+          "medium":"dd.MMM.yyyy",
+          "full":"dd MMMM yyyy EEEE"
+        },
+        "time":{
+          "short":"HH:mm",
+          "medium":"HH:mm:ss",
+          "full":"HH:mm:ss z"
+        }
+      },
+      "displayLanguage":"Türkçe"
+    },
+    {
+      "code":"zh_CN",
+      "dateFormats":{
+        "dateTime":{
+          "short":"yy-M-d ah:mm",
+          "medium":"yyyy-M-d H:mm:ss",
+          "full":"yyyy'年'M'月'd'日' EEEE ahh'时'mm'分'ss'秒' z"
+        },
+        "date":{
+          "short":"yy-M-d",
+          "medium":"yyyy-M-d",
+          "full":"yyyy'年'M'月'd'日' EEEE"
+        },
+        "time":{
+          "short":"ah:mm",
+          "medium":"H:mm:ss",
+          "full":"ahh'时'mm'分'ss'秒' z"
+        }
+      },
+      "displayLanguage":"中文"
+    },
+    {
+      "code":"zh_TW",
+      "dateFormats":{
+        "dateTime":{
+          "short":"yyyy\/M\/d a h:mm",
+          "medium":"yyyy\/M\/d a hh:mm:ss",
+          "full":"yyyy'年'M'月'd'日' EEEE ahh'時'mm'分'ss'秒' z"
+        },
+        "date":{
+          "short":"yyyy\/M\/d",
+          "medium":"yyyy\/M\/d",
+          "full":"yyyy'年'M'月'd'日' EEEE"
+        },
+        "time":{
+          "short":"a h:mm",
+          "medium":"a hh:mm:ss",
+          "full":"ahh'時'mm'分'ss'秒' z"
+        }
+      },
+      "displayLanguage":"中文"
+    }
+  ],
+  "fallbackLanguage":{
+    "code":"en_US",
+    "dateFormats":{
+      "dateTime":{
+        "short":"M\/d\/yy h:mm a",
+        "medium":"MMM d, yyyy h:mm:ss a",
+        "full":"EEEE, MMMM d, yyyy h:mm:ss a z"
+      },
+      "date":{
+        "short":"M\/d\/yy",
+        "medium":"MMM d, yyyy",
+        "full":"EEEE, MMMM d, yyyy"
+      },
+      "time":{
+        "short":"h:mm a",
+        "medium":"h:mm:ss a",
+        "full":"h:mm:ss a z"
       }
-   },
-   "fallbackLanguage": {
-      "code": "en_US",
-      "displayLanguage":"English",
-      "dateFormats": {
-        "medium": "tt.MM.uuuu HH:mm:ss"
-      }
-   },
-   "availableLanguages":[
-      {
-         "dateFormats":{
-            "time":{
-               "short":"HH:mm",
-               "full":"HH:mm' Uhr 'z",
-               "medium":"HH:mm:ss"
-            },
-            "dateTime":{
-               "short":"dd.MM.yy HH:mm",
-               "full":"EEEE, d. MMMM yyyy HH:mm' Uhr 'z",
-               "medium":"dd.MM.yyyy HH:mm:ss"
-            },
-            "date":{
-               "short":"dd.MM.yy",
-               "full":"EEEE, d. MMMM yyyy",
-               "medium":"dd.MM.yyyy"
-            }
-         },
-         "displayLanguage":"German",
-         "code":"de_DE"
-      },
-      {
-         "dateFormats":{
-            "time":{
-               "short":"h:mm a",
-               "full":"h:mm:ss a z",
-               "medium":"h:mm:ss a"
-            },
-            "dateTime":{
-               "short":"M\/d\/yy h:mm a",
-               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
-               "medium":"MMM d, yyyy h:mm:ss a"
-            },
-            "date":{
-               "short":"M\/d\/yy",
-               "full":"EEEE, MMMM d, yyyy",
-               "medium":"MMM d, yyyy"
-            }
-         },
-         "displayLanguage":"English",
-         "code":"en_US"
-      },
-      {
-         "dateFormats":{
-            "time":{
-               "short":"h時mm分",
-               "full":"h時mm分ss秒 z",
-               "medium":"h時mm分ss秒"
-            },
-            "dateTime":{
-               "short":"yyyy年MM月dd日HH:mm:ss",
-               "full":"yyyy年MM月dd日火曜日HH時mm分ss秒 z",
-               "medium":"yyyy年MM月dd日火曜日HH時mm分ss秒"
-            },
-            "date":{
-               "short":"yyyy年MM月dd日",
-               "full":"yyyy年MM月dd日",
-               "medium":"yyyy年MM月dd日"
-            }
-         },
-         "displayLanguage":"Japanese",
-         "code":"ja_JP"
-      },
-      {
-         "dateFormats":{
-            "time":{
-               "short":"h:mm a",
-               "full":"h:mm:ss a z",
-               "medium":"h:mm:ss a"
-            },
-            "dateTime":{
-               "short":"M\/d\/yy h:mm a",
-               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
-               "medium":"MMM d, yyyy h:mm:ss a"
-            },
-            "date":{
-               "short":"M\/d\/yy",
-               "full":"EEEE, MMMM d, yyyy",
-               "medium":"MMM d, yyyy"
-            }
-         },
-         "displayLanguage":"Norsk",
-         "code":"no_NO"
-      },
-      {
-         "dateFormats":{
-            "time":{
-               "short":"h:mm a",
-               "full":"h:mm:ss a z",
-               "medium":"h:mm:ss a"
-            },
-            "dateTime":{
-               "short":"M\/d\/yy h:mm a",
-               "full":"EEEE, MMMM d, yyyy h:mm:ss a z",
-               "medium":"MMM d, yyyy h:mm:ss a"
-            },
-            "date":{
-               "short":"M\/d\/yy",
-               "full":"EEEE, MMMM d, yyyy",
-               "medium":"MMM d, yyyy"
-            }
-         },
-         "displayLanguage":"French",
-         "code":"fr_FR"
-      }
-   ]
+    },
+    "displayLanguage":"English"
+  }
 }

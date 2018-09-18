@@ -1,10 +1,13 @@
 {
   "name": "paella-opencast",
   "private": true,
+  "scripts": {
+    "eslint": "eslint src/main/paella-opencast/"
+  },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "gulp-clean": "^0.3.2",
     "merge-stream": "^1.0.1",
-    "paellaplayer": "github:polimediaupv/paella#5.2.13"
+    "paellaplayer": "github:polimediaupv/paella#5.3.10",
+    "eslint": "^5.5.0"
   }
 }

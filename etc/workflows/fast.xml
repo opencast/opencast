@@ -162,6 +162,21 @@
       </configurations>
     </operation>
 
+    <!-- generate default thumbnail preview for video editor -->
+
+    <operation
+        id="image"
+        fail-on-error="true"
+        exception-handler-workflow="partial-error"
+        description="Creating default thumbnail">
+      <configurations>
+        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="target-flavor">thumbnail/preview</configuration>
+        <configuration key="encoding-profile">editor.thumbnail.preview</configuration>
+        <configuration key="time">1</configuration>
+      </configurations>
+    </operation>
+
     <!-- encode to engage player preview images -->
 
     <operation

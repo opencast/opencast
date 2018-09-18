@@ -64,7 +64,13 @@
          "NAME": "Nome"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Requírese confirmación"
+         "CONFIRMATION": "Confirmación"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "Estas series non conteñen eventos. Eliminar as series non eliminará os eventos."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "Estas series non poden ser eliminadas mentres conteñan eventos."
       }
    },
    "MEDIAMODULE": "Módulo Multimedia",
@@ -75,7 +81,7 @@
       "USERS_GUIDE": "Guía do Usuario",
       "DOCUMENTATION": "Documentación",
       "REST_DOC": "Documentación da API REST",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
+      "HOTKEY_CHEAT_SHEET": "Atallos de teclado"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Política de acceso creada",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "Non se puido gardar ningunha serie",
       "EVENTS_DELETED": "Evento borrado",
       "EVENTS_NOT_DELETED": "Non se puideron eliminar os eventos",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar o evento porque non se dispón do permiso para facelo.",
       "SERIES_DELETED": "Serie borrada",
       "SERIES_NOT_DELETED": "Non se puido borrar a serie",
       "USER_BLACKLIST_CREATED": "Lista negra creada",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "Non se puido borrar a lista negra",
       "LOCATION_DELETED": "Ubicación borrada",
       "LOCATION_NOT_DELETED": "Non se puido borrar a ubicación",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Non se puido borrar a ubicación porque non se dispón do permiso para facelo.",
       "LOCATION_BLACKLIST_CREATED": "Lista negra creada",
       "LOCATION_BLACKLIST_NOT_CREATED": "Non se puido crear a lista negra",
       "LOCATION_BLACKLIST_SAVED": "Lista negra gardada",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Conflito de programación: o cambio dos eventos xera conflitos. Por favor mude a localización, datas ou horarios.",
       "CONFLICT_ALREADY_ENDED": "Erro de programación: O evento xa rematou.",
       "CONFLICT_END_BEFORE_START": "Erro de programación: O final ten que ser máis tarde que o comezo.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "As regras deben conter un nome de rol válido e permiso(s) de lectura e/ou escritura.",
       "MISSING_ACL_RULES": "Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
       "SAVED_ACL_RULES": "Regras de acceso gardadas.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "Este nome xa está en uso",
       "THEME_NAME_EMPTY": "O nome non pode estar baleiro",
       "BUMPER_UPLOAD_ERROR": "Error na subida de arquivos",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Error na subida de arquivos",
       "TITLE_UPLOAD_ERROR": "Error na subida de arquivos",
       "LICENSE_UPLOAD_ERROR": "Error na subida de arquivos",
       "WATERMARK_UPLOAD_ERROR": "Error na subida de arquivos",
+      "WATERMARK_REQUIRED": "Tes que subir unha marca de auga",
       "THEME_UPLOAD_STARTED": "Os arquivos estanse a subir…",
       "THEME_CREATED": "Estilo creado",
       "THEME_NOT_CREATED": "Non se puido crear o estilo",
@@ -179,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "Non se puideron gardar os datos de edición",
       "VIDEO_CUT_SAVED": "Datos de edición gardados",
       "VIDEO_CUT_PROCESSING": "Estase a procesar o vídeo…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
@@ -195,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Borrar",
-            "BUTTON": "Borrar"
+            "BUTTON": "Borrar",
+            "CANNOT_DELETE": "As series resaltadas non poden ser eliminadas mentres conteñan eventos."
          },
          "EVENTS": {
             "CAPTION": "Borrar",
@@ -211,6 +224,7 @@
                "EVENTS_RETRACTED": "Eventos para Retirar",
                "RETRACT_WORKFLOW": "Fluxo de Traballo para Retirar Eventos"
             },
+            "UNAUTHORIZED": "Non está autorizado a borrar os eventos seleccionados. Por favor, desmárqueos para continuar.",
             "UNPUBLISHED": {
                "NONE": "Non se pode borrar ningún dos seguintes eventos sen deixar arquivos orfos."
             },
@@ -242,12 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Editar eventos programados",
+         "CONFLICT_CHECK_RUNNING": "Verificación de conflitos en curso…",
          "GENERAL": {
             "CAPTION": "Xeral",
             "CANNOTSTART": "O/Os evento( s) destacado(s) non poden ser procesados, admítense soamente os eventos programados.",
             "NOCHANGES": "¡Non se detectaron cambios nos eventos!",
-            "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_FIRST_EVENT": "Evento modificado",
+            "CONFLICT_SECOND_EVENT": "Evento en conflicto",
+            "CANNOTEDITSCHEDULE": "Non ten permiso para modificar a programación dos eventos indicados. Pode continuar, pero non poderá modificar a programación de ningún evento."
          },
          "METADATA": {
             "EDIT": "Modificar Metadatos"
@@ -269,7 +285,10 @@
    "DATES": {
       "TODAY": "Hoxe",
       "TOMORROW": "Mañá",
-      "YESTERDAY": "Onte"
+      "YESTERDAY": "Onte",
+      "THIS_WEEK": "Esta semana",
+      "THIS_MONTH": "Este mes",
+      "THIS_YEAR": "Este ano"
    },
    "DATETIMES": {
       "TODAY": "Hoxe á(s) {{ time }}",
@@ -438,6 +457,7 @@
                "CAPTION": "Envío de recursos",
                "SELECT_TYPE": "Seleccionar o tipo do recurso",
                "ADD": "Engadir Recurso",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Apuntamentos de clase",
                   "CAPTIONS_DFXP": "Subtítulos DFXP",
@@ -455,7 +475,7 @@
             "SUMMARY": {
                "CAPTION": "Resumo",
                "SOURCE": {
-                  "INPUT": "Input"
+                  "INPUT": "Entrada"
                }
             },
             "WEEKDAYS": {
@@ -468,13 +488,13 @@
                "SU": "Do"
             },
             "WEEKDAYSLONG": {
-               "MO": "Monday",
-               "TU": "Tuesday",
-               "WE": "Wednesday",
-               "TH": "Thursday",
-               "FR": "Friday",
-               "SA": "Saturday",
-               "SU": "Sunday"
+               "MO": "Luns",
+               "TU": "Martes",
+               "WE": "Mércores",
+               "TH": "Xoves",
+               "FR": "Venres",
+               "SA": "Sábado",
+               "SU": "Domingo"
             }
          },
          "NAVIGATION": {
@@ -640,6 +660,8 @@
                "TYPE": "Tipo",
                "SIZE": "Tamaño",
                "DETAILS": "Detalles",
+               "STREAMS": "Fluxos",
+               "PREVIEW": "Vista previa",
                "ATTACHMENTS": {
                   "TITLE": "Adxuntos",
                   "CAPTION": "Adxuntos",
@@ -847,6 +869,7 @@
                "ACTIONS": "Accións",
                "DETAILS": "Detalles",
                "DESCRIPTION": "",
+               "MORE_INFO": "Máis información e Accións",
                "ID": "Id.",
                "TYPE": "Tipo",
                "TITLE": "Título",
@@ -864,17 +887,50 @@
                   "ABORT": "Anular a execución da instancia de fluxo de traballo (non volver tentar a operación errada)",
                   "RETRY": "Volver tentar a execución da instancia de fluxo de traballo",
                   "DELETE": "Borrar a instancia de fluxo do traballo"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "Procesando",
+                  "PAUSED": "Pausado",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Errado",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Instancias do fuxo de traballo"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Detalles do fluxo de traballo",
                "CONFIGURATION": "Configuración do fluxo de traballo"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Operacións do fluxo de traballo"
+               "TITLE": "Operacións do fluxo de traballo",
+               "DETAILS_LINK": "Operacións",
+               "TABLE_HEADERS": {
+                  "TITLE": "Título",
+                  "STATUS": "Estado",
+                  "DESCRIPTION": "Descrición"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Detalles da operación"
+               "TITLE": "Detalles da operación",
+               "TABLE_HEADERS": {
+                  "TITLE": "Título",
+                  "STATE": "Estado",
+                  "DESCRIPTION": "Descrición",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Traballo",
+                  "TIME_IN_QUEUE": "Tempo na cola",
+                  "STARTED": "Iniciado",
+                  "FINISHED": "Finalizado",
+                  "RETRY_STRATEGY": "Reintentar estratexia",
+                  "FAILED_ATTEMPTS": "Intentos fallidos",
+                  "MAX_ATTEMPTS": "Máx.",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Detalles do fluxo de traballo"
@@ -973,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "Series",
             "TITLE": "Series",
+            "HAS_EVENTS": "Contén eventos",
             "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Creado",
@@ -1525,7 +1582,8 @@
                "ACTIVE": "Activo",
                "ENABLE": "Activar secuencia",
                "UPLOAD_LABEL": "Subir vídeo",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subir",
+               "SELECT": "Seleccionar"
             },
             "TITLE": {
                "CAPTION": "Título",
@@ -1593,6 +1651,19 @@
                "OPERATIONS": "Operacións",
                "INCIDENTS": "Incidentes"
             }
+         },
+         "STATUS": {
+            "QUEUED": "Na cola",
+            "PAUSED": "Pausado",
+            "RUNNING": "Procesando",
+            "FINISHED": "Finalizado",
+            "FAILED": "Errado",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Esperando"
          }
       },
       "SERVERS": {
@@ -1628,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanea-lo servizo (reestablecer o servizo ó estado normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normal",
+            "WARNING": "Advertencia",
+            "ERROR": "Erro"
          }
       }
    },
@@ -1651,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Metadatos",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Comentarios",
          "SEGMENTS": "Segmentos"
       },
@@ -1667,7 +1744,45 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Eliminar segmento",
-         "USE_SEGMENT": "Usar este segmento"
+         "USE_SEGMENT": "Usar este segmento",
+         "START": "Inicio",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Subir imaxe",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Reproducir",
@@ -1736,7 +1851,10 @@
             "LABEL": "Política de acceso"
          },
          "COMMENTS": {
-            "LABEL": "Comentarios"
+            "LABEL": "Comentarios",
+            "NONE": "Ningún",
+            "OPEN": "Abrir",
+            "RESOLVED": "Resolto"
          },
          "CONTRIBUTORS": {
             "LABEL": "Colaboradores"
@@ -1947,14 +2065,14 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "TITLE": "Atallos de teclado",
+         "HINT": "Esta páxina contén a lista dos atallos de teclado dispoñibles actualmente. Teña en conta que estes poden cambiar dependendo da páxina que se estea a visitar."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Espazo",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -1969,21 +2087,21 @@
          "CAPSLOCK": "⇪",
          "ESC": "Esc",
          "ESCAPE": "Esc",
-         "PAGEUP": "Page↑",
-         "PAGEDOWN": "Page↓",
-         "END": "End",
-         "HOME": "Home",
+         "PAGEUP": "Páx↑",
+         "PAGEDOWN": "Páx↓",
+         "END": "Fin",
+         "HOME": "Inicio",
          "INS": "Ins",
-         "DEL": "Del"
+         "DEL": "Supr"
       },
       "GROUPS": {
          "GENERAL": "Xeral",
-         "PLAYER": "Player",
+         "PLAYER": "Reprodutor",
          "EDITOR": "Editor"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
+            "MAIN_MENU": "Menú principal",
             "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
             "REMOVE_FILTERS": "Limpar todos os filtros",
@@ -1991,28 +2109,39 @@
             "SERIES_VIEW": "Series",
             "NEW_EVENT": "Engadir evento",
             "NEW_SERIES": "Engadir serie",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "Atallos de teclado"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "Reproducir/Pausa",
             "PREVIOUS_FRAME": "Fotograma anterior",
             "NEXT_FRAME": "Fotograma seguinte",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
+            "STEP_BACKWARD": "Saltar 10s cara atrás",
+            "STEP_FORWARD": "Saltar 10s cara adiante",
+            "PREVIOUS_SEGMENT": "Segmento anterior / Saltar ó inicio",
+            "NEXT_SEGMENT": "Seguinte segmento / Saltar ó fin",
+            "VOLUME_UP": "Subir volume",
+            "VOLUME_DOWN": "Baixar volume",
             "MUTE": "Mute/unmute"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dividir",
             "CUT_SELECTED_SEGMENT": "Cortar",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT": "Reproducir segmento actual",
+            "CLEAR_LIST": "Borrar segmento",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturando",
+         "ERROR": "Erro",
+         "IDLE": "Inactivo",
+         "OFFLINE": "Desconectado",
+         "SHUTTING_DOWN": "Apagando",
+         "UNKNOWN": "Descoñecido",
+         "UPLOADING": "Subindo"
       }
    }
 }

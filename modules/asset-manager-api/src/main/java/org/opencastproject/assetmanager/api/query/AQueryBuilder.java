@@ -66,6 +66,9 @@ public interface AQueryBuilder {
   // direct predicate constructors
   //
 
+  /* -- */
+  Predicate mediaPackageIds(String... mpIds);
+
   /** Create a predicate to match an snapshot's media package ID. */
   Predicate mediaPackageId(String mpId);
 

@@ -19,10 +19,10 @@
     <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
     <eclipselink.version>2.6.4</eclipselink.version>
-    <commons-collections.version>4.1</commons-collections.version>
-    <commons-compress.version>1.16.1</commons-compress.version>
-    <httpcomponents-httpcore.version>4.4.9</httpcomponents-httpcore.version>
-    <httpcomponents-httpclient.version>4.5.5</httpcomponents-httpclient.version>
+    <commons-collections.version>4.2</commons-collections.version>
+    <commons-compress.version>1.18</commons-compress.version>
+    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
+    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
     <aws.version>1.11.49_1</aws.version>
     <jmeter.version>2.4</jmeter.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
@@ -34,7 +34,7 @@
     <jackson.version>2.9.4</jackson.version>
     <functional.version>1.4.2</functional.version>
     <jdk.version>1.8</jdk.version>
-    <mina.version>2.0.16</mina.version>
+    <mina.version>2.0.19</mina.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
@@ -126,6 +126,7 @@
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
     <module>modules/lti</module>
+    <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
     <module>modules/message-broker-impl</module>
     <module>modules/messages</module>
@@ -140,6 +141,8 @@
     <module>modules/oaipmh-remote</module>
     <module>modules/presets</module>
     <module>modules/publication-service-api</module>
+    <module>modules/publication-service-configurable</module>
+    <module>modules/publication-service-configurable-remote</module>
     <module>modules/publication-service-oaipmh</module>
     <module>modules/publication-service-oaipmh-remote</module>
     <module>modules/publication-service-youtube-remote</module>
@@ -330,7 +333,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.8</version>
+            <version>8.12</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -691,17 +694,17 @@
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-bundle</artifactId>
-        <version>1.1</version>
+        <version>1.18</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-core</artifactId>
-        <version>1.1</version>
+        <version>1.18</version>
       </dependency>
       <dependency>
         <groupId>org.apache.tika</groupId>
         <artifactId>tika-parsers</artifactId>
-        <version>1.1</version>
+        <version>1.18</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -929,6 +932,21 @@
         <version>3.1.4.RELEASE</version>
       </dependency>
       <dependency>
+        <groupId>org.apache.velocity</groupId>
+        <artifactId>velocity</artifactId>
+        <version>1.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.santuario</groupId>
+        <artifactId>xmlsec</artifactId>
+        <version>2.1.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.owasp.esapi</groupId>
+        <artifactId>esapi</artifactId>
+        <version>2.1.0.1</version>
+      </dependency>
+      <dependency>
         <groupId>org.opensaml</groupId>
         <artifactId>opensaml</artifactId>
         <version>2.6.4</version>
@@ -977,7 +995,7 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>3.5.1</version>
+        <version>3.6</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
@@ -1083,24 +1101,24 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.9.9</version>
+        <version>2.10</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>3.0.7</version>
+        <version>3.1.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>xml-path</artifactId>
-        <version>3.0.7</version>
+        <version>3.1.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>3.0.7</version>
+        <version>3.1.1</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1159,7 +1177,7 @@
       <dependency>
         <groupId>com.google.code.gson</groupId>
         <artifactId>gson</artifactId>
-        <version>2.8.2</version>
+        <version>2.8.5</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
@@ -1199,7 +1217,7 @@
       <dependency>
         <groupId>org.freemarker</groupId>
         <artifactId>freemarker</artifactId>
-        <version>2.3.23</version>
+        <version>2.3.28</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

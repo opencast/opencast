@@ -171,7 +171,8 @@
               }]);
             }
             scroller.bind('scroll', getMoreElements);
-            var search = angular.element(angular.element(element).parent().children(".chosen-container").children('.chosen-drop').children('.chosen-search')[0].childNodes["0"]);
+            var search = angular.element(angular.element(element).parent().children(".chosen-container")
+                           .children('.chosen-drop').children('.chosen-search').children('input.chosen-search-input')["0"]);
             search.bind('keyup.chosen paste.chosen', getMoreElements);
           });
           if (attr.ngOptions && ngModel) {

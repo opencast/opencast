@@ -1,0 +1,16 @@
+[
+  {
+    "reason": "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING",
+    "resolvedStatus": false,
+    "modificationDate": "2018-08-10T12:42:02Z",
+    "replies": [],
+    "author": {
+      "name": "Opencast Project Administrator",
+      "email": "admin@localhost",
+      "username": "admin"
+    },
+    "id": 1902,
+    "text": "Recording has not been cut yet.",
+    "creationDate": "2018-08-10T12:42:02Z"
+  }
+]

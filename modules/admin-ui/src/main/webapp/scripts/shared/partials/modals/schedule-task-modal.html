@@ -59,7 +59,8 @@
             </div><!-- modal-content [general] -->
 
             <footer>
-                <a wz-next class="submit"
+                <a class="submit"
+                   ng-click="clearWorkflowFormAndContinue()"
                    ng-class="{active: scheduleTaskForm.generalForm.$valid, disabled: scheduleTaskForm.generalForm.$invalid}">
                     {{ 'WIZARD.NEXT_STEP' | translate }}
                 </a>
@@ -78,8 +79,8 @@
                             <div class="obj-container">
                                 <select chosen
                                         data-width="'100%'"
-                                        ng-change="processing.changeWorkflow()"
-                                        data-disable-search-threshold="8"
+                                        ng-change="processing.changeWorkflow(workflowProperties, getSelectedIds())"
+                                        data-disable-search-threshold="0"
                                         not-empty-selection
                                         ng-model="processing.ud.workflow"
                                         ng-model-options="{ allowInvalid: true }"

@@ -1,0 +1,36 @@
+{
+  "date": "2018-08-10T12:36:57Z",
+  "duration": 23857,
+  "series": {
+    "id": "",
+    "title": ""
+  },
+  "presenters": [
+    "Pamela Published"
+  ],
+  "previews": [
+    {
+      "uri": "/admin-ng/resources/video/sunrise.mp4",
+      "frameRate": 29.97003
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Publish",
+      "id": "publish-after-cutting"
+    },
+    {
+      "name": "Trim and Encode to 3 delivery formats without theme ",
+      "id": "publish-after-cutting-process-smil"
+    }
+  ],
+  "title": "Mock Event Published",
+  "tracks": [
+    {
+      "flavor": "presenter",
+      "id": "dc00c757-f0f4-40d5-b341-75a7e51efd09",
+      "waveform": "/admin-ng/resources/img/waveform.png"
+    }
+  ],
+  "segments": []
+}

@@ -44,7 +44,6 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParam;
 import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowInstanceImpl;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -238,21 +237,18 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID).anyTimes();
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream).anyTimes();
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.AudioVisual).anyTimes();
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).anyTimes();
     EasyMock.expect(profile.getSuffix()).andReturn("-v.flv").anyTimes();
 
     profile2 = EasyMock.createNiceMock(EncodingProfile.class); // Video Only
     EasyMock.expect(profile2.getIdentifier()).andReturn(PROFILE_ID2).anyTimes();
     EasyMock.expect(profile2.getApplicableMediaType()).andReturn(MediaType.Visual).anyTimes();
     EasyMock.expect(profile2.getOutputType()).andReturn(MediaType.Visual).anyTimes();
-    EasyMock.expect(profile2.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).anyTimes();
     EasyMock.expect(profile2.getSuffix()).andReturn("-v.mp4").anyTimes();
 
     profile3 = EasyMock.createNiceMock(EncodingProfile.class); // different suffix
     EasyMock.expect(profile3.getIdentifier()).andReturn(PROFILE_ID3).anyTimes();
     EasyMock.expect(profile3.getApplicableMediaType()).andReturn(MediaType.Audio).anyTimes();
     EasyMock.expect(profile3.getOutputType()).andReturn(MediaType.Audio).anyTimes();
-    EasyMock.expect(profile3.getMimeType()).andReturn(MimeTypes.AAC.toString()).anyTimes();
     EasyMock.expect(profile3.getSuffix()).andReturn("-a.mp4").anyTimes();
     profileList = new EncodingProfile[] { profile, profile2, profile3 };
     EasyMock.replay(profile, profile2, profile3);
@@ -569,7 +565,6 @@ public class ProcessSmilWorkflowOperationHandlerTest {
     EasyMock.expect(profile.getIdentifier()).andReturn(PROFILE_ID);
     EasyMock.expect(profile.getApplicableMediaType()).andReturn(MediaType.Stream);
     EasyMock.expect(profile.getOutputType()).andReturn(MediaType.Stream);
-    EasyMock.expect(profile.getMimeType()).andReturn(MimeTypes.MPEG4.toString()).times(2);
     profileList = new EncodingProfile[] { profile };
     EasyMock.replay(profile);
 

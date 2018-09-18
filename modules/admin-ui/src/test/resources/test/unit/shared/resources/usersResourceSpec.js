@@ -37,9 +37,9 @@ describe('Users API Resource', function () {
             var data = UsersResource.query();
 
             $httpBackend.flush();
-            expect(data.rows.length).toBe(6);
-            expect(data.rows[0].name).toBe('•mock• Xavier Butty');
-            expect(data.rows[0].username).toBe('xavier_butty');
+            expect(data.rows.length).toBe(5);
+            expect(data.rows[0].name).toBe('•mock• MH System Account');
+            expect(data.rows[0].username).toBe('matterhorn_system_account');
             expect(data.rows[0].roles).toContain('ROLE_USER');
         });
     });

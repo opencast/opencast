@@ -69,7 +69,6 @@ All profiles should have the following properties:
     .input  = [audio|visual|stream|image]
     .output = [audio|visual|stream|image]
     .suffix
-    .mimetype
     .ffmpeg.command
 
 For example:
@@ -79,7 +78,6 @@ For example:
     profile.my-av-profile.http.input          = visual
     profile.my-av-profile.http.output         = visual
     profile.my-av-profile.http.suffix         = -encoded.enc
-    profile.my-av-profile.http.mimetype       = video/x-enc
     profile.my-av-profile.http.ffmpeg.command = -i #{in.video.path} -c:v venc -c:a aenc #{out.dir}/#{out.name}#{out.suffix}
 
 The most important part of this profile is the `ffmpeg.command`. This line specifies FFmpeg command line options using

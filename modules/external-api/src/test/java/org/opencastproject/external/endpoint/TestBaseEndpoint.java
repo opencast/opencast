@@ -53,6 +53,7 @@ public class TestBaseEndpoint extends BaseEndpoint {
     orgProperties.put(FEED_URL_ORG_PROPERTY, "https://feeds.opencast.org");
     orgProperties.put(ADMIN_DOC_URL_ORG_PROPERTY, "https://documentation.opencast.org");
     orgProperties.put(EXTERNAL_API_URL_ORG_PROPERTY, "https://api.opencast.org");
+    this.endpointBaseUrl = "https://api.opencast.org";
 
     // Prepare mocked organization
     Organization org = createNiceMock(Organization.class);

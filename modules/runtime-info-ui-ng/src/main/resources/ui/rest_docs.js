@@ -9,12 +9,12 @@ $(document).ready(function($) {
   $('input').change(search);
   $('input').keyup(search);
 
-  $.getJSON("/info/components.json", function(data) {
+  $.getJSON('/info/components.json', function(data) {
     $.each(data, function(section) {
-      if ("rest" == section) {
-        data.rest.sort(function(a,b) {return a.path > b.path ? 1 : -1});
+      if ('rest' == section) {
+        data.rest.sort((a,b) => a.path > b.path ? 1 : -1);
         $.each(data.rest, function(i) {
-          $('#docs').append('<li><a href="/docs.html?path='+ data.rest[i].path + '">'
+          $('#docs').append('<li><a href="/docs.html?path=' + data.rest[i].path + '">'
               + '<span>' + data.rest[i].path + '</span>'
               + data.rest[i].description + '</a></li>');
         });

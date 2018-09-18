@@ -38,7 +38,7 @@ angular.module('adminNg.directives')
 
             element.bind('scroll', function () {
                 if (raw.scrollTop + raw.offsetHeight > raw.scrollHeight) {
-                    scope.$apply(attrs.adminNgLoadingScroller);
+                    scope.$apply(attrs.loadingScroller);
                 }
             });
         }

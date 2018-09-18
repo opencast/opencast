@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
+  <scr:component name="org.opencastproject.publication.configurable.ConfigurablePublicationServiceImpl" immediate="true">
+  <implementation class="org.opencastproject.publication.configurable.ConfigurablePublicationServiceImpl" />
+    <property name="service.description" value="Publication Service (Configurable)" />
+    <service>
+      <provide interface="org.opencastproject.publication.api.ConfigurablePublicationService" />
+    </service>
+    <reference name="serviceRegistry"
+               interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+               cardinality="1..1"
+               policy="static"
+               bind="setServiceRegistry" />
+    <reference name="security-service"
+               interface="org.opencastproject.security.api.SecurityService"
+               cardinality="1..1"
+               policy="static"
+               bind="setSecurityService" />
+    <reference name="user-directory"
+               interface="org.opencastproject.security.api.UserDirectoryService"
+               cardinality="1..1"
+               policy="static"
+               bind="setUserDirectoryService" />
+    <reference name="orgDirectory"
+               interface="org.opencastproject.security.api.OrganizationDirectoryService"
+               cardinality="1..1"
+               policy="static"
+               bind="setOrganizationDirectoryService" />
+    <reference name="DownloadDistributionService"
+               interface="org.opencastproject.distribution.api.DownloadDistributionService"
+               cardinality="1..1"
+               policy="static"
+               target="(distribution.channel=download)"
+               bind="setDownloadDistributionService" />
+  </scr:component>
+
+   <scr:component name="org.opencastproject.publication.configurable.endpoint.ConfigurablePublicationRestService" immediate="true">
+     <implementation class="org.opencastproject.publication.configurable.endpoint.ConfigurablePublicationRestService" />
+     <property name="service.description" value="Configurable Publication REST Endpoint" />
+
+     <property name="opencast.service.type" value="org.opencastproject.publication.configurable" />
+     <property name="opencast.service.path" value="/publication/api" />
+     <property name="opencast.service.jobproducer" value="true" />
+
+     <service>
+       <provide interface="org.opencastproject.publication.configurable.endpoint.ConfigurablePublicationRestService" />
+     </service>
+
+     <reference name="publicationService"
+                interface="org.opencastproject.publication.api.ConfigurablePublicationService"
+                cardinality="1..1"
+                policy="static"
+                bind="setService" />
+     <reference name="serviceRegistry"
+                interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+                cardinality="1..1"
+                policy="static"
+                bind="setServiceRegistry" />
+   </scr:component>
+</scr:components>

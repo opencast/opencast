@@ -72,10 +72,6 @@ public class EncodingProfileImpl implements EncodingProfile {
   protected String suffix = null;
   */
 
-  /** Mime type */
-  @XmlElement(name = "mimetype")
-  protected String mimeType = null;
-
   /** The track type that this profile may be applied to */
   @XmlElement(name = "inputmediatype")
   protected MediaType applicableType = null;
@@ -212,26 +208,6 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   public void setSuffix(String tag ,String suffix) {
     this.suffixes.put(tag, suffix);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.composer.api.EncodingProfile#getMimeType()
-   */
-  @Override
-  public String getMimeType() {
-    return mimeType;
-  }
-
-  /**
-   * Sets the Mimetype.
-   *
-   * @param mimeType
-   *          the Mimetype
-   */
-  public void setMimeType(String mimeType) {
-    this.mimeType = mimeType;
   }
 
   /**

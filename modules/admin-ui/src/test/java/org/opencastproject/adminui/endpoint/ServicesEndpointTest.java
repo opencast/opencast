@@ -392,20 +392,20 @@ public class ServicesEndpointTest {
             .contentType(ContentType.JSON)
             .body("count", equalTo(6))
             .body("total", equalTo(6))
-            .body("results[0].status", equalTo("NORMAL"))
-            .body("results[1].status", equalTo("NORMAL"))
-            .body("results[4].status", equalTo("WARNING"))
-            .body("results[5].status", equalTo("ERROR"))
+            .body("results[0].status", equalTo("SYSTEMS.SERVICES.STATUS.NORMAL"))
+            .body("results[1].status", equalTo("SYSTEMS.SERVICES.STATUS.NORMAL"))
+            .body("results[4].status", equalTo("SYSTEMS.SERVICES.STATUS.WARNING"))
+            .body("results[5].status", equalTo("SYSTEMS.SERVICES.STATUS.ERROR"))
             .when().get(rt.host(TEST_DATA_JSON));
 
     given().param("sort", "status:desc").expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON)
             .body("count", equalTo(6))
             .body("total", equalTo(6))
-            .body("results[5].status", equalTo("NORMAL"))
-            .body("results[4].status", equalTo("NORMAL"))
-            .body("results[1].status", equalTo("WARNING"))
-            .body("results[0].status", equalTo("ERROR"))
+            .body("results[5].status", equalTo("SYSTEMS.SERVICES.STATUS.NORMAL"))
+            .body("results[4].status", equalTo("SYSTEMS.SERVICES.STATUS.NORMAL"))
+            .body("results[1].status", equalTo("SYSTEMS.SERVICES.STATUS.WARNING"))
+            .body("results[0].status", equalTo("SYSTEMS.SERVICES.STATUS.ERROR"))
             .when().get(rt.host(TEST_DATA_JSON));
   }
 }

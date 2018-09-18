@@ -1,0 +1,87 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
+
+.function-buttons a:first-child {
+    margin-left: 0;
+}
+.function-buttons a {
+    @include btn(white);
+    font-size: 12px;
+    font-weight: $weight-semibold;
+    padding: 10px;
+    display: inline-block;
+    margin-left: 6px;
+
+    // Function Icons
+    $pseudo-position: before;
+    $display-value: inline;
+    $margin: 0 4px 0 0;
+    $padding: 0;
+    $color: inherit;
+    $font-size: 12px;
+    $font-weight: normal;
+    $line-height: 1;
+
+    &.cut {
+        @include fa-icon($fa-var-trash, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.split {
+        @include fa-icon($fa-var-scissors, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.replay {
+        @include fa-icon($fa-var-arrows-h, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.replay-with-preroll {
+        @include fa-icon($fa-var-long-arrow-right $fa-var-long-arrow-left, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.replay-end-of-segment {
+        @include fa-icon($fa-var-long-arrow-left, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.switch-feed {
+        @include fa-icon($fa-var-exchange, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.undo {
+        @include fa-icon($fa-var-rotate-left, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.redo {
+        @include fa-icon($fa-var-rotate-right, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.clear-segments {
+        @include fa-icon($fa-var-trash, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+    
+    &.extract-thumbnail {
+        @include fa-icon($fa-var-camera, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+    &.upload-thumbnail {
+        @include fa-icon($fa-var-upload, $pseudo-position, $display-value, $margin, $padding, $color, $font-size);
+    }
+
+}

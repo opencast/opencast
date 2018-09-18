@@ -24,8 +24,8 @@ angular.module('adminNg.controllers')
 .controller('UserCtrl', ['$scope', 'Table', 'UserRolesResource', 'UserResource', 'UsersResource', 'JsHelper', 'Notifications', 'Modal', 'AuthService', 'underscore',
     function ($scope, Table, UserRolesResource, UserResource, UsersResource, JsHelper, Notifications, Modal, AuthService, _) {
         $scope.manageable = true;
-        var roleSlice = 100;
-        var roleOffset = roleSlice; //Note that the initial offset is the same size as the initial slice so that the *next* slice starts at the right place
+        $scope.roleSlice = 100;
+        $scope.roleOffset = $scope.roleSlice; //Note that the initial offset is the same size as the initial slice so that the *next* slice starts at the right place
         var loading = false;
         var showExternalRoles = false; // Should the External Roles tab be visible
 
@@ -40,7 +40,7 @@ angular.module('adminNg.controllers')
         });
 
         $scope.role = {
-            available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}), // Load all the internal roles
+            available: UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'}), // Load the first rolesSlice internal roles
             external: [],
             selected:  [],
             derived: [],
@@ -57,8 +57,8 @@ angular.module('adminNg.controllers')
 
             loading = true;
             UserRolesResource.query({limit: $scope.roleSlice, offset: $scope.roleOffset, filter: 'role_target:USER'}).$promise.then(function (data) {
-                angular.extend($scope.role.available, data);
-                roleOffset = roleOffset + roleSlice;
+                $scope.role.available = $scope.role.available.concat(data);
+                $scope.roleOffset = $scope.roleOffset + $scope.roleSlice;
             }, this).finally(function () {
                 loading = false;
             });

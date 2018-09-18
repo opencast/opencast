@@ -1,0 +1,51 @@
+{
+  "date": "2018-08-10T11:22:51Z",
+  "duration": 52125,
+  "series": {
+    "id": "",
+    "title": ""
+  },
+  "presenters": [
+    "Peter Processor"
+  ],
+  "previews": [
+    {
+      "uri": "/admin-ng/resources/video/sunrise.mp4",
+      "frameRate": 29.97003
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Publish",
+      "id": "publish-after-cutting"
+    },
+    {
+      "name": "Trim and Encode to 3 delivery formats without theme ",
+      "id": "publish-after-cutting-process-smil"
+    }
+  ],
+  "title": "Mock Event Processing",
+  "tracks": [{
+    "id": "id-1",
+    "flavor": "presenter\/audio",
+    "mimetype": "audio\/mp3",
+    "waveform": "img\/waveform.jpg"
+  }, {
+    "id": "id-2",
+    "flavor": "presenter\/video",
+    "mimetype": "video\/mpeg"
+  }],
+  "thumbnail": {
+    "type": "DEFAULT"
+  },
+  "segments": [{
+    "start": 0,
+    "end": 17003
+  }, {
+    "start": 17003,
+    "end": 28009
+  }, {
+    "start": 28009,
+    "end": 52125
+  }]
+}

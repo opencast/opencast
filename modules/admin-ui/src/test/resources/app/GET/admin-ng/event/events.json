@@ -1,268 +1,124 @@
 {
-  "results": [{
-    "source": "ARCHIVE",
-    "id": "40518",
-    "title": "•mock• A Test Title",
-    "technical_presenters": [],
-    "presenters": ["Matt Smith", "Chuck Norris"],
-    "series": {
-      "id": "78753d04-18a4-4327-9a61-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 2",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T10:00:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T10:00:00Z",
-    "workflow_state": "processing",
-    "has_open_comments":false,
-    "has_preview":false,
-    "scheduling_status": "",
-    "source":"ARCHIVE",
-    "review_status": "",
-    "comments": {
-      "resolved": 0,
-      "unresolved": 2
-    },
-    "publications": [{
-      "id": "engage",
-      "name": "Engage",
-      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }]
-  }, {
-    "source":"ARCHIVE",
-    "id": "30112",
-    "title": "•mock• Another Title",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-23T10:00:00Z",
-    "end_date": "2012-12-23T11:15:00Z",
-    "technical_start": "2012-12-23T10:00:00Z",
-    "technical_end": "2012-12-23T11:15:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_open_comments":true,
-    "has_preview":true,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": []
-  }, {
-    "source": "ARCHIVE",
-    "id": "80201",
-    "title": "•mock• No Comments",
-    "technical_presenters": [],
-    "presenters": ["John Doe"],
-    "series": {
-      "id": "11113d04-18a4-4327-9a61-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Auditorium",
-    "start_date": "2012-11-01T14:30:00Z",
-    "end_date": "2012-11-01T15:45:00Z",
-    "technical_start": "2012-11-01T14:30:00Z",
-    "technical_end": "2012-11-01T15:45:00Z",
-    "workflow_state": "processed",
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 3,
-      "unresolved": 0
-    },
-    "publications": [{
-      "id": "engage",
-      "name": "Engage",
-      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }]
-  }, {
-    "source": "ARCHIVE",
-    "id": "1",
-    "title": "•mock• Pagination 1",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_preview":true,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": [{
-      "id": "engage",
-      "name": "Engage",
-      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }]
-  }, {
-    "source": "ARCHIVE",
-    "id": "2",
-    "title": "•mock• Pagination 2",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_preview":false,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": [{
-      "id": "engage",
-      "name": "Engage",
-      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }]
-  }, {
-    "source": "ARCHIVE",
-    "id": "3",
-    "title": "•mock• Pagination 3",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_preview":true,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": []
-  }, {
-    "source": "ARCHIVE",
-    "id": "4",
-    "title": "•mock• Pagination 4",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": []
-  }, {
-    "source": "ARCHIVE",
-    "id": "5",
-    "title": "•mock• Pagination 5",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_preview":false,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": []
-  }, {
-    "source": "ARCHIVE",
-    "id": "6",
-    "title": "•mock• Pagination 6",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "ARCHIVED",
-    "has_preview":true,
-    "scheduling_status": "",
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": [{
-      "id": "engage",
-      "name": "Engage",
-      "url": "http://localhost:8080/Engage/play.html?id=32423445354"
-    }]
-  }, {
-    "source": "WORKFLOW",
-    "id": "7",
-    "title": "•mock• Pagination 7",
-    "technical_presenters": [],
-    "presenters": ["Chuck Norris"],
-    "series": {
-      "id": "91203d04-18a4-4327-9812-b6d93816a7d2",
-      "title": "Physics semester 2 by professor Norton and Wyatt"
-    },
-    "location": "Room 1",
-    "start_date": "2012-12-01T08:30:00Z",
-    "end_date": "2012-12-01T08:30:00Z",
-    "technical_start": "2012-12-01T08:30:00Z",
-    "technical_end": "2012-12-01T08:30:00Z",
-    "workflow_state": "",
-    "scheduling_status": "",
-    "has_preview":true,
-    "review_status": "",
-    "comments": {
-      "resolved": 1,
-      "unresolved": 2
-    },
-    "publications": []
-  }],
-  "offset": 0,
   "total": 12000,
-  "limit": 10,
-  "count": 10
+  "offset": 0,
+  "count": 4,
+  "limit": 0,
+  "results": [
+    {
+      "end_date": "2018-08-31T12:55:00Z",
+      "agent_id": "F300.1",
+      "needs_cutting": false,
+      "source": "SCHEDULE",
+      "title": "Mock Event Planned",
+      "scheduling_status": "EVENTS.EVENTS.SCHEDULING_STATUS.READY_FOR_RECORDING",
+      "has_open_comments": false,
+      "has_preview": false,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-31T12:55:00Z",
+      "presenters": [
+        "Peter Planner"
+      ],
+      "technical_start": "2018-08-31T12:00:00Z",
+      "location": "F300.1",
+      "managedAcl": "",
+      "workflow_state": "",
+      "id": "9cc888e8-cdf6-4974-bf18-effecdadfa94",
+      "review_status": "UNSENT",
+      "start_date": "2018-08-31T12:00:00Z",
+      "event_status": "EVENTS.EVENTS.STATUS.SCHEDULED",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T11:22:51Z",
+      "agent_id": "",
+      "needs_cutting": false,
+      "source": "ARCHIVE",
+      "title": "Mock Event Processing",
+      "scheduling_status": "",
+      "has_open_comments": false,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-10T11:22:51Z",
+      "presenters": [
+        "Peter Processor"
+      ],
+      "technical_start": "2018-08-10T11:22:51Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "PROCESSING",
+      "id": "c3a4f68d-14d4-47e2-8981-8eb2fb300d3a",
+      "review_status": "UNSENT",
+      "start_date": "2018-08-10T11:22:51Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSING",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T12:39:02Z",
+      "agent_id": "",
+      "needs_cutting": true,
+      "source": "ARCHIVE",
+      "title": "Mock Event Unpublished",
+      "scheduling_status": "",
+      "has_open_comments": true,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": true,
+      "technical_end": "2018-08-10T12:39:02Z",
+      "presenters": [
+        "Usain Unpublished"
+      ],
+      "technical_start": "2018-08-10T12:39:02Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "SUCCEEDED",
+      "id": "1a2a040b-ef73-4323-93dd-052b86036b75",
+      "review_status": "UNSENT",
+      "start_date": "2018-08-10T12:39:02Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "publications": []
+    },
+    {
+      "end_date": "2018-08-10T12:36:57Z",
+      "agent_id": "",
+      "needs_cutting": false,
+      "source": "ARCHIVE",
+      "title": "Mock Event Published",
+      "scheduling_status": "",
+      "has_open_comments": false,
+      "has_preview": true,
+      "technical_presenters": [],
+      "has_comments": false,
+      "technical_end": "2018-08-10T12:36:57Z",
+      "presenters": [
+        "Pamela Published"
+      ],
+      "technical_start": "2018-08-10T12:36:57Z",
+      "location": "",
+      "managedAcl": "",
+      "workflow_state": "SUCCEEDED",
+      "id": "c990ea15-e5ed-4fcf-bc17-cb070091c343",
+      "review_status": "UNSENT",
+      "start_date": "2018-08-10T12:36:57Z",
+      "event_status": "EVENTS.EVENTS.STATUS.PROCESSED",
+      "publications": [
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
+          "id": "engage-player",
+          "url": "http://localhost:8080/engage/theodul/ui/core.html?id=c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        },
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
+          "id": "api",
+          "url": "http://localhost:8080/api/events/c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        },
+        {
+          "name": "EVENTS.EVENTS.DETAILS.PUBLICATIONS.CUSTOM",
+          "id": "oaipmh-default",
+          "url": "/oaipmh/default?verb=ListMetadataFormats&identifier=c990ea15-e5ed-4fcf-bc17-cb070091c343"
+        }
+      ]
+    }
+  ]
 }

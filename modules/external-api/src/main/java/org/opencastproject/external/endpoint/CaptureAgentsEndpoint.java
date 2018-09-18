@@ -83,7 +83,7 @@ public class CaptureAgentsEndpoint {
 
   /** OSGi activation method */
   void activate(ComponentContext cc) {
-    logger.info("Activated External API - Capture Agents Endpoint");
+    logger.info("Activating External API - Capture Agents Endpoint");
   }
 
   @GET

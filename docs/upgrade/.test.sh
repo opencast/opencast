@@ -1,6 +1,14 @@
 #!/bin/sh
 
-set -eu
+set -eux
+
+remote=""
+if [ "$#" -ge 1 ];
+then
+  remote="-h 127.0.0.1 -P $1"
+  echo "# Port and host overriden to $remote"
+fi
+
 cd "$(dirname "$0")"
 
 versions="$(
@@ -19,15 +27,15 @@ curl -s -L -o "$tmp22sql" https://raw.githubusercontent.com/opencast/opencast/2.
 
 echo "# Creating database and applying Opencast 2.2 ddl script"
 
-echo "create database octest;" | mysql -u root
-echo "mysql -u root octest < $tmp22sql"
-mysql -u root octest < "$tmp22sql"
+echo "create database octest;" | mysql -u root $remote
+echo "mysql -u root $remote octest < $tmp22sql"
+mysql -u root $remote octest < "$tmp22sql"
 rm "$tmp22sql"
 
 echo "# Running upgrade scripts"
 
 echo "$versions" | while read -r line; do
   dir="$(echo "$line" | cut -d' ' -f2)"
-  echo "mysql -u root octest < $dir/mysql5.sql"
-  mysql -u root octest < "$dir/mysql5.sql"
+  echo "mysql -u root $remote octest < $dir/mysql5.sql"
+  mysql -u root $remote octest < "$dir/mysql5.sql"
 done

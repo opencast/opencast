@@ -174,15 +174,6 @@ public class EncodingProfileTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.composer.api.EncodingProfileImpl#getMimeType()}.
-   */
-  @Test
-  public void testGetMimeType() {
-    EncodingProfile profile = profiles.get(h264ProfileId);
-    assertEquals("visual/x-m4v", profile.getMimeType());
-  }
-
-  /**
    * Test method for {@link org.opencastproject.composer.api.EncodingProfileImpl#getExtension(java.lang.String)}.
    */
   @Test

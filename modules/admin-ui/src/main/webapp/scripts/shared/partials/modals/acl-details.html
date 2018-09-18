@@ -80,7 +80,7 @@
                                                     </p>
                                                     <select chosen pre-select-from="acls"
                                                         data-width="'200px'"
-                                                        data-disable-search-threshold="8"
+                                                        data-disable-search-threshold="0"
                                                         data-search_contains="true"
                                                         ng-change="changeBaseAcl()"
                                                         ng-model="baseAclId"
@@ -129,7 +129,7 @@
                                                     <select chosen pre-select-from="roles"
                                                         ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"
                                                         data-width="'360px'"
-                                                        data-disable-search-threshold="8"
+                                                        data-disable-search-threshold="0"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
                                                         ng-change="save(policy)"

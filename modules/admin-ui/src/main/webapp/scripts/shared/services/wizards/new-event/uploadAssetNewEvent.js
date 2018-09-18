@@ -61,13 +61,17 @@ function (ResourcesListResource, UploadAssetOptions, JsHelper, Notifications, $i
   var NewEventUploadAsset = function () {
 
     var self = this;
-    self.requiredMetadata = {};
-    self.ud = {};
-    self.ud.assets = {};
-    self.ud.defaults = {};
-    self.ud.namemap = {};
-    self.ud.assetlistforsummary = [];
-    self.ud.hasNonTrackOptions = false;
+
+    this.reset = function () {
+      self.requiredMetadata = {};
+      self.ud = {};
+      self.ud.assets = {};
+      self.ud.defaults = {};
+      self.ud.namemap = {};
+      self.ud.assetlistforsummary = [];
+      self.ud.hasNonTrackOptions = false;
+    };
+    self.reset();
 
     // This is used as the callback from the uploadAssetDirective
     self.onAssetUpdate = function() {

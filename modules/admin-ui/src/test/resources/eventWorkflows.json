@@ -7,7 +7,7 @@
             "id": 1,
             "series": "Serie 1",
             "title": "Mediapackage 1",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
             "workflow": "Full"
         },
@@ -15,7 +15,7 @@
             "id": 2,
             "series": "Serie 1",
             "title": "",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
             "workflow": "Full"
         },
@@ -23,7 +23,7 @@
             "id": 3,
             "series": "Serie 1",
             "title": "Mediapackage 3",
-            "status": "INSTANTIATED",
+            "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
             "submitted": "2014-06-05T15:00:00Z",
             "workflow": "Full"
         }

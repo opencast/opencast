@@ -9,7 +9,8 @@ angular.module('adminNg.controllers')
                 label: 'SYSTEMS.JOBS.TABLE.ID'
             }, {
                 name:  'status',
-                label: 'SYSTEMS.JOBS.TABLE.STATUS'
+                label: 'SYSTEMS.JOBS.TABLE.STATUS',
+                translate: true
             }, {
                 name:  'operation',
                 label: 'SYSTEMS.JOBS.TABLE.OPERATION'

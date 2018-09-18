@@ -64,7 +64,13 @@
          "NAME": "Imię"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Wymagane potwierdzenie"
+         "CONFIRMATION": "Confirmation"
+      },
+      "WARNINGS": {
+         "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
+      },
+      "ERRORS": {
+         "SERIES_HAS_EVENTS": "This series cannot be deleted as it still contains events."
       }
    },
    "MEDIAMODULE": "Galeria",
@@ -121,6 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "Żadna seria nie została zapisana",
       "EVENTS_DELETED": "Wydarzenie zostało usunięte",
       "EVENTS_NOT_DELETED": "Wydarzenie/wydarzenia nie mogły być usunięte",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
       "SERIES_DELETED": "Seria została skasowana",
       "SERIES_NOT_DELETED": "Seria nie mogła zostać usunięta",
       "USER_BLACKLIST_CREATED": "Czarna lista została utworzona",
@@ -131,6 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "Czarna lista nie mogła być usunięta",
       "LOCATION_DELETED": "Lokalizacja została usunięta",
       "LOCATION_NOT_DELETED": "Nie udało się usunąć lokalizacji",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
       "LOCATION_BLACKLIST_CREATED": "Czarna lista została utworzona",
       "LOCATION_BLACKLIST_NOT_CREATED": "Nie można utworzyć czarnej listy",
       "LOCATION_BLACKLIST_SAVED": "Czarna lista została zapisana",
@@ -150,6 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
       "CONFLICT_ALREADY_ENDED": "Błąd w harmonogramie: Wydarzenie się już zakończyło.",
       "CONFLICT_END_BEFORE_START": "Błąd w harmonogramie: Rozpoczęcie zakończenie zdarzenia zaplanowano przed jego rozpoczęciem.",
+      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
       "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
       "MISSING_ACL_RULES": "Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
       "SAVED_ACL_RULES": "Reguły dostępu zostały zapisane.",
@@ -165,10 +174,12 @@
       "THEME_NAME_ALREADY_TAKEN": "Ta nazwa jest już w użyciu",
       "THEME_NAME_EMPTY": "Nazwa nie może być pusta",
       "BUMPER_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
+      "BUMPER_REQUIRED": "You must upload a bumper",
       "TRAILER_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
       "TITLE_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
       "LICENSE_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
       "WATERMARK_UPLOAD_ERROR": "Wystąpił błąd podczas przesyłania multimediów",
+      "WATERMARK_REQUIRED": "You must upload a watermark",
       "THEME_UPLOAD_STARTED": "Nagranie jest ładowane…",
       "THEME_CREATED": "Motyw został utworzony",
       "THEME_NOT_CREATED": "Nie można utworzyć motywu",
@@ -179,6 +190,7 @@
       "VIDEO_CUT_NOT_SAVED": "Nie udało się zapisać informacji edycji",
       "VIDEO_CUT_SAVED": "Informacje o edycji zostały zapisane",
       "VIDEO_CUT_PROCESSING": "Nagranie jest przetwarzane…",
+      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
       "SERVER_UNRESPONSIVE": "Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
       "SERVICE_UNAVAILABLE": "Oops! Serwer nie odpowiada. Proszę spróbować ponownie później.",
       "ACTIVE_TRANSACTION": "Wydarzenie nie może być modyfikowane, ponieważ w chwili obecnej system wykonuje operacje z jego udziałem."
@@ -195,7 +207,8 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Usuń",
-            "BUTTON": "Usuń"
+            "BUTTON": "Usuń",
+            "CANNOT_DELETE": "The highlighted series cannot be deleted as they still contain events."
          },
          "EVENTS": {
             "CAPTION": "Usuń",
@@ -211,6 +224,7 @@
                "EVENTS_RETRACTED": "Wydarzenia do wycofania",
                "RETRACT_WORKFLOW": "Przepływ Wycofujący Zdarzenie"
             },
+            "UNAUTHORIZED": "You are not authorized to delete the highlighted events. Please unselect them to continue.",
             "UNPUBLISHED": {
                "NONE": "Żadne z wybranych zdarzeń, nie może zostać usunięte bez pozostawienia niepowiązanych plików."
             },
@@ -242,12 +256,14 @@
       },
       "EDIT_EVENTS": {
          "CAPTION": "Edit scheduled events",
+         "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Ogólne",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
             "NOCHANGES": "No changes to the events detected!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict"
+            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
             "EDIT": "Edit metadata"
@@ -269,7 +285,10 @@
    "DATES": {
       "TODAY": "Dzisiaj",
       "TOMORROW": "Jutro",
-      "YESTERDAY": "Wczoraj"
+      "YESTERDAY": "Wczoraj",
+      "THIS_WEEK": "This week",
+      "THIS_MONTH": "This month",
+      "THIS_YEAR": "This year"
    },
    "DATETIMES": {
       "TODAY": "Dziś o {{ time }}",
@@ -438,6 +457,7 @@
                "CAPTION": "Napisy",
                "SELECT_TYPE": "Wybierz typ zasobu",
                "ADD": "Dodaj zasób",
+               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Materiały uzupełniające",
                   "CAPTIONS_DFXP": "Napisy w formacie DFXP",
@@ -640,6 +660,8 @@
                "TYPE": "Typ",
                "SIZE": "Rozmiar",
                "DETAILS": "Szczegóły",
+               "STREAMS": "Streams",
+               "PREVIEW": "Preview",
                "ATTACHMENTS": {
                   "TITLE": "Załączniki",
                   "CAPTION": "Załączniki",
@@ -847,6 +869,7 @@
                "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "",
+               "MORE_INFO": "More Information & Actions",
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "TITLE": "Tytuł",
@@ -864,17 +887,50 @@
                   "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
                   "RETRY": "Retry execution of workflow instance",
                   "DELETE": "Delete workflow instance"
+               },
+               "OPERATION_STATUS": {
+                  "INSTANTIATED": "Instantiated",
+                  "RUNNING": "W toku",
+                  "PAUSED": "Zatrzymane",
+                  "SUCCEEDED": "Succeeded",
+                  "FAILED": "Zakończone niepowodzeniem",
+                  "SKIPPED": "Skipped",
+                  "RETRY": "Retry"
                }
+            },
+            "WORKFLOW_INSTANCES": {
+               "TITLE": "Workflow instances"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Szczegóły przepływu pracy",
                "CONFIGURATION": "Konfiguracja przepływu pracy"
             },
             "WORKFLOW_OPERATIONS": {
-               "TITLE": "Operacje w przepływie pracy"
+               "TITLE": "Operacje w przepływie pracy",
+               "DETAILS_LINK": "Operacje",
+               "TABLE_HEADERS": {
+                  "TITLE": "Tytuł",
+                  "STATUS": "Status",
+                  "DESCRIPTION": "Opis"
+               }
             },
             "OPERATION_DETAILS": {
-               "TITLE": "Szczegóły operacji"
+               "TITLE": "Szczegóły operacji",
+               "TABLE_HEADERS": {
+                  "TITLE": "Tytuł",
+                  "STATE": "Stan",
+                  "DESCRIPTION": "Opis",
+                  "EXECUTION_HOST": "Execution Host",
+                  "JOB": "Job",
+                  "TIME_IN_QUEUE": "Time in Queue",
+                  "STARTED": "Rozpoczęte",
+                  "FINISHED": "Zakończone",
+                  "RETRY_STRATEGY": "Retry Strategy",
+                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "MAX_ATTEMPTS": "Max",
+                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
+                  "FAIL_ON_ERROR": "Fail on Error"
+               }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
                "TITLE": "Szczegóły przepływu pracy"
@@ -973,6 +1029,7 @@
          "TABLE": {
             "CAPTION": "Seria",
             "TITLE": "Seria",
+            "HAS_EVENTS": "Contains events",
             "CREATORS": "Organizator(rzy)",
             "CONTRIBUTORS": "Współpracownik(cy)",
             "CREATED": "Utworzono",
@@ -1525,7 +1582,8 @@
                "ACTIVE": "Aktywne",
                "ENABLE": "Dodaj początek i zakończenie",
                "UPLOAD_LABEL": "Prześlij film wideo",
-               "UPLOAD_BUTTON": "Prześlij"
+               "UPLOAD_BUTTON": "Prześlij",
+               "SELECT": "Wybierz"
             },
             "TITLE": {
                "CAPTION": "Tytuł",
@@ -1593,6 +1651,19 @@
                "OPERATIONS": "Operacje",
                "INCIDENTS": "Problemy"
             }
+         },
+         "STATUS": {
+            "QUEUED": "W kolejce",
+            "PAUSED": "Zatrzymane",
+            "RUNNING": "W toku",
+            "FINISHED": "Zakończone",
+            "FAILED": "Zakończone niepowodzeniem",
+            "DELETED": "Deleted",
+            "INSTANTIATED": "Instantiated",
+            "DISPATCHING": "Dispatching",
+            "RESTART": "Restart",
+            "CANCELED": "Canceled",
+            "WAITING": "Oczekujące"
          }
       },
       "SERVERS": {
@@ -1628,6 +1699,11 @@
             "TOOLTIP": {
                "SANITIZE": "Sanitize service (set service back to state normal)"
             }
+         },
+         "STATUS": {
+            "NORMAL": "Normalne",
+            "WARNING": "UWAGA",
+            "ERROR": "Błąd"
          }
       }
    },
@@ -1651,6 +1727,7 @@
       },
       "AREAS": {
          "METADATA": "Metadane",
+         "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Komentarze",
          "SEGMENTS": "Segments"
       },
@@ -1667,7 +1744,45 @@
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Usuń segment",
-         "USE_SEGMENT": "Use this Segment"
+         "USE_SEGMENT": "Use this Segment",
+         "START": "Start",
+         "END": "End"
+      },
+      "THUMBNAIL": {
+         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "ACTIONS": {
+            "EXTRACT": {
+               "FROM_VIDEO": {
+                  "LABEL": "Extract from video",
+                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+               },
+               "FROM_LEFT_VIDEO": {
+                  "LABEL": "Extract from left video",
+                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+               },
+               "FROM_RIGHT_VIDEO": {
+                  "LABEL": "Extract from right video",
+                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+               }
+            },
+            "UPLOAD": {
+               "LABEL": "Przesyłanie zdjęć",
+               "TOOLTIP": "Upload a thumbnail image"
+            },
+            "USE_DEFAULT": {
+               "LABEL": "Use default thumbnail",
+               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+            }
+         },
+         "PREVIEW": {
+            "NOT_AVAILABLE": "No preview available",
+            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+         },
+         "CURRENT": {
+            "DEFAULT": "You are currently using the default thumbnail.",
+            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
+            "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
       },
       "PLAYER": {
          "PLAY": "Odtwarzaj",
@@ -1736,7 +1851,10 @@
             "LABEL": "Zasady dostępu"
          },
          "COMMENTS": {
-            "LABEL": "Komentarze"
+            "LABEL": "Komentarze",
+            "NONE": "None",
+            "OPEN": "Open",
+            "RESOLVED": "Rozwiązane"
          },
          "CONTRIBUTORS": {
             "LABEL": "Współtwórcy"
@@ -2013,6 +2131,17 @@
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Koniec segmentu"
          }
+      }
+   },
+   "AGENTS": {
+      "STATUS": {
+         "CAPTURING": "Capturing",
+         "ERROR": "Błąd",
+         "IDLE": "Idle",
+         "OFFLINE": "Nieaktywny",
+         "SHUTTING_DOWN": "Shutting down",
+         "UNKNOWN": "Unknown",
+         "UPLOADING": "Przesyłanie"
       }
    }
 }

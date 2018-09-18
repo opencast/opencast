@@ -79,8 +79,9 @@ public class SchedulerUpdateHandler extends UpdateHandler {
           break;
         case Delete:
         case DeleteRecordingStatus:
-          if (isLive(mpId))
-            liveScheduleService.deleteLiveEvent(mpId);
+          // We can't check workflow config here to determine if the event is live because the
+          // event has already been deleted. The live scheduler service will do that.
+          liveScheduleService.deleteLiveEvent(mpId);
           break;
         case UpdateAgentId:
         case UpdateStart:

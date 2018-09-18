@@ -27,7 +27,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListProvider
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -38,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -161,14 +161,10 @@ public class ListProvidersScanner implements ArtifactInstaller {
     logger.debug("Adding {}", artifact.getAbsolutePath());
 
     // Format name
-    FileInputStream in = null;
     Properties properties = new Properties();
-    try {
-      in = new FileInputStream(artifact);
-      properties.load(in);
-      in.close();
-    } finally {
-      IOUtils.closeQuietly(in);
+
+    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(artifact), "UTF-8")) {
+      properties.load(reader);
     }
 
     String listName =  properties.getProperty(LIST_NAME_KEY);
