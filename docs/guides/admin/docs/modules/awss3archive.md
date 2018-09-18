@@ -31,6 +31,7 @@ The Opencast AWS S3 Archive service has four configuration keys which can be fou
 
 |Key name|Value|Example|
 |:--------|:-----|:-------:|
+|org.opencastproject.assetmanager.aws.s3.enabled|Whether to enable this service|true|
 |org.opencastproject.archive.aws.s3.region|The AWS region to set|us-west-2|
 |org.opencastproject.archive.aws.s3.bucket|The S3 bucket name|example-org-archive|
 |org.opencastproject.archive.aws.s3.access.id|Your access ID|20 alphanumeric characters|
@@ -41,7 +42,7 @@ Using S3 Archiving
 
 There are two major methods to access S3 archiving features: manually, and via a workflow.  Amazon S3 archiving is not
 part of the default workflows and manual S3 offload is disabled by default.  To enable manual S3 offload you must edit
-the `ng-offload.xml` workflow configuration file and change `var s3Enabled = false;` to `var s3Enabled = true;`.  To
+the `offload.xml` workflow configuration file and change `var s3Enabled = false;` to `var s3Enabled = true;`.  To
 manually offload a mediapackage follow the directions in the user documentation.
 
 To automatically offload a mediapackage to S3 you must add the `move-storage` workflow operation to your workflow.

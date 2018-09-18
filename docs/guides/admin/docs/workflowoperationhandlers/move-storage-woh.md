@@ -19,13 +19,10 @@ Notes:
 
 ## Operation Example
 
-    <operation id="copy"
-             description="Copy sources to my disk"
-             fail-on-error="true"
-             exception-handler-workflow="partial-error">
-    <configurations>
-      <configuration key="source-flavors">presenter/source, presentation/source</configuration>
-      <configuration key="target-directory">/mnt/mydisk</configuration>
-    </configurations>
-  </operation>
-
+    <operation
+      id="move-to-remote"
+      description="Offloading to AWS S3">
+      <configurations>
+        <configuration key="target-storage">aws-s3</configuration>
+      </configurations>
+    </operation>

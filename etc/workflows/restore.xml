@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <definition xmlns="http://workflow.opencastproject.org">
 
-  <id>ng-restore</id>
-  <title>Restore</title>
+  <id>restore-from-remote</id>
+  <title>Restore from Remote Storage</title>
   <tags>
     <tag>archive</tag>
   </tags>
