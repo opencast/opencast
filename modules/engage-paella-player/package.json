@@ -8,6 +8,6 @@
     "eslint": "^5.6.0",
     "gulp": "^3.9.1",
     "merge-stream": "^1.0.1",
-    "paellaplayer": "github:polimediaupv/paella#6.0.x"
+    "paellaplayer": "github:polimediaupv/paella#6.0.0"
   }
 }
