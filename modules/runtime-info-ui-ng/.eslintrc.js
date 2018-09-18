@@ -7,14 +7,10 @@ module.exports = {
   'parserOptions': {
     'ecmaVersion': 2015
   },
-  "plugins": [
-    "header"
-  ],
+  'globals': {
+    '$': true
+  },
   'rules': {
-    'header/header': [
-      2,
-      '../../docs/checkstyle/opencast-header.txt'
-    ],
     'indent': [
       'error',
       2,

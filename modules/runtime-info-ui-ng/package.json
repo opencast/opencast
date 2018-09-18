@@ -1,0 +1,13 @@
+{
+  "name": "opencast-runtime-info-ui-ng",
+  "license": "ECL-2.0",
+  "scripts": {
+    "eslint": "eslint src/main/resources/ui/"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.0"
+  }
+}
