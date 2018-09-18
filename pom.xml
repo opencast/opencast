@@ -81,6 +81,7 @@
     <module>modules/crop-workflowoperation</module>
     <module>modules/crop-api</module>
     <module>modules/crop-ffmpeg</module>
+    <module>modules/crop-remote</module>
     <module>modules/dataloader</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>
