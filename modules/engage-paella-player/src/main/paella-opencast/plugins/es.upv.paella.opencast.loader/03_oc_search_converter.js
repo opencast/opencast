@@ -1,6 +1,6 @@
 class OpencastToPaellaConverter {
 
-  constructor() {        
+  constructor() {
   }
 
   getVideoTypeFromTrack(track) {
@@ -40,7 +40,7 @@ class OpencastToPaellaConverter {
         case 'application/dash+xml':
           videoType = 'mpd';
           break;
-        
+
         default:
           paella.debug.log(`OpencastToPaellaConverter: MimeType (${track.mimetype}) not supported!`);
           break;
@@ -60,7 +60,7 @@ class OpencastToPaellaConverter {
     if (track.video instanceof Object) {
       res = track.video.resolution.split('x');
     }
-    
+
     var src = track.url;
     var urlSplit = /^(rtmps?:\/\/[^/]*\/[^/]*)\/(.*)$/.exec(track.url);
     if (urlSplit != null) {
@@ -71,20 +71,20 @@ class OpencastToPaellaConverter {
         stream: encodeURIComponent(rtmp_stream)
       };
     }
-    
+
     var source = {
       src:  src,
       mimetype: track.mimetype,
       res: {w:res[0], h:res[1]},
       isLiveStream: (track.live===true)
     };
-    
+
     return source;
   }
 
   getStreamFromFlavour(episode, mainFlavour) {
-    var currentStream = { sources:{}, preview: '', content: mainFlavour };        
-    
+    var currentStream = { sources:{}, preview: '', content: mainFlavour };
+
     var tracks = episode.mediapackage.media.track;
     var attachments = episode.mediapackage.attachments.attachment;
     if (!(tracks instanceof Array)) { tracks = [tracks]; }
@@ -100,14 +100,14 @@ class OpencastToPaellaConverter {
           }
           currentStream.sources[videoType].push(this.getStreamSourceFromTrack(currentTrack));
         }
-      }                        
-    });         
+      }
+    });
 
     // Read the attachments
     var duration = parseInt(episode.mediapackage.duration/1000);
     var imageSource =   {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:320, h:180}};
-    var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};    
-    attachments.forEach((currentAttachment) => {            
+    var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
+    attachments.forEach((currentAttachment) => {
       if (currentAttachment.type == `${mainFlavour}/player+preview`) {
         currentStream.preview = currentAttachment.url;
       }
@@ -122,9 +122,9 @@ class OpencastToPaellaConverter {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
           var time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
           imageSource.frames['frame_'+time] = currentAttachment.url;
-          imageSource.count = imageSource.count + 1;      
+          imageSource.count = imageSource.count + 1;
         }
-      }            
+      }
     });
 
     var imagesArray = [];
@@ -138,12 +138,12 @@ class OpencastToPaellaConverter {
       currentStream.sources.image = imagesArray;
     }
 
-    return currentStream;               
+    return currentStream;
   }
 
   getContentToImport(episode) {
     var flavours = [];
-    var tracks = episode.mediapackage.media.track;    
+    var tracks = episode.mediapackage.media.track;
     if (!(tracks instanceof Array)) { tracks = [tracks]; }
 
     tracks.forEach((currentTrack) => {
@@ -153,7 +153,7 @@ class OpencastToPaellaConverter {
     });
 
     return flavours;
-  }    
+  }
 
   getStreams(episode) {
     // Get the streams
@@ -168,12 +168,12 @@ class OpencastToPaellaConverter {
     });
     return paellaStreams;
   }
-        
+
   getCaptions(episode) {
     var captions = [];
 
     var attachments = episode.mediapackage.attachments.attachment;
-    var catalogs = episode.mediapackage.metadata.catalog;    
+    var catalogs = episode.mediapackage.metadata.catalog;
     if (!(attachments instanceof Array)) { attachments = [attachments]; }
     if (!(catalogs instanceof Array)) { catalogs = [catalogs]; }
 
@@ -183,7 +183,7 @@ class OpencastToPaellaConverter {
       try {
         let captions_regex = /^captions\/([^+]+)(\+(.+))?/g;
         let captions_match = captions_regex.exec(currentAttachment.type);
-      
+
         if (captions_match) {
           let captions_format = captions_match[1];
           let captions_lang = captions_match[3];
@@ -224,7 +224,7 @@ class OpencastToPaellaConverter {
         // Catalogs flavored as 'captions/timedtext' are assumed to be dfxp
         if (currentCatalog.type == 'captions/timedtext') {
           let captions_lang;
-    
+
           if (currentCatalog.tags && currentCatalog.tags.tag) {
             if (!(currentCatalog.tags.tag instanceof Array)) {
               currentCatalog.tags.tag = [currentCatalog.tags.tag];
@@ -236,7 +236,7 @@ class OpencastToPaellaConverter {
               }
             });
           }
-        
+
           let captions_label = captions_lang || 'unknown language';
           captions.push({
             id: currentCatalog.id,
@@ -266,7 +266,7 @@ class OpencastToPaellaConverter {
         if (currentAttachment.type == 'presentation/segment+preview+hires') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
             time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
-          
+
             if (!(opencastFrameList[time])){
               opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
             }
@@ -288,7 +288,7 @@ class OpencastToPaellaConverter {
 
     Object.keys(opencastFrameList).forEach((key, index) => {
       segments.push(opencastFrameList[key]);
-    });        
+    });
     return segments;
   }
 
