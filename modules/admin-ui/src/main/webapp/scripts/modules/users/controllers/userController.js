@@ -141,7 +141,6 @@ angular.module('adminNg.controllers')
        * @param id the id of the user
        */
       function fetchChildResources(id) {
-        console.log($scope.searchField);
         $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
         $scope.user = UserResource.get({ username: id });
         $scope.user.$promise.then(function () {
