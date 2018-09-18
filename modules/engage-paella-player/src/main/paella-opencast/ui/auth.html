@@ -18,7 +18,7 @@
 
 			var redirect = search['redirect'];
 			var id = search['id'];
-			var series = search['series'] || search['sid'];
+			var series = search['series'] || search['sid'] || search['epFrom'];
 			if (redirect != undefined) {
 				window.location.href = decodeURIComponent(redirect);
 			}
@@ -26,10 +26,10 @@
 				window.location.href = "watch.html?id=" + id;
 			}
 			else if (series != undefined) {
-				window.location.href = "index.html?series=" + series;
+				window.location.href = "/engage/ui/index.html?epFrom=" + series;
 			}
 			else {
-				window.location.href = "index.html";
+				window.location.href = "/engage/ui/index.html";
 			}
 		}
 	</script>
