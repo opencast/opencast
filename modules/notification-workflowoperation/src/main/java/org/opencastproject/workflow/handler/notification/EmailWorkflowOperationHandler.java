@@ -106,7 +106,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText = null;
     String body = operation.getConfiguration(BODY_PROPERTY);
-    boolean isHTML = "true".equals(operation.getConfiguration(IS_HTML));
+    Boolean isHTML = "true".equals(operation.getConfiguration(IS_HTML));
     // If specified, templateFile is a file that contains the Freemarker template
     String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
     // Body informed? If not, use the default.

@@ -183,7 +183,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String subject, String body, boolean isHTML) throws MessagingException {
+  public void send(String to, String subject, String body, Boolean isHTML) throws MessagingException {
     MimeMessage message = createMessage();
     message.addRecipient(RecipientType.TO, new InternetAddress(to));
     message.setSubject(subject);
@@ -234,7 +234,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String cc, String bcc, String subject, String body, boolean isHTML) throws MessagingException {
+  public void send(String to, String cc, String bcc, String subject, String body, Boolean isHTML) throws MessagingException {
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
@@ -289,7 +289,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, boolean isHTML) throws MessagingException {
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, Boolean isHTML) throws MessagingException {
     MimeMessage message = createMessage();
     addRecipients(message, RecipientType.TO, to);
     addRecipients(message, RecipientType.CC, cc);

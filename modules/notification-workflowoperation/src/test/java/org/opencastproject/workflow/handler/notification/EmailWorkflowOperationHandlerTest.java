@@ -95,7 +95,7 @@ public class EmailWorkflowOperationHandlerTest {
     capturedSubject = Capture.newInstance();
     capturedBody = Capture.newInstance();
     smtpService.send(EasyMock.capture(capturedTo), EasyMock.capture(capturedCC), EasyMock.capture(capturedBCC),
-            EasyMock.capture(capturedSubject), EasyMock.capture(capturedBody));
+            EasyMock.capture(capturedSubject), EasyMock.capture(capturedBody), EasyMock.anyBoolean());
     EasyMock.expectLastCall().once();
     EasyMock.replay(smtpService);
     operationHandler.setSmtpService(smtpService);
