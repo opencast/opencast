@@ -13,7 +13,14 @@ module.exports = {
   'rules': {
     'indent': [
       'error',
-      2
+      2,
+      {
+        "VariableDeclarator": {
+          "var": 2,
+          "let": 2,
+          "const": 3
+        }
+      }
     ],
     'linebreak-style': [
       'error',
@@ -32,6 +39,13 @@ module.exports = {
     ],
     'space-infix-ops': [
       'error'
+    ],
+    'eol-last': [
+      'error'
+    ],
+    'linebreak-style': [
+      'error',
+      'unix'
     ]
   }
 };

@@ -43,6 +43,13 @@ module.exports = {
     ],
     'space-infix-ops': [
       'error'
+    ],
+    'eol-last': [
+      'error'
+    ],
+    'linebreak-style': [
+      'error',
+      'unix'
     ]
   }
 };
