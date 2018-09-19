@@ -193,8 +193,8 @@
     <sec:intercept-url pattern="/api/version/*" method="GET" access="ROLE_ADMIN, ROLE_API"/>
     <sec:intercept-url pattern="/api/workflows" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_VIEW"/>
     <sec:intercept-url pattern="/api/workflows/*" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_VIEW"/>
-    <sec:intercept-url pattern="/api/workflow-definition" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
-    <sec:intercept-url pattern="/api/workflow-definition/*" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
+    <sec:intercept-url pattern="/api/workflow-definitions" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
+    <sec:intercept-url pattern="/api/workflow-definitions/*" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
     <!-- External API PUT Endpoints -->
     <sec:intercept-url pattern="/api/events/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
