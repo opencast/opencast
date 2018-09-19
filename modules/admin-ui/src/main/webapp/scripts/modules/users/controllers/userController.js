@@ -106,6 +106,8 @@ angular.module('adminNg.controllers')
 
         if ($scope.action === 'edit') {
             fetchChildResources($scope.resourceId);
+        } else if ($scope.action === 'add') {
+          $scope.role.available = UserRolesResource.query({limit: $scope.roleSlice, offset: 0, filter: 'role_target:USER'});
         }
 
 
