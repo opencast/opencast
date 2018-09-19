@@ -27,6 +27,7 @@ curl -s -L -o "$tmp22sql" https://raw.githubusercontent.com/opencast/opencast/2.
 
 echo "# Creating database and applying Opencast 2.2 ddl script"
 
+echo "drop database octest;" | mysql -u root $remote || true
 echo "create database octest;" | mysql -u root $remote
 echo "mysql -u root $remote octest < $tmp22sql"
 mysql -u root $remote octest < "$tmp22sql"
