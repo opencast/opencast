@@ -1,13 +1,9 @@
 {
-  "id": 1,
-  "series": "serie1",
-  "title": "Mediapackage 1",
-  "duration": 3600000,
-  "start": "2014-06-05T15:00:00Z",
-  "workflowId": "full",
+  "wiid": 1,
+  "title": "Full",
+  "executionTime": 3600000,
+  "submittedAt": "2014-06-05T15:00:00Z",
+  "wdid": "full",
   "description": "",
-  "state": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
-  "license": "",
-  "series_title": "Serie 1",
-  "workflow": "Full"
+  "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED"
 }

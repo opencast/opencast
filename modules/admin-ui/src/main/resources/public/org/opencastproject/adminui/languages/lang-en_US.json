@@ -876,15 +876,18 @@
           "WORKFLOWS": {
             "ACTIONS": "Actions",
             "DETAILS": "Details",
-            "DESCRIPTION": "",
-            "MORE_INFO": "More Information & Actions",
-            "ID": "ID",
+            "DESCRIPTION": "Description",
+            "MORE_INFO": "More Information",
+            "ID": "WIID",
             "TYPE": "Type",
             "TITLE": "Title",
-            "STATE": "State",
-            "STARTED": "Started",
+            "STATUS": "Status",
+            "STARTED": "Started At",
             "SERIES": "Series",
-            "SUBMITTED": "Submitted",
+            "SUBMITTED_AT": "Submitted At",
+            "SUBMITTED_BY": "Submitted By",
+            "EXECUTION_TIME": "Execution Time",
+            "WDID": "WDID",
             "MIMETYPE": "Mimetype",
             "URL": "URL",
             "CONFIGURATION": "Configuration",
@@ -894,7 +897,8 @@
               "STOP": "Stop execution workflow instance",
               "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
               "RETRY": "Retry execution of workflow instance",
-              "DELETE": "Delete workflow instance"
+              "DELETE": "Delete workflow instance",
+              "DETAILS": "Open workflow details"
             },
             "OPERATION_STATUS": {
               "INSTANTIATED": "Instantiated",
@@ -907,7 +911,7 @@
             }
           },
          "WORKFLOW_INSTANCES": {
-           "TITLE": "Workflow instances"
+           "TITLE": "Workflows"
          },
          "WORKFLOW_DETAILS": {
            "TITLE": "Workflow details",
