@@ -34,6 +34,7 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -106,7 +107,7 @@ public class EmailWorkflowOperationHandler extends AbstractWorkflowOperationHand
     String subject = applyTemplateIfNecessary(workflowInstance, operation, SUBJECT_PROPERTY);
     String bodyText = null;
     String body = operation.getConfiguration(BODY_PROPERTY);
-    Boolean isHTML = "true".equals(operation.getConfiguration(IS_HTML));
+    Boolean isHTML = BooleanUtils.toBoolean(operation.getConfiguration(IS_HTML));
     // If specified, templateFile is a file that contains the Freemarker template
     String bodyTemplateFile = operation.getConfiguration(BODY_TEMPLATE_FILE_PROPERTY);
     // Body informed? If not, use the default.

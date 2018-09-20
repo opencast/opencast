@@ -54,6 +54,9 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    */
   private static final String SPLIT_PATTERN = "[\\s,]+";
 
+  /** Define the MIME type for HTML mail content */
+  private static final String TEXT_HTML = "text/html";
+
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
    *
@@ -188,7 +191,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     message.addRecipient(RecipientType.TO, new InternetAddress(to));
     message.setSubject(subject);
     if (isHTML) {
-        message.setContent(body, "text/html");
+        message.setContent(body, TEXT_HTML);
     } else {
         message.setText(body);
     }
@@ -296,7 +299,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     addRecipients(message, RecipientType.BCC, bcc);
     message.setSubject(subject);
     if (isHTML) {
-        message.setContent(body, "text/html");
+        message.setContent(body, TEXT_HTML);
     } else {
         message.setText(body);
     }
