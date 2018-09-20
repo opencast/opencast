@@ -1,15 +1,15 @@
 <a data-open-modal="user-modal"
-  data-action="edit"
-  data-resource-id="{{ row.id }}"
-  class="more"
-  title="{{ 'USERS.USERS.TABLE.TOOLTIP.DETAILS' | translate }}"
-  with-role="ROLE_UI_USERS_EDIT">
+   data-action="edit"
+   data-resource-id="{{ row.id }}"
+   class="more"
+   title="{{ 'USERS.USERS.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_USERS_EDIT">
 </a>
 <a data-confirmation-modal="confirm-modal"
-  data-callback="table.delete"
-  data-object="row"
-  class="remove"
-  title="{{ 'USERS.USERS.TABLE.TOOLTIP.DETAILS' | translate }}"
-  ng-if="row.manageable"
-  with-role="ROLE_UI_USERS_DELETE">
+   data-callback="table.delete"
+   data-object="row"
+   class="remove"
+   title="{{ 'USERS.USERS.TABLE.TOOLTIP.DETAILS' | translate }}"
+   ng-if="row.manageable"
+   with-role="ROLE_UI_USERS_DELETE">
 </a>

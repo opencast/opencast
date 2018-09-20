@@ -59,10 +59,12 @@ paella.addPlugin(function() {
       episodesFromSeriesTitle.id = 'episodesFromSeriesTitle';
       episodesFromSeriesTitle.className = 'episodesFromSeriesTitle';
       if (serieId) {
-        episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>' +paella.dictionary.translate('Videos in this series:')+'</span> ' + serieTitle;
+        episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
+          + paella.dictionary.translate('Videos in this series:') + '</span> ' + serieTitle;
       }
       else {
-        episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>' +paella.dictionary.translate('Available videos:')+'</span>';
+        episodesFromSeriesTitle.innerHTML = '<span class=\'episodesFromSeriesTitle_Bold\'>'
+          + paella.dictionary.translate('Available videos:') + '</span>';
       }
 
       var episodesFromSeriesListing = document.createElement('div');
@@ -151,9 +153,11 @@ var SearchEpisode = Class.create({
     // header div
     var divHeader = this.createDOMElement('div', thisClass.recordingEntryID + '_header', 'recordings_header');
     domElement.appendChild(divHeader);
-    this.divResults = this.createDOMElement('div', thisClass.recordingEntryID + '_header_results', 'recordings_header_results');
+    this.divResults = this.createDOMElement('div', thisClass.recordingEntryID + '_header_results',
+      'recordings_header_results');
     divHeader.appendChild(this.divResults);
-    var divNavigation = this.createDOMElement('div', thisClass.recordingEntryID + '_header_navigation', 'recordings_header_navigation');
+    var divNavigation = this.createDOMElement('div', thisClass.recordingEntryID + '_header_navigation',
+      'recordings_header_navigation');
     divHeader.appendChild(divNavigation);
 
     // loading results
@@ -170,7 +174,7 @@ var SearchEpisode = Class.create({
 
   processSearchResults:function(response, params, divList, divNavigation) {
     var thisClass = this;
-    if (typeof(response)=='string') {
+    if (typeof(response) == 'string') {
       response = JSON.parse(response);
     }
 
@@ -216,7 +220,7 @@ var SearchEpisode = Class.create({
       var results = response['search-results'].result;
       if (!(results instanceof Array)) { results = [results]; }
       //There are annotations of the desired type, deleting...
-      for (var i =0; i < results.length; ++i ){
+      for (var i = 0; i < results.length; ++i ){
         asyncLoader.addCallback(new thisClass.AsyncLoaderPublishCallback(thisClass.config, results[i]));
       }
 
@@ -273,7 +277,7 @@ var SearchEpisode = Class.create({
           var offsetPages = 2;
           for (i = 1; i <= maxPage; i++)	{
             var divPageId = document.createElement('div');
-            divPageId.id = thisClass.recordingEntryID + '_header_navigation_pageid_'+i;
+            divPageId.id = thisClass.recordingEntryID + '_header_navigation_pageid_' + i;
             divPageId.className = 'recordings_header_navigation_pageid';
 
             if (!spanBeforeSet && currentPage >= 5 && i > 1 && (currentPage - (offsetPages + 2) != 1)) {
@@ -289,7 +293,7 @@ var SearchEpisode = Class.create({
             else {
               if (i !== currentPage) {
                 var divPageIdLink = document.createElement('a');
-                divPageIdLink.param_offset = (i -1) * params.limit;
+                divPageIdLink.param_offset = (i - 1) * params.limit;
                 divPageIdLink.param_limit = params.limit;
                 divPageIdLink.param_q = params.q;
                 divPageIdLink.param_sid = params.sid;
@@ -338,7 +342,7 @@ var SearchEpisode = Class.create({
         }
 
         // create recording divs
-        for (i=0; i < results.length; ++i ){
+        for (i = 0; i < results.length; ++i ){
           var recording = results[i];
 
           var divRecording = thisClass.createRecordingEntry(i, recording);
@@ -353,9 +357,9 @@ var SearchEpisode = Class.create({
 
   setLoading:function(loading) {
     if (loading == true) {
-      this.divLoading.style.display='block';
+      this.divLoading.style.display = 'block';
     } else {
-      this.divLoading.style.display='none';
+      this.divLoading.style.display = 'none';
     }
   },
 
@@ -364,7 +368,7 @@ var SearchEpisode = Class.create({
   },
 
   getUrlOfAttachmentWithType:function(recording, type) {
-    for (var i =0; i < recording.mediapackage.attachments.attachment.length; ++i ){
+    for (var i = 0; i < recording.mediapackage.attachments.attachment.length; ++i ){
       var attachment = recording.mediapackage.attachments.attachment[i];
       if (attachment.type === type) {
         return attachment.url;
@@ -382,11 +386,11 @@ var SearchEpisode = Class.create({
     divEntry.id = rootID;
 
 
-    divEntry.className='recordings_entry ' + recording.entry_published_class;
+    divEntry.className = 'recordings_entry ' + recording.entry_published_class;
     if (index % 2 == 1) {
-      divEntry.className=divEntry.className+' odd_entry';
+      divEntry.className = divEntry.className + ' odd_entry';
     } else {
-      divEntry.className=divEntry.className+' even_entry';
+      divEntry.className = divEntry.className + ' even_entry';
     }
 
     var previewUrl = this.getUrlOfAttachmentWithType(recording, 'presentation/search+preview');
@@ -395,18 +399,18 @@ var SearchEpisode = Class.create({
     }
 
     var divPreview = document.createElement('div');
-    divPreview.id = rootID+'_preview_container';
+    divPreview.id = rootID + '_preview_container';
     divPreview.className = 'recordings_entry_preview_container';
     var imgLink = document.createElement('a');
     imgLink.setAttribute('tabindex', '-1');
-    imgLink.id = rootID+'_preview_link';
+    imgLink.id = rootID + '_preview_link';
     imgLink.className = 'recordings_entry_preview_link';
     imgLink.href = 'watch.html?id=' + recording.id;
     var imgPreview = document.createElement('img');
     imgPreview.setAttribute('alt', '');
     imgPreview.setAttribute('title', recording.dcTitle);
     imgPreview.setAttribute('aria-label', recording.dcTitle);
-    imgPreview.id = rootID+'_preview';
+    imgPreview.id = rootID + '_preview';
     imgPreview.src = previewUrl;
     imgPreview.className = 'recordings_entry_preview';
     imgLink.appendChild(imgPreview);
@@ -414,17 +418,17 @@ var SearchEpisode = Class.create({
     divEntry.appendChild(divPreview);
 
     var divResultText = document.createElement('div');
-    divResultText.id = rootID+'_text_container';
+    divResultText.id = rootID + '_text_container';
     divResultText.className = 'recordings_entry_text_container';
 
 
     // title
     var divResultTitleText = document.createElement('div');
-    divResultTitleText.id = rootID+'_text_title_container';
+    divResultTitleText.id = rootID + '_text_title_container';
     divResultTitleText.className = 'recordings_entry_text_title_container';
     var titleResultText = document.createElement('a');
     titleResultText.setAttribute('tabindex', '-1');
-    titleResultText.id = rootID+'_text_title';
+    titleResultText.id = rootID + '_text_title';
     titleResultText.innerHTML = recording.dcTitle;
     titleResultText.className = 'recordings_entry_text_title';
     titleResultText.href = 'watch.html?id=' + recording.id;
@@ -440,11 +444,11 @@ var SearchEpisode = Class.create({
       author_search = recording.dcCreator;
     }
     var divResultAuthorText = document.createElement('div');
-    divResultAuthorText.id = rootID+'_text_author_container';
+    divResultAuthorText.id = rootID + '_text_author_container';
     divResultAuthorText.className = 'recordings_entry_text_author_container';
     var authorResultText = document.createElement('a');
     authorResultText.setAttribute('tabindex', '-1');
-    authorResultText.id = rootID+'_text_title';
+    authorResultText.id = rootID + '_text_title';
     authorResultText.innerHTML = author;
     authorResultText.className = 'recordings_entry_text_title';
     if (author_search != '') {
@@ -478,7 +482,7 @@ var SearchEpisode = Class.create({
 
 
     var divResultDateText = document.createElement('div');
-    divResultDateText.id = rootID+'_text_date';
+    divResultDateText.id = rootID + '_text_date';
     divResultDateText.className = 'recordings_entry_text_date';
     divResultDateText.innerHTML = timeDate;
     divResultText.appendChild(divResultDateText);
@@ -487,7 +491,7 @@ var SearchEpisode = Class.create({
 
     divEntry.setAttribute('tabindex','10000');
     $(divEntry).keyup(function(event) {
-      if (event.keyCode == 13) { window.location.href='watch.html?id=' + recording.id; }
+      if (event.keyCode == 13) { window.location.href = 'watch.html?id=' + recording.id; }
     });
 
     divEntry.setAttribute('alt', '');

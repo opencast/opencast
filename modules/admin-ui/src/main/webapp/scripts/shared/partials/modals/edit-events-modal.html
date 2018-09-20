@@ -1,288 +1,288 @@
 <section ng-form="editEventsForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="EditEventsCtrl">
-    <header>
-        <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="BULK_ACTIONS.EDIT_EVENTS.CAPTION"><!-- Template --></h2>
-    </header>
-    <wizard edit-mode="false" name="editEventsWz" on-finish="submit()" template="shared/partials/wizardNav.html">
-        <wz-step wz-title="General" canexit="editEventsForm.generalForm.$valid" wz-disabled="!editEventsForm.generalForm.$valid" ng-form="generalForm" novalidate>
-            <!-- First Step: General -->
-            <div class="modal-content active">
-                <div class="modal-body">
-                    <div class="row">
-                        <div ng-show="nonScheduleSelected()" class="alert sticky warning">
-                            <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTSTART">
-                                <!-- Cannot start -->
-                            </p>
-                        </div>
-                        <div ng-show="!hasAllAgentsAccess()" class="alert sticky info">
-                          <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE">
-                            <!-- Cannot update scheduling -->
-                          </p>
-                        </div>
-                    </div>
-                    <div class="full-col">
-                        <div class="obj tbl-list">
-                            <header translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION" />
-                            <div class="obj-container">
-                                <table class="main-tbl">
-                                    <thead>
-                                    <tr>
-                                        <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged(allSelected)" class="select-all-cbox"></th>
-                                        <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
-                                            <!-- Title -->
-                                        </th>
-                                        <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
-                                            <!-- Series -->
-                                        </th>
-                                        <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
-                                            <!-- Progress -->
-                                        </th>
-                                    </tr>
-                                    </thead>
-                                    <tbody >
-                                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
-                                        <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
-                                        <td>{{ row.title }}</td>
-                                        <td class="nowrap">{{ row.series_name}}</td>
-                                        <td class="nowrap">{{ row.event_status }}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="BULK_ACTIONS.EDIT_EVENTS.CAPTION"><!-- Template --></h2>
+  </header>
+  <wizard edit-mode="false" name="editEventsWz" on-finish="submit()" template="shared/partials/wizardNav.html">
+  <wz-step wz-title="General" canexit="editEventsForm.generalForm.$valid" wz-disabled="!editEventsForm.generalForm.$valid" ng-form="generalForm" novalidate>
+    <!-- First Step: General -->
+    <div class="modal-content active">
+      <div class="modal-body">
+        <div class="row">
+          <div ng-show="nonScheduleSelected()" class="alert sticky warning">
+            <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTSTART">
+            <!-- Cannot start -->
+            </p>
+          </div>
+          <div ng-show="!hasAllAgentsAccess()" class="alert sticky info">
+            <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CANNOTEDITSCHEDULE">
+            <!-- Cannot update scheduling -->
+            </p>
+          </div>
+        </div>
+        <div class="full-col">
+          <div class="obj tbl-list">
+            <header translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.CAPTION" />
+              <div class="obj-container">
+                <table class="main-tbl">
+                  <thead>
+                    <tr>
+                      <th class="small"><input type="checkbox" ng-model="allSelected" ng-change="allSelectedChanged(allSelected)" class="select-all-cbox"></th>
+                      <th class="full-width" translate="EVENTS.EVENTS.TABLE.TITLE">
+                        <!-- Title -->
+                      </th>
+                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.SERIES">
+                        <!-- Series -->
+                      </th>
+                      <th class="nowrap" translate="EVENTS.EVENTS.TABLE.STATUS">
+                        <!-- Progress -->
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody >
+                    <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: nonSchedule(row), info: noAgentAccess(row)}">
+                      <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
+                      <td>{{ row.title }}</td>
+                      <td class="nowrap">{{ row.series_name}}</td>
+                      <td class="nowrap">{{ row.event_status }}</td>
+                    </tr>
+                  </tbody>
+                </table>
 
-                            </div><!-- obj-container -->
+              </div><!-- obj-container -->
 
-                        </div><!-- obj -->
+          </div><!-- obj -->
 
-                    </div>
+        </div>
 
-                </div>
+      </div>
 
-            </div><!-- modal-content [general] -->
+    </div><!-- modal-content [general] -->
 
-            <footer>
-                <a class="submit"
-                   ng-click="clearFormAndContinue()"
-                   ng-class="{active: rowsValid(), disabled: !rowsValid()}">
-                    {{ 'WIZARD.NEXT_STEP' | translate }}
-                </a>
-            </footer>
-        </wz-step>
+    <footer>
+      <a class="submit"
+         ng-click="clearFormAndContinue()"
+         ng-class="{active: rowsValid(), disabled: !rowsValid()}">
+        {{ 'WIZARD.NEXT_STEP' | translate }}
+      </a>
+    </footer>
+  </wz-step>
 
-        <!-- Second Step: The actual Editing -->
-        <wz-step wz-title="{{ 'BULK_ACTIONS.EDIT_EVENTS.EDIT.CAPTION' | translate }}" ng-form="editEventsForm" novalidate canenter="rowsValid()" canexit="editEventsForm.$valid">
-            <div class="modal-content active">
+  <!-- Second Step: The actual Editing -->
+  <wz-step wz-title="{{ 'BULK_ACTIONS.EDIT_EVENTS.EDIT.CAPTION' | translate }}" ng-form="editEventsForm" novalidate canenter="rowsValid()" canexit="editEventsForm.$valid">
+    <div class="modal-content active">
 
-                <div class="modal-body">
-                    <div class="full-col">
-                      <div data-admin-ng-notifications="" context="event-scheduling"></div>
-                      <div class="obj list-obj" ng-show="conflicts.length > 0">
-                        <table class="main-tbl scheduling-conflict">
-                          <tr>
-                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_FIRST_EVENT' | translate }}</th>
-                            <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_SECOND_EVENT' | translate }}</th>
-                            <th>{{ 'EVENTS.EVENTS.TABLE.START' | translate }}</th>
-                            <th>{{ 'EVENTS.EVENTS.TABLE.END' | translate }}</th>
-                          </tr>
-                          <tr ng-repeat="conflict in conflicts">
-                            <td>{{ conflict.eventId }}</td>
-                            <td>{{ conflict.title }}</td>
-                            <td>{{ conflict.start }}</td>
-                            <td>{{ conflict.end }}</td>
-                          </tr>
-                        </table>
-                      </div>
+      <div class="modal-body">
+        <div class="full-col">
+          <div data-admin-ng-notifications="" context="event-scheduling"></div>
+          <div class="obj list-obj" ng-show="conflicts.length > 0">
+            <table class="main-tbl scheduling-conflict">
+              <tr>
+                <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_FIRST_EVENT' | translate }}</th>
+                <th>{{ 'BULK_ACTIONS.EDIT_EVENTS.GENERAL.CONFLICT_SECOND_EVENT' | translate }}</th>
+                <th>{{ 'EVENTS.EVENTS.TABLE.START' | translate }}</th>
+                <th>{{ 'EVENTS.EVENTS.TABLE.END' | translate }}</th>
+              </tr>
+              <tr ng-repeat="conflict in conflicts">
+                <td>{{ conflict.eventId }}</td>
+                <td>{{ conflict.title }}</td>
+                <td>{{ conflict.start }}</td>
+                <td>{{ conflict.end }}</td>
+              </tr>
+            </table>
+          </div>
 
-                        <div class="obj tbl-details">
-                            <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.METADATA"><!-- Edit Metadata --></header>
-                            <div class="obj-container">
+          <div class="obj tbl-details">
+            <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.METADATA"><!-- Edit Metadata --></header>
+            <div class="obj-container">
 
-                              <table class="main-tbl">
-                                <tr ng-repeat="row in metadataRows">
-                                  <td>
-                                    <span translate="{{ row.label }}"></span>
-                                    <i ng-show="row.required" class="required">*</i>
-                                  </td>
-                                  <td admin-ng-editable
-                                      required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
-                                      params="row"
-                                      save="saveField">
-                                  </td>
-                                </tr>
-                              </table>
+              <table class="main-tbl">
+                <tr ng-repeat="row in metadataRows">
+                  <td>
+                    <span translate="{{ row.label }}"></span>
+                    <i ng-show="row.required" class="required">*</i>
+                  </td>
+                  <td admin-ng-editable
+                      required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                      params="row"
+                      save="saveField">
+                  </td>
+                </tr>
+              </table>
 
-                            </div><!-- obj-container -->
+            </div><!-- obj-container -->
 
-                        </div><!--list-obj -->
+          </div><!--list-obj -->
 
-                        <div class="obj tbl-details" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-                            <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"><!-- Edit scheduling --></header>
-                            <div class="obj-container">
+          <div class="obj tbl-details" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+            <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"><!-- Edit scheduling --></header>
+            <div class="obj-container">
 
-                              <table class="main-tbl">
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
-                                  <td>{{ tz }}</td>
-                                </tr>
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
-                                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-                                    <select chosen
-                                            ng-disabled="checkingConflicts"
-                                            data-width="'100px'"
-                                            data-disable-search-threshold="8"
-                                            ng-model="scheduling.start.hour"
-                                            ng-change="onTemporalValueChange('start');"
-                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
-                                            ng-options="h.index as h.value for h in hours"
-                                            />
-                                    <select chosen
-                                            ng-disabled="checkingConflicts"
-                                            data-width="'100px'"
-                                            data-disable-search-threshold="8"
-                                            ng-model="scheduling.start.minute"
-                                            ng-change="onTemporalValueChange('start');"
-                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
-                                            ng-options="m.index as m.value for m in minutes"
-                                            />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME' | translate }}</td>
-                                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-                                    <select chosen
-                                            ng-disabled="checkingConflicts"
-                                            data-width="'100px'"
-                                            data-disable-search-threshold="8"
-                                            ng-model="scheduling.end.hour"
-                                            ng-change="onTemporalValueChange('end');"
-                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
-                                            ng-options="h.index as h.value for h in hours"
-                                            />
-                                    <select chosen
-                                            ng-disabled="checkingConflicts"
-                                            data-width="'100px'"
-                                            data-disable-search-threshold="8"
-                                            ng-model="scheduling.end.minute"
-                                            ng-change="onTemporalValueChange('end');"
-                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
-                                            ng-options="m.index as m.value for m in minutes"
-                                            />
-                                    <span ng-bind="scheduling.end.date"
-                                          ng-show="scheduling.end.date !== scheduling.start.date"
-                                          />
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
-                                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-                                    <select chosen pre-select-from="captureAgents"
-                                            ng-disabled="checkingConflicts"
-                                            data-width="'200px'"
-                                            ng-change="roomChanged();"
-                                            data-disable-search-threshold="8"
-                                            ng-model="scheduling.location"
-                                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
-                                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                                            />
-                                  </td>
-                                  <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-                                    {{ source.device.name }}
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
-                                  <td>
-                                    <label ng-repeat="inputMethod in source.device.inputs">
-                                      <input type="checkbox"
-                                             ng-model="source.device.inputMethods[inputMethod.id]"
-                                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
-                                      <br>
-                                    </label>
-                                  </td>
-                                </tr>
-                                <tr>
-                                  <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS' | translate }}</td>
-                                  <td class="weekdays">
-                                    <label ng-repeat="weekday in weekdays">
-                                      <input type="radio"
-                                             ng-model="scheduling.weekday"
-                                             name="weekdays"
-                                             value="{{weekday.key}}"
-                                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ weekday.translation | translate }}
-                                    </label>
-                                  </td>
-                                </tr>
-                              </table>
+              <table class="main-tbl">
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.TIMEZONE' | translate }}</td>
+                  <td>{{ tz }}</td>
+                </tr>
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.START_TIME' | translate }}</td>
+                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                    <select chosen
+                            ng-disabled="checkingConflicts"
+                            data-width="'100px'"
+                            data-disable-search-threshold="8"
+                            ng-model="scheduling.start.hour"
+                            ng-change="onTemporalValueChange('start');"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
+                            ng-options="h.index as h.value for h in hours"
+                            />
+                      <select chosen
+                              ng-disabled="checkingConflicts"
+                              data-width="'100px'"
+                              data-disable-search-threshold="8"
+                              ng-model="scheduling.start.minute"
+                              ng-change="onTemporalValueChange('start');"
+                              placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
+                              ng-options="m.index as m.value for m in minutes"
+                              />
+                  </td>
+                </tr>
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.DATE_TIME.END_TIME' | translate }}</td>
+                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                    <select chosen
+                            ng-disabled="checkingConflicts"
+                            data-width="'100px'"
+                            data-disable-search-threshold="8"
+                            ng-model="scheduling.end.hour"
+                            ng-change="onTemporalValueChange('end');"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
+                            ng-options="h.index as h.value for h in hours"
+                            />
+                      <select chosen
+                              ng-disabled="checkingConflicts"
+                              data-width="'100px'"
+                              data-disable-search-threshold="8"
+                              ng-model="scheduling.end.minute"
+                              ng-change="onTemporalValueChange('end');"
+                              placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
+                              ng-options="m.index as m.value for m in minutes"
+                              />
+                        <span ng-bind="scheduling.end.date"
+                              ng-show="scheduling.end.date !== scheduling.start.date"
+                              />
+                  </td>
+                </tr>
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
+                  <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                    <select chosen pre-select-from="captureAgents"
+                                   ng-disabled="checkingConflicts"
+                                   data-width="'200px'"
+                                   ng-change="roomChanged();"
+                                   data-disable-search-threshold="8"
+                                   ng-model="scheduling.location"
+                                   ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
+                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
+                                   />
+                  </td>
+                  <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
+                    {{ source.device.name }}
+                  </td>
+                </tr>
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.INPUTS' | translate }}</td>
+                  <td>
+                    <label ng-repeat="inputMethod in source.device.inputs">
+                      <input type="checkbox"
+                             ng-model="source.device.inputMethods[inputMethod.id]"
+                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ inputMethod.value | translate }}
+                             <br>
+                    </label>
+                  </td>
+                </tr>
+                <tr>
+                  <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS' | translate }}</td>
+                  <td class="weekdays">
+                    <label ng-repeat="weekday in weekdays">
+                      <input type="radio"
+                             ng-model="scheduling.weekday"
+                             name="weekdays"
+                             value="{{weekday.key}}"
+                             ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ weekday.translation | translate }}
+                    </label>
+                  </td>
+                </tr>
+              </table>
 
-                            </div>
+            </div>
 
-                          </div><!-- obj-container -->
+          </div><!-- obj-container -->
 
-                        </div><!--list-obj -->
-                    </div><!-- full-col-->
-                </div><!-- modal-body -->
-            </div><!-- modal-content [task] -->
-            <footer>
-                <a
-                  class="submit"
-                  ng-click="checkConflicts()"
-                  ng-class="{active: !checkingConflicts, disabled: checkingConflicts}">
-                    {{ nextButtonText() | translate }}
-                </a>
-                <a wz-previous translate="WIZARD.BACK" class="cancel">
-                </a>
-            </footer>
-        </wz-step>
+        </div><!--list-obj -->
+      </div><!-- full-col-->
+    </div><!-- modal-body -->
+    </div><!-- modal-content [task] -->
+    <footer>
+      <a
+        class="submit"
+        ng-click="checkConflicts()"
+        ng-class="{active: !checkingConflicts, disabled: checkingConflicts}">
+        {{ nextButtonText() | translate }}
+      </a>
+      <a wz-previous translate="WIZARD.BACK" class="cancel">
+      </a>
+    </footer>
+  </wz-step>
 
-        <!-- Third step: Summary -->
-        <wz-step wz-title="{{ 'BULK_ACTIONS.EDIT_EVENTS.SUMMARY.CAPTION' | translate }}" novalidate canenter="rowsValid() && !hasConflicts()">
-            <div class="modal-content active">
-                <div class="modal-body">
-                    <div class="row">
-                        <div ng-show="noChanges()" class="alert sticky warning">
-                            <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.NOCHANGES">
-                                <!-- No actual changes -->
-                            </p>
-                        </div>
-                    </div>
-                    <div class="full-col">
-                        <div class="obj tbl-list" ng-repeat="event in eventSummaries">
-                            <header translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.SINGLE_EVENT_CAPTION" translate-values='{ title: event.title}'><!-- Summary --></header>
-                            <div class="obj-container">
-                                <table class="main-tbl">
-                                    <thead>
-                                    <tr>
-                                        <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE" />
-                                        <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS" />
-                                        <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT" />
-                                    </tr>
-                                    </thead>
-                                    <tbody >
-                                    <tr ng-repeat="row in event.changes">
-                                        <td>{{ row.type | translate }}</td>
-                                        <td>{{ row.previous}}</td>
-                                        <td class="highlighted-cell">{{ row.next }}</td>
-                                    </tr>
-                                    </tbody>
-                                </table>
-                            </div><!-- obj-container -->
-                        </div>
-                    </div>
+  <!-- Third step: Summary -->
+  <wz-step wz-title="{{ 'BULK_ACTIONS.EDIT_EVENTS.SUMMARY.CAPTION' | translate }}" novalidate canenter="rowsValid() && !hasConflicts()">
+    <div class="modal-content active">
+      <div class="modal-body">
+        <div class="row">
+          <div ng-show="noChanges()" class="alert sticky warning">
+            <p translate="BULK_ACTIONS.EDIT_EVENTS.GENERAL.NOCHANGES">
+            <!-- No actual changes -->
+            </p>
+          </div>
+        </div>
+        <div class="full-col">
+          <div class="obj tbl-list" ng-repeat="event in eventSummaries">
+            <header translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.SINGLE_EVENT_CAPTION" translate-values='{ title: event.title}'><!-- Summary --></header>
+            <div class="obj-container">
+              <table class="main-tbl">
+                <thead>
+                  <tr>
+                    <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.TYPE" />
+                      <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.PREVIOUS" />
+                        <th class="fit" translate="BULK_ACTIONS.EDIT_EVENTS.SUMMARY.NEXT" />
+                  </tr>
+                </thead>
+                <tbody >
+                  <tr ng-repeat="row in event.changes">
+                    <td>{{ row.type | translate }}</td>
+                    <td>{{ row.previous}}</td>
+                    <td class="highlighted-cell">{{ row.next }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div><!-- obj-container -->
+          </div>
+        </div>
 
-                </div>
-            </div><!-- modal-content [summary] -->
-            <footer>
-                <a wz-next class="submit"
-                   ng-class="{active: editEventsForm.$valid, disabled: noChanges() || submitButton}">
-                    {{ 'WIZARD.UPDATE' | translate }}
-                </a>
-                <a wz-previous translate="WIZARD.BACK" class="cancel">
-                </a>
-            </footer>
-        </wz-step>
+      </div>
+    </div><!-- modal-content [summary] -->
+    <footer>
+      <a wz-next class="submit"
+                 ng-class="{active: editEventsForm.$valid, disabled: noChanges() || submitButton}">
+        {{ 'WIZARD.UPDATE' | translate }}
+      </a>
+      <a wz-previous translate="WIZARD.BACK" class="cancel">
+      </a>
+    </footer>
+  </wz-step>
 
-    </wizard>
+  </wizard>
 
 
-    <div class="btm-spacer"></div>
+  <div class="btm-spacer"></div>
 </section>

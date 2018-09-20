@@ -8,8 +8,8 @@
     <div class="modal-body">
       <div class="full-col">
         <p translate="HOTKEYS.CHEAT_SHEET.HINT" class="hint"><!--
-          This page lists the currently available keyboard shortcuts.
-          Note that these might change depending on what page you are currently visiting.
+        This page lists the currently available keyboard shortcuts.
+        Note that these might change depending on what page you are currently visiting.
         --></p>
         <div class="obj tbl-list" ng-repeat="group in keyGroups">
           <header translate="{{ 'HOTKEYS.GROUPS.' + group.name | uppercase }}" class="no-expand"></header>
@@ -18,16 +18,16 @@
               <tr ng-repeat="hotkey in group.keys">
                 <td class="hotkey">
                   <p class="combo" ng-repeat="combo in hotkey.combos">
-                    <span class="chord"ng-repeat="chord in combo">
-                      <span ng-repeat="key in chord">
-                        <span
-                          class="key"
-                          translate="{{ 'HOTKEYS.KEYS.' + key | uppercase }}"
-                          translate-default="{{ key }}"
+                  <span class="chord"ng-repeat="chord in combo">
+                    <span ng-repeat="key in chord">
+                      <span
+                        class="key"
+                        translate="{{ 'HOTKEYS.KEYS.' + key | uppercase }}"
+                        translate-default="{{ key }}"
                         ></span>
-                        {{ $last ? '' : '+' }}
-                      </span>
+                      {{ $last ? '' : '+' }}
                     </span>
+                  </span>
                   </p>
                 </td>
                 <td translate="{{ 'HOTKEYS.DESCRIPTIONS.' + hotkey.description | uppercase }}"></td>

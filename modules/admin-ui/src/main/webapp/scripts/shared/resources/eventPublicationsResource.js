@@ -22,5 +22,5 @@
 
 angular.module('adminNg.resources')
 .factory('EventPublicationsResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/event/:id/publications.json', { id: '@id' });
+  return $resource('/admin-ng/event/:id/publications.json', { id: '@id' });
 }]);

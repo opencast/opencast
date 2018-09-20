@@ -34,15 +34,15 @@
  */
 angular.module('adminNg.directives')
 .directive('openModal', ['ResourceModal', function (ResourceModal) {
-    return {
-        link: function ($scope, element, attr) {
-            element.bind('click', function () {
-                ResourceModal.show(attr.openModal, attr.resourceId, attr.tab, attr.action);
-            });
+  return {
+    link: function ($scope, element, attr) {
+      element.bind('click', function () {
+        ResourceModal.show(attr.openModal, attr.resourceId, attr.tab, attr.action);
+      });
 
-            $scope.$on('$destroy', function () {
-                element.unbind('click');
-            });
-        }
-    };
+      $scope.$on('$destroy', function () {
+        element.unbind('click');
+      });
+    }
+  };
 }]);

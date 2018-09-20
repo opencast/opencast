@@ -22,7 +22,7 @@
 
 angular.module('adminNg.resources')
 .factory('SeriesHasEventsResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/series/:id/hasEvents.json', { id: '@id' }, {
-        get: { method: 'GET' }
-    });
+  return $resource('/admin-ng/series/:id/hasEvents.json', { id: '@id' }, {
+    get: { method: 'GET' }
+  });
 }]);

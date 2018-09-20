@@ -22,48 +22,50 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('ScheduleTaskCtrl', ['$scope', 'Table', 'NewEventProcessing', 'EventWorkflowPropertiesResource', 'TaskResource',
-    'Notifications', 'decorateWithTableRowSelection', 'WizardHandler',
-function ($scope, Table, NewEventProcessing, EventWorkflowPropertiesResource, TaskResource, Notifications, decorateWithTableRowSelection, WizardHandler) {
+.controller('ScheduleTaskCtrl', ['$scope', 'Table', 'NewEventProcessing', 'EventWorkflowPropertiesResource',
+  'TaskResource', 'Notifications', 'decorateWithTableRowSelection', 'WizardHandler',
+  function ($scope, Table, NewEventProcessing, EventWorkflowPropertiesResource, TaskResource, Notifications,
+    decorateWithTableRowSelection, WizardHandler) {
     $scope.rows = Table.copySelected();
     $scope.allSelected = true; // by default, all rows are selected
     $scope.test = false;
     $scope.currentForm = 'generalForm';
     $scope.processing = NewEventProcessing.get('tasks');
-    $scope.workflowProperties = EventWorkflowPropertiesResource.get($scope.rows.map(function callback(x) { return x.id; }));
+    $scope.workflowProperties = EventWorkflowPropertiesResource.get(
+      $scope.rows.map(function callback(x) { return x.id; }));
 
     $scope.valid = function () {
-        return $scope.getSelectedIds().length > 0;
+      return $scope.getSelectedIds().length > 0;
     };
 
     $scope.clearWorkflowFormAndContinue = function() {
-        $scope.processing.initWorkflowConfig($scope.workflowProperties, $scope.getSelectedIds());
-        WizardHandler.wizard("scheduleTaskWz").next();
+      $scope.processing.initWorkflowConfig($scope.workflowProperties, $scope.getSelectedIds());
+      WizardHandler.wizard('scheduleTaskWz').next();
     };
 
     var onSuccess = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('success', 'TASK_CREATED');
-        Table.deselectAll();
+      $scope.submitButton = false;
+      $scope.close();
+      Notifications.add('success', 'TASK_CREATED');
+      Table.deselectAll();
     };
 
     var onFailure = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
+      $scope.submitButton = false;
+      $scope.close();
+      Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
     };
 
     $scope.submitButton = false;
     $scope.submit = function () {
-        $scope.submitButton = true;
-        if ($scope.valid()) {
-            var payload = {
-                workflow: $scope.processing.ud.workflow.id,
-                configuration: $scope.processing.getWorkflowConfigs($scope.workflowProperties, $scope.getSelectedIds())
-            };
-            TaskResource.save(payload, onSuccess, onFailure);
-        }
+      $scope.submitButton = true;
+      if ($scope.valid()) {
+        var payload = {
+          workflow: $scope.processing.ud.workflow.id,
+          configuration: $scope.processing.getWorkflowConfigs($scope.workflowProperties, $scope.getSelectedIds())
+        };
+        TaskResource.save(payload, onSuccess, onFailure);
+      }
     };
     decorateWithTableRowSelection($scope);
-}]);
+  }]);

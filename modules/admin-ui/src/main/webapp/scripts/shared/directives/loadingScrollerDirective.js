@@ -30,17 +30,17 @@
  */
 angular.module('adminNg.directives')
 .directive('loadingScroller', [function () {
-    return {
-        restrict: 'A',
-        require: 'ngModel',
-        link: function (scope, element, attrs, ctrl) {
-            var raw = element[0];
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, ctrl) {
+      var raw = element[0];
 
-            element.bind('scroll', function () {
-                if (raw.scrollTop + raw.offsetHeight > raw.scrollHeight) {
-                    scope.$apply(attrs.loadingScroller);
-                }
-            });
+      element.bind('scroll', function () {
+        if (raw.scrollTop + raw.offsetHeight > raw.scrollHeight) {
+          scope.$apply(attrs.loadingScroller);
         }
-    };
+      });
+    }
+  };
 }]);

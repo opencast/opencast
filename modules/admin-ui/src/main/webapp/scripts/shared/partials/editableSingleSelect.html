@@ -1,5 +1,5 @@
 <div ng-form="innerForm" ng-click="enterEditMode()">
-    &nbsp;<span ng-show="!editMode" ng-click="enterEditMode()" translate="{{((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value))}}"></span>
+  &nbsp;<span ng-show="!editMode" ng-click="enterEditMode()" translate="{{((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value))}}"></span>
 
   <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="enterEditMode()" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
   <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>

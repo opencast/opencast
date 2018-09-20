@@ -23,33 +23,33 @@
 angular.module('adminNg.services')
 .factory('RelativeDatesService', function () {
 
-    var RelativeDatesService = function () {
+  var RelativeDatesService = function () {
 
-        moment.locale(navigator.language);
+    moment.locale(navigator.language);
 
-        this.relativeToAbsoluteDate = function(relative, type, from) {
+    this.relativeToAbsoluteDate = function(relative, type, from) {
 
-            if (from === true) {
-                var absolute = moment().startOf(type);
-            }
-            else {
-                var absolute = moment().endOf(type)
-            }
+      var absolute;
+      if (from === true) {
+        absolute = moment().startOf(type);
+      } else {
+        absolute = moment().endOf(type);
+      }
 
-            absolute = absolute.add(relative, type);
+      absolute = absolute.add(relative, type);
 
-            return absolute.toDate();
-        };
-
-        this.relativeDateSpanToFilterValue = function(fromRelativeDate, toRelativeDate, type) {
-
-            var fromAbsoluteDate = this.relativeToAbsoluteDate(fromRelativeDate, type, true);
-            var toAbsoluteDate = this.relativeToAbsoluteDate(toRelativeDate, type, false);
-
-            return fromAbsoluteDate.toISOString() + "/" + toAbsoluteDate.toISOString();
-        };
+      return absolute.toDate();
     };
 
-    return new RelativeDatesService();
+    this.relativeDateSpanToFilterValue = function(fromRelativeDate, toRelativeDate, type) {
+
+      var fromAbsoluteDate = this.relativeToAbsoluteDate(fromRelativeDate, type, true);
+      var toAbsoluteDate = this.relativeToAbsoluteDate(toRelativeDate, type, false);
+
+      return fromAbsoluteDate.toISOString() + '/' + toAbsoluteDate.toISOString();
+    };
+  };
+
+  return new RelativeDatesService();
 
 });

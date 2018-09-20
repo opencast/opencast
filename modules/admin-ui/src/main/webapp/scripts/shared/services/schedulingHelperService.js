@@ -22,77 +22,77 @@
 
 angular.module('adminNg.services')
 .factory('SchedulingHelperService', ['AuthService', function (AuthService) {
-    var SchedulingHelperService = function () {
+  var SchedulingHelperService = function () {
 
-        var me = this;
+    var me = this;
 
-        this.parseDate = function(dateStr, hour, minute) {
-            var dateArray = dateStr.split("-");
-            return new Date(dateArray[0], parseInt(dateArray[1]) - 1, dateArray[2], hour, minute);
-        }
+    this.parseDate = function(dateStr, hour, minute) {
+      var dateArray = dateStr.split('-');
+      return new Date(dateArray[0], parseInt(dateArray[1]) - 1, dateArray[2], hour, minute);
+    };
 
-        this.getUpdatedEndDateSingle = function(start, end) {
-            var startDate = me.parseDate(start.date, start.hour, start.minute);
-            if (end.hour < start.hour) {
-                startDate.setHours(24);
-            }
-            return moment(startDate).format('YYYY-MM-DD');
-        };
+    this.getUpdatedEndDateSingle = function(start, end) {
+      var startDate = me.parseDate(start.date, start.hour, start.minute);
+      if (end.hour < start.hour) {
+        startDate.setHours(24);
+      }
+      return moment(startDate).format('YYYY-MM-DD');
+    };
 
-        this.applyTemporalValueChange = function(temporalValues, change, single){
-            var startMins = temporalValues.start.hour * 60 + temporalValues.start.minute;
-            switch(change) {
-                case "duration":
-                    // Update end time
-                    var durationMins = temporalValues.duration.hour * 60 + temporalValues.duration.minute;
-                    temporalValues.end.hour = (Math.floor((startMins + durationMins) / 60)) % 24;
-                    temporalValues.end.minute = (startMins + durationMins) % 60;
-                    break;
-                case "start":
-                case "end":
-                    // Update duration
-                    var endMins = temporalValues.end.hour * 60 + temporalValues.end.minute;
-                    if (endMins < startMins) endMins += 24 * 60; // end is on the next day
-                    temporalValues.duration.hour = Math.floor((endMins - startMins) / 60);
-                    temporalValues.duration.minute = (endMins - startMins) % 60;
-                    break;
-                default:
-                    return;
-            }
-            if (single) {
-                temporalValues.end.date = me.getUpdatedEndDateSingle(temporalValues.start, temporalValues.end);
-            }
-        };
+    this.applyTemporalValueChange = function(temporalValues, change, single){
+      var startMins = temporalValues.start.hour * 60 + temporalValues.start.minute;
+      switch(change) {
+      case 'duration':
+        // Update end time
+        var durationMins = temporalValues.duration.hour * 60 + temporalValues.duration.minute;
+        temporalValues.end.hour = (Math.floor((startMins + durationMins) / 60)) % 24;
+        temporalValues.end.minute = (startMins + durationMins) % 60;
+        break;
+      case 'start':
+      case 'end':
+        // Update duration
+        var endMins = temporalValues.end.hour * 60 + temporalValues.end.minute;
+        if (endMins < startMins) endMins += 24 * 60; // end is on the next day
+        temporalValues.duration.hour = Math.floor((endMins - startMins) / 60);
+        temporalValues.duration.minute = (endMins - startMins) % 60;
+        break;
+      default:
+        return;
+      }
+      if (single) {
+        temporalValues.end.date = me.getUpdatedEndDateSingle(temporalValues.start, temporalValues.end);
+      }
+    };
 
-        this.hasAgentAccess = function(agentId) {
-            if (AuthService.isOrganizationAdmin()) return true;
-            var role = "ROLE_CAPTURE_AGENT_" + agentId.replace(/[^a-zA-Z0-9_]/g, "").toUpperCase();
-            return AuthService.userIsAuthorizedAs(role);
-        };
+    this.hasAgentAccess = function(agentId) {
+      if (AuthService.isOrganizationAdmin()) return true;
+      var role = 'ROLE_CAPTURE_AGENT_' + agentId.replace(/[^a-zA-Z0-9_]/g, '').toUpperCase();
+      return AuthService.userIsAuthorizedAs(role);
+    };
 
-        this.alreadyEnded = function(start, duration) {
-            if (angular.isDefined(start) && angular.isDefined(start.hour)
+    this.alreadyEnded = function(start, duration) {
+      if (angular.isDefined(start) && angular.isDefined(start.hour)
                 && angular.isDefined(start.minute) && angular.isDefined(start.date)
                 && angular.isDefined(duration) && angular.isDefined(duration.hour)
                 && angular.isDefined(duration.minute)) {
-                var startDate = this.parseDate(start.date, start.hour, start.minute);
-                var endDate = new Date(startDate.getTime());
-                endDate.setHours(endDate.getHours() + duration.hour, endDate.getMinutes() + duration.minute, 0, 0);
-                var nowDate = new Date();
-                return endDate < nowDate;
-            }
-            return false;
-        };
-
-        this.endBeforeStart = function(start, end) {
-           if (angular.isDefined(start) && angular.isDefined(start.date) && angular.isDefined(end)
-               && angular.isDefined(end.date)) {
-               var startDate = new Date(start.date);
-               var endDate = new Date(end.date);
-               return endDate < startDate;
-            }
-            return false;
-        };
+        var startDate = this.parseDate(start.date, start.hour, start.minute);
+        var endDate = new Date(startDate.getTime());
+        endDate.setHours(endDate.getHours() + duration.hour, endDate.getMinutes() + duration.minute, 0, 0);
+        var nowDate = new Date();
+        return endDate < nowDate;
+      }
+      return false;
     };
-    return new SchedulingHelperService();
+
+    this.endBeforeStart = function(start, end) {
+      if (angular.isDefined(start) && angular.isDefined(start.date) && angular.isDefined(end)
+               && angular.isDefined(end.date)) {
+        var startDate = new Date(start.date);
+        var endDate = new Date(end.date);
+        return endDate < startDate;
+      }
+      return false;
+    };
+  };
+  return new SchedulingHelperService();
 }]);

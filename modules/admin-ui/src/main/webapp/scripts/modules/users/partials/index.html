@@ -1,35 +1,35 @@
 <section class="action-nav-bar">
-    <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
+  <ng-include src="'modules/' + table.category + '/partials/' + table.resource + 'Buttons.html'"></ng-include>
 
-    <admin-ng-nav></admin-ng-nav>
-    <nav>
-        <a href="#/users/users" ng-class="{active: table.resource == 'users'}" translate="USERS.NAVIGATION.USERS" with-role="ROLE_UI_USERS_VIEW">
-            <!-- Users -->
-        </a>
-        <a href="#/users/groups" ng-class="{active: table.resource == 'groups'}" translate="USERS.NAVIGATION.GROUPS" with-role="ROLE_UI_GROUPS_VIEW">
-            <!-- Groups -->
-        </a>
-        <a href="#/users/acls" ng-class="{active: table.resource == 'acls'}" translate="USERS.NAVIGATION.PERMISSIONS" with-role="ROLE_UI_ACLS_VIEW">
-            <!-- Permissions -->
-        </a>
-<!--         <a href="#/users/userblacklists" ng-class="{active: table.resource == 'userblacklists'}" translate="USERS.NAVIGATION.BLACKLISTS" with-role="ROLE_UI_USERSBLACKLISTS_VIEW">Blacklist</a> -->
-    </nav>
+  <admin-ng-nav></admin-ng-nav>
+  <nav>
+    <a href="#/users/users" ng-class="{active: table.resource == 'users'}" translate="USERS.NAVIGATION.USERS" with-role="ROLE_UI_USERS_VIEW">
+      <!-- Users -->
+    </a>
+    <a href="#/users/groups" ng-class="{active: table.resource == 'groups'}" translate="USERS.NAVIGATION.GROUPS" with-role="ROLE_UI_GROUPS_VIEW">
+      <!-- Groups -->
+    </a>
+    <a href="#/users/acls" ng-class="{active: table.resource == 'acls'}" translate="USERS.NAVIGATION.PERMISSIONS" with-role="ROLE_UI_ACLS_VIEW">
+      <!-- Permissions -->
+    </a>
+    <!--         <a href="#/users/userblacklists" ng-class="{active: table.resource == 'userblacklists'}" translate="USERS.NAVIGATION.BLACKLISTS" with-role="ROLE_UI_USERSBLACKLISTS_VIEW">Blacklist</a> -->
+  </nav>
 </section>
 
 <div class="main-view">
-    <div data-admin-ng-notifications=""></div>
+  <div data-admin-ng-notifications=""></div>
 
-    <div class="controls-container">
+  <div class="controls-container">
 
-        <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
+    <div data-admin-ng-table-filter="" data-filters="filters" data-namespace="table.resource"></div>
 
-        <h1 translate="{{ table.caption }}">
-            <!-- Users | Groups | Permissions -->
-        </h1>
-        <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }">
-            <!-- {{numberOfRows}} rows -->
-        </h4>
+    <h1 translate="{{ table.caption }}">
+      <!-- Users | Groups | Permissions -->
+    </h1>
+    <h4 translate="TABLE_SUMMARY" translate-values="{ numberOfRows: '{{ table.pagination.totalItems }}' }">
+      <!-- {{numberOfRows}} rows -->
+    </h4>
 
-    </div>
-    <div class="table-container top-addon" admin-ng-table="" table="table"></div>
+  </div>
+  <div class="table-container top-addon" admin-ng-table="" table="table"></div>
 </div>

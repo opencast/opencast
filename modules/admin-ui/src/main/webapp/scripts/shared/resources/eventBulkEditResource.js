@@ -22,23 +22,24 @@
 'use strict';
 
 angular.module('adminNg.resources')
-    .factory('EventBulkEditResource', ['$resource', '$httpParamSerializerJQLike', function ($resource, $httpParamSerializerJQLike) {
+.factory('EventBulkEditResource', ['$resource', '$httpParamSerializerJQLike',
+  function ($resource, $httpParamSerializerJQLike) {
     return $resource('/admin-ng/event/bulk/:ext', {}, {
-        update: {
-            method: 'PUT',
-            params: { ext: 'update' },
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            transformRequest: function (data) {
-                return $httpParamSerializerJQLike({update: JSON.stringify(data)});
-            },
+      update: {
+        method: 'PUT',
+        params: { ext: 'update' },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        transformRequest: function (data) {
+          return $httpParamSerializerJQLike({update: JSON.stringify(data)});
         },
-        conflicts: {
-            method: 'POST',
-            params: { ext: 'conflicts' },
-            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-            transformRequest: function (data) {
-                return $httpParamSerializerJQLike({update: JSON.stringify(data)});
-            },
-        }
+      },
+      conflicts: {
+        method: 'POST',
+        params: { ext: 'conflicts' },
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        transformRequest: function (data) {
+          return $httpParamSerializerJQLike({update: JSON.stringify(data)});
+        },
+      }
     });
-}]);
+  }]);

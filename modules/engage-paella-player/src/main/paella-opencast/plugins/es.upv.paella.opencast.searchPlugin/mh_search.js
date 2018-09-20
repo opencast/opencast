@@ -40,7 +40,7 @@ paella.addPlugin(function() {
 
         paella.ajax.get({url:'/search/episode.json', params:{id:episodeId, q:text, limit:1000}},
           function(data, contentType, returnCode) {
-            paella.debug.log('Searching episode=' + episodeId + ' q='+text);
+            paella.debug.log('Searching episode=' + episodeId + ' q=' + text);
             var segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                         (data['search-results'].result !== undefined) &&
                         (data['search-results'].result.segments !== undefined) &&
@@ -52,7 +52,7 @@ paella.addPlugin(function() {
               var segments = data['search-results'].result.segments;
               var i, segment;
 
-              for (i =0; i < segments.segment.length; ++i ) {
+              for (i = 0; i < segments.segment.length; ++i ) {
                 segment = segments.segment[i];
                 var relevance = parseInt(segment.relevance);
 
@@ -60,7 +60,7 @@ paella.addPlugin(function() {
                   searchResult.push({
                     content: segment.text,
                     scote: segment. relevance,
-                    time: parseInt(segment.time)/1000
+                    time: parseInt(segment.time) / 1000
                   });
                 }
               }

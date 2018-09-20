@@ -31,19 +31,19 @@
  */
 angular.module('adminNg.directives')
 .directive('deleteSingleSeriesModal', ['DeleteSingleSeriesModal', function (DeleteSingleSeriesModal) {
-    return {
-        scope: {
-            callback: '=',
-            object:   '='
-        },
-        link: function ($scope, element, attr) {
-            element.bind('click', function () {
-                DeleteSingleSeriesModal.show(attr.deleteSingleSeriesModal, $scope.callback, $scope.object);
-            });
+  return {
+    scope: {
+      callback: '=',
+      object:   '='
+    },
+    link: function ($scope, element, attr) {
+      element.bind('click', function () {
+        DeleteSingleSeriesModal.show(attr.deleteSingleSeriesModal, $scope.callback, $scope.object);
+      });
 
-            $scope.$on('$destroy', function () {
-                element.unbind('click');
-            });
-        }
-    };
+      $scope.$on('$destroy', function () {
+        element.unbind('click');
+      });
+    }
+  };
 }]);

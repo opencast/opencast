@@ -86,7 +86,7 @@ paella.addPlugin(function() {
       var link = document.createElement('a');
       link.className = 'downloadsLinkItem';
       link.innerHTML = this.getTextInfo(track);
-      link.setAttribute('tabindex', 4000+tabindexcount);
+      link.setAttribute('tabindex', 4000 + tabindexcount);
       link.href = track.url;
 
       elem.appendChild(link);
@@ -104,7 +104,7 @@ paella.addPlugin(function() {
         text = '<span class="downloadLinkText TypeFile Audio">' + paella.dictionary.translate('Audio file') + '</span>';
       }
       // track
-      var trackText= '<span class="downloadLinkText Track">' + track.type + '</span>';
+      var trackText = '<span class="downloadLinkText Track">' + track.type + '</span>';
 
       // Resolution
       var resolution = '';
@@ -124,10 +124,10 @@ paella.addPlugin(function() {
       }
 
       if (mimetype)
-        text += ' <span class="downloadLinkText MIMEType">[' + paella.dictionary.translate(mimetype) + ']' + '</span>';
+        text += ' <span class="downloadLinkText MIMEType">[' + paella.dictionary.translate(mimetype) + ']</span>';
       text += ': ' + trackText;
       if (resolution)
-        text += ' <span class="downloadLinkText Resolution">(' + resolution + ')' + '</span>';
+        text += ' <span class="downloadLinkText Resolution">(' + resolution + ')</span>';
 
       return text;
     }

@@ -33,17 +33,17 @@
  */
 angular.module('adminNg.directives')
 .directive('adminNgPwCheck', function () {
-    return {
-        require: 'ngModel',
-        link: function (scope, elem, attrs, ctrl) {
-            scope.deregisterWatch = scope.$watch(attrs.adminNgPwCheck, function (confirmPassword) {
-                var isValid = ctrl.$viewValue === confirmPassword;
-                ctrl.$setValidity('pwmatch', isValid);
-            });
+  return {
+    require: 'ngModel',
+    link: function (scope, elem, attrs, ctrl) {
+      scope.deregisterWatch = scope.$watch(attrs.adminNgPwCheck, function (confirmPassword) {
+        var isValid = ctrl.$viewValue === confirmPassword;
+        ctrl.$setValidity('pwmatch', isValid);
+      });
 
-            scope.$on('$destroy', function () {
-                scope.deregisterWatch();
-            });
-        }
-    };
+      scope.$on('$destroy', function () {
+        scope.deregisterWatch();
+      });
+    }
+  };
 });

@@ -22,58 +22,58 @@
 
 angular.module('adminNg.controllers')
 .controller('HotkeyCheatSheetCtrl', ['$scope',
-    function ($scope) {
-        $scope.$watchCollection('hotkeys', function (newHotkeys, oldHotkeys, scope) {
-            // This function groups the functions by the first part of their key identifier
+  function ($scope) {
+    $scope.$watchCollection('hotkeys', function (newHotkeys, oldHotkeys, scope) {
+      // This function groups the functions by the first part of their key identifier
 
-            // While managing both a list and a hash table of the groups seems redundant,
-            // we do it to retain the order in which the hotkeys were added (i.e. the groups
-            // are ordered by the point in time their first hotkey was added), while also
-            // making this function efficient.
-            var keyGroups = scope.keyGroups = [];
-            var groupIndex = {};
-            angular.forEach(newHotkeys, function (hotkey) {
-                // Ignore keys without a description
-                if (hotkey.description === '$$undefined$$') return;
+      // While managing both a list and a hash table of the groups seems redundant,
+      // we do it to retain the order in which the hotkeys were added (i.e. the groups
+      // are ordered by the point in time their first hotkey was added), while also
+      // making this function efficient.
+      var keyGroups = scope.keyGroups = [];
+      var groupIndex = {};
+      angular.forEach(newHotkeys, function (hotkey) {
+        // Ignore keys without a description
+        if (hotkey.description === '$$undefined$$') return;
 
-                // Manage our collection bin and index
-                var group = hotkey.description.split('.')[0];
-                if (!(group in groupIndex)) {
-                    groupIndex[group] = [];
-                    keyGroups.push({
-                        name: group,
-                        keys: groupIndex[group]
-                    });
+        // Manage our collection bin and index
+        var group = hotkey.description.split('.')[0];
+        if (!(group in groupIndex)) {
+          groupIndex[group] = [];
+          keyGroups.push({
+            name: group,
+            keys: groupIndex[group]
+          });
+        }
+
+        // Construct a "view model" for the hotkey
+        var viewHotkey = {
+          description: hotkey.description,
+          combos: []
+        };
+        // We extract the actual keys from a "chord string" like `'a+b'`.
+        angular.forEach(hotkey.combo, function (combo) {
+          var chords = [];
+          angular.forEach(combo.split(/\s/), function (chord) {
+            var keys = [];
+            angular.forEach(chord.split('+'), function (key) {
+              // Translate generic `mod` key to the current platform
+              if (key === 'mod') {
+                if (/mac/i.test(window.navigator.platform)) {
+                  keys.push('command');
+                } else {
+                  keys.push('ctrl');
                 }
-
-                // Construct a "view model" for the hotkey
-                var viewHotkey = {
-                    description: hotkey.description,
-                    combos: []
-                };
-                // We extract the actual keys from a "chord string" like `'a+b'`.
-                angular.forEach(hotkey.combo, function (combo) {
-                    var chords = [];
-                    angular.forEach(combo.split(/\s/), function (chord) {
-                        var keys = [];
-                        angular.forEach(chord.split('+'), function (key) {
-                            // Translate generic `mod` key to the current platform
-                            if (key === 'mod') {
-                                if (/mac/i.test(window.navigator.platform)) {
-                                    keys.push('command');
-                                } else {
-                                    keys.push('ctrl');
-                                }
-                            } else {
-                                keys.push(key);
-                            }
-                        });
-                        chords.push(keys);
-                    });
-                    viewHotkey.combos.push(chords);
-                });
-                groupIndex[group].push(viewHotkey);
+              } else {
+                keys.push(key);
+              }
             });
+            chords.push(keys);
+          });
+          viewHotkey.combos.push(chords);
         });
-    }
+        groupIndex[group].push(viewHotkey);
+      });
+    });
+  }
 ]);

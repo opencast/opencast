@@ -23,34 +23,34 @@
 // A controller for global page navigation
 angular.module('adminNg.controllers')
 .controller('UserPreferencesCtrl', ['$scope', 'SignatureResource', 'IdentityResource',
-    function ($scope, SignatureResource, IdentityResource) {
-        var persist = function (persistenceMethod) {
-            var me = IdentityResource.get();
-            me.$promise.then(function (data) {
-                $scope.userprefs.username = data.username;
-                SignatureResource[persistenceMethod]($scope.userprefs);
-            });
-        };
+  function ($scope, SignatureResource, IdentityResource) {
+    var persist = function (persistenceMethod) {
+      var me = IdentityResource.get();
+      me.$promise.then(function (data) {
+        $scope.userprefs.username = data.username;
+        SignatureResource[persistenceMethod]($scope.userprefs);
+      });
+    };
 
-        // load the current user preferences
-        $scope.userprefs = SignatureResource.get({});
+    // load the current user preferences
+    $scope.userprefs = SignatureResource.get({});
 
-        // perform update
-        $scope.update = function () {
-            if ($scope.userPrefForm.$valid) {
-                persist('update');
-                $scope.close();
-            }
-        };
+    // perform update
+    $scope.update = function () {
+      if ($scope.userPrefForm.$valid) {
+        persist('update');
+        $scope.close();
+      }
+    };
 
 
-        // perform save
-        $scope.save = function () {
-            if ($scope.userPrefForm.$valid) {
-                persist('save');
-                $scope.close();
-            }
-        };
-    }
+    // perform save
+    $scope.save = function () {
+      if ($scope.userPrefForm.$valid) {
+        persist('save');
+        $scope.close();
+      }
+    };
+  }
 ]);
 

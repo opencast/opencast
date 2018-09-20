@@ -23,44 +23,44 @@
 // Controller for all event screens.
 angular.module('adminNg.controllers')
 .controller('SeriesCtrl', ['$scope', 'Table', 'SeriesResource', 'ResourcesFilterResource', 'Notifications',
-    function ($scope, Table, SeriesResource, ResourcesFilterResource, Notifications) {
+  function ($scope, Table, SeriesResource, ResourcesFilterResource, Notifications) {
 
-        $scope.table = Table;
-        $scope.table.configure({
-            columns: [{
-                template: 'modules/events/partials/seriesTitleCell.html',
-                name:  'title',
-                label: 'EVENTS.SERIES.TABLE.TITLE'
-            }, {
-                name:  'creator',
-                label: 'EVENTS.SERIES.TABLE.CREATORS'
-            }, {
-                name:  'contributors',
-                label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS'
-            }, {
-            	name:  'createdDateTime',
-            	label: 'EVENTS.SERIES.TABLE.CREATED'
-            }, {
-                template: 'modules/events/partials/seriesActionsCell.html',
-                label:    'EVENTS.SERIES.TABLE.ACTION',
-                dontSort: true
-            }],
-            caption:    'EVENTS.SERIES.TABLE.CAPTION',
-            resource: 'series',
-            category: 'events',
-            apiService: SeriesResource,
-            multiSelect: true
-        });
+    $scope.table = Table;
+    $scope.table.configure({
+      columns: [{
+        template: 'modules/events/partials/seriesTitleCell.html',
+        name:  'title',
+        label: 'EVENTS.SERIES.TABLE.TITLE'
+      }, {
+        name:  'creator',
+        label: 'EVENTS.SERIES.TABLE.CREATORS'
+      }, {
+        name:  'contributors',
+        label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS'
+      }, {
+        name:  'createdDateTime',
+        label: 'EVENTS.SERIES.TABLE.CREATED'
+      }, {
+        template: 'modules/events/partials/seriesActionsCell.html',
+        label:    'EVENTS.SERIES.TABLE.ACTION',
+        dontSort: true
+      }],
+      caption:    'EVENTS.SERIES.TABLE.CAPTION',
+      resource: 'series',
+      category: 'events',
+      apiService: SeriesResource,
+      multiSelect: true
+    });
 
-        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+    $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (row) {
-            SeriesResource.delete({id: row.id}, function () {
-                Table.fetch();
-                Notifications.add('success', 'SERIES_DELETED');
-            }, function () {
-                Notifications.add('error', 'SERIES_NOT_DELETED');
-            });
-        };
-    }
+    $scope.table.delete = function (row) {
+      SeriesResource.delete({id: row.id}, function () {
+        Table.fetch();
+        Notifications.add('success', 'SERIES_DELETED');
+      }, function () {
+        Notifications.add('error', 'SERIES_NOT_DELETED');
+      });
+    };
+  }
 ]);

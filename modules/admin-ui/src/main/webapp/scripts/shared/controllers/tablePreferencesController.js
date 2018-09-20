@@ -23,55 +23,55 @@
 // A controller for global page navigation
 angular.module('adminNg.controllers')
 .controller('TablePreferencesCtrl', ['$scope', 'Table', 'Modal', 'Storage', '$translate',
-    function ($scope, Table, Modal, Storage, $translate) {
-        var filteredColumns, cloneColumns;
+  function ($scope, Table, Modal, Storage, $translate) {
+    var filteredColumns, cloneColumns;
 
-        cloneColumns = function () {
-            return JSON.parse(JSON.stringify(Table.columns));
-        };
+    cloneColumns = function () {
+      return JSON.parse(JSON.stringify(Table.columns));
+    };
 
-        filteredColumns = function (isDeactivated) {
-            var result = [];
-            angular.forEach($scope.columnsClone, function (column) {
-                if (column.deactivated === isDeactivated) {
-                    result.push(column);
-                }
-            });
-            return result;
-        };
+    filteredColumns = function (isDeactivated) {
+      var result = [];
+      angular.forEach($scope.columnsClone, function (column) {
+        if (column.deactivated === isDeactivated) {
+          result.push(column);
+        }
+      });
+      return result;
+    };
 
-        $scope.table = Table;
-        $scope.keyUp = Modal.keyUp;
+    $scope.table = Table;
+    $scope.keyUp = Modal.keyUp;
 
-        $scope.changeColumn = function (column, deactivate) {
-            if (deactivate) {
-                $scope.activeColumns.splice($scope.activeColumns.indexOf(column), 1);
-                $scope.deactivatedColumns.push(column);
-            }
-            else {
-                $scope.deactivatedColumns.splice($scope.deactivatedColumns.indexOf(column), 1);
-                $scope.activeColumns.push(column);
-            }
-            column.deactivated = deactivate;
-        };
+    $scope.changeColumn = function (column, deactivate) {
+      if (deactivate) {
+        $scope.activeColumns.splice($scope.activeColumns.indexOf(column), 1);
+        $scope.deactivatedColumns.push(column);
+      }
+      else {
+        $scope.deactivatedColumns.splice($scope.deactivatedColumns.indexOf(column), 1);
+        $scope.activeColumns.push(column);
+      }
+      column.deactivated = deactivate;
+    };
 
-        $scope.save = function () {
-            var type = 'table_column_visibility', namespace = Table.resource, prefs = 'columns',
-                settings = $scope.deactivatedColumns.concat($scope.activeColumns);
-            Storage.put(type, namespace, prefs, settings);
-        };
+    $scope.save = function () {
+      var type = 'table_column_visibility', namespace = Table.resource, prefs = 'columns',
+          settings = $scope.deactivatedColumns.concat($scope.activeColumns);
+      Storage.put(type, namespace, prefs, settings);
+    };
 
-        $scope.initialize = function () {
-            $scope.columnsClone = cloneColumns();
-            $scope.deactivatedColumns = filteredColumns(true);
-            $scope.activeColumns = filteredColumns(false);
-            $translate(Table.caption).then(function (translation) {
-                $scope.tableName = translation;
-            });
-            $translate('RESET').then(function (translation) {
-                $scope.resetTranslation = translation;
-            });
-        };
-        $scope.initialize();
-    }
+    $scope.initialize = function () {
+      $scope.columnsClone = cloneColumns();
+      $scope.deactivatedColumns = filteredColumns(true);
+      $scope.activeColumns = filteredColumns(false);
+      $translate(Table.caption).then(function (translation) {
+        $scope.tableName = translation;
+      });
+      $translate('RESET').then(function (translation) {
+        $scope.resetTranslation = translation;
+      });
+    };
+    $scope.initialize();
+  }
 ]);

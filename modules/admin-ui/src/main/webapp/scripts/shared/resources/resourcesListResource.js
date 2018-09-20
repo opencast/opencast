@@ -22,53 +22,53 @@
 
 angular.module('adminNg.resources')
 .factory('ResourcesListResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/resources/:resource.json', {}, {
-        query: { // for parsing lists where the value is a string
-            method: 'GET',
-            isArray: true,
-            transformResponse: function (data) {
-              var result = [];
+  return $resource('/admin-ng/resources/:resource.json', {}, {
+    query: { // for parsing lists where the value is a string
+      method: 'GET',
+      isArray: true,
+      transformResponse: function (data) {
+        var result = [];
 
-              data = JSON.parse(data);
+        data = JSON.parse(data);
 
-              if (angular.isDefined(data)) {
-                angular.forEach(data, function(value, key) {
+        if (angular.isDefined(data)) {
+          angular.forEach(data, function(value, key) {
 
-                  result.push({
-                    name: key,
-                    value: value
-                  });
+            result.push({
+              name: key,
+              value: value
+            });
 
-                });
-              }
-
-              return result;
-            }
-        },
-        queryRecursive: { // for parsing lists where the value is json
-          method: 'GET',
-          isArray: true,
-          transformResponse: function (data) {
-
-            var result = [];
-
-            data = JSON.parse(data);
-
-            if (angular.isDefined(data)) {
-              angular.forEach(data, function(value, key) {
-
-                var jsonValue = JSON.parse(value);
-
-                result.push({
-                  name: key,
-                  value: jsonValue
-                });
-
-              });
-            }
-
-            return result;
-          }
+          });
         }
-    });
+
+        return result;
+      }
+    },
+    queryRecursive: { // for parsing lists where the value is json
+      method: 'GET',
+      isArray: true,
+      transformResponse: function (data) {
+
+        var result = [];
+
+        data = JSON.parse(data);
+
+        if (angular.isDefined(data)) {
+          angular.forEach(data, function(value, key) {
+
+            var jsonValue = JSON.parse(value);
+
+            result.push({
+              name: key,
+              value: jsonValue
+            });
+
+          });
+        }
+
+        return result;
+      }
+    }
+  });
 }]);

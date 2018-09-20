@@ -22,44 +22,45 @@
 
 // Controller for all recording blacklists.
 angular.module('adminNg.controllers')
-.controller('LocationblacklistsCtrl', ['$scope', 'Table', 'Notifications', 'LocationBlacklistsResource', 'ResourcesFilterResource',
-    function ($scope, Table, Notifications, LocationBlacklistsResource, ResourcesFilterResource) {
+.controller('LocationblacklistsCtrl', ['$scope', 'Table', 'Notifications', 'LocationBlacklistsResource',
+  'ResourcesFilterResource',
+  function ($scope, Table, Notifications, LocationBlacklistsResource, ResourcesFilterResource) {
 
-        $scope.table = Table;
-        $scope.table.configure({
-            columns: [{
-                name:  'resourceName',
-                label: 'USERS.BLACKLISTS.TABLE.NAME'
-            }, {
-                name:  'date_from',
-                label: 'USERS.BLACKLISTS.TABLE.DATE_FROM'
-            }, {
-                name:  'date_to',
-                label: 'USERS.BLACKLISTS.TABLE.DATE_TO'
-            }, {
-                name:  'reason',
-                label: 'USERS.BLACKLISTS.TABLE.REASON',
-                translate: true
-            }, {
-                template: 'modules/recordings/partials/locationblacklistActionsCell.html',
-                label:    'USERS.BLACKLISTS.TABLE.ACTION',
-                dontSort: true
-            }],
-            caption:    'RECORDINGS.BLACKLISTS.TABLE.CAPTION',
-            resource:   'locationblacklists',
-            category:   'recordings',
-            apiService: LocationBlacklistsResource
-        });
+    $scope.table = Table;
+    $scope.table.configure({
+      columns: [{
+        name:  'resourceName',
+        label: 'USERS.BLACKLISTS.TABLE.NAME'
+      }, {
+        name:  'date_from',
+        label: 'USERS.BLACKLISTS.TABLE.DATE_FROM'
+      }, {
+        name:  'date_to',
+        label: 'USERS.BLACKLISTS.TABLE.DATE_TO'
+      }, {
+        name:  'reason',
+        label: 'USERS.BLACKLISTS.TABLE.REASON',
+        translate: true
+      }, {
+        template: 'modules/recordings/partials/locationblacklistActionsCell.html',
+        label:    'USERS.BLACKLISTS.TABLE.ACTION',
+        dontSort: true
+      }],
+      caption:    'RECORDINGS.BLACKLISTS.TABLE.CAPTION',
+      resource:   'locationblacklists',
+      category:   'recordings',
+      apiService: LocationBlacklistsResource
+    });
 
-        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+    $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (row) {
-            row.$delete({ id: row.id }, function () {
-                Table.fetch();
-                Notifications.add('success', 'LOCATION_BLACKLIST_DELETED');
-            }, function () {
-                Notifications.add('error', 'LOCATION_BLACKLIST_NOT_DELETED');
-            });
-        };
-    }
+    $scope.table.delete = function (row) {
+      row.$delete({ id: row.id }, function () {
+        Table.fetch();
+        Notifications.add('success', 'LOCATION_BLACKLIST_DELETED');
+      }, function () {
+        Notifications.add('error', 'LOCATION_BLACKLIST_NOT_DELETED');
+      });
+    };
+  }
 ]);

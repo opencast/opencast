@@ -21,48 +21,49 @@
 'use strict';
 
 angular.module('adminNg.resources')
-    .factory('EventsSchedulingResource', ['$resource', 'JsHelper', '$httpParamSerializer', function ($resource, JsHelper, $httpParamSerializer) {
+.factory('EventsSchedulingResource', ['$resource', 'JsHelper', '$httpParamSerializer',
+  function ($resource, JsHelper, $httpParamSerializer) {
     var transformRequest = function (data) {
-        return $httpParamSerializer(data);
+      return $httpParamSerializer(data);
     };
     var transformSingle = function (parsedData) {
-        // Better deep-copy our response, testing frameworks use immutable structures.
-        var data = jQuery.extend(true, {}, parsedData);
+      // Better deep-copy our response, testing frameworks use immutable structures.
+      var data = $.extend(true, {}, parsedData);
 
-        var startDate = new Date(parsedData.start);
-        var endDate = new Date(parsedData.end);
-        var duration = (endDate - startDate) / 1000;
-        var durationHours = (duration - (duration % 3600)) / 3600;
-        var durationMinutes = (duration % 3600) / 60;
+      var startDate = new Date(parsedData.start);
+      var endDate = new Date(parsedData.end);
+      var duration = (endDate - startDate) / 1000;
+      var durationHours = (duration - (duration % 3600)) / 3600;
+      var durationMinutes = (duration % 3600) / 60;
 
 
-        data.start = JsHelper.zuluTimeToDateObject(startDate);
-        data.end = JsHelper.zuluTimeToDateObject(endDate);
-        data.duration = {
-            hour: durationHours,
-            minute: durationMinutes
-        };
+      data.start = JsHelper.zuluTimeToDateObject(startDate);
+      data.end = JsHelper.zuluTimeToDateObject(endDate);
+      data.duration = {
+        hour: durationHours,
+        minute: durationMinutes
+      };
 
-        return data;
+      return data;
     };
     var transformResponse = function (parsedData) {
-        var result = [];
-        angular.forEach(parsedData, function(value) {
-            result.push(transformSingle(value));
-        });
-        return result;
+      var result = [];
+      angular.forEach(parsedData, function(value) {
+        result.push(transformSingle(value));
+      });
+      return result;
     };
 
     return $resource('/admin-ng/event/scheduling.json', {}, {
-        bulkGet: {
-            method: 'POST',
-            responseType: 'json',
-            isArray: true,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-            },
-            transformRequest: transformRequest,
-            transformResponse: transformResponse
-        }
+      bulkGet: {
+        method: 'POST',
+        responseType: 'json',
+        isArray: true,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        },
+        transformRequest: transformRequest,
+        transformResponse: transformResponse
+      }
     });
-}]);
+  }]);

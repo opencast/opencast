@@ -1,112 +1,112 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="capture-agent-details-modal" ng-controller="RecordingCtrl">
-    <header>
-        <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="RECORDINGS.RECORDINGS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId }}' }">
-          <!-- Location Details -->
-        </h2>
-    </header>
+  <header>
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 translate="RECORDINGS.RECORDINGS.DETAILS.HEADER" translate-values="{ resourceId: '{{ resourceId }}' }">
+      <!-- Location Details -->
+    </h2>
+  </header>
 
-    <nav class="modal-nav" id="modal-nav">
-        <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.GENERAL" with-role="ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW">>
-            <!-- General -->
-        </a>
-        <a ng-click="openTab('configuration')" data-modal-tab="configuration" ng-class="{ active: tab == 'configuration' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.CONFIGURATION" with-role="ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW">>
-            <!-- Configuration -->
-        </a>
-        <a ng-click="openTab('capabilities')" data-modal-tab="capabilities" ng-class="{ active: tab == 'capabilities' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.CAPABILITIES" with-role="ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW">>
-            <!-- Capabilities -->
-        </a>
-    </nav>
+  <nav class="modal-nav" id="modal-nav">
+    <a ng-click="openTab('general')" data-modal-tab="general" ng-class="{ active: tab == 'general' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.GENERAL" with-role="ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW">>
+      <!-- General -->
+    </a>
+    <a ng-click="openTab('configuration')" data-modal-tab="configuration" ng-class="{ active: tab == 'configuration' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.CONFIGURATION" with-role="ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW">>
+      <!-- Configuration -->
+    </a>
+    <a ng-click="openTab('capabilities')" data-modal-tab="capabilities" ng-class="{ active: tab == 'capabilities' }" translate="RECORDINGS.RECORDINGS.DETAILS.TAB.CAPABILITIES" with-role="ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW">>
+      <!-- Capabilities -->
+    </a>
+  </nav>
 
-    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
-    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
+  <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+  <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
 
-    <div class="modal-content" data-modal-tab-content="general">
-      <div class="modal-body">
-        <div class="full-col">
-          <div class="obj tbl-details">
-            <header>
-              <span translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.CAPTION">
-                <!-- Capture Agents details -->
-              </span>
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr>
-                  <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.NAME"><!-- Name --></td>
-                  <td>{{ agent.name }}</td>
-                </tr>
-                <tr>
-                  <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.URL"><!-- URL --></td>
-                  <td><a href="{{ agent.url }}" target="_blank">{{ agent.url }}</a></td>
-                </tr>
-                <tr>
-                  <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.STATUS"><!-- Status --></td>
-                  <td>{{ agent.status | translate }}</td>
-                </tr>
-                <tr>
-                  <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.UPDATE"><!-- Last Heard From --></td>
-                  <td>{{ agent.updated }}</td>
-                </tr>
-              </table>
-            </div>
+  <div class="modal-content" data-modal-tab-content="general">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj tbl-details">
+          <header>
+            <span translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.CAPTION">
+              <!-- Capture Agents details -->
+            </span>
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr>
+                <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.NAME"><!-- Name --></td>
+                <td>{{ agent.name }}</td>
+              </tr>
+              <tr>
+                <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.URL"><!-- URL --></td>
+                <td><a href="{{ agent.url }}" target="_blank">{{ agent.url }}</a></td>
+              </tr>
+              <tr>
+                <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.STATUS"><!-- Status --></td>
+                <td>{{ agent.status | translate }}</td>
+              </tr>
+              <tr>
+                <td translate="RECORDINGS.RECORDINGS.DETAILS.GENERAL.UPDATE"><!-- Last Heard From --></td>
+                <td>{{ agent.updated }}</td>
+              </tr>
+            </table>
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-content" data-modal-tab-content="configuration">
-      <div class="modal-body">
-        <div class="full-col">
-          <div class="obj tbl-details" ng-if="agent.configuration.length > 0">
-            <header>
-              <span translate="RECORDINGS.RECORDINGS.DETAILS.CONFIGURATION.CAPTION">
-                <!-- Configuration details -->
-              </span>
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr ng-repeat="item in agent.configuration">
-                  <td>{{ item.key }}</td>
-                  <td>{{ item.value }}</td>
-                </tr>
-              </table>
-            </div>
+  <div class="modal-content" data-modal-tab-content="configuration">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj tbl-details" ng-if="agent.configuration.length > 0">
+          <header>
+            <span translate="RECORDINGS.RECORDINGS.DETAILS.CONFIGURATION.CAPTION">
+              <!-- Configuration details -->
+            </span>
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr ng-repeat="item in agent.configuration">
+                <td>{{ item.key }}</td>
+                <td>{{ item.value }}</td>
+              </tr>
+            </table>
           </div>
-          <div ng-if="agent.configuration.length == 0 ">
-            <p translate="RECORDINGS.RECORDINGS.DETAILS.CONFIGURATION.NO_CONFIGURATION ">
-              <!-- No configuration provided -->
-            </p>
-          </div>
+        </div>
+        <div ng-if="agent.configuration.length == 0 ">
+          <p translate="RECORDINGS.RECORDINGS.DETAILS.CONFIGURATION.NO_CONFIGURATION ">
+          <!-- No configuration provided -->
+          </p>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="modal-content" data-modal-tab-content="capabilities">
-      <div class="modal-body">
-        <div class="full-col">
-          <div class="obj tbl-details" ng-if="agent.capabilities.length > 0">
-            <header>
-              <span translate="RECORDINGS.RECORDINGS.DETAILS.CAPABILITIES.CAPTION">
-                <!-- Capabilities -->
-              </span>
-            </header>
-            <div class="obj-container">
-              <table class="main-tbl">
-                <tr ng-repeat="item in agent.capabilities">
-                  <td>{{ item.key }}</td>
-                  <td>{{ item.value }}</td>
-                </tr>
-              </table>
-            </div>
+  <div class="modal-content" data-modal-tab-content="capabilities">
+    <div class="modal-body">
+      <div class="full-col">
+        <div class="obj tbl-details" ng-if="agent.capabilities.length > 0">
+          <header>
+            <span translate="RECORDINGS.RECORDINGS.DETAILS.CAPABILITIES.CAPTION">
+              <!-- Capabilities -->
+            </span>
+          </header>
+          <div class="obj-container">
+            <table class="main-tbl">
+              <tr ng-repeat="item in agent.capabilities">
+                <td>{{ item.key }}</td>
+                <td>{{ item.value }}</td>
+              </tr>
+            </table>
           </div>
-          <div ng-if="agent.capabilities.length == 0 ">
-             <p translate="RECORDINGS.RECORDINGS.DETAILS.CAPABILITIES.NO_CAPABILITIES">
-               <!-- No capabilities provided -->
-             </p>
-          </div>
+        </div>
+        <div ng-if="agent.capabilities.length == 0 ">
+          <p translate="RECORDINGS.RECORDINGS.DETAILS.CAPABILITIES.NO_CAPABILITIES">
+          <!-- No capabilities provided -->
+          </p>
         </div>
       </div>
     </div>
-    <div class="btm-spacer"></div>
+  </div>
+  <div class="btm-spacer"></div>
 </section>

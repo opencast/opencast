@@ -1,158 +1,161 @@
 <div class="filters-container">
-    <input type="text" class="search expand"
-        placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate }}"
-        ng-model="textFilter"
-        ng-change="selectFilterTextValue('textFilter', textFilter)">
+  <input type="text"
+         class="search expand"
+         placeholder="{{ 'TABLE_FILTERS.PLACEHOLDER' | translate }}"
+         ng-model="textFilter"
+         ng-change="selectFilterTextValue('textFilter', textFilter)">
 
-    <div class="table-filter" ng-show="filters.filters">
-        <div class="filters">
-            <i title="{{ 'TABLE_FILTERS.ADD' | translate }}"
-                ng-click="displayFilterSelector()" class="fa fa-filter"></i>
+  <div class="table-filter" ng-show="filters.filters">
+    <div class="filters">
+      <i title="{{ 'TABLE_FILTERS.ADD' | translate }}"
+         ng-click="displayFilterSelector()" class="fa fa-filter"></i>
 
-            <div ng-show="showFilterSelector">
-                <select
-                    chosen
-                    disable_search_threshold="10"
-                    search_contains="true"
-                    placeholder-text-single="'{{'TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER' | translate}}'"
-                    no-results-text="'{{'TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS' | translate}}'"
-                    class="main-filter"
-                    ng-model="selectedFilter"
-                    ng-change="onChangeSelectMainFilter(selectedFilter)"
-                    ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters track by key"
-                    >
-                    <option value=""></option>
-                </select>
-            </div>
+      <div ng-show="showFilterSelector">
+        <select
+          chosen
+          disable_search_threshold="10"
+          search_contains="true"
+          placeholder-text-single="'{{'TABLE_FILTERS.FILTER_SELECTION.PLACEHOLDER' | translate}}'"
+          no-results-text="'{{'TABLE_FILTERS.FILTER_SELECTION.NO_OPTIONS' | translate}}'"
+          class="main-filter"
+          ng-model="selectedFilter"
+          ng-change="onChangeSelectMainFilter(selectedFilter)"
+          ng-options="value as value.label | translate | limitTo : 70 for (key,value) in filters.filters track by key"
+          >
+          <option value=""></option>
+        </select>
+      </div>
 
-            <div ng-show="selectedFilter"
-                ng-switch on="selectedFilter.type">
-                <div ng-switch-when="select">
-                    <select ng-if="selectedFilter.translatable"
-                        chosen
-                        class="second-filter"
-                        placeholder-text-single="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate}}'"
-                        no-results-text="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate}}'"
-                        disable_search_threshold="10"
-                        search_contains="true"
-                        ng-model="filterValue"
-                        ng-change="selectFilterSelectValue(filterValue)"
-                        ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options track by option.value"
-                        >
-                        <option value=""></option>
-                    </select>
-                    <select ng-if="!selectedFilter.translatable"
-                        chosen
-                        class="second-filter"
-                        placeholder-text-single="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate}}'"
-                        no-results-text="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate}}'"
-                        disable_search_threshold="10"
-                        search_contains="true"
-                        ng-model="filterValue"
-                        ng-change="selectFilterSelectValue(filterValue)"
-                        ng-options="option as option.label | limitTo : 70 for option in selectedFilter.options track by option.value"
-                        >
-                        <option value=""></option>
-                    </select>
-                </div>
+      <div ng-show="selectedFilter"
+           ng-switch on="selectedFilter.type">
+        <div ng-switch-when="select">
+          <select ng-if="selectedFilter.translatable"
+                  chosen
+                  class="second-filter"
+                  placeholder-text-single="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate}}'"
+                  no-results-text="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate}}'"
+                  disable_search_threshold="10"
+                  search_contains="true"
+                  ng-model="filterValue"
+                  ng-change="selectFilterSelectValue(filterValue)"
+                  ng-options="option as option.label | translate | limitTo : 70 for option in selectedFilter.options track by option.value"
+                  >
+                  <option value=""></option>
+          </select>
+          <select ng-if="!selectedFilter.translatable"
+                  chosen
+                  class="second-filter"
+                  placeholder-text-single="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.PLACEHOLDER' | translate}}'"
+                  no-results-text="'{{'TABLE_FILTERS.FILTER_VALUE_SELECTION.NO_OPTIONS' | translate}}'"
+                  disable_search_threshold="10"
+                  search_contains="true"
+                  ng-model="filterValue"
+                  ng-change="selectFilterSelectValue(filterValue)"
+                  ng-options="option as option.label | limitTo : 70 for option in selectedFilter.options track by option.value"
+                  >
+                  <option value=""></option>
+          </select>
+        </div>
 
-                <div ng-switch-when="period">
-                    <input type="text" class="small-search start-date" datepicker ng-model="filter.period.from"
-                        select="selectFilterPeriodValue(filter, 'from', 'to')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
-                    <input type="text" class="small-search end-date" datepicker ng-model="filter.period.to"
-                        select="selectFilterPeriodValue(filter, 'to', 'from')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
-                </div>
-            </div>
+        <div ng-switch-when="period">
+          <input type="text" class="small-search start-date" datepicker ng-model="filter.period.from"
+                                                                        select="selectFilterPeriodValue(filter, 'from', 'to')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.START_DATE' | translate }}">
+          <input type="text" class="small-search end-date" datepicker ng-model="filter.period.to"
+                                                                      select="selectFilterPeriodValue(filter, 'to', 'from')" placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.END_DATE' | translate }}">
+        </div>
+      </div>
 
-            <span ng-repeat="(name, filter) in filters.map"
-                class="ng-multi-value" ng-if="filter.value">
-                <span ng-switch on="filter.type">
-                    <span ng-switch-when="select">
-                      {{ filter.label | translate | limitTo : 70 }}:
-                      <span ng-if="filter.translatable">
-                        {{ filter.options[filter.value] | translate | limitTo : 70 }}
-                      </span>
-                      <span ng-if="!filter.translatable">
-                        {{ filter.options[filter.value] | limitTo : 70 }}
-                      </span>
-                    </span>
-                    <span ng-switch-when="period">
-                        {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}
-                    </span>
-                </span>
-                <a title="{{ 'TABLE_FILTERS.REMOVE' | translate }}"
-                    ng-click="removeFilter(name, filter)">
-                    <i class="fa fa-times"></i>
-                </a>
+      <span ng-repeat="(name, filter) in filters.map"
+            class="ng-multi-value" ng-if="filter.value">
+        <span ng-switch on="filter.type">
+          <span ng-switch-when="select">
+            {{ filter.label | translate | limitTo : 70 }}:
+            <span ng-if="filter.translatable">
+              {{ filter.options[filter.value] | translate | limitTo : 70 }}
             </span>
-        </div>
-        <i ng-click="removeFilters()"
-            title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
-            class="clear fa fa-times"></i>
-
-        <i ng-click="toggleFilterSettings()"
-            title="{{ 'TABLE_FILTERS.PROFILES.FILTERS_HEADER' | translate }}"
-            class="settings fa fa-cog fa-times"></i>
-
-        <div class="btn-dd filter-settings-dd df-profile-filters">
-            <div ng-show="mode == 1" class="filters-list">
-                <header>
-                    <a class="icon close" ng-click="closeProfile()"></a>
-                    <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!-- Saved Filter Sets --></h4>
-                </header>
-                <ul>
-                    <li ng-repeat="profile in profiles">
-                        <a title="{{ profile.description }}"
-                            ng-click="loadFilterProfile($index)"
-                            ng-class="{ active: $index === activeProfile }">
-                            {{ profile.name | limitTo : 70 }}
-                        </a>
-                        <a ng-click="editFilterProfile($index)"
-                            title="{{ 'TABLE_FILTERS.PROFILES.EDIT' | translate }}"
-                            class="icon edit"></a>
-                        <a ng-click="removeFilterProfile($index)"
-                            title="{{ 'TABLE_FILTERS.PROFILES.REMOVE' | translate }}"
-                            class="icon remove"></a>
-                    </li>
-                    <li ng-show="profiles.length == 0"
-                    translate="TABLE_FILTERS.PROFILES.EMPTY"><!-- No saved filters yet --></li>
-                </ul>
-
-                <div class="input-container">
-                    <div class="btn-container">
-                        <a class="save" ng-click="mode = 2">
-                            {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate | limitTo : 70 }}
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div ng-show="mode == 2" class="filter-details">
-                <header>
-                    <a class="icon close" ng-click="cancelProfileEditing()"></a>
-                    <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!-- Save Filter Set --></h4>
-                </header>
-                <div ng-form="profileForm" ng-model="profile" class="input-container">
-                    <label>{{ 'TABLE_FILTERS.PROFILES.NAME' | translate }} <i class="required">*</i></label>
-                    <input required name="name" ng-model="profile.name"
-                        ng-change="validateProfileName()"
-                        type="text"
-                        placeholder="{{ 'TABLE_FILTERS.PROFILES.NAME_PLACEHOLDER' | translate }}">
-
-                    <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!-- Description --></label>
-                    <textarea ng-model="profile.description"
-                        placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
-                </div>
-                <div class="input-container">
-                    <div class="btn-container">
-                        <a ng-click="cancelProfileEditing()" class="cancel"
-                            translate="CANCEL"><!-- Cancel --></a>
-                        <a ng-click="saveProfile()"
-                            ng-class="{ disabled: !profileForm.$valid }"
-                            class="save" translate="SAVE"><!-- Save --></a>
-                    </div>
-                </div>
-            </div>
-        </div>
+            <span ng-if="!filter.translatable">
+              {{ filter.options[filter.value] | limitTo : 70 }}
+            </span>
+          </span>
+          <span ng-switch-when="period">
+            {{ filter.label | translate }}: {{ formatDateRange('short', filter.value) }}
+          </span>
+        </span>
+        <a title="{{ 'TABLE_FILTERS.REMOVE' | translate }}"
+           ng-click="removeFilter(name, filter)">
+          <i class="fa fa-times"></i>
+        </a>
+      </span>
     </div>
+    <i ng-click="removeFilters()"
+       title="{{ 'TABLE_FILTERS.CLEAR' | translate }}"
+       class="clear fa fa-times"></i>
+
+    <i ng-click="toggleFilterSettings()"
+       title="{{ 'TABLE_FILTERS.PROFILES.FILTERS_HEADER' | translate }}"
+       class="settings fa fa-cog fa-times"></i>
+
+    <div class="btn-dd filter-settings-dd df-profile-filters">
+      <div ng-show="mode == 1" class="filters-list">
+        <header>
+          <a class="icon close" ng-click="closeProfile()"></a>
+          <h4 translate="TABLE_FILTERS.PROFILES.FILTERS_HEADER"><!-- Saved Filter Sets --></h4>
+        </header>
+        <ul>
+          <li ng-repeat="profile in profiles">
+            <a title="{{ profile.description }}"
+               ng-click="loadFilterProfile($index)"
+               ng-class="{ active: $index === activeProfile }">
+              {{ profile.name | limitTo : 70 }}
+            </a>
+            <a ng-click="editFilterProfile($index)"
+               title="{{ 'TABLE_FILTERS.PROFILES.EDIT' | translate }}"
+               class="icon edit"></a>
+            <a ng-click="removeFilterProfile($index)"
+               title="{{ 'TABLE_FILTERS.PROFILES.REMOVE' | translate }}"
+               class="icon remove"></a>
+          </li>
+          <li ng-show="profiles.length == 0"
+              translate="TABLE_FILTERS.PROFILES.EMPTY"><!-- No saved filters yet --></li>
+        </ul>
+
+        <div class="input-container">
+          <div class="btn-container">
+            <a class="save" ng-click="mode = 2">
+              {{ 'TABLE_FILTERS.PROFILES.SAVE_FILTERS' | translate | limitTo : 70 }}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div ng-show="mode == 2" class="filter-details">
+        <header>
+          <a class="icon close" ng-click="cancelProfileEditing()"></a>
+          <h4 translate="TABLE_FILTERS.PROFILES.FILTER_HEADER"><!-- Save Filter Set --></h4>
+        </header>
+        <div ng-form="profileForm" ng-model="profile" class="input-container">
+          <label>{{ 'TABLE_FILTERS.PROFILES.NAME' | translate }} <i class="required">*</i></label>
+          <input required
+                 name="name"
+                 ng-model="profile.name"
+                 ng-change="validateProfileName()"
+                 type="text"
+                 placeholder="{{ 'TABLE_FILTERS.PROFILES.NAME_PLACEHOLDER' | translate }}">
+
+          <label translate="TABLE_FILTERS.PROFILES.DESCRIPTION"><!-- Description --></label>
+          <textarea ng-model="profile.description"
+                    placeholder="{{ 'TABLE_FILTERS.PROFILES.DESCRIPTION_PLACEHOLDER' | translate }}"></textarea>
+        </div>
+        <div class="input-container">
+          <div class="btn-container">
+            <a ng-click="cancelProfileEditing()" class="cancel"
+                                                 translate="CANCEL"><!-- Cancel --></a>
+            <a ng-click="saveProfile()"
+               ng-class="{ disabled: !profileForm.$valid }"
+               class="save" translate="SAVE"><!-- Save --></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

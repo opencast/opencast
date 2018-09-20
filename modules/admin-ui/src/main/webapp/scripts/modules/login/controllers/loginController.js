@@ -33,33 +33,33 @@
  */
 angular.module('adminNg.controllers')
 .controller('LoginCtrl', ['$scope', '$location', 'VersionResource', 'Language', '$rootScope',
-        function ($scope, $location, VersionResource, Language, $rootScope) {
+  function ($scope, $location, VersionResource, Language, $rootScope) {
 
-            $scope.isError = false;
+    $scope.isError = false;
 
-            $scope.changeLanguage = function (language) {
-                Language.changeLanguage(language);
-            };
+    $scope.changeLanguage = function (language) {
+      Language.changeLanguage(language);
+    };
 
 
-            // If authentication fails, the `error` search parameter will be
-            // set.
-            if ($location.absUrl().match(/\?error$/)) {
-                $scope.isError = true;
-            } else {
-                VersionResource.query(function(response){
-                    $scope.version = response.version ? response : (angular.isArray(response.versions) ? response.versions[0]:{});
-                    if (!response.consistent) {
-                        $scope.version.buildNumber = 'inconsistent';
-                    }
-                });
-            }
+    // If authentication fails, the `error` search parameter will be
+    // set.
+    if ($location.absUrl().match(/\?error$/)) {
+      $scope.isError = true;
+    } else {
+      VersionResource.query(function(response){
+        $scope.version = response.version ? response : (angular.isArray(response.versions) ? response.versions[0] : {});
+        if (!response.consistent) {
+          $scope.version.buildNumber = 'inconsistent';
+        }
+      });
+    }
 
-            $rootScope.$on('language-changed', function () {
-                $scope.currentLanguageCode = Language.getLanguageCode();
-                $scope.currentLanguageName = Language.getLanguage().displayLanguage;
-                $scope.availableLanguages = Language.getAvailableLanguages();
-            });
+    $rootScope.$on('language-changed', function () {
+      $scope.currentLanguageCode = Language.getLanguageCode();
+      $scope.currentLanguageName = Language.getLanguage().displayLanguage;
+      $scope.availableLanguages = Language.getAvailableLanguages();
+    });
 
-            // For the logout please check the navigationController.
-        }]);
+    // For the logout please check the navigationController.
+  }]);

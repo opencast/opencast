@@ -1,45 +1,46 @@
 <a data-open-modal="event-details"
-  data-resource-id="{{ row.id }}"
-  class="more"
-  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS' | translate }}"
-  with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
+   data-resource-id="{{ row.id }}"
+   class="more"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
 </a>
 
 <!-- Remove button for published events. -->
 <a class="remove"
-  ng-click="row.checkedDelete()"
-  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DELETE' | translate }}"
-  with-role="ROLE_UI_EVENTS_DELETE">
+   ng-click="row.checkedDelete()"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.DELETE' | translate }}"
+   with-role="ROLE_UI_EVENTS_DELETE">
 </a>
 
-<a ng-if="row.has_preview" href="#/events/events/{{row.id}}/tools/editor"
-  class="cut"
-  title="{{ row.needs_cutting ? 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING' : 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
-  with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
+<a ng-if="row.has_preview"
+   href="#/events/events/{{row.id}}/tools/editor"
+   class="cut"
+   title="{{ row.needs_cutting ? 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR_NEEDS_CUTTING' : 'EVENTS.EVENTS.TABLE.TOOLTIP.EDITOR' | translate }}"
+   with-role="ROLE_UI_EVENTS_EDITOR_VIEW">
   <span id="badge" class="badge" ng-show="row.needs_cutting"></span>
 </a>
 
 <a ng-if="row.has_comments && !row.has_open_comments"
-  data-open-modal="event-details"
-  data-resource-id="{{ row.id }}"
-  data-tab="comments"
-  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
-  class="comments">
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="comments"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
+   class="comments">
 </a>
 
 <a ng-if="row.has_comments && row.has_open_comments"
-  data-open-modal="event-details"
-  data-resource-id="{{ row.id }}"
-  data-tab="comments"
-  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
-  class="comments-open">
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="comments"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.COMMENTS' | translate }}"
+   class="comments-open">
 </a>
 
 <a ng-if="row.workflow_state == 'PAUSED'"
-  data-open-modal="event-details"
-  data-resource-id="{{ row.id }}"
-  data-tab="workflows"
-  with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
-  title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW' | translate }}"
-  class="fa fa-warning">
+   data-open-modal="event-details"
+   data-resource-id="{{ row.id }}"
+   data-tab="workflows"
+   with-role="ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PAUSED_WORKFLOW' | translate }}"
+   class="fa fa-warning">
 </a>

@@ -1,9 +1,9 @@
 <div class="main-stats">
-    <div class="col" ng-repeat="stat in stats.stats">
-        <div class="stat" ng-click="showStatsFilter(stat.index)" title="{{ stat.description | translate }}">
-            <h1>{{ stat.counter }}</h1>
-            <span ng-if="stat.description">{{ stat.description | translate }}</span>
-            <span ng-if="!stat.description" ng-repeat="filter in stat.filters">{{ filter.filter | translate }}: {{ filter.value | translate }}</span>
-        </div>
+  <div class="col" ng-repeat="stat in stats.stats">
+    <div class="stat" ng-click="showStatsFilter(stat.index)" title="{{ stat.description | translate }}">
+      <h1>{{ stat.counter }}</h1>
+      <span ng-if="stat.description">{{ stat.description | translate }}</span>
+      <span ng-if="!stat.description" ng-repeat="filter in stat.filters">{{ filter.filter | translate }}: {{ filter.value | translate }}</span>
     </div>
+  </div>
 </div>

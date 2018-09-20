@@ -22,12 +22,12 @@
 
 angular.module('adminNg.services')
 .factory('NewSeriesSummary', [function () {
-    var Summary = function () {
-        this.ud = {};
-        this.isValid = function () {
-            return true;
-        };
-        this.isDisabled = false;
+  var Summary = function () {
+    this.ud = {};
+    this.isValid = function () {
+      return true;
     };
-    return new Summary();
+    this.isDisabled = false;
+  };
+  return new Summary();
 }]);

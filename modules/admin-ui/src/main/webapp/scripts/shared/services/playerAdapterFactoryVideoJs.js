@@ -18,52 +18,55 @@
  * the License.
  *
  */
+
+/* global videojs */
 'use strict';
 
 angular.module('adminNg.services')
-.factory('PlayerAdapterFactoryVIDEOJS', ['PlayerAdapter', 'PlayerAdapterFactoryDefault', function (PlayerAdapter, PlayerAdapterFactoryDefault) {
+.factory('PlayerAdapterFactoryVIDEOJS', ['PlayerAdapter', 'PlayerAdapterFactoryDefault', function (PlayerAdapter,
+  PlayerAdapterFactoryDefault) {
 
-    var PlayerAdapterFactoryVideoJs = function () {
+  var PlayerAdapterFactoryVideoJs = function () {
 
-        /**
-         * Implementation of the player adapter for the HTML5 native player
-         * @constructor
-         * @alias module:player-adapter-HTML5.PlayerAdapterVideoJs
-         * @augments {module:player-adapter.PlayerAdapter}
-         * @param {DOMElement} targetElement DOM Element representing the player
-         */
-        var PlayerAdapterVideoJs = function (targetElement) {
-            'use strict';
+    /**
+     * Implementation of the player adapter for the HTML5 native player
+     * @constructor
+     * @alias module:player-adapter-HTML5.PlayerAdapterVideoJs
+     * @augments {module:player-adapter.PlayerAdapter}
+     * @param {DOMElement} targetElement DOM Element representing the player
+     */
+    var PlayerAdapterVideoJs = function (targetElement) {
+      'use strict';
 
-            var defaultAdapter;
+      var defaultAdapter;
 
-            function initPlayer() {
-                var myPlayer = videojs(targetElement);
-                myPlayer.controls(false);
-                myPlayer.controlBar.hide();
-                myPlayer.dimensions('auto', 'auto');
-                return myPlayer;
-            }
-
-
-            // =========================
-            // INITIALIZATION
-            // =========================
-
-            // Instantiate DefaultAdapter and copy its methods to this adapter.
-            defaultAdapter = PlayerAdapterFactoryDefault.create(targetElement);
-            defaultAdapter.extend(this);
-            defaultAdapter.registerDefaultListeners();
-
-            initPlayer();
-
-        };
+      function initPlayer() {
+        var myPlayer = videojs(targetElement);
+        myPlayer.controls(false);
+        myPlayer.controlBar.hide();
+        myPlayer.dimensions('auto', 'auto');
+        return myPlayer;
+      }
 
 
-        this.create = function (targetElement) {
-            return new PlayerAdapterVideoJs(targetElement);
-        };
+      // =========================
+      // INITIALIZATION
+      // =========================
+
+      // Instantiate DefaultAdapter and copy its methods to this adapter.
+      defaultAdapter = PlayerAdapterFactoryDefault.create(targetElement);
+      defaultAdapter.extend(this);
+      defaultAdapter.registerDefaultListeners();
+
+      initPlayer();
+
     };
-    return new PlayerAdapterFactoryVideoJs();
+
+
+    this.create = function (targetElement) {
+      return new PlayerAdapterVideoJs(targetElement);
+    };
+  };
+  return new PlayerAdapterFactoryVideoJs();
 
 }]);

@@ -86,7 +86,8 @@ $(document).ready(function () {
       checkAndDisplay(data.version, $version);
       checkAndDisplay(data.buildNumber, $buildNumber);
     } else {
-      $message.html('Opencast is running with inconsistent bundles version. Update the deprecated bundles to avoid loss or corruption of data.');
+      $message.html('Opencast is running with inconsistent bundles version. '
+                    + 'Update the deprecated bundles to avoid loss or corruption of data.');
       $buildNumber.addClass('error');
 
       if (typeof data.versions !== 'undefined') {

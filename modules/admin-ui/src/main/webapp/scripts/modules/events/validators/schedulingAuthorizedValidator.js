@@ -28,27 +28,28 @@
  *
  */
 angular.module('adminNg.directives')
-.directive('schedulingAuthorized', ['Notifications', 'SchedulingHelperService', function (Notifications, SchedulingHelperService) {
-    var link = function (scope, elm, attrs, ctrl) {
-        scope, elm, attrs, ctrl, Notifications;
-        ctrl.$validators.schedulingAuthorized = function (modelValue, viewValue) {
-            if (viewValue) {
-                if (angular.isDefined(attrs.schedulingAuthorized)) {
-                    var event = JSON.parse(attrs.schedulingAuthorized);
-                    return event.source !== "SCHEDULE" || SchedulingHelperService.hasAgentAccess(event.agent_id);
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return true;
-            }
-        };
+.directive('schedulingAuthorized', ['Notifications', 'SchedulingHelperService', function (Notifications,
+  SchedulingHelperService) {
+  var link = function (scope, elm, attrs, ctrl) {
+    scope, elm, attrs, ctrl, Notifications;
+    ctrl.$validators.schedulingAuthorized = function (modelValue, viewValue) {
+      if (viewValue) {
+        if (angular.isDefined(attrs.schedulingAuthorized)) {
+          var event = JSON.parse(attrs.schedulingAuthorized);
+          return event.source !== 'SCHEDULE' || SchedulingHelperService.hasAgentAccess(event.agent_id);
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return true;
+      }
     };
+  };
 
-    return {
-        require: 'ngModel',
-        link: link
-    };
+  return {
+    require: 'ngModel',
+    link: link
+  };
 }]);

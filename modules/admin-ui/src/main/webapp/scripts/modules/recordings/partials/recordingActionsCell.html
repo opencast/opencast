@@ -1,14 +1,14 @@
 <a data-open-modal="recording-details"
-  data-resource-id="{{ row.id }}"
-  class="more"
-  title="{{ 'RECORDINGS.RECORDINGS.TABLE.TOOLTIP.DETAILS' | translate }}"
-  with-role="ROLE_UI_LOCATIONS_DETAILS_VIEW">
+   data-resource-id="{{ row.id }}"
+   class="more"
+   title="{{ 'RECORDINGS.RECORDINGS.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_LOCATIONS_DETAILS_VIEW">
 </a>
 <a data-confirmation-modal="confirm-modal"
-  data-callback="table.delete"
-  data-object="row"
-  ng-if="row.removable"
-  class="remove"
-  title="{{ 'RECORDINGS.RECORDINGS.TABLE.TOOLTIP.DELETE' | translate }}"
-  with-role="ROLE_UI_LOCATIONS_DELETE">
+   data-callback="table.delete"
+   data-object="row"
+   ng-if="row.removable"
+   class="remove"
+   title="{{ 'RECORDINGS.RECORDINGS.TABLE.TOOLTIP.DELETE' | translate }}"
+   with-role="ROLE_UI_LOCATIONS_DELETE">
 </a>

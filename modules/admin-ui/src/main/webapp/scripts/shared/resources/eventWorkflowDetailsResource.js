@@ -22,10 +22,10 @@
 
 angular.module('adminNg.resources')
 .factory('EventWorkflowDetailsResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/event/:id0/workflows/:id1:ext', undefined, {
-        get: {
-          params: { ext: '.json' },
-          method: 'GET'
-        }
-    });
+  return $resource('/admin-ng/event/:id0/workflows/:id1:ext', undefined, {
+    get: {
+      params: { ext: '.json' },
+      method: 'GET'
+    }
+  });
 }]);

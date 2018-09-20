@@ -21,37 +21,38 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('PlayerAdapterFactoryHTML5', ['PlayerAdapter', 'PlayerAdapterFactoryDefault', function (PlayerAdapter, PlayerAdapterFactoryDefault) {
+.factory('PlayerAdapterFactoryHTML5', ['PlayerAdapter', 'PlayerAdapterFactoryDefault', function (PlayerAdapter,
+  PlayerAdapterFactoryDefault) {
 
-    var PlayerAdapterFactoryHTML5 = function () {
+  var PlayerAdapterFactoryHTML5 = function () {
 
-        /**
+    /**
          * Implementation of the player adapter for the HTML5 native player
          * @constructor
          * @alias module:player-adapter-HTML5.PlayerAdapterHTML5
          * @augments {module:player-adapter.PlayerAdapter}
          * @param {DOMElement} targetElement DOM Element representing the player
          */
-        var PlayerAdapterHTML5 = function (targetElement) {
-            'use strict';
+    var PlayerAdapterHTML5 = function (targetElement) {
+      'use strict';
 
-            var defaultAdapter, self = this;
+      var defaultAdapter, self = this;
 
-            // =========================
-            // INITIALIZATION
-            // =========================
+      // =========================
+      // INITIALIZATION
+      // =========================
 
-            // Instantiate DefaultAdapter and copy its methods to this adapter.
-            defaultAdapter = PlayerAdapterFactoryDefault.create(targetElement);
-            defaultAdapter.extend(this);
-            defaultAdapter.registerDefaultListeners();
-        };
-
-
-        this.create = function (targetElement) {
-            return new PlayerAdapterHTML5(targetElement);
-        };
+      // Instantiate DefaultAdapter and copy its methods to this adapter.
+      defaultAdapter = PlayerAdapterFactoryDefault.create(targetElement);
+      defaultAdapter.extend(this);
+      defaultAdapter.registerDefaultListeners();
     };
-    return new PlayerAdapterFactoryHTML5();
+
+
+    this.create = function (targetElement) {
+      return new PlayerAdapterHTML5(targetElement);
+    };
+  };
+  return new PlayerAdapterFactoryHTML5();
 
 }]);

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 paella.addPlugin(function() {
   return class logIn extends paella.VideoOverlayButtonPlugin {
     constructor() {

@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 paella.addPlugin(function() {
   return class TranscriptionTabBarPlugin extends paella.TabBarPlugin {
     get divContainer() { return this._divContainer; }
@@ -109,12 +110,12 @@ paella.addPlugin(function() {
 
     setLoading(b) {
       if (b == true){
-        this.divLoading.style.display='block';
-        this.divResults.style.display='none';
+        this.divLoading.style.display = 'block';
+        this.divResults.style.display = 'none';
       }
       else{
-        this.divLoading.style.display='none';
-        this.divResults.style.display='block';
+        this.divLoading.style.display = 'none';
+        this.divResults.style.display = 'block';
       }
     }
 
@@ -138,7 +139,7 @@ paella.addPlugin(function() {
       inputElement.setAttribute('spellcheck','true');
       inputElement.setAttribute('x-webkit-speech','');
       inputElement.setAttribute('tabindex','4000');
-      inputElement.onfocus = function(){this.value=''; this.onfocus=undefined;};
+      inputElement.onfocus = function(){this.value = ''; this.onfocus = undefined;};
       inputElement.onkeyup = function(){thisClass.doSearch(this.value);};
 
       divSearchBarLeft.appendChild(inputElement);
@@ -177,7 +178,7 @@ paella.addPlugin(function() {
       }
       else {
         var segments = self._episode.segments;
-        for (var i =0; i < segments.segment.length; ++i ){
+        for (var i = 0; i < segments.segment.length; ++i ){
           var segment = segments.segment[i];
           this.appendSegmentTextEntry(segment);
         }
@@ -187,14 +188,14 @@ paella.addPlugin(function() {
 
     appendSegmentTextEntry(segment) {
       var divEntry = document.createElement('div');
-      divEntry.className='searchTabBarResultEntry';
-      divEntry.id='searchTabBarResultEntry_' + segment.index;
+      divEntry.className = 'searchTabBarResultEntry';
+      divEntry.id = 'searchTabBarResultEntry_' + segment.index;
       divEntry.setAttribute('tabindex', 4100 + parseInt(segment.index));
       $(divEntry).click(function(event){
-        $(document).trigger( paella.events.seekToTime, {time: segment.time/1000});
+        $(document).trigger( paella.events.seekToTime, {time: segment.time / 1000});
       });
       $(divEntry).keyup(function(event) {
-        if (event.keyCode == 13) { $(document).trigger( paella.events.seekToTime, {time: segment.time/1000}); }
+        if (event.keyCode == 13) { $(document).trigger( paella.events.seekToTime, {time: segment.time / 1000}); }
       });
 
       var divPreview = document.createElement('div');
@@ -212,7 +213,8 @@ paella.addPlugin(function() {
 
 
       var textResultText = document.createElement('a');
-      textResultText.innerHTML = '<span class=\'time\'>' + paella.utils.timeParse.secondsToTime(segment.time/1000) + '</span> ' + segment.text;
+      textResultText.innerHTML = '<span class=\'time\'>' + paella.utils.timeParse.secondsToTime(segment.time / 1000)
+        + '</span> ' + segment.text;
       divResultText.appendChild(textResultText);
       divEntry.appendChild(divResultText);
 
@@ -222,10 +224,10 @@ paella.addPlugin(function() {
     doSearch(value) {
       var thisClass = this;
       if (value != '') {
-        this.divSearchBarRelevance.style.display='none'; //"block";
+        this.divSearchBarRelevance.style.display = 'none'; //"block";
       }
       else {
-        this.divSearchBarRelevance.style.display='none';
+        this.divSearchBarRelevance.style.display = 'none';
       }
       this.setLoading(true);
 
@@ -233,7 +235,7 @@ paella.addPlugin(function() {
       var segmentsAvailable = false;
       paella.ajax.get({url:'/search/episode.json', params:{id:thisClass._episode.id, q:value, limit:1000}},
         function(data, contentType, returnCode) {
-          paella.debug.log('Searching episode='+thisClass._episode.id + ' q='+value);
+          paella.debug.log('Searching episode=' + thisClass._episode.id + ' q=' + value);
 
           segmentsAvailable = (data !== undefined) && (data['search-results'] !== undefined) &&
                       (data['search-results'].result !== undefined) &&
@@ -252,7 +254,7 @@ paella.addPlugin(function() {
             var maxRelevance = 0;
             var i, segment;
 
-            for (i =0; i < segments.segment.length; ++i ){
+            for (i = 0; i < segments.segment.length; ++i){
               segment = segments.segment[i];
               if (maxRelevance < parseInt(segment.relevance)) {
                 maxRelevance = parseInt(segment.relevance);
@@ -261,7 +263,7 @@ paella.addPlugin(function() {
             paella.debug.log('Search Max Revelance ' + maxRelevance);
 
 
-            for (i =0; i < segments.segment.length; ++i ){
+            for (i = 0; i < segments.segment.length; ++i){
               segment = segments.segment[i];
               var relevance = parseInt(segment.relevance);
 
@@ -278,7 +280,7 @@ paella.addPlugin(function() {
                 }
               }
 
-              var divEntry = $('#searchTabBarResultEntry_'+segment.index);
+              var divEntry = $('#searchTabBarResultEntry_' + segment.index);
               divEntry[0].className = 'searchTabBarResultEntry ' + relevanceClass;
             }
 
@@ -303,8 +305,9 @@ paella.addPlugin(function() {
 
 
     setNoActualResultAvailable(searchValue) {
-      this.divSearch.innerHTML = paella.dictionary.translate('Results for \'{0}\' (no actual results for \'{1}\' found)').replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
-
+      this.divSearch.innerHTML = paella.dictionary
+        .translate('Results for \'{0}\' (no actual results for \'{1}\' found)')
+        .replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
     }
 
     setResultAvailable(searchValue) {
@@ -312,7 +315,7 @@ paella.addPlugin(function() {
     }
 
     setNotSearch() {
-      this.divSearch.innerHTML='';
+      this.divSearch.innerHTML = '';
     }
   };
 });

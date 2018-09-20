@@ -22,31 +22,31 @@
 
 // A controller for global page navigation
 angular.module('adminNg.controllers')
-.controller('NavCtrl', ['$scope', '$rootScope', '$location', '$window', '$resource', '$routeParams', 'Language', 'hotkeys',
-    function ($scope, $rootScope, $location, $window, $resource, $routeParams, Language, hotkeys) {
-        // FIXME Move this information to the Language service so it can be
-        // fetched via Language.getAvailableLanguages().
+.controller('NavCtrl', ['$scope', '$rootScope', '$location', '$window', '$resource', '$routeParams', 'Language',
+  'hotkeys', function ($scope, $rootScope, $location, $window, $resource, $routeParams, Language, hotkeys) {
+    // FIXME Move this information to the Language service so it can be
+    // fetched via Language.getAvailableLanguages().
 
-        $scope.category = $routeParams.category || $rootScope.category;
+    $scope.category = $routeParams.category || $rootScope.category;
 
-        $scope.availableLanguages = [];
+    $scope.availableLanguages = [];
 
-        $scope.changeLanguage = function (key) {
-            Language.changeLanguage(key);
-        };
+    $scope.changeLanguage = function (key) {
+      Language.changeLanguage(key);
+    };
 
-        $scope.showHotkeyCheatSheet = function () {
-            hotkeys.toggleCheatSheet();
-        };
+    $scope.showHotkeyCheatSheet = function () {
+      hotkeys.toggleCheatSheet();
+    };
 
-        $rootScope.$on('language-changed', function () {
-            $scope.currentLanguageCode = Language.getLanguageCode();
-            $scope.currentLanguageName = Language.getLanguage().displayLanguage;
-            $scope.availableLanguages = Language.getAvailableLanguages();
-        });
+    $rootScope.$on('language-changed', function () {
+      $scope.currentLanguageCode = Language.getLanguageCode();
+      $scope.currentLanguageName = Language.getLanguage().displayLanguage;
+      $scope.availableLanguages = Language.getAvailableLanguages();
+    });
 
-        $scope.logout = function () {
-            $window.location.href = $window.location.origin + '/j_spring_security_logout';
-        };
-    }
+    $scope.logout = function () {
+      $window.location.href = $window.location.origin + '/j_spring_security_logout';
+    };
+  }
 ]);

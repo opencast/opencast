@@ -19,7 +19,6 @@
  *
  */
 
-
 class Opencast {
 
   constructor() {
@@ -115,7 +114,7 @@ class Opencast {
       return new Promise((resolve, reject)=>{
         var serie = episode.mediapackage.series;
         if (serie != undefined) {
-          base.ajax.get({url:'/series/'+serie+'/acl.json'},
+          base.ajax.get({url:'/series/' + serie + '/acl.json'},
             function(data,contentType,code) {
               self._acl = data;
               resolve(self._acl);
@@ -144,18 +143,18 @@ base.ajax.send = function(type,params,onSuccess,onFail) {
     type:type
   });
 
-  if (typeof(onSuccess)=='function') {
+  if (typeof(onSuccess) == 'function') {
     ajaxObj.done(function(data,textStatus,jqXHR) {
       var contentType = jqXHR.getResponseHeader('content-type');
       onSuccess(data,contentType,jqXHR.status,jqXHR.responseText);
     });
   }
 
-  if (typeof(onFail)=='function') {
+  if (typeof(onFail) == 'function') {
     ajaxObj.fail(function(jqXHR,textStatus,error) {
       var data = jqXHR.responseText;
       var contentType = jqXHR.getResponseHeader('content-type');
-      if ( (jqXHR.status == 200) && (typeof(jqXHR.responseText)=='string') ) {
+      if ( (jqXHR.status == 200) && (typeof(jqXHR.responseText) == 'string') ) {
         try {
           data = JSON.parse(jqXHR.responseText);
         }

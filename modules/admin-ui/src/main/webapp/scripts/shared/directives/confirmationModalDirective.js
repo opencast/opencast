@@ -36,19 +36,19 @@
  */
 angular.module('adminNg.directives')
 .directive('confirmationModal', ['ConfirmationModal', function (ConfirmationModal) {
-    return {
-        scope: {
-            callback: '=',
-            object:   '='
-        },
-        link: function ($scope, element, attr) {
-            element.bind('click', function () {
-                ConfirmationModal.show(attr.confirmationModal, $scope.callback, $scope.object);
-            });
+  return {
+    scope: {
+      callback: '=',
+      object:   '='
+    },
+    link: function ($scope, element, attr) {
+      element.bind('click', function () {
+        ConfirmationModal.show(attr.confirmationModal, $scope.callback, $scope.object);
+      });
 
-            $scope.$on('$destroy', function () {
-                element.unbind('click');
-            });
-        }
-    };
+      $scope.$on('$destroy', function () {
+        element.unbind('click');
+      });
+    }
+  };
 }]);

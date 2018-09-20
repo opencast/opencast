@@ -29,28 +29,28 @@
  */
 angular.module('adminNg.directives')
 .directive('taskStartable', ['Notifications', function (Notifications) {
-    var link = function (scope, elm, attrs, ctrl) {
-        scope, elm, attrs, ctrl, Notifications;
-        ctrl.$validators.taskStartable = function (modelValue, viewValue) {
-            if (viewValue) {
-                if (angular.isDefined(attrs.taskStartable) &&
+  var link = function (scope, elm, attrs, ctrl) {
+    scope, elm, attrs, ctrl, Notifications;
+    ctrl.$validators.taskStartable = function (modelValue, viewValue) {
+      if (viewValue) {
+        if (angular.isDefined(attrs.taskStartable) &&
                     (attrs.taskStartable.toUpperCase().indexOf('PROCESSED') > -1
                     || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
                     || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_CANCELED') > -1)) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            }
-            else {
-                return true;
-            }
-        };
+          return true;
+        }
+        else {
+          return false;
+        }
+      }
+      else {
+        return true;
+      }
     };
+  };
 
-    return {
-        require: 'ngModel',
-        link: link
-    };
+  return {
+    require: 'ngModel',
+    link: link
+  };
 }]);

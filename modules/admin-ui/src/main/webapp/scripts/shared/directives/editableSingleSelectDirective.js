@@ -45,102 +45,102 @@
  */
 angular.module('adminNg.directives')
 .directive('adminNgEditableSingleSelect', ['$timeout', '$filter', function ($timeout, $filter) {
-    return {
-        restrict: 'A',
-        templateUrl: 'shared/partials/editableSingleSelect.html',
-        replace: true,
-        scope: {
-            params:     '=',
-            collection: '=',
-            ordered:    '=',
-            save:       '='
-        },
-        link: function (scope, element) {
+  return {
+    restrict: 'A',
+    templateUrl: 'shared/partials/editableSingleSelect.html',
+    replace: true,
+    scope: {
+      params:     '=',
+      collection: '=',
+      ordered:    '=',
+      save:       '='
+    },
+    link: function (scope, element) {
 
-            var mapToArray = function (map, translate) {
-                var array = [];
+      var mapToArray = function (map, translate) {
+        var array = [];
 
-                angular.forEach(map, function (mapValue, mapKey) {
+        angular.forEach(map, function (mapValue, mapKey) {
 
-                    array.push({
-                        label: translate ? $filter('translate')(mapKey) : mapKey,
-                        value: mapValue
-                    });
-                });
+          array.push({
+            label: translate ? $filter('translate')(mapKey) : mapKey,
+            value: mapValue
+          });
+        });
 
-                return $filter('orderBy')(array, 'label');
-            }
+        return $filter('orderBy')(array, 'label');
+      };
 
-            var mapToArrayOrdered = function (map, translate) {
-                var array = [];
+      var mapToArrayOrdered = function (map, translate) {
+        var array = [];
 
-                angular.forEach(map, function (mapValue, mapKey) {
-                    var entry = JSON.parse(mapKey);
-                    if (entry.selectable || scope.params.value === mapValue) {
-                        array.push({
-                            label: entry,
-                            value: mapValue
-                        });
-                    }
-                });
-                array.sort(function(a, b) {
-                    return a.label.order - b.label.order;
-                });
-                return array.map(function (entry) {
-                    return {
-                        label: translate ? $filter('translate')(entry.label.label) : entry.label.label,
-                        value: entry.value
-                    };
-                });
-            }
-
-
-            //transform map to array so that orderBy can be used
-            scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
-                mapToArray(scope.collection, scope.params.translatable);
-
-            scope.submit = function () {
-                // Wait until the change of the value propagated to the parent's
-                // metadata object.
-                scope.submitTimer = $timeout(function () {
-                    scope.save(scope.params.id);
-                });
-                scope.editMode = false;
-            };
-
-            scope.getLabel = function (searchedValue) {
-                var label;
-
-                angular.forEach(scope.collection, function (obj) {
-                    if (obj.value === searchedValue) {
-                        label = obj.label;
-                    }
-                });
-
-                return label;
-            };
-
-            scope.$on('$destroy', function () {
-                $timeout.cancel(scope.submitTimer);
+        angular.forEach(map, function (mapValue, mapKey) {
+          var entry = JSON.parse(mapKey);
+          if (entry.selectable || scope.params.value === mapValue) {
+            array.push({
+              label: entry,
+              value: mapValue
             });
+          }
+        });
+        array.sort(function(a, b) {
+          return a.label.order - b.label.order;
+        });
+        return array.map(function (entry) {
+          return {
+            label: translate ? $filter('translate')(entry.label.label) : entry.label.label,
+            value: entry.value
+          };
+        });
+      };
 
-            scope.enterEditMode = function () {
-                // Store the original value for later comparision or undo
-                if (!angular.isDefined(scope.original)) {
-                    scope.original = scope.params.value;
-                }
-                scope.editMode = true;
-                scope.focusTimer = $timeout(function () {
-                  if ($('[chosen]')) {
-                    element.find('select').trigger('chosen:activate');
-                  }
-                });
-            };
 
-            scope.leaveEditMode = function () {
-                // does not work currently, as angular chose does not support ng-blur yet. But it does not break anything
-                scope.editMode = false;
-            };
-       }
-    };
+      //transform map to array so that orderBy can be used
+      scope.collection = scope.ordered ? mapToArrayOrdered(scope.collection, scope.params.translatable) :
+        mapToArray(scope.collection, scope.params.translatable);
+
+      scope.submit = function () {
+        // Wait until the change of the value propagated to the parent's
+        // metadata object.
+        scope.submitTimer = $timeout(function () {
+          scope.save(scope.params.id);
+        });
+        scope.editMode = false;
+      };
+
+      scope.getLabel = function (searchedValue) {
+        var label;
+
+        angular.forEach(scope.collection, function (obj) {
+          if (obj.value === searchedValue) {
+            label = obj.label;
+          }
+        });
+
+        return label;
+      };
+
+      scope.$on('$destroy', function () {
+        $timeout.cancel(scope.submitTimer);
+      });
+
+      scope.enterEditMode = function () {
+        // Store the original value for later comparision or undo
+        if (!angular.isDefined(scope.original)) {
+          scope.original = scope.params.value;
+        }
+        scope.editMode = true;
+        scope.focusTimer = $timeout(function () {
+          if ($('[chosen]')) {
+            element.find('select').trigger('chosen:activate');
+          }
+        });
+      };
+
+      scope.leaveEditMode = function () {
+        // does not work currently, as angular chose does not support ng-blur yet. But it does not break anything
+        scope.editMode = false;
+      };
+    }
+  };
 }]);

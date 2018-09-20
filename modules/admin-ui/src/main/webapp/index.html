@@ -1,401 +1,402 @@
 <!doctype html>
 <html ng-app="adminNg">
-    <head>
-        <meta charset="utf-8">
-        <title>Opencast</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width">
-        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-        <!-- build:css(src/main) styles/vendor.css -->
-        <!-- bower:css -->
-        <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
-        <!-- endbower -->
-        <!-- endbuild -->
-        <!-- build:css(target/grunt/.tmp) styles/main.css -->
-        <link rel="stylesheet" href="styles/main.css">
-        <!-- endbuild -->
-        <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
-        <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
-        <link rel="shortcut icon" href="img/favicon.ico">
-        <script>
-            window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>')
-        </script>
-        <script type="text/javascript" src="lib/jquery-ui.js"></script>
-        <script type="text/javascript" src="lib/datepicker/i18n/jquery-ui-i18n.js"></script>
-        <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
-        <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
-        <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
-        <script type="text/javascript" src="lib/chosen.jquery.js"></script>
-        <script type="text/javascript" src="lib/moment-with-locales.js"></script>
-    </head>
-    <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
-        <header ng-controller="NavCtrl" class="primary-header">
-            <div class="header-branding">
-                <a href="/" target="_self" class="logo">
-                    <img src="img/opencast-white.svg" alt="Opencast Logo" />
-                </a>
-            </div>
-            <nav class="header-nav nav-dd-container" id="nav-dd-container">
-                <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
-                    <div class="lang" ng-class="currentLanguageCode" title="{{ 'LANGUAGE' | translate}}">
-                        <img ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
-                            ng-attr-alt="{{ currentLanguageCode }}" />
-                    </div>
-                    <ul class="dropdown-ul">
-                        <li><a ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
-                            ng-click="changeLanguage(language.code)">
-                            <img class=lang-flag ng-attr-src="img/lang/{{ language.code }}.svg"
-                                ng-attr-alt="{{ language.code }}" />
-                            {{ language.displayLanguage }}</a>
-                        </li>
-                    </ul>
-                </div>
+  <head>
+    <meta charset="utf-8">
+    <title>Opencast</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(src/main) styles/vendor.css -->
+    <!-- bower:css -->
+    <link rel="stylesheet" href="../../bower_components/angular-hotkeys/build/hotkeys.css" />
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(target/grunt/.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+    <link type="text/css" href="lib/datepicker/themes/smoothness/jquery-ui-1.10.3.min.css" rel="stylesheet">
+    <link type="text/css" href="lib/timepicker/jquery-ui-timepicker-addon.css" rel="stylesheet">
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <script>
+      window.jQuery || document.write('<script src="lib/jquery-1.10.2.js"><\/script>');
+      </script>
+      <script type="text/javascript" src="lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="lib/datepicker/i18n/jquery-ui-i18n.js"></script>
+      <script type="text/javascript" src="lib/timepicker/jquery-ui-timepicker-addon.js"></script>
+      <script type="text/javascript" src="lib/timepicker/i18n/jquery-ui-timepicker-addon-i18n.js"></script>
+      <script type="text/javascript" src="lib/underscore-1.5.2.js"></script>
+      <script type="text/javascript" src="lib/chosen.jquery.js"></script>
+      <script type="text/javascript" src="lib/moment-with-locales.js"></script>
+  </head>
+  <body ng-cloak ng-controller="ApplicationCtrl" ng-click="bodyClicked()">
+    <header ng-controller="NavCtrl" class="primary-header">
+      <div class="header-branding">
+        <a href="/" target="_self" class="logo">
+          <img src="img/opencast-white.svg" alt="Opencast Logo" />
+        </a>
+      </div>
+      <nav class="header-nav nav-dd-container" id="nav-dd-container">
+        <div class="nav-dd lang-dd" id="lang-dd" old-admin-ng-dropdown="">
+          <div class="lang" ng-class="currentLanguageCode" title="{{ 'LANGUAGE' | translate}}">
+            <img ng-attr-src="img/lang/{{ currentLanguageCode }}.svg"
+                 ng-attr-alt="{{ currentLanguageCode }}" />
+          </div>
+          <ul class="dropdown-ul">
+            <li><a ng-repeat="language in availableLanguages | orderBy:'displayLanguage'"
+                   ng-click="changeLanguage(language.code)">
+                <img class=lang-flag
+                     ng-attr-src="img/lang/{{ language.code }}.svg"
+                     ng-attr-alt="{{ language.code }}" />
+                {{ language.displayLanguage }}</a>
+            </li>
+          </ul>
+        </div>
 
-                <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
-                    <a href="{{mediaModuleUrl}}">
-                        <span class="fa fa-play-circle"><!-- Media Module --></span>
-                    </a>
-                </div>
+        <div ng-if="mediaModuleUrl" class="nav-dd" title="{{ 'MEDIAMODULE' | translate}}">
+          <a href="{{mediaModuleUrl}}">
+            <span class="fa fa-play-circle"><!-- Media Module --></span>
+          </a>
+        </div>
 
-                <div class="nav-dd info-dd" id="info-dd" title="{{ 'SYSTEM_NOTIFICATIONS' | translate}}" old-admin-ng-dropdown="" with-role="ROLE_ADMIN">
-                  <i class="fa fa-bell" aria-hidden="true"></i>
-                    <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
-                    <ul class="dropdown-ul">
-                      <li ng-repeat="(key, value) in services.service"><!-- service directive -->
-                        <a ng-click="toServices($event)" service-name="{{ key }}">
-                          <span>{{ key }}</span>
-                          <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
-                          <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
-                        </a>
-                      </li><!-- directive end -->
-                    </ul>
-                </div>
+        <div class="nav-dd info-dd" id="info-dd" title="{{ 'SYSTEM_NOTIFICATIONS' | translate}}" old-admin-ng-dropdown="" with-role="ROLE_ADMIN">
+          <i class="fa fa-bell" aria-hidden="true"></i>
+          <span id="error-count" class="badge" ng-show="services.error">{{ services.numErr }}</span>
+          <ul class="dropdown-ul">
+            <li ng-repeat="(key, value) in services.service"><!-- service directive -->
+              <a ng-click="toServices($event)" service-name="{{ key }}">
+                <span>{{ key }}</span>
+                <span class="ng-multi-value ng-multi-value-red" ng-if="value.error">{{ value.status }}</span>
+                <span class="ng-multi-value ng-multi-value-green" ng-if="!value.error">{{ value.status }}</span>
+              </a>
+            </li><!-- directive end -->
+          </ul>
+        </div>
 
-              <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
-                    id="help-dd" old-admin-ng-dropdown="">
-                    <div class="fa fa-question-circle"></div>
-                    <ul class="dropdown-ul">
-                        <li ng-if="documentationUrl">
-                        <a href="{{documentationUrl}}">
-                          <span translate="HELP.DOCUMENTATION"><!-- Documentation Server --></span>
-                        </a>
-                        </li>
-                        <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
-                        <a target="_self" href="{{restdocsUrl}}">
-                            <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
-                        </a>
-                        </li>
-                        <li>
-                            <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
-                        </li>
-                    </ul>
-                </div>
+        <div ng-if="documentationUrl || restdocsUrl" title="{{ 'HELP.HELP' | translate}}" class="nav-dd"
+                                                                                          id="help-dd" old-admin-ng-dropdown="">
+          <div class="fa fa-question-circle"></div>
+          <ul class="dropdown-ul">
+            <li ng-if="documentationUrl">
+              <a href="{{documentationUrl}}">
+                <span translate="HELP.DOCUMENTATION"><!-- Documentation Server --></span>
+              </a>
+            </li>
+            <li ng-if="restdocsUrl" with-role="ROLE_ADMIN">
+              <a target="_self" href="{{restdocsUrl}}">
+                <span translate="HELP.REST_DOC"><!-- REST Doc --></span>
+              </a>
+            </li>
+            <li>
+              <a translate="HELP.HOTKEY_CHEAT_SHEET" ng-click="showHotkeyCheatSheet()"></a>
+            </li>
+          </ul>
+        </div>
 
-                <div class="nav-dd user-dd" id="user-dd" old-admin-ng-dropdown="">
-                    <div class="h-nav dropdown-icon">{{ currentUser.user.name || currentUser.user.username }}</div>
-                    <ul class="dropdown-ul">
-                        <li>
-                        <a ng-click="logout()">
-                            <span class="logout-icon" translate="LOGOUT"><!-- Logout--></span>
-                        </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-        </header>
+        <div class="nav-dd user-dd" id="user-dd" old-admin-ng-dropdown="">
+          <div class="h-nav dropdown-icon">{{ currentUser.user.name || currentUser.user.username }}</div>
+          <ul class="dropdown-ul">
+            <li>
+              <a ng-click="logout()">
+                <span class="logout-icon" translate="LOGOUT"><!-- Logout--></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
 
-        <section ng-view class="main-content">
-        </section>
+    <section ng-view class="main-content">
+    </section>
 
-        <footer id="main-footer" ng-controller="NavCtrl">
-            <div class="default-footer">
-                <div ng-if="version.version" class="meta">
-                    Opencast {{ version.version }}
-                    <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
-                </div>
-                <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
-                    <a href="javascript:;">Feedback</a>
-                </div>
-            </div>
-        </footer>
+    <footer id="main-footer" ng-controller="NavCtrl">
+      <div class="default-footer">
+        <div ng-if="version.version" class="meta">
+          Opencast {{ version.version }}
+          <span with-role="ROLE_ADMIN"> - {{ version.buildNumber || 'undefined' }}</span>
+        </div>
+        <div ng-if="feedbackUrl" class="feedback-btn" id="feedback-btn">
+          <a href="javascript:;">Feedback</a>
+        </div>
+      </div>
+    </footer>
 
 
-        <!-- build:js(src/main) scripts/bower.js -->
-        <!-- bower:js -->
-        <script src="../../bower_components/angular/angular.js"></script>
-        <script src="../../bower_components/angular-route/angular-route.js"></script>
-        <script src="../../bower_components/angular-resource/angular-resource.js"></script>
-        <script src="../../bower_components/angular-animate/angular-animate.js"></script>
-        <script src="../../bower_components/angular-messages/angular-messages.js"></script>
-        <script src="../../bower_components/angular-md5/angular-md5.js"></script>
-        <script src="../../bower_components/angular-translate/angular-translate.js"></script>
-        <script src="../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
-        <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
-        <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
-        <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
-        <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
-        <!-- endbower -->
-        <!-- endbuild -->
-        <!-- build:js(src/main/webapp) scripts/vendor.js -->
-        <script src="scripts/lib/angular-chosen.js"></script>
-        <script src="scripts/lib/angular-sortable.js"></script>
-        <script src="scripts/lib/video-js/video.js"></script>
-        <script src="scripts/lib/javascript-md5/js/md5.min.js"></script>
-        <!-- endbuild -->
+    <!-- build:js(src/main) scripts/bower.js -->
+    <!-- bower:js -->
+    <script src="../../bower_components/angular/angular.js"></script>
+    <script src="../../bower_components/angular-route/angular-route.js"></script>
+    <script src="../../bower_components/angular-resource/angular-resource.js"></script>
+    <script src="../../bower_components/angular-animate/angular-animate.js"></script>
+    <script src="../../bower_components/angular-messages/angular-messages.js"></script>
+    <script src="../../bower_components/angular-md5/angular-md5.js"></script>
+    <script src="../../bower_components/angular-translate/angular-translate.js"></script>
+    <script src="../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
+    <script src="../../bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
+    <script src="../../bower_components/angular-wizard/dist/angular-wizard.js"></script>
+    <script src="../../bower_components/angular-hotkeys/build/hotkeys.js"></script>
+    <script src="../../bower_components/ng-file-upload/angular-file-upload.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:js(src/main/webapp) scripts/vendor.js -->
+    <script src="scripts/lib/angular-chosen.js"></script>
+    <script src="scripts/lib/angular-sortable.js"></script>
+    <script src="scripts/lib/video-js/video.js"></script>
+    <script src="scripts/lib/javascript-md5/js/md5.min.js"></script>
+    <!-- endbuild -->
 
-        <!-- build:js(src/main/webapp) scripts/scripts.js -->
-        <script src="scripts/app.js"></script>
-        <script src="scripts/shared/services/services.js"></script>
-        <script src="scripts/shared/services/resourceHelperService.js"></script>
-        <script src="scripts/shared/services/authService.js"></script>
-        <script src="scripts/shared/services/cryptService.js"></script>
-        <script src="scripts/shared/services/relativeDatesService.js"></script>
-        <script src="scripts/shared/services/jsHelperService.js"></script>
-        <script src="scripts/shared/services/languageService.js"></script>
-        <script src="scripts/shared/services/storageService.js"></script>
-        <script src="scripts/shared/services/modalService.js"></script>
-        <script src="scripts/shared/services/filterProfilesService.js"></script>
-        <script src="scripts/shared/services/notificationsService.js"></script>
-        <script src="scripts/shared/services/tableService.js"></script>
-        <script src="scripts/shared/services/decorateWithTableRowSelection.js"></script>
-        <script src="scripts/shared/services/statsService.js"></script>
-        <script src="scripts/shared/services/underscoreService.js"></script>
-        <script src="scripts/shared/services/formNavigatorService.js"></script>
-        <script src="scripts/shared/services/videoService.js"></script>
-        <script src="scripts/shared/services/regexService.js"></script>
-        <script src="scripts/shared/services/schedulingHelperService.js"></script>
-        <script src="scripts/shared/services/eventHelperService.js"></script>
-        <script src="scripts/shared/services/hotkeysService.js"></script>
-        <script src="scripts/shared/services/restServiceMonitor.js"></script>
-        <script src="scripts/shared/resources/resources.js"></script>
-        <script src="scripts/shared/resources/identityResource.js"></script>
-        <script src="scripts/shared/resources/versionResource.js"></script>
-        <script src="scripts/shared/resources/eventsResource.js"></script>
-        <script src="scripts/shared/resources/optoutsResource.js"></script>
-        <script src="scripts/shared/resources/optoutSingleResource.js"></script>
-        <script src="scripts/shared/resources/seriesResource.js"></script>
-        <script src="scripts/shared/resources/seriesAccessResource.js"></script>
-        <script src="scripts/shared/resources/seriesMetadataResource.js"></script>
-        <script src="scripts/shared/resources/seriesParticipationResource.js"></script>
-        <script src="scripts/shared/resources/seriesEventsResource.js"></script>
-        <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
-        <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
-        <script src="scripts/shared/resources/seriesThemeResource.js"></script>
-        <script src="scripts/shared/resources/eventMetadataResource.js"></script>
-        <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
-        <script src="scripts/shared/resources/newEventMetadataResource.js"></script>
-        <script src="scripts/shared/resources/newEventProcessingResource.js"></script>
-        <script src="scripts/shared/resources/newEventResource.js"></script>
-        <script src="scripts/shared/resources/newSeriesMetadataResource.js"></script>
-        <script src="scripts/shared/resources/newSeriesThemeResource.js"></script>
-        <script src="scripts/shared/resources/conflictCheckResource.js"></script>
-        <script src="scripts/shared/resources/bulkDeleteResource.js"></script>
-        <script src="scripts/shared/resources/eventAssetMediaResource.js"></script>
-        <script src="scripts/shared/resources/eventAttachmentDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventMediaDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventCatalogDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventParticipationResource.js"></script>
-        <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventAssetPublicationsResource.js"></script>
-        <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
-        <script src="scripts/shared/resources/eventsSchedulingResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowPropertiesResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowsResource.js"></script>
-        <script src="scripts/shared/resources/eventTransactionResource.js"></script>
-        <script src="scripts/shared/resources/eventErrorsResource.js"></script>
-        <script src="scripts/shared/resources/eventErrorDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
-        <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
-        <script src="scripts/shared/resources/eventAssetAttachmentsResource.js"></script>
-        <script src="scripts/shared/resources/eventAssetCatalogsResource.js"></script>
-        <script src="scripts/shared/resources/eventAssetsResource.js"></script>
-        <script src="scripts/shared/resources/eventAccessResource.js"></script>
-        <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
-        <script src="scripts/shared/resources/eventHasSnapshotsResource.js"></script>
-        <script src="scripts/shared/resources/eventBulkEditResource.js"></script>
-        <script src="scripts/shared/resources/toolsResource.js"></script>
-        <script src="scripts/shared/resources/commentResource.js"></script>
-        <script src="scripts/shared/resources/usersResource.js"></script>
-        <script src="scripts/shared/resources/userResource.js"></script>
-        <script src="scripts/shared/resources/groupsResource.js"></script>
-        <script src="scripts/shared/resources/groupResource.js"></script>
-        <script src="scripts/shared/resources/aclsResource.js"></script>
-        <script src="scripts/shared/resources/aclResource.js"></script>
-        <script src="scripts/shared/resources/captureAgentResource.js"></script>
-        <script src="scripts/shared/resources/captureAgentsResource.js"></script>
-        <script src="scripts/shared/resources/userRolesResource.js"></script>
-        <script src="scripts/shared/resources/serversResource.js"></script>
-        <script src="scripts/shared/resources/servicesResource.js"></script>
-        <script src="scripts/shared/resources/serviceResource.js"></script>
-        <script src="scripts/shared/resources/jobsResource.js"></script>
-        <script src="scripts/shared/resources/resourcesFilterResource.js"></script>
-        <script src="scripts/shared/resources/resourcesListResource.js"></script>
-        <script src="scripts/shared/resources/workflowsResource.js"></script>
-        <script src="scripts/shared/resources/blacklistsResource.js"></script>
-        <script src="scripts/shared/resources/blacklistCountResource.js"></script>
-        <script src="scripts/shared/resources/themesResource.js"></script>
-        <script src="scripts/shared/resources/newThemeResource.js"></script>
-        <script src="scripts/shared/resources/signatureResource.js"></script>
-        <script src="scripts/shared/resources/taskResource.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/access.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/metadata.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/metadataExtended.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/processing.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/source.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/summary.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/states.js"></script>
-        <script src="scripts/shared/services/wizards/new-event/uploadAssetNewEvent.js"></script>
-        <script src="scripts/shared/services/wizards/new-group/summary.js"></script>
-        <script src="scripts/shared/services/wizards/new-group/users.js"></script>
-        <script src="scripts/shared/services/wizards/new-group/roles.js"></script>
-        <script src="scripts/shared/services/wizards/new-group/states.js"></script>
-        <script src="scripts/shared/services/wizards/new-group/metadata.js"></script>
-        <script src="scripts/shared/services/wizards/userblacklist/states.js"></script>
-        <script src="scripts/shared/services/wizards/userblacklist/items.js"></script>
-        <script src="scripts/shared/services/wizards/userblacklist/dates.js"></script>
-        <script src="scripts/shared/services/wizards/userblacklist/reason.js"></script>
-        <script src="scripts/shared/services/wizards/userblacklist/summary.js"></script>
-        <script src="scripts/shared/services/wizards/locationblacklist/states.js"></script>
-        <script src="scripts/shared/services/wizards/locationblacklist/items.js"></script>
-        <script src="scripts/shared/services/wizards/locationblacklist/dates.js"></script>
-        <script src="scripts/shared/services/wizards/locationblacklist/reason.js"></script>
-        <script src="scripts/shared/services/wizards/locationblacklist/summary.js"></script>
-        <script src="scripts/shared/services/wizards/bulk-message/states.js"></script>
-        <script src="scripts/shared/services/wizards/bulk-message/recipients.js"></script>
-        <script src="scripts/shared/services/wizards/bulk-message/message.js"></script>
-        <script src="scripts/shared/services/wizards/bulk-message/summary.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/access.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/metadata.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/metadataExtended.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/theme.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/states.js"></script>
-        <script src="scripts/shared/services/wizards/new-series/summary.js"></script>
-        <script src="scripts/shared/services/wizards/new-acl/access.js"></script>
-        <script src="scripts/shared/services/wizards/new-acl/metadata.js"></script>
-        <script src="scripts/shared/services/wizards/new-acl/states.js"></script>
-        <script src="scripts/shared/services/wizards/new-acl/summary.js"></script>
-        <script src="scripts/shared/services/playerAdapterRepository.js"></script>
-        <script src="scripts/shared/services/playerAdapterFactoryDefault.js"></script>
-        <script src="scripts/shared/services/playerAdapterFactoryHtml5.js"></script>
-        <script src="scripts/shared/services/playerAdapterFactoryVideoJs.js"></script>
-        <script src="scripts/shared/services/playerAdapter.js"></script>
-        <script src="scripts/shared/services/httpInterceptor.js"></script>
-        <script src="scripts/shared/filters/filters.js"></script>
-        <script src="scripts/shared/filters/localizeDateFilter.js"></script>
-        <script src="scripts/shared/filters/addLeadingZerosFilter.js"></script>
-        <script src="scripts/shared/filters/humanByteSizeFilter.js"></script>
-        <script src="scripts/shared/filters/humanDurationFilter.js"></script>
-        <script src="scripts/shared/filters/arrayFilter.js"></script>
-        <script src="scripts/shared/filters/removeQueryParams.js"></script>
-        <script src="scripts/shared/filters/translateOverrideFallbackFilter.js"></script>
-        <script src="scripts/shared/filters/trustedResourceUrlFilter.js"></script>
-        <script src="scripts/shared/directives/directives.js"></script>
-        <script src="scripts/shared/directives/customIcon.js"></script>
-        <script src="scripts/shared/directives/datepickerDirective.js"></script>
-        <script src="scripts/shared/directives/datetimepickerDirective.js"></script>
-        <script src="scripts/shared/directives/focushere.js"></script>
-        <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
-        <script src="scripts/shared/directives/passwordCheckDirective.js"></script>
-        <script src="scripts/shared/directives/selectBoxDirective.js"></script>
-        <script src="scripts/shared/directives/navDirective.js"></script>
-        <script src="scripts/shared/directives/tableDirective.js"></script>
-        <script src="scripts/shared/directives/statsDirective.js"></script>
-        <script src="scripts/shared/directives/confirmationModalDirective.js"></script>
-        <script src="scripts/shared/directives/deleteSingleSeriesModalDirective.js"></script>
-        <script src="scripts/shared/directives/resourceModalDirective.js"></script>
-        <script src="scripts/shared/directives/editableDirective.js"></script>
-        <script src="scripts/shared/directives/editableBooleanValueDirective.js"></script>
-        <script src="scripts/shared/directives/editableDateValueDirective.js"></script>
-        <script src="scripts/shared/directives/editableSingleValueDirective.js"></script>
-        <script src="scripts/shared/directives/editableMultiValueDirective.js"></script>
-        <script src="scripts/shared/directives/editableSingleSelectDirective.js"></script>
-        <script src="scripts/shared/directives/editableMultiSelectDirective.js"></script>
-        <script src="scripts/shared/directives/fileDirective.js"></script>
-        <script src="scripts/shared/directives/timelineDirective.js"></script>
-        <script src="scripts/shared/directives/segmentsDirective.js"></script>
-        <script src="scripts/shared/directives/playerDirective.js"></script>
-        <script src="scripts/shared/directives/hrefRoleDirective.js"></script>
-        <script src="scripts/shared/directives/tableFilterDirective.js"></script>
-        <script src="scripts/shared/directives/notificationsDirective.js"></script>
-        <script src="scripts/shared/directives/notificationDirective.js"></script>
-        <script src="scripts/shared/directives/wizardDirective.js"></script>
-        <script src="scripts/shared/directives/withRoleDirective.js"></script>
-        <script src="scripts/shared/directives/fileuploadDirective.js"></script>
-        <script src="scripts/shared/directives/popOverDirective.js"></script>
-        <script src="scripts/shared/directives/preSelectFromDirective.js"></script>
-        <script src="scripts/shared/directives/loadingScrollerDirective.js"></script>
-        <script src="scripts/shared/directives/opencastScrollGlue.js"></script>
-        <script src="scripts/shared/directives/uploadAssetDirective.js"></script>
-        <script src="scripts/shared/services/resourceModalService.js"></script>
-        <script src="scripts/shared/services/confirmationModalService.js"></script>
-        <script src="scripts/shared/services/deleteSingleSeriesModalService.js"></script>
-        <script src="scripts/shared/services/uploadAssetOptionsService.js"></script>
-        <script src="scripts/shared/controllers/controllers.js"></script>
-        <script src="scripts/shared/controllers/navigationController.js"></script>
-        <script src="scripts/shared/controllers/applicationController.js"></script>
-        <script src="scripts/shared/controllers/applicationController.js"></script>
-        <script src="scripts/shared/controllers/userPreferencesController.js"></script>
-        <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
-        <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
-        <script src="scripts/modules/events/controllers/eventsController.js"></script>
-        <script src="scripts/modules/events/controllers/eventController.js"></script>
-        <script src="scripts/modules/events/controllers/editStatusController.js"></script>
-        <script src="scripts/modules/events/controllers/editEventsController.js"></script>
-        <script src="scripts/modules/events/controllers/newEventController.js"></script>
-        <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
-        <script src="scripts/modules/events/controllers/seriesController.js"></script>
-        <script src="scripts/modules/events/controllers/serieController.js"></script>
-        <script src="scripts/modules/events/controllers/bulkMessageController.js"></script>
-        <script src="scripts/modules/events/controllers/bulkDeleteController.js"></script>
-        <script src="scripts/modules/events/controllers/retractEventController.js"></script>
-        <script src="scripts/modules/events/controllers/scheduleTaskController.js"></script>
-        <script src="scripts/modules/events/subresources/controllers/toolsController.js"></script>
-        <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
-        <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
-        <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
-        <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
-        <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
-        <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
-        <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>
-        <script src="scripts/modules/recordings/controllers/locationblacklistController.js"></script>
-        <script src="scripts/modules/users/controllers/usersController.js"></script>
-        <script src="scripts/modules/users/controllers/userController.js"></script>
-        <script src="scripts/modules/users/controllers/groupsController.js"></script>
-        <script src="scripts/modules/users/controllers/groupController.js"></script>
-        <script src="scripts/modules/users/controllers/newGroupController.js"></script>
-        <script src="scripts/modules/users/controllers/newAclController.js"></script>
-        <script src="scripts/modules/users/controllers/aclController.js"></script>
-        <script src="scripts/modules/users/controllers/aclsController.js"></script>
-        <script src="scripts/modules/users/controllers/userblacklistsController.js"></script>
-        <script src="scripts/modules/users/controllers/userblacklistController.js"></script>
-        <script src="scripts/modules/login/controllers/loginController.js"></script>
-        <script src="scripts/modules/systems/controllers/serversController.js"></script>
-        <script src="scripts/modules/systems/controllers/jobsController.js"></script>
-        <script src="scripts/modules/systems/controllers/servicesController.js"></script>
-        <script src="scripts/modules/dashboard/controllers/dashboardController.js"></script>
-        <script src="scripts/modules/configuration/controllers/themesController.js"></script>
-        <script src="scripts/modules/configuration/controllers/themeFormController.js"></script>
-        <script src="scripts/modules/configuration/validators/uniqueThemeName.js"></script>
-        <!-- endbuild -->
-        <script ng-if="feedbackUrl" type="text/javascript" ng-src="{{ feedbackUrl | trusted }}"></script>
-        <script ng-if="feedbackUrl" type="text/javascript">
-            window.ATL_JQ_PAGE_PROPS =  {
-                "triggerFunction": function(showCollectorDialog) {
-                //Requires that jQuery is available!
-                jQuery("#feedback-btn").click(function(e) {
-                   e.preventDefault();
-                   showCollectorDialog();
-                });
-           }};
-        </script>
-        <!-- <script src="modules/configuration/controllers/emailtemplatesController.js"></script> -->
-        <!-- <script src="modules/configuration/controllers/emailtemplateController.js"></script> -->
-        <!-- <script src="shared/resources/emailTemplateResource.js"></script> -->
-        <!-- <script src="shared/resources/emailResource.js"></script> -->
-        <!-- <script src="shared/services/wizards/emailtemplate/states.js"></script> -->
-        <!-- <script src="shared/services/wizards/emailtemplate/message.js"></script> -->
-        <!-- <script src="shared/services/wizards/emailtemplate/summary.js"></script> -->
-</body>
+    <!-- build:js(src/main/webapp) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/shared/services/services.js"></script>
+    <script src="scripts/shared/services/resourceHelperService.js"></script>
+    <script src="scripts/shared/services/authService.js"></script>
+    <script src="scripts/shared/services/cryptService.js"></script>
+    <script src="scripts/shared/services/relativeDatesService.js"></script>
+    <script src="scripts/shared/services/jsHelperService.js"></script>
+    <script src="scripts/shared/services/languageService.js"></script>
+    <script src="scripts/shared/services/storageService.js"></script>
+    <script src="scripts/shared/services/modalService.js"></script>
+    <script src="scripts/shared/services/filterProfilesService.js"></script>
+    <script src="scripts/shared/services/notificationsService.js"></script>
+    <script src="scripts/shared/services/tableService.js"></script>
+    <script src="scripts/shared/services/decorateWithTableRowSelection.js"></script>
+    <script src="scripts/shared/services/statsService.js"></script>
+    <script src="scripts/shared/services/underscoreService.js"></script>
+    <script src="scripts/shared/services/formNavigatorService.js"></script>
+    <script src="scripts/shared/services/videoService.js"></script>
+    <script src="scripts/shared/services/regexService.js"></script>
+    <script src="scripts/shared/services/schedulingHelperService.js"></script>
+    <script src="scripts/shared/services/eventHelperService.js"></script>
+    <script src="scripts/shared/services/hotkeysService.js"></script>
+    <script src="scripts/shared/services/restServiceMonitor.js"></script>
+    <script src="scripts/shared/resources/resources.js"></script>
+    <script src="scripts/shared/resources/identityResource.js"></script>
+    <script src="scripts/shared/resources/versionResource.js"></script>
+    <script src="scripts/shared/resources/eventsResource.js"></script>
+    <script src="scripts/shared/resources/optoutsResource.js"></script>
+    <script src="scripts/shared/resources/optoutSingleResource.js"></script>
+    <script src="scripts/shared/resources/seriesResource.js"></script>
+    <script src="scripts/shared/resources/seriesAccessResource.js"></script>
+    <script src="scripts/shared/resources/seriesMetadataResource.js"></script>
+    <script src="scripts/shared/resources/seriesParticipationResource.js"></script>
+    <script src="scripts/shared/resources/seriesEventsResource.js"></script>
+    <script src="scripts/shared/resources/seriesHasEventsResource.js"></script>
+    <script src="scripts/shared/resources/seriesConfigurationResource.js"></script>
+    <script src="scripts/shared/resources/seriesThemeResource.js"></script>
+    <script src="scripts/shared/resources/eventMetadataResource.js"></script>
+    <script src="scripts/shared/resources/eventUploadAssetResource.js"></script>
+    <script src="scripts/shared/resources/newEventMetadataResource.js"></script>
+    <script src="scripts/shared/resources/newEventProcessingResource.js"></script>
+    <script src="scripts/shared/resources/newEventResource.js"></script>
+    <script src="scripts/shared/resources/newSeriesMetadataResource.js"></script>
+    <script src="scripts/shared/resources/newSeriesThemeResource.js"></script>
+    <script src="scripts/shared/resources/conflictCheckResource.js"></script>
+    <script src="scripts/shared/resources/bulkDeleteResource.js"></script>
+    <script src="scripts/shared/resources/eventAssetMediaResource.js"></script>
+    <script src="scripts/shared/resources/eventAttachmentDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventMediaDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventCatalogDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventParticipationResource.js"></script>
+    <script src="scripts/shared/resources/eventPublicationDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventAssetPublicationsResource.js"></script>
+    <script src="scripts/shared/resources/eventSchedulingResource.js"></script>
+    <script src="scripts/shared/resources/eventsSchedulingResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowPropertiesResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowsResource.js"></script>
+    <script src="scripts/shared/resources/eventTransactionResource.js"></script>
+    <script src="scripts/shared/resources/eventErrorsResource.js"></script>
+    <script src="scripts/shared/resources/eventErrorDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowOperationsResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowOperationDetailsResource.js"></script>
+    <script src="scripts/shared/resources/eventWorkflowActionResource.js"></script>
+    <script src="scripts/shared/resources/eventAssetAttachmentsResource.js"></script>
+    <script src="scripts/shared/resources/eventAssetCatalogsResource.js"></script>
+    <script src="scripts/shared/resources/eventAssetsResource.js"></script>
+    <script src="scripts/shared/resources/eventAccessResource.js"></script>
+    <script src="scripts/shared/resources/eventPublicationsResource.js"></script>
+    <script src="scripts/shared/resources/eventHasSnapshotsResource.js"></script>
+    <script src="scripts/shared/resources/eventBulkEditResource.js"></script>
+    <script src="scripts/shared/resources/toolsResource.js"></script>
+    <script src="scripts/shared/resources/commentResource.js"></script>
+    <script src="scripts/shared/resources/usersResource.js"></script>
+    <script src="scripts/shared/resources/userResource.js"></script>
+    <script src="scripts/shared/resources/groupsResource.js"></script>
+    <script src="scripts/shared/resources/groupResource.js"></script>
+    <script src="scripts/shared/resources/aclsResource.js"></script>
+    <script src="scripts/shared/resources/aclResource.js"></script>
+    <script src="scripts/shared/resources/captureAgentResource.js"></script>
+    <script src="scripts/shared/resources/captureAgentsResource.js"></script>
+    <script src="scripts/shared/resources/userRolesResource.js"></script>
+    <script src="scripts/shared/resources/serversResource.js"></script>
+    <script src="scripts/shared/resources/servicesResource.js"></script>
+    <script src="scripts/shared/resources/serviceResource.js"></script>
+    <script src="scripts/shared/resources/jobsResource.js"></script>
+    <script src="scripts/shared/resources/resourcesFilterResource.js"></script>
+    <script src="scripts/shared/resources/resourcesListResource.js"></script>
+    <script src="scripts/shared/resources/workflowsResource.js"></script>
+    <script src="scripts/shared/resources/blacklistsResource.js"></script>
+    <script src="scripts/shared/resources/blacklistCountResource.js"></script>
+    <script src="scripts/shared/resources/themesResource.js"></script>
+    <script src="scripts/shared/resources/newThemeResource.js"></script>
+    <script src="scripts/shared/resources/signatureResource.js"></script>
+    <script src="scripts/shared/resources/taskResource.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/access.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/metadata.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/metadataExtended.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/processing.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/source.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/summary.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/states.js"></script>
+    <script src="scripts/shared/services/wizards/new-event/uploadAssetNewEvent.js"></script>
+    <script src="scripts/shared/services/wizards/new-group/summary.js"></script>
+    <script src="scripts/shared/services/wizards/new-group/users.js"></script>
+    <script src="scripts/shared/services/wizards/new-group/roles.js"></script>
+    <script src="scripts/shared/services/wizards/new-group/states.js"></script>
+    <script src="scripts/shared/services/wizards/new-group/metadata.js"></script>
+    <script src="scripts/shared/services/wizards/userblacklist/states.js"></script>
+    <script src="scripts/shared/services/wizards/userblacklist/items.js"></script>
+    <script src="scripts/shared/services/wizards/userblacklist/dates.js"></script>
+    <script src="scripts/shared/services/wizards/userblacklist/reason.js"></script>
+    <script src="scripts/shared/services/wizards/userblacklist/summary.js"></script>
+    <script src="scripts/shared/services/wizards/locationblacklist/states.js"></script>
+    <script src="scripts/shared/services/wizards/locationblacklist/items.js"></script>
+    <script src="scripts/shared/services/wizards/locationblacklist/dates.js"></script>
+    <script src="scripts/shared/services/wizards/locationblacklist/reason.js"></script>
+    <script src="scripts/shared/services/wizards/locationblacklist/summary.js"></script>
+    <script src="scripts/shared/services/wizards/bulk-message/states.js"></script>
+    <script src="scripts/shared/services/wizards/bulk-message/recipients.js"></script>
+    <script src="scripts/shared/services/wizards/bulk-message/message.js"></script>
+    <script src="scripts/shared/services/wizards/bulk-message/summary.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/access.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/metadata.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/metadataExtended.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/theme.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/states.js"></script>
+    <script src="scripts/shared/services/wizards/new-series/summary.js"></script>
+    <script src="scripts/shared/services/wizards/new-acl/access.js"></script>
+    <script src="scripts/shared/services/wizards/new-acl/metadata.js"></script>
+    <script src="scripts/shared/services/wizards/new-acl/states.js"></script>
+    <script src="scripts/shared/services/wizards/new-acl/summary.js"></script>
+    <script src="scripts/shared/services/playerAdapterRepository.js"></script>
+    <script src="scripts/shared/services/playerAdapterFactoryDefault.js"></script>
+    <script src="scripts/shared/services/playerAdapterFactoryHtml5.js"></script>
+    <script src="scripts/shared/services/playerAdapterFactoryVideoJs.js"></script>
+    <script src="scripts/shared/services/playerAdapter.js"></script>
+    <script src="scripts/shared/services/httpInterceptor.js"></script>
+    <script src="scripts/shared/filters/filters.js"></script>
+    <script src="scripts/shared/filters/localizeDateFilter.js"></script>
+    <script src="scripts/shared/filters/addLeadingZerosFilter.js"></script>
+    <script src="scripts/shared/filters/humanByteSizeFilter.js"></script>
+    <script src="scripts/shared/filters/humanDurationFilter.js"></script>
+    <script src="scripts/shared/filters/arrayFilter.js"></script>
+    <script src="scripts/shared/filters/removeQueryParams.js"></script>
+    <script src="scripts/shared/filters/translateOverrideFallbackFilter.js"></script>
+    <script src="scripts/shared/filters/trustedResourceUrlFilter.js"></script>
+    <script src="scripts/shared/directives/directives.js"></script>
+    <script src="scripts/shared/directives/customIcon.js"></script>
+    <script src="scripts/shared/directives/datepickerDirective.js"></script>
+    <script src="scripts/shared/directives/datetimepickerDirective.js"></script>
+    <script src="scripts/shared/directives/focushere.js"></script>
+    <script src="scripts/shared/directives/oldDropdownDirective.js"></script>
+    <script src="scripts/shared/directives/passwordCheckDirective.js"></script>
+    <script src="scripts/shared/directives/selectBoxDirective.js"></script>
+    <script src="scripts/shared/directives/navDirective.js"></script>
+    <script src="scripts/shared/directives/tableDirective.js"></script>
+    <script src="scripts/shared/directives/statsDirective.js"></script>
+    <script src="scripts/shared/directives/confirmationModalDirective.js"></script>
+    <script src="scripts/shared/directives/deleteSingleSeriesModalDirective.js"></script>
+    <script src="scripts/shared/directives/resourceModalDirective.js"></script>
+    <script src="scripts/shared/directives/editableDirective.js"></script>
+    <script src="scripts/shared/directives/editableBooleanValueDirective.js"></script>
+    <script src="scripts/shared/directives/editableDateValueDirective.js"></script>
+    <script src="scripts/shared/directives/editableSingleValueDirective.js"></script>
+    <script src="scripts/shared/directives/editableMultiValueDirective.js"></script>
+    <script src="scripts/shared/directives/editableSingleSelectDirective.js"></script>
+    <script src="scripts/shared/directives/editableMultiSelectDirective.js"></script>
+    <script src="scripts/shared/directives/fileDirective.js"></script>
+    <script src="scripts/shared/directives/timelineDirective.js"></script>
+    <script src="scripts/shared/directives/segmentsDirective.js"></script>
+    <script src="scripts/shared/directives/playerDirective.js"></script>
+    <script src="scripts/shared/directives/hrefRoleDirective.js"></script>
+    <script src="scripts/shared/directives/tableFilterDirective.js"></script>
+    <script src="scripts/shared/directives/notificationsDirective.js"></script>
+    <script src="scripts/shared/directives/notificationDirective.js"></script>
+    <script src="scripts/shared/directives/wizardDirective.js"></script>
+    <script src="scripts/shared/directives/withRoleDirective.js"></script>
+    <script src="scripts/shared/directives/fileuploadDirective.js"></script>
+    <script src="scripts/shared/directives/popOverDirective.js"></script>
+    <script src="scripts/shared/directives/preSelectFromDirective.js"></script>
+    <script src="scripts/shared/directives/loadingScrollerDirective.js"></script>
+    <script src="scripts/shared/directives/opencastScrollGlue.js"></script>
+    <script src="scripts/shared/directives/uploadAssetDirective.js"></script>
+    <script src="scripts/shared/services/resourceModalService.js"></script>
+    <script src="scripts/shared/services/confirmationModalService.js"></script>
+    <script src="scripts/shared/services/deleteSingleSeriesModalService.js"></script>
+    <script src="scripts/shared/services/uploadAssetOptionsService.js"></script>
+    <script src="scripts/shared/controllers/controllers.js"></script>
+    <script src="scripts/shared/controllers/navigationController.js"></script>
+    <script src="scripts/shared/controllers/applicationController.js"></script>
+    <script src="scripts/shared/controllers/applicationController.js"></script>
+    <script src="scripts/shared/controllers/userPreferencesController.js"></script>
+    <script src="scripts/shared/controllers/tablePreferencesController.js"></script>
+    <script src="scripts/shared/controllers/hotkeyCheatSheetController.js"></script>
+    <script src="scripts/modules/events/controllers/eventsController.js"></script>
+    <script src="scripts/modules/events/controllers/eventController.js"></script>
+    <script src="scripts/modules/events/controllers/editStatusController.js"></script>
+    <script src="scripts/modules/events/controllers/editEventsController.js"></script>
+    <script src="scripts/modules/events/controllers/newEventController.js"></script>
+    <script src="scripts/modules/events/controllers/newSeriesController.js"></script>
+    <script src="scripts/modules/events/controllers/seriesController.js"></script>
+    <script src="scripts/modules/events/controllers/serieController.js"></script>
+    <script src="scripts/modules/events/controllers/bulkMessageController.js"></script>
+    <script src="scripts/modules/events/controllers/bulkDeleteController.js"></script>
+    <script src="scripts/modules/events/controllers/retractEventController.js"></script>
+    <script src="scripts/modules/events/controllers/scheduleTaskController.js"></script>
+    <script src="scripts/modules/events/subresources/controllers/toolsController.js"></script>
+    <script src="scripts/modules/events/subresources/controllers/video/editController.js"></script>
+    <script src="scripts/modules/events/validators/taskStartableValidator.js"></script>
+    <script src="scripts/modules/events/validators/notEmptySelectionValidator.js"></script>
+    <script src="scripts/modules/events/validators/schedulingAuthorizedValidator.js"></script>
+    <script src="scripts/modules/recordings/controllers/recordingController.js"></script>
+    <script src="scripts/modules/recordings/controllers/recordingsController.js"></script>
+    <script src="scripts/modules/recordings/controllers/locationblacklistsController.js"></script>
+    <script src="scripts/modules/recordings/controllers/locationblacklistController.js"></script>
+    <script src="scripts/modules/users/controllers/usersController.js"></script>
+    <script src="scripts/modules/users/controllers/userController.js"></script>
+    <script src="scripts/modules/users/controllers/groupsController.js"></script>
+    <script src="scripts/modules/users/controllers/groupController.js"></script>
+    <script src="scripts/modules/users/controllers/newGroupController.js"></script>
+    <script src="scripts/modules/users/controllers/newAclController.js"></script>
+    <script src="scripts/modules/users/controllers/aclController.js"></script>
+    <script src="scripts/modules/users/controllers/aclsController.js"></script>
+    <script src="scripts/modules/users/controllers/userblacklistsController.js"></script>
+    <script src="scripts/modules/users/controllers/userblacklistController.js"></script>
+    <script src="scripts/modules/login/controllers/loginController.js"></script>
+    <script src="scripts/modules/systems/controllers/serversController.js"></script>
+    <script src="scripts/modules/systems/controllers/jobsController.js"></script>
+    <script src="scripts/modules/systems/controllers/servicesController.js"></script>
+    <script src="scripts/modules/dashboard/controllers/dashboardController.js"></script>
+    <script src="scripts/modules/configuration/controllers/themesController.js"></script>
+    <script src="scripts/modules/configuration/controllers/themeFormController.js"></script>
+    <script src="scripts/modules/configuration/validators/uniqueThemeName.js"></script>
+    <!-- endbuild -->
+    <script ng-if="feedbackUrl" type="text/javascript" ng-src="{{ feedbackUrl | trusted }}"></script>
+    <script ng-if="feedbackUrl" type="text/javascript">
+      window.ATL_JQ_PAGE_PROPS =  {
+        "triggerFunction": function(showCollectorDialog) {
+          //Requires that jQuery is available!
+          jQuery("#feedback-btn").click(function(e) {
+            e.preventDefault();
+            showCollectorDialog();
+          });
+        }};
+    </script>
+    <!-- <script src="modules/configuration/controllers/emailtemplatesController.js"></script> -->
+    <!-- <script src="modules/configuration/controllers/emailtemplateController.js"></script> -->
+    <!-- <script src="shared/resources/emailTemplateResource.js"></script> -->
+    <!-- <script src="shared/resources/emailResource.js"></script> -->
+    <!-- <script src="shared/services/wizards/emailtemplate/states.js"></script> -->
+    <!-- <script src="shared/services/wizards/emailtemplate/message.js"></script> -->
+    <!-- <script src="shared/services/wizards/emailtemplate/summary.js"></script> -->
+  </body>
 </html>

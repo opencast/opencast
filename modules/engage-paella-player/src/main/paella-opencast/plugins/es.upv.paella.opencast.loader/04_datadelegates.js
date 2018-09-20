@@ -1,3 +1,23 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
 
 class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
   constructor() {
@@ -6,7 +26,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
 
   read(context,params,onSuccess) {
     var episodeId = params.id;
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/' + context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if (!(annotations instanceof Array)) { annotations = [annotations]; }
@@ -34,9 +54,9 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
   write(context,params,value,onSuccess) {
     var thisClass = this;
     var episodeId = params.id;
-    if (typeof(value)=='object') value = JSON.stringify(value);
+    if (typeof(value) == 'object') value = JSON.stringify(value);
 
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/' + context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if (annotations == undefined) {annotations = [];}
@@ -56,7 +76,7 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
         }
         else if (annotations.length == 1 ) {
           var annotationId = annotations[0].annotationId;
-          paella.ajax.put({ url: '/annotation/'+ annotationId, params: { value: value }},
+          paella.ajax.put({ url: '/annotation/' + annotationId, params: { value: value }},
             function(data, contentType, returnCode) { onSuccess({}, true); },
             function(data, contentType, returnCode) { onSuccess({}, false); }
           );
@@ -79,15 +99,15 @@ class MHAnnotationServiceDefaultDataDelegate extends paella.DataDelegate {
   remove(context,params,onSuccess) {
     var episodeId = params.id;
 
-    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/'+context}},
+    paella.ajax.get({url: '/annotation/annotations.json', params: {episode: episodeId, type: 'paella/' + context}},
       function(data, contentType, returnCode) {
         var annotations = data.annotations.annotation;
         if(annotations) {
           if (!(annotations instanceof Array)) { annotations = [annotations]; }
           var asyncLoader = new paella.AsyncLoader();
-          for ( var i=0; i< annotations.length; ++i) {
+          for (var i = 0; i < annotations.length; ++i) {
             var annotationId = data.annotations.annotation.annotationId;
-            asyncLoader.addCallback(new paella.JSONCallback({url:'/annotation/'+annotationId}, 'DELETE'));
+            asyncLoader.addCallback(new paella.JSONCallback({url:'/annotation/' + annotationId}, 'DELETE'));
           }
           asyncLoader.load(function(){ if (onSuccess) { onSuccess({}, true); } }, function() { onSuccess({}, false); });
         }
@@ -191,14 +211,14 @@ class OpencastTrackCameraDataDelegate extends paella.DataDelegate {
     if (trackhdUrl) {
       paella.utils.ajax.get({ url:trackhdUrl },
         (data) => {
-          if (typeof(data)=='string') {
+          if (typeof(data) == 'string') {
             try {
               data = JSON.parse(data);
             }
             catch(err) {/**/}
           }
           data.positions.sort((a,b) => {
-            return a.time-b.time;
+            return a.time - b.time;
           });
           onSuccess(data);
         },

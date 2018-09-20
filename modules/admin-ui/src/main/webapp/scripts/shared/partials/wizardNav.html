@@ -1,9 +1,9 @@
 <div>
-    <nav class="step-by-step steps-{{getEnabledSteps().length}}">
-        <a ng-repeat="step in getEnabledSteps()"
-           ng-class="{'not-complete': !step.completed && !step.selected, active: step.selected}" ng-click="goTo(step)">
-            {{step.title || step.wzTitle}}
-        </a>
-    </nav>
-    <div class="steps" ng-transclude></div>
+  <nav class="step-by-step steps-{{getEnabledSteps().length}}">
+    <a ng-repeat="step in getEnabledSteps()"
+       ng-class="{'not-complete': !step.completed && !step.selected, active: step.selected}" ng-click="goTo(step)">
+      {{step.title || step.wzTitle}}
+    </a>
+  </nav>
+  <div class="steps" ng-transclude></div>
 </div>

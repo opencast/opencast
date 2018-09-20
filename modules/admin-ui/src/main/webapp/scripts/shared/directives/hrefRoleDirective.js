@@ -31,21 +31,21 @@
  */
 angular.module('adminNg.directives')
 .directive('adminNgHrefRole', ['AuthService', function (AuthService) {
-    return {
-        scope: {
-            rolesHref: '@adminNgHrefRole'
-        },
-        link: function ($scope, element) {
-            var href;
-            angular.forEach($scope.$eval($scope.rolesHref), function(value, key) {
-                if (AuthService.userIsAuthorizedAs(key) && angular.isUndefined(href)) {
-                    href = value;
-                }
-            });
-
-            if (angular.isDefined(href)) {
-                element.attr('href', href);
-            }
+  return {
+    scope: {
+      rolesHref: '@adminNgHrefRole'
+    },
+    link: function ($scope, element) {
+      var href;
+      angular.forEach($scope.$eval($scope.rolesHref), function(value, key) {
+        if (AuthService.userIsAuthorizedAs(key) && angular.isUndefined(href)) {
+          href = value;
         }
-    };
+      });
+
+      if (angular.isDefined(href)) {
+        element.attr('href', href);
+      }
+    }
+  };
 }]);

@@ -22,20 +22,20 @@
 
 angular.module('adminNg.filters')
 .filter('localizeDate', ['Language', function (Language) {
-    return function (input, type, format) {
-        if (angular.isUndefined(format)) {
-            format = 'short';
-        }
+  return function (input, type, format) {
+    if (angular.isUndefined(format)) {
+      format = 'short';
+    }
 
-        switch (type) {
-            case 'date':
-                return Language.formatDate(format, input);
-            case 'dateTime':
-                return Language.formatDateTime(format, input);
-            case 'time':
-                return Language.formatTime(format, input);
-            default:
-                return input;
-        }
-    };
+    switch (type) {
+    case 'date':
+      return Language.formatDate(format, input);
+    case 'dateTime':
+      return Language.formatDateTime(format, input);
+    case 'time':
+      return Language.formatTime(format, input);
+    default:
+      return input;
+    }
+  };
 }]);

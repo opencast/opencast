@@ -337,6 +337,20 @@
                   </arguments>
                 </configuration>
               </execution>
+              <execution>
+                <id>esline</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>eslint</argument>
+                  </arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
@@ -379,6 +393,16 @@
                 </goals>
                 <configuration>
                   <arguments>build --skipTests=${skipTests}</arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <phase>test</phase>
+                <id>eslint</id>
+                <goals>
+                  <goal>npm</goal>
+                </goals>
+                <configuration>
+                  <arguments>run eslint</arguments>
                 </configuration>
               </execution>
             </executions>

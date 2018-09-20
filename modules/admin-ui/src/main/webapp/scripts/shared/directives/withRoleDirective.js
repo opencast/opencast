@@ -31,16 +31,16 @@
  */
 angular.module('adminNg.directives')
 .directive('withRole', ['AuthService', function (AuthService) {
-    return {
-        priority: 1000,
-        link: function ($scope, element, attr) {
-            element.addClass('hide');
+  return {
+    priority: 1000,
+    link: function ($scope, element, attr) {
+      element.addClass('hide');
 
-            AuthService.userIsAuthorizedAs(attr.withRole, function () {
-                element.removeClass('hide');
-            }, function () {
-                element.remove();
-            });
-        }
-    };
+      AuthService.userIsAuthorizedAs(attr.withRole, function () {
+        element.removeClass('hide');
+      }, function () {
+        element.remove();
+      });
+    }
+  };
 }]);

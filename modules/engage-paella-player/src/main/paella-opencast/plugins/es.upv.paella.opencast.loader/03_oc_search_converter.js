@@ -1,3 +1,23 @@
+/**
+ * Licensed to The Apereo Foundation under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ *
+ * The Apereo Foundation licenses this file to you under the Educational
+ * Community License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License
+ * at:
+ *
+ *   http://opensource.org/licenses/ecl2.txt
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ */
 class OpencastToPaellaConverter {
 
   constructor() {
@@ -76,7 +96,7 @@ class OpencastToPaellaConverter {
       src:  src,
       mimetype: track.mimetype,
       res: {w:res[0], h:res[1]},
-      isLiveStream: (track.live===true)
+      isLiveStream: (track.live === true)
     };
 
     return source;
@@ -104,7 +124,7 @@ class OpencastToPaellaConverter {
     });
 
     // Read the attachments
-    var duration = parseInt(episode.mediapackage.duration/1000);
+    var duration = parseInt(episode.mediapackage.duration / 1000);
     var imageSource =   {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:320, h:180}};
     var imageSourceHD = {type:'image/jpeg', frames:{}, count:0, duration: duration, res:{w:1280, h:720}};
     attachments.forEach((currentAttachment) => {
@@ -113,15 +133,15 @@ class OpencastToPaellaConverter {
       }
       else if (currentAttachment.type == `${mainFlavour}/segment+preview+hires`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
-          time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
-          imageSourceHD.frames['frame_'+time] = currentAttachment.url;
+          time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
+          imageSourceHD.frames['frame_' + time] = currentAttachment.url;
           imageSourceHD.count = imageSourceHD.count + 1;
         }
       }
       else if (currentAttachment.type == `${mainFlavour}/segment+preview`) {
         if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
-          var time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
-          imageSource.frames['frame_'+time] = currentAttachment.url;
+          var time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
+          imageSource.frames['frame_' + time] = currentAttachment.url;
           imageSource.count = imageSource.count + 1;
         }
       }
@@ -203,7 +223,8 @@ class OpencastToPaellaConverter {
             });
           }
 
-          let captions_label = captions_lang || 'unknown language'; //base.dictionary.translate("CAPTIONS_" + captions_lang);
+          let captions_label = captions_lang || 'unknown language';
+          //base.dictionary.translate("CAPTIONS_" + captions_lang);
 
           captions.push({
             id: currentAttachment.id,
@@ -265,19 +286,31 @@ class OpencastToPaellaConverter {
       try {
         if (currentAttachment.type == 'presentation/segment+preview+hires') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
-            time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
+            time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
 
             if (!(opencastFrameList[time])){
-              opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
+              opencastFrameList[time] = {
+                id: 'frame_' + time,
+                mimetype: currentAttachment.mimetype,
+                time: time,
+                url: currentAttachment.url,
+                thumb: currentAttachment.url
+              };
             }
             opencastFrameList[time].url = currentAttachment.url;
           }
         }
         else if (currentAttachment.type == 'presentation/segment+preview') {
           if (/time=T(\d+):(\d+):(\d+)/.test(currentAttachment.ref)) {
-            var time = parseInt(RegExp.$1)*60*60 + parseInt(RegExp.$2)*60 + parseInt(RegExp.$3);
+            var time = parseInt(RegExp.$1) * 60 * 60 + parseInt(RegExp.$2) * 60 + parseInt(RegExp.$3);
             if (!(opencastFrameList[time])){
-              opencastFrameList[time] = {id:'frame_'+time, mimetype:currentAttachment.mimetype, time:time, url:currentAttachment.url, thumb:currentAttachment.url};
+              opencastFrameList[time] = {
+                id: 'frame_' + time,
+                mimetype: currentAttachment.mimetype,
+                time: time,
+                url: currentAttachment.url,
+                thumb: currentAttachment.url
+              };
             }
             opencastFrameList[time].thumb = currentAttachment.url;
           }
@@ -301,7 +334,7 @@ class OpencastToPaellaConverter {
     var data =  {
       metadata: {
         title: episode.mediapackage.title,
-        duration: episode.mediapackage.duration/1000
+        duration: episode.mediapackage.duration / 1000
       },
       streams: streams,
       frameList: segments,

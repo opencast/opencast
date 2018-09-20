@@ -22,54 +22,54 @@
 
 // Controller for all recordings screens.
 angular.module('adminNg.controllers')
-.controller('RecordingsCtrl', ['$scope', 'Table', 'CaptureAgentsResource', 'ResourcesFilterResource', 'Notifications', 'Modal',
-    function ($scope, Table, CaptureAgentsResource, ResourcesFilterResource, Notifications, Modal) {
+.controller('RecordingsCtrl', ['$scope', 'Table', 'CaptureAgentsResource', 'ResourcesFilterResource', 'Notifications',
+  'Modal', function ($scope, Table, CaptureAgentsResource, ResourcesFilterResource, Notifications, Modal) {
 
-        $scope.table = Table;
-        $scope.table.configure({
-            columns: [{
-                name:  'status',
-                template: 'modules/recordings/partials/recordingStatusCell.html',
-                label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
-                translate: true
-            }, {
-                template: 'modules/recordings/partials/recordingsNameCell.html',
-                name:  'name',
-                label: 'RECORDINGS.RECORDINGS.TABLE.NAME'
-            }, {
-                name:  'updated',
-                label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED'
-            //}, {
-            //    name:  'blacklist_from',
-            //    label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
-            //}, {
-            //    name:  'blacklist_to',
-            //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
-            }, {
-                template: 'modules/recordings/partials/recordingActionsCell.html',
-                label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
-                dontSort: true
-            }],
-            caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
-            resource:   'recordings',
-            category:   'recordings',
-            apiService: CaptureAgentsResource
-        });
+    $scope.table = Table;
+    $scope.table.configure({
+      columns: [{
+        name:  'status',
+        template: 'modules/recordings/partials/recordingStatusCell.html',
+        label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
+        translate: true
+      }, {
+        template: 'modules/recordings/partials/recordingsNameCell.html',
+        name:  'name',
+        label: 'RECORDINGS.RECORDINGS.TABLE.NAME'
+      }, {
+        name:  'updated',
+        label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED'
+        //}, {
+        //    name:  'blacklist_from',
+        //    label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
+        //}, {
+        //    name:  'blacklist_to',
+        //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
+      }, {
+        template: 'modules/recordings/partials/recordingActionsCell.html',
+        label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
+        dontSort: true
+      }],
+      caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
+      resource:   'recordings',
+      category:   'recordings',
+      apiService: CaptureAgentsResource
+    });
 
-        $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
+    $scope.filters = ResourcesFilterResource.get({ resource: $scope.table.resource });
 
-        $scope.table.delete = function (row) {
-            CaptureAgentsResource.delete({target: row.name}, function () {
-                Table.fetch();
-                Modal.$scope.close();
-                Notifications.add('success', 'LOCATION_DELETED');
-            }, function (error) {
-                if (error.status === 401) {
-                    Notifications.add('error', 'LOCATION_NOT_DELETED_NOT_AUTHORIZED');
-                } else {
-                    Notifications.add('error', 'LOCATION_NOT_DELETED');
-                }
-            });
-        };
-    }
+    $scope.table.delete = function (row) {
+      CaptureAgentsResource.delete({target: row.name}, function () {
+        Table.fetch();
+        Modal.$scope.close();
+        Notifications.add('success', 'LOCATION_DELETED');
+      }, function (error) {
+        if (error.status === 401) {
+          Notifications.add('error', 'LOCATION_NOT_DELETED_NOT_AUTHORIZED');
+        } else {
+          Notifications.add('error', 'LOCATION_NOT_DELETED');
+        }
+      });
+    };
+  }
 ]);

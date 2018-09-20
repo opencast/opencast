@@ -22,7 +22,7 @@
 
 angular.module('adminNg.resources')
 .factory('SeriesConfigurationResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/series/configuration.json', { }, {
-        get: { method: 'GET' }
-    });
+  return $resource('/admin-ng/series/configuration.json', { }, {
+    get: { method: 'GET' }
+  });
 }]);

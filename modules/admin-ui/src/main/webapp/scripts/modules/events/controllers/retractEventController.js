@@ -23,14 +23,14 @@
 // Controller for retracting a single event that has been published
 angular.module('adminNg.controllers')
 .controller('RetractEventCtrl', ['$scope', 'NewEventProcessing', 'TaskResource', 'Notifications',
-function ($scope, NewEventProcessing, TaskResource, Notifications) {
+  function ($scope, NewEventProcessing, TaskResource, Notifications) {
     var onSuccess, onFailure;
 
     $scope.currentForm = 'generalForm';
     $scope.processing = NewEventProcessing.get('delete-event');
     $scope.$valid = false;
     $scope.valid = function () {
-        $scope.$valid = angular.isDefined($scope.processing.ud.workflow.id);
+      $scope.$valid = angular.isDefined($scope.processing.ud.workflow.id);
     };
 
     $scope.getSubmitButtonState = function() {
@@ -38,27 +38,27 @@ function ($scope, NewEventProcessing, TaskResource, Notifications) {
     };
 
     onSuccess = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('success', 'TASK_CREATED');
+      $scope.submitButton = false;
+      $scope.close();
+      Notifications.add('success', 'TASK_CREATED');
     };
 
     onFailure = function () {
-        $scope.submitButton = false;
-        $scope.close();
-        Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
+      $scope.submitButton = false;
+      $scope.close();
+      Notifications.add('error', 'TASK_NOT_CREATED', 'global', -1);
     };
 
     $scope.submitButton = false;
     $scope.submit = function () {
-        $scope.submitButton = true;
-        var finalConfiguration = {};
-        var eventId = $scope.$parent.resourceId;
-        finalConfiguration[eventId] = $scope.processing.ud.workflow.selection.configuration;
-        var payload = {
-            workflow: $scope.processing.ud.workflow.id,
-            configuration: finalConfiguration
-        };
-        TaskResource.save(payload, onSuccess, onFailure);
+      $scope.submitButton = true;
+      var finalConfiguration = {};
+      var eventId = $scope.$parent.resourceId;
+      finalConfiguration[eventId] = $scope.processing.ud.workflow.selection.configuration;
+      var payload = {
+        workflow: $scope.processing.ud.workflow.id,
+        configuration: finalConfiguration
+      };
+      TaskResource.save(payload, onSuccess, onFailure);
     };
-}]);
+  }]);

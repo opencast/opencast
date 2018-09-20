@@ -22,7 +22,7 @@
 
 angular.module('adminNg.services')
 .factory('HotkeysService', ['$q', 'IdentityResource', 'hotkeys',
-        function ($q, IdentityResource, hotkeys) {
+  function ($q, IdentityResource, hotkeys) {
     var HotkeysService = function () {
       var me = this,
           identity,
@@ -38,8 +38,8 @@ angular.module('adminNg.services')
             if (info && info.org && info.org.properties && info.org.properties) {
               var properties = info.org.properties;
               angular.forEach(Object.keys(properties), function (key) {
-                if (key.indexOf("admin.shortcut.") >= 0) {
-                  var keyIdentifier = key.substring("admin.shortcut.".length),
+                if (key.indexOf('admin.shortcut.') >= 0) {
+                  var keyIdentifier = key.substring('admin.shortcut.'.length),
                       value = properties[key];
                   me.keyBindings[keyIdentifier] = value;
                 }
@@ -67,7 +67,7 @@ angular.module('adminNg.services')
             });
           }
         });
-      };
+      }
 
       this.activateHotkey = function (scope, keyIdentifier, callback) {
         activateHotkey(hotkeys.bindTo(scope), keyIdentifier, callback);
@@ -81,4 +81,4 @@ angular.module('adminNg.services')
     };
 
     return new HotkeysService();
-}]);
+  }]);

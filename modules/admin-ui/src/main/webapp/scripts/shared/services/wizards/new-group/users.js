@@ -21,45 +21,46 @@
 'use strict';
 
 angular.module('adminNg.services')
-.factory('NewGroupUsers', ['AuthService', 'ResourcesListResource', '$location', function (AuthService, ResourcesListResource) {
+.factory('NewGroupUsers', ['AuthService', 'ResourcesListResource', '$location',
+  function (AuthService, ResourcesListResource) {
     var Users = function () {
-        var me = this;
+      var me = this;
 
-        var listName = AuthService.getUser().$promise.then(function (current_user) {
-            return angular.isDefined(current_user)
+      var listName = AuthService.getUser().$promise.then(function (current_user) {
+        return angular.isDefined(current_user)
                 && angular.isDefined(current_user.org)
                 && angular.isDefined(current_user.org.properties) ?
-                current_user.org.properties['adminui.user.listname'] : undefined;
+          current_user.org.properties['adminui.user.listname'] : undefined;
+      });
+
+      this.reset = function () {
+        me.users = {
+          available: [],
+          selected:  [],
+          i18n: 'USERS.GROUPS.DETAILS.USERS',
+          searchable: true
+        };
+        listName.then(function (listName) {
+          me.users.available = ResourcesListResource.query({ resource: listName || 'USERS.INVERSE.WITH.USERNAME'});
+        });
+      };
+
+      this.reset();
+
+      this.isValid = function () {
+        return true;
+      };
+
+      this.getUsersList = function () {
+        var list = '';
+
+        angular.forEach(me.users.selected, function (user, index) {
+          list += user.name + ((index + 1) === me.users.selected.length ? '' : ', ');
         });
 
-        this.reset = function () {
-            me.users = {
-                available: [],
-                selected:  [],
-                i18n: 'USERS.GROUPS.DETAILS.USERS',
-                searchable: true
-            };
-            listName.then(function (listName) {
-                me.users.available = ResourcesListResource.query({ resource: listName || 'USERS.INVERSE.WITH.USERNAME'});
-            });
-        };
-
-        this.reset();
-
-        this.isValid = function () {
-            return true;
-        };
-
-        this.getUsersList = function () {
-            var list = '';
-
-            angular.forEach(me.users.selected, function (user, index) {
-                list += user.name + ((index + 1) === me.users.selected.length ? '' : ', ');
-            });
-
-            return list;
-        };
+        return list;
+      };
     };
 
     return new Users();
-}]);
+  }]);

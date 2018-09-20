@@ -21,125 +21,131 @@
 'use strict';
 
 angular.module('adminNg.controllers')
-.controller('GroupCtrl', ['$scope', 'AuthService', 'UserRolesResource', 'ResourcesListResource', 'GroupResource', 'GroupsResource', 'Notifications', 'Modal',
-    function ($scope, AuthService, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources, Notifications, Modal) {
+.controller('GroupCtrl', ['$scope', 'AuthService', 'UserRolesResource', 'ResourcesListResource', 'GroupResource',
+  'GroupsResource', 'Notifications', 'Modal',
+  function ($scope, AuthService, UserRolesResource, ResourcesListResource, GroupResource, GroupsResources,
+    Notifications, Modal) {
 
-        var reloadSelectedUsers = function () {
-            $scope.group.$promise.then(function() {
-                $scope.user.all.$promise.then(function() {
-                    // Now that we have the user users and the group users populate the selected and available
-                    $scope.user.selected = $scope.user.all.filter(function (user) {
-                        var foundUser = $scope.group.users.find(function (groupUser) {
-                            return groupUser.username === user.value;
-                        });
-                        return foundUser !== undefined;
-                    });
-                    $scope.user.available = $scope.user.all.filter(function (user) {
-                        var foundUser = $scope.user.selected.find(function (selectedUser) {
-                            return selectedUser.value === user.value;
-                        });
-                        return foundUser === undefined;
-                    });
-                });
+    var reloadSelectedUsers = function () {
+      $scope.group.$promise.then(function() {
+        $scope.user.all.$promise.then(function() {
+          // Now that we have the user users and the group users populate the selected and available
+          $scope.user.selected = $scope.user.all.filter(function (user) {
+            var foundUser = $scope.group.users.find(function (groupUser) {
+              return groupUser.username === user.value;
             });
-        };
-
-        var reloadSelectedRoles = function () {
-            $scope.group.$promise.then(function() {
-                $scope.role.available.$promise.then(function() {
-                    // Now that we have the user roles and the available roles populate the selected and available
-                    $scope.role.selected = [];
-                    angular.forEach($scope.group.roles, function (role) {
-                        $scope.role.selected.push({name: role, value: role});
-                    });
-                    // Filter the selected from the available list
-                    $scope.role.available = _.filter($scope.role.available, function(role) {
-                        return !_.findWhere($scope.role.selected, {name: role.name});
-                    });
-                });
+            return foundUser !== undefined;
+          });
+          $scope.user.available = $scope.user.all.filter(function (user) {
+            var foundUser = $scope.user.selected.find(function (selectedUser) {
+              return selectedUser.value === user.value;
             });
-        };
-
-        var reloadRoles = function () {
-          $scope.role = {
-              available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}),
-              selected:  [],
-              i18n: 'USERS.GROUPS.DETAILS.ROLES',
-              searchable: true
-          };
-          reloadSelectedRoles();
-        };
-
-        var reloadUsers = function (current_user) {
-          $scope.orgProperties = {};
-          if (angular.isDefined(current_user) && angular.isDefined(current_user.org) && angular.isDefined(current_user.org.properties)) {
-               $scope.orgProperties = current_user.org.properties;
-          }
-          $scope.user = {
-              all: ResourcesListResource.query({ resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
-              available: [],
-              selected:  [],
-              i18n: 'USERS.GROUPS.DETAILS.USERS',
-              searchable: true
-          };
-          reloadSelectedUsers();
-        };
-
-        if ($scope.action === 'edit') {
-            $scope.group = GroupResource.get({ id: $scope.resourceId }, function () {
-                reloadSelectedRoles();
-                reloadSelectedUsers();
-            });
-        }
-
-        $scope.submit = function () {
-            $scope.group.users = [];
-            $scope.group.roles = [];
-
-            angular.forEach($scope.user.selected, function (item) {
-              $scope.group.users.push(item.value);
-            });
-
-            angular.forEach($scope.role.selected, function (item) {
-              $scope.group.roles.push(item.name);
-            });
-
-          if ($scope.action === 'edit') {
-            GroupResource.save({ id: $scope.group.id }, $scope.group, function () {
-                Notifications.add('success', 'GROUP_UPDATED');
-                Modal.$scope.close();
-            }, function () {
-                Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
-            });
-          } else {
-            GroupsResources.create($scope.group, function () {
-                Notifications.add('success', 'GROUP_ADDED');
-                Modal.$scope.close();
-            }, function (response) {
-                if(response.status === 409) {
-                    Notifications.add('error', 'GROUP_CONFLICT', 'group-form');
-                } else {
-                    Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
-                }
-            });
-          }
-        };
-
-        $scope.$on('change', function (event, id) {
-          $scope.$broadcast('clear');
-          $scope.group = GroupResource.get({ id: id }, function () {
-            reloadRoles();
-            reloadSelectedUsers();
+            return foundUser === undefined;
           });
         });
+      });
+    };
 
-        $scope.getSubmitButtonState = function () {
-          return $scope.groupForm.$valid ? 'active' : 'disabled';
-        };
-
-        reloadRoles();
-        AuthService.getUser().$promise.then(function(current_user) {
-          reloadUsers(current_user);
+    var reloadSelectedRoles = function () {
+      $scope.group.$promise.then(function() {
+        $scope.role.available.$promise.then(function() {
+          // Now that we have the user roles and the available roles populate the selected and available
+          $scope.role.selected = [];
+          angular.forEach($scope.group.roles, function (role) {
+            $scope.role.selected.push({name: role, value: role});
+          });
+          // Filter the selected from the available list
+          $scope.role.available = _.filter($scope.role.available, function(role) {
+            return !_.findWhere($scope.role.selected, {name: role.name});
+          });
         });
+      });
+    };
+
+    var reloadRoles = function () {
+      $scope.role = {
+        available: UserRolesResource.query({limit: 0, offset: 0, filter: 'role_target:USER'}),
+        selected:  [],
+        i18n: 'USERS.GROUPS.DETAILS.ROLES',
+        searchable: true
+      };
+      reloadSelectedRoles();
+    };
+
+    var reloadUsers = function (current_user) {
+      $scope.orgProperties = {};
+      if (angular.isDefined(current_user)
+        && angular.isDefined(current_user.org)
+        && angular.isDefined(current_user.org.properties))
+      {
+        $scope.orgProperties = current_user.org.properties;
+      }
+      $scope.user = {
+        all: ResourcesListResource.query({
+          resource: $scope.orgProperties['adminui.user.listname'] || 'USERS.INVERSE.WITH.USERNAME'}),
+        available: [],
+        selected:  [],
+        i18n: 'USERS.GROUPS.DETAILS.USERS',
+        searchable: true
+      };
+      reloadSelectedUsers();
+    };
+
+    if ($scope.action === 'edit') {
+      $scope.group = GroupResource.get({ id: $scope.resourceId }, function () {
+        reloadSelectedRoles();
+        reloadSelectedUsers();
+      });
     }
+
+    $scope.submit = function () {
+      $scope.group.users = [];
+      $scope.group.roles = [];
+
+      angular.forEach($scope.user.selected, function (item) {
+        $scope.group.users.push(item.value);
+      });
+
+      angular.forEach($scope.role.selected, function (item) {
+        $scope.group.roles.push(item.name);
+      });
+
+      if ($scope.action === 'edit') {
+        GroupResource.save({ id: $scope.group.id }, $scope.group, function () {
+          Notifications.add('success', 'GROUP_UPDATED');
+          Modal.$scope.close();
+        }, function () {
+          Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+        });
+      } else {
+        GroupsResources.create($scope.group, function () {
+          Notifications.add('success', 'GROUP_ADDED');
+          Modal.$scope.close();
+        }, function (response) {
+          if(response.status === 409) {
+            Notifications.add('error', 'GROUP_CONFLICT', 'group-form');
+          } else {
+            Notifications.add('error', 'GROUP_NOT_SAVED', 'group-form');
+          }
+        });
+      }
+    };
+
+    $scope.$on('change', function (event, id) {
+      $scope.$broadcast('clear');
+      $scope.group = GroupResource.get({ id: id }, function () {
+        reloadRoles();
+        reloadSelectedUsers();
+      });
+    });
+
+    $scope.getSubmitButtonState = function () {
+      return $scope.groupForm.$valid ? 'active' : 'disabled';
+    };
+
+    reloadRoles();
+    AuthService.getUser().$promise.then(function(current_user) {
+      reloadUsers(current_user);
+    });
+  }
 ]);

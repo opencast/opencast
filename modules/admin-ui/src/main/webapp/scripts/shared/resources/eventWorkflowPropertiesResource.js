@@ -22,17 +22,17 @@
 
 angular.module('adminNg.resources')
 .factory('EventWorkflowPropertiesResource', ['$resource', function ($resource) {
-    return $resource('/admin-ng/event/workflowProperties', {}, {
-        get: {
-          method: 'POST',
-          responseType: 'json',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          isArray: false,
-          transformRequest: function (data) {
-            return $.param({
-              eventIds : JSON.stringify(data)
-            });
-          }
-        }
-    });
+  return $resource('/admin-ng/event/workflowProperties', {}, {
+    get: {
+      method: 'POST',
+      responseType: 'json',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      isArray: false,
+      transformRequest: function (data) {
+        return $.param({
+          eventIds : JSON.stringify(data)
+        });
+      }
+    }
+  });
 }]);

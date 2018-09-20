@@ -1,26 +1,26 @@
 <div ng-click="enterEditMode()" ng-form="innerForm">
-    &nbsp;<ul ng-show="!editMode">
-        <li ng-repeat="value in params.value">
-            <span>{{ value | translate }}</span>
-        </li>
-    </ul>
+  &nbsp;<ul ng-show="!editMode">
+    <li ng-repeat="value in params.value">
+      <span>{{ value | translate }}</span>
+    </li>
+  </ul>
 
-    <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
-    <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
+  <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
+  <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
-    <div class="editable-select" ng-show="editMode">
-        <input type="text" ng-model="value"
-            ng-required="params.required"
-            name="{{ params.name }}"
-            tabindex="{{ params.tabindex }}"
-            ng-blur="leaveEditMode()"
-            ng-keyup="keyUp($event)">
-    </div>
-    <span ng-show="editMode" class="ng-multi-value"
-        ng-repeat="value in params.value">
-        {{ value | translate }}
-        <a ng-mousedown="removeValue(params.value, value)">
-            <i class="fa fa-times"></i>
-        </a>
-    </span>
+  <div class="editable-select" ng-show="editMode">
+    <input type="text" ng-model="value"
+                       ng-required="params.required"
+                       name="{{ params.name }}"
+                       tabindex="{{ params.tabindex }}"
+                       ng-blur="leaveEditMode()"
+                       ng-keyup="keyUp($event)">
+  </div>
+  <span ng-show="editMode" class="ng-multi-value"
+                           ng-repeat="value in params.value">
+    {{ value | translate }}
+    <a ng-mousedown="removeValue(params.value, value)">
+      <i class="fa fa-times"></i>
+    </a>
+  </span>
 </div>
