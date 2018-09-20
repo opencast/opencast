@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.kernel.security.OAuthConsumerDetailsService" immediate="true">
+  <implementation class="org.opencastproject.kernel.security.OAuthConsumerDetailsService"/>
+  <property name="service.description" value="OAuth consumer details service"/>
+  <service>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
+    <provide interface="org.springframework.security.oauth.provider.ConsumerDetailsService"/>
+  </service>
+  <reference name="userDetailsService" interface="org.springframework.security.core.userdetails.UserDetailsService"
+             cardinality="1..1" policy="static" bind="setDelegate"/>
+</scr:component>

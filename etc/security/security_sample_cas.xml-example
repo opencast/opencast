@@ -172,13 +172,6 @@
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
-    <constructor-arg index="0" ref="userDetailsService" />
-    <constructor-arg index="1" value="consumerkey" />
-    <constructor-arg index="2" value="consumersecret" />
-    <constructor-arg index="3" value="constructorName" />
-  </bean>
-
   <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">
     <property name="consumerDetailsService" ref="oAuthConsumerDetailsService" />
     <property name="tokenServices">
@@ -187,19 +180,7 @@
     <property name="nonceServices">
       <bean class="org.springframework.security.oauth.provider.nonce.InMemoryNonceServices" />
     </property>
-    <property name="authHandler">
-      <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
-        <constructor-arg index="0" ref="userDetailsService" />
-        <!-- Uncomment to allow the included keys to be trusted to provide known user details
-        <constructor-arg index="1">
-          <list>
-            <value>trustedKey</value>
-            <value>trustedKey2</value>
-          </list>
-        </constructor-arg>
-        -->
-      </bean>
-    </property>
+    <property name="authHandler" ref="ltiLaunchAuthenticationHandler" />
   </bean>
 
   <!-- ############### -->
@@ -266,6 +247,11 @@
 
   <osgi:reference id="securityService" cardinality="1..1" interface="org.opencastproject.security.api.SecurityService" />
 
+  <osgi:reference id="oAuthConsumerDetailsService" cardinality="1..1"
+    interface="org.springframework.security.oauth.provider.ConsumerDetailsService" />
+
+  <osgi:reference id="ltiLaunchAuthenticationHandler" cardinality="1..1"
+    interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler" />
 
   <!-- ############################# -->
   <!-- # Spring Security Internals # -->
