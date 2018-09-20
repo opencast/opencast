@@ -13,6 +13,10 @@ org.opencastproject.userdirectory.moodle.token=mytoken1234abcdef
 # The maximum number of minutes to cache a user
 #org.opencastproject.userdirectory.moodle.cache.expiration=60
 
+# Optionally activate Moodle group roles
+#org.opencastproject.userdirectory.moodle.group.roles.enabled=true
+
 # Optional regexp for matching Moodle course and user IDs.
 #org.opencastproject.userdirectory.moodle.course.pattern=^[0-9]+$
 #org.opencastproject.userdirectory.moodle.user.pattern=^[0-9a-zA-Z_]+$
+#org.opencastproject.userdirectory.moodle.group.pattern=^[0-9]+$

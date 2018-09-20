@@ -142,7 +142,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
     List<NameValuePair> params = Collections
             .singletonList((NameValuePair) new BasicNameValuePair("username", username));
 
-    return parseCourseList(executeMoodleRequest(MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_INSTRUCTOR, params));
+    return parseIdList(executeMoodleRequest(MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_INSTRUCTOR, params));
   }
 
   /**
@@ -158,7 +158,18 @@ public class MoodleWebServiceImpl implements MoodleWebService {
     List<NameValuePair> params = Collections
             .singletonList((NameValuePair) new BasicNameValuePair("username", username));
 
-    return parseCourseList(executeMoodleRequest(MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_LEARNER, params));
+    return parseIdList(executeMoodleRequest(MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_LEARNER, params));
+  }
+
+  @Override
+  public List<String> toolOpencastGetGroupsForLearner(String username)
+          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+    logger.debug("toolOpencastGetGroupsForLearner({})", username);
+
+    List<NameValuePair> params = Collections
+            .singletonList((NameValuePair) new BasicNameValuePair("username", username));
+
+    return parseIdList(executeMoodleRequest(MOODLE_FUNCTION_TOOL_OPENCAST_GET_GROUPS_FOR_LEARNER, params));
   }
 
   /**
@@ -172,13 +183,13 @@ public class MoodleWebServiceImpl implements MoodleWebService {
   }
 
   /**
-   * Parses the returned Moodle response for a list of courses.
+   * Parses the returned Moodle response for a list of IDs.
    *
-   * @param resp The Moodle response as. It should be of type {@link JSONArray}.
-   * @return A list of Moodle course IDs.
+   * @param resp The Moodle response. It should be of type {@link JSONArray}.
+   * @return A list of Moodle IDs.
    * @throws MoodleWebServiceException If the parsing failed because the response format was unexpected.
    */
-  private List<String> parseCourseList(Object resp) throws MoodleWebServiceException {
+  private List<String> parseIdList(Object resp) throws MoodleWebServiceException {
     if (resp == null)
       return new LinkedList<>();
 
@@ -186,16 +197,16 @@ public class MoodleWebServiceImpl implements MoodleWebService {
       throw new MoodleWebServiceException("Moodle responded in unexpected format");
 
     JSONArray respArray = (JSONArray) resp;
-    List<String> courses = new ArrayList<>(respArray.size());
+    List<String> ids = new ArrayList<>(respArray.size());
 
     for (Object courseObj : respArray) {
       if (!(courseObj instanceof JSONObject) || ((JSONObject) courseObj).get("id") == null)
         throw new MoodleWebServiceException("Moodle responded in unexpected format");
 
-      courses.add(((JSONObject) courseObj).get("id").toString());
+      ids.add(((JSONObject) courseObj).get("id").toString());
     }
 
-    return courses;
+    return ids;
   }
 
   /**

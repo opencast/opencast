@@ -83,6 +83,16 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
   private static final String INSTRUCTOR_ROLE_SUFFIX = "Instructor";
 
   /**
+   * Prefix for Moodle group roles.
+   */
+  private static final String GROUP_ROLE_PREFIX = "G";
+
+  /**
+   * Suffix for Moodle group roles.
+   */
+  private static final String GROUP_ROLE_SUFFIX = "Learner";
+
+  /**
    * The Moodle web service client.
    */
   private MoodleWebService client;
@@ -93,6 +103,11 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
   private Organization organization;
 
   /**
+   * Whether to create group roles.
+   */
+  private boolean groupRoles;
+
+  /**
    * Regular expression for matching valid courses.
    */
   private String coursePattern;
@@ -101,6 +116,11 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    * Regular expression for matching valid users.
    */
   private String userPattern;
+
+  /**
+   * Regular expression for matching valid groups.
+   */
+  private String groupPattern;
 
   /**
    * A cache of users, which lightens the load on Moodle.
@@ -130,15 +150,18 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
    * @param organization    The organization.
    * @param coursePattern   The pattern of a Moodle course ID.
    * @param userPattern     The pattern of a Moodle user ID.
+   * @param groupRoles      Whether to activate groupRoles
    * @param cacheSize       The number of users to cache.
    * @param cacheExpiration The number of minutes to cache users.
    */
   public MoodleUserProviderInstance(String pid, MoodleWebService client, Organization organization,
-          String coursePattern, String userPattern, int cacheSize, int cacheExpiration) {
+          String coursePattern, String userPattern, String groupPattern, boolean groupRoles, int cacheSize, int cacheExpiration) {
     this.client = client;
     this.organization = organization;
+    this.groupRoles = groupRoles;
     this.coursePattern = coursePattern;
     this.userPattern = userPattern;
+    this.groupPattern = groupPattern;
 
     logger.info("Creating new MoodleUserProviderInstance(pid={}, url={}, cacheSize={}, cacheExpiration={})", pid,
             client.getURL(), cacheSize, cacheExpiration);
@@ -377,41 +400,58 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       return Collections.emptyIterator();
 
     // Verify that role name ends with LEARNER_ROLE_SUFFIX or INSTRUCTOR_ROLE_SUFFIX
-    if (exact && !query.endsWith("_" + LEARNER_ROLE_SUFFIX) && !query.endsWith("_" + INSTRUCTOR_ROLE_SUFFIX))
+    if (exact
+            && !query.endsWith("_" + LEARNER_ROLE_SUFFIX)
+            && !query.endsWith("_" + INSTRUCTOR_ROLE_SUFFIX)
+            && !query.endsWith("_" + GROUP_ROLE_SUFFIX))
       return Collections.emptyIterator();
 
-    // Extract moodle course id
-    String moodleCourseId = query;
+    boolean findGroupRole = groupRoles && query.startsWith(GROUP_ROLE_PREFIX);
+
+    // Extract Moodle id
+    String moodleId = findGroupRole ? query.substring(GROUP_ROLE_PREFIX.length()) : query;
     if (query.endsWith("_" + LEARNER_ROLE_SUFFIX)) {
-      moodleCourseId = query.substring(0, query.lastIndexOf("_" + LEARNER_ROLE_SUFFIX));
+      moodleId = query.substring(0, query.lastIndexOf("_" + LEARNER_ROLE_SUFFIX));
       ltirole = true;
     } else if (query.endsWith("_" + INSTRUCTOR_ROLE_SUFFIX)) {
-      moodleCourseId = query.substring(0, query.lastIndexOf("_" + INSTRUCTOR_ROLE_SUFFIX));
+      moodleId = query.substring(0, query.lastIndexOf("_" + INSTRUCTOR_ROLE_SUFFIX));
+      ltirole = true;
+    } else if (query.endsWith("_" + GROUP_ROLE_SUFFIX)) {
+      moodleId = query.substring(0, query.lastIndexOf("_" + GROUP_ROLE_SUFFIX));
       ltirole = true;
     }
 
-    // Check if course matches pattern
+    // Check if matches patterns
+    String pattern = findGroupRole ? groupPattern : coursePattern;
     try {
-      if ((coursePattern != null) && !moodleCourseId.matches(coursePattern)) {
-        logger.debug("verify course {} failed regexp {}", moodleCourseId, coursePattern);
+      if ((pattern != null) && !moodleId.matches(pattern)) {
+        logger.debug("Verify Moodle ID {} failed regexp {}", moodleId, pattern);
         return Collections.emptyIterator();
       }
     } catch (PatternSyntaxException e) {
-      logger.warn("Invalid regular expression for course pattern {} - disabling checks", coursePattern);
-      coursePattern = null;
+      logger.warn("Invalid regular expression for pattern {} - disabling checks", pattern);
+      if (findGroupRole) {
+        groupPattern = null;
+      } else {
+        coursePattern = null;
+      }
     }
 
     // Roles list
     List<Role> roles = new LinkedList<>();
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
     if (ltirole) {
-      // Query is for a Course ID and an LTI role (Instructor/Learner)
+      // Query is for a Moodle ID and an LTI role (Instructor/Learner/Group)
       roles.add(new JaxbRole(query, jaxbOrganization, "Moodle Site Role", Role.Type.EXTERNAL));
+    } else if (findGroupRole) {
+      // Group ID
+      roles.add(new JaxbRole(GROUP_ROLE_PREFIX + moodleId + "_" + GROUP_ROLE_SUFFIX, jaxbOrganization,
+              "Moodle Group Learner Role", Role.Type.EXTERNAL));
     } else {
       // Course ID - return both roles
-      roles.add(new JaxbRole(moodleCourseId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization,
+      roles.add(new JaxbRole(moodleId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization,
               "Moodle Course Instructor Role", Role.Type.EXTERNAL));
-      roles.add(new JaxbRole(moodleCourseId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Learner Role",
+      roles.add(new JaxbRole(moodleId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Learner Role",
               Role.Type.EXTERNAL));
     }
 
@@ -461,17 +501,22 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       // Load Roles
       List<String> courseIdsInstructor = client.toolOpencastGetCoursesForInstructor(username);
       List<String> courseIdsLearner = client.toolOpencastGetCoursesForLearner(username);
+      List<String> groupIdsLearner = groupRoles ? client.toolOpencastGetGroupsForLearner(username) : Collections.emptyList();
 
       // Create Opencast Objects
       Set<JaxbRole> roles = new HashSet<>();
       roles.add(new JaxbRole(Group.ROLE_PREFIX + "MOODLE", jaxbOrganization, "Moodle Users", Role.Type.EXTERNAL_GROUP));
       for (String courseId : courseIdsInstructor) {
-        roles.add(new JaxbRole(courseId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization, "Moodle external role",
+        roles.add(new JaxbRole(courseId + "_" + INSTRUCTOR_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Instructor Role",
                 Role.Type.EXTERNAL));
       }
       for (String courseId : courseIdsLearner) {
-        roles.add(new JaxbRole(courseId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle external role",
+        roles.add(new JaxbRole(courseId + "_" + LEARNER_ROLE_SUFFIX, jaxbOrganization, "Moodle Course Learner Role",
                 Role.Type.EXTERNAL));
+      }
+      for (String groupId : groupIdsLearner) {
+        roles.add(new JaxbRole(GROUP_ROLE_PREFIX + groupId + "_" + GROUP_ROLE_SUFFIX, jaxbOrganization,
+                "Moodle Group Learner Role", Role.Type.EXTERNAL));
       }
 
       return new JaxbUser(moodleUser.getUsername(), null, moodleUser.getFullname(), moodleUser.getEmail(),

@@ -34,6 +34,7 @@ public interface MoodleWebService {
   String MOODLE_FUNCTION_CORE_USER_GET_USERS_BY_FIELD = "core_user_get_users_by_field";
   String MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_INSTRUCTOR = "tool_opencast_get_courses_for_instructor";
   String MOODLE_FUNCTION_TOOL_OPENCAST_GET_COURSES_FOR_LEARNER = "tool_opencast_get_courses_for_learner";
+  String MOODLE_FUNCTION_TOOL_OPENCAST_GET_GROUPS_FOR_LEARNER = "tool_opencast_get_groups_for_learner";
 
   /**
    * Searches for a user in Moodle.
@@ -73,6 +74,19 @@ public interface MoodleWebService {
    * @throws ParseException            In case the Moodle response cannot be parsed.
    */
   List<String> toolOpencastGetCoursesForLearner(String username)
+          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
+
+  /**
+   * Returns the list of Moodle group IDs where the given user has the learner capability.
+   *
+   * @param username The username to search for.
+   * @return A list of Moodle group IDs.
+   * @throws URISyntaxException        In case the URL cannot be constructed.
+   * @throws IOException               In case of an IO error.
+   * @throws MoodleWebServiceException In case Moodle returns an error.
+   * @throws ParseException            In case the Moodle response cannot be parsed.
+   */
+  List<String> toolOpencastGetGroupsForLearner(String username)
           throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
 
   /**
