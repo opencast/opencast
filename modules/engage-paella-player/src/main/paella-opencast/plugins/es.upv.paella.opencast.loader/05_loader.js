@@ -1,4 +1,4 @@
-/*global Opencast 
+/*global Opencast
          MHAnnotationServiceDefaultDataDelegate
          MHAnnotationServiceTrimmingDataDelegate
          MHFootPrintsDataDelegate
@@ -10,17 +10,17 @@
 function initPaellaOpencast() {
   if (!paella.opencast) {
     paella.opencast = new Opencast();
-    
+
     paella.dataDelegates.MHAnnotationServiceDefaultDataDelegate = MHAnnotationServiceDefaultDataDelegate;
     paella.dataDelegates.MHAnnotationServiceTrimmingDataDelegate = MHAnnotationServiceTrimmingDataDelegate;
     paella.dataDelegates.MHFootPrintsDataDelegate = MHFootPrintsDataDelegate;
     paella.dataDelegates.OpencastTrackCameraDataDelegate = OpencastTrackCameraDataDelegate;
-  } 
+  }
 }
 
 function loadOpencastPaella(containerId) {
   initPaellaOpencast();
-  paella.load(containerId, {    
+  paella.load(containerId, {
     configUrl:'/paella/config/config.json',
     loadVideo:function() {
       return new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ function loadOpencastPaella(containerId) {
               paella.messageBox.showError(errMsg);
             }
           });
-        });    
+        });
       });
     }
   });
