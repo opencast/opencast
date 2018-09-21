@@ -57,6 +57,8 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_OAIPMH_CHANNEL = "oaipmh.channel";
   public static final String OPT_SOURCE_TRACK_LEFT_FLAVOR = "sourcetrack.left.flavor";
   public static final String OPT_SOURCE_TRACK_RIGHT_FLAVOR = "sourcetrack.right.flavor";
+  public static final String OPT_PREVIEW_AUDIO_SUBTYPE = "preview.audio.subtype";
+  public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
 
   private static final String DEFAULT_PREVIEW_SUBTYPE = "preview";
   private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
@@ -74,6 +76,8 @@ public class AdminUIConfiguration implements ManagedService {
   private static final String DEFAULT_THUMBNAIL_DEFAULT_TRACK_SECONDARY = "presentation";
   private static final Boolean DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION = false;
   private static final String DEFAULT_OAIPMH_CHANNEL = "default";
+  private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
+  private static final String DEFAULT_PREVIEW_AUDIO_SUBTYPE = "audio+preview";
   private static final String DEFAULT_SOURCE_TRACK_LEFT_FLAVOR = "presenter/source";
   private static final String DEFAULT_SOURCE_TRACK_RIGHT_FLAVOR = "presentation/source";
 
@@ -93,6 +97,8 @@ public class AdminUIConfiguration implements ManagedService {
   private String thumbnailDefaultTrackSecondary = DEFAULT_THUMBNAIL_DEFAULT_TRACK_SECONDARY;
   private boolean thumbnailAutoDistribution = DEFAULT_THUMBNAIL_AUTO_DISTRIBUTION;
   private String oaipmhChannel = DEFAULT_OAIPMH_CHANNEL;
+  private String previewVideoSubtype = DEFAULT_PREVIEW_VIDEO_SUBTYPE;
+  private String previewAudioSubtype = DEFAULT_PREVIEW_AUDIO_SUBTYPE;
   private MediaPackageElementFlavor sourceTrackLeftFlavor = MediaPackageElementFlavor.parseFlavor(
     DEFAULT_SOURCE_TRACK_LEFT_FLAVOR);
   private MediaPackageElementFlavor sourceTrackRightFlavor = MediaPackageElementFlavor.parseFlavor(
@@ -160,6 +166,14 @@ public class AdminUIConfiguration implements ManagedService {
 
   public String getOaipmhChannel() {
     return oaipmhChannel;
+  }
+
+  public String getPreviewVideoSubtype() {
+    return previewVideoSubtype;
+  }
+
+  public String getPreviewAudioSubtype() {
+    return previewAudioSubtype;
   }
 
   public MediaPackageElementFlavor getSourceTrackLeftFlavor() {
@@ -255,6 +269,16 @@ public class AdminUIConfiguration implements ManagedService {
     oaipmhChannel = StringUtils.defaultString(
       (String) properties.get(OPT_OAIPMH_CHANNEL), DEFAULT_OAIPMH_CHANNEL);
     logger.debug("OAI-PMH channel set to '{}", oaipmhChannel);
+
+    // Preview Video subtype
+    previewVideoSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_VIDEO_SUBTYPE),
+      DEFAULT_PREVIEW_VIDEO_SUBTYPE);
+    logger.debug("Preview video subtype set to '{}'", previewVideoSubtype);
+
+    // Preview Audio subtype
+    previewAudioSubtype = StringUtils.defaultString((String) properties.get(OPT_PREVIEW_AUDIO_SUBTYPE),
+      DEFAULT_PREVIEW_AUDIO_SUBTYPE);
+    logger.debug("Preview audio subtype set to '{}'", previewAudioSubtype);
 
     // Source track left flavor
     sourceTrackLeftFlavor = MediaPackageElementFlavor.parseFlavor(StringUtils.defaultString(

@@ -18,33 +18,14 @@
     <!-- making sure that the audio track is part of each video track.     -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-    <!-- Prepare presenter track -->
-
     <operation
-      id="prepare-av"
+      id="select-tracks"
       exception-handler-workflow="partial-error"
       description="Preparing presenter (camera) audio and video work versions">
       <configurations>
-        <configuration key="source-flavor">presenter/source</configuration>
-        <configuration key="target-flavor">presenter/work</configuration>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
-        <configuration key="rewrite">false</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Prepare presentation track -->
-
-    <operation
-      id="prepare-av"
-      exception-handler-workflow="partial-error"
-      description="Preparing presentation (screen) audio and video work version">
-      <configurations>
-        <configuration key="source-flavor">presentation/source</configuration>
-        <configuration key="target-flavor">presentation/work</configuration>
-        <configuration key="target-tags">-archive</configuration>
-        <configuration key="rewrite">false</configuration>
-        <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
       </configurations>
     </operation>
 

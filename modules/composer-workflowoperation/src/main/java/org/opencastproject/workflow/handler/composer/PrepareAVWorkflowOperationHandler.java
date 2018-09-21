@@ -38,6 +38,7 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workflow.api.WorkflowOperationTagUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,8 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -58,8 +57,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ComposeWorkflowOperationHandler.class);
-  private static final String PLUS = "+";
-  private static final String MINUS = "-";
   private static final String QUESTION_MARK = "?";
 
   /** Name of the 'encode to a/v work copy' encoding profile */
@@ -175,23 +172,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     String videoOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("video-encoding-profile"));
     String audioOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-encoding-profile"));
 
-    String[] targetTags = StringUtils.split(targetTrackTags, ",");
-
-    List<String> removeTags = new ArrayList<String>();
-    List<String> addTags = new ArrayList<String>();
-    List<String> overrideTags = new ArrayList<String>();
-
-    if (targetTags != null) {
-      for (String tag : targetTags) {
-        if (tag.startsWith(MINUS)) {
-          removeTags.add(tag);
-        } else if (tag.startsWith(PLUS)) {
-          addTags.add(tag);
-        } else {
-          overrideTags.add(tag);
-        }
-      }
-    }
+    final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(targetTrackTags);
 
     // Make sure the source flavor is properly set
     if (sourceFlavorName == null)
@@ -299,7 +280,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       logger.info("Muxing audio and video only track {} to work version", videoTrack);
 
       if (audioTrack.hasVideo()) {
-        logger.info("Stripping audio from track {}", audioTrack);
+        logger.info("Stripping video from track {}", audioTrack);
         audioTrack = prepare(audioTrack, null, PREPARE_AONLY_PROFILE);
       }
 
@@ -333,23 +314,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     composedTrack.setFlavor(targetFlavor);
     logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
 
-    // Add the target tags
-    if (overrideTags.size() > 0) {
-      composedTrack.clearTags();
-      for (String tag : overrideTags) {
-        logger.trace("Tagging composed track with '{}'", tag);
-        composedTrack.addTag(tag);
-      }
-    } else {
-      for (String tag : removeTags) {
-        logger.trace("Remove tagging '{}' from composed track", tag);
-        composedTrack.removeTag(tag.substring(MINUS.length()));
-      }
-      for (String tag : addTags) {
-        logger.trace("Add tagging '{}' to composed track", tag);
-        composedTrack.addTag(tag.substring(PLUS.length()));
-      }
-    }
+    WorkflowOperationTagUtil.applyTagDiff(tagDiff, composedTrack);
     return createResult(mediaPackage, Action.CONTINUE, timeInQueue);
   }
 

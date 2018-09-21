@@ -25,6 +25,7 @@ angular.module('adminNg.controllers')
 .controller('ToolsCtrl', ['$scope', '$route', '$location', 'Storage', '$window', 'ToolsResource', 'Notifications', 'EventHelperService',
     function ($scope, $route, $location, Storage, $window, ToolsResource, Notifications, EventHelperService) {
         var thumbnailErrorMessageId = null;
+        var trackErrorMessageId = null;
 
         var LOCAL_CONTEXT = 'video-tools';
 
@@ -109,11 +110,66 @@ angular.module('adminNg.controllers')
             $scope.area = area;
         };
 
+        $scope.anyTrackSelected = function (type) {
+            var selected = false;
+            var present = false;
+            if ($scope.video.source_tracks === undefined) {
+                return false;
+            }
+            for(var i = 0; i < $scope.video.source_tracks.length; i++) {
+                var t = $scope.video.source_tracks[i][type];
+                if (t.present === true) {
+                    present = true;
+                }
+                if (t.present === true && t.hidden === false) {
+                    selected = true;
+                }
+            }
+            // If we don't have any tracks at all, selecting none is valid
+            if (present === false) {
+                return true;
+            }
+            return selected;
+        };
+
+        $scope.trackClicked = function(index, type) {
+            $scope.video.source_tracks[index][type].hidden = !$scope.video.source_tracks[index][type].hidden;
+        };
+
+        $scope.trackHasPreview = function(index, type) {
+            return $scope.video.source_tracks[index][type].preview_image !== null;
+        };
+
+        $scope.trackIndexToName = function(index) {
+            var flavor = $scope.video.source_tracks[index].flavor;
+            return flavor.type;
+        };
+
+        $scope.tooManyAudios = function () {
+            var audioTrackCount = 0;
+            var videoTrackCount = 0;
+            for(var i = 0; i < $scope.video.source_tracks.length; i++) {
+                var t = $scope.video.source_tracks[i];
+                if (t.audio.present === true && t.audio.hidden === false) {
+                    audioTrackCount++;
+                }
+                if (t.video.present === true && t.video.hidden === false) {
+                    videoTrackCount++;
+                }
+            }
+            return audioTrackCount > videoTrackCount;
+        };
+
+        $scope.sanityCheckFlags = function() {
+            return (!$scope.anyTrackSelected('video') || $scope.tooManyAudios()) || !$scope.anyTrackSelected('audio');
+        };
+
         // TODO Move the following to a VideoCtrl
         $scope.player = {};
         $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
 
         $scope.activeTransaction = false;
+
         $scope.submit = function () {
             $scope.activeTransaction = true;
             $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
@@ -135,10 +191,14 @@ angular.module('adminNg.controllers')
                     $scope.$root.originalDefaultThumbnailPosition = response.thumbnail.position;
                 }
                 $scope.video.thumbnail.loading = false;
+                if (trackErrorMessageId !== null) {
+                    Notifications.remove(trackErrorMessageId);
+                    trackErrorMessageId = null;
+                }
             }, function () {
                 $scope.activeTransaction = false;
                 $scope.video.thumbnail.loading = false;
-                Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
+                trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
             });
         };
 

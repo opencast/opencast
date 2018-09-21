@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.composer.SelectStreamsWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.composer.SelectStreamsWorkflowOperationHandler" />
+  <property name="service.description" value="Hide/unhide specific tracks in a media package" />
+  <property name="workflow.operation" value="select-tracks" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference cardinality="1..1" interface="org.opencastproject.composer.api.ComposerService"
+    name="ComposerService" policy="static" bind="setComposerService"/>
+  <reference cardinality="1..1" interface="org.opencastproject.workspace.api.Workspace" name="Workspace"
+    policy="static" bind="setWorkspace" />
+  <reference name="ServiceRegistry" cardinality="1..1" interface="org.opencastproject.serviceregistry.api.ServiceRegistry"
+    policy="static" bind="setServiceRegistry" />
+</scr:component>

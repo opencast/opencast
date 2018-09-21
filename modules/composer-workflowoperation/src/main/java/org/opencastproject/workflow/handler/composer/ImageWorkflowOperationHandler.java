@@ -592,7 +592,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     if (r.isDefined() && r.getRest().isEmpty()) {
       return r.getResult();
     } else {
-      throw new WorkflowOperationException(format("Cannot parse time string %s. Rest is %s", time, r.getRest()));
+      throw new WorkflowOperationException(format("Cannot parse time string %s.", time));
     }
   }
 

@@ -74,6 +74,8 @@
                             ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
                         <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor'"
                             ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a>
+                        <a ng-class="{active: area === 'tracks'}" ng-if="tab === 'editor'"
+                            ng-click="openArea('tracks')" translate>VIDEO_TOOL.AREAS.TRACKS</a>
                         <a ng-class="{active: area === 'comments'}"
                             ng-click="openArea('comments')" translate>VIDEO_TOOL.AREAS.COMMENTS</a>
                     </nav>
@@ -307,6 +309,92 @@
                   </div>
                 </div>
 
+                <div ng-if="area === 'tracks'" class="editor-tracks">
+                  <div class="area-body">
+                    <div data-admin-ng-notification="" data-type="error"
+                         show="!anyTrackSelected('video')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_VIDEO_TRACK_SELECTED">
+                    </div>
+                    <div data-admin-ng-notification="" data-type="error"
+                         show="!anyTrackSelected('audio')" message="VIDEO_TOOL.TRACKS.NOTIFICATION.NO_AUDIO_TRACK_SELECTED">
+                    </div>
+                    <div data-admin-ng-notification="" data-type="error"
+                         show="tooManyAudios() && anyTrackSelected('video')" message="NOTIFICATIONS.VIDEO_TOO_MANY_AUDIOS">
+                    </div>
+                    <div class="full-col">
+                      <div class="obj tbl-details">
+                          <div class="obj-container">
+                          <table class="main-tbl">
+                            <tr>
+                              <th translate="VIDEO_TOOL.TRACKS.TRACK.HEADER">
+                                <!-- Track -->
+                              </th>
+                              <th translate="VIDEO_TOOL.TRACKS.VIDEO.HEADER">
+                                <!-- Video -->
+                              </th>
+                              <th translate="VIDEO_TOOL.TRACKS.AUDIO.HEADER">
+                                <!-- Audio -->
+                              </th>
+                            </tr>
+                            <tr ng-repeat="row in video.source_tracks">
+                              <td>
+                                <span class="track-name">{{ trackIndexToName($index) }}</span>
+                              </td>
+                              <td>
+                                <div ng-if="video.source_tracks[$index].video.present"
+                                  class="video-canvas"
+                                  style="background-image: url({{video.source_tracks[$index].video.preview_image}})"
+                                  ng-click="trackClicked($index, 'video')"
+                                  title="{{ video.source_tracks[$index].video.hidden ? 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.VIDEO.TOOLTIPS.HIDE' | translate }}">
+                                  <div class="{{video.source_tracks[$index].video.hidden ? 'track-hidden' : 'track'}}" >
+                                    <span class="video-line-height"
+                                          ng-if="!trackHasPreview($index, 'video')"
+                                          translate="VIDEO_TOOL.TRACKS.VIDEO.NO_PREVIEW_AVAILABLE">
+                                      <!-- No preview available -->
+                                    </span>
+                                    <span class="video-track-hidden-icon"
+                                          ng-if="video.source_tracks[$index].video.hidden">
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <span ng-if="!video.source_tracks[$index].video.present"
+                                      class="video-line-height"
+                                      translate="VIDEO_TOOL.TRACKS.VIDEO.NOT_AVAILABLE">
+                                  <!-- Stream has no video -->
+                                </span>
+                              </td>
+                              <td>
+                                <div ng-if="video.source_tracks[$index].audio.present"
+                                  class="audio-canvas"
+                                  style="background-image: url({{video.source_tracks[$index].audio.preview_image}})"
+                                  ng-click="trackClicked($index, 'audio')"
+                                  title="{{ video.source_tracks[$index].audio.hidden ? 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.UNHIDE' : 'VIDEO_TOOL.TRACKS.AUDIO.TOOLTIPS.HIDE' | translate }}">
+
+                                  <div class="{{video.source_tracks[$index].audio.hidden ? 'track-hidden' : 'track'}}">
+                                    <span class="audio-line-height"
+                                          ng-if="!trackHasPreview($index, 'audio')"
+                                          translate="VIDEO_TOOL.TRACKS.AUDIO.NO_PREVIEW_AVAILABLE">
+                                      <!-- No preview available -->
+                                    </span>
+                                    <span class="audio-track-hidden-icon"
+                                          ng-if="video.source_tracks[$index].audio.hidden">
+                                    </span>
+                                  </div>
+                                </div>
+                                <span ng-if="!video.source_tracks[$index].audio.present"
+                                      class="audio-line-height"
+                                      translate="VIDEO_TOOL.TRACKS.AUDIO.NOT_AVAILABLE">
+                                  <!-- Stream has no audio -->
+                                </span>
+                              </td>
+                            </tr>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
             </div>
 
             <div data-admin-ng-notifications="" type="warning" show="activeTransaction" context="video-editor-event-access"></div>
@@ -324,7 +412,7 @@
                             ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                         <a ng-click="submit()"
-                           ng-class="{disabled: activeTransaction}"
+                           ng-class="{disabled: activeTransaction || sanityCheckFlags()}"
                            class="save-and-close-button"
                            translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                           <!-- Save and Continue -->

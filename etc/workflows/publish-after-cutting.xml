@@ -21,6 +21,7 @@
         <configuration key="publishToApi">true</configuration>
         <configuration key="publishToYouTube">false</configuration>
         <configuration key="thumbnailType">0</configuration>
+        <configuration key="thumbnailPosition">1</configuration>
       </configurations>
     </operation>
 
