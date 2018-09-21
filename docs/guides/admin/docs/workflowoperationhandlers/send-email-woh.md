@@ -29,6 +29,7 @@ Parameter Table
 |to|The field `to` of the email<br>i.e. the comma separated list of email accounts the email will be sent to.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |cc|The field `cc` of the email<br>i.e. the comma separated list of email accounts that will receive a carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
 |bcc|The field `bcc` of the email<br>i.e. the comma separated list of email accounts that will receive a blind carbon copy of the email.|EMPTY|email-account@email-domain.org,second-account@second-domain.org|
+|use-html|Flag to indicate that the email content should be displayed as 'text/html'|false|true/false|
 
 **Some other email parameters can be customized in the SMTP Service configuration**
 

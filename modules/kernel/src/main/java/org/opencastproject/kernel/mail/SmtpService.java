@@ -54,6 +54,9 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    */
   private static final String SPLIT_PATTERN = "[\\s,]+";
 
+  /** Define the MIME type for HTML mail content */
+  private static final String TEXT_HTML = "text/html";
+
   /**
    * Callback from the OSGi <code>ConfigurationAdmin</code> on configuration changes.
    *
@@ -166,10 +169,32 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *           if sending the message failed
    */
   public void send(String to, String subject, String body) throws MessagingException {
+    send(to, subject, body, false);
+  }
+
+  /**
+   * Method to send a message
+   *
+   * @param to
+   *          Recipient of the message
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @param isHTML
+   *          Is the body of the message in HTML
+   * @throws MessagingException
+   *           if sending the message failed
+   */
+  public void send(String to, String subject, String body, Boolean isHTML) throws MessagingException {
     MimeMessage message = createMessage();
     message.addRecipient(RecipientType.TO, new InternetAddress(to));
     message.setSubject(subject);
-    message.setText(body);
+    if (isHTML) {
+        message.setContent(body, TEXT_HTML);
+    } else {
+        message.setText(body);
+    }
     message.saveChanges();
     send(message);
   }
@@ -191,6 +216,28 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *           if sending the message failed
    */
   public void send(String to, String cc, String bcc, String subject, String body) throws MessagingException {
+    send(to, cc, bcc, subject, body, false);
+  }
+
+  /**
+   * Send a message to multiple recipients
+   *
+   * @param to
+   *          "To:" message recipient(s), separated by commas and/or spaces
+   * @param cc
+   *          "CC:" message recipient(s), separated by commas and/or spaces
+   * @param bcc
+   *          "BCC:" message recipient(s), separated by commas and/or spaces
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @param isHTML
+   *          Is the body of the message in HTML
+   * @throws MessagingException
+   *           if sending the message failed
+   */
+  public void send(String to, String cc, String bcc, String subject, String body, Boolean isHTML) throws MessagingException {
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
@@ -204,7 +251,7 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     if (bcc != null)
       bccArray = bcc.trim().split(SPLIT_PATTERN, 0);
 
-    send(toArray, ccArray, bccArray, subject, body);
+    send(toArray, ccArray, bccArray, subject, body, isHTML);
   }
 
   /**
@@ -224,12 +271,38 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    *           if sending the message failed
    */
   public void send(String[] to, String[] cc, String[] bcc, String subject, String body) throws MessagingException {
+    send(to, cc, bcc, subject, body, false);
+  }
+
+  /**
+   * Send a message to multiple recipients
+   *
+   * @param to
+   *          Array with the "To:" recipients of the message
+   * @param cc
+   *          Array with the "CC:" recipients of the message
+   * @param bcc
+   *          Array with the "BCC:" recipients of the message
+   * @param subject
+   *          Subject of the message
+   * @param body
+   *          Body of the message
+   * @param isHTML
+   *          Is the body of the message in HTML
+   * @throws MessagingException
+   *           if sending the message failed
+   */
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String body, Boolean isHTML) throws MessagingException {
     MimeMessage message = createMessage();
     addRecipients(message, RecipientType.TO, to);
     addRecipients(message, RecipientType.CC, cc);
     addRecipients(message, RecipientType.BCC, bcc);
     message.setSubject(subject);
-    message.setText(body);
+    if (isHTML) {
+        message.setContent(body, TEXT_HTML);
+    } else {
+        message.setText(body);
+    }
     message.saveChanges();
     send(message);
   }
