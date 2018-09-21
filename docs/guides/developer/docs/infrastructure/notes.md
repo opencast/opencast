@@ -27,17 +27,17 @@ ETH
 - Using [packaged Nexus](https://copr.fedorainfracloud.org/coprs/lkiesow/nexus-oss/)
 
 
-SWITCH
-------
+University of Cologne
+---------------------
 
 ### Common Configuration Choices
 
 - Unattended upgrade
 - CentOS Linux release 7.x
 
-### Test Cluster (\*.oc-test.switch.ch)
+### ci.opencast.org
 
-- Rebuilt weekly via cron + shell, manual branch selection
+- Buildbot installed and managed via ansible script in [this repo](https://github.com/opencast/opencast-project-infrastructure)
 
 
 University of Osnabrück
@@ -61,30 +61,7 @@ University of Osnabrück
 
 - Using tarballs build from build.opencast.org
 
-### pullrequests.opencast.org
-
-- Scientific Linux 6.x
-- Due for retirement, services will be moved to repo.opencast.org VM and DNS updated
-- Merge ticket list needs to be set manually
-
-### repo.opencast.org and pkg.opencast.org
+### repo.opencast.org, pkg.opencast.org, pullrequests.opencast.org
 
 - Same server
 
-
-University of Saskatchewean
----------------------------
-
-### Common Configuration Choices
-
-- Debian 8.x
-- Unattended upgrades
-
-### Testing Cluster (test\*.usask.ca)
-
-- Using Debian packages for Opencast
-- Nightly reset and upgrade
-
-### oc-cache.usask.ca
-
-- Using [Docker Nexus](https://hub.docker.com/r/lkiesow/opencast-nexus-oss/)

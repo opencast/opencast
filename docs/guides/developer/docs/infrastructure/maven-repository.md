@@ -134,29 +134,38 @@ generatePom | Whether or not to generate a pom file automatically               
 #### Help with push to the remote Nexus repository
 
 Uploading to Nexus is more difficult than it should be: You can't just run deploy:deploy-file. This script is handy
-when you need to manually upload something like a previous release.  Make a copy of
-`~/.m2/repository/org/opencastproject/*` to `$SOURCE_FILES` inside of your git clone, check out the version you're
-uploading, then run this script.  There will be numerous errors as it processes things that either don't have
-artifacts, or don't have artifacts in the version you're uploading, but those can be ignored.
+when you need to manually upload something like a previous release.  The script below checks out a version, then
+attempts to upload each module in the version.  Build Opencast, then run the script.  There will be numerous errors as
+it processes things that either don't have artifacts, or don't have artifacts in the version you're uploading, but
+those can be ignored.
 
     #!/bin/bash
 
     CORE_NEXUS="nexus.virtuos.uos.de:8081"
     SOURCE_FILES="nexus_copy"
+    VERSION=5.1
 
     uploadVersion() {
-      ls $1 | while read line
+      ls modules | while read line
       do
-        mvn deploy:deploy-file \
-          -DrepositoryId=opencast \
-          -Durl=http://$CORE_NEXUS/nexus/content/repositories/releases \
-          -Dfile=$SOURCE_FILES/$line/$2/$line-$2.jar \
-          -DgroupId=org.opencastproject -DartifactId=$line \
-          -Dversion=$2 \
-          -DgeneratePom=true \
-          -Dpackaging=jar
+        fn="$SOURCE_FILES/opencast-$line/$1/opencast-$line-$1.jar"
+        if [ -f "$fn" ]; then
+          mvn deploy:deploy-file \
+            -DrepositoryId=opencast \
+            -Durl=http://$CORE_NEXUS/nexus/content/repositories/releases \
+            -Dfile=$fn \
+            -DgroupId=org.opencastproject -DartifactId=opencast-$line \
+            -Dversion=$1 \
+            -DgeneratePom=true \
+            -Dpackaging=jar
+        else
+          echo "$fn is missing"
+        fi
       done
     }
 
-    git checkout <VERSION>
-    uploadVersion ~/.m2/repository/org/opencastproject <VERSION>
+    rm -f nexus_copy
+    ln -s ~/.m2/repository/org/opencastproject/ nexus_copy
+    git checkout $VERSION
+    uploadVersion $VERSION
+

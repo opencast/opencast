@@ -15,6 +15,15 @@ ETH Zürich                 | stable.opencast.org           | Lars Kiesow      |
 Jan Koppe                  | legacy.opencast.org           | Greg Logan       | Jan Koppe
 
 
+### CI Servers
+Institution                | Hostname                             | Admin (Software) | Admin (Hardware)
+---------------------------|--------------------------------------|------------------|--------------------
+University of Cologne      | oc-com-admin.rrz.uni-koeln.de        | Greg Logan       | Ruth Lang
+University of Cologne      | oc-com-worker1.rrz.uni-koeln.de      | Greg Logan       | Ruth Lang
+University of Cologne      | oc-com-presentation.rrz.uni-koeln.de | Greg Logan       | Ruth Lang
+
+
+
 ### Maven Repository
 
 Institution                | Hostname                      | Admin (Software) | Admin (Hardware)  | Notes
@@ -34,6 +43,7 @@ Nexus administration:
 Institution                | Hostname                        | Admin (Software) | Admin (Hardware)
 ---------------------------|---------------------------------|------------------|-------------------------
 University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
+University of Cologne      | ci.opencast.org                 | Greg Logan       | Ruth Lang
 University of Osnabrück    | build.opencast.org              | Greg Logan       | Lars Kiesow
 University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | opencast.org                    | Rüdiger Rolf     | UOS RZ
@@ -71,7 +81,7 @@ groups in multiple places when a change is necessary.  These changes are
 - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
 - Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
-- Modifying the list of committers on the [Opencast website](http://www.opencast.org/community)
+- Modifying the list of committers on the [Opencast website](http://www.opencast.org/people)
 
 ### Current Administrators
 
