@@ -68,7 +68,9 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -1316,6 +1318,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
         convertedImage.setIdentifier(idBuilder.createNew().toString());
+        try {
+          convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
+        } catch (UnknownFileTypeException e) {
+          logger.warn("Mime type unknown for file {}. Setting none.", convertedImage.getURI(), e);
+        }
+
         convertedImages.add(convertedImage);
       }
     } catch (Throwable t) {
