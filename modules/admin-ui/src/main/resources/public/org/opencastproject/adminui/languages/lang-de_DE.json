@@ -191,6 +191,8 @@
       "VIDEO_CUT_SAVED": "Die Bearbeitungsinformationen wurden gespeichert",
       "VIDEO_CUT_PROCESSING": "Das Video wird verarbeitet…",
       "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
+      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
       "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "SERVICE_UNAVAILABLE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "ACTIVE_TRANSACTION": "Dieses Ereignis kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind."
@@ -1729,7 +1731,8 @@
          "METADATA": "Metadaten",
          "THUMBNAIL": "Thumbnail",
          "COMMENTS": "Kommentare",
-         "SEGMENTS": "Segmente"
+         "SEGMENTS": "Segmente",
+         "TRACKS": "Tracks"
       },
       "ACTIONS": {
          "SPLIT": "Auftrennen",
@@ -1782,6 +1785,36 @@
             "DEFAULT": "You are currently using the default thumbnail.",
             "SNAPSHOT": "The current thumbnail has been extracted from the video.",
             "UPLOAD": "You are currently using an uploaded thumbnail."
+         }
+      },
+      "TRACKS": {
+         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "NOTIFICATION": {
+            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+         },
+         "TRACK": {
+            "HEADER": "Track"
+         },
+         "VIDEO": {
+            "HEADER": "Video track",
+            "NOT_AVAILABLE": "No video tracks available",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No video track selected",
+            "TOOLTIPS": {
+               "HIDE": "This video track is currently enabled. Click to disable",
+               "UNHIDE": "This video track is currently disabled. Click to enable."
+            }
+         },
+         "AUDIO": {
+            "HEADER": "Audio track",
+            "NOT_AVAILABLE": "No audio tracks available",
+            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "NO_TRACK_SELECTED": "No audio track selected",
+            "TOOLTIPS": {
+               "HIDE": "This audio track is currently enabled. Click to disable",
+               "UNHIDE": "This audio track is currently disabled. Click to enable"
+            }
          }
       },
       "PLAYER": {
