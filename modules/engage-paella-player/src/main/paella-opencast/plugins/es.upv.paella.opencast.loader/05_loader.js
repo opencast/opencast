@@ -29,7 +29,7 @@ function loadOpencastPaella(containerId) {
           var converter = new OpencastToPaellaConverter();
           var data = converter.convertToDataJson(episode);
           if (data.streams.length < 1) {
-            paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video traks found'));
+            paella.messageBox.showError(paella.dictionary.translate('Error loading video! No video tracks found'));
           }
           else {
             resolve(data);
