@@ -1,11 +1,10 @@
 {
   "name": "opencast-lit-tools",
-  "version": "1.0.0",
+  "private": true,
   "scripts": {
     "eslint": "eslint src/main/resources/",
     "html-linter": "html-linter --config .html-linter.json 'src/main/resources/**/*.html'"
   },
-  "license": "ECL-2.0",
   "dependencies": {
     "font-awesome": "^4.7.0",
     "jquery": "^3.3.1",

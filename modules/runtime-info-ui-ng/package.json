@@ -1,6 +1,6 @@
 {
   "name": "opencast-runtime-info-ui-ng",
-  "license": "ECL-2.0",
+  "private": true,
   "scripts": {
     "eslint": "eslint src/main/resources/ui/"
   },
