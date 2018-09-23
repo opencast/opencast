@@ -1,15 +1,3 @@
-Coding Principles
------------------
-
-<dl>
-  <dt>Modularity</dt>
-  <dd>Reusable interface components to build out new views based on the existing code structure.</dd>
-  <dt>Validation</dt>
-  <dd>All code languages are HTML5 and CSS3 and adhere to W3C standards.</dd>
-  <dt>Extension</dt>
-  <dd>For ease of UI and UX changes the styling elements are driven by SASS CSS pre-compiler.</dd>
-</dl>
-
 Style Guide
 -----------
 
@@ -17,50 +5,19 @@ The style guide defines a set of guidelines that the design follows to maintain 
 It is defined to be flexible, easy to update and consistent. Before delving deeper into the UI or
 developing additional features we recommend familiarizing yourself with some of the items.
 
-Modifying Sources
------------------
-
-When you make changes to the sources, it should be sufficient to rebuild the
-Admin UI NG module and copy the packaged module file into the Opencast assembly.
-
-Example:
-```bash
-cd modules/admin-ui
-mvn install
-cp ./target/admin-ui-2.2-SNAPSHOT.jar ../../build/opencast-dist-allinone-2.2-SNAPSHOT/system/org/opencastproject/admin-ui/2.2-SNAPSHOT/admin-ui-2.2-SNAPSHOT.jar
-```
-
-*Note: Before you run `mvn install` from a module's root directory,
-please make sure that you have built the complete software at least once
---i.e. you should have already run `mvn install` from the repository root
-at some point.*
-
-*Note: In the example above, the paths are for a specific Opencast version.
-Your paths might look different.*
 
 Prerequisites
 -------------
 
-1. Checkout and build Opencast.
-
-2. You will need to install [NodeJS][2] (which includes npm).
-
-3. Before setting up the local server ensure that your npm is up-to-date (this might require `sudo` on certain systems):
-
-        npm update -g npm
-
-You can also run a local version of [Grunt][1] and [NodeJS][2] from the Opencast module:
+For admin interface development, it may come handy to run npm or grunt from the command line. For that, you can either
+install those tools globally on your machine, or use the versions Opencast installs locally when building via Maven. If
+you want to do that, you may want to add the installation folders to your path variable:
 
 ```bash
 cd modules/admin-ui
-export PATH=node:node_modules/grunt-cli/bin:node_modules/karma/bin:$PATH
+export PATH=node:node_modules/.bin:$PATH
 ```
 
-*Note: The node and node_modules folders are created during the Maven build process.*
-
-*Note: We already had reports of Grunt behaving differently on different systems.
-Watch out for local or system-wide installations of Grunt and/or NodeJS as they can
-change the build behavior of Admin UI NG.*
 
 Debugging Javascript unit tests
 ------------------------------------
