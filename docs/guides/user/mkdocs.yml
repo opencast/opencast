@@ -34,3 +34,5 @@ pages:
   - Overview: 'advanced/index.md'
   - Capture Agent Access Control: 'advanced/capture-agent-access.md'
   - Role-Based Visibility: 'advanced/role-based-visibility.md'
+  - Offloading Event to AWS S3: 'advanced/offload-s3.md'
+  - Restoring Events from AWS to local storage: 'advanced/restore.md'
