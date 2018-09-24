@@ -40,7 +40,7 @@
                                     </thead>
                                     <tbody >
                                     <tr ng-repeat="row in rows" ng-form="rowsForm" ng-class="{error: rowsForm.selection.$error.taskStartable}">
-                                        <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" task-startable="{{row.source}}" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
+                                        <td><input name="selection" ng-required="!hasAnySelected()" type="checkbox" task-startable="{{row.event_status_raw}}" ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></td>
                                         <td>{{ row.title }}</td>
                                         <td class="nowrap">{{ row.series_name}}</td>
                                         <td class="nowrap">{{ row.event_status }}</td>

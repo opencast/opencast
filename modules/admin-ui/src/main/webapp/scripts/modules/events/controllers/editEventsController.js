@@ -342,11 +342,11 @@ function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, C
     };
 
     $scope.nonSchedule = function(row) {
-        return row.source !== 'SCHEDULE';
+        return row.event_status_raw !== 'EVENTS.EVENTS.STATUS.SCHEDULED';
     };
 
     $scope.nonScheduleSelected = function() {
-        return JsHelper.filter($scope.getSelected(),function (r) { return r.source !== 'SCHEDULE'; }).length > 0;
+        return JsHelper.filter($scope.getSelected(), $scope.nonSchedule).length > 0;
     };
 
     $scope.rowsValid = function() {

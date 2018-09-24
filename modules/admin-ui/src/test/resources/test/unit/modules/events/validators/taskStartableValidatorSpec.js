@@ -18,14 +18,14 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
 
     beforeEach(function () {
         $rootScope.row = {
-            source: 'ARCHIVE',
+            event_status_raw: 'PROCESSED',
             selected: true
         };
-        element = '<form name="testform"><input name="selection" type="checkbox" task-startable="{{row.source}}" ' +
+        element = '<form name="testform"><input name="selection" type="checkbox" task-startable="{{row.event_status_raw}}" ' +
             'ng-model="row.selected" ng-change="rowSelectionChanged($index)" class="child-cbox"></form>';
     });
 
-    describe('source === ARCHIVE', function () {
+    describe('event_status_raw === PROCESSED', function () {
         beforeEach(function () {
             $compile(element)($rootScope);
             $rootScope.$digest();
@@ -35,15 +35,47 @@ describe('adminNg.modules.events.validators.taskStartableValidator', function ()
             expect($rootScope.row.selected).toBeTruthy();
         });
 
-        it('is valid if it is selected and source equals ARCHIVE', function () {
+        it('is valid if it is selected and event_status_raw equals PROCESSED', function () {
             expect($rootScope.testform.$valid).toBeTruthy();
         });
-
     });
 
-    describe('source === PROCESSING', function () {
-        it('is invalid if source does not equal ARCHIVE', function () {
-            $rootScope.row.source = 'PROCESSING';
+    describe('event_status_raw === PROCESSING_CANCELED', function () {
+        beforeEach(function () {
+            $rootScope.row.event_status_raw = 'PROCESSING_CANCELED';
+            $compile(element)($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('instantiates', function () {
+            expect($rootScope.row.selected).toBeTruthy();
+        });
+
+        it('is valid if it is selected and event_status_raw equals PROCESSING_CANCELED', function () {
+            expect($rootScope.testform.$valid).toBeTruthy();
+        });
+    });
+
+    describe('event_status_raw === PROCESSING_FAILURE', function () {
+        beforeEach(function () {
+            $rootScope.row.event_status_raw = 'PROCESSING_FAILURE';
+            $compile(element)($rootScope);
+            $rootScope.$digest();
+        });
+
+        it('instantiates', function () {
+            expect($rootScope.row.selected).toBeTruthy();
+        });
+
+        it('is valid if it is selected and event_status_raw equals PROCESSING_FAILURE', function () {
+            expect($rootScope.testform.$valid).toBeTruthy();
+        });
+    });
+
+
+    describe('event_status_raw === RECORDING_FAILURE', function () {
+        it('is invalid if source does not equal PROCESSED, nor PROCESSING_CANCELED, nor PROCESSING_FAILURE', function () {
+            $rootScope.row.event_status_raw = 'RECORDING_FAILURE';
             $compile(element)($rootScope);
             $rootScope.$digest();
             expect($rootScope.testform.$valid).toBeFalsy();

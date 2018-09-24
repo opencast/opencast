@@ -34,7 +34,9 @@ angular.module('adminNg.directives')
         ctrl.$validators.taskStartable = function (modelValue, viewValue) {
             if (viewValue) {
                 if (angular.isDefined(attrs.taskStartable) &&
-                    attrs.taskStartable.toUpperCase().indexOf('ARCHIVE') === 0) {
+                    (attrs.taskStartable.toUpperCase().indexOf('PROCESSED') > -1
+                    || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_FAILURE') > -1
+                    || attrs.taskStartable.toUpperCase().indexOf('PROCESSING_CANCELED') > -1)) {
                     return true;
                 }
                 else {
