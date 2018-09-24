@@ -426,7 +426,7 @@
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
             <Import-Package>
-              net.fortuna.ical4j.*,
+              net.mnode.ical4j.*,
               org.opencastproject.index.service.message,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,

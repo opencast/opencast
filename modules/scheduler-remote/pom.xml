@@ -71,7 +71,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              net.fortuna.ical4j.*,
+              net.mnode.ical4j.*,
               *
             </Import-Package>
             <Export-Package>
