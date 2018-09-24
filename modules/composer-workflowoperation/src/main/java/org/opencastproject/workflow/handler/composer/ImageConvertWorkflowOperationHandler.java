@@ -58,6 +58,28 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
 
   private static final Logger logger = LoggerFactory.getLogger(ImageConvertWorkflowOperationHandler.class);
 
+  /** Configuration key for the source flavor */
+  private static final String CONFIG_KEY_SOURCE_FLAVOR = "source-flavor";
+  /** Configuration key for source flavors (comma seperated values) */
+  private static final String CONFIG_KEY_SOURCE_FLAVORS = "source-flavors";
+  /** Configuration key for source tags (comma separated values) */
+  private static final String CONFIG_KEY_SOURCE_TAGS = "source-tags";
+  /** Configuration key for the target flavor */
+  private static final String CONFIG_KEY_TARGET_FLAVOR = "target-flavor";
+  /** Configuration key for target flavor. The value of this configuration will be used, if target-flavor isn't set */
+  private static final String CONFIG_KEY_TARGET_FLAVORS = "target-flavors";
+  /** Configuration key for target tags */
+  private static final String CONFIG_KEY_TARGET_TAGS = "target-tags";
+  /** Configuration key for encoding profile */
+  private static final String CONFIG_KEY_ENCODING_PROFILE = "encoding-profile";
+  /** Configuration key for encoding profile. The value of this configuration will be used,
+   * if encoding-profile isn't set  */
+  private static final String CONFIG_KEY_ENCODING_PROFILES = "encoding-profiles";
+  /** Boolean configuration key for value, wether to use flavors and tags for selection of the source
+   *  attachments (set to true) or flavors or tags (set to false) */
+  private static final String CONFIG_KEY_TAGS_AND_FLAVORS = "tags-and-flavors";
+
+
   /** The composer service */
   private ComposerService composerService = null;
 
@@ -87,17 +109,17 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration("source-flavor"));
-    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("source-flavors"));
-    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration("source-tags"));
-    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavor"));
+    String sourceFlavorOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_SOURCE_FLAVOR));
+    String sourceFlavorsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_SOURCE_FLAVORS));
+    String sourceTagsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_SOURCE_TAGS));
+    String targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TARGET_FLAVOR));
     if (targetFlavorOption == null)
-      targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration("target-flavors"));
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration("target-tags"));
-    String encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration("encoding-profile"));
+      targetFlavorOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TARGET_FLAVORS));
+    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TARGET_TAGS));
+    String encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILE));
     if (encodingProfileOption == null)
-      encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration("encoding-profiles"));
-    String tagsAndFlavorsOption = StringUtils.trimToNull(operation.getConfiguration("tags-and-flavors"));
+      encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILES));
+    String tagsAndFlavorsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TAGS_AND_FLAVORS));
     boolean tagsAndFlavors = BooleanUtils.toBoolean(tagsAndFlavorsOption);
 
 
@@ -117,6 +139,24 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
         targetFlavor = MediaPackageElementFlavor.parseFlavor(targetFlavorOption);
       } catch (IllegalArgumentException e) {
         throw new WorkflowOperationException("Target flavor '" + targetFlavorOption + "' is malformed");
+      }
+    }
+    // check target-tags configuration
+    List<String> fixedTags = new ArrayList<>();
+    List<String> additionalTags = new ArrayList<>();
+    List<String> removingTags = new ArrayList<>();
+    for (String targetTag : asList(targetTagsOption)) {
+      if (!StringUtils.startsWithAny(targetTag, "+", "-")) {
+        if (additionalTags.size() > 0 || removingTags.size() > 0) {
+          logger.warn("You may not mix fixed tags and tag changes. "
+                  + "Please review target-tags option on image-convert operation of your workflow definition. "
+                  + "The tag {} is not prefixed with '+' or '-'.", targetTag);
+        }
+        fixedTags.add(targetTag);
+      } else if (StringUtils.startsWith(targetTag, "+")) {
+        additionalTags.add(StringUtils.substring(targetTag, 1));
+      } else if (StringUtils.startsWith(targetTag, "-")) {
+        removingTags.add(StringUtils.substring(targetTag, 1));
       }
     }
 
@@ -154,7 +194,7 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
         jobs.put(job, sourceElement);
       }
       if (!waitForStatus(jobs.keySet().toArray(new Job[jobs.size()])).isSuccess()) {
-        throw new WorkflowOperationException("At least one image conversation job does not succeeded.");
+        throw new WorkflowOperationException("At least one image conversation job did not succeed.");
       }
       for (Map.Entry<Job, Attachment> jobEntry : jobs.entrySet()) {
         Job job = jobEntry.getKey();
@@ -181,23 +221,6 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
             }
           }
           // set tags on target element
-          List<String> fixedTags = new ArrayList<>();
-          List<String> additionalTags = new ArrayList<>();
-          List<String> removingTags = new ArrayList<>();
-          for (String targetTag : asList(targetTagsOption)) {
-            if (!StringUtils.startsWithAny(targetTag, "+", "-")) {
-              if (additionalTags.size() > 0 || removingTags.size() > 0) {
-                logger.warn("You may not mix fixed tags and tag changes. "
-                        + "Please review target-tags option on image-convert operation of your workflow definition. "
-                        + "The tag {} is not prefixed with '+' or '-'.", targetTag);
-              }
-              fixedTags.add(targetTag);
-            } else if (StringUtils.startsWith(targetTag, "+")) {
-              additionalTags.add(StringUtils.substring(targetTag, 1));
-            } else if (StringUtils.startsWith(targetTag, "-")) {
-              removingTags.add(StringUtils.substring(targetTag, 1));
-            }
-          }
           targetElement.clearTags();
           if (fixedTags.isEmpty() && (!additionalTags.isEmpty() || !removingTags.isEmpty())) {
             for (String tag : sourceElement.getTags()) {

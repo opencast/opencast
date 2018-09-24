@@ -1243,11 +1243,12 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
       List<Attachment> result = convertImage(job, image, profileId);
-      if (result.isEmpty()) {
-        job.setStatus(Job.Status.FAILED);
-        return null;
-      }
       job.setStatus(Job.Status.FINISHED);
+      if (result.isEmpty()) {
+        throw new EncoderException(format(
+                "Unable to convert image %s with encoding profile %s. The result set is empty.",
+                image.getURI().toString(), profileId));
+      }
       return result.get(0);
     } catch (ServiceRegistryException | NotFoundException e) {
       throw new EncoderException("Unable to create a job", e);
@@ -1287,11 +1288,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         } catch (NotFoundException e) {
           incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
                   getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
-          throw new EncoderException("Requested video track " + sourceImage + " was not found", e);
+          throw new EncoderException("Requested attachment " + sourceImage + " was not found", e);
         } catch (IOException e) {
           incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
                   getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
-          throw new EncoderException("Error accessing video track " + sourceImage, e);
+          throw new EncoderException("Error accessing attachment " + sourceImage, e);
         }
 
         // Do the work
@@ -1309,7 +1310,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         // encoding did not return a file
         if (!output.exists() || output.length() == 0)
           throw new EncoderException(format(
-              "Image conversion job %d doesn't created an output file for the source image %s with encoding profile %s",
+              "Image conversion job %d didn't created an output file for the source image %s with encoding profile %s",
               job.getId(), sourceImage.getURI().toString(), profileId));
 
         // Put the file in the workspace
