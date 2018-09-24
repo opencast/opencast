@@ -68,11 +68,15 @@ import org.opencastproject.smil.entity.media.param.api.SmilMediaParamGroup;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LoadUtil;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.Gson;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -1205,21 +1209,24 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
-   *      java.lang.String)
+   *      java.lang.String...)
    */
   @Override
-  public Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+  public Job convertImage(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
     if (image == null)
       throw new IllegalArgumentException("Source image cannot be null");
 
-    String[] parameters = new String[2];
-    parameters[0] = profileId;
-    parameters[1] = MediaPackageElementParser.getAsXml(image);
+    if (profileIds == null)
+      throw new IllegalArgumentException("At least one encoding profile must be set");
 
+    Gson gson = new Gson();
+    List<String> params = Arrays.asList(gson.toJson(profileIds), MediaPackageElementParser.getAsXml(image));
+    float jobLoad = Arrays.stream(profileIds)
+            .map(p -> profileScanner.getProfile(p).getJobLoad())
+            .max(Float::compare)
+            .orElse(0.f);
     try {
-      final EncodingProfile profile = profileScanner.getProfile(profileId);
-      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageConversion.toString(), Arrays.asList(parameters),
-              profile.getJobLoad());
+      return serviceRegistry.createJob(JOB_TYPE, Operation.ImageConversion.toString(), params, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
@@ -1235,9 +1242,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
               JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      Option<Attachment> result = convertImage(job, image, profileId);
+      List<Attachment> result = convertImage(job, image, profileId);
       job.setStatus(Job.Status.FINISHED);
-      return result.getOrElseNull();
+      if (result.isEmpty()) {
+        throw new EncoderException(format(
+                "Unable to convert image %s with encoding profile %s. The result set is empty.",
+                image.getURI().toString(), profileId));
+      }
+      return result.get(0);
     } catch (ServiceRegistryException | NotFoundException e) {
       throw new EncoderException("Unable to create a job", e);
     } finally {
@@ -1252,62 +1264,84 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          the associated job
    * @param sourceImage
    *          the source image
-   * @param profileId
-   *          the identifer of the encoding profile to use
-   * @return the image as an attachment or none if the operation does not return an image. This may happen for example
-   *         when doing two pass encodings where the first pass only creates metadata for the second one
+   * @param profileIds
+   *          the identifier of the encoding profiles to use
+   * @return the list of converted images as an attachment.
    * @throws EncoderException
    *           if converting the image fails
    */
-  private Option<Attachment> convertImage(Job job, Attachment sourceImage, String profileId) throws EncoderException,
+  private List<Attachment> convertImage(Job job, Attachment sourceImage, String... profileIds) throws EncoderException,
           MediaPackageException {
-    logger.info("Converting {}", sourceImage);
-
-    // Get the encoding profile
-    final EncodingProfile profile = getProfile(job, profileId);
-
-    // Create the encoding engine
+    List<Attachment> convertedImages = new ArrayList<>();
     final EncoderEngine encoderEngine = getEncoderEngine();
-
-    // Finally get the file that needs to be encoded
-    File imageFile;
     try {
-      imageFile = workspace.get(sourceImage.getURI());
-    } catch (NotFoundException e) {
-      incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
-              getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
-      throw new EncoderException("Requested video track " + sourceImage + " was not found", e);
-    } catch (IOException e) {
-      incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
-              getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
-      throw new EncoderException("Error accessing video track " + sourceImage, e);
-    }
+      for (String profileId : profileIds) {
+        logger.info("Converting {} using encoding profile {}", sourceImage, profileId);
 
-    // Do the work
-    File output;
-    try {
-      output = encoderEngine.encode(imageFile, profile, null);
-    } catch (EncoderException e) {
-      Map<String, String> params = new HashMap<>();
-      params.put("image", sourceImage.getURI().toString());
-      params.put("profile", profile.getIdentifier());
-      incident().recordFailure(job, CONVERT_IMAGE_FAILED, e, params, detailsFor(e, encoderEngine));
-      throw e;
+        // Get the encoding profile
+        final EncodingProfile profile = getProfile(job, profileId);
+
+        // Finally get the file that needs to be encoded
+        File imageFile;
+        try {
+          imageFile = workspace.get(sourceImage.getURI());
+        } catch (NotFoundException e) {
+          incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
+                  getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
+          throw new EncoderException("Requested attachment " + sourceImage + " was not found", e);
+        } catch (IOException e) {
+          incident().recordFailure(job, WORKSPACE_GET_IO_EXCEPTION, e,
+                  getWorkspaceMediapackageParams("source image", sourceImage), NO_DETAILS);
+          throw new EncoderException("Error accessing attachment " + sourceImage, e);
+        }
+
+        // Do the work
+        File output;
+        try {
+          output = encoderEngine.encode(imageFile, profile, null);
+        } catch (EncoderException e) {
+          Map<String, String> params = new HashMap<>();
+          params.put("image", sourceImage.getURI().toString());
+          params.put("profile", profile.getIdentifier());
+          incident().recordFailure(job, CONVERT_IMAGE_FAILED, e, params, detailsFor(e, encoderEngine));
+          throw e;
+        }
+
+        // encoding did not return a file
+        if (!output.exists() || output.length() == 0)
+          throw new EncoderException(format(
+              "Image conversion job %d didn't created an output file for the source image %s with encoding profile %s",
+              job.getId(), sourceImage.getURI().toString(), profileId));
+
+        // Put the file in the workspace
+        URI workspaceURI = putToCollection(job, output, "converted image file");
+
+        MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
+        convertedImage.setIdentifier(idBuilder.createNew().toString());
+        try {
+          convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
+        } catch (UnknownFileTypeException e) {
+          logger.warn("Mime type unknown for file {}. Setting none.", convertedImage.getURI(), e);
+        }
+
+        convertedImages.add(convertedImage);
+      }
+    } catch (Throwable t) {
+      for (Attachment convertedImage : convertedImages) {
+        try {
+          workspace.delete(convertedImage.getURI());
+        } catch (NotFoundException ex) {
+          // do nothing here
+        } catch (IOException ex) {
+          logger.warn("Unable to delete converted image {} from workspace", convertedImage.getURI(), ex);
+        }
+      }
+      throw t;
     } finally {
       activeEncoder.remove(encoderEngine);
     }
-
-    // encoding did not return a file
-    if (!output.exists() || output.length() == 0)
-      return none();
-
-    // Put the file in the workspace
-    URI workspaceURI = putToCollection(job, output, "converted image file");
-
-    MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-    Attachment attachment = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
-
-    return some(attachment);
+    return convertedImages;
   }
 
   /**
@@ -1352,9 +1386,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           serialized = MediaPackageElementParser.getArrayAsXml(resultingElements);
           break;
         case ImageConversion:
+          Gson gson = new Gson();
+          String[] encodingProfilesArr = gson.fromJson(arguments.get(0), String[].class);
           Attachment sourceImage = (Attachment) MediaPackageElementParser.getFromXml(arguments.get(1));
-          serialized = convertImage(job, sourceImage, encodingProfile).map(
-                  MediaPackageElementParser.getAsXml()).getOrElse("");
+          List<Attachment> convertedImages = convertImage(job, sourceImage, encodingProfilesArr);
+          serialized = MediaPackageElementParser.getArrayAsXml(convertedImages);
           break;
         case Mux:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));

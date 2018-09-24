@@ -119,6 +119,7 @@ pages:
    - Failing: 'workflowoperationhandlers/failing-woh.md'
    - HTTP Notify: 'workflowoperationhandlers/httpnotify-woh.md'
    - Image: 'workflowoperationhandlers/image-woh.md'
+   - Image convert: 'workflowoperationhandlers/image-convert-woh.md'
    - Image to Video: 'workflowoperationhandlers/imagetovideo-woh.md'
    - Import Workflow Properties: 'workflowoperationhandlers/import-wf-properties-woh.md'
    - Incident: 'workflowoperationhandlers/incident-woh.md'

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns2:mediapackage start="2010-05-19T09:27:46"
+	id="d51f9d4e-b5e7-41e0-8640-0d1f43b2fed0" duration="65649"
+	xmlns:ns2="http://mediapackage.opencastproject.org">
+	<ns2:title>Image convert operation handler test</ns2:title>
+	<ns2:metadata>
+		<ns2:catalog type="dublincore/episode" id="9a9eb5dd-e0e1-4321-b46b-66a1feb5bac7">
+			<ns2:mimetype>text/xml</ns2:mimetype>
+			<ns2:tags />
+			<ns2:url>fooDC.xml</ns2:url>
+		</ns2:catalog>
+	</ns2:metadata>
+	<ns2:attachments>
+		<ns2:attachment type="image/intro" id="intro-image">
+			<ns2:mimetype>image/png</ns2:mimetype>
+			<ns2:tags>intro</ns2:tags>
+			<ns2:url>image.png</ns2:url>
+		</ns2:attachment>
+	</ns2:attachments>
+</ns2:mediapackage>

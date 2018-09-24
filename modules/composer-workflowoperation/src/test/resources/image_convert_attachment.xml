@@ -1,0 +1,5 @@
+<attachment id="attachment-2" ref="track:intro-image" type="image/converted" xmlns="http://mediapackage.opencastproject.org">
+  <mimetype>image/jpeg</mimetype>
+  <url>converted.jpg</url>
+  <size>0</size>
+</attachment>

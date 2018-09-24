@@ -50,6 +50,7 @@ The following table contains the workflow operations that are available in an ou
 |failing             |Operations that always fails                                   |[Documentation](failing-woh.md)|
 |http-notify         |Notifies an HTTP endpoint about the process of the workflow    |[Documentation](httpnotify-woh.md)|
 |image               |Extract images from a video using FFmpeg                       |[Documentation](image-woh.md)|
+|image-convert       |Convert images using FFmpeg                                    |[Documentation](image-convert-woh.md)|
 |image-to-video      |Create a video track from a source image                       |[Documentation](imagetovideo-woh.md)|
 |import-wf-properties|Import workflow properties                                     |[Documentation](import-wf-properties-woh.md)|
 |incident            |Testing incidents on a dummy job                               |[Documentation](incident-woh.md)|

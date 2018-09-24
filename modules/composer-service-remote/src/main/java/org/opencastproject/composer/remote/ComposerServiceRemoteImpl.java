@@ -335,15 +335,15 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    * {@inheritDoc}
    *
    * @see org.opencastproject.composer.api.ComposerService#convertImage(org.opencastproject.mediapackage.Attachment,
-   *      java.lang.String)
+   *      java.lang.String...)
    */
   @Override
-  public Job convertImage(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+  public Job convertImage(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/convertimage");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
-      params.add(new BasicNameValuePair("profileId", profileId));
+      params.add(new BasicNameValuePair("profileId", StringUtils.join(profileIds, ',')));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new EncoderException(e);
