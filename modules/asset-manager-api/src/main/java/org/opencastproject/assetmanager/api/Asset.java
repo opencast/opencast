@@ -50,4 +50,7 @@ public interface Asset {
 
   /** Tell about the availability of the asset. */
   Availability getAvailability();
+
+  /** Get the store ID of the asset store where this snapshot currently lives */
+  String getStorageId();
 }

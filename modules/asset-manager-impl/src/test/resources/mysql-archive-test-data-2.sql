@@ -277,782 +277,782 @@ VALUES ('00316361-68f2-47b1-a1ca-7f7f88ea71b2', 9, 'mh_default_org',
 #### 
 # oc_archive_asset
 ##
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5707913, '0c7da2f5-05c3-4924-903c-b6d0ea63c582', '00078f49-3a0c-4970-beb2-a4ef6fbd3e75', 'mh_default_org',
    '0635dd994ddfa3e8e4a14eab0103aeee (md5)',
-   'urn:matterhorn:00078f49-3a0c-4970-beb2-a4ef6fbd3e75:3:0c7da2f5-05c3-4924-903c-b6d0ea63c582', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00078f49-3a0c-4970-beb2-a4ef6fbd3e75:3:0c7da2f5-05c3-4924-903c-b6d0ea63c582', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5707914, 'catalog-1', '00078f49-3a0c-4970-beb2-a4ef6fbd3e75', 'mh_default_org',
-   'e97523e277cb291ea4dda6bacc95b186 (md5)', 'urn:matterhorn:00078f49-3a0c-4970-beb2-a4ef6fbd3e75:3:catalog-1', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'e97523e277cb291ea4dda6bacc95b186 (md5)', 'urn:matterhorn:00078f49-3a0c-4970-beb2-a4ef6fbd3e75:3:catalog-1', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487343, '5cb8fca0-fae3-4370-93af-3ed504f60798', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '35da151812331f49830525a79c9ff31e (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:5cb8fca0-fae3-4370-93af-3ed504f60798', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:5cb8fca0-fae3-4370-93af-3ed504f60798', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487342, 'security-policy-series', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'e1d23fb610078194ec7c8ed8470962e1 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:security-policy-series', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:security-policy-series', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487341, '84fdcc5c-29c4-4cfa-9983-faa6f86579ef', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'cf2d7d5b452dd1f651a2dda6ff73ed2c (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487340, 'track-6', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-6', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-6', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487339, 'fd2774f4-6374-4097-a2d7-915d4d4e0f31', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '7b5a5681c0a55aa94f50ce907a971121 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487338, 'track-1', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-1', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-1', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2487337, 'track-0', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-0', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:2:track-0', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418135, 'security-policy-series', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'e1d23fb610078194ec7c8ed8470962e1 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418134, '84fdcc5c-29c4-4cfa-9983-faa6f86579ef', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'cf2d7d5b452dd1f651a2dda6ff73ed2c (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418133, '5cb8fca0-fae3-4370-93af-3ed504f60798', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '35da151812331f49830525a79c9ff31e (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:5cb8fca0-fae3-4370-93af-3ed504f60798', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:5cb8fca0-fae3-4370-93af-3ed504f60798', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418132, 'track-6', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418131, 'fd2774f4-6374-4097-a2d7-915d4d4e0f31', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '7b5a5681c0a55aa94f50ce907a971121 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418130, 'track-1', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2418129, 'track-0', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759320, 'security-policy', '00068237-8316-48c5-b898-9ae7ad236f89', 'mh_default_org',
    '51a8f8236cf8309e9ebe6f892b9c1d31 (md5)', 'urn:matterhorn:00068237-8316-48c5-b898-9ae7ad236f89:2:security-policy',
-   2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759319, 'b4aee770-dfb0-49b7-93e4-9fed53a6cd30', '00068237-8316-48c5-b898-9ae7ad236f89', 'mh_default_org',
    '3da473316e0dae124dce99d011209d49 (md5)',
-   'urn:matterhorn:00068237-8316-48c5-b898-9ae7ad236f89:2:b4aee770-dfb0-49b7-93e4-9fed53a6cd30', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00068237-8316-48c5-b898-9ae7ad236f89:2:b4aee770-dfb0-49b7-93e4-9fed53a6cd30', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759318, '48906694-2a9f-42a8-a701-8212d1595b7c', '00068237-8316-48c5-b898-9ae7ad236f89', 'mh_default_org',
    'efbc526a45141f1c0b5f31d85f213e5f (md5)',
-   'urn:matterhorn:00068237-8316-48c5-b898-9ae7ad236f89:2:48906694-2a9f-42a8-a701-8212d1595b7c', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00068237-8316-48c5-b898-9ae7ad236f89:2:48906694-2a9f-42a8-a701-8212d1595b7c', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458717, '5cb8fca0-fae3-4370-93af-3ed504f60798', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '6ffd3250bc331c43a5560b618bba6d50 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:5cb8fca0-fae3-4370-93af-3ed504f60798', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:5cb8fca0-fae3-4370-93af-3ed504f60798', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458716, 'security-policy-series', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'e1d23fb610078194ec7c8ed8470962e1 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:security-policy-series', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:security-policy-series', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458715, '84fdcc5c-29c4-4cfa-9983-faa6f86579ef', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    'cf2d7d5b452dd1f651a2dda6ff73ed2c (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:84fdcc5c-29c4-4cfa-9983-faa6f86579ef', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458714, 'track-6', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-6', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-6', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458713, 'fd2774f4-6374-4097-a2d7-915d4d4e0f31', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
    '7b5a5681c0a55aa94f50ce907a971121 (md5)',
-   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:fd2774f4-6374-4097-a2d7-915d4d4e0f31', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458712, 'track-1', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '7b5a5681c0a55aa94f50ce907a971121 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2458711, 'track-0', '00072fc3-b216-470f-9511-36452046a5ce', 'mh_default_org',
-   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-0', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '41cb1b4b3deb117ae7f97a9ed5a1dfb4 (md5)', 'urn:matterhorn:00072fc3-b216-470f-9511-36452046a5ce:1:track-0', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186607, 'track-0', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186608, 'track-1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186609, 'eb1fb579-6e8e-42b9-a864-04611513620c', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '87ec11b732992b02b4b780f24d369e02 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:eb1fb579-6e8e-42b9-a864-04611513620c', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:eb1fb579-6e8e-42b9-a864-04611513620c', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186610, 'track-6', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186611, 'c50ed549-578f-40eb-a0b4-b03be8434757', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'a8d364e19aec74a4ef9d2ed6d088e108 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:c50ed549-578f-40eb-a0b4-b03be8434757', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:c50ed549-578f-40eb-a0b4-b03be8434757', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186612, '2854d264-5f0e-4a94-a2de-c8351b6d56e1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'c10d50bb15e82b1271a44878568831e3 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2186613, 'security-policy-series', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '05dea0e9d2a29c2b997af2426fe446ef (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188111, 'track-0', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-0', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-0', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189460, '2854d264-5f0e-4a94-a2de-c8351b6d56e1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'c10d50bb15e82b1271a44878568831e3 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189461, 'security-policy-series', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '05dea0e9d2a29c2b997af2426fe446ef (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:security-policy-series', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:security-policy-series', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189462, 'c50ed549-578f-40eb-a0b4-b03be8434757', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '61c6f4fc77876a978987b26ace1c7e2c (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:c50ed549-578f-40eb-a0b4-b03be8434757', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:c50ed549-578f-40eb-a0b4-b03be8434757', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188112, 'track-1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188113, 'eb1fb579-6e8e-42b9-a864-04611513620c', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '87ec11b732992b02b4b780f24d369e02 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:eb1fb579-6e8e-42b9-a864-04611513620c', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:eb1fb579-6e8e-42b9-a864-04611513620c', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188114, 'track-6', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-6', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:track-6', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188115, '2854d264-5f0e-4a94-a2de-c8351b6d56e1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'c10d50bb15e82b1271a44878568831e3 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188116, 'security-policy-series', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '05dea0e9d2a29c2b997af2426fe446ef (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:security-policy-series', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:security-policy-series', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2188117, 'c50ed549-578f-40eb-a0b4-b03be8434757', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '61c6f4fc77876a978987b26ace1c7e2c (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:c50ed549-578f-40eb-a0b4-b03be8434757', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:1:c50ed549-578f-40eb-a0b4-b03be8434757', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189456, 'track-0', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-0', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-0', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189457, 'track-1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-1', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-1', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189458, 'eb1fb579-6e8e-42b9-a864-04611513620c', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '87ec11b732992b02b4b780f24d369e02 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:eb1fb579-6e8e-42b9-a864-04611513620c', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:eb1fb579-6e8e-42b9-a864-04611513620c', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189459, 'track-6', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-6', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:2:track-6', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234159, '2854d264-5f0e-4a94-a2de-c8351b6d56e1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'c10d50bb15e82b1271a44878568831e3 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234160, 'security-policy-series', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '05dea0e9d2a29c2b997af2426fe446ef (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:security-policy-series', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:security-policy-series', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234161, 'c50ed549-578f-40eb-a0b4-b03be8434757', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'b9a622aaf6c06f1abcc962bee33d0442 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:c50ed549-578f-40eb-a0b4-b03be8434757', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:c50ed549-578f-40eb-a0b4-b03be8434757', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234155, 'track-0', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-0', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-0', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234156, 'track-1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-1', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-1', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234157, 'eb1fb579-6e8e-42b9-a864-04611513620c', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '87ec11b732992b02b4b780f24d369e02 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:eb1fb579-6e8e-42b9-a864-04611513620c', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:eb1fb579-6e8e-42b9-a864-04611513620c', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2234158, 'track-6', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-6', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:3:track-6', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342571, 'd4a655e4-4438-4ed7-a4aa-b640c5936541', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    'fed7a3a72227c35cecb34a274596fd8d (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:d4a655e4-4438-4ed7-a4aa-b640c5936541', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:d4a655e4-4438-4ed7-a4aa-b640c5936541', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342572, 'security-policy-series', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    'cbfe6ab1a916953d107aa6f672dfa435 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:security-policy-series', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:security-policy-series', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342573, 'fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    'bdcb3554180493df87796ea56e95fdd3 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342567, 'track-0', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   'c51496ddf70b8ca5a7604d674c89bd91 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-0', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'c51496ddf70b8ca5a7604d674c89bd91 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-0', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342568, 'track-1', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342569, 'ffe10ea3-101f-4c09-90c7-7affeddc2d16', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:ffe10ea3-101f-4c09-90c7-7affeddc2d16', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:ffe10ea3-101f-4c09-90c7-7affeddc2d16', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2342570, 'track-6', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-6', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:1:track-6', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153470, '5d038a80-bc07-449d-856e-4b2e08c7471c', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
    '9d3ce7c248c5fdda090c7aa1ace57372 (md5)',
-   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:5d038a80-bc07-449d-856e-4b2e08c7471c', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:5d038a80-bc07-449d-856e-4b2e08c7471c', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5771356, 'f075c97b-a1ad-45e2-a7d3-6fa3b9ea883b', '0017067d-0203-40f1-9793-f291a55bcb3a', 'mh_default_org',
    '3d27dfa4acfc2b4efbdabc06533d17f9 (md5)',
-   'urn:matterhorn:0017067d-0203-40f1-9793-f291a55bcb3a:1:f075c97b-a1ad-45e2-a7d3-6fa3b9ea883b', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017067d-0203-40f1-9793-f291a55bcb3a:1:f075c97b-a1ad-45e2-a7d3-6fa3b9ea883b', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153471, '5fff5a97-162d-470e-bf59-ec760eae2100', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
    'eea4894a8c96a7737346b197fbedc0a7 (md5)',
-   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:5fff5a97-162d-470e-bf59-ec760eae2100', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:5fff5a97-162d-470e-bf59-ec760eae2100', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153472, 'security-policy-series', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
    '17d6a5023edf20faff1b28e769c7bdad (md5)',
-   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290889, 'track-0', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-0', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '9de48a8fac19fb25aa42d3bd459c2745 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-0', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290890, 'track-1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-1', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-1', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290891, 'eb1fb579-6e8e-42b9-a864-04611513620c', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '87ec11b732992b02b4b780f24d369e02 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:eb1fb579-6e8e-42b9-a864-04611513620c', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:eb1fb579-6e8e-42b9-a864-04611513620c', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290892, 'track-6', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
-   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-6', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '87ec11b732992b02b4b780f24d369e02 (md5)', 'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:track-6', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290893, '2854d264-5f0e-4a94-a2de-c8351b6d56e1', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'c10d50bb15e82b1271a44878568831e3 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:2854d264-5f0e-4a94-a2de-c8351b6d56e1', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290894, 'security-policy-series', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    '05dea0e9d2a29c2b997af2426fe446ef (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:security-policy-series', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:security-policy-series', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324238, 'track-0', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   'c51496ddf70b8ca5a7604d674c89bd91 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'c51496ddf70b8ca5a7604d674c89bd91 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153466, 'track-0', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
-   '5909089fb11f43ace4a9cccb4b3c6e5b (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '5909089fb11f43ace4a9cccb4b3c6e5b (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153467, 'track-1', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
-   '408d4fd9cf287df7c3b9176ddc9947f4 (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '408d4fd9cf287df7c3b9176ddc9947f4 (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153468, '4589fd24-97f9-4d29-951c-c807af613b58', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
    '408d4fd9cf287df7c3b9176ddc9947f4 (md5)',
-   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:4589fd24-97f9-4d29-951c-c807af613b58', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:4589fd24-97f9-4d29-951c-c807af613b58', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2153469, 'track-6', '001169d8-fd8d-4ee1-a3b5-6220740f4e1e', 'mh_default_org',
-   '408d4fd9cf287df7c3b9176ddc9947f4 (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '408d4fd9cf287df7c3b9176ddc9947f4 (md5)', 'urn:matterhorn:001169d8-fd8d-4ee1-a3b5-6220740f4e1e:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324239, 'track-1', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324240, 'ffe10ea3-101f-4c09-90c7-7affeddc2d16', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:ffe10ea3-101f-4c09-90c7-7affeddc2d16', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:ffe10ea3-101f-4c09-90c7-7affeddc2d16', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324241, 'track-6', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
-   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '39d6eaa7662ad96c0e2ec05a318f29b0 (md5)', 'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324242, 'fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    '9c83c9794e9771591f46f74342a22d78 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:fe88f4d8-3f77-450f-b8c8-8e26f23a1ef9', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324243, 'd4a655e4-4438-4ed7-a4aa-b640c5936541', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    'fed7a3a72227c35cecb34a274596fd8d (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:d4a655e4-4438-4ed7-a4aa-b640c5936541', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:d4a655e4-4438-4ed7-a4aa-b640c5936541', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2324244, 'security-policy-series', '00112197-b239-496c-a1c0-9710bf8208a7', 'mh_default_org',
    'cbfe6ab1a916953d107aa6f672dfa435 (md5)',
-   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00112197-b239-496c-a1c0-9710bf8208a7:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5771355, '82317802-f2d7-4b60-8755-2e3f31637e9b', '0017067d-0203-40f1-9793-f291a55bcb3a', 'mh_default_org',
    '2151d165baa27a45d5683dfefec60431 (md5)',
-   'urn:matterhorn:0017067d-0203-40f1-9793-f291a55bcb3a:1:82317802-f2d7-4b60-8755-2e3f31637e9b', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017067d-0203-40f1-9793-f291a55bcb3a:1:82317802-f2d7-4b60-8755-2e3f31637e9b', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5771357, 'security-policy', '0017067d-0203-40f1-9793-f291a55bcb3a', 'mh_default_org',
    'd89f4e3fefc6933fd1dcedadefb8d0b5 (md5)', 'urn:matterhorn:0017067d-0203-40f1-9793-f291a55bcb3a:1:security-policy',
-   1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759207, '6ffd8ce7-a2b0-407a-a8ac-f72248ba134c', '0017433f-e49d-4c9b-9a17-a2afb43c1ca0', 'mh_default_org',
    '42306b47f97fb76484afd8f160beb749 (md5)',
-   'urn:matterhorn:0017433f-e49d-4c9b-9a17-a2afb43c1ca0:1:6ffd8ce7-a2b0-407a-a8ac-f72248ba134c', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017433f-e49d-4c9b-9a17-a2afb43c1ca0:1:6ffd8ce7-a2b0-407a-a8ac-f72248ba134c', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759208, '2715dee2-a72b-4f6b-add8-e79fbda7e93c', '0017433f-e49d-4c9b-9a17-a2afb43c1ca0', 'mh_default_org',
    'dfc600f29eec8621ad70dd04892632b4 (md5)',
-   'urn:matterhorn:0017433f-e49d-4c9b-9a17-a2afb43c1ca0:1:2715dee2-a72b-4f6b-add8-e79fbda7e93c', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017433f-e49d-4c9b-9a17-a2afb43c1ca0:1:2715dee2-a72b-4f6b-add8-e79fbda7e93c', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5759209, 'security-policy', '0017433f-e49d-4c9b-9a17-a2afb43c1ca0', 'mh_default_org',
    '8297853fe372a84e489fa806d91980ba (md5)', 'urn:matterhorn:0017433f-e49d-4c9b-9a17-a2afb43c1ca0:1:security-policy',
-   1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5764856, '389800f0-4494-4dde-bbc9-17f1ee710fa3', '0017a130-b301-4022-918c-864fd9caf5b1', 'mh_default_org',
    '8123c7cd8556a01720ae031c10df52be (md5)',
-   'urn:matterhorn:0017a130-b301-4022-918c-864fd9caf5b1:2:389800f0-4494-4dde-bbc9-17f1ee710fa3', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017a130-b301-4022-918c-864fd9caf5b1:2:389800f0-4494-4dde-bbc9-17f1ee710fa3', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5764857, 'cec11396-d9f8-4183-8fa9-38d4c792c894', '0017a130-b301-4022-918c-864fd9caf5b1', 'mh_default_org',
    'e2c0b4374a7bc396865d5512be3e9e43 (md5)',
-   'urn:matterhorn:0017a130-b301-4022-918c-864fd9caf5b1:2:cec11396-d9f8-4183-8fa9-38d4c792c894', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0017a130-b301-4022-918c-864fd9caf5b1:2:cec11396-d9f8-4183-8fa9-38d4c792c894', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5764858, 'security-policy', '0017a130-b301-4022-918c-864fd9caf5b1', 'mh_default_org',
    'ff6f324e0704887ffcc284ee941d4a09 (md5)', 'urn:matterhorn:0017a130-b301-4022-918c-864fd9caf5b1:2:security-policy',
-   2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2290895, 'c50ed549-578f-40eb-a0b4-b03be8434757', '000b29fb-f35d-4578-8f8f-9bc2125d71d3', 'mh_default_org',
    'ddcef01b3eb6ac1bc485e8e5d5ba9208 (md5)',
-   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:c50ed549-578f-40eb-a0b4-b03be8434757', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:000b29fb-f35d-4578-8f8f-9bc2125d71d3:4:c50ed549-578f-40eb-a0b4-b03be8434757', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5794423, '786c9df3-a10d-4520-9985-f3985e22658c', '0012a436-75b5-4982-a40a-1d071e8d4c9f', 'mh_default_org',
    'bfa1c3cb8316965c3b5c1061c0e95c6b (md5)',
-   'urn:matterhorn:0012a436-75b5-4982-a40a-1d071e8d4c9f:1:786c9df3-a10d-4520-9985-f3985e22658c', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0012a436-75b5-4982-a40a-1d071e8d4c9f:1:786c9df3-a10d-4520-9985-f3985e22658c', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5794424, '6489b68f-2f60-4f49-8525-8874482b0aea', '0012a436-75b5-4982-a40a-1d071e8d4c9f', 'mh_default_org',
    'ed00822dcfece06f3b52a76708d4b3de (md5)',
-   'urn:matterhorn:0012a436-75b5-4982-a40a-1d071e8d4c9f:1:6489b68f-2f60-4f49-8525-8874482b0aea', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0012a436-75b5-4982-a40a-1d071e8d4c9f:1:6489b68f-2f60-4f49-8525-8874482b0aea', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5794425, 'security-policy', '0012a436-75b5-4982-a40a-1d071e8d4c9f', 'mh_default_org',
    '527391af10e4f37b56dcd22aa2fcd077 (md5)', 'urn:matterhorn:0012a436-75b5-4982-a40a-1d071e8d4c9f:1:security-policy',
-   1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5487395, 'track-1', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:track-1', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:track-1', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5487396, '4c7013b2-1823-4f7b-b190-1e9324587b92', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '2fb75441e552cbdc042d64e5aa8e6ca2 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:4c7013b2-1823-4f7b-b190-1e9324587b92', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:4c7013b2-1823-4f7b-b190-1e9324587b92', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5487397, 'security-policy-series', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '3f3a2fb30495f909d14cbbdde0f8a6a7 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:security-policy-series', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:security-policy-series', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5487398, '632df5ce-82f5-46ff-a6c3-f78cee89357c', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '9b72681fcebab51498a33601b4a14f75 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:632df5ce-82f5-46ff-a6c3-f78cee89357c', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:632df5ce-82f5-46ff-a6c3-f78cee89357c', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5487394, 'track-0', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:track-0', 2);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:2:track-0', 2, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244743, '04a73e7a-f0b5-463e-a52f-6feb22b62458', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
    '3ff992eadbaa0e4f39b462f23b3d5848 (md5)',
-   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:04a73e7a-f0b5-463e-a52f-6feb22b62458', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:04a73e7a-f0b5-463e-a52f-6feb22b62458', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244744, 'track-6', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
-   '3ff992eadbaa0e4f39b462f23b3d5848 (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '3ff992eadbaa0e4f39b462f23b3d5848 (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244745, '2f9ba231-0960-48e9-83f9-bb7309b72d6f', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
    'fe5c82d19db65f569680c2569a3d0f9a (md5)',
-   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:2f9ba231-0960-48e9-83f9-bb7309b72d6f', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:2f9ba231-0960-48e9-83f9-bb7309b72d6f', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244746, 'eae36ed2-fe42-49aa-ab62-81375d93afdc', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
    'f20d7415bedb9259782b33da5edd010d (md5)',
-   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:eae36ed2-fe42-49aa-ab62-81375d93afdc', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:eae36ed2-fe42-49aa-ab62-81375d93afdc', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5489342, 'track-0', '001a514d-635a-477c-a69d-cfb3754cc4e8', 'mh_default_org',
-   'dcde0997ead545fac8cf3d42118566a9 (md5)', 'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'dcde0997ead545fac8cf3d42118566a9 (md5)', 'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5489343, 'track-1', '001a514d-635a-477c-a69d-cfb3754cc4e8', 'mh_default_org',
-   '3884b8a190bdd6643931bf02ae50138a (md5)', 'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '3884b8a190bdd6643931bf02ae50138a (md5)', 'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5489344, 'cdb0d9d9-9ed0-4504-b40a-2abc0e551627', '001a514d-635a-477c-a69d-cfb3754cc4e8', 'mh_default_org',
    'cba3dd560b7b467ccbafa77b6070abdb (md5)',
-   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:cdb0d9d9-9ed0-4504-b40a-2abc0e551627', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:cdb0d9d9-9ed0-4504-b40a-2abc0e551627', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5745494, 'dc186597-67fe-46bf-9364-f2cdd7521530', '00186110-638d-4d3d-ba4c-ed36c4e1a2b4', 'mh_default_org',
    '47f5c2f2884d7de41f1937e98bc84c25 (md5)',
-   'urn:matterhorn:00186110-638d-4d3d-ba4c-ed36c4e1a2b4:4:dc186597-67fe-46bf-9364-f2cdd7521530', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00186110-638d-4d3d-ba4c-ed36c4e1a2b4:4:dc186597-67fe-46bf-9364-f2cdd7521530', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5745495, '8475db21-fa4a-445b-b34a-459451aede92', '00186110-638d-4d3d-ba4c-ed36c4e1a2b4', 'mh_default_org',
    'f1c1842b9c741dc57db433e83d30dc7a (md5)',
-   'urn:matterhorn:00186110-638d-4d3d-ba4c-ed36c4e1a2b4:4:8475db21-fa4a-445b-b34a-459451aede92', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00186110-638d-4d3d-ba4c-ed36c4e1a2b4:4:8475db21-fa4a-445b-b34a-459451aede92', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5489345, 'b6057538-9098-411f-a329-9808f15bd3b1', '001a514d-635a-477c-a69d-cfb3754cc4e8', 'mh_default_org',
    '6d9db3822482187075d6e15f2ef11338 (md5)',
-   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:b6057538-9098-411f-a329-9808f15bd3b1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:b6057538-9098-411f-a329-9808f15bd3b1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5745496, 'security-policy', '00186110-638d-4d3d-ba4c-ed36c4e1a2b4', 'mh_default_org',
    'd4da310908877dc03ef532e283a13dbf (md5)', 'urn:matterhorn:00186110-638d-4d3d-ba4c-ed36c4e1a2b4:4:security-policy',
-   4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5489346, 'security-policy-series', '001a514d-635a-477c-a69d-cfb3754cc4e8', 'mh_default_org',
    '9014ccb3e8f82fd2971fe51b9090f0f8 (md5)',
-   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:001a514d-635a-477c-a69d-cfb3754cc4e8:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244741, 'track-0', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
-   '10387bdb53e819f746b34575247a1b6f (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '10387bdb53e819f746b34575247a1b6f (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244742, 'track-1', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
-   '3ff992eadbaa0e4f39b462f23b3d5848 (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '3ff992eadbaa0e4f39b462f23b3d5848 (md5)', 'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5189726, 'track-0', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:track-0', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:track-0', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5189727, 'track-1', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:track-1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:track-1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5189728, '4c7013b2-1823-4f7b-b190-1e9324587b92', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '2fb75441e552cbdc042d64e5aa8e6ca2 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:4c7013b2-1823-4f7b-b190-1e9324587b92', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:4c7013b2-1823-4f7b-b190-1e9324587b92', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5189729, 'security-policy-series', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '3f3a2fb30495f909d14cbbdde0f8a6a7 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:security-policy-series', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:security-policy-series', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5189730, '632df5ce-82f5-46ff-a6c3-f78cee89357c', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '549e128a81d57df388dd4a42ecba680c (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:632df5ce-82f5-46ff-a6c3-f78cee89357c', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:1:632df5ce-82f5-46ff-a6c3-f78cee89357c', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2244747, 'security-policy-series', '00233185-41e2-42cc-bf30-9e1500db3afe', 'mh_default_org',
    '62d9534f81068b00cc28984c055f5dc8 (md5)',
-   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00233185-41e2-42cc-bf30-9e1500db3afe:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5800970, 'd8563482-9c3a-4154-a587-066c3cdf0dd5', '00293105-8cf0-471d-b748-e0ef2f2fbfe1', 'mh_default_org',
    '4c382a2e169173c3a61c61a39a7ee4d0 (md5)',
-   'urn:matterhorn:00293105-8cf0-471d-b748-e0ef2f2fbfe1:1:d8563482-9c3a-4154-a587-066c3cdf0dd5', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00293105-8cf0-471d-b748-e0ef2f2fbfe1:1:d8563482-9c3a-4154-a587-066c3cdf0dd5', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5800971, 'ce5307b0-f7ef-47e0-8dda-37233442fc46', '00293105-8cf0-471d-b748-e0ef2f2fbfe1', 'mh_default_org',
    'c1699e6e3306a52d1cbf93b22c0b09f3 (md5)',
-   'urn:matterhorn:00293105-8cf0-471d-b748-e0ef2f2fbfe1:1:ce5307b0-f7ef-47e0-8dda-37233442fc46', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00293105-8cf0-471d-b748-e0ef2f2fbfe1:1:ce5307b0-f7ef-47e0-8dda-37233442fc46', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5248696, 'track-0', '00250ab0-5afd-4e98-884b-b89796704608', 'mh_default_org',
-   'b14d8d9f76aa9c610d8693c64f8ca1fd (md5)', 'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'b14d8d9f76aa9c610d8693c64f8ca1fd (md5)', 'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5248697, 'track-1', '00250ab0-5afd-4e98-884b-b89796704608', 'mh_default_org',
-   'f33190b73167ac9989cdd3e2edf2b266 (md5)', 'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'f33190b73167ac9989cdd3e2edf2b266 (md5)', 'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5248698, '1ddcc18e-76f4-4649-b43b-2d9225eeb00d', '00250ab0-5afd-4e98-884b-b89796704608', 'mh_default_org',
    '33263d3f68e2b9aa333ca6e01f709868 (md5)',
-   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:1ddcc18e-76f4-4649-b43b-2d9225eeb00d', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:1ddcc18e-76f4-4649-b43b-2d9225eeb00d', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5248699, 'f4f7e7d6-95de-4877-8da2-2dd92fbf41d9', '00250ab0-5afd-4e98-884b-b89796704608', 'mh_default_org',
    '95b33b79102abe6c943431c6ca9d35ed (md5)',
-   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:f4f7e7d6-95de-4877-8da2-2dd92fbf41d9', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:f4f7e7d6-95de-4877-8da2-2dd92fbf41d9', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5248700, 'security-policy-series', '00250ab0-5afd-4e98-884b-b89796704608', 'mh_default_org',
    '3deb02f6b068aa5222d2f652a0c76c53 (md5)',
-   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00250ab0-5afd-4e98-884b-b89796704608:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5076024, 'track-0', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'b776fd7f25d736754146ec90a4b11a4d (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5076025, 'track-1', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
-   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'c0e66912fa1ceb25bd98a2a4d41b9218 (md5)', 'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5076026, '632df5ce-82f5-46ff-a6c3-f78cee89357c', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    'aef1238a63db5f315a2ef9f0614e8ef5 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:632df5ce-82f5-46ff-a6c3-f78cee89357c', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:632df5ce-82f5-46ff-a6c3-f78cee89357c', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5076027, '4c7013b2-1823-4f7b-b190-1e9324587b92', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '2fb75441e552cbdc042d64e5aa8e6ca2 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:4c7013b2-1823-4f7b-b190-1e9324587b92', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:4c7013b2-1823-4f7b-b190-1e9324587b92', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5076028, 'security-policy-series', '0018d845-0d5a-4245-9d24-64b5a24bb39f', 'mh_default_org',
    '3f3a2fb30495f909d14cbbdde0f8a6a7 (md5)',
-   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:0018d845-0d5a-4245-9d24-64b5a24bb39f:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5431932, 'track-1', '00293973-d669-430b-b1e5-6b6342beda50', 'mh_default_org',
-   '79507c02fb734880dfc6878abc5d6855 (md5)', 'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '79507c02fb734880dfc6878abc5d6855 (md5)', 'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5431933, '3f9fbfe4-a6cc-4ef3-9fa9-e01fd2efe95d', '00293973-d669-430b-b1e5-6b6342beda50', 'mh_default_org',
    '7fa070604219171a4477d092850ca0e2 (md5)',
-   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:3f9fbfe4-a6cc-4ef3-9fa9-e01fd2efe95d', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:3f9fbfe4-a6cc-4ef3-9fa9-e01fd2efe95d', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5431934, 'adef6c85-130a-4c1c-aa99-d0bcd01d3468', '00293973-d669-430b-b1e5-6b6342beda50', 'mh_default_org',
    'd4695455660db32a1421e2e31d166cdf (md5)',
-   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:adef6c85-130a-4c1c-aa99-d0bcd01d3468', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:adef6c85-130a-4c1c-aa99-d0bcd01d3468', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5431935, 'security-policy-series', '00293973-d669-430b-b1e5-6b6342beda50', 'mh_default_org',
    'a5ab3170771ad9194c27aff4faa4fe0d (md5)',
-   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5786742, 'e56ab383-3026-4697-b9e8-26082199c39a', '002b6ed4-db19-41d5-bb46-9a08acf1cde6', 'mh_default_org',
    '57bcf83bbba44c968fef98bb7447d50e (md5)',
-   'urn:matterhorn:002b6ed4-db19-41d5-bb46-9a08acf1cde6:1:e56ab383-3026-4697-b9e8-26082199c39a', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002b6ed4-db19-41d5-bb46-9a08acf1cde6:1:e56ab383-3026-4697-b9e8-26082199c39a', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5800972, 'security-policy', '00293105-8cf0-471d-b748-e0ef2f2fbfe1', 'mh_default_org',
    '2ab25fdb28f35dec29c7288e3974d179 (md5)', 'urn:matterhorn:00293105-8cf0-471d-b748-e0ef2f2fbfe1:1:security-policy',
-   1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5431931, 'track-0', '00293973-d669-430b-b1e5-6b6342beda50', 'mh_default_org',
-   '29a07a4fd2947aacb15b238361988778 (md5)', 'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '29a07a4fd2947aacb15b238361988778 (md5)', 'urn:matterhorn:00293973-d669-430b-b1e5-6b6342beda50:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570128, 'track-1', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
-   '4688bace773b1bcf8020e29d00ef8b7b (md5)', 'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '4688bace773b1bcf8020e29d00ef8b7b (md5)', 'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570129, '49e5cb37-70fa-46bd-8767-324cad7f0971', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
    '4688bace773b1bcf8020e29d00ef8b7b (md5)',
-   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:49e5cb37-70fa-46bd-8767-324cad7f0971', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:49e5cb37-70fa-46bd-8767-324cad7f0971', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570130, 'd45d9005-ac67-4c62-89fe-4c024b920595', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
    '63a7870801f650962bb23ebabee2052e (md5)',
-   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:d45d9005-ac67-4c62-89fe-4c024b920595', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:d45d9005-ac67-4c62-89fe-4c024b920595', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570131, '443817d6-9e20-4e5a-93f3-6c273f09f003', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
    '9882151ed62dc3f4a4da317651014652 (md5)',
-   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:443817d6-9e20-4e5a-93f3-6c273f09f003', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:443817d6-9e20-4e5a-93f3-6c273f09f003', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570132, 'security-policy-series', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
    '87d93635eb2529869a120c4f21dfde05 (md5)',
-   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1570127, 'track-0', '002fa1f5-9414-43af-8488-c5debf219f53', 'mh_default_org',
-   'a8da36ebe1b395ebb3a6872eecd4cfe4 (md5)', 'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'a8da36ebe1b395ebb3a6872eecd4cfe4 (md5)', 'urn:matterhorn:002fa1f5-9414-43af-8488-c5debf219f53:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5434285, 'track-0', '002530a5-a9e7-428f-b1fc-9b127bf46104', 'mh_default_org',
-   '1ff8fa3494365b383eea39a21ba9fa8c (md5)', 'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '1ff8fa3494365b383eea39a21ba9fa8c (md5)', 'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5434286, 'track-1', '002530a5-a9e7-428f-b1fc-9b127bf46104', 'mh_default_org',
-   '3a6d35701767e2486a44501c3a30cad0 (md5)', 'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '3a6d35701767e2486a44501c3a30cad0 (md5)', 'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5434287, 'c96baf63-1e60-4778-b011-4adfd90fdf48', '002530a5-a9e7-428f-b1fc-9b127bf46104', 'mh_default_org',
    '59886d1f43305001695b697c88fe33da (md5)',
-   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:c96baf63-1e60-4778-b011-4adfd90fdf48', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:c96baf63-1e60-4778-b011-4adfd90fdf48', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5434288, 'bc67691d-78cb-4326-862a-4fb97e5cb871', '002530a5-a9e7-428f-b1fc-9b127bf46104', 'mh_default_org',
    '0499fa527d51fffd492ecf4c0d97c5e7 (md5)',
-   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:bc67691d-78cb-4326-862a-4fb97e5cb871', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:bc67691d-78cb-4326-862a-4fb97e5cb871', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5434289, 'security-policy-series', '002530a5-a9e7-428f-b1fc-9b127bf46104', 'mh_default_org',
    'd8a01d7dc14ad5fd062e0f68fcd93218 (md5)',
-   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002530a5-a9e7-428f-b1fc-9b127bf46104:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5786744, 'security-policy', '002b6ed4-db19-41d5-bb46-9a08acf1cde6', 'mh_default_org',
    '83e1e8e689d98d2127cf2e8f59891249 (md5)', 'urn:matterhorn:002b6ed4-db19-41d5-bb46-9a08acf1cde6:1:security-policy',
-   1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787365, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-0', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-0', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787366, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-1', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-1', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787367, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787368, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-6', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:track-6', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787369, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '72aa861e5bba5556d04b06ac3e4c894e (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:01daefac-2d42-4543-9127-e88793c2baea', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:01daefac-2d42-4543-9127-e88793c2baea', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787370, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:5e94c895-49f6-4326-83f8-add4400e3692', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:5e94c895-49f6-4326-83f8-add4400e3692', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (1787371, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:security-policy-series', 0);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:0:security-policy-series', 0, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (5786743, '7a1801f4-151d-444c-ab22-3ee0cd65efac', '002b6ed4-db19-41d5-bb46-9a08acf1cde6', 'mh_default_org',
    'b38b5f2bd030395aa0e833d608b3211f (md5)',
-   'urn:matterhorn:002b6ed4-db19-41d5-bb46-9a08acf1cde6:1:7a1801f4-151d-444c-ab22-3ee0cd65efac', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:002b6ed4-db19-41d5-bb46-9a08acf1cde6:1:7a1801f4-151d-444c-ab22-3ee0cd65efac', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018390, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:security-policy-series', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:security-policy-series', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018391, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '7ea19deaf0fa86000ea1149dbce2fcfa (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:01daefac-2d42-4543-9127-e88793c2baea', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:01daefac-2d42-4543-9127-e88793c2baea', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189181, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-0', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-0', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189182, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-1', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-1', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189183, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189185, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:5e94c895-49f6-4326-83f8-add4400e3692', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:5e94c895-49f6-4326-83f8-add4400e3692', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189186, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:security-policy-series', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:security-policy-series', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018385, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-0', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-0', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018386, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-1', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-1', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018387, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189184, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-6', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:track-6', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018388, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-6', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:track-6', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2018389, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:5e94c895-49f6-4326-83f8-add4400e3692', 1);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:1:5e94c895-49f6-4326-83f8-add4400e3692', 1, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247275, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:5e94c895-49f6-4326-83f8-add4400e3692', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:5e94c895-49f6-4326-83f8-add4400e3692', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247276, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:security-policy-series', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:security-policy-series', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247277, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'bd1143733d28b076f5a6b247a0df41d0 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:01daefac-2d42-4543-9127-e88793c2baea', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:01daefac-2d42-4543-9127-e88793c2baea', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258069, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-0', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-0', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258070, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-1', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-1', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258071, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258072, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-6', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:track-6', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247271, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-0', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-0', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247272, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-1', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-1', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247273, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258073, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:5e94c895-49f6-4326-83f8-add4400e3692', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:5e94c895-49f6-4326-83f8-add4400e3692', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258074, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:security-policy-series', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:security-policy-series', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258075, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'ca507bd3aa1feac40ff5a6bd2ec54f7c (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:01daefac-2d42-4543-9127-e88793c2baea', 6);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:6:01daefac-2d42-4543-9127-e88793c2baea', 6, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247274, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-6', 5);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:5:track-6', 5, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258363, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-6', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-6', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258364, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:5e94c895-49f6-4326-83f8-add4400e3692', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:5e94c895-49f6-4326-83f8-add4400e3692', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258365, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:security-policy-series', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:security-policy-series', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258366, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'ca507bd3aa1feac40ff5a6bd2ec54f7c (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:01daefac-2d42-4543-9127-e88793c2baea', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:01daefac-2d42-4543-9127-e88793c2baea', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258360, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-0', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-0', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258361, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-1', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:track-1', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2258362, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 7);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:7:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 7, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2189187, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'ca507bd3aa1feac40ff5a6bd2ec54f7c (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:01daefac-2d42-4543-9127-e88793c2baea', 3);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:3:01daefac-2d42-4543-9127-e88793c2baea', 3, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247215, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-0', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-0', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247216, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-1', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-1', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247217, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247218, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-6', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:track-6', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247219, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:5e94c895-49f6-4326-83f8-add4400e3692', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:5e94c895-49f6-4326-83f8-add4400e3692', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247220, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:security-policy-series', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:security-policy-series', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2247221, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'bd1143733d28b076f5a6b247a0df41d0 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:01daefac-2d42-4543-9127-e88793c2baea', 4);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:4:01daefac-2d42-4543-9127-e88793c2baea', 4, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518474, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-6', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-6', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518475, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:5e94c895-49f6-4326-83f8-add4400e3692', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:5e94c895-49f6-4326-83f8-add4400e3692', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518476, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:security-policy-series', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:security-policy-series', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518477, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'a63c1e851b0c544241fcd6bd1dc64ac6 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:01daefac-2d42-4543-9127-e88793c2baea', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:01daefac-2d42-4543-9127-e88793c2baea', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518471, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-0', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-0', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518472, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-1', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:track-1', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518473, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 9);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:9:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 9, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518365, 'track-0', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-0', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   '73ae651529684cc4fd46c9244731f9a7 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-0', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518366, 'track-1', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-1', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-1', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518367, '3af60d49-ca1f-42c8-bcd7-0a9961516b8b', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'db6e936873c9336f0209cd14c015b131 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:3af60d49-ca1f-42c8-bcd7-0a9961516b8b', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518368, 'track-6', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
-   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-6', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'db6e936873c9336f0209cd14c015b131 (md5)', 'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:track-6', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518369, '5e94c895-49f6-4326-83f8-add4400e3692', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    '18d86c85979d7219ca254d0487433576 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:5e94c895-49f6-4326-83f8-add4400e3692', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:5e94c895-49f6-4326-83f8-add4400e3692', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518370, 'security-policy-series', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'da0920f9b73bdb26f7794c6a2fadaccb (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:security-policy-series', 8);
-INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version) VALUES
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:security-policy-series', 8, "local-test");
+INSERT INTO oc_archive_asset (id, mediapackageelement, mediapackage, organization, checksum, uri, version, storage_id) VALUES
   (2518371, '01daefac-2d42-4543-9127-e88793c2baea', '00316361-68f2-47b1-a1ca-7f7f88ea71b2', 'mh_default_org',
    'a63c1e851b0c544241fcd6bd1dc64ac6 (md5)',
-   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:01daefac-2d42-4543-9127-e88793c2baea', 8);
+   'urn:matterhorn:00316361-68f2-47b1-a1ca-7f7f88ea71b2:8:01daefac-2d42-4543-9127-e88793c2baea', 8, "local-test");
 
 ####
 # oc_archive_version_claim

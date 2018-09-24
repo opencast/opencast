@@ -96,7 +96,7 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   public abstract HttpAssetProvider getHttpAssetProvider();
 
-  public abstract AssetStore getAssetStore();
+  public abstract AssetStore getLocalAssetStore();
 
   /** The workspace is used to download assets from their URIs. */
   protected abstract Workspace getWorkspace();
@@ -153,12 +153,13 @@ public abstract class AbstractAssetManager implements AssetManager {
   @Override public Opt<Asset> getAsset(Version version, final String mpId, final String mpeId) {
     // try to fetch the asset
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
-      for (final InputStream assetStream : getAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+      for (final InputStream assetStream : getLocalAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
         final Asset a = new AssetImpl(
                 AssetId.mk(version, mpId, mpeId),
                 assetStream,
                 asset.getAssetDto().getMimeType(),
                 asset.getAssetDto().getSize(),
+                asset.getStorageId(),
                 asset.getAvailability());
         return Opt.some(a);
       }
@@ -199,7 +200,7 @@ public abstract class AbstractAssetManager implements AssetManager {
     final SnapshotDto snapshotDto;
     try {
       rewriteUrisForArchival(pmp, version);
-      snapshotDto = getDb().saveSnapshot(getCurrentOrgId(), pmp, now, version, Availability.ONLINE, owner);
+      snapshotDto = getDb().saveSnapshot(getCurrentOrgId(), pmp, now, version, Availability.ONLINE, getLocalAssetStore().getStoreType(), owner);
     } catch (AssetManagerException e) {
       logger.error("Could not take snapshot {}: {}", mpId, e);
       throw new AssetManagerException(e);
@@ -241,21 +242,28 @@ public abstract class AbstractAssetManager implements AssetManager {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} has been archived before",
                     existingAsset.getMediaPackageElementId(), e.getChecksum());
-        if (!getAssetStore().copy(existingAsset, storagePath)) {
+        if (!getLocalAssetStore().copy(existingAsset, storagePath)) {
           throw new AssetManagerException(
                   format("An asset with checksum %s has already been archived but trying to copy or link asset %s to it failed",
                          e.getChecksum(), existingAsset));
         }
       } else {
         final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.<Long>none();
-        getAssetStore().put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
+        getLocalAssetStore().put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
       }
     }
   }
 
-  /** Check if element <code>e</code> is already part of the history. */
+  /** Check if element <code>e</code> is already part of the history and in the local store. */
   private Opt<StoragePath> findAssetInVersions(final String checksum) throws Exception {
-    return getDb().findAssetByChecksum(checksum).map(new Fn<AssetDtos.Full, StoragePath>() {
+    return getDb().findAssetByChecksum(checksum).filter(new Fn<AssetDtos.Full, Boolean>() {
+      @Override public Boolean apply(AssetDtos.Full dto) {
+        if (getLocalAssetStore().getStoreType().equals(dto.getStorageId())) {
+          return true;
+        }
+        return false;
+      }
+    }).map(new Fn<AssetDtos.Full, StoragePath>() {
       @Override public StoragePath apply(AssetDtos.Full dto) {
         return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
       }
@@ -275,7 +283,7 @@ public abstract class AbstractAssetManager implements AssetManager {
             manifestFileName,
             IOUtils.toInputStream(MediaPackageParser.getAsXml(pmp.getMediaPackage()), "UTF-8"));
     try {
-      getAssetStore().put(
+      getLocalAssetStore().put(
               StoragePath.mk(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
               Source.mk(manifestTmpUri, Opt.<Long>none(), Opt.some(MimeTypes.XML)));
     } finally {
@@ -408,6 +416,7 @@ public abstract class AbstractAssetManager implements AssetManager {
         snapshot.getOrganizationId(),
         snapshot.getArchivalDate(),
         snapshot.getAvailability(),
+        snapshot.getStorageId(),
         snapshot.getOwner(),
         mpCopy);
   }

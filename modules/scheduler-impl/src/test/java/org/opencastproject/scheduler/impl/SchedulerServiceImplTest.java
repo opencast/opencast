@@ -53,6 +53,7 @@ import static org.opencastproject.scheduler.api.RecordingState.CAPTURING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 import static org.opencastproject.util.EqualsUtil.eqObj;
+import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -79,6 +80,7 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -142,6 +144,7 @@ import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -204,6 +207,8 @@ import javax.ws.rs.core.Response;
 
 public class SchedulerServiceImplTest {
 
+  public static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
+
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
   private AssetManager assetManager;
@@ -223,8 +228,6 @@ public class SchedulerServiceImplTest {
   private static Map<String, String> wfPropertiesUpdated = new HashMap<>();
 
   private static TestConflictHandler testConflictHandler;
-
-  private static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
 
   private static class TestConflictHandler implements ConflictHandler {
 
@@ -2495,13 +2498,24 @@ public class SchedulerServiceImplTest {
     final PersistenceEnv penv = PersistenceEnvs.mk(mkEntityManagerFactory("org.opencastproject.assetmanager.impl"));
     final Database db = new Database(penv);
     return new AbstractAssetManager() {
+
       @Override
       public HttpAssetProvider getHttpAssetProvider() {
         // identity provider
         return new HttpAssetProvider() {
           @Override
           public Snapshot prepareForDelivery(Snapshot snapshot) {
-            return snapshot;
+            return AbstractAssetManager.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
+              @Override public URI apply(MediaPackageElement mpe) {
+                String baseName = getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
+
+                // the returned uri must match the path of the {@link #getAsset} method
+                return uri(baseDir.toURI(),
+                        mpe.getMediaPackage().getIdentifier().toString(),
+                        mpe.getIdentifier(),
+                        baseName);
+              }
+            });
           }
         };
       }
@@ -2517,7 +2531,7 @@ public class SchedulerServiceImplTest {
       }
 
       @Override
-      public AssetStore getAssetStore() {
+      public AssetStore getLocalAssetStore() {
         return mkAssetStore();
       }
 
@@ -2594,6 +2608,11 @@ public class SchedulerServiceImplTest {
       @Override
       public boolean contains(StoragePath path) throws AssetStoreException {
         return false;
+      }
+
+      @Override
+      public String getStoreType() {
+        return "test_store";
       }
     };
   }

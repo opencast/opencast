@@ -28,10 +28,12 @@ import org.opencastproject.mediapackage.MediaPackage;
 import java.util.Date;
 
 public class SnapshotImpl implements Snapshot {
+  private final Long id;
   private final Version version;
   private final String organizationId;
   private final Date archivalDate;
   private final Availability availability;
+  private final String storageId;
   private final String owner;
   private final MediaPackage mediaPackage;
 
@@ -40,14 +42,36 @@ public class SnapshotImpl implements Snapshot {
           String organizationId,
           Date archivalDate,
           Availability availability,
+          String storageId,
           String owner,
           MediaPackage mediaPackage) {
+    this.id = null;
     this.version = version;
     this.organizationId = organizationId;
     this.archivalDate = archivalDate;
     this.availability = availability;
     this.mediaPackage = mediaPackage;
     this.owner = owner;
+    this.storageId = storageId;
+  }
+
+  public SnapshotImpl(
+          Long id,
+          Version version,
+          String organizationId,
+          Date archivalDate,
+          Availability availability,
+          String storageId,
+          String owner,
+          MediaPackage mediaPackage) {
+    this.id = id;
+    this.version = version;
+    this.organizationId = organizationId;
+    this.archivalDate = archivalDate;
+    this.availability = availability;
+    this.mediaPackage = mediaPackage;
+    this.owner = owner;
+    this.storageId = storageId;
   }
 
   @Override public Version getVersion() {
@@ -73,4 +97,6 @@ public class SnapshotImpl implements Snapshot {
   @Override public String getOwner() {
     return owner;
   }
+
+  @Override public String getStorageId() { return storageId; }
 }

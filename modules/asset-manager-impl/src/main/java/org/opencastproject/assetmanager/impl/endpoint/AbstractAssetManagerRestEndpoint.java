@@ -47,7 +47,9 @@ import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
+import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.mediapackage.MediaPackageImpl;
+import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.MimeTypeUtil;
 import org.opencastproject.util.data.Option;
@@ -93,15 +95,14 @@ import javax.ws.rs.core.Response;
             + "<a href=\"http://opencast.jira.com\">Opencast Issue Tracker</a>"
     },
     abstractText = "This service indexes and queries available (distributed) episodes.")
-public abstract class AbstractAssetManagerRestEndpoint {
-
+public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProducerEndpoint {
   protected static final Logger logger = LoggerFactory.getLogger(AbstractAssetManagerRestEndpoint.class);
 
   private final Gson gson = new Gson();
 
   private final java.lang.reflect.Type stringMapType = new TypeToken<Map<String, String>>() { }.getType();
 
-  public abstract AssetManager getAssetManager();
+  public abstract TieredStorageAssetManager getAssetManager();
 
   /**
    * @deprecated use {@link #snapshot} instead

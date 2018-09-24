@@ -26,7 +26,6 @@ import static java.lang.String.format;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.assetmanager.api.Asset;
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
@@ -62,7 +61,7 @@ import java.io.InputStream;
 /**
  * Security layer.
  */
-public class AssetManagerWithSecurity extends AssetManagerDecorator {
+public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorageAssetManager> {
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithSecurity.class);
 
   public static final String WRITE_ACTION = "write";
@@ -73,7 +72,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator {
   private final SecurityService secSvc;
 
   public AssetManagerWithSecurity(
-      AssetManager delegate,
+      TieredStorageAssetManager delegate,
       AuthorizationService authSvc,
       SecurityService secSvc) {
     super(delegate);

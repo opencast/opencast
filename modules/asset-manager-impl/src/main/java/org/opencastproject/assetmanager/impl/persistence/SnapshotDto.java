@@ -76,6 +76,9 @@ public class SnapshotDto {
   @Column(name = "availability", nullable = false)
   private String availability;
 
+  @Column(name = "storage_id", nullable = false)
+  private String storageId;
+
   @Column(name = "owner", nullable = false)
   private String owner;
 
@@ -89,6 +92,7 @@ public class SnapshotDto {
           String organization,
           Date archivalDate,
           Availability availability,
+          String storageId,
           String owner) {
     try {
       final SnapshotDto dto = new SnapshotDto();
@@ -99,8 +103,23 @@ public class SnapshotDto {
       dto.archivalDate = archivalDate;
       dto.mediaPackageXml = MediaPackageParser.getAsXml(mediaPackage);
       dto.availability = availability.name();
+      dto.storageId = storageId;
       dto.owner = owner;
       return dto;
+    } catch (Exception e) {
+      return chuck(e);
+    }
+  }
+
+  public static SnapshotDto mk(Snapshot snapshot) {
+    try {
+      return mk(snapshot.getMediaPackage(),
+              VersionImpl.mk(Long.parseLong(snapshot.getVersion().toString())),
+              snapshot.getOrganizationId(),
+              snapshot.getArchivalDate(),
+              snapshot.getAvailability(),
+              snapshot.getStorageId(),
+              snapshot.getOwner());
     } catch (Exception e) {
       return chuck(e);
     }
@@ -118,12 +137,26 @@ public class SnapshotDto {
     return mediaPackageId;
   }
 
+  public String getStorageId() {
+    return storageId;
+  }
+
+  void setAvailability(Availability a) {
+    this.availability = a.name();
+  }
+
+  void setStorageId(String id) {
+    this.storageId = id;
+  }
+
   public Snapshot toSnapshot() {
     return new SnapshotImpl(
+            id,
             Conversions.toVersion(version),
             organizationId,
             archivalDate,
             Availability.valueOf(availability),
+            storageId,
             owner,
             Conversions.toMediaPackage(mediaPackageXml));
   }

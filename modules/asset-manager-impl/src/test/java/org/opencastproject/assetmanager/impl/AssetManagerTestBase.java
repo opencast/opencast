@@ -292,14 +292,14 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
       }).anyTimes();
     EasyMock.replay(workspace);
     //
-    final AssetStore assetStore = mkAssetStore();
+    final AssetStore assetStore = mkAssetStore("test-store-type");
     //
     return new AbstractAssetManager() {
       @Override public Database getDb() {
         return db;
       }
 
-      @Override public AssetStore getAssetStore() {
+      @Override public AssetStore getLocalAssetStore() {
         return assetStore;
       }
 
@@ -325,12 +325,12 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   /**
    * Create a test asset store.
    */
-  protected AssetStore mkAssetStore() {
+  protected AssetStore mkAssetStore(String storeType) {
     return new AssetStore() {
       private Set<StoragePath> store = new HashSet<>();
 
       private void logSize() {
-        logger.debug(format("Store contains %d asset/s", store.size()));
+        logger.debug(format("Store contains %d asset(s)", store.size()));
       }
 
       @Override public void put(StoragePath path, Source source) throws AssetStoreException {
@@ -385,6 +385,8 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
       @Override public Option<Long> getUsedSpace() {
         return Option.some((long) store.size());
       }
+
+      @Override public String getStoreType() { return storeType; }
     };
   }
 
@@ -397,7 +399,11 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
   }
 
   void assertStoreSize(long size) {
-    assertEquals("Assets in store", size, (long) getAbstractAssetManager().getAssetStore().getUsedSpace().get());
+    assertEquals("Assets in store", size, (long) getAbstractAssetManager().getLocalAssetStore().getUsedSpace().get());
+  }
+
+  String getStoreType() {
+    return "test";
   }
 }
 // CHECKSTYLE:ON

@@ -66,7 +66,7 @@ import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 @RunWith(JUnitParamsRunner.class)
-public class AssetManagerWithSecurityTest extends AssetManagerTestBase<AssetManagerWithSecurity> {
+public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetManagerTest<AssetManagerWithSecurity> {
   public static final String ROLE_TEACHER = "ROLE_TEACHER";
   public static final String ROLE_USER = "ROLE_USER";
   public static final String ROLE_STUDENT = "ROLE_STUDENT";
@@ -112,7 +112,7 @@ public class AssetManagerWithSecurityTest extends AssetManagerTestBase<AssetMana
     }).anyTimes();
     EasyMock.replay(secSvc);
     //
-    return new AssetManagerWithSecurity(mkAbstractAssetManager(), authSvc, secSvc);
+    return new AssetManagerWithSecurity(mkTieredStorageAM(), authSvc, secSvc);
   }
 
   @Override public AbstractAssetManager getAbstractAssetManager() {

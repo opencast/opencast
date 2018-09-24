@@ -49,7 +49,7 @@ public class UnitTestWorkspace implements Workspace {
   private final File baseDir;
 
   public UnitTestWorkspace() {
-    baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulertest");
+    baseDir = SchedulerServiceImplTest.baseDir;
     logger.info("Creating workspace under " + baseDir.getAbsolutePath());
     baseDir.mkdirs();
     clean();

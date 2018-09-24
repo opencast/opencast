@@ -24,7 +24,6 @@ import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 
-import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
@@ -64,7 +63,7 @@ import java.util.Map;
  * <p>
  * Please make sure to {@link #close()} the AssetManager.
  */
-public class AssetManagerWithMessaging extends AssetManagerDecorator
+public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStorageAssetManager>
         implements DeleteSnapshotHandler, IndexProducer, AutoCloseable {
   /** Log facility */
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerWithMessaging.class);
@@ -78,7 +77,7 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator
 
   private final AbstractIndexProducer indexProducerMsgReceiver;
 
-  public AssetManagerWithMessaging(final AssetManager delegate, final MessageSender messageSender,
+  public AssetManagerWithMessaging(final TieredStorageAssetManager delegate, final MessageSender messageSender,
           MessageReceiver messageReceiver, AuthorizationService authSvc, OrganizationDirectoryService orgDir,
           SecurityService secSvc, Workspace workspace, final String systemUserName) {
     super(delegate);

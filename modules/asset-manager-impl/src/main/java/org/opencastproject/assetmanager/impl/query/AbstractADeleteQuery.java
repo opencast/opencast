@@ -111,7 +111,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       final String orgId = t.get(Q_SNAPSHOT.organizationId);
       final String mpId = t.get(Q_SNAPSHOT.mediaPackageId);
       final VersionImpl version = Conversions.toVersion(t.get(Q_SNAPSHOT.version));
-      am.getAssetStore().delete(DeletionSelector.delete(orgId, mpId, version));
+      am.getLocalAssetStore().delete(DeletionSelector.delete(orgId, mpId, version));
       deleteSnapshotHandler.notifyDeleteSnapshot(mpId, version);
     }
     for (String mpId : deletion.deletedEpisodes) {

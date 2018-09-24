@@ -40,6 +40,9 @@ public interface Snapshot {
   /** Get the availability of the media package's assets. */
   Availability getAvailability();
 
+  /** Get the store ID of the asset store where this snapshot currently lives */
+  String getStorageId();
+
   /** Get the owner of the snapshot. **/
   String getOwner();
 

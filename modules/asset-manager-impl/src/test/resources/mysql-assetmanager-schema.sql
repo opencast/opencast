@@ -7,6 +7,7 @@ CREATE TABLE `oc_assets_snapshot` (
   `id` bigint(20) NOT NULL,
   `availability` varchar(32) NOT NULL,
   `series_id` varchar(128) DEFAULT NULL,
+  `storage_id` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UNQ_oc_assets_snapshot` (`mediapackage_id`,`version`),
   KEY `IX_oc_assets_snapshot_archival_date` (`archival_date`),
@@ -22,6 +23,7 @@ CREATE TABLE `oc_assets_asset` (
   `snapshot_id` bigint(20) NOT NULL,
   `mime_type` varchar(64) DEFAULT NULL,
   `size` bigint(20) NOT NULL,
+  `storage_id` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `IX_oc_assets_asset_checksum` (`checksum`),
   KEY `IX_oc_assets_asset_mediapackage_element_id` (`mediapackage_element_id`)

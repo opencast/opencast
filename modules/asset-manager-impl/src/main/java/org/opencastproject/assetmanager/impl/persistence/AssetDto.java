@@ -65,13 +65,19 @@ public class AssetDto {
   @Column(name = "size", nullable = false)
   private Long size;
 
-  /** Create a new DTO. */
-  public static AssetDto mk(String mediaPackageElementId, long snapshotId, String checksum, Opt<MimeType> mimeType, long size) {
+  @Column(name = "storage_id", nullable = false)
+  private String storageId;
+
+  /**
+   * Create a new DTO.
+   */
+  public static AssetDto mk(String mediaPackageElementId, long snapshotId, String checksum, Opt<MimeType> mimeType, String storeageId, long size) {
     final AssetDto dto = new AssetDto();
     dto.snapshotId = snapshotId;
     dto.mediaPackageElementId = mediaPackageElementId;
     dto.checksum = checksum;
     dto.mimeType = mimeType.isSome() ? mimeType.get().toString() : null;
+    dto.storageId = storeageId;
     dto.size = size;
     return dto;
   }
@@ -90,6 +96,14 @@ public class AssetDto {
 
   public Long getSize() {
     return size;
+  }
+
+  public String getStorageId() {
+    return storageId;
+  }
+
+  void setStorageId(String storage) {
+    this.storageId = storage;
   }
 }
 

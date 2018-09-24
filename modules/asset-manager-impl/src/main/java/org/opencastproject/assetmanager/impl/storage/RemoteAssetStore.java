@@ -18,23 +18,10 @@
  * the License.
  *
  */
-package org.opencastproject.assetmanager.impl.endpoint;
 
-import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
+package org.opencastproject.assetmanager.impl.storage;
 
-import javax.ws.rs.Path;
-
-/** OSGi bound implementation. */
-@Path("/")
-public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetManagerRestEndpoint {
-  private TieredStorageAssetManager assetManager;
-
-  @Override public TieredStorageAssetManager getAssetManager() {
-    return assetManager;
-  }
-
-  /** OSGi DI */
-  public void setAssetManager(TieredStorageAssetManager assetManager) {
-    this.assetManager = assetManager;
-  }
+public interface RemoteAssetStore extends AssetStore {
+    //Defines the root directory to be used for any caching done by a remote asset store.  Caches should live as directories under this directory.
+    String ASSET_STORE_CACHE_ROOT = "org.opencastproject.assetmanager.storage.cache.rootdir";
 }
