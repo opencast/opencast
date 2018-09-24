@@ -61,6 +61,7 @@ import org.opencastproject.metadata.dublincore.MetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -95,7 +96,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.joda.time.DateTimeConstants;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -103,15 +103,19 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.component.ComponentException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -124,14 +128,14 @@ import java.util.UUID;
 public class IndexServiceImplTest {
 
   private static final JSONParser parser = new JSONParser();
+  private static final Logger logger = LoggerFactory.getLogger(IndexServiceImplTest.class);
 
   /**
    * Tests for the method calculatePeriods
    */
-  private final TimeZone utc = TimeZone.getTimeZone("UTC");
-  private final TimeZone jst = TimeZone.getTimeZone("JST"); // Japan Standard Time (UTC +9)
-  private final TimeZone pst = TimeZone.getTimeZone("PST"); // Alaska Standard Time (UTC -8)
-  private final TimeZone cet = TimeZone.getTimeZone("CET"); // Alaska Standard Time (UTC +2)
+  private final TimeZone jst = TimeZone.getTimeZone("Asia/Tokyo"); // Japan Standard Time (UTC +9)
+  private final TimeZone pst = TimeZone.getTimeZone("America/Anchorage"); // Alaska Standard Time (UTC -8)
+  private final TimeZone cet = TimeZone.getTimeZone("Europe/Zurich"); // European time (UTC +2)
 
   private JpaOrganization organization = new JpaOrganization("org-id", "Organization", null, null, null, null, null);
 
@@ -887,6 +891,8 @@ public class IndexServiceImplTest {
     String days;
     List<Period> periods;
 
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
+
     // JST
     start = Calendar.getInstance(jst);
     start.set(2016, 2, 25, 22, 0);
@@ -900,25 +906,45 @@ public class IndexServiceImplTest {
 
     // PST
     start = Calendar.getInstance(pst);
-    start.set(2016, 2, 25, 22, 0);
+    start.set(2016, 2, 25, 22, 0); //  March 25, 2016 2200hrs PST is a Friday (not a schedule day)
     end = Calendar.getInstance(pst);
-    end.set(2016, 2, 29, start.get(Calendar.HOUR_OF_DAY), 5);
+    end.set(2016, 2, 29, start.get(Calendar.HOUR_OF_DAY), 5); // March 29, 2016 is a Tues
     durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
     days = "MO,TU,WE,SA,SU"; // --> A day after when switching to UTC (22+8)
 
     periods = generatePeriods(pst, start, end, days, durationMillis);
-    assertEquals(5, periods.size());
+    simpleDateFormat.setTimeZone(pst);
+    Iterator<Period> iter = periods.iterator();
+    while (iter.hasNext()) {
+      Period p = iter.next();
+      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
+              simpleDateFormat.format(p.getRangeEnd()));
+    }
+    //Expecting 4 days to be scheduled: Sat (26th), Sun (27th), Mon (28th), Tues(29th)
+    assertEquals(4, periods.size());
 
     // CET
     start = Calendar.getInstance(cet);
     start.set(2016, 2, 25, 0, 5);
     end = Calendar.getInstance(cet);
-    end.set(2016, 2, 29, start.get(Calendar.HOUR_OF_DAY), 10);
+    end.set(2016, 2, 29, start.get(Calendar.HOUR_OF_DAY), 10); // March 29 is a Tues, not a schedule day
     durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
     days = "MO,TH,FR,SA,SU"; // --> A day before when switch to UCT (0-2)
 
     periods = generatePeriods(cet, start, end, days, durationMillis);
-    assertEquals(5, periods.size());
+    simpleDateFormat.setTimeZone(cet);
+    iter = periods.iterator();
+    while (iter.hasNext()) {
+      Period p = iter.next();
+      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
+              simpleDateFormat.format(p.getRangeEnd()));
+    }
+    // Expecting 4 days to be scheduled:
+    //period Fri Mar 25 00:05:52 CET 2016 to Fri Mar 25 00:10:52 CET 2016
+    //period Sat Mar 26 00:05:52 CET 2016 to Sat Mar 26 00:10:52 CET 2016
+    //period Sun Mar 27 00:05:52 CET 2016 to Sun Mar 27 00:10:52 CET 2016
+    //period Mon Mar 28 00:05:52 CEST 2016 to Mon Mar 28 00:10:52 CEST 2016
+    assertEquals(4, periods.size());
   }
 
   @Test
@@ -1089,10 +1115,9 @@ public class IndexServiceImplTest {
 
   private List<Period> generatePeriods(TimeZone tz, Calendar start, Calendar end, String days, Long duration)
           throws ParseException {
-    Calendar utcDate = Calendar.getInstance(utc);
-    utcDate.setTime(start.getTime());
-    RRule rRule = new RRule(generateRule(days, utcDate.get(Calendar.HOUR_OF_DAY), utcDate.get(Calendar.MINUTE)));
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    Calendar tzDate = Calendar.getInstance(tz);
+    tzDate.setTime(start.getTime());
+    RRule rRule = new RRule(generateRule(days, tzDate.get(Calendar.HOUR_OF_DAY), tzDate.get(Calendar.MINUTE)));
     return calculatePeriods(rRule, start.getTime(), end.getTime(), duration, tz);
   }
 
@@ -1100,51 +1125,8 @@ public class IndexServiceImplTest {
     return String.format("FREQ=WEEKLY;BYDAY=%s;BYHOUR=%d;BYMINUTE=%d", days, hour, minute);
   }
 
-  //NOTE: Do not modify this without making the same modifications to the copy of this method in Util in the scheduler service
-  //I would have moved this to an abstract class in the scheduler-api bundle, but that would introduce a circular dependency :(
+  // The Util class is in the scheduler-api bundle (this Test class is very similar to the test class in schduler-api)
   public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    final TimeZone timeZone = TimeZone.getDefault();
-    final TimeZone utc = TimeZone.getTimeZone("UTC");
-    TimeZone.setDefault(tz);
-    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
-    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
-
-    Calendar endCalendar = Calendar.getInstance(utc);
-    endCalendar.setTime(end);
-    Calendar calendar = Calendar.getInstance(utc);
-    calendar.setTime(periodStart);
-    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
-    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
-    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-    periodEnd.setTime(calendar.getTime().getTime() + duration);
-    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
-
-    List<Period> events = new LinkedList<>();
-
-    TimeZone.setDefault(utc);
-    for (Object date : rrule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
-      Date d = (Date) date;
-      Calendar cDate = Calendar.getInstance(utc);
-
-      // Adjust for DST, if start of event
-      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
-        if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
-        }
-      } else { // Event doesn't start in DST
-        if (tz.inDaylightTime(d)) {
-          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
-        }
-      }
-      cDate.setTime(d);
-
-      TimeZone.setDefault(timeZone);
-      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
-              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
-      events.add(p);
-      TimeZone.setDefault(utc);
-    }
-    TimeZone.setDefault(timeZone);
-    return events;
+    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 }
