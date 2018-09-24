@@ -1092,7 +1092,7 @@ public class SchedulerRestService {
           @RestParameter(name = "end", description = "End time of conflicting period, in milliseconds", isRequired = true, type = Type.INTEGER),
           @RestParameter(name = "rrule", description = "Rule for recurrent conflicting, specified as: \"FREQ=WEEKLY;BYDAY=day(s);BYHOUR=hour;BYMINUTE=minute\". FREQ is required. BYDAY may include one or more (separated by commas) of the following: SU,MO,TU,WE,TH,FR,SA.", isRequired = false, type = Type.STRING),
           @RestParameter(name = "duration", description = "If recurrence rule is specified duration of each conflicting period, in milliseconds", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = true, type = Type.STRING) }, reponses = {
+          @RestParameter(name = "timezone", description = "The timezone of the capture device", isRequired = false, type = Type.STRING) }, reponses = {
                   @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
                   @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Found conflicting events, returned in body of response"),
                   @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters"),
@@ -1142,6 +1142,10 @@ public class SchedulerRestService {
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
           @QueryParam("timezone") String timezone) throws UnauthorizedException {
     // Pass dates in the TZ to be schedule to (not UTC)
+    // If no timezone passed, use the local timezone of the system
+    if (StringUtils.isBlank(timezone)) {
+      timezone = DateTimeZone.getDefault().toString();
+    }
     Date start = new DateTime(startDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
     Date end = new DateTime(endDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
 
