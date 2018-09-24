@@ -1,10 +1,9 @@
 <section ng-form="themeForm" ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal wizard modal-animation ng-hide" ng-controller="ThemeFormCtrl">
-    <header>
-        <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="CONFIGURATION.THEMES.DETAILS.{{ action === 'edit' ? 'EDIT':'NEW' }}CAPTION">
-            <!-- Template -->
-        </h2>
-    </header>
+  <header ng-switch="action">
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 ng-switch-when="add" translate="CONFIGURATION.THEMES.DETAILS.NEWCAPTION"><!-- Create theme --></h2>
+    <h2 ng-switch-when="edit" translate="CONFIGURATION.THEMES.DETAILS.EDITCAPTION" translate-values="{{general}}"><!-- Theme details - {{name}} --></h2>
+  </header>
     <nav id="modal-nav" ng-class="{'step-by-step': action === 'add', 'modal-nav': action === 'edit'}">
         <a ng-click="navigateTo('generalForm', currentForm, [])" ng-class="{ active: currentForm === 'generalForm', 'not-complete': !generalForm.$valid}">
             {{ 'CONFIGURATION.THEMES.DETAILS.GENERAL.CAPTION' | translate }}
@@ -28,6 +27,9 @@
             {{ 'CONFIGURATION.THEMES.DETAILS.USAGE.CAPTION' | translate }}
         </a>
     </nav>
+
+    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
     
     <div class="modal-content" ng-class="{active: currentForm === 'generalForm'}" data-modal-tab-content="general" data-level="1">
         <div class="modal-body">

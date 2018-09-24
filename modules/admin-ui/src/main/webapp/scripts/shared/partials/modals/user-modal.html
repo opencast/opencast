@@ -1,8 +1,9 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="user-modal" ng-controller="UserCtrl">
 
-    <header>
+    <header ng-switch="action">
         <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="{{ caption }}"><!-- Create New User --></h2>
+        <h2 ng-switch-when="add" translate="USERS.USERS.DETAILS.NEWCAPTION"><!-- Create user --></h2>
+        <h2 ng-switch-when="edit" translate="USERS.USERS.DETAILS.EDITCAPTION" translate-values="{{user}}"><!-- User details - {{name}} --></h2>
     </header>
 
     <nav class="modal-nav" id="modal-nav">
@@ -27,6 +28,9 @@
             <!-- Effective Roles = Internal + External -->
         </a>
     </nav>
+
+    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
 
     <form name="userForm">
         <div class="modal-content" data-modal-tab-content="user">
@@ -142,7 +146,7 @@
     </form>
 
     <footer>
-        <a ng-click="submit()" class="submit {{ getSubmitButtonState() }}" translate="SUBMIT">
+        <a ng-click="submit()" class="submit" ng-class="{disabled: !(userForm.$valid && manageable)}" translate="SUBMIT">
             <!-- Submit -->
         </a>
         <a ng-click="close()" class="cancel" translate="CANCEL"><!-- Cancel --></a>

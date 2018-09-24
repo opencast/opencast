@@ -1,9 +1,10 @@
 <section ng-show="open" ng-keyup="keyUp($event)" tabindex="1" class="modal modal-animation ng-hide" id="group-modal" ng-controller="GroupCtrl">
 
-    <header>
-        <a class="fa fa-times close-modal" ng-click="close()"></a>
-        <h2 translate="{{ caption }}"><!-- Create New Group | Edit group --></h2>
-    </header>
+  <header ng-switch="action">
+    <a class="fa fa-times close-modal" ng-click="close()"></a>
+    <h2 ng-switch-when="add" translate="USERS.GROUPS.DETAILS.NEWCAPTION"><!-- Create group --></h2>
+    <h2 ng-switch-when="edit" translate="USERS.GROUPS.DETAILS.EDITCAPTION" translate-values="{{group}}"><!-- Group details - {{name}} --></h2>
+  </header>
 
     <nav class="modal-nav" id="modal-nav">
         <a ng-click="openTab('group')" data-modal-tab="group" ng-class="{ active: tab == 'group' }" translate="USERS.GROUPS.DETAILS.TABS.GROUP">
@@ -16,6 +17,9 @@
             <!-- Users -->
         </a>
     </nav>
+
+    <a ng-click="showAdjacent(true)" ng-if="hasAdjacent(true)"><i class="arrow fa fa-chevron-left"></i></a>
+    <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
 
     <form name="groupForm">
         <div class="modal-content" data-modal-tab-content="group">

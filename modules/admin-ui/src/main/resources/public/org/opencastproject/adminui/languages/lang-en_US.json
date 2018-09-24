@@ -1251,7 +1251,7 @@
        },
        "DETAILS": {
          "NEWCAPTION": "Create user",
-         "EDITCAPTION": "Edit user",
+         "EDITCAPTION": "User details - {{username}}",
          "TABS": {
            "USER":  "User",
            "ROLES": "Roles",
@@ -1295,7 +1295,7 @@
        },
        "DETAILS": {
          "NEWCAPTION":  "Create group",
-         "EDITCAPTION": "Edit group",
+         "EDITCAPTION": "Group details - {{name}}",
          "TABS": {
             "GROUP"    : "Group",
             "ROLES"    : "Roles",
@@ -1376,7 +1376,7 @@
          }
         },
         "DETAILS": {
-          "HEADER": "Access Policy Details  - {{resourceId}}",
+          "HEADER": "Access policy details  - {{name}}",
           "TABS": {
             "SUMMARY"  : "Summary",
             "METADATA" : "Metadata",
@@ -1559,7 +1559,7 @@
        },
        "DETAILS": {
          "NEWCAPTION":  "Create theme",
-         "EDITCAPTION": "Edit theme",
+         "EDITCAPTION": "Theme details - {{name}}",
          "GENERAL": {
            "CAPTION": "General",
            "NAME": "Name",

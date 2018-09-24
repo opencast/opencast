@@ -22,8 +22,8 @@
 
 // Controller for all single series screens.
 angular.module('adminNg.controllers')
-.controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications',
-        function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications) {
+.controller('AclCtrl', ['$scope', 'AclResource', 'UserRolesResource', 'ResourcesListResource', 'Notifications', 'Modal',
+        function ($scope, AclResource, UserRolesResource, ResourcesListResource, Notifications, Modal) {
     var roleSlice = 100;
     var roleOffset = 0;
     var loading = false;
@@ -167,51 +167,48 @@ angular.module('adminNg.controllers')
         fetchChildResources(id);
     });
 
-    $scope.save = function (field) {
-        var ace = [];
+    $scope.submit = function () {
+      var ace = [];
 
-        if (angular.isDefined(field) && angular.isUndefined(field.role)) {
-            return;
+      angular.forEach($scope.policies, function (policy) {
+        if (angular.isDefined(policy.role)) {
+          if (policy.read) {
+            ace.push({
+              'action' : 'read',
+              'allow'  : policy.read,
+              'role'   : policy.role
+            });
+          }
+
+          if (policy.write) {
+            ace.push({
+              'action' : 'write',
+              'allow'  : policy.write,
+              'role'   : policy.role
+            });
+          }
+
+          angular.forEach(policy.actions.value, function(customAction){
+            ace.push({
+              'action' : customAction,
+              'allow'  : true,
+              'role'   : policy.role
+            });
+          });
         }
 
-        angular.forEach($scope.policies, function (policy) {
-            if (angular.isDefined(policy.role)) {
-                if (policy.read) {
-                    ace.push({
-                        'action' : 'read',
-                        'allow'  : policy.read,
-                        'role'   : policy.role
-                    });
-                }
+      });
 
-                if (policy.write) {
-                    ace.push({
-                        'action' : 'write',
-                        'allow'  : policy.write,
-                        'role'   : policy.role
-                    });
-                }
-
-                angular.forEach(policy.actions.value, function(customAction){
-                    ace.push({
-                        'action' : customAction,
-                        'allow'  : true,
-                        'role'   : policy.role
-                   });
-                });
-            }
-
-        });
-
-        AclResource.save({id: $scope.resourceId}, {
-            acl: {
-                ace: ace
-            },
-            name: $scope.metadata.name
-        }, function () {
-            Notifications.add('success', 'ACL_UPDATED', 'acl-form');
-        }, function () {
-            Notifications.add('error', 'ACL_NOT_SAVED', 'acl-form');
-        });
+      AclResource.save({id: $scope.resourceId}, {
+        acl: {
+          ace: ace
+        },
+        name: $scope.metadata.name
+      }, function () {
+        Notifications.add('success', 'ACL_UPDATED');
+        Modal.$scope.close();
+      }, function () {
+        Notifications.add('error', 'ACL_NOT_SAVED', 'acl-form');
+      });
     };
 }]);

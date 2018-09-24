@@ -54,6 +54,10 @@ angular.module('adminNg.directives')
                 };
             };
 
+            $scope.$on('clear', function () {
+              $scope.searchField = '';
+            });
+
             $scope.customSelectedFilter = function () {
 
                 return function (item) {

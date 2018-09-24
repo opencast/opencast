@@ -38,20 +38,6 @@ describe('Group controller', function () {
         expect($scope.user).toBeDefined();
     });
 
-    it('sets the creation caption', function () {
-        expect($scope.caption).toContain('NEWCAPTION');
-    });
-
-    describe('when editing', function () {
-
-        it('sets the edit caption', function () {
-            $scope.action = 'edit';
-            $controller('GroupCtrl', {$scope: $scope});
-
-            expect($scope.caption).toContain('EDITCAPTION');
-        });
-    });
-
     describe('#submit', function () {
 
         beforeEach(function () {
