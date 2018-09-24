@@ -154,4 +154,14 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
     return getTermsForField(ThemeIndexSchema.NAME, Option.some(new String[] { Theme.DOCUMENT_TYPE }));
   }
 
+  /**
+   * Returns all the known events' publishers
+   *
+   * @return a list of events' publishers
+   */
+  @Override
+  public List<String> getEventPublishers() {
+    return getTermsForField(EventIndexSchema.PUBLISHER, Option.some(new String[] { Event.DOCUMENT_TYPE }));
+  }
+
 }

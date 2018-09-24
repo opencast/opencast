@@ -142,6 +142,11 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.CREATOR, query.getCreator(), true);
     }
 
+    // Publisher
+    if (query.getPublisher() != null) {
+      and(EventIndexSchema.PUBLISHER, query.getPublisher(), true);
+    }
+
     // License
     if (query.getLicense() != null) {
       and(EventIndexSchema.LICENSE, query.getLicense(), true);

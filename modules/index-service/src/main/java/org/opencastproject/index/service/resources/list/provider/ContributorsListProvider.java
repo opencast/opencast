@@ -128,6 +128,8 @@ public class ContributorsListProvider implements ResourceListProvider {
             Option.some(new String[] { Event.DOCUMENT_TYPE })));
     contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.PRESENTER,
             Option.some(new String[] { Event.DOCUMENT_TYPE })));
+    contributorsList.addAll(searchIndex.getTermsForField(EventIndexSchema.PUBLISHER,
+            Option.some(new String[] { Event.DOCUMENT_TYPE })));
     contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.CONTRIBUTORS,
             Option.some(new String[] { Series.DOCUMENT_TYPE })));
     contributorsList.addAll(searchIndex.getTermsForField(SeriesIndexSchema.ORGANIZERS,

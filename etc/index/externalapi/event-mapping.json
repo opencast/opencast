@@ -51,6 +51,8 @@
 
             "creator": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
+            "publisher": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
+
             "license": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
             "rights": { "type" : "string", "index" : "not_analyzed", "store" : "no" },

@@ -59,6 +59,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Date technicalStartFrom = null;
   private Date technicalStartTo = null;
   private String creator = null;
+  private String publisher = null;
   private String license = null;
   private String rights = null;
   private final List<String> trackMimetypes = new ArrayList<String>();
@@ -533,6 +534,28 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String getCreator() {
     return creator;
+  }
+
+  /**
+   * Selects recordings with the given publisher.
+   *
+   * @param publisher
+   *          the publisher
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withPublisher(String publisher) {
+    clearExpectations();
+    this.publisher = publisher;
+    return this;
+  }
+
+  /**
+   * Returns the publisher of the recording.
+   *
+   * @return the publisher
+   */
+  public String getPublisher() {
+    return publisher;
   }
 
   /**
