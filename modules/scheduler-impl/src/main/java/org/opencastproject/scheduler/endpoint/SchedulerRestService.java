@@ -903,8 +903,9 @@ public class SchedulerRestService {
     if (ids != null)
       userIds.addAll(Arrays.asList(ids));
 
-    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.UTC);
-    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.UTC);
+    // ical4j expects start and end dates to be in TimeZone to be schedule to (not UTC)
+    DateTime startDate = new DateTime(startTime).toDateTime(DateTimeZone.forTimeZone(tz));
+    DateTime endDate = new DateTime(endTime).toDateTime(DateTimeZone.forTimeZone(tz));
 
     try {
       service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
@@ -1140,6 +1141,14 @@ public class SchedulerRestService {
   public Response getConflicts(@PathParam("type") final String type, @QueryParam("agent") String device, @QueryParam("rrule") String rrule,
           @QueryParam("start") Long startDate, @QueryParam("end") Long endDate, @QueryParam("duration") Long duration,
           @QueryParam("timezone") String timezone) throws UnauthorizedException {
+    // Pass dates in the TZ to be schedule to (not UTC)
+    // If no timezone passed, use the local timezone of the system
+    if (StringUtils.isBlank(timezone)) {
+      timezone = DateTimeZone.getDefault().toString();
+    }
+    Date start = new DateTime(startDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
+    Date end = new DateTime(endDate).toDateTime(DateTimeZone.forID(timezone)).toDate();
+
     try {
       List<MediaPackage> events = getConflictingEvents(device, rrule, startDate, endDate, duration, timezone);
       if (!events.isEmpty()) {
