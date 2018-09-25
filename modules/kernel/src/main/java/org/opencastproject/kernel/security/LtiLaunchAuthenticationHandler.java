@@ -104,7 +104,7 @@ public class LtiLaunchAuthenticationHandler
    *          the user details service used to map user identifiers to more detailed information
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService) {
-    this(userDetailsService, null, new ArrayList<String>());
+    this(userDetailsService, null, new ArrayList<String>(), null);
   }
 
   /**
@@ -115,7 +115,8 @@ public class LtiLaunchAuthenticationHandler
    */
   public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
           List<String> highlyTrustedkeys) {
-    this(userDetailsService, securityService, highlyTrustedkeys, null);
+    this(userDetailsService, securityService, highlyTrustedkeys, "^(admin|opencast_system_account)$");
+    logger.warn("No untrusted users pattern configured - using default \"" + this.untrustedUsersPattern + "\"");
   }
 
   /**
