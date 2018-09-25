@@ -444,15 +444,8 @@
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
-  <!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
-
-  <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
-    <constructor-arg index="0" ref="userDetailsService" />
-    <constructor-arg index="1" value="CONSUMERKEY" />
-    <constructor-arg index="2" value="CONSUMERSECRET" />
-    <constructor-arg index="3" value="constructorName" />
-  </bean>
+  <!-- This is required for LTI. If you plan to use LTI, uncomment this and set
+       custom values for consumerkey and consumersecret:
 
   <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">
     <property name="consumerDetailsService" ref="oAuthConsumerDetailsService" />
@@ -462,26 +455,9 @@
     <property name="nonceServices">
       <bean class="org.springframework.security.oauth.provider.nonce.InMemoryNonceServices" />
     </property>
-    <property name="authHandler">
-      <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
-        <constructor-arg index="0" ref="userDetailsService" />
-
-        <!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
-        <!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
-
-        <!--
-        <constructor-arg index="1" ref="securityService" />
-        <constructor-arg index="2">
-          <list>
-            <value>CONSUMERKEY</value>
-          </list>
-        </constructor-arg>
-        <constructor-arg index="3" value="^(admin|opencast_system_account)$" />
-        -->
-
-      </bean>
-    </property>
+    <property name="authHandler" ref="ltiLaunchAuthenticationHandler" />
   </bean>
+  -->
 
   <!-- ###################### -->
   <!-- # Shibboleth Support # -->
@@ -585,6 +561,11 @@
                   interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
                   filter="(instanceId=theId)"/>
 
+  <osgi:reference id="oAuthConsumerDetailsService" cardinality="1..1"
+                  interface="org.springframework.security.oauth.provider.ConsumerDetailsService" />
+
+  <osgi:reference id="ltiLaunchAuthenticationHandler" cardinality="1..1"
+                  interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler" />
 
   <!-- ############################# -->
   <!-- # Spring Security Internals # -->
@@ -595,7 +576,9 @@
     <!-- Uncomment this if using Shibboleth authentication -->
     <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
+      <sec:password-encoder hash="md5">
+        <sec:salt-source user-property="username" />
+      </sec:password-encoder>
     </sec:authentication-provider>
     <sec:authentication-provider ref="ldapAuthProvider" />
   </sec:authentication-manager>
