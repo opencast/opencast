@@ -4,8 +4,35 @@ Opencast 6: Release Notes
 New Features and Improvements
 -----------------------------
 
-- **Admin UI** - Deleting Series now warns if series contains events. You can configure if the user is allowed to
+- Deleting Series now warns if series contains events. You can configure if the user is allowed to
   delete a series containing events in the series endpoint config file.
+- Update Paella Player to 6.0.x
+- Add Moodle groups to Moodle role provider
+- Add start-workflow operation
+- Ability to send HTML emails
+- Ability for blacklisting languages from the admin UI
+- Update LTI Series Tool
+- External API 1.1.0
+    - Add filters for new fields
+- Fill creator metadata field with actual user when new event
+- AWS S3 Asset Storage
+- Tiered Storage for the Asset Manager
+- image-convert operation
+- Multiencode
+- Improved keyboard/hotkey support
+- Video editor
+    - Audio and video track selection in video editor
+    - Intuitive Merging of Video Segments
+- Alternative video editor backend (process-smil)
+- Capture Agent Access Management
+- Add new modal to edit multiple scheduled events at once
+- Manually Select And Upload Thumbnails
+- As an unprivileged user, I only want to see series and events that I have write access to.
+- Make workflow processing settings persistent
+- Demux Operation
+- Lossless Concat Operation
+- Mattermost-notification-workflowoperationhandler
+- Per-tenant digest user for capture agents
 
 
 Configuration changes
