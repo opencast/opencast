@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+ name="org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflowOperationHandler" immediate="true">
+  <implementation class="org.opencastproject.workflow.handler.workflow.StartWorkflowWorkflowOperationHandler" />
+  <property name="service.description" value="Start Workflow Workflow Operation Handler" />
+  <property name="workflow.operation" value="start-workflow" />
+  <service>
+    <provide interface="org.opencastproject.workflow.api.WorkflowOperationHandler" />
+  </service>
+  <reference name="asset-manager" interface="org.opencastproject.assetmanager.api.AssetManager"
+             cardinality="1..1" policy="static" bind="setAssetManager" />
+  <reference name="workflowService" interface="org.opencastproject.workflow.api.WorkflowService"
+             cardinality="1..1" policy="static" bind="setWorkflowService" />
+</scr:component>
