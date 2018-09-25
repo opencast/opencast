@@ -87,7 +87,7 @@ The easiest way of creating that file is probably to create a copy of the alread
 ### Other Configuration
 
 Two additional files should be copied: `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`
-should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg-tenant1`, and
+should be copied to `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common-tenant1.cfg`, and
 `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common.cfg` should be copied to
 `org.opencastproject.ui.metadata.CatalogUIAdapterFactory-series-common-tenant1.cfg`.
 
