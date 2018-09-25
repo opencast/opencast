@@ -21,11 +21,14 @@
 
 package org.opencastproject.kernel.security;
 
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -37,67 +40,91 @@ import org.springframework.security.oauth.provider.ConsumerDetailsService;
 import org.springframework.security.oauth.provider.ExtraTrustConsumerDetails;
 
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * A sample OAuth consumer details service, hard coded to authenticate a consumer with the following information:
- *
- * <ul>
- *  <li>key=consumerkey</li>
- *  <li>name=consumername</li>
- *  <li>secret=consumersecret</li>
- * </ul>
- *
- * A UserDetailsService must be provided for delegating user lookup requests.
+ * A OAuth consumer details service with multiple consumers. UserDetailsService is used for delegating user
+ * lookup requests.
  */
-public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService, UserDetailsService {
+public class OAuthConsumerDetailsService implements ConsumerDetailsService, UserDetailsService, ManagedService {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(OAuthSingleConsumerDetailsService.class);
+  private static final Logger logger = LoggerFactory.getLogger(OAuthConsumerDetailsService.class);
 
-  /** The single hard-coded OAuth consumer. To be replaced later. */
-  private ConsumerDetails consumer;
+  /** The prefix of the key to look up a consumer name. */
+  private static final String CONSUMER_NAME_PREFIX = "oauth.consumer.name.";
+
+  /** The prefix of the key to look up a consumer key. */
+  private static final String CONSUMER_KEY_PREFIX = "oauth.consumer.key.";
+
+  /** The prefix of the key to look up a consumer secret. */
+  private static final String CONSUMER_SECRET_PREFIX = "oauth.consumer.secret.";
 
   /** The user details service to use as a delegate for user lookups */
   private UserDetailsService delegate;
 
+  /** A map associating consumer keys to OAuth consumers. */
+  private Map<String, ConsumerDetails> consumers = new HashMap<>();
+
   /**
-   * Full constructor that accepts all the consumer details
-   *
-   * @param delegate
-   *          the user detail service to handle user lookups
-   * @param consumerKey
-   *          The consumer's secret key
-   * @param consumerSecret
-   *          The shared secret for the consumer
-   * @param consumerName
-   *          The consumer's name
+   * OSGi DI
    */
-  public OAuthSingleConsumerDetailsService(UserDetailsService delegate, String consumerKey, String consumerSecret,
-          String consumerName) {
+  public void setDelegate(UserDetailsService delegate) {
     this.delegate = delegate;
-    consumer = createConsumerDetails(consumerKey, consumerName, consumerSecret);
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    logger.debug("Updating OAuthConsumerDetailsService");
+
+    consumers.clear();
+
+    if (properties == null) {
+      logger.warn("OAuthConsumerDetailsService has no configured OAuth consumers");
+      return;
+    }
+
+    for (int i = 1; true; i++) {
+      logger.debug("Looking for configuration of {}", CONSUMER_NAME_PREFIX + i);
+      String consumerName = StringUtils.trimToNull((String) properties.get(CONSUMER_NAME_PREFIX + i));
+      String consumerKey = StringUtils.trimToNull((String) properties.get(CONSUMER_KEY_PREFIX + i));
+      String consumerSecret = StringUtils.trimToNull((String) properties.get(CONSUMER_SECRET_PREFIX + i));
+
+      // Has the consumer been fully configured
+      if (consumerName == null || consumerKey == null || consumerSecret == null) {
+        logger.debug(
+                "Unable to configure OAuth consumer with name'{}' because the name, key or secret is missing. Stopping to look for new consumers.",
+                consumerName);
+        break;
+      }
+
+      consumers.put(consumerKey, createConsumerDetails(consumerName, consumerKey, consumerSecret));
+    }
   }
 
   /**
    * Creates a spring security consumer details object, suitable to achieve two-legged OAuth.
    *
-   * @param consumerKey
-   *          the consumer key
    * @param consumerName
    *          the consumer name
+   * @param consumerKey
+   *          the consumer key
    * @param consumerSecret
    *          the consumer secret
    * @return the consumer details
    */
-  private ExtraTrustConsumerDetails createConsumerDetails(String consumerKey, String consumerName, String consumerSecret) {
+  private ExtraTrustConsumerDetails createConsumerDetails(String consumerName, String consumerKey,
+          String consumerSecret) {
     SharedConsumerSecret secret = new SharedConsumerSecret(consumerSecret);
     BaseConsumerDetails bcd = new BaseConsumerDetails();
     bcd.setConsumerKey(consumerKey);
     bcd.setConsumerName(consumerName);
     bcd.setSignatureSecret(secret);
-    List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-    authorities.add(new GrantedAuthorityImpl("ROLE_OAUTH_USER"));
+    List<GrantedAuthority> authorities = new ArrayList<>();
+    authorities.add(new SimpleGrantedAuthority("ROLE_OAUTH_USER"));
     bcd.setAuthorities(authorities);
     bcd.setRequiredToObtainAuthenticatedToken(false); // false for 2 legged OAuth
     return bcd;
@@ -106,7 +133,8 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
   @Override
   public ConsumerDetails loadConsumerByConsumerKey(String key) throws OAuthException {
     logger.debug("Request received to find consumer for consumerKey=[" + key + "]");
-    if (!consumer.getConsumerKey().equals(key)) {
+    ConsumerDetails consumer = consumers.get(key);
+    if (consumer == null) {
       logger.debug("Result: No consumer found for [" + key + "]");
       throw new OAuthException("No consumer found for key " + key);
     }
@@ -118,5 +146,4 @@ public class OAuthSingleConsumerDetailsService implements ConsumerDetailsService
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, DataAccessException {
     return delegate.loadUserByUsername(username);
   }
-
 }

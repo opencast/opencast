@@ -21,9 +21,13 @@
 
 package org.opencastproject.kernel.security;
 
-import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.util.SecurityUtil;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -35,16 +39,14 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth.provider.ConsumerAuthentication;
+import org.springframework.security.oauth.provider.OAuthAuthenticationHandler;
 import org.springframework.security.oauth.provider.token.OAuthAccessProviderToken;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Dictionary;
 import java.util.HashSet;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -52,91 +54,117 @@ import javax.servlet.http.HttpServletRequest;
  * Callback interface for handing authentication details that are used when an authenticated request for a protected
  * resource is received.
  */
-public class LtiLaunchAuthenticationHandler
-        implements org.springframework.security.oauth.provider.OAuthAuthenticationHandler {
+public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandler, ManagedService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
 
   /** The Http request parameter, sent by the LTI consumer, containing the user ID. */
-  public static final String LTI_USER_ID_PARAM = "user_id";
+  private static final String LTI_USER_ID_PARAM = "user_id";
 
-  /** The http request paramater containing the Consumer GUI **/
-  public static final String LTI_CONSUMER_GUID = "tool_consumer_instance_guid";
+  /** The http request parameter containing the Consumer GUI **/
+  private static final String LTI_CONSUMER_GUID = "tool_consumer_instance_guid";
 
-  /** LTI field containing a comma delimeted list of roles */
-  public static final String ROLES = "roles";
+  /** LTI field containing a comma delimited list of roles */
+  private static final String ROLES = "roles";
 
   /** The LTI field containing the context_id */
-  public static final String CONTEXT_ID = "context_id";
+  private static final String CONTEXT_ID = "context_id";
 
   /** The prefix for LTI user ids */
-  public static final String LTI_USER_ID_PREFIX = "lti";
+  private static final String LTI_USER_ID_PREFIX = "lti";
 
   /** The delimiter to use in generated OAUTH id's **/
-  public static final String LTI_ID_DELIMITER = ":";
+  private static final String LTI_ID_DELIMITER = ":";
 
   /** The Opencast Role for OAUTH users **/
   private static final String ROLE_OAUTH_USER = "ROLE_OAUTH_USER";
 
-  /** The default context for LTI x **/
+  /** The default context for LTI **/
   private static final String DEFAULT_CONTEXT = "LTI";
 
   /** The default learner for LTI **/
   private static final String DEFAULT_LEARNER = "USER";
 
+  /** The key to look up the admin username **/
+  private static final String ADMIN_USER_KEY = "org.opencastproject.security.admin.user";
+
+  /** The prefix of the key to look up a consumer key. */
+  private static final String HIGHLY_TRUSTED_CONSUMER_KEY_PREFIX = "lti.oauth.highly_trusted_consumer_key.";
+
+  /** The prefix of the key to look up a blacklisted user. */
+  private static final String BLACKLIST_USER_PREFIX = "lti.blacklist.user.";
+
+  /** The key to look up whether the admin user should be able to authenticate via LTI **/
+  private static final String ALLOW_SYSTEM_ADMINISTRATOR_KEY = "lti.allow_system_administrator";
+
+  /** The key to look up whether the digest user should be able to authenticate via LTI **/
+  private static final String ALLOW_DIGIST_USER_KEY = "lti.allow_digest_user";
+
   /** The user details service */
-  protected UserDetailsService userDetailsService;
+  private UserDetailsService userDetailsService;
 
-  /** the Security Service **/
-  protected SecurityService securityService;
+  /** OSGi component context */
+  private ComponentContext componentContext;
 
-  /** list of keys that will be highly */
-  protected List<String> highlyTrustedKeys;
+  /** Set of OAuth consumer keys that are highly trusted */
+  private Set<String> highlyTrustedConsumerKeys = new HashSet<>();
 
-  /** Pattern that matches user names, which should not be trusted from LTI */
-  protected Pattern untrustedUsersPattern;
-
-  /**
-   * Constructs a new LTI authentication handler, using the supplied user details service for performing user lookups.
-   *
-   * @param userDetailsService
-   *          the user details service used to map user identifiers to more detailed information
-   */
-  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService) {
-    this(userDetailsService, null, new ArrayList<String>());
-  }
+  /** Set of usernames that should not authenticated as themselves even if the OAuth consumer keys is trusted */
+  private Set<String> usernameBlacklist = new HashSet<>();
 
   /**
-   * Constructor for a LTI authentication handler that includes a list of highly trusted keys
-   *
-   * @param userDetailsService
-   * @param highlyTrustedkeys
+   * OSGi DI
    */
-  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
-          List<String> highlyTrustedkeys) {
-    this(userDetailsService, securityService, highlyTrustedkeys, null);
-  }
-
-  /**
-   * Full constructor for a LTI authentication handler that includes a list of highly trusted keys with exceptions.
-   *
-   * @param userDetailsService
-   * @param highlyTrustedkeys
-   * @param untrustedUsersPattern
-   */
-  public LtiLaunchAuthenticationHandler(UserDetailsService userDetailsService, SecurityService securityService,
-          List<String> highlyTrustedkeys, String untrustedUsersPattern) {
+  public void setUserDetailsService(UserDetailsService userDetailsService) {
     this.userDetailsService = userDetailsService;
-    this.securityService = securityService;
-    this.highlyTrustedKeys = highlyTrustedkeys;
+  }
 
-    if (StringUtils.isNotBlank(untrustedUsersPattern)) {
-      try {
-        this.untrustedUsersPattern = Pattern.compile(untrustedUsersPattern);
-      } catch (PatternSyntaxException e) {
-        logger.warn("The configured untrusted users pattern is invalid - disabling checks:", e);
+  public void activate(ComponentContext cc) {
+    logger.info("Activating LtiLaunchAuthenticationHandler");
+    componentContext = cc;
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    logger.debug("Updating LtiLaunchAuthenticationHandler");
+
+    highlyTrustedConsumerKeys.clear();
+    usernameBlacklist.clear();
+
+    if (properties == null) {
+      logger.warn("LtiLaunchAuthenticationHandler is not configured");
+      return;
+    }
+
+    // Highly trusted OAuth consumer keys
+    for (int i = 1; true; i++) {
+      logger.debug("Looking for configuration of {}", HIGHLY_TRUSTED_CONSUMER_KEY_PREFIX + i);
+      String consumerKey = StringUtils.trimToNull((String) properties.get(HIGHLY_TRUSTED_CONSUMER_KEY_PREFIX + i));
+      if (consumerKey == null) {
+        break;
       }
+      highlyTrustedConsumerKeys.add(consumerKey);
+    }
+
+    // User blacklist
+    if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_SYSTEM_ADMINISTRATOR_KEY)))) {
+      String adminUsername = StringUtils.trimToNull(componentContext.getBundleContext().getProperty(ADMIN_USER_KEY));
+      if (adminUsername != null) {
+        usernameBlacklist.add(adminUsername);
+      }
+    }
+    if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_DIGIST_USER_KEY)))) {
+      usernameBlacklist.add(SecurityUtil.getSystemUserName(componentContext));
+    }
+
+    for (int i = 1; true; i++) {
+      logger.debug("Looking for configuration of {}", BLACKLIST_USER_PREFIX + i);
+      String username = StringUtils.trimToNull((String) properties.get(BLACKLIST_USER_PREFIX + i));
+      if (username == null) {
+        break;
+      }
+      usernameBlacklist.add(username);
     }
   }
 
@@ -170,7 +198,7 @@ public class LtiLaunchAuthenticationHandler
 
     // if this is a trusted consumer we trust their details
     String oaAuthKey = request.getParameter("oauth_consumer_key");
-    if (highlyTrustedKeys.contains(oaAuthKey)) {
+    if (highlyTrustedConsumerKeys.contains(oaAuthKey)) {
       logger.debug("{} is a trusted key", oaAuthKey);
 
       // If supplied we use the human readable name coming from:
@@ -186,9 +214,9 @@ public class LtiLaunchAuthenticationHandler
       }
 
       // Check if the provided username should be trusted
-      if (untrustedUsersPattern != null && untrustedUsersPattern.matcher(ltiUsername).matches()) {
+      if (usernameBlacklist.contains(ltiUsername)) {
         // Do not trust the username
-        logger.debug("{} is an untrusted username", ltiUsername);
+        logger.debug("{} is blacklisted", ltiUsername);
       } else {
         username = ltiUsername;
       }
@@ -198,8 +226,8 @@ public class LtiLaunchAuthenticationHandler
       logger.debug("LTI user id is : {}", username);
     }
 
-    UserDetails userDetails = null;
-    Collection<GrantedAuthority> userAuthorities = null;
+    UserDetails userDetails;
+    Collection<GrantedAuthority> userAuthorities;
     try {
       userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -208,7 +236,7 @@ public class LtiLaunchAuthenticationHandler
       // On the other hand, one cannot add non-null elements or modify the existing ones in a Collection<? extends
       // GrantedAuthority>. Therefore, we *must* instantiate a new Collection<GrantedAuthority> (an ArrayList in this
       // case) and populate it with whatever elements are returned by getAuthorities()
-      userAuthorities = new HashSet<GrantedAuthority>(userDetails.getAuthorities());
+      userAuthorities = new HashSet<>(userDetails.getAuthorities());
 
       // we still need to enrich this user with the LTI Roles
       String roles = request.getParameter(ROLES);
@@ -216,7 +244,7 @@ public class LtiLaunchAuthenticationHandler
       enrichRoleGrants(roles, context, userAuthorities);
     } catch (UsernameNotFoundException e) {
       // This user is known to the tool consumer, but not to Opencast. Create a user "on the fly"
-      userAuthorities = new HashSet<GrantedAuthority>();
+      userAuthorities = new HashSet<>();
       // We should add the authorities passed in from the tool consumer?
       String roles = request.getParameter(ROLES);
       String context = request.getParameter(CONTEXT_ID);
@@ -239,23 +267,25 @@ public class LtiLaunchAuthenticationHandler
   }
 
   /**
-   * Enrich A collection of role grants with specified LTI memberships
+   * Enrich A collection of role grants with specified LTI memberships.
    *
    * @param roles
+   *          String of LTI roles.
    * @param context
+   *          LTI context ID.
    * @param userAuthorities
+   *          Collection to append to.
    */
   private void enrichRoleGrants(String roles, String context, Collection<GrantedAuthority> userAuthorities) {
     // Roles could be a list
     if (roles != null) {
-      List<String> roleList = Arrays.asList(roles.split(","));
+      String[] roleList = roles.split(",");
 
-      /* Use a generic context and learner if none is given: */
+      // Use a generic context and learner if none is given:
       context = StringUtils.isBlank(context) ? DEFAULT_CONTEXT : context;
 
       for (String learner : roleList) {
-
-        /* Build the role */
+        // Build the role
         String role;
         if (StringUtils.isBlank(learner)) {
           role = context + "_" + DEFAULT_LEARNER;
@@ -263,17 +293,16 @@ public class LtiLaunchAuthenticationHandler
           role = context + "_" + learner;
         }
 
-        /* Make sure to not accept ROLE_… */
+        // Make sure to not accept ROLE_…
         if (role.trim().toUpperCase().startsWith("ROLE_")) {
           logger.warn("Discarding attempt to acquire role “{}”", role);
           continue;
         }
 
-        /* Add this role */
+        // Add this role
         logger.debug("Adding role: {}", role);
         userAuthorities.add(new SimpleGrantedAuthority(role));
       }
     }
   }
-
 }
