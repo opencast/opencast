@@ -7,10 +7,10 @@ What it does
 The Opencast LTI module provides an easy way to integrate Opencast into a Learning Management System (LMS),
 or any other system which supports the LTI standard as an LTI _tool consumer_.
 
-Typically, students enrolled in a course access Opencast through an LTI tool in the LMS course site, 
-and can play back videos in an Opencast series set up for the course. 
+Typically, students enrolled in a course access Opencast through an LTI tool in the LMS course site,
+and can play back videos in an Opencast series set up for the course.
 
-More information about the LTI specifications is available at 
+More information about the LTI specifications is available at
 [IMS Learning Tools Interoperability](http://www.imsglobal.org/activity/learning-tools-interoperability).
 
 Configure Opencast
@@ -72,24 +72,24 @@ Configure an LTI tool in the LMS with these values:
 
 In a clustered Opencast system, choose the URL of the presentation server where the media module and player are available.
 
-Access the LTI tool configured for Opencast in the LMS. The Opencast LTI Welcome page should appear. Click on the links 
+Access the LTI tool configured for Opencast in the LMS. The Opencast LTI Welcome page should appear. Click on the links
 provided to `OPENCAST-URL/lti` and `OPENCAST-URL/info/me.json` to verify the LTI parameters provided to Opencast by the LMS,
 and the list of roles which the LTI user has in Opencast.
 
 LTI roles
 ----------
 
-LTI users will only see Opencast series and videos which are public, or those to which they have access 
+LTI users will only see Opencast series and videos which are public, or those to which they have access
 because of the Opencast roles which they have. The Opencast LTI module grants an LTI user the role(s) formed
 from the LTI parameters `context_id` and `roles`.
 
 The LTI context is typically the LMS course ID, and the default LTI role for a student in a course is `Learner`.
 The Opencast role granted would therefore be `SITEID_Learner`.
 
-To make a series or video visible to students who access Opencast through LTI in an LMS course, 
-add the role `SITEID_Learner` to the Series or Event Access Control List (ACL). 
+To make a series or video visible to students who access Opencast through LTI in an LMS course,
+add the role `SITEID_Learner` to the Series or Event Access Control List (ACL).
 
-LTI users may also have additional roles if the LTI user is created as an Opencast user in the Admin UI and 
+LTI users may also have additional roles if the LTI user is created as an Opencast user in the Admin UI and
 given additional roles, or if one or more Opencast User Providers or Role Providers are configured.
 
 Customize the LTI tool in the LMS
