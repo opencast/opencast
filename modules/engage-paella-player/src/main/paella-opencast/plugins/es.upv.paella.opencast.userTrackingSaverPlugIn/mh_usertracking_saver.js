@@ -39,15 +39,20 @@ paella.addPlugin(function() {
     }
 
     log(event, params) {
-      paella.player.videoContainer.currentTime().then(function(ct){
-        var videoCurrentTime = parseInt(ct + paella.player.videoContainer.trimStart());
+      var videoCurrentTime;
+      paella.player.videoContainer.currentTime()
+      .then((ct) => {
+        videoCurrentTime = parseInt(ct + paella.player.videoContainer.trimStart());
+        return paella.player.videoContainer.paused();
+      })
+      .then((paused) => {
         var opencastLog = {
           _method: 'PUT',
           'id': paella.player.videoIdentifier,
           'type': undefined,
           'in': videoCurrentTime,
           'out': videoCurrentTime,
-          'playing': !paella.player.videoContainer.paused()
+          'playing': !paused
         };
 
         switch (event) {
