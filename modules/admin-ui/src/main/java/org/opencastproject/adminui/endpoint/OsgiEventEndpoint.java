@@ -35,6 +35,7 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 
@@ -53,6 +54,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   private EventCommentService eventCommentService;
   private IndexService indexService;
   private JobEndpoint jobService;
+  private SeriesEndpoint seriesService;
   private SchedulerService schedulerService;
   private SecurityService securityService;
   private UrlSigningService urlSigningService;
@@ -61,6 +63,9 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
+
+  public static final String EVENTMODAL_ONLYSERIESWITHWRITEACCESS_KEY = "eventModal.onlySeriesWithWriteAccess";
+  private Boolean onlySeriesWithWriteAccessEventModal = false;
 
   @Override
   public AdminUIConfiguration getAdminUIConfiguration() {
@@ -85,6 +90,16 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   @Override
   public JobEndpoint getJobService() {
     return jobService;
+  }
+
+  /** OSGi DI. */
+  public void setSeriesService(SeriesEndpoint seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  @Override
+  public SeriesEndpoint getSeriesService() {
+    return seriesService;
   }
 
   /** OSGi DI. */
@@ -192,6 +207,11 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
     expireSeconds = UrlSigningServiceOsgiUtil.getUpdatedSigningExpiration(properties, this.getClass().getSimpleName());
     signWithClientIP = UrlSigningServiceOsgiUtil.getUpdatedSignWithClientIP(properties,
             this.getClass().getSimpleName());
+
+    Object dictionaryValue = properties.get(EVENTMODAL_ONLYSERIESWITHWRITEACCESS_KEY);
+    if (dictionaryValue != null) {
+      onlySeriesWithWriteAccessEventModal = BooleanUtils.toBoolean(dictionaryValue.toString());
+    }
   }
 
   @Override
@@ -202,6 +222,11 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint implements ManagedS
   @Override
   public Boolean signWithClientIP() {
     return signWithClientIP;
+  }
+
+  @Override
+  public Boolean getOnlySeriesWithWriteAccessEventModal() {
+    return onlySeriesWithWriteAccessEventModal;
   }
 
 }

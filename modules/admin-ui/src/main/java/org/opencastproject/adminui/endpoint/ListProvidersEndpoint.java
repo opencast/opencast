@@ -85,6 +85,7 @@ public class ListProvidersEndpoint {
 
   private SecurityService securityService;
   private ListProvidersService listProvidersService;
+  private SeriesEndpoint seriesEndpoint;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("Activate list provider service");
@@ -98,6 +99,11 @@ public class ListProvidersEndpoint {
   /** OSGi callback for sercurity service. */
   public void setSecurityService(SecurityService securitySerivce) {
     this.securityService = securitySerivce;
+  }
+
+  /** OSGi callback for series end point. */
+  public void setSeriesEndpoint(SeriesEndpoint seriesEndpoint) {
+    this.seriesEndpoint = seriesEndpoint;
   }
 
   @GET
@@ -218,7 +224,13 @@ public class ListProvidersEndpoint {
     }
 
     try {
-      return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
+      if ("events".equals(page) && seriesEndpoint.getOnlySeriesWithWriteAccessEventsFilter()) {
+        Map<String, String> seriesWriteAccess = seriesEndpoint.getUserSeriesByAccess(true);
+        return RestUtils.okJson(JSONUtils.filtersToJSONSeriesWriteAccess(query, listProvidersService,
+                securityService.getOrganization(), seriesWriteAccess));
+      } else {
+        return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
+      }
     } catch (ListProviderException e) {
       logger.error("Not able to get list of options for the filters for the page {}: {}", page, e);
       return SERVER_ERROR;

@@ -27,6 +27,11 @@
              cardinality="1..1"
              policy="static"
              bind="setJobService"/>
+  <reference name="seriesService"
+             interface="org.opencastproject.adminui.endpoint.SeriesEndpoint"
+             cardinality="1..1"
+             policy="static"
+             bind="setSeriesService"/>
   <reference name="AclServiceFactory"
              interface="org.opencastproject.authorization.xacml.manager.api.AclServiceFactory"
              cardinality="1..1"
