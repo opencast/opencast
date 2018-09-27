@@ -108,7 +108,8 @@ paella.addPlugin(function() {
       divDate.innerHTML = paella.dictionary.translate('Date')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.date) + '</span>';
       divContributor.innerHTML = paella.dictionary.translate('Contributor')
-        + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.contributor) + '</span>';
+        + ': <span class="showMHDescriptionTabBarValue">'
+        + paella.AntiXSS.htmlEscape(this.desc.contributor) + '</span>';
       divLanguage.innerHTML = paella.dictionary.translate('Language')
         + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.language) + '</span>';
       divViews.innerHTML = paella.dictionary.translate('Views')
@@ -136,7 +137,8 @@ paella.addPlugin(function() {
           + this.desc.serieId + '">' + paella.AntiXSS.htmlEscape(this.desc.serie) + '</a></span>';
       }
       divDescription.innerHTML = paella.dictionary.translate('Description')
-        + ': <span class="showMHDescriptionTabBarValue">' + paella.AntiXSS.htmlEscape(this.desc.description) + '</span>';
+        + ': <span class="showMHDescriptionTabBarValue">'
+        + paella.AntiXSS.htmlEscape(this.desc.description) + '</span>';
 
       //---------------------------//
       var divLeft = document.createElement('div');
