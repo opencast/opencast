@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.OptimisticLockException;
+import javax.persistence.RollbackException;
 
 /**
  * This class is a utility implementation that will wait for all given jobs to change their status to either one of:
@@ -159,7 +160,9 @@ public final class JobBarrier {
             if (setBlockerJob(j, waiter)) {
               blockedForJobs.add(j.getId());
             }
-          } catch (OptimisticLockException e) {
+          } catch (OptimisticLockException | RollbackException e) {
+            // Catch javax.persistence.RollbackException: javax.persistence.OptimisticLockException
+            // from tx.commit()
             // Try again, this happens if the job finishes before we get here
             // If the same exception happens again then we're in a very weird state
             if (setBlockerJob(j, waiter)) {
