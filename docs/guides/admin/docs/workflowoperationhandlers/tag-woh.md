@@ -37,7 +37,7 @@ Tags and flavors can be used in combination.
       exception-handler-workflow="error"
       description="Tagging media package elements">
       <configurations>
-        <configuration key="source-tags">engage,atom,-publish</configuration>
+        <configuration key="source-tags">engage,atom,publish</configuration>
         <configuration key="source-flavors">presentation/trimmed</configuration>
         <configuration key="target-tags">-atom,+rss</configuration>
         <configuration key="target-flavor">presentation/tagged</configuration>
