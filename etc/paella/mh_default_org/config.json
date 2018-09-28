@@ -84,7 +84,7 @@
       "color": "gray"
     }
   },
-  "defaultProfile": "slide_professor",
+  "defaultProfile": "presenter_presentation",
   "data": {
     "enabled": true,
     "dataDelegates": {
@@ -119,6 +119,30 @@
     },
     "//**** For a list of available plugins and configuration, go to": "https://github.com/polimediaupv/paella/blob/master/doc/plugins.md",
     "list": {
+      "//**** Video profile plugins": "",
+      "es.upv.paella.singleStreamProfilePlugin": {
+          "enabled": true,
+          "videoSets": [
+            { "icon":"professor_icon.svg", "id":"presenter", "content":["presenter"]},
+            { "icon":"slide_icon.svg", "id":"presentation", "content":["presentation"]}
+          ]
+
+      },
+      "es.upv.paella.dualStreamProfilePlugin": { "enabled":true,
+        "videoSets": [
+          { "icon":"slide_professor_icon.svg", "id":"presenter_presentation", "content":["presenter","presentation"] },
+          { "icon":"slide_professor_icon.svg", "id":"presenter2_presentation", "content":["presenter-2","presentation"] },
+          { "icon":"slide_professor_icon.svg", "id":"presenter3_presentation", "content":["presenter-3","presentation"] }
+        ]
+      },
+      "es.upv.paella.tripleStreamProfilePlugin": {
+        "enabled": true,
+        "videoSets": [
+          { "icon":"three_streams_icon.svg", "id":"presenter_presentation_presenter2", "content":["presenter","presentation","multitrack"] },
+          { "icon":"three_streams_icon.svg", "id":"presenter_presentation_presenter3", "content":["presenter","presentation","presenter-2"] },
+          { "icon":"three_streams_icon.svg", "id":"presenter_presentation_presenter3", "content":["presenter","presentation","presenter-3"] }
+        ]
+      },
       "edu.harvard.dce.paella.flexSkipPlugin": {
         "enabled": true,
         "direction": "Rewind",
