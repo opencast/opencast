@@ -834,6 +834,7 @@
                "SOURCE": "Vir",
                "CREATED": "Ustvarjeno",
                "CREATED_BY": "Ustvaril",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licenca",
                "CONTRIBUTORS": "Sodelavec (-ci)",
                "RIGHTS": "Pravice",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari uporabnika",
-            "EDITCAPTION": "Uredi uporabnika",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Uporabnik",
                "ROLES": "Vloge",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari skupino",
-            "EDITCAPTION": "Uredi skupino",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Skupina",
                "ROLES": "Vloge",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Podrobnosti pravilnika o dostopu – {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Povzetek",
                "METADATA": "Metapodatki",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Ustvari predlogo",
-            "EDITCAPTION": "Uredi temo",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Splošno",
                "NAME": "Ime",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Avtor"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Ime gostitelja"

@@ -834,6 +834,7 @@
                "SOURCE": "Sources",
                "CREATED": "Créée",
                "CREATED_BY": "Auteur",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licence",
                "CONTRIBUTORS": "Contributeur(s)",
                "RIGHTS": "Droits",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer utilisateur",
-            "EDITCAPTION": "Modifier l’utilisateur",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Utilisateur",
                "ROLES": "Rôles",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer groupe",
-            "EDITCAPTION": "Modifier le groupe",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Groupe",
                "ROLES": "Rôles",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Détails des droits d'accès - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Résumé",
                "METADATA": "Métadonnées",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer un thème",
-            "EDITCAPTION": "Modifier le thème",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Général",
                "NAME": "Nom",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Auteur"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"

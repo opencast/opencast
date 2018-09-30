@@ -834,6 +834,7 @@
                "SOURCE": "来源",
                "CREATED": "创建",
                "CREATED_BY": "创建者",
+               "PUBLISHER": "Publisher",
                "LICENSE": "许可证",
                "CONTRIBUTORS": "贡献者",
                "RIGHTS": "权利",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "创建用户",
-            "EDITCAPTION": "编辑用户",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "用户",
                "ROLES": "角色",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "建立群组",
-            "EDITCAPTION": "编辑群组",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "群组",
                "ROLES": "角色",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "访问策略详情  - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "常规",
                "METADATA": "元数据",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "创建主题",
-            "EDITCAPTION": "编辑主题",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "常规",
                "NAME": "姓名",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "创建者"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "主机名"

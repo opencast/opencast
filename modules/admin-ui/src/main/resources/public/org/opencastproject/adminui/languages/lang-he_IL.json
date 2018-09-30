@@ -834,6 +834,7 @@
                "SOURCE": "מקור",
                "CREATED": "נוצר",
                "CREATED_BY": "נוצר על-ידי",
+               "PUBLISHER": "Publisher",
                "LICENSE": "רישיון",
                "CONTRIBUTORS": "תורמ(ים)",
                "RIGHTS": "זכויות",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "צור משתמש",
-            "EDITCAPTION": "Edit User",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "משתמש",
                "ROLES": "תפקידים",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "צור קבוצה",
-            "EDITCAPTION": "ערוך קבוצה",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "קבוצה",
                "ROLES": "תפקידים",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "פרטי מדיניות גישה - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "סיכום",
                "METADATA": "מטא-נתונים",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "יצירת ערכת נושא",
-            "EDITCAPTION": "עריכת ערכת נושא",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "כללי",
                "NAME": "שם",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "יוצר"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "שם מחשב מארח"
