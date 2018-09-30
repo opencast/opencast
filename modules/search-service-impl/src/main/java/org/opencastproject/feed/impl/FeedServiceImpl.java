@@ -56,7 +56,7 @@ import javax.ws.rs.core.Variant;
 
 @Path("/")
 @RestService(name = "feedservice", title = "Feed Service",
-    abstractText = "This class is responsible of creating RSS and Atom feeds.", notes = "")
+    abstractText = "This class is responsible of creating RSS and Atom feeds.", notes = {})
 /**
  * This class is responsible of creating RSS and Atom feeds.
  * <p>
@@ -104,14 +104,14 @@ public class FeedServiceImpl {
    */
   @GET
   @Produces(MediaType.TEXT_XML)
-  @Path("{query: .*}")
-  //FIXME: These Opencast REST classes do not support this path style, and need to have that support added
+  @Path("/{type}/{version}/{query:.*}")
   @RestQuery(name = "getFeed", description = "Gets an Atom or RSS feed", pathParameters = {
-          @RestParameter(description = "The feed type", name = "type", type = Type.STRING, isRequired = true),
-          @RestParameter(description = "The feed version", name = "version", type = Type.STRING, isRequired = true),
-          @RestParameter(description = "The feed query", name = "query", type = Type.STRING, isRequired = true)
-      },
-      reponses = {
+          @RestParameter(description = "Feed type (atom or rss)", name = "type", type = Type.STRING, isRequired = true),
+          @RestParameter(description = "Feed version", name = "version", type = Type.STRING, isRequired = true),
+          @RestParameter(description = "Feed query", name = "query", type = Type.STRING, isRequired = true)
+      }, restParameters = {
+          @RestParameter(description = "Requested result size", name = "size", type = Type.INTEGER, isRequired = false)
+      }, reponses = {
           @RestResponse(description = "Return the feed of the appropriate type", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
