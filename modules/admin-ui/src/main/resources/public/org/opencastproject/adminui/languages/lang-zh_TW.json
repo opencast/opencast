@@ -834,6 +834,7 @@
                "SOURCE": "來源",
                "CREATED": "創建",
                "CREATED_BY": "創建者",
+               "PUBLISHER": "Publisher",
                "LICENSE": "許可證",
                "CONTRIBUTORS": "貢獻者",
                "RIGHTS": "權利",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "建立使用者",
-            "EDITCAPTION": "編輯使用者",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "使用者",
                "ROLES": "角色",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "建立群組",
-            "EDITCAPTION": "編輯群組",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "群組",
                "ROLES": "角色",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "訪問者權限的詳細資訊-{{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "摘要",
                "METADATA": "後設資料",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "創建主題",
-            "EDITCAPTION": "編輯主題",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "常規",
                "NAME": "姓名",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "建立者"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "主機名稱"

@@ -834,6 +834,7 @@
                "SOURCE": "Kaynak",
                "CREATED": "Oluşturuldu",
                "CREATED_BY": "Oluşturan kişi",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Sürüm",
                "CONTRIBUTORS": "Katkı Sağlayan(lar)",
                "RIGHTS": "Haklar",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Kullanıcı oluştur",
-            "EDITCAPTION": "Kullanıcı düzenle",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Kullanıcı",
                "ROLES": "Roller",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Grup oluştur",
-            "EDITCAPTION": "Grup düzenle",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grup",
                "ROLES": "Roller",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Erişim İlkesi Detayları - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Özet",
                "METADATA": "Meta verisi",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Tema oluştur",
-            "EDITCAPTION": "Tema düzenle",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Genel",
                "NAME": "İsim",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Yaratıcı"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Ana bilgisayar adı"

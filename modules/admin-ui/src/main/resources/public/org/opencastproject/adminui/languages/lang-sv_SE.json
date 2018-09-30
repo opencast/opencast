@@ -834,6 +834,7 @@
                "SOURCE": "Källa",
                "CREATED": "Skapad",
                "CREATED_BY": "Skapad av",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licens",
                "CONTRIBUTORS": "Medförfattare",
                "RIGHTS": "Rättigheter",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa användare",
-            "EDITCAPTION": "Redigera användare",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Användare",
                "ROLES": "Roller",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa grupp",
-            "EDITCAPTION": "Redigera grupp",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grupp",
                "ROLES": "Roller",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Tillgångsinformationer - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Summering",
                "METADATA": "Metadata",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa tema",
-            "EDITCAPTION": "Redigera tema",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Allmänt",
                "NAME": "Namn",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Skapare"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Hostnamn"

@@ -834,6 +834,7 @@
                "SOURCE": "Pinagmulan",
                "CREATED": "Gumawa",
                "CREATED_BY": "Ginawa ni",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Lisensya",
                "CONTRIBUTORS": "(mga) Taga-ambag",
                "RIGHTS": "Mga karapatan",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Gumawa ng gumagamit",
-            "EDITCAPTION": "I-edit ang User",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Gumagamit",
                "ROLES": "Mga tungkulin",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Gumawa ng grupo",
-            "EDITCAPTION": "I-edit ang grupo",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grupo",
                "ROLES": "Mga tungkulin",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Mga detalye sa patakaran ng pag-access - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Buod",
                "METADATA": "Metadata",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Gumawa ng tema",
-            "EDITCAPTION": "I-edit ang tema",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Pangkalahatan",
                "NAME": "Pangalan",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Gumawa"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Pangalan ng host"

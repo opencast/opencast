@@ -834,6 +834,7 @@
                "SOURCE": "Źródło",
                "CREATED": "Utworzono",
                "CREATED_BY": "Utworzył",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licencja",
                "CONTRIBUTORS": "Współpracownik(cy)",
                "RIGHTS": "Prawa",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz użytkownika",
-            "EDITCAPTION": "Edycja użytkownika",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Użytkownik",
                "ROLES": "Role",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz grupę",
-            "EDITCAPTION": "Edycja grupy",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grupa",
                "ROLES": "Role",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Ustawienia dostępu - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Podsumowanie",
                "METADATA": "Metadane",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz motyw",
-            "EDITCAPTION": "Edycja motywu",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Ogólne",
                "NAME": "Nazwa",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Twórca"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Nazwa hosta"

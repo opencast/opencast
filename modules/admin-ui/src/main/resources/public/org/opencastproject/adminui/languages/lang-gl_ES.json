@@ -834,6 +834,7 @@
                "SOURCE": "Orixe",
                "CREATED": "Creado",
                "CREATED_BY": "Creado por",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licenza",
                "CONTRIBUTORS": "Colaborador(es)",
                "RIGHTS": "Permisos",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear usuario",
-            "EDITCAPTION": "Modificar usuario",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Usuario",
                "ROLES": "Roles",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear grupo",
-            "EDITCAPTION": "Modificar grupo",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grupo",
                "ROLES": "Roles",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Detalles da Política de Acceso - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Resumo",
                "METADATA": "Metadatos",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear estilo",
-            "EDITCAPTION": "Editar estilo",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Xeral",
                "NAME": "Nome",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Creador"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Nome do servidor"

@@ -834,6 +834,7 @@
                "SOURCE": "Ang pinagmulan",
                "CREATED": "Ang nalikha",
                "CREATED_BY": "Likha ni",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Lisensya",
                "CONTRIBUTORS": "Kontribyutor(mga)",
                "RIGHTS": "Mga Karapatan",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Lumikha ng gumagamit",
-            "EDITCAPTION": "Baguhin ang gumagamit",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Ang Gumagamit",
                "ROLES": "Mga tungkulin",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Lumikha ng grupo",
-            "EDITCAPTION": "Baguhin ang grupo",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Grupo",
                "ROLES": "Mga tungkulin",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Mga Detalye ng Patakaran sa pag-access - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Kabuuan",
                "METADATA": "Ang metadata",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Lumikha ng tema",
-            "EDITCAPTION": "I-edit ang tema",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Pangkaraniwan",
                "NAME": "Ang pangalan",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Ang lumikha"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Ang pangan ng host"

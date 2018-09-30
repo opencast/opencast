@@ -834,6 +834,7 @@
                "SOURCE": "Bron",
                "CREATED": "Aangemaakt",
                "CREATED_BY": "Aangemaakt door",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Licentie",
                "CONTRIBUTORS": "Bijdrager(s)",
                "RIGHTS": "Rechten",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Gebruiker aanmaken",
-            "EDITCAPTION": "Gebruiker editeren",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Gebruiker",
                "ROLES": "Rollen",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Groep aanmaken",
-            "EDITCAPTION": "Groep aanpassen",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Groep",
                "ROLES": "Rollen",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Toegang beleidsdetails - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Samenvatting",
                "METADATA": "Metadata",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Thema aanmaken",
-            "EDITCAPTION": "Editeer thema",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Algemeen",
                "NAME": "Naam",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Auteur"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Hostnaam"

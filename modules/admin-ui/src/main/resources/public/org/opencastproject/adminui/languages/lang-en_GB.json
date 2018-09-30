@@ -81,7 +81,7 @@
       "USERS_GUIDE": "User's Guide",
       "DOCUMENTATION": "Documentation",
       "REST_DOC": "REST API Docs",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
+      "HOTKEY_CHEAT_SHEET": "Keyboard shortcuts"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "The access policy has been created",
@@ -834,6 +834,7 @@
                "SOURCE": "Source",
                "CREATED": "Created",
                "CREATED_BY": "Created by",
+               "PUBLISHER": "Publisher",
                "LICENSE": "License",
                "CONTRIBUTORS": "Contributor(s)",
                "RIGHTS": "Rights",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Create user",
-            "EDITCAPTION": "Edit user",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "User",
                "ROLES": "Roles",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Create group",
-            "EDITCAPTION": "Edit group",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Group",
                "ROLES": "Roles",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access Policy Details  - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Summary",
                "METADATA": "Metadata",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Create theme",
-            "EDITCAPTION": "Edit theme",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "General",
                "NAME": "Name",
@@ -1791,7 +1792,7 @@
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
             "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one video track"
          },
          "TRACK": {
             "HEADER": "Track"
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Creator"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Host name"

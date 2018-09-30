@@ -834,6 +834,7 @@
                "SOURCE": "Πηγή",
                "CREATED": "Δημιουργήθηκε",
                "CREATED_BY": "Δημιουργήθηκε από",
+               "PUBLISHER": "Publisher",
                "LICENSE": "Άδεια χρήσης",
                "CONTRIBUTORS": "Χορηγός(οι)",
                "RIGHTS": "Δικαιώματα",
@@ -1250,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "δημιουργία χρήστη",
-            "EDITCAPTION": "Επεξεργασία χρήστη",
+            "EDITCAPTION": "User details - {{username}}",
             "TABS": {
                "USER": "Χρήστης",
                "ROLES": "Ρόλοι",
@@ -1294,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Δημιουργία ομάδας",
-            "EDITCAPTION": "Επεξεργασία ομάδας",
+            "EDITCAPTION": "Group details - {{name}}",
             "TABS": {
                "GROUP": "Ομάδες",
                "ROLES": "Ρόλοι",
@@ -1375,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Λεπτομέρειες πολιτικής πρόσβασης - {{resourceId}}",
+            "HEADER": "Access policy details  - {{name}}",
             "TABS": {
                "SUMMARY": "Περίληψη",
                "METADATA": "Μεταδεδομένα",
@@ -1558,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Δημιουργία θέματος",
-            "EDITCAPTION": "Επεξεργασία θέματος",
+            "EDITCAPTION": "Theme details - {{name}}",
             "GENERAL": {
                "CAPTION": "Γενικά",
                "NAME": "Όνομα",
@@ -1894,6 +1895,9 @@
          },
          "CREATOR": {
             "LABEL": "Δημιουργός"
+         },
+         "PUBLISHER": {
+            "LABEL": "Publisher"
          },
          "HOSTNAME": {
             "LABEL": "Όνομα κεντρικού υπολογιστή"
