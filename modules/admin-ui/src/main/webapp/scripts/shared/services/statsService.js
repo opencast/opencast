@@ -42,10 +42,11 @@ angular.module('adminNg.services')
       };
 
       /**
-         * Retrieve data from the defined API with the given filter values.
-         */
+       * Retrieve data from the defined API with the given filter values.
+       */
       this.fetch = function () {
         if (angular.isUndefined(me.apiService)) {
+          me.refreshScheduler.restartSchedule();
           return;
         }
 
@@ -76,9 +77,9 @@ angular.module('adminNg.services')
           }
 
           /* Workaround:
-                 * We don't want actual data here, but limit 0 does not work (retrieves all data)
-                 * See MH-11892 Implement event counters efficiently
-                 */
+           * We don't want actual data here, but limit 0 does not work (retrieves all data)
+           * See MH-11892 Implement event counters efficiently
+           */
           query.limit = 1;
           me.runningQueries++;
 
@@ -97,8 +98,8 @@ angular.module('adminNg.services')
       };
 
       /**
-         * Scheduler for the refresh of the fetch
-         */
+       * Scheduler for the refresh of the fetch
+       */
       this.refreshScheduler = {
         on: true,
         restartSchedule: function () {
