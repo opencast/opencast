@@ -25,15 +25,16 @@ angular.module('adminNg.services')
 
   var RelativeDatesService = function () {
 
-    moment.locale(navigator.language);
+    var localeMoment = moment();
+    localeMoment.locale(navigator.language);
 
     this.relativeToAbsoluteDate = function(relative, type, from) {
 
       var absolute;
       if (from === true) {
-        absolute = moment().startOf(type);
+        absolute = localeMoment.startOf(type);
       } else {
-        absolute = moment().endOf(type);
+        absolute = localeMoment.endOf(type);
       }
 
       absolute = absolute.add(relative, type);
