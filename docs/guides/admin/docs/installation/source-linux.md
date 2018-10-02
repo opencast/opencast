@@ -37,7 +37,7 @@ Cloning the Git repository:
 Install Dependencies
 --------------------
 
-Please make sure to install the following dependencies. Note that not all dependencies are in the system repositories.
+Please make sure to install the following dependencies.
 
 Required:
 
@@ -48,6 +48,7 @@ Required:
     gcc-c++
     tar
     bzip2
+    nc
 
 Required (not necessarily on the same machine):
 

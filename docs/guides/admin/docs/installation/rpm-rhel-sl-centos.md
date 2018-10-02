@@ -140,7 +140,7 @@ from the repository, all necessary dependencies will be installed automatically.
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    yum install ffmpeg tesseract hunspell sox synfig
+    yum install ffmpeg tesseract hunspell sox synfig nmap-ncat
 
 
 Upgrading Major Versions
