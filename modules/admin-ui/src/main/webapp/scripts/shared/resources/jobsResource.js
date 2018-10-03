@@ -23,7 +23,7 @@
 angular.module('adminNg.resources')
 .factory('JobsResource', ['$resource', 'Language', function ($resource, Language) {
   return $resource('/admin-ng/job/jobs.json', {}, {
-    query: { method: 'GET', isArray: false, transformResponse: function (json) {
+    query: { method: 'GET', isArray: false, cancellable: true, transformResponse: function (json) {
       var result = [], i = 0, parse, data;
       data = JSON.parse(json);
 

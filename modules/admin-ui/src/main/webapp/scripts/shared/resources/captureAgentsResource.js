@@ -26,6 +26,7 @@ angular.module('adminNg.resources')
     query: {
       method: 'GET',
       isArray: false,
+      cancellable: true,
       params: {target: 'agents.json'},
       transformResponse: function (json) {
         var result = [], i = 0, parse, data;

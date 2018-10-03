@@ -24,7 +24,7 @@ angular.module('adminNg.resources')
 .factory('ServicesResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
   // Note: This is the productive path
   return $resource('/admin-ng/services/services.json', {}, {
-    query: { method: 'GET', isArray: false, transformResponse: function (data) {
+    query: { method: 'GET', isArray: false, cancellable: true, transformResponse: function (data) {
       var result = [], i = 0, parse, payload;
       data = JSON.parse(data);
       payload = data.results;
