@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
-               name="org.opencastproject.runtimeinfo.RuntimeInfo" immediate="true" activate="activate"
-               deactivate="deactivate">
+               name="org.opencastproject.runtimeinfo.RuntimeInfo" immediate="true">
   <implementation class="org.opencastproject.runtimeinfo.RuntimeInfo"/>
   <property name="service.description" value="Runtime Information REST Endpoint"/>
 
@@ -12,7 +11,7 @@
     <provide interface="org.opencastproject.runtimeinfo.RuntimeInfo"/>
   </service>
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-             cardinality="1..1" policy="static" bind="setSecurityService"/>
+             bind="setSecurityService"/>
   <reference name="userid-role-provider" interface="org.opencastproject.userdirectory.UserIdRoleProvider"
              cardinality="0..1" policy="dynamic" bind="setUserIdRoleProvider"/>
 </scr:component>

@@ -124,7 +124,8 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
       throw new IllegalArgumentException("Method must not be null and must not be empty.");
     }
     if (!RestDocData.isValidPath(path)) {
-      throw new IllegalArgumentException("Path must not be null and must look something like /a/b/{c}.");
+      throw new IllegalArgumentException(String.format("Path '%s' must not be null and must look something like "
+              + "/a/b/{c}.", path));
     }
     this.returnTypeSchema = JaxbXmlSchemaGenerator.getXmlSchema(returnType);
     this.name = name;
@@ -423,7 +424,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    */
   public List<String> getNotes() {
     if (notes == null) {
-      notes = new ArrayList<String>(0);
+      notes = new ArrayList<>(0);
     }
     return notes;
   }

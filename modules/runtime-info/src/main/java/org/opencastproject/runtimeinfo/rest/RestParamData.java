@@ -52,7 +52,7 @@ public final class RestParamData {
    * parameter. "size" is used to control the size of text box for other types of parameter. Please look at the template
    * to see how this is used.
    */
-  private Map<String, String> attributes = new HashMap<String, String>();
+  private Map<String, String> attributes = new HashMap<>();
 
   /**
    * Convenient constructor: take a RestParameter annotation and create a RestParamData from it.
