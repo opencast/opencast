@@ -28,6 +28,7 @@ angular.module('adminNg.resources')
       method: 'GET',
       params: { id: 'series.json' },
       isArray: false,
+      cancellable: true,
       transformResponse: function (data) {
         return ResourceHelper.parseResponse(data, function (r) {
           var row = {};

@@ -27,6 +27,7 @@ angular.module('adminNg.resources')
       method: 'GET',
       params: { ext: 'groups.json' },
       isArray: false,
+      cancellable: true,
       transformResponse: function (json) {
         return ResourceHelper.parseResponse(json, function (r) {
           var row = {};
