@@ -38,16 +38,13 @@ angular.module('adminNg.services')
         me.stats.sort(function(a, b) {
           return a.order - b.order;
         });
+        me.fetch();
       };
 
       /**
-         * Retrieve data from the defined API with the given filter values.
-         */
+        * Retrieve data from the defined API with the given filter values.
+        */
       this.fetch = function () {
-        if (angular.isUndefined(me.apiService)) {
-          return;
-        }
-
         me.runningQueries = 0;
 
         angular.forEach(me.stats, function (stat) {
@@ -74,9 +71,9 @@ angular.module('adminNg.services')
           }
 
           /* Workaround:
-                 * We don't want actual data here, but limit 0 does not work (retrieves all data)
-                 * See MH-11892 Implement event counters efficiently
-                 */
+           * We don't want actual data here, but limit 0 does not work (retrieves all data)
+           * See MH-11892 Implement event counters efficiently
+           */
           query.limit = 1;
           me.runningQueries++;
 
@@ -94,8 +91,8 @@ angular.module('adminNg.services')
       };
 
       /**
-         * Scheduler for the refresh of the fetch
-         */
+        * Scheduler for the refresh of the fetch
+        */
       this.refreshScheduler = {
         on: true,
         restartSchedule: function () {

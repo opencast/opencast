@@ -58,7 +58,6 @@ angular.module('adminNg.directives')
         stats: '='
       },
       link: function (scope) {
-        scope.stats.fetch();
         scope.statsFilterNumber = -1;
 
         scope.showStatsFilter = function (index) {
@@ -107,6 +106,10 @@ angular.module('adminNg.directives')
           event.preventDefault();
           Storage.remove('filter');
           scope.statsFilterNumber = -1;
+        });
+        
+        scope.$on('$destroy', function() {
+          scope.stats.refreshScheduler.cancel();
         });
       }
     };
