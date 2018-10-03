@@ -28,7 +28,6 @@ angular.module('adminNg.services')
           DEFAULT_REFRESH_DELAY = 5000;
 
       this.stats = [];
-      this.loading = true;
 
       this.configure = function (options) {
         me.resource = options.resource;
@@ -49,7 +48,6 @@ angular.module('adminNg.services')
           return;
         }
 
-        me.loading = true;
         me.runningQueries = 0;
 
         angular.forEach(me.stats, function (stat) {
@@ -83,7 +81,6 @@ angular.module('adminNg.services')
           me.runningQueries++;
 
           me.apiService.query(query).$promise.then(function (data) {
-            me.loading = false;
             stat.counter = data.total;
             stat.index = me.stats.indexOf(stat);
 
@@ -116,13 +113,6 @@ angular.module('adminNg.services')
           }
         }
       };
-
-      // Reload the stats if the language is changed
-      $rootScope.$on('language-changed', function () {
-        if (!me.loading) {
-          me.fetch();
-        }
-      });
 
     };
     return new StatsService();
