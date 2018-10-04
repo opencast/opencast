@@ -36,7 +36,7 @@
             ng-disabled="!editMode && params.type === 'time'"
             ng-required="params.required"
             name="hours"
-            data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+            placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
             ng-options="h.index as h.value for h in hours"
             />
       <select chosen
@@ -50,7 +50,7 @@
               ng-disabled="!editMode && params.type === 'time'"
               ng-required="params.required"
               name="minutes"
-              data-placeholder="{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+              placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
               ng-options="m.index as m.value for m in minutes"
               />
 </div>

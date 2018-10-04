@@ -88,7 +88,7 @@
                                   ng-change="wizard.step.changeBaseAcl()"
                                   ng-model="wizard.step.ud.id"
                                   ng-options="id as name for (id, name) in wizard.step.acls"
-                                  data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                   />
                         </div>
@@ -137,7 +137,7 @@
                                   ng-options="id as id for (id, type) in wizard.step.roles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                  data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}">
+                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}'">
                             <option value=""></option>
                           </select>
                         </td>
@@ -187,7 +187,7 @@
                       ng-change="wizard.step.themeSave()"
                       ng-model="wizard.step.ud.theme"
                       ng-options="id as list.name for (id, list) in wizard.step.themes"
-                      data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                      placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}'"
                       no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
                       >
                       <option value=""></option>

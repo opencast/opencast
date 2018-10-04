@@ -50,7 +50,7 @@
                          ng-change="wizard.step.applyTemplate()"
                          ng-model="wizard.step.ud.email_template"
                          ng-options="template as template.name for template in wizard.step.templates"
-                         data-placeholder="{{ 'EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE' | translate }}..."
+                         placeholder-text-single="'{{ 'EVENTS.SEND_MESSAGE.MESSAGE.EMAIL_TEMPLATE' | translate }}...'"
                          />
         </div>
 
