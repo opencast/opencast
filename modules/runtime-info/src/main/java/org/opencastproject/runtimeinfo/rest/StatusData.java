@@ -135,8 +135,6 @@ public class StatusData {
     return description;
   }
 
-  // CHECKSTYLE:OFF
-
   /**
    * This will resolve a human readable name for all known status codes.
    *
@@ -152,7 +150,7 @@ public class StatusData {
     }
 
     // list from http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-    String result = "UNKNOWN";
+    String result;
     switch (code) {
     // 1xx Informational
       case HttpServletResponse.SC_CONTINUE: // 100
@@ -279,11 +277,11 @@ public class StatusData {
       case HttpServletResponse.SC_HTTP_VERSION_NOT_SUPPORTED: // 505
         result = "Version Not Supported";
         break;
+      default:
+        result = "UNKNOWN";
     }
     return result;
   }
-
-  // CHECKSTYLE:ON
 
   /**
    * @return the xmlSchema

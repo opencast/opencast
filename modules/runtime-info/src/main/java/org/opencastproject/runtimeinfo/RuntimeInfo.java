@@ -118,10 +118,6 @@ public class RuntimeInfo {
     serverUrl = new URL(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY));
   }
 
-  public void deactivate() {
-    // Nothing to do
-  }
-
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("components.json")

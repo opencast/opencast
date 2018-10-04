@@ -65,17 +65,6 @@ public class RestDocData extends DocData {
   public static final String PATH_PARAM_COUNTING_REGEX = "\\{(.+?)\\}";
 
   /**
-   * Regular expression used to validate a path.
-   */
-  // FIXME: This regex doesn't match all valid paths that can occur in rest endpoint @Path;
-  public static final String PATH_VALIDATION_REGEX = "^[\\w\\/{}|\\:\\.\\*\\+|\\[\\w-\\w\\]\\+]+$";
-
-  /**
-   * A slash character.
-   */
-  public static final String SLASH = "/";
-
-  /**
    * List of RestEndpointHolderData which each stores a group of endpoints. Currently there are 2 groups, READ group and
    * WRITE group.
    */
@@ -84,7 +73,7 @@ public class RestDocData extends DocData {
   /**
    * The service object which this RestDocData is about.
    */
-  private Object serviceObject = null;
+  private Object serviceObject;
 
   /**
    * A map of macro values for REST documentation.
@@ -244,19 +233,7 @@ public class RestDocData extends DocData {
    * @return true if this path is valid, false otherwise
    */
   public static boolean isValidPath(String path) {
-    boolean valid = true;
-    if (isBlank(path)) {
-      valid = false;
-    } else {
-      if (SLASH.equals(path)) {
-        valid = true;
-      } else if (path.endsWith(SLASH) || !path.startsWith(SLASH)) {
-        valid = false;
-      } else {
-        valid = path.matches(PATH_VALIDATION_REGEX);
-      }
-    }
-    return valid;
+    return path != null && path.matches("^/$|^/[\\w/{}|:.*+]*[\\w}.]$");
   }
 
   /**
@@ -273,7 +250,7 @@ public class RestDocData extends DocData {
     StringBuilder sb = new StringBuilder();
     int begin = 0;
     while (matcher.find()) {
-      sb.append(value.substring(begin, matcher.start()));
+      sb.append(value, begin, matcher.start());
       String macro = matcher.group(1);
       // All macros that start with "this." is a "local" macro.
       if (macro.startsWith("this.")) {
@@ -293,7 +270,7 @@ public class RestDocData extends DocData {
       }
       begin = matcher.end();
     }
-    sb.append(value.substring(begin, value.length()));
+    sb.append(value.substring(begin));
 
     return sb.toString();
   }
