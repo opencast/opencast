@@ -107,7 +107,7 @@ angular.module('adminNg.directives')
           Storage.remove('filter');
           scope.statsFilterNumber = -1;
         });
-        
+
         scope.$on('$destroy', function() {
           scope.stats.refreshScheduler.cancel();
         });
