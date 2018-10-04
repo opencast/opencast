@@ -33,13 +33,18 @@ $(document).ready(function($) {
   $('input').keyup(search);
 
   $.getJSON('/info/components.json', function(data) {
+    var docs = $('#docs'),
+        tpl = $('#template').html();
     $.each(data, function(section) {
       if ('rest' == section) {
         data.rest.sort((a,b) => a.path > b.path ? 1 : -1);
         $.each(data.rest, function(i) {
-          $('#docs').append('<li><a href="/docs.html?path=' + data.rest[i].path + '">'
-              + '<span>' + data.rest[i].path + '</span>'
-              + data.rest[i].description + '</a></li>');
+          let path = data.rest[i].path,
+              service = $(tpl);
+          $('a', service).attr('href', '/docs.html?path=' + path);
+          $('.path', service).text(path);
+          $('.desc', service).text(data.rest[i].description);
+          docs.append(service);
         });
         return;
       }

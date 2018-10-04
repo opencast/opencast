@@ -1,0 +1,18 @@
+{
+    "error": "Fejl",
+    "error_unknown": "En fejlopstod. Prøv at genindlæse siden.",
+    "reloadPage": "Genindlæs side",
+    "loginInformation": "Log ind med din OpenCast-brugerkonto",
+    "login": "Log ind",
+    "enterUsernamePassword": "Angiv dit brugernavn og adgangskode:",
+    "username": "Brugernavn",
+    "password": "Adgangskode",
+    "rememberMe": "Husk mig",
+    "cancel": "Annullér",
+    "loginSuccessful": "Logget ind. Genindlæs siden, hvis den ikke genindlæses automatisk.",
+    "logoutSuccessful": "Logget ud. Genindlæs siden, hvis den ikke genindlæses automatisk.",
+    "loginFailed": "Mislykkedes at logge ind.",
+    "description": "Beskriveslse",
+    "slideText": "Diastekst",
+    "shortcuts": "Genveje"
+}

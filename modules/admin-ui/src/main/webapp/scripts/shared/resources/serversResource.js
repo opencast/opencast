@@ -23,7 +23,7 @@
 angular.module('adminNg.resources')
 .factory('ServersResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
   return $resource('/admin-ng/server/servers.json', {}, {
-    query: { method: 'GET', isArray: false, transformResponse: function (rawData) {
+    query: { method: 'GET', isArray: false, cancellable: true, transformResponse: function (rawData) {
       var data = JSON.parse(rawData);
       var result = [];
       for (var i = 0; i < data.results.length; i++) {

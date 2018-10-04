@@ -46,7 +46,7 @@ angular.module('adminNg.resources')
           /**
                  * Returns a list of themes mainly used by the table implementation.
                  */
-          query: {method: 'GET', isArray: false, transformResponse: function (json) {
+          query: {method: 'GET', isArray: false, cancellable: true, transformResponse: function (json) {
             return ResourceHelper.parseResponse(json, themesConverter);
           }}
         });

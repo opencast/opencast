@@ -168,6 +168,7 @@ define(["require", "jquery", "underscore", "backbone", "mousetrap", "bowser", "b
   function getDefaultLanguage(language) {
       switch (language) {
           case "de": return "de-DE";
+          case "da": return "da-DK";
           case "el": return "el-GR";
           case "en": return "en-US";
           case "es": return "es-ES";

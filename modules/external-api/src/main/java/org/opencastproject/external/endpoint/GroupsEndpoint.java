@@ -191,8 +191,7 @@ public class GroupsEndpoint {
   @RestQuery(name = "addgroupmember", description = "Adds a member to a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, reponses = {
-                          @RestResponse(description = "The member was already member of the group.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The member has been added.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+                          @RestResponse(description = "The member was has been added to the group or was already member of the group.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {

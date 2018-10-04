@@ -26,55 +26,58 @@
  * @description
  * Provides a service for displaying details of table records.
  */
-angular.module('adminNg.services')
-    .factory('ResourceHelper',
-      function () {
+angular.module('adminNg.services').factory('ResourceHelper', ResourceHelper);
 
-        /**
-         * Returns input at it is. Can be used if no result transformation is necessary.
-         * @param input
-         * @returns {*}
-         */
-        var defaultMapper = function (input) {
-          return input;
-        };
+function ResourceHelper() {
 
-        return {
-          parseResponse: function (responseBody, mapper) {
+  /**
+   * Returns input at it is. Can be used if no result transformation is necessary.
+   * @param input
+   * @returns {*}
+   */
+  var defaultMapper = function (input) {
+    return input;
+  };
 
-            var effectiveMapper = mapper || defaultMapper;
+  /**
+   * Parse a given JSON object response and return all entries of its `results` property as array, modified using the
+   * provided `mapper` function if provided.
+   */
+  var parseResponse = function (responseBody, mapper) {
 
-            var result = [], data = {};
+    // ignore null responses
+    if (responseBody === null) {
+      return;
+    }
 
-            try {
-              data = JSON.parse(responseBody);
+    var effectiveMapper = mapper || defaultMapper,
+        data = JSON.parse(responseBody),
+        result;
 
-              // Distinguish between single and multiple values
-              if ($.isArray(data.results)) {
-                angular.forEach(data.results, function (event) {
-                  result.push(effectiveMapper(event));
-                });
-              } else {
-                result.push(effectiveMapper(data.results));
-              }
-            } catch (e) {
-              //console.warn(e);
-            }
+    // guard against empty dataset
+    if (data === null || angular.isUndefined(data.results)) {
+      return;
+    }
 
-            // guard against empty dataset
-            if (angular.isUndefined(data.results)) {
-              return;
-            }
-
-
-            return {
-              rows: result,
-              total: data.total,
-              offset: data.offset,
-              count: data.count,
-              limit: data.limit
-            };
-          }
-        };
+    // Distinguish between single and multiple values
+    if ($.isArray(data.results)) {
+      result = data.results.map(function (event) {
+        return effectiveMapper(event);
       });
+    } else {
+      result = [effectiveMapper(data.results)];
+    }
 
+    return {
+      rows: result,
+      total: data.total,
+      offset: data.offset,
+      count: data.count,
+      limit: data.limit
+    };
+  };
+
+  return {
+    parseResponse: parseResponse
+  };
+}

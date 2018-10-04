@@ -142,10 +142,5 @@ angular.module('adminNg.controllers')
         }
       });
     };
-
-    $scope.$on('$destroy', function() {
-      // stop polling event stats on an inactive tab
-      $scope.stats.refreshScheduler.cancel();
-    });
   }
 ]);
