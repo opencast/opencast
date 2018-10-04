@@ -64,7 +64,7 @@
          "NAME": "Navn"
       },
       "ACTIONS": {
-         "CONFIRMATION": "Confirmation"
+         "CONFIRMATION": "Bekræftelse"
       },
       "WARNINGS": {
          "SERIES_HAS_EVENTS": "This series does contain events. Deleting the series will not delete the events."
@@ -179,7 +179,7 @@
       "TITLE_UPLOAD_ERROR": "Fejl under upload af medie",
       "LICENSE_UPLOAD_ERROR": "Fejl under upload af medie",
       "WATERMARK_UPLOAD_ERROR": "Fejl under upload af medie",
-      "WATERMARK_REQUIRED": "You must upload a watermark",
+      "WATERMARK_REQUIRED": "Du skal uploade et vandmærke",
       "THEME_UPLOAD_STARTED": "Mediet uploades…",
       "THEME_CREATED": "Mediet er blevet oprettet",
       "THEME_NOT_CREATED": "Temaet kunne ikke oprettes",
@@ -288,9 +288,9 @@
       "TODAY": "I dag",
       "TOMORROW": "I morgen",
       "YESTERDAY": "I går",
-      "THIS_WEEK": "This week",
-      "THIS_MONTH": "This month",
-      "THIS_YEAR": "This year"
+      "THIS_WEEK": "Denne uge",
+      "THIS_MONTH": "Denne måned",
+      "THIS_YEAR": "Dette år"
    },
    "DATETIMES": {
       "TODAY": "I dag {{ time }}",
@@ -834,7 +834,7 @@
                "SOURCE": "Kilde",
                "CREATED": "Oprettet",
                "CREATED_BY": "Oprettet af",
-               "PUBLISHER": "Publisher",
+               "PUBLISHER": "Forlægger",
                "LICENSE": "Licens",
                "CONTRIBUTORS": "Bidragyder(-e)",
                "RIGHTS": "Rettigheder",
@@ -898,7 +898,7 @@
                   "SUCCEEDED": "Succeeded",
                   "FAILED": "Mislykkedes",
                   "SKIPPED": "Skipped",
-                  "RETRY": "Retry"
+                  "RETRY": "Prøv igen"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -1295,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Opret gruppe",
-            "EDITCAPTION": "Group details - {{name}}",
+            "EDITCAPTION": "Gruppe detaljer - {{name}}",
             "TABS": {
                "GROUP": "Gruppe",
                "ROLES": "Roller",
@@ -1661,11 +1661,11 @@
             "RUNNING": "I gang",
             "FINISHED": "Afsluttet",
             "FAILED": "Mislykkedes",
-            "DELETED": "Deleted",
+            "DELETED": "Slettet",
             "INSTANTIATED": "Instantiated",
             "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
+            "RESTART": "Genstart",
+            "CANCELED": "Annulleret",
             "WAITING": "Afventer"
          }
       },
@@ -1750,7 +1750,7 @@
          "REMOVE_SEGMENT": "Fjern segment",
          "USE_SEGMENT": "Benyt dette segment",
          "START": "Start",
-         "END": "End"
+         "END": "Slut"
       },
       "THUMBNAIL": {
          "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
