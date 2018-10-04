@@ -68,8 +68,8 @@
       }
    },
    "MEDIAMODULE": "Mediemodul",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "SYSTEM_NOTIFICATIONS": "Systemvarningar och meddelanden",
+   "LANGUAGE": "Välj språk",
    "HELP": {
       "HELP": "Hjälp",
       "USERS_GUIDE": "Användarhandbok",
@@ -109,8 +109,8 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Bearbetning kunde inte fortsättas.",
       "EVENTS_PROCESSING_ACTION_NONE": "Bearbetning avbryts...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Bearbetning kunde inte avbrytas.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Behandlingen stoppades.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Bearbetning kunde inte avbrytas.",
       "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
       "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
       "SERIES_UPDATED_NB": "{{ number }} serier har uppdaterats",
@@ -387,7 +387,7 @@
                   "START_TIME": "Starttid",
                   "TIMEZONE": "Tidszon",
                   "END_DATE": "Slutdatum",
-                  "END_TIME": "End time",
+                  "END_TIME": "Sluttid",
                   "DURATION": "Längd"
                },
                "SCHEDULE_SINGLE": {
@@ -469,8 +469,8 @@
             "NOCONTENT": "Inga data tillgängliga",
             "PUBLISHED": "Publicerad",
             "TOOLTIP": {
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
+               "START": "Filter för detta startdatum",
+               "SERIES": "Filter för den här serien",
                "STATUS": "Filter for this event status",
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
@@ -1050,7 +1050,7 @@
             "TOOLTIP": {
                "NAME": "Filter events for this location",
                "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "DELETE": "Ta bort plats (avregistrera capture agent)"
             }
          },
          "DETAILS": {
@@ -1144,8 +1144,8 @@
             "BLACKLIST_TO": "Svartlistad tills",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Ta bort användare",
+               "DETAILS": "Öppna användaruppgifter"
             }
          },
          "DETAILS": {
@@ -1188,7 +1188,7 @@
             "ROLE": "Roll",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
+               "DETAILS": "Öppna gruppdetaljer",
                "DELETE": "Delete group"
             }
          },

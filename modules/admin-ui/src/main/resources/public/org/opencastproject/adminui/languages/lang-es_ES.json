@@ -193,7 +193,7 @@
       "DELETE": {
          "SERIES": {
             "CAPTION": "Eliminar",
-            "BUTTON": "Suprimir"
+            "BUTTON": "Eliminar"
          },
          "EVENTS": {
             "CAPTION": "Eliminar",
