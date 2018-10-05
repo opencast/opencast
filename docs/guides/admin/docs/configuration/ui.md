@@ -77,3 +77,42 @@ Available Language Configuration
 
 The admin UI is translated into a number of languages by default.  If you wish to restrict the languages available to
 your users, add the relevant locale code to `etc/org.opencastproject.adminui.endpoint.LanguageServiceEndpoint.cfg`.
+
+
+Configuring the events publisher metadata field
+-----------------------------------------------
+
+The metadata field can be used in two ways, and its meaning varies slightly:
+
+* The publisher is the creator of the event: when an event is created, this field is filled automatically with the
+logged in user. It cannot be modified on creation of the event nor later.
+* The publisher is responsible for uploading the content but may not be the creator of the event in the UI:
+in this case, when the event is created, the publisher is selected from a list provider that includes the logged in user
+(selected by default) and it is also modifiable later, but then the logged in user is not selectable.
+
+The configuration is done in the file: `etc/org.opencastproject.ui.metadata.CatalogUIAdapterFactory-episode-common.cfg`.
+
+First option is the default one and the configuration is as follows:
+
+    property.publisher.inputID=publisher
+    property.publisher.label=EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER
+    property.publisher.type=text
+    property.publisher.readOnly=true
+    property.publisher.required=true
+    property.publisher.order=16
+
+To configure the second option:
+
+    property.publisher.inputID=publisher
+    property.publisher.label=EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER
+    property.publisher.type=text
+    property.publisher.readOnly=false
+    property.publisher.required=true
+    property.publisher.listprovider=YOUR_LIST_PROVIDER
+    property.publisher.order=16
+
+If you want to use the publishers as list provider, you must set up the provider in this way:
+
+    property.publisher.listprovider=EVENTS.PUBLISHER
+
+In both cases, you can filter events by publisher.
