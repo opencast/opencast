@@ -156,10 +156,13 @@ public class TieredStorageAssetManagerJobProducerTest extends AbstractTieredStor
   }
 
   @Test
-  public void testInternalByDate() throws NotFoundException, ServiceRegistryException {
+  public void testInternalByDate() throws ServiceRegistryException, InterruptedException {
     Date start = new Date();
+    Thread.sleep(1);
     Date before = new Date();
+    Thread.sleep(1);
     String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    Thread.sleep(1);
     Date after = new Date();
     //Non terminal query, but internal test so we create terminal expectations
     createIdAndVersionExpectation(mp[0], 0, 2);
