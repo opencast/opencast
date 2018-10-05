@@ -24,13 +24,14 @@
     <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
     <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
     <aws.version>1.11.49_1</aws.version>
+    <guava.version>23.0</guava.version>
     <jmeter.version>2.4</jmeter.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.10</karaf.version>
-    <pax.web.version>4.3.4</pax.web.version>
-    <cxf.version>3.1.12</cxf.version>
+    <karaf.version>4.1.6</karaf.version>
+    <pax.web.version>6.0.11</pax.web.version>
+    <cxf.version>3.2.6</cxf.version>
     <jackson.version>2.9.4</jackson.version>
     <functional.version>1.4.2</functional.version>
     <jdk.version>1.8</jdk.version>
@@ -728,7 +729,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>18.0</version>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>net.fortuna.ical4j</groupId>

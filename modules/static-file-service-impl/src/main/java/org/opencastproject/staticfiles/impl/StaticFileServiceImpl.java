@@ -118,7 +118,7 @@ public class StaticFileServiceImpl implements StaticFileService {
       public void failed(State from, Throwable failure) {
         logger.warn("Temporary storage purging service failed: {}", getStackTrace(failure));
       }
-    }, MoreExecutors.sameThreadExecutor());
+    }, MoreExecutors.directExecutor());
     purgeService.startAsync();
     logger.info("Purging of temporary storage section scheduled");
   }

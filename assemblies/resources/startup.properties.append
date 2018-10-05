@@ -1,2 +1,2 @@
 # Bundles to be started specifically for Opencast
-mvn\:org.apache.felix/org.apache.felix.metatype/1.1.2 = 5
+mvn\:org.apache.felix/org.apache.felix.metatype/1.1.6 = 5

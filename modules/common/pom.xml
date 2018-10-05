@@ -76,10 +76,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-    </dependency>
-    <dependency>
       <groupId>net.fortuna.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>

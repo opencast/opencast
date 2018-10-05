@@ -33,9 +33,6 @@ import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
 
 /**
@@ -48,8 +45,6 @@ import javax.xml.XMLConstants;
  * Please see <a href="http://www.w3.org/TR/xml-names/">http://www.w3.org/TR/xml-names/</a> for a complete definition
  * and reference.
  */
-@Immutable
-@ParametersAreNonnullByDefault
 public final class EName implements Serializable, Comparable<EName> {
   private static final long serialVersionUID = -5494762745288614634L;
 
@@ -173,7 +168,7 @@ public final class EName implements Serializable, Comparable<EName> {
    *          A NameSpace to apply if the provided {@code String} does not have any. Please note that a explicit empty
    *          NameSpace **is** a NameSpace. If this argument is blank or {@code null}, it has no effect.
    */
-  public static EName fromString(String strEName, @Nullable String defaultNameSpace) throws IllegalArgumentException {
+  public static EName fromString(String strEName, String defaultNameSpace) throws IllegalArgumentException {
     Matcher m = pattern.matcher(strEName);
 
     if (m.matches()) {
