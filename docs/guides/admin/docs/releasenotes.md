@@ -41,6 +41,9 @@ New Features
     - **select-tracks** can filter source tracks based on workflow properties
     - **start-workflow** allows a workflow to start another workflow
 
+- **Asset Manager Storage Layers** - The Asset Manager now supports multiple storage layers natively.  This allows
+  users to move data from local storage to remote storage within Opencast.  These moves can be triggered manually, or
+  via a built-in timer.  Currently we support local file storage, and AWS S3 storage.
 
 Improvements
 ------------
@@ -59,8 +62,6 @@ A non-comprehensive list of improvements:
 - Ability for blacklisting languages from the admin UI
 - Update LTI Series Tool
 - Fill creator metadata field with actual user when new event
-- AWS S3 Asset Storage
-- Tiered Storage for the Asset Manager
 - Video editor
 - Intuitive Merging of Video Segments
 - Add new modal to edit multiple scheduled events at once
