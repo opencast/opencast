@@ -30,6 +30,8 @@ angular.module('adminNg.filters')
     switch (type) {
     case 'date':
       return Language.formatDate(format, input);
+    case 'dateRaw':
+      return Language.formatDateRaw(format, input);
     case 'dateTime':
       return Language.formatDateTime(format, input);
     case 'time':
