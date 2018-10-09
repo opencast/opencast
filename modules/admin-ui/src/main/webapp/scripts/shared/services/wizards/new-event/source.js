@@ -31,7 +31,7 @@ angular.module('adminNg.services')
     var NOTIFICATION_CONTEXT = 'events-form';
     var SCHEDULE_SINGLE = 'SCHEDULE_SINGLE';
     var SCHEDULE_MULTIPLE = 'SCHEDULE_MULTIPLE';
-    var WEEKDAY_PREFIX = 'EVENTS.EVENTS.NEW.WEEKDAYS.';
+    var WEEKDAY_PREFIX = 'EVENTS.EVENTS.NEW.WEEKDAYSLONG.';
     var UPLOAD = 'UPLOAD';
 
     var WEEKDAYS = {
@@ -153,7 +153,7 @@ angular.module('adminNg.services')
       };
 
       this.sortedWeekdays = _.map(self.weekdays, function(day, index) {
-        return { key: index, translation: day };
+        return { key: index, translation: day.replace('LONG', '') };
       });
 
       this.hours = JsHelper.initArray(24);
@@ -383,7 +383,7 @@ angular.module('adminNg.services')
             translatedWeekdays.push(t);
           });
 
-          self.ud[SCHEDULE_MULTIPLE].presentableWeekdays = translatedWeekdays.join(',');
+          self.ud[SCHEDULE_MULTIPLE].presentableWeekdays = translatedWeekdays.join(', ');
         });
       };
 
