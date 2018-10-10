@@ -38,8 +38,10 @@ import org.opencastproject.index.IndexProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
@@ -118,6 +120,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -488,8 +491,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       throw new IllegalStateException("A workflow definition with ID '" + id + "' is already registered.");
     }
     workflowDefinitionScanner.putWorkflowDefinition(id, workflow);
-    messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-            WorkflowItem.addDefinition(workflow));
   }
 
   /**
@@ -501,8 +502,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   public void unregisterWorkflowDefinition(String workflowDefinitionId) throws NotFoundException,
           WorkflowDatabaseException {
     boolean deleted = workflowDefinitionScanner.removeWorkflowDefinition(workflowDefinitionId) != null;
-    messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-            WorkflowItem.deleteDefinition(workflowDefinitionId));
     if (deleted)
       throw new NotFoundException("Workflow definition not found");
   }
@@ -1375,6 +1374,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         throw new WorkflowDatabaseException(e);
       }
 
+      final String dcXml = getEpisodeDublinCoreXml(updatedMediaPackage);
+      final AccessControlList accessControlList = authorizationService.getActiveAcl(updatedMediaPackage).getA();
+
       // Update both workflow and workflow job
       try {
         job = serviceRegistry.updateJob(job);
@@ -1385,7 +1387,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         // updates for running operations since we updated the metadata right before these operations and will do so
         // again right after those operations.
         if (op == null || op.getState() != OperationState.RUNNING) {
-          messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue, WorkflowItem.updateInstance(workflowInstance));
+          messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
+                  WorkflowItem.updateInstance(workflowInstance, dcXml, accessControlList));
         }
         index(workflowInstance);
       } catch (ServiceRegistryException e) {
@@ -2385,11 +2388,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           continue;
         }
         Organization organization = instance.getOrganization();
+
+        // get metadata for index update
+        final String dcXml = getEpisodeDublinCoreXml(instance.getMediaPackage());
+        final AccessControlList accessControlList = authorizationService.getActiveAcl(instance.getMediaPackage()).getA();
+
         SecurityUtil.runAs(securityService, organization,
                 SecurityUtil.createSystemUser(componentContext, organization), () -> {
                   // Send message to update index item
                   messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                          WorkflowItem.updateInstance(instance));
+                          WorkflowItem.updateInstance(instance, dcXml, accessControlList));
                 });
         if ((current % responseInterval == 0) || (current == total)) {
           logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
@@ -2404,6 +2412,18 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
                       IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Workflow));
             });
+  }
+
+  private String getEpisodeDublinCoreXml(MediaPackage mediaPackage) {
+    // get metadata for index update
+    for (Catalog catalog: mediaPackage.getCatalogs(MediaPackageElements.EPISODE)) {
+      try (InputStream in = workspace.read(catalog.getURI())) {
+        return IOUtils.toString(in, StandardCharsets.UTF_8);
+      } catch (Exception e) {
+        logger.warn("Unable to load dublin core catalog for event '{}'", mediaPackage.getIdentifier(), e);
+      }
+    }
+    return null;
   }
 
   @Override
