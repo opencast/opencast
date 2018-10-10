@@ -61,7 +61,6 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -407,8 +406,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return index.isOptOut(seriesId);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occured while getting opt out status of series '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Exception occurred while getting opt out status of series '{}'", seriesId, e);
       throw new SeriesException(e);
     }
   }
@@ -421,8 +419,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.updateOptOut(seriesId, optOut));
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to update opt out status of series with id '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to update opt out status of series with id '{}'", seriesId, e);
       throw new SeriesException(e);
     }
   }
@@ -433,8 +430,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperties(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series properties for series with id '{}': {}", seriesID,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to get series properties for series with id '{}'", seriesID, e);
       throw new SeriesException(e);
     }
   }
@@ -445,8 +441,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperty(seriesID, propertyName);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series property for series with series id '{}' and property name '{}': {}", seriesID,
-              propertyName, ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to get series property for series with series id '{}' and property name '{}'", seriesID,
+              propertyName, e);
       throw new SeriesException(e);
     }
   }
@@ -460,8 +456,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
               SeriesItem.updateProperty(seriesID, propertyName, propertyValue));
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
-              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}': {}",
-              seriesID, propertyName, propertyValue, ExceptionUtils.getStackTrace(e));
+              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}'",
+              seriesID, propertyName, propertyValue, e);
       throw new SeriesException(e);
     }
   }
@@ -474,8 +470,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.updateProperty(seriesID, propertyName, null));
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to delete series property for series with series id '{}' and property name '{}': {}",
-              seriesID, propertyName, ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
+              seriesID, propertyName, e);
       throw new SeriesException(e);
     }
   }

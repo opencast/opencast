@@ -49,7 +49,6 @@ import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -403,7 +402,7 @@ public class CaptureAgentStateRestService {
         return Response.ok(new RecordingStateUpdate(rec)).type(MediaType.TEXT_XML).build();
       }
     } catch (SchedulerException e) {
-      logger.debug("Unable to get recording state of {}: {}", id, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to get recording state of {}", id, e);
       return Response.serverError().build();
     }
   }
@@ -435,7 +434,7 @@ public class CaptureAgentStateRestService {
         return Response.status(Response.Status.BAD_REQUEST).build();
       }
     } catch (SchedulerException e) {
-      logger.debug("Unable to set recording state of {}: {}", id, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to set recording state of {}", id, e);
       return Response.serverError().build();
     }
   }
@@ -460,7 +459,7 @@ public class CaptureAgentStateRestService {
       schedulerService.removeRecording(id);
       return Response.ok(id + " removed").build();
     } catch (SchedulerException e) {
-      logger.debug("Unable to remove recording with id '{}': {}", id, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to remove recording with id '{}'", id, e);
       return Response.serverError().build();
     }
   }
@@ -482,7 +481,7 @@ public class CaptureAgentStateRestService {
       }
       return update;
     } catch (SchedulerException e) {
-      logger.debug("Unable to get all recordings: {}", ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to get all recordings", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }

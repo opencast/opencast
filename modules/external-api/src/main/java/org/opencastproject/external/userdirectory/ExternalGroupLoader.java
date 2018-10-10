@@ -34,7 +34,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,7 +136,7 @@ public class ExternalGroupLoader {
             groupRoleProvider.addGroup(externalApplicationGroup);
           }
         } catch (NotFoundException | IllegalStateException | IOException | UnauthorizedException e) {
-          logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to load external API groups", e);
         }
       });
     }

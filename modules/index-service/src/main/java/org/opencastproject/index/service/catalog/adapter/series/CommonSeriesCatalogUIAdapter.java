@@ -74,7 +74,7 @@ public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIA
     try {
       getSeriesService().updateSeries(dc);
     } catch (SeriesException e) {
-      logger.warn("Error while updating series DublinCore: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while updating series DublinCore", e);
       return false;
     } catch (UnauthorizedException e) {
       logger.warn("User is not authorized to change series DublinCore");

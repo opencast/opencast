@@ -109,7 +109,7 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
     try {
       EventIndexUtils.updateSeriesName(event, organization, user, getSearchIndex());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the series name of the event to index: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error updating the series name of the event to index", e);
     }
 
     // Persist the scheduling event

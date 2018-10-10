@@ -51,7 +51,6 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -599,14 +598,13 @@ public final class EventIndexUtils {
           event.setSeriesName(result.getItems()[0].getSource().getTitle());
           break;
         } else {
-          Integer triesLeft = new Integer(tries - i);
+          Integer triesLeft = tries - i;
           logger.debug("Not able to find the series {} in the search index for the event {}. Will try {} more times.",
                   event.getSeriesId(), event.getIdentifier(), triesLeft);
           try {
             Thread.sleep(sleep);
           } catch (InterruptedException e) {
-            logger.warn("Interupted while sleeping before checking for the series being added to the index {}",
-                    ExceptionUtils.getStackTrace(e));
+            logger.warn("Interrupted while sleeping before checking for the series being added to the index", e);
           }
         }
 
@@ -652,7 +650,7 @@ public final class EventIndexUtils {
     try {
       searchIndex.addOrUpdate(event);
     } catch (SearchIndexException e) {
-      logger.warn("Unable to update event '{}': {}", event, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to update event '{}'", event, e);
     }
   }
 
@@ -677,8 +675,8 @@ public final class EventIndexUtils {
       result = searchIndex
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              organization, currentManagedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -688,8 +686,8 @@ public final class EventIndexUtils {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
           logger.warn(
-                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}' because {}",
-                  event, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e));
+                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
+                  event, currentManagedAcl, newManagedAcl, e);
         }
       }
     }
@@ -714,8 +712,8 @@ public final class EventIndexUtils {
       result = searchIndex
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              organization, managedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              organization, managedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -724,8 +722,7 @@ public final class EventIndexUtils {
         try {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
-          logger.warn("Unable to update event '{}' to remove managed acl '{}' because {}",
-                  event, managedAcl, ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to update event '{}' to remove managed acl '{}'", event, managedAcl, e);
         }
       }
     }

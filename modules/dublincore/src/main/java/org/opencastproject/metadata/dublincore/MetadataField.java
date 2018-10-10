@@ -36,7 +36,6 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -1063,8 +1062,7 @@ public class MetadataField<A> {
           Integer orderValue = Integer.parseInt(value);
           this.order = Opt.some(orderValue);
         } catch (NumberFormatException e) {
-          logger.warn("Unable to parse order value {} of metadata field {} because:{}",
-                  value, this.getInputID(), ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to parse order value {} of metadata field {}", value, this.getInputID(), e);
           this.order = Opt.none();
         }
         break;

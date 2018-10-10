@@ -40,7 +40,6 @@ import com.entwinemedia.fn.FnX;
 
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -108,7 +107,7 @@ public final class SmilUtil {
 
       throw eitherDocument.left().value();
     } catch (Exception e) {
-      logger.warn("Unable to load smil document from catalog '{}': {}", mpe, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to load smil document from catalog '{}'", mpe, e);
       return Misc.chuck(e);
     }
   }

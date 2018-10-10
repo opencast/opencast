@@ -30,7 +30,6 @@ import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.messages.MessageTemplate;
 import org.opencastproject.security.api.Organization;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,7 +110,7 @@ public class EmailListProvider implements ResourceListProvider {
           messageTemplateList = mailService.getMessageTemplates();
         }
       } catch (MailServiceException e) {
-        logger.error("Error retreiving message templates from mail service: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Error retreiving message templates from mail service", e);
         throw new ListProviderException("Error retreiving message templates from mail service", e);
       }
 

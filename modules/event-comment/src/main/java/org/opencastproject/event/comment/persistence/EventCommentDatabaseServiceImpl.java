@@ -45,7 +45,6 @@ import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
@@ -170,7 +169,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       q.setParameter("org", securityService.getOrganization().getId());
       return q.getResultList();
     } catch (Exception e) {
-      logger.error("Could not get reasons: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get reasons", e);
       throw new EventCommentDatabaseException(e);
     } finally {
       if (em != null)
@@ -190,7 +189,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not get event comment {}: {}", commentId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get event comment {}", commentId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
       if (em != null)
@@ -214,7 +213,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not delete event comment: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not delete event comment", e);
       if (tx.isActive())
         tx.rollback();
 
@@ -248,7 +247,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not delete event comments: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not delete event comments", e);
       if (tx.isActive())
         tx.rollback();
 
@@ -314,7 +313,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
               }).value();
       return new ArrayList<>(comments);
     } catch (Exception e) {
-      logger.error("Could not retreive comments for event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not retreive comments for event {}", eventId, e);
       throw new EventCommentDatabaseException(e);
     } finally {
       if (em != null)
@@ -329,7 +328,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       Query q = em.createNamedQuery("EventComment.findAll");
       return new ArrayList<EventCommentDto>(q.getResultList()).iterator();
     } catch (Exception e) {
-      logger.error("Could not retreive event comments: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not retreive event comments", e);
       throw new EventCommentDatabaseException(e);
     } finally {
       if (em != null)

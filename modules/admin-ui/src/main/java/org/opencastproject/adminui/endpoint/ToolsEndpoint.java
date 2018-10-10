@@ -109,7 +109,6 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -606,7 +605,7 @@ public class ToolsEndpoint implements ManagedService {
       JSONObject detailsJSON = (JSONObject) parser.parse(details);
       editingInfo = EditingInfo.parse(detailsJSON);
     } catch (Exception e) {
-      logger.warn("Unable to parse concat information ({}): {}", details, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse concat information ({})", details, e);
       return R.badRequest("Unable to parse details");
     }
 

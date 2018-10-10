@@ -110,7 +110,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
       try {
         dublinCoreMetadata.addField(dublinCoreProperties.get(field), "", getListProvidersService());
       } catch (Exception e) {
-        logger.error("Skipping metadata field '{}' because of error: {}", field, ExceptionUtils.getStackTrace(e));
+        logger.error("Skipping metadata field '{}' because of error", field, e);
       }
     }
   }
@@ -194,7 +194,7 @@ public class ConfigurableEventDCCatalogUIAdapter implements EventCatalogUIAdapte
       // setting the URI to a new source so the checksum will most like be invalid
       catalog.setChecksum(null);
     } catch (IOException e) {
-      logger.error("Unable to store catalog {} metadata to workspace: {}", catalog, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to store catalog {} metadata to workspace", catalog, e);
     } finally {
       IoSupport.closeQuietly(inputStream);
     }

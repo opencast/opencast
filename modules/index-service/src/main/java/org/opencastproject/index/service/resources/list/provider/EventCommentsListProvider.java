@@ -28,7 +28,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListProvider
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,7 +87,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
       try {
         reasons = eventCommentService.getReasons();
       } catch (EventCommentException e) {
-        logger.error("Error retreiving reasons from event comment service: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Error retreiving reasons from event comment service", e);
         throw new ListProviderException("Error retreiving reasons from event comment service", e);
       }
 

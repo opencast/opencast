@@ -374,7 +374,7 @@ public class SeriesRestService {
       logger.warn("Series with id '{}' does not exist.", seriesId);
       return Response.status(Status.NOT_FOUND).build();
     } catch (Exception e) {
-      logger.warn("Unable to get series opt out status with id '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to get series opt out status with id '{}'", seriesId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -567,7 +567,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -793,7 +793,7 @@ public class SeriesRestService {
         return R.notFound();
       }
     } catch (SeriesException e) {
-      logger.warn("Error while retrieving elements for sieres '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving elements for sieres '{}'", seriesId, e);
       return R.serverError();
     }
   }
@@ -850,10 +850,10 @@ public class SeriesRestService {
         }
       }
     } catch (IOException e) {
-      logger.error("Error while trying to read from request: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error while trying to read from request", e);
       return R.serverError();
     } catch (SeriesException e) {
-      logger.warn("Error while adding element to series '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while adding element to series '{}'", seriesId, e);
       return R.serverError();
     } finally {
       IOUtils.closeQuietly(is);

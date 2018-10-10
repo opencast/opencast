@@ -453,7 +453,7 @@ public class ThemesEndpoint {
       Theme updatedTheme = themesServiceDatabase.updateTheme(theme);
       return RestUtils.okJson(themeToJSON(updatedTheme));
     } catch (ThemesServiceDatabaseException e) {
-      logger.error("Unable to update theme {}: {}", themeId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update theme {}", themeId, e);
       return RestUtil.R.serverError();
     }
   }
@@ -512,7 +512,7 @@ public class ThemesEndpoint {
       } catch (NotFoundException e) {
         logger.warn("Theme {} already deleted on series {}", themeId, seriesId);
       } catch (SeriesException e) {
-        logger.error("Unable to remove theme from series {}: {}", seriesId, ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to remove theme from series {}", seriesId, e);
         throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
       }
     }
@@ -583,7 +583,7 @@ public class ThemesEndpoint {
         fields.add(f(fieldName.concat("Name"), v(staticFileService.getFileName(staticFileId))));
         fields.add(f(fieldName.concat("Url"), v(staticFileRestService.getStaticFileURL(staticFileId).toString(), Jsons.BLANK)));
       } catch (IllegalStateException | NotFoundException e) {
-        logger.error("Error retreiving static file '{}' : {}", staticFileId, ExceptionUtils.getStackTrace(e));
+        logger.error("Error retreiving static file '{}' ", staticFileId, e);
       }
     }
   }

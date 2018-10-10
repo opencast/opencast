@@ -96,7 +96,6 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -1282,8 +1281,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.debug("Restoring workflow properties from scheduler event {}", mediaPackageId);
       mergedProperties.putAll(recordingProperties);
     } catch (SchedulerException e) {
-      logger.warn("Unable to get workflow properties from scheduler event {}: {}", mediaPackageId,
-              ExceptionUtils.getMessage(e));
+      logger.warn("Unable to get workflow properties from scheduler event {}", mediaPackageId, e);
     } catch (NotFoundException e) {
       logger.info("No capture event found for id {}", mediaPackageId);
     } catch (UnauthorizedException e) {
@@ -1419,8 +1417,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         } catch (UnauthorizedException e) {
           throw new IllegalStateException(e);
         } catch (SchedulerException e) {
-          logger.warn("Unable to get the workflow definition id from scheduler event {}: {}", mediaPackageId,
-                  ExceptionUtils.getMessage(e));
+          logger.warn("Unable to get the workflow definition id from scheduler event {}", mediaPackageId, e);
           throw new IngestException(e);
         }
       } else {

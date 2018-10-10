@@ -35,7 +35,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +93,7 @@ public class PresetsEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }

@@ -251,7 +251,7 @@ public class UserSettingsService {
 
       return result;
     } catch (Exception e) {
-      logger.error("Could not get user setting: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get user setting", e);
       throw new UserSettingsServiceException(e);
     } finally {
       if (em != null)

@@ -40,7 +40,6 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -160,7 +159,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not get theme: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get theme", e);
       throw new ThemesServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -182,7 +181,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       }
       return themes;
     } catch (Exception e) {
-      logger.error("Could not get themes: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get themes", e);
       throw new ThemesServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -219,7 +218,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
               ThemeItem.update(toSerializableTheme(theme)));
       return theme;
     } catch (Exception e) {
-      logger.error("Could not update theme {}: {}", theme, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not update theme {}", theme, e);
       if (tx.isActive()) {
         tx.rollback();
       }
@@ -270,7 +269,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not delete theme '{}': {}", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not delete theme '{}'", id, e);
       if (tx.isActive())
         tx.rollback();
       throw new ThemesServiceDatabaseException(e);
@@ -290,7 +289,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       Number countResult = (Number) q.getSingleResult();
       return countResult.intValue();
     } catch (Exception e) {
-      logger.error("Could not count themes: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not count themes", e);
       throw new ThemesServiceDatabaseException(e);
     } finally {
       if (em != null) {
@@ -356,7 +355,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
             current++;
           }
         } catch (ThemesServiceDatabaseException e) {
-          logger.error("Unable to get themes from the database because", e);
+          logger.error("Unable to get themes from the database", e);
           throw new IllegalStateException(e);
         }
       });

@@ -38,7 +38,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +97,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
         tx.commit();
         success = true;
       } catch (Exception e) {
-        final String message = ExceptionUtils.getMessage(e.getCause()).toLowerCase();
+        final String message = e.getCause().getMessage().toLowerCase();
         if (message.contains("unique") || message.contains("duplicate")) {
           try {
             Thread.sleep(1100L);
@@ -106,11 +105,11 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
             throw new OaiPmhDatabaseException(e1);
           }
           i++;
-          logger.info("Storing OAI-PMH entry '{}' from  repository '{}' failed, retry {} times.", new String[] {
-                  mediaPackage.getIdentifier().toString(), repository, Integer.toString(i) });
+          logger.info("Storing OAI-PMH entry '{}' from  repository '{}' failed, retry {} times.",
+                  mediaPackage.getIdentifier(), repository, i);
         } else {
-          logger.error("Could not store mediapackage '{}' to OAI-PMH repository '{}': {}", new String[] {
-                  mediaPackage.getIdentifier().toString(), repository, ExceptionUtils.getStackTrace(e) });
+          logger.error("Could not store mediapackage '{}' to OAI-PMH repository '{}'", mediaPackage.getIdentifier(),
+                  repository, e);
           if (tx != null && tx.isActive())
             tx.rollback();
 
@@ -193,7 +192,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       } catch (NotFoundException e) {
         throw e;
       } catch (Exception e) {
-        final String message = ExceptionUtils.getMessage(e.getCause()).toLowerCase();
+        final String message = e.getCause().getMessage().toLowerCase();
         if (message.contains("unique") || message.contains("duplicate")) {
           try {
             Thread.sleep(1100L);
@@ -202,10 +201,10 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
           }
           i++;
           logger.info("Deleting OAI-PMH entry '{}' from  repository '{}' failed, retry {} times.",
-                  new String[] { mediaPackageId, repository, Integer.toString(i) });
+                  mediaPackageId, repository, i);
         } else {
-          logger.error("Could not delete mediapackage '{}' from OAI-PMH repository '{}': {}",
-                  new String[] { mediaPackageId, repository, ExceptionUtils.getStackTrace(e) });
+          logger.error("Could not delete mediapackage '{}' from OAI-PMH repository '{}'",
+                  mediaPackageId, repository, e);
           if (tx != null && tx.isActive())
             tx.rollback();
 

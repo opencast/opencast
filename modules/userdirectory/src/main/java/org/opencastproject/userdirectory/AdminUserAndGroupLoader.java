@@ -268,7 +268,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
         }
 
       } catch (Throwable t) {
-        logger.error("Unable to load system administrator group because", t);
+        logger.error("Unable to load system administrator group", t);
       }
     });
   }
