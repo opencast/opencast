@@ -213,7 +213,7 @@
           <table class="main-tbl">
             <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()" ng-if="userEntry.presentableValue">
               <td>{{ userEntry.label | translate }}</td>
-              <td>{{ userEntry.presentableValue }}</td>
+              <td>{{ userEntry.presentableValue | translate }}</td>
               <tr>
           </table>
         </div>
@@ -263,13 +263,16 @@
         </div>
       </div>
 
-      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').ud.theme !== ''">
+      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme 
+          && wizard.getStateControllerByName('theme').themes.hasOwnProperty(wizard.getStateControllerByName('theme').ud.theme)">
         <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></header>
         <div class="obj-container">
           <table class="main-tbl">
             <tr>
               <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></td>
-              <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}</td>
+              <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">
+                {{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}
+              </td>
 
             </tr>
           </table>

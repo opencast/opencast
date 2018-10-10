@@ -92,7 +92,16 @@ angular.module('adminNg.services')
 
           params.presentableValue = presentableValue;
         } else {
-          params.presentableValue = params.collection[value];
+          if (params.collection.hasOwnProperty(value)) {
+            params.presentableValue = params.collection[value];
+          } else {
+            // this should work in older browsers, albeit looking clumsy
+            var matchingKey = Object.keys(params.collection)
+              .filter(function(key) {return params.collection[key] === value;})[0];
+            params.presentableValue = params.type === 'ordered_text'
+              ? JSON.parse(matchingKey)['label']
+              : matchingKey;
+          }
         }
       } else {
         params.presentableValue = value;
