@@ -254,9 +254,15 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
     logger.debug("Executing notification request on target {}, {} attempts left", request.getURI(), maxAttempts);
 
-    RequestConfig config = RequestConfig.custom().setConnectTimeout(timeout).setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout).build();
-    CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+    RequestConfig config = RequestConfig.custom()
+                                        .setConnectTimeout(timeout)
+                                        .setConnectionRequestTimeout(timeout)
+                                        .setSocketTimeout(timeout)
+                                        .build();
+    CloseableHttpClient httpClient = HttpClientBuilder.create()
+                                                      .useSystemProperties()
+                                                      .setDefaultRequestConfig(config)
+                                                      .build();
 
     HttpResponse response;
     try {
