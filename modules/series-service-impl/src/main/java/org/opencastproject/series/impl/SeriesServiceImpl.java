@@ -55,8 +55,6 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
 
@@ -68,13 +66,17 @@ import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
@@ -582,32 +584,38 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       for (SeriesEntity series: databaseSeries) {
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-                new Function0.X<Void>() {
-                  @Override
-                  public Void xapply() throws Exception {
-                    String id = series.getSeriesId();
-                    logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
-                    DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateCatalog(catalog));
+                () -> {
+                  String id = series.getSeriesId();
+                  logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
+                  DublinCoreCatalog catalog;
+                  try {
+                    catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                  } catch (IOException | ParserConfigurationException | SAXException e) {
+                    logger.error("Could not read dublincore XML", e);
+                    return;
+                  }
+                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                          SeriesItem.updateCatalog(catalog));
 
-                    String aclStr = series.getAccessControl();
-                    if (StringUtils.isNotBlank(aclStr)) {
-                      try {
-                          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                  SeriesItem.updateAcl(id, acl));
-                      } catch (Exception ex) {
-                        logger.error("Unable to parse series {} access control list", id, ex);
-                      }
+                  String aclStr = series.getAccessControl();
+                  if (StringUtils.isNotBlank(aclStr)) {
+                    try {
+                        AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                                SeriesItem.updateAcl(id, acl));
+                    } catch (Exception ex) {
+                      logger.error("Unable to parse series {} access control list", id, ex);
                     }
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateOptOut(id, series.isOptOut()));
+                  }
+                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                          SeriesItem.updateOptOut(id, series.isOptOut()));
+                  try {
                     for (Entry<String, String> property : persistence.getSeriesProperties(id).entrySet()) {
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateProperty(id, property.getKey(), property.getValue()));
                     }
-                    return null;
+                  } catch (NotFoundException | SeriesServiceDatabaseException e) {
+                    logger.error("Error requesting series properties", e);
                   }
                 });
         if ((current % responseInterval == 0) || (current == total)) {
@@ -622,15 +630,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       throw new ServiceException(e.getMessage());
     }
 
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                        IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
-              }
-            });
+    Organization org = new DefaultOrganization();
+    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(systemUserName, org), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
+    });
   }
 
   @Override

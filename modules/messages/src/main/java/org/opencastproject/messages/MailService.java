@@ -37,7 +37,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
@@ -98,15 +97,11 @@ public class MailService {
     logger.info("Activating persistence manager for participation management");
 
     for (Organization org : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            updateSmtpConfiguration(getEmailConfiguration());
-          } catch (MailServiceException e) {
-            logger.error("Unable to initialize the SMTP configuration from the database: {}",
-                    ExceptionUtils.getStackTrace(e));
-          }
+      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), () -> {
+        try {
+          updateSmtpConfiguration(getEmailConfiguration());
+        } catch (MailServiceException e) {
+          logger.error("Unable to initialize the SMTP configuration from the database", e);
         }
       });
     }

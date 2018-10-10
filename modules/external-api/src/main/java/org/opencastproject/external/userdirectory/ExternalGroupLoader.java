@@ -32,7 +32,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Effect0;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -112,36 +111,33 @@ public class ExternalGroupLoader {
    */
   private void createDefaultGroups(ComponentContext cc) {
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            Organization testOrg = organizationDirectoryService.getOrganization(organization.getId());
-            if (!(testOrg instanceof JpaOrganization)) {
-              logger.info("Note: Ignoring organization with id " + testOrg.getId() + " because it is not a JpaOrganization");
-              return;
-            }
-            JpaOrganization org = (JpaOrganization) testOrg;
-
-            // External Applications
-            String externalApplicationsGroupId = org.getId().toUpperCase().concat(EXTERNAL_GROUP_SUFFIX);
-            JpaGroup externalApplicationGroup = (JpaGroup) groupRoleProvider.loadGroup(externalApplicationsGroupId,
-                    org.getId());
-            if (externalApplicationGroup == null) {
-              String externalApplicationsGroupname = org.getName().concat(" External Applications");
-              String externalApplicationsGroupDescription = "External application users of '" + org.getName() + "'";
-              Set<JpaRole> roles = new HashSet<JpaRole>();
-              for (String role : loadRoles(EXTERNAL_APPLICATIONS_ROLES_FILE)) {
-                roles.add(new JpaRole(role, org));
-              }
-              roles.add(new JpaRole(SecurityConstants.GLOBAL_SUDO_ROLE, org));
-              externalApplicationGroup = new JpaGroup(externalApplicationsGroupId, org, externalApplicationsGroupname,
-                      externalApplicationsGroupDescription, roles, new HashSet<String>());
-              groupRoleProvider.addGroup(externalApplicationGroup);
-            }
-          } catch (NotFoundException | IllegalStateException | IOException | UnauthorizedException e) {
-            logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+        try {
+          Organization testOrg = organizationDirectoryService.getOrganization(organization.getId());
+          if (!(testOrg instanceof JpaOrganization)) {
+            logger.info("Note: Ignoring organization with id " + testOrg.getId() + " because it is not a JpaOrganization");
+            return;
           }
+          JpaOrganization org = (JpaOrganization) testOrg;
+
+          // External Applications
+          String externalApplicationsGroupId = org.getId().toUpperCase().concat(EXTERNAL_GROUP_SUFFIX);
+          JpaGroup externalApplicationGroup = (JpaGroup) groupRoleProvider.loadGroup(externalApplicationsGroupId,
+                  org.getId());
+          if (externalApplicationGroup == null) {
+            String externalApplicationsGroupname = org.getName().concat(" External Applications");
+            String externalApplicationsGroupDescription = "External application users of '" + org.getName() + "'";
+            Set<JpaRole> roles = new HashSet<JpaRole>();
+            for (String role : loadRoles(EXTERNAL_APPLICATIONS_ROLES_FILE)) {
+              roles.add(new JpaRole(role, org));
+            }
+            roles.add(new JpaRole(SecurityConstants.GLOBAL_SUDO_ROLE, org));
+            externalApplicationGroup = new JpaGroup(externalApplicationsGroupId, org, externalApplicationsGroupname,
+                    externalApplicationsGroupDescription, roles, new HashSet<String>());
+            groupRoleProvider.addGroup(externalApplicationGroup);
+          }
+        } catch (NotFoundException | IllegalStateException | IOException | UnauthorizedException e) {
+          logger.error("Unable to load external API groups because {}", ExceptionUtils.getStackTrace(e));
         }
       });
     }

@@ -38,7 +38,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -341,37 +340,31 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   public void repopulate(final String indexName) {
     final String destinationId = ThemeItem.THEME_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            final List<Theme> themes = getThemes();
-            int total = themes.size();
-            int current = 1;
-            logger.info(
-                    "Re-populating '{}' index with themes from organization {}. There are {} theme(s) to add to the index.",
-                    indexName, securityService.getOrganization().getId(), total);
-            for (Theme theme : themes) {
-              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                      ThemeItem.update(toSerializableTheme(theme)));
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                      IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Themes, total, current));
-              current++;
-            }
-          } catch (ThemesServiceDatabaseException e) {
-            logger.error("Unable to get themes from the database because: {}", ExceptionUtils.getStackTrace(e));
-            throw new IllegalStateException(e);
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+        try {
+          final List<Theme> themes = getThemes();
+          int total = themes.size();
+          int current = 1;
+          logger.info(
+                  "Re-populating '{}' index with themes from organization {}. There are {} theme(s) to add to the index.",
+                  indexName, securityService.getOrganization().getId(), total);
+          for (Theme theme : themes) {
+            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                    ThemeItem.update(toSerializableTheme(theme)));
+            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Themes, total, current));
+            current++;
           }
+        } catch (ThemesServiceDatabaseException e) {
+          logger.error("Unable to get themes from the database because", e);
+          throw new IllegalStateException(e);
         }
       });
     }
     Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-      @Override
-      protected void run() {
-        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Themes));
-      }
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Themes));
     });
   }
 

@@ -42,7 +42,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -50,7 +49,6 @@ import com.entwinemedia.fn.data.Opt;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -289,26 +287,22 @@ public class CaptureNowProlongingService implements ManagedService {
     private void execute(final CaptureNowProlongingService prolongingService, final String agentId) {
       for (Organization organization : prolongingService.getOrgDirectoryService().getOrganizations()) {
         User user = SecurityUtil.createSystemUser(prolongingService.getComponentContext(), organization);
-        SecurityUtil.runAs(prolongingService.getSecurityService(), organization, user, new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              MediaPackage mp = prolongingService.getCurrentRecording(agentId);
-              Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(prolongingService.getWorkspace(),
-                      mp);
-              if (dublinCore.isSome()
-                      && EncodingSchemeUtils.decodeMandatoryPeriod(dublinCore.get().getFirst(PROPERTY_TEMPORAL))
-                              .getEnd().before(DateTime.now().plusSeconds(90).toDate())) {
-                prolong(prolongingService, mp, dublinCore.get(), agentId);
-              } else {
-                logger.debug("Wait another minute before extending the ad-hoc recording for agent '{}'", agentId);
-              }
-            } catch (NotFoundException e) {
-              logger.info("Unable to extend the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
-            } catch (Exception e) {
-              logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId,
-                      ExceptionUtils.getStackTrace(e));
+        SecurityUtil.runAs(prolongingService.getSecurityService(), organization, user, () -> {
+          try {
+            MediaPackage mp = prolongingService.getCurrentRecording(agentId);
+            Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(prolongingService.getWorkspace(),
+                    mp);
+            if (dublinCore.isSome()
+                    && EncodingSchemeUtils.decodeMandatoryPeriod(dublinCore.get().getFirst(PROPERTY_TEMPORAL))
+                            .getEnd().before(DateTime.now().plusSeconds(90).toDate())) {
+              prolong(prolongingService, mp, dublinCore.get(), agentId);
+            } else {
+              logger.debug("Wait another minute before extending the ad-hoc recording for agent '{}'", agentId);
             }
+          } catch (NotFoundException e) {
+            logger.info("Unable to extend the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
+          } catch (Exception e) {
+            logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId, e);
           }
         });
       }

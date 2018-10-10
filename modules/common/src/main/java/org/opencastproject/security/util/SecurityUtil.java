@@ -43,7 +43,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
@@ -66,15 +65,22 @@ public final class SecurityUtil {
   /**
    * Run function <code>f</code> in the context described by the given organization and user.
    *
-   * @return the function's outcome.
+   * @param sec
+   *          Security service to use for getting data
+   * @param org
+   *          Organization to switch to
+   * @param user
+   *          User to switch to
+   * @param fn
+   *          Function to execute
    */
-  public static <A> A runAs(SecurityService sec, Organization org, User user, Function0<A> f) {
+  public static void runAs(SecurityService sec, Organization org, User user, Runnable fn) {
     final Organization prevOrg = sec.getOrganization();
     final User prevUser = prevOrg != null ? sec.getUser() : null;
     sec.setOrganization(org);
     sec.setUser(user);
     try {
-      return f.apply();
+      fn.run();
     } finally {
       sec.setOrganization(prevOrg);
       sec.setUser(prevUser);
