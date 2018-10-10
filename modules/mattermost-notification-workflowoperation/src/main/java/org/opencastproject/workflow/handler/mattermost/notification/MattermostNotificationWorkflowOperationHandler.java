@@ -217,7 +217,7 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
     json.addProperty("text", s);
     GsonBuilder builder = new GsonBuilder();
     Gson gson = builder.create();
-    return gson.toJson(s);
+    return gson.toJson(json);
   }
 
   /**
