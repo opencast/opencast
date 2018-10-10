@@ -26,7 +26,8 @@ import static org.opencastproject.util.EqualsUtil.ne;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.data.Function0;
+
+import java.util.function.Supplier;
 
 /**
  * This class handles all the boilerplate of setting up and tearing down a security context. It also makes it possible
@@ -47,17 +48,25 @@ public class SecurityContext {
   }
 
   /** Run function <code>f</code> within the context. */
-  public <A> A runInContext(Function0<A> f) {
+  public <A> A runInContext(Supplier<A> f) {
     final Organization prevOrg = sec.getOrganization();
     // workaround: if no organization is bound to the current thread sec.getUser() will throw a NPE
     final User prevUser = prevOrg != null ? sec.getUser() : null;
     sec.setOrganization(org);
     sec.setUser(user);
     try {
-      return f.apply();
+      return f.get();
     } finally {
       sec.setOrganization(prevOrg);
       sec.setUser(prevUser);
     }
+  }
+
+  /** Run function <code>f</code> within the context. */
+  public void runInContext(Runnable f) {
+    runInContext(() -> {
+      f.run();
+      return null;
+    });
   }
 }

@@ -24,7 +24,6 @@ import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
@@ -41,8 +40,6 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -227,17 +224,14 @@ public class BaseEndpoint {
   public Response clearIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    return securityContext.runInContext(new Function0<Response>() {
-      @Override
-      public Response apply() {
-        try {
-          logger.info("Clear the external index");
-          externalIndex.clear();
-          return R.ok();
-        } catch (Throwable t) {
-          logger.error("Clearing the external index failed", t);
-          return R.serverError();
-        }
+    return securityContext.runInContext(() -> {
+      try {
+        logger.info("Clear the external index");
+        externalIndex.clear();
+        return R.ok();
+      } catch (Throwable t) {
+        logger.error("Clearing the external index failed", t);
+        return R.serverError();
       }
     });
   }
@@ -256,28 +250,20 @@ public class BaseEndpoint {
   public Response recreateIndexFromService(@PathParam("service") final String service) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              logger.info("Starting to repopulate the index from service {}", service);
-              externalIndex.recreateIndex(service);
-            } catch (InterruptedException e) {
-              logger.error("Repopulating the index was interrupted", e);
-            } catch (CancellationException e) {
-              logger.trace("Listening for index messages has been cancelled.");
-            } catch (ExecutionException e) {
-              logger.error("Repopulating the index failed to execute", e);
-            } catch (Throwable t) {
-              logger.error("Repopulating the index failed", t);
-            }
-          }
-        });
+    executor.execute(() -> securityContext.runInContext(() -> {
+      try {
+        logger.info("Starting to repopulate the index from service {}", service);
+        externalIndex.recreateIndex(service);
+      } catch (InterruptedException e) {
+        logger.error("Repopulating the index was interrupted", e);
+      } catch (CancellationException e) {
+        logger.trace("Listening for index messages has been cancelled.");
+      } catch (ExecutionException e) {
+        logger.error("Repopulating the index failed to execute", e);
+      } catch (Throwable t) {
+        logger.error("Repopulating the index failed", t);
       }
-    });
+    }));
     return R.ok();
   }
 
@@ -288,29 +274,21 @@ public class BaseEndpoint {
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              logger.info("Starting to repopulate the external index");
-              externalIndex.recreateIndex();
-              logger.info("Finished repopulating the external index");
-            } catch (InterruptedException e) {
-              logger.error("Repopulating the external index was interrupted {}", getStackTrace(e));
-            } catch (CancellationException e) {
-              logger.trace("Listening for external index messages has been cancelled.");
-            } catch (ExecutionException e) {
-              logger.error("Repopulating the external index failed to execute because {}", getStackTrace(e));
-            } catch (Throwable t) {
-              logger.error("Repopulating the external index failed because {}", getStackTrace(t));
-            }
-          }
-        });
+    executor.execute(() -> securityContext.runInContext(() -> {
+      try {
+        logger.info("Starting to repopulate the external index");
+        externalIndex.recreateIndex();
+        logger.info("Finished repopulating the external index");
+      } catch (InterruptedException e) {
+        logger.error("Repopulating the external index was interrupted", e);
+      } catch (CancellationException e) {
+        logger.trace("Listening for external index messages has been cancelled.");
+      } catch (ExecutionException e) {
+        logger.error("Repopulating the external index failed to execute", e);
+      } catch (Throwable t) {
+        logger.error("Repopulating the external index failed", t);
       }
-    });
+    }));
     return R.ok();
   }
 

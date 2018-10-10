@@ -29,7 +29,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -178,12 +177,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
       // iterate all organizations
       for (final Organization org : parameters.getOrganizationDirectoryService().getOrganizations()) {
         // set the organization on the current thread
-        parameters.getAdminContextFor(org.getId()).runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            parameters.scan();
-          }
-        });
+        parameters.getAdminContextFor(org.getId()).runInContext(parameters::scan);
       }
 
       logger.debug("Finished " + parameters.getScannerName() + " job.");

@@ -28,7 +28,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NeedleEye;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
@@ -223,12 +222,7 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       // iterate all organizations
       for (final Organization org : parameters.getOrganizationDirectoryService().getOrganizations()) {
         // set the organization on the current thread
-        parameters.getAdminContextFor(org.getId()).runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            parameters.scan();
-          }
-        });
+        parameters.getAdminContextFor(org.getId()).runInContext(parameters::scan);
       }
 
       logger.info("Finished " + parameters.getScannerName() + " job.");

@@ -110,7 +110,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -1970,48 +1969,38 @@ public class IndexServiceImpl implements IndexService {
   public void updateCommentCatalog(final Event event, final List<EventComment> comments) throws Exception {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              MediaPackage mediaPackage = getEventMediapackage(event);
-              updateMediaPackageCommentCatalog(mediaPackage, comments);
-              switch (getEventSource(event)) {
-                case WORKFLOW:
-                  logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-                  if (workflowInstance.isNone()) {
-                    logger.error("No workflow instance for event {} found!", event.getIdentifier());
-                    throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
-                  }
-                  WorkflowInstance instance = workflowInstance.get();
-                  instance.setMediaPackage(mediaPackage);
-                  updateWorkflowInstance(instance);
-                  break;
-                case ARCHIVE:
-                  logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  assetManager.takeSnapshot(mediaPackage);
-                  break;
-                case SCHEDULE:
-                  logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(),
-                          Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage),
-                          Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(),
-                          SchedulerService.ORIGIN);
-                  break;
-                default:
-                  logger.error("Unkown event source {}!", event.getSource().toString());
-              }
-            } catch (Exception e) {
-              logger.error("Unable to update event {} comment catalog: {}", event.getIdentifier(), getStackTrace(e));
+    executorService.execute(() -> securityContext.runInContext(() -> {
+      try {
+        MediaPackage mediaPackage = getEventMediapackage(event);
+        updateMediaPackageCommentCatalog(mediaPackage, comments);
+        switch (getEventSource(event)) {
+          case WORKFLOW:
+            logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
+            if (workflowInstance.isNone()) {
+              logger.error("No workflow instance for event {} found!", event.getIdentifier());
+              throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
             }
-          }
-        });
+            WorkflowInstance instance = workflowInstance.get();
+            instance.setMediaPackage(mediaPackage);
+            updateWorkflowInstance(instance);
+            break;
+          case ARCHIVE:
+            logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            assetManager.takeSnapshot(mediaPackage);
+            break;
+          case SCHEDULE:
+            logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                    Opt.some(mediaPackage), Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+            break;
+          default:
+            logger.error("Unkown event source {}!", event.getSource());
+        }
+      } catch (Exception e) {
+        logger.error("Unable to update event {} comment catalog", event.getIdentifier(), e);
       }
-    });
+    }));
   }
 
   private void updateMediaPackageCommentCatalog(MediaPackage mediaPackage, List<EventComment> comments)

@@ -30,7 +30,6 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NeedleEye;
-import org.opencastproject.util.data.Effect0;
 
 import org.osgi.service.cm.ManagedService;
 import org.quartz.JobDetail;
@@ -142,12 +141,7 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
       // iterate all organizations
       for (final Organization org : parameters.getOrganizationDirectoryService().getOrganizations()) {
         // set the organization on the current thread
-        parameters.getAdminContextFor(org.getId()).runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            parameters.scan();
-          }
-        });
+        parameters.getAdminContextFor(org.getId()).runInContext(parameters::scan);
       }
 
       logger.info("Finished " + parameters.getScannerName() + " job.");
