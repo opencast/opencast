@@ -573,7 +573,9 @@
     <!-- Uncomment this if using Shibboleth authentication -->
     <!--sec:authentication-provider ref="preauthAuthProvider" /-->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <sec:password-encoder hash="md5"><sec:salt-source user-property="username" /></sec:password-encoder>
+      <sec:password-encoder hash="md5">
+        <sec:salt-source user-property="username" />
+      </sec:password-encoder>
     </sec:authentication-provider>
     <sec:authentication-provider ref="ldapAuthProvider" />
   </sec:authentication-manager>

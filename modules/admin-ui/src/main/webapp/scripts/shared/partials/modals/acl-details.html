@@ -85,7 +85,7 @@
                                     ng-change="changeBaseAcl()"
                                     ng-model="baseAclId"
                                     ng-options="id as name for (id, name) in acls"
-                                    data-placeholder="{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                    placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                     no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                     />
                           </div>
@@ -135,7 +135,7 @@
                                       ng-model="policy.role"
                                       ng-options="id as id for (id, type) in roles"
                                       ng-get-more="getMoreRoles"
-                                      data-placeholder="{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                      placeholder-text-single="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'USERS.ACLS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                       />
                             </td>

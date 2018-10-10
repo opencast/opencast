@@ -22,7 +22,13 @@
 
 angular.module('adminNg.resources')
 .factory('EventSchedulingResource', ['$resource', 'JsHelper', function ($resource, JsHelper) {
-  var transformResponse = function (data) {
+  var transformResponse = function (data, headers, status) {
+
+        // an event may have no schedule
+        if (status == 404) {
+          return;
+        }
+
         var parsedData,
             startDate,
             endDate,
