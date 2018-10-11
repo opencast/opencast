@@ -101,8 +101,6 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    */
   public static final String PUT = "put";
 
-
-
   /**
    * The logging facility
    */
@@ -127,6 +125,11 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
    * The scale factor to the sleep time between two notification attempts
    */
   public static final int SLEEP_SCALE_FACTOR = 2;
+
+  /**
+   * Gson instance for JSON serialization.
+   */
+  private static Gson gson = new GsonBuilder().create();
 
   /**
    * {@inheritDoc}
@@ -215,8 +218,6 @@ public class MattermostNotificationWorkflowOperationHandler extends AbstractWork
 
     JsonObject json = new JsonObject();
     json.addProperty("text", s);
-    GsonBuilder builder = new GsonBuilder();
-    Gson gson = builder.create();
     return gson.toJson(json);
   }
 
