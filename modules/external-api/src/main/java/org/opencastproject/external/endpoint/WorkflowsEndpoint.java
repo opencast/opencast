@@ -104,7 +104,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
-@RestService(name = "externalapiworkflowinstances", title = "External API Workflow Instances Service", notes = "", abstractText = "Provides resources and operations related to the workflow instances")
+@RestService(name = "externalapiworkflowinstances", title = "External API Workflow Instances Service", notes = {}, abstractText = "Provides resources and operations related to the workflow instances")
 public class WorkflowsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
