@@ -43,7 +43,7 @@ describe('Edit events controller', function () {
         $controller('EditEventsCtrl', {$scope: $scope});
         jasmine.getJSONFixtures().fixturesPath = 'base/app/GET';
         // These are the requests that are necessary to construct the modal.
-        $httpBackend.expectGET('/admin-ng/series/series.json').respond(JSON.stringify(getJSONFixture('admin-ng/series/series.json')));
+        $httpBackend.expectGET('/admin-ng/series/series.json?limit=-1').respond(JSON.stringify(getJSONFixture('admin-ng/series/series.json')));
         $httpBackend.expectGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
         $httpBackend.expectPOST('/admin-ng/event/scheduling.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/scheduling.json')));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));

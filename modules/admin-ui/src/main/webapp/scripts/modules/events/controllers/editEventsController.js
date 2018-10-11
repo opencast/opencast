@@ -53,7 +53,10 @@ angular.module('adminNg.controllers')
 
       // Get available series
       $scope.seriesResults = {};
-      SeriesResource.query().$promise.then(function(results) {
+      var query = {};
+      query.limit = -1;
+
+      SeriesResource.query(query).$promise.then(function(results) {
         angular.forEach(results.rows, function(row) {
           $scope.seriesResults[row.title] = row.id;
         });
