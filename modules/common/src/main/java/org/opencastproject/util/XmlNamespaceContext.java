@@ -40,15 +40,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.Immutable;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 
-@Immutable
-@ParametersAreNonnullByDefault
 public final class XmlNamespaceContext implements NamespaceContext {
   // the number of default bindings
   private static final int DEFAULT_BINDINGS = 2;
@@ -96,12 +90,12 @@ public final class XmlNamespaceContext implements NamespaceContext {
                     }));
   }
 
-  @Override @Nonnull
+  @Override
   public String getNamespaceURI(String prefix) {
     return Opt.nul(prefixToUri.get(prefix)).getOr(XMLConstants.NULL_NS_URI);
   }
 
-  @Override @Nullable
+  @Override
   public String getPrefix(String uri) {
     return $(prefixToUri.entrySet()).find(Booleans.eq(RequireUtil.notNull(uri, "uri")).o(value)).map(key).orNull();
   }

@@ -26,16 +26,11 @@ import static org.opencastproject.util.EqualsUtil.hash;
 
 import java.io.Serializable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.Immutable;
-
 /**
  * Declaration of an XML namespace binding which is the association of a prefix to a namespace URI (namespace name).
  * <p>
  * See <a href="http://www.w3.org/TR/xml-names11/#sec-namespaces">W3C specification</a> for details.
  */
-@Immutable
-@ParametersAreNonnullByDefault
 public final class XmlNamespaceBinding implements Serializable {
   private static final long serialVersionUID = -3189348197739705012L;
 

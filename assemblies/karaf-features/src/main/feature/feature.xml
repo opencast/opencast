@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-  <feature name="query-dsl">
-    <bundle>mvn:com.google.guava/guava/18.0</bundle>
+  <feature name="query-dsl" version="${project.version}">
+    <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
     <bundle>mvn:joda-time/joda-time/2.10</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
@@ -10,7 +10,7 @@
     <bundle>mvn:com.mysema.querydsl/querydsl-jpa/3.6.5</bundle>
   </feature>
 
-  <feature name="ext-core">
+  <feature name="ext-core" version="${project.version}">
     <!-- Base features -->
     <feature>http</feature>
     <feature>http-whiteboard</feature>
@@ -106,7 +106,7 @@
     <bundle>mvn:org.springframework/spring-web/3.1.4.RELEASE</bundle>
   </feature>
 
-  <feature name="opencast-core">
+  <feature name="opencast-core" version="${project.version}">
     <feature start-level="80">ext-core</feature>
 
     <!-- Opencast -->
@@ -148,7 +148,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-impl/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-allinone">
+  <feature name="opencast-allinone" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
@@ -278,7 +278,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-admin">
+  <feature name="opencast-admin" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
@@ -384,7 +384,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-adminpresentation">
+  <feature name="opencast-adminpresentation" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
@@ -511,7 +511,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-ingest">
+  <feature name="opencast-ingest" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
@@ -526,7 +526,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-worker">
+  <feature name="opencast-worker" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
@@ -567,7 +567,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-adminworker">
+  <feature name="opencast-adminworker" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-animate-api/${project.version}</bundle>
@@ -676,7 +676,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-presentation">
+  <feature name="opencast-presentation" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
@@ -720,7 +720,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-migration">
+  <feature name="opencast-migration" version="${project.version}">
     <feature start-level="80">opencast-core</feature>
 
     <!-- Note: This is the minimum set of bundles for the 4.0 migration bundle.  If this is not 4.0 then this list should probably change! -->
@@ -734,7 +734,7 @@
     <bundle start-level="85">mvn:org.opencastproject/opencast-migration/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-security-cas" version="0.0.0">
+  <feature name="opencast-security-cas" version="${project.version}">
     <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
     <bundle start-level="82">mvn:org.apache.santuario/xmlsec/2.1.2</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk15on/1.51</bundle>
