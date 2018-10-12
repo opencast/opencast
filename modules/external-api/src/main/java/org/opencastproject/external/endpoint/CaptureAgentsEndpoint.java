@@ -59,7 +59,7 @@ import javax.ws.rs.core.Response;
 @RestService(
     name = "externalapicaptureagents",
     title = "External API Capture Agents Service",
-    notes = "",
+    notes = {},
     abstractText = "Provides resources and operations related to the capture agents"
 )
 public class CaptureAgentsEndpoint {

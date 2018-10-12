@@ -30,7 +30,7 @@ import javax.ws.rs.Path;
         title = "OAI-PMH server info service",
         abstractText = "This service "
                 + "provides system gateway to the OAI-PMH server.",
-        notes = "")
+        notes = {})
 public class OsgiOaiPmhServerInfoRestEndpoint extends AbstractOaiPmhServerInfoRestEndpoint {
   private OaiPmhServerInfo oaiPmhServerInfo;
 
