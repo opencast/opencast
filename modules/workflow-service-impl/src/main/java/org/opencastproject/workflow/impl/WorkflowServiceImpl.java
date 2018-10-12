@@ -73,7 +73,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.Log;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.ResumableWorkflowOperationHandler;
@@ -2387,13 +2386,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
         Organization organization = instance.getOrganization();
         SecurityUtil.runAs(securityService, organization,
-                SecurityUtil.createSystemUser(componentContext, organization), new Effect0() {
-                  @Override
-                  public void run() {
-                    // Send message to update index item
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            WorkflowItem.updateInstance(instance));
-                  }
+                SecurityUtil.createSystemUser(componentContext, organization), () -> {
+                  // Send message to update index item
+                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                          WorkflowItem.updateInstance(instance));
                 });
         if ((current % responseInterval == 0) || (current == total)) {
           logger.info("Updating {} workflow index {}/{}: {} percent complete.", indexName, current, total,
@@ -2404,12 +2400,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     logger.info("Finished populating {} index with workflows", indexName);
     Organization organization = new DefaultOrganization();
     SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(componentContext, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                        IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Workflow));
-              }
+            () -> {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                      IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Workflow));
             });
   }
 

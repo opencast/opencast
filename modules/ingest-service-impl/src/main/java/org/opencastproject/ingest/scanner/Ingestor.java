@@ -31,12 +31,10 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.util.SecurityContext;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,54 +110,41 @@ public class Ingestor {
   }
 
   private Runnable getIngestRunnable(final File artifact) {
-    return new Runnable() {
-      @Override
-      public void run() {
-        secCtx.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            InputStream in = null;
-            try {
-              in = new FileInputStream(artifact);
-              if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
-                ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
-                logger.info("Ingested {} as a mediapackage from inbox", artifact.getName());
-              } else {
-                /* Create MediaPackage and add Track */
-                MediaPackage mp = ingestService.createMediaPackage();
-                ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
-                logger.info("Added track to mediapackage for ingest from inbox");
+    return () -> secCtx.runInContext(() -> {
+      try (InputStream in = new FileInputStream(artifact)) {
+        if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
+          ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
+          logger.info("Ingested {} as a mediapackage from inbox", artifact.getName());
+        } else {
+          /* Create MediaPackage and add Track */
+          MediaPackage mp = ingestService.createMediaPackage();
+          ingestService.addTrack(in, artifact.getName(), mediaFlavor, mp);
+          logger.info("Added track to mediapackage for ingest from inbox");
 
-                /* Add title */
-                DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-                dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
-                ByteArrayOutputStream dcout = new ByteArrayOutputStream();
-                dcc.toXml(dcout, true);
-                InputStream dcin = new ByteArrayInputStream(dcout.toByteArray());
-                ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE, mp);
-                logger.info("Added DC catalog to mediapackage for ingest from inbox");
+          /* Add title */
+          DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
+          dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
+          ByteArrayOutputStream dcout = new ByteArrayOutputStream();
+          dcc.toXml(dcout, true);
+          InputStream dcin = new ByteArrayInputStream(dcout.toByteArray());
+          ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE, mp);
+          logger.info("Added DC catalog to mediapackage for ingest from inbox");
 
-                /* Ingest media */
-                ingestService.ingest(mp, workflowDefinition, workflowConfig);
-                logger.info("Ingested {} from inbox", artifact.getName());
-              }
-              in.close();
-            } catch (IOException e) {
-              logger.error("Error accessing inbox file '{}'", artifact.getName(), e);
-            } catch (Exception e) {
-              logger.error("Error ingesting inbox file '{}'", artifact.getName(), e);
-            } finally {
-              IOUtils.closeQuietly(in);
-            }
-            try {
-              FileUtils.forceDelete(artifact);
-            } catch (IOException e) {
-              logger.error("Unable to delete file {}", artifact.getAbsolutePath(), e);
-            }
-          }
-        });
+          /* Ingest media */
+          ingestService.ingest(mp, workflowDefinition, workflowConfig);
+          logger.info("Ingested {} from inbox", artifact.getName());
+        }
+      } catch (IOException e) {
+        logger.error("Error accessing inbox file '{}'", artifact.getName(), e);
+      } catch (Exception e) {
+        logger.error("Error ingesting inbox file '{}'", artifact.getName(), e);
       }
-    };
+      try {
+        FileUtils.forceDelete(artifact);
+      } catch (IOException e) {
+        logger.error("Unable to delete file {}", artifact.getAbsolutePath(), e);
+      }
+    });
   }
 
   /** Return true if the passed artifact can be handled by this ingestor, i.e. it lies in its inbox and its name does

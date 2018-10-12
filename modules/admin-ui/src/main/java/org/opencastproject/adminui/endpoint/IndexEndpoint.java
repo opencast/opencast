@@ -25,8 +25,6 @@ import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
-import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -99,17 +97,14 @@ public class IndexEndpoint {
   public Response clearIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
       securityService.getUser());
-    return securityContext.runInContext(new Function0<Response>() {
-      @Override
-      public Response apply() {
-        try {
-          logger.info("Clear the Admin UI index");
-          adminUISearchIndex.clear();
-          return R.ok();
-        } catch (Throwable t) {
-          logger.error("Clearing the Admin UI index failed", t);
-          return R.serverError();
-        }
+    return securityContext.runInContext(() -> {
+      try {
+        logger.info("Clear the Admin UI index");
+        adminUISearchIndex.clear();
+        return R.ok();
+      } catch (Throwable t) {
+        logger.error("Clearing the Admin UI index failed", t);
+        return R.serverError();
       }
     });
   }
@@ -128,28 +123,20 @@ public class IndexEndpoint {
   public Response recreateIndexFromService(@PathParam("service") final String service) {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
       securityService.getUser());
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              logger.info("Starting to repopulate the index from service {}", service);
-              adminUISearchIndex.recreateIndex(service);
-            } catch (InterruptedException e) {
-              logger.error("Repopulating the index was interrupted", e);
-            } catch (CancellationException e) {
-              logger.trace("Listening for index messages has been cancelled.");
-            } catch (ExecutionException e) {
-              logger.error("Repopulating the index failed to execute", e);
-            } catch (Throwable t) {
-              logger.error("Repopulating the index failed", t);
-            }
-          }
-        });
+    executor.execute(() -> securityContext.runInContext(() -> {
+      try {
+        logger.info("Starting to repopulate the index from service {}", service);
+        adminUISearchIndex.recreateIndex(service);
+      } catch (InterruptedException e) {
+        logger.error("Repopulating the index was interrupted", e);
+      } catch (CancellationException e) {
+        logger.trace("Listening for index messages has been cancelled.");
+      } catch (ExecutionException e) {
+        logger.error("Repopulating the index failed to execute", e);
+      } catch (Throwable t) {
+        logger.error("Repopulating the index failed", t);
       }
-    });
+    }));
     return R.ok();
   }
 
@@ -161,28 +148,20 @@ public class IndexEndpoint {
   public Response recreateIndex() {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    executor.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              logger.info("Starting to repopulate the index");
-              adminUISearchIndex.recreateIndex();
-            } catch (InterruptedException e) {
-              logger.error("Repopulating the index was interrupted", e);
-            } catch (CancellationException e) {
-              logger.trace("Listening for index messages has been cancelled.");
-            } catch (ExecutionException e) {
-              logger.error("Repopulating the index failed to execute", e);
-            } catch (Throwable t) {
-              logger.error("Repopulating the index failed", t);
-            }
-          }
-        });
+    executor.execute(() -> securityContext.runInContext(() -> {
+      try {
+        logger.info("Starting to repopulate the index");
+        adminUISearchIndex.recreateIndex();
+      } catch (InterruptedException e) {
+        logger.error("Repopulating the index was interrupted", e);
+      } catch (CancellationException e) {
+        logger.trace("Listening for index messages has been cancelled.");
+      } catch (ExecutionException e) {
+        logger.error("Repopulating the index failed to execute", e);
+      } catch (Throwable t) {
+        logger.error("Repopulating the index failed", t);
       }
-    });
+    }));
     return R.ok();
   }
 }

@@ -37,7 +37,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
@@ -152,33 +151,30 @@ public abstract class AbstractAclScheduler {
       for (final Organization org : parameters.getOrganizationDirectoryService().getOrganizations()) {
         // set the org on the current thread... this approach should be deprecated
         // todo check if after the heavy refactoring this is still necessary.
-        parameters.getAdminContextFor(org.getId()).runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            // create an ACL service for the org. This approach should be used in favour of thread bound orgs.
-            final AclService aclMan = parameters.getAclServiceFactory().serviceFor(org);
-            final Date now = new Date();
-            final TransitionQuery q = TransitionQuery.query().before(now).withDone(false);
-            try {
-              final TransitionResult r = aclMan.getTransitions(q);
-              final List<ACLTransition> transitions = Collections.<ACLTransition>concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
-              logger.debug("Found {} transition/s for organization {}", transitions.size(), org.getId());
-              for (final ACLTransition t : transitions) {
-                if (t instanceof EpisodeACLTransition) {
-                  final EpisodeACLTransition et = (EpisodeACLTransition) t;
-                  logger.info("Apply transition to episode {}", et.getEpisodeId());
-                  aclMan.applyEpisodeAclTransition(et);
-                } else if (t instanceof SeriesACLTransition) {
-                  final SeriesACLTransition st = (SeriesACLTransition) t;
-                  logger.info("Apply transition to series {}", st.getSeriesId());
-                  aclMan.applySeriesAclTransition(st);
-                } else {
-                  unexhaustiveMatch();
-                }
+        parameters.getAdminContextFor(org.getId()).runInContext(() -> {
+          // create an ACL service for the org. This approach should be used in favour of thread bound orgs.
+          final AclService aclMan = parameters.getAclServiceFactory().serviceFor(org);
+          final Date now = new Date();
+          final TransitionQuery q = TransitionQuery.query().before(now).withDone(false);
+          try {
+            final TransitionResult r = aclMan.getTransitions(q);
+            final List<ACLTransition> transitions = Collections.concat(r.getEpisodeTransistions(), r.getSeriesTransistions());
+            logger.debug("Found {} transition/s for organization {}", transitions.size(), org.getId());
+            for (final ACLTransition t : transitions) {
+              if (t instanceof EpisodeACLTransition) {
+                final EpisodeACLTransition et = (EpisodeACLTransition) t;
+                logger.info("Apply transition to episode {}", et.getEpisodeId());
+                aclMan.applyEpisodeAclTransition(et);
+              } else if (t instanceof SeriesACLTransition) {
+                final SeriesACLTransition st = (SeriesACLTransition) t;
+                logger.info("Apply transition to series {}", st.getSeriesId());
+                aclMan.applySeriesAclTransition(st);
+              } else {
+                unexhaustiveMatch();
               }
-            } catch (AclServiceException e) {
-              logger.error("Error executing runner", e);
             }
+          } catch (AclServiceException e) {
+            logger.error("Error executing runner", e);
           }
         });
       }

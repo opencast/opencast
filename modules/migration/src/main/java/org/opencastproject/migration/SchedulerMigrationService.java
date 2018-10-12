@@ -52,7 +52,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -167,25 +166,22 @@ public class SchedulerMigrationService {
     } catch (NotFoundException e) {
       throw new ConfigurationException(CFG_ORGANIZATION, String.format("Could not find organization '%s'", orgId), e);
     }
-    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
-      @Override
-      protected void run() {
-        // check if migration is needed
-        try {
-          int size = schedulerService.search(none(), none(), none(), none(), none()).size();
-          if (size > 0) {
-            logger.info("There are already '{}' existing scheduled events, skip scheduler migration!", size);
-            return;
-          }
-        } catch (UnauthorizedException | SchedulerException e) {
-          logger.error("Unable to read existing scheduled events, skip scheduler migration!", e);
+    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), () -> {
+      // check if migration is needed
+      try {
+        int size = schedulerService.search(none(), none(), none(), none(), none()).size();
+        if (size > 0) {
+          logger.info("There are already '{}' existing scheduled events, skip scheduler migration!", size);
+          return;
         }
+      } catch (UnauthorizedException | SchedulerException e) {
+        logger.error("Unable to read existing scheduled events, skip scheduler migration!", e);
+      }
 
-        try {
-          migrateScheduledEvents();
-        } catch (SQLException e) {
-          chuck(e);
-        }
+      try {
+        migrateScheduledEvents();
+      } catch (SQLException e) {
+        chuck(e);
       }
     });
     logger.info("Finished migrating scheduled events");

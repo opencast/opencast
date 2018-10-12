@@ -37,7 +37,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
@@ -413,29 +412,26 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
       for (String orgId : eventsWithComments.keySet()) {
         Organization organization = organizationDirectoryService.getOrganization(orgId);
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization),
-                new Effect0() {
-                  @Override
-                  protected void run() {
-                    for (String eventId : eventsWithComments.get(orgId)) {
-                      try {
-                        List<EventComment> comments = getComments(eventId);
-                        boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
-                        boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
-                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
+                () -> {
+                  for (String eventId : eventsWithComments.get(orgId)) {
+                    try {
+                      List<EventComment> comments = getComments(eventId);
+                      boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
+                      boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+                      messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                              CommentItem.update(eventId, !comments.isEmpty(), hasOpenComments, needsCutting));
 
-                        current[0] += comments.size();
-                        if (responseInterval == 1 || comments.size() > responseInterval || current[0] == total
-                                || current[0] % responseInterval < comments.size()) {
-                          messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
-                                  MessageSender.DestinationType.Queue, IndexRecreateObject
-                                          .update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
-                        }
-                      } catch (EventCommentDatabaseException e) {
-                        logger.error("Unable to retrieve event comments for organization {}", orgId, e);
-                      } catch (Throwable t) {
-                        logger.error("Unable to update comment on event {} for organization {}", eventId, orgId, t);
+                      current[0] += comments.size();
+                      if (responseInterval == 1 || comments.size() > responseInterval || current[0] == total
+                              || current[0] % responseInterval < comments.size()) {
+                        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE,
+                                MessageSender.DestinationType.Queue, IndexRecreateObject
+                                        .update(indexName, IndexRecreateObject.Service.Comments, total, current[0]));
                       }
+                    } catch (EventCommentDatabaseException e) {
+                      logger.error("Unable to retrieve event comments for organization {}", orgId, e);
+                    } catch (Throwable t) {
+                      logger.error("Unable to update comment on event {} for organization {}", eventId, orgId, t);
                     }
                   }
                 });
@@ -446,12 +442,9 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     }
 
     Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-      @Override
-      protected void run() {
-        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Comments));
-      }
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Comments));
     });
   }
 

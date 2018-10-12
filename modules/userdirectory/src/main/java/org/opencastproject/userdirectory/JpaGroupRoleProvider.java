@@ -57,7 +57,6 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -626,35 +625,29 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   public void repopulate(final String indexName) {
     final String destinationId = GroupItem.GROUP_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-        @Override
-        protected void run() {
-          final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
-          int total = groups.size();
-          final int responseInterval = (total < 100) ? 1 : (total / 100);
-          int current = 1;
-          logger.info(
-                  "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
-                  indexName, securityService.getOrganization().getId(), total);
-          for (JpaGroup group : groups) {
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    GroupItem.update(JaxbGroup.fromGroup(group)));
-            if (((current % responseInterval) == 0) || (current == total)) {
-              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
-            }
-            current++;
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+        final List<JpaGroup> groups = UserDirectoryPersistenceUtil.findGroups(organization.getId(), 0, 0, emf);
+        int total = groups.size();
+        final int responseInterval = (total < 100) ? 1 : (total / 100);
+        int current = 1;
+        logger.info(
+                "Re-populating index '{}' with groups of organization {}. There are {} group(s) to add to the index.",
+                indexName, securityService.getOrganization().getId(), total);
+        for (JpaGroup group : groups) {
+          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                  GroupItem.update(JaxbGroup.fromGroup(group)));
+          if (((current % responseInterval) == 0) || (current == total)) {
+            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Groups, total, current));
           }
+          current++;
         }
       });
     }
     Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-      @Override
-      protected void run() {
-        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
-      }
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Groups));
     });
   }
 

@@ -21,8 +21,6 @@
 
 package org.opencastproject.scheduler.impl;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.Organization;
@@ -32,7 +30,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.RequireUtil;
-import org.opencastproject.util.data.Effect0;
 
 import org.quartz.Job;
 import org.quartz.JobDetail;
@@ -166,14 +163,11 @@ public class TransactionCleaner {
     private void execute(final TransactionCleaner transactionCleaner) throws UnauthorizedException, SchedulerException {
       for (final Organization org : transactionCleaner.getOrgDirectoryService().getOrganizations()) {
         User user = SecurityUtil.createSystemUser(transactionCleaner.getSystemUserName(), org);
-        SecurityUtil.runAs(transactionCleaner.getSecurityService(), org, user, new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              transactionCleaner.getSchedulerService().cleanupTransactions();
-            } catch (UnauthorizedException | SchedulerException e) {
-              logger.error("Unable to cleanup transactions for organization {}: {}", org, getStackTrace(e));
-            }
+        SecurityUtil.runAs(transactionCleaner.getSecurityService(), org, user, () -> {
+          try {
+            transactionCleaner.getSchedulerService().cleanupTransactions();
+          } catch (UnauthorizedException | SchedulerException e) {
+            logger.error("Unable to cleanup transactions for organization {}", org, e);
           }
         });
       }

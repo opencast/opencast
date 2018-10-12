@@ -39,7 +39,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -136,33 +135,27 @@ public class OsgiAclServiceFactory extends AbstractIndexProducer implements AclS
   public void repopulate(final String indexName) {
     final String destinationId = AclItem.ACL_QUEUE_PREFIX + WordUtils.capitalize(indexName);
     for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-        @Override
-        protected void run() {
-          AclService aclService = serviceFor(organization);
-          List<ManagedAcl> acls = aclService.getAcls();
-          int total = aclService.getAcls().size();
-          logger.info("Re-populating index with acls. There are {} acls(s) to add to the index.", total);
-          int current = 1;
-          for (ManagedAcl acl : acls) {
-            logger.trace("Adding acl '{}' for org '{}'", acl.getName(), organization.getId());
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    AclItem.create(acl.getName()));
-            messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Acl, total, current));
-            current++;
-          }
+      SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+        AclService aclService = serviceFor(organization);
+        List<ManagedAcl> acls = aclService.getAcls();
+        int total = aclService.getAcls().size();
+        logger.info("Re-populating index with acls. There are {} acls(s) to add to the index.", total);
+        int current = 1;
+        for (ManagedAcl acl : acls) {
+          logger.trace("Adding acl '{}' for org '{}'", acl.getName(), organization.getId());
+          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                  AclItem.create(acl.getName()));
+          messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                  IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Acl, total, current));
+          current++;
         }
       });
     }
 
     Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), new Effect0() {
-      @Override
-      protected void run() {
-        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Acl));
-      }
+    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(cc, organization), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Acl));
     });
   }
 
