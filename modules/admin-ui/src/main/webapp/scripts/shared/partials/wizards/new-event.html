@@ -673,7 +673,7 @@
             <!-- Start date upload -->
             <tr ng-if="wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start">
               <td translate="EVENTS.EVENTS.NEW.SOURCE.DATE_TIME.START_DATE"><!-- Start Date --></td>
-              <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start.value | localizeDate:'dateTime' }}</td>
+              <td>{{ wizard.getStateControllerByName('source').getUserEntries()[wizard.getStateControllerByName('source').getUserEntries().type].metadata.start.value | localizeDate:'dateRaw' }}</td>
             </tr>
 
             <!-- Start date schedule -->
