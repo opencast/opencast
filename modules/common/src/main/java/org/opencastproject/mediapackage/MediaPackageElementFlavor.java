@@ -399,14 +399,13 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     if (subtype == null) {
       if (other.subtype != null && !isWildcard(other.subtype))
         return false;
-    } else if (!subtype.equals(other.subtype) && (!isWildcard(subtype) && !isWildcard(other.subtype)))
+    } else if (!subtype.equals(other.subtype) && !isWildcard(subtype) && !isWildcard(other.subtype))
       return false;
     if (type == null) {
-      if (other.type != null && !isWildcard(other.type))
-        return false;
-    } else if (!type.equals(other.type) && (!isWildcard(type) && !isWildcard(other.type)))
-      return false;
-    return true;
+      return other.type == null || isWildcard(other.type);
+    } else {
+      return type.equals(other.type) || isWildcard(type) || isWildcard(other.type);
+    }
   }
 
   @Override
