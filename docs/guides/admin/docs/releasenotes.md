@@ -115,6 +115,11 @@ following is a non-exhaustive list of known issues fixed by this release.
 |                  | CVE-2016-8739 |
 |                  | CVE-2016-6812 |
 
+Additional Notes about 3.7
+--------------------------
+
+Opencast 3.7 contains a small performance improvement, and a security fix for LTI, which was filed as MH-13156.
+
 
 Release Schedule
 ----------------

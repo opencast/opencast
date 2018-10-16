@@ -1,3 +1,16 @@
+Upgrading Opencast 3.x to 3.7
+=============================
+
+Opencast 3.7 introduces changes to the LTI authentication system to repair a vulnerability discovered in older 3.x versions.
+
+How to Upgrade
+--------------
+
+1. Create a backup of your security configuration xml files
+2. Reset the security config files back to their original values.
+3. Reconfigure the security settings as if you were installing for the first time
+
+
 Upgrading Opencast 2.3 To 3.0
 =============================
 
