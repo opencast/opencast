@@ -377,6 +377,11 @@ angular.module('adminNg.controllers')
             }
           });
 
+          $scope.setWorkflowDefinitions = function (workflowDefinitions) {
+            $scope.workflowDefinitions = workflowDefinitions;
+            $scope.workflowDefinitionIds = workflowDefinitions.map(function (w) {return w.id;});
+          };
+
           $scope.workflow = {};
           $scope.workflows = EventWorkflowsResource.get({ id: id }, function () {
             if (angular.isDefined($scope.workflows.workflow)) {
@@ -385,7 +390,7 @@ angular.module('adminNg.controllers')
               $scope.workflowDefinitionsObject = NewEventProcessingResource.get({
                 tags: 'schedule'
               }, function () {
-                $scope.workflowDefinitions = $scope.workflowDefinitionsObject.workflows;
+                $scope.setWorkflowDefinitions($scope.workflowDefinitionsObject.workflows);
                 $scope.changeWorkflow(true);
                 setWorkflowConfig();
               });
