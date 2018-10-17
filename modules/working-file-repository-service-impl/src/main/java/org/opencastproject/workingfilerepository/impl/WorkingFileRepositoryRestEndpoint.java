@@ -25,7 +25,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.MimeTypes.getMimeType;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.fileResponse;
@@ -35,8 +34,9 @@ import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -49,11 +49,6 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
-import org.apache.tika.metadata.HttpHeaders;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.BodyContentHandler;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
@@ -62,7 +57,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 
 import javax.servlet.http.HttpServletRequest;
@@ -90,9 +84,6 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
 
   private static final Logger logger = LoggerFactory.getLogger(WorkingFileRepositoryRestEndpoint.class);
 
-  /** The Apache Tika parser */
-  private Parser tikaParser;
-
   /**
    * Callback from OSGi that is called when this service is activated.
    *
@@ -102,15 +93,6 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
   @Override
   public void activate(ComponentContext cc) throws IOException {
     super.activate(cc);
-  }
-
-  /**
-   * Sets the Apache Tika parser.
-   *
-   * @param tikaParser
-   */
-  public void setTikaParser(Parser tikaParser) {
-    this.tikaParser = tikaParser;
   }
 
   @POST
@@ -259,38 +241,22 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       logger.warn("Error reading digest of {}/{}", mediaPackageElementID, mediaPackageElementID);
     }
     try {
-      return withFile(getFile(mediaPackageID, mediaPackageElementID), new Function2.X<InputStream, File, Response>() {
-        @Override
-        public Response xapply(InputStream in, File f) throws Exception {
-          return ok(get(mediaPackageID, mediaPackageElementID), extractContentType(in), some(f.length()), none(""));
-        }
-      }).orError(new NotFoundException()).get();
+      String contentType;
+      File file = getFile(mediaPackageID, mediaPackageElementID);
+      try {
+        contentType = MimeTypes.fromString(file.getPath()).toString();
+      } catch (UnknownFileTypeException e) {
+        contentType = "application/octet-stream";
+      }
+      try {
+        return ok(get(mediaPackageID, mediaPackageElementID), contentType, some(file.length()), none(""));
+      } catch (IOException e) {
+        throw new NotFoundException();
+      }
     } catch (IllegalStateException e) {
       logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
               mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-    }
-  }
-
-  /**
-   * Determines the content type of an input stream. This method reads part of the stream, so it is typically best to
-   * close the stream immediately after calling this method.
-   *
-   * @param in
-   *          the input stream
-   * @return the content type
-   */
-  protected String extractContentType(InputStream in) {
-    try {
-      // Find the content type, based on the stream content
-      BodyContentHandler contenthandler = new BodyContentHandler();
-      Metadata metadata = new Metadata();
-      ParseContext context = new ParseContext();
-      tikaParser.parse(in, contenthandler, metadata, context);
-      return metadata.get(HttpHeaders.CONTENT_TYPE);
-    } catch (Exception e) {
-      logger.warn("Unable to extract mimetype from input stream, ", e);
-      return MediaType.APPLICATION_OCTET_STREAM;
     }
   }
 
