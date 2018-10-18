@@ -38,7 +38,7 @@ public interface Attachment extends MediaPackageElement {
   Type TYPE = Type.Attachment;
 
   /** Element flavor definition */
-  MediaPackageElementFlavor FLAVOR = new MediaPackageElementFlavor("attachment", "(unkown)", "Unspecified attachment");
+  MediaPackageElementFlavor FLAVOR = new MediaPackageElementFlavor("attachment", "(unkown)");
 
   /**
    * Returns a map containing the properties for this media package element or an empty map if there are no properties.
