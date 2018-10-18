@@ -26,6 +26,7 @@ import static java.lang.String.format;
 import org.opencastproject.util.data.Function;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -221,11 +222,6 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     }
   };
 
-  /** Check if <code>type</code> is a {@link #WILDCARD wildcard}. */
-  public static boolean isWildcard(String type) {
-    return WILDCARD.equals(type);
-  }
-
   /**
    * JAXB adapter implementation.
    */
@@ -234,9 +230,8 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     public String marshal(MediaPackageElementFlavor flavor) throws Exception {
       if (flavor == null) {
         return null;
-      } else {
-        return flavor.toString();
       }
+      return flavor.toString();
     }
 
     @Override
@@ -245,18 +240,31 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     }
   }
 
+  /**
+   * Check if types match.
+   * Two types match if they are equal or if one of them is a {@link #WILDCARD wildcard}.
+   **/
+  private static boolean typeMatches(String a, String b) {
+    return a.equals(b) || WILDCARD.equals(a) || WILDCARD.equals(b);
+  }
+
+  /**
+   * Check if two flavors match.
+   * Two flavors match if both their type and subtype matches.
+   *
+   * @param other
+   *          Flavor to compare against
+   * @return  If the flavors match
+   */
   public boolean matches(MediaPackageElementFlavor other) {
-    return (other != null)
-      && (type.equals(other.type) || isWildcard(type) || isWildcard(other.type))
-      && (subtype.equals(other.subtype) || isWildcard(subtype) || isWildcard(other.subtype));
+    return other != null
+      && typeMatches(type, other.type)
+      && typeMatches(subtype, other.subtype);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = prime + subtype.hashCode();
-    result = prime * result + type.hashCode();
-    return result;
+    return Objects.hash(type, subtype);
   }
 
   @Override
