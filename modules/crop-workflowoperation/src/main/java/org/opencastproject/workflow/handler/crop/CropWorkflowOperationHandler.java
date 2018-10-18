@@ -33,6 +33,7 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdBuilder;
 import org.opencastproject.mediapackage.identifier.IdBuilderFactory;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -59,6 +60,8 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_ANALYSIS_TRACK_FLAVOR = "source-flavor";
+
+  private static final String PROP_TARGET_FLAVOR = "target-flavor";
 
   /** Name of the configuration key that specifies the flavor of the track to analyze */
   private static final String PROP_TARGET_TAGS = "target-tags";
@@ -87,6 +90,9 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
     String trackFlavor = StringUtils.trimToNull(operation.getConfiguration(PROP_ANALYSIS_TRACK_FLAVOR));
     List<String> targetTags = asList(operation.getConfiguration(PROP_TARGET_TAGS));
+    Option<MediaPackageElementFlavor> targetFlavor = getCfg(workflowInstance, PROP_TARGET_FLAVOR).map(
+            MediaPackageElementFlavor.parseFlavor
+    );
     List<Track> candidates = new ArrayList<>();
     if (trackFlavor != null) {
       candidates.addAll(Arrays.asList(mediaPackage.getTracks(MediaPackageElementFlavor.parseFlavor(trackFlavor))));
@@ -146,6 +152,10 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
 
       // Add target tags
       targetTags.forEach(croppedTrack::addTag);
+
+      for (MediaPackageElementFlavor flavor : targetFlavor) {
+        croppedTrack.setFlavor(flavor);
+      }
 
       // add new track to mediapackage
       mediaPackage.add(croppedTrack);

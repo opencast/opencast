@@ -50,11 +50,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Media analysis plugin that takes a video stream and removes black bars on each side
@@ -184,10 +187,16 @@ public class CropServiceImpl extends AbstractJobProducer implements CropService,
     logger.info("Starting cropping of {}", track);
 
     File croppedMedia = cropFFmpeg(mediaFile);
-
+    String fileName = UUID.randomUUID() + "-" + croppedMedia.getName();
+    URI croppedMediaUri;
+    try (FileInputStream fileStream = new FileInputStream(croppedMedia)) {
+      croppedMediaUri = workspace.putInCollection(COLLECTION_ID, fileName, fileStream);
+    } catch (IOException e) {
+      throw new CropException("Error putting output file in workspace collection", e);
+    }
     Track cropTrack = (Track) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .newElement(Track.TYPE, track.getFlavor());
-    cropTrack.setURI(croppedMedia.toURI());
+    cropTrack.setURI(croppedMediaUri);
 
     logger.info("Finished video cropping of {}", track.getURI());
     return cropTrack;
