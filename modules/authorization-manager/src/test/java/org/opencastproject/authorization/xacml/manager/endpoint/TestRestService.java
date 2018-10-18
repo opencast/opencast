@@ -165,8 +165,15 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
-    EasyMock.expect(authorizationService.setAcl((MediaPackage) EasyMock.anyObject(), (AclScope) EasyMock.anyObject(),
-            (AccessControlList) EasyMock.anyObject())).andReturn(Tuple.tuple(mediapackage, attachment));
+    try {
+      EasyMock.expect(authorizationService.setAcl(
+                EasyMock.anyObject(MediaPackage.class),
+                EasyMock.anyObject(AclScope.class),
+                EasyMock.anyObject(AccessControlList.class)))
+              .andReturn(Tuple.tuple(mediapackage, attachment));
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
     EasyMock.replay(authorizationService);
 
     return authorizationService;

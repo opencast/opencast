@@ -33,12 +33,10 @@ import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
@@ -312,18 +310,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
       for (MediaPackageElement elem : streamingElements) {
         streamingElementIds.add(elem.getIdentifier());
-      }
-
-      // Also distribute the security configuration
-      // -----
-      // This was removed in the meantime by a fix for MH-8515, but could now be used again.
-      // -----
-      Attachment[] securityAttachments = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY);
-      if (securityAttachments != null && securityAttachments.length > 0) {
-        for (Attachment a : securityAttachments) {
-          downloadElementIds.add(a.getIdentifier());
-          streamingElementIds.add(a.getIdentifier());
-        }
       }
 
       removePublicationElement(mediaPackage);

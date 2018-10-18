@@ -1353,23 +1353,26 @@ public class IndexServiceImpl implements IndexService {
         // Not updating the acl as the workflow might have already passed the point of distribution.
         throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
       case ARCHIVE:
-        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+        try {
+          mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+        } catch (MediaPackageException e) {
+          throw new IndexServiceException("Unable to update  acl", e);
+        }
         assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:
-        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
         try {
-          schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                  Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
-                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
-        } catch (SchedulerException e) {
+          mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.some(mediaPackage),
+                  Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+        } catch (SchedulerException | MediaPackageException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
         return acl;
       default:
         logger.error("Unknown event source '{}' unable to update ACL!", getEventSource(event));
         throw new IndexServiceException(
-                String.format("Unable to update the ACL as '{}' is an unknown event source.", getEventSource(event)));
+                String.format("Unable to update the ACL as '%s' is an unknown event source.", getEventSource(event)));
     }
   }
 
@@ -1767,7 +1770,7 @@ public class IndexServiceImpl implements IndexService {
               }
             }
           }
-        } catch (SeriesException e) {
+        } catch (SeriesException | MediaPackageException e) {
           throw new IllegalStateException("Unable to retrieve series ACL for series " + oldSeriesId, e);
         } catch (NotFoundException e) {
           logger.debug("There is no ACL set for the series {}", mp.getSeries());

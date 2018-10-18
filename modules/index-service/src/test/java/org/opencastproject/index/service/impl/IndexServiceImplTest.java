@@ -588,9 +588,13 @@ public class IndexServiceImplTest {
     // Setup Authorization Service
     Tuple<MediaPackage, Attachment> returnValue = new Tuple<>(mediapackage, null);
     AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
-    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue)
-            .anyTimes();
+    try {
+      EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+              EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class)))
+              .andReturn(returnValue).anyTimes();
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
     EasyMock.replay(authorizationService);
     return authorizationService;
   }

@@ -872,11 +872,6 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public boolean hasPolicy(MediaPackage mp) {
-      return false;
-    }
-
-    @Override
     public boolean hasPermission(MediaPackage mp, String action) {
       return false;
     }
