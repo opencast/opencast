@@ -68,14 +68,12 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   }
 
   /**
-   * Creates a new element type with the given type and subtype.
+   * Creates a new flavor with the given type and subtype.
    *
    * @param type
-   *          the major type
+   *          the type of the flavor
    * @param subtype
-   *          minor type
-   * @param description
-   *          an optional description
+   *          the subtype of the flavor
    */
   public MediaPackageElementFlavor(String type, String subtype) {
     this.type = checkPartSyntax(type);
@@ -115,24 +113,24 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
   }
 
   /**
-   * Returns the major type of this element type. Major types are more of a technical description.
-   * The major type is never null.
+   * Returns the type of this flavor.
+   * The type is never <code>null</code>.
    * <p>
-   * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
-   * this method will return <code>track</code>.
+   * For example, if the type is a presentation movie which is represented as <code>presentation/source</code>,
+   * this method will return <code>presentation</code>.
    *
-   * @return the type
+   * @return the type of this flavor
    */
   public String getType() {
     return type;
   }
 
   /**
-   * Returns the minor type of this element type. Minor types define the meaning.
-   * The minor type is never null.
+   * Returns the subtype of this flavor.
+   * The subtype is never <code>null</code>.
    * <p>
-   * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
-   * this method will return <code>presentation</code>.
+   * For example, if the subtype is a presentation movie which is represented as <code>presentation/source</code>,
+   * this method will return <code>source</code>.
    *
    * @return the subtype
    */
@@ -150,13 +148,13 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    * @return The resulting flavor.
    */
   public MediaPackageElementFlavor applyTo(MediaPackageElementFlavor target) {
-    String subtype = this.subtype;
     String type = this.type;
-    if ("*".equals(this.subtype)) {
-      subtype = target.getSubtype();
-    }
-    if ("*".equals(this.type)) {
+    String subtype = this.subtype;
+    if (WILDCARD.equals(this.type)) {
       type = target.getType();
+    }
+    if (WILDCARD.equals(this.subtype)) {
+      subtype = target.getSubtype();
     }
     return new MediaPackageElementFlavor(type, subtype);
   }
@@ -228,11 +226,6 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     return WILDCARD.equals(type);
   }
 
-  /** Check if type or subtype of <code>flavor</code> is a wildcard. */
-  public static boolean hasWildcard(MediaPackageElementFlavor flavor) {
-    return isWildcard(flavor.getType()) || isWildcard(flavor.getSubtype());
-  }
-
   /**
    * JAXB adapter implementation.
    */
@@ -248,31 +241,27 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
 
     @Override
     public MediaPackageElementFlavor unmarshal(String str) throws Exception {
-      MediaPackageElementFlavor f = parseFlavor(str);
-      return f;
+      return parseFlavor(str);
     }
   }
 
   public boolean matches(MediaPackageElementFlavor other) {
-    return (other != null) && matchParts(type, other.type) && matchParts(subtype, other.subtype);
-  }
-
-  private boolean matchParts(String part1, String part2) {
-    return part1.equals(part2) || isWildcard(part1) || isWildcard(part2);
+    return (other != null)
+      && (type.equals(other.type) || isWildcard(type) || isWildcard(other.type))
+      && (subtype.equals(other.subtype) || isWildcard(subtype) || isWildcard(other.subtype));
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
-    int result = 1;
-    result = prime * result + subtype.hashCode();
+    int result = prime + subtype.hashCode();
     result = prime * result + type.hashCode();
     return result;
   }
 
   @Override
   public boolean equals(Object other) {
-    return (other != null) && (other instanceof MediaPackageElementFlavor)
+    return (other instanceof MediaPackageElementFlavor)
       && type.equals(((MediaPackageElementFlavor) other).type)
       && subtype.equals(((MediaPackageElementFlavor) other).subtype);
   }
