@@ -902,7 +902,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "Instance des flux de travail"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Détails du workflow",
@@ -923,16 +923,16 @@
                   "TITLE": "Titre",
                   "STATE": "Statut",
                   "DESCRIPTION": "Description",
-                  "EXECUTION_HOST": "Execution Host",
-                  "JOB": "Job",
-                  "TIME_IN_QUEUE": "Time in Queue",
+                  "EXECUTION_HOST": "Hôte d'exécution",
+                  "JOB": "Tâche",
+                  "TIME_IN_QUEUE": "Temps d'attente",
                   "STARTED": "Démarré",
                   "FINISHED": "Terminé",
-                  "RETRY_STRATEGY": "Retry Strategy",
-                  "FAILED_ATTEMPTS": "Failed Attempts",
+                  "RETRY_STRATEGY": "Stratégie de réessaie",
+                  "FAILED_ATTEMPTS": "Tentatives échouées",
                   "MAX_ATTEMPTS": "Max",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "EXCEPTION_HANDLER_WORKFLOW": "Gestionnaire d'exceptions des flux de travail",
+                  "FAIL_ON_ERROR": "Échec en cas d'erreur"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1032,7 +1032,7 @@
          "TABLE": {
             "CAPTION": "Séries",
             "TITLE": "Séries",
-            "HAS_EVENTS": "Contains events",
+            "HAS_EVENTS": "Contient des événements",
             "CREATORS": "Organisateur(s)",
             "CONTRIBUTORS": "Contributeur(s)",
             "CREATED": "Création",
@@ -1251,7 +1251,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer utilisateur",
-            "EDITCAPTION": "User details - {{username}}",
+            "EDITCAPTION": "Détails de l'utilisateur - {{username}}",
             "TABS": {
                "USER": "Utilisateur",
                "ROLES": "Rôles",
@@ -1295,7 +1295,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer groupe",
-            "EDITCAPTION": "Group details - {{name}}",
+            "EDITCAPTION": "Détails du groupe - {{name}}",
             "TABS": {
                "GROUP": "Groupe",
                "ROLES": "Rôles",
@@ -1376,7 +1376,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Détails des droits d'accès  - {{name}}",
             "TABS": {
                "SUMMARY": "Résumé",
                "METADATA": "Métadonnées",
@@ -1559,7 +1559,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Créer un thème",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "Détails des thèmes - {{name}}",
             "GENERAL": {
                "CAPTION": "Général",
                "NAME": "Nom",
@@ -1661,11 +1661,11 @@
             "RUNNING": "Traitement en cours",
             "FINISHED": "Terminé",
             "FAILED": "Echoué",
-            "DELETED": "Deleted",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
+            "DELETED": "Supprimé",
+            "INSTANTIATED": "Instancié",
+            "DISPATCHING": "En cours expédition",
+            "RESTART": "Redémarrer",
+            "CANCELED": "Annulé",
             "WAITING": "En Attente"
          }
       },
@@ -1730,10 +1730,10 @@
       },
       "AREAS": {
          "METADATA": "Métadonnées",
-         "THUMBNAIL": "Thumbnail",
+         "THUMBNAIL": "Vignette",
          "COMMENTS": "Commentaires",
          "SEGMENTS": "Segments",
-         "TRACKS": "Tracks"
+         "TRACKS": "Pistes"
       },
       "ACTIONS": {
          "SPLIT": "Segmenter",
@@ -1750,71 +1750,71 @@
          "REMOVE_SEGMENT": "Enlever Segment",
          "USE_SEGMENT": "Utiliser ce Segment",
          "START": "Accueil",
-         "END": "End"
+         "END": "Fin"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "Une vignette par défaut est générée automatiquement et utilisée pour représenter visuellement l'événement. Si vous souhaitez utiliser une vignette différente, vous pouvez extraire une vignette de la vidéo à la position de lecture actuelle ou télécharger une image.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
-                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+                  "LABEL": "Extraire de la vidéo",
+                  "TOOLTIP": "Extraire la vignette de la vidéo à la position de lecture actuelle"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
-                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+                  "LABEL": "Extrait de la vidéo de gauche",
+                  "TOOLTIP": "Extraire la vignette de la vidéo de gauche à la position de lecture actuelle"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "LABEL": "Extraire de la vidéo de droite",
+                  "TOOLTIP": "Extraire la vignette de la vidéo de droite à la position de lecture actuelle"
                }
             },
             "UPLOAD": {
                "LABEL": "Envoyer une image",
-               "TOOLTIP": "Upload a thumbnail image"
+               "TOOLTIP": "Télécharger une vignette"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "LABEL": "Utiliser la vignette par défaut",
+               "TOOLTIP": "Utiliser la vignette par défaut générée automatiquement"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "NOT_AVAILABLE": "Aucun aperçu disponible",
+            "OUTDATED": "L'aperçu est obsolète car les segments ont été modifiés. Il sera mis à jour dès que vous enregistrez vos modifications."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Vous utilisez actuellement la vignette par défaut.",
+            "SNAPSHOT": "La vignette actuelle a été extraite de la vidéo.",
+            "UPLOAD": "Vous utilisez actuellement une vignette téléchargée."
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Vous pouvez désélectionner des pistes pour les exclure des traitement ultérieurs. Noter que vous devez (re) publier l'événement pour appliquer les modifications.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Vous devez activer au moins une piste vidéo",
+            "NO_AUDIO_TRACK_SELECTED": "Vous devez activer au moins une piste audio"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "Pistes"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "Piste vidéo",
+            "NOT_AVAILABLE": "Aucune piste vidéo disponible",
+            "NO_PREVIEW_AVAILABLE": "Aucune image d'aperçu trouvée",
+            "NO_TRACK_SELECTED": "Aucune piste vidéo sélectionnée",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Cette piste vidéo est actuellement activée. Cliquez pour désactiver",
+               "UNHIDE": "Cette piste vidéo est actuellement désactivée. Cliquez pour activer."
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
+            "HEADER": "Piste audio",
+            "NOT_AVAILABLE": "Aucune piste audio disponible",
+            "NO_PREVIEW_AVAILABLE": "Aucune image d'aperçu trouvée",
             "NO_TRACK_SELECTED": "Aucune piste audio sélectionnée",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Cette piste audio est actuellement activée. Cliquez pour désactiver",
+               "UNHIDE": "Cette piste audio est actuellement désactivée. Cliquez pour activer"
             }
          }
       },
@@ -1886,8 +1886,8 @@
          },
          "COMMENTS": {
             "LABEL": "Commentaires",
-            "NONE": "None",
-            "OPEN": "Open",
+            "NONE": "Aucun",
+            "OPEN": "Ouvert",
             "RESOLVED": "Résolu"
          },
          "CONTRIBUTORS": {
@@ -1897,7 +1897,7 @@
             "LABEL": "Auteur"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Editeur"
          },
          "HOSTNAME": {
             "LABEL": "Nom d'hôte"
@@ -2102,14 +2102,14 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "TITLE": "Raccourcis clavier",
+         "HINT": "Cette page répertorie les raccourcis clavier actuellement disponibles. Notez que ceux-ci peuvent changer en fonction de la page visitée."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Espace",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -2133,51 +2133,51 @@
       },
       "GROUPS": {
          "GENERAL": "Général",
-         "PLAYER": "Player",
+         "PLAYER": "Lecteur",
          "EDITOR": "Éditeur"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
-            "MAIN_MENU": "Main menu",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "MAIN_MENU": "Menu principal",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Sélectionner le prochain filtre du tableau de bord",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Sélectionner le filtre précédent du tableau de bord",
             "REMOVE_FILTERS": "Supprimer tous les filtres",
             "EVENT_VIEW": "Événements",
             "SERIES_VIEW": "Série",
             "NEW_EVENT": "Ajouter événement",
             "NEW_SERIES": "Ajouter série",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "Raccourcis clavier"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "Jouer/Pause",
             "PREVIOUS_FRAME": "Image précédente",
             "NEXT_FRAME": "Image suivante",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "STEP_BACKWARD": "Saut 10s en arrière",
+            "STEP_FORWARD": "Saut 10s en avant",
+            "PREVIOUS_SEGMENT": "Segment précédent / Aller au début",
+            "NEXT_SEGMENT": "Prochain segment / Aller à la fin",
+            "VOLUME_UP": "Augmenter le volume",
+            "VOLUME_DOWN": "Diminuer le volume",
+            "MUTE": "Sans son/Avec son"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Segmenter",
             "CUT_SELECTED_SEGMENT": "Couper",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT": "Jouer le segment en cours",
+            "CLEAR_LIST": "Effacer les segments",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Rejouer le segment avec pré-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin du segment"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Capture en cours",
          "ERROR": "Erreur",
-         "IDLE": "Idle",
+         "IDLE": "Inactif",
          "OFFLINE": "Hors-Ligne",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
+         "SHUTTING_DOWN": "Éteindre",
+         "UNKNOWN": "Inconnu",
          "UPLOADING": "Transfert"
       }
    }
