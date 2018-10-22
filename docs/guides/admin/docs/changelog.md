@@ -242,6 +242,18 @@ Opencast 4.0
 Opencast 3.x
 ============
 
+Opencast 3.7
+------------
+*Released on Oct 16, 2018*
+
+- [[MH-12982](https://opencast.jira.com/browse/MH-12982)] - 3.0 database upgrade error
+- [[MH-13022](https://opencast.jira.com/browse/MH-13022)] - Fix LTI highly trusted keys being discarded
+- [[MH-13034](https://opencast.jira.com/browse/MH-13034)] - Add lis_person_sourcedid back as LTI source field for the username
+- [[MH-13082](https://opencast.jira.com/browse/MH-13082)] - Fix LTI security vulnerability and refactor LTI and OAuth classes
+- [[MH-13152](https://opencast.jira.com/browse/MH-13152)] - Reduce Workflow Messages, backport of Lars fix for >=r/5.x
+- [[MH-13156](https://opencast.jira.com/browse/MH-13156)] - Set the auth scheme to digest for inter-server communication
+
+
 Opencast 3.6
 ------------
 *Released on May 31, 2018*
