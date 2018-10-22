@@ -26,10 +26,10 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.opencastproject.rest.RestServiceTestEnv.testEnvForCustomConfig;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForCustomConfig;
 
-import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.security.api.Permissions.Action;
+import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.UrlSupport;
 

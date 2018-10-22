@@ -31,7 +31,6 @@ import com.entwinemedia.fn.data.json.JValue;
 import org.apache.http.HttpStatus;
 import org.junit.Test;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 public class ApiResponsesTest {
@@ -41,7 +40,7 @@ public class ApiResponsesTest {
     Response response = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "body");
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals(new MediaType("application", "v1.0.0+json"), response.getMetadata().get("Content-Type").get(0));
+    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));
   }
 
   @Test
@@ -50,7 +49,7 @@ public class ApiResponsesTest {
     Response response = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, json);
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals(new MediaType("application", "v1.0.0+json"), response.getMetadata().get("Content-Type").get(0));
+    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));
   }
 
 }

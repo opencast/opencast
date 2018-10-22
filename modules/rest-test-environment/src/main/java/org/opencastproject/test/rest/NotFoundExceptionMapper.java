@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.rest;
+package org.opencastproject.test.rest;
 
 import org.opencastproject.util.NotFoundException;
 
