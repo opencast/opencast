@@ -51,6 +51,8 @@ public final class DeleteQueryContribution {
 
   final String name;
 
+  final boolean willRemoveWholeMediaPackage;
+
   private static final Fn<EntityPath<?>, BooleanExpression> NO_WHERE = new Fn<EntityPath<?>, BooleanExpression>() {
     @Override public BooleanExpression apply(EntityPath<?> entityPathBase) {
       return null;
@@ -67,6 +69,20 @@ public final class DeleteQueryContribution {
     this.where = where;
     this.targetPredicate = targetPredicate;
     this.name = name;
+    this.willRemoveWholeMediaPackage = false;
+  }
+
+  private DeleteQueryContribution(
+      Stream<EntityPath<?>> from,
+      Fn<EntityPath<?>, BooleanExpression> where,
+      Opt<BooleanExpression> targetPredicate,
+      String name,
+      boolean willRemoveWholeMediaPackage) {
+    this.from = from;
+    this.where = where;
+    this.targetPredicate = targetPredicate;
+    this.name = name;
+    this.willRemoveWholeMediaPackage = willRemoveWholeMediaPackage;
   }
 
   /**
@@ -110,6 +126,11 @@ public final class DeleteQueryContribution {
       }
     };
     return new DeleteQueryContribution(from, w, targetPredicate, name);
+  }
+
+
+  DeleteQueryContribution willRemoveWholeMediaPackage(final boolean willRemoveWholeMediaPackage) {
+    return new DeleteQueryContribution(from, where, targetPredicate, name, willRemoveWholeMediaPackage);
   }
 
   DeleteQueryContribution name(String name) {

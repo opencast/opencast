@@ -93,6 +93,16 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     };
   }
 
+  @Override public ADeleteQuery willRemoveWholeMediaPackage(boolean willRemoveWholeMediaPackage) {
+    return new AbstractADeleteQuery(am, owner) {
+      @Override
+      public DeleteQueryContribution contributeDelete(String owner) {
+        final DeleteQueryContribution cParent = AbstractADeleteQuery.this.contributeDelete(owner);
+        return DeleteQueryContribution.mk(cParent).willRemoveWholeMediaPackage(willRemoveWholeMediaPackage);
+      }
+    };
+  }
+
   public long run(DeleteSnapshotHandler deleteSnapshotHandler) {
     // run query and map the result to records
     final long startTime = System.nanoTime();
@@ -192,7 +202,9 @@ HAVING v = (SELECT count(*)
       am.getDb().logDelete(formatQueryName(c.name, "main"), qMain);
       final long deletedItems = qMain.execute();
       // delete orphaned properties
-      deleteOrphanedProperties();
+      if (!c.willRemoveWholeMediaPackage) {
+        deleteOrphanedProperties();
+      }
       // <BLOCK>
       // TODO Bad solution. Yields all media package IDs which can easily be thousands
       // TODO The above SQL solution does not work with H2 so I suspect the query is not 100% clean
@@ -220,7 +232,7 @@ HAVING v = (SELECT count(*)
       final BooleanExpression where;
       {
         final BooleanExpression w = c.where.apply(Q_PROPERTY);
-        if (w != null) {
+        if (w != null && !c.willRemoveWholeMediaPackage) {
           /* The original sub query used an "ON" clause to filter the join by mediapackage id [1].
              Unfortunately Eclipse link drops this clause completely when transforming the query
              into SQL. It creates a cross join instead of the inner join, which is perfectly legal
@@ -248,7 +260,7 @@ HAVING v = (SELECT count(*)
                           .distinct()
                           .list(Q_PROPERTY.mediaPackageId));
         } else {
-          where = null;
+          where = w;
         }
       }
       final JPADeleteClause qProperties = jpa.delete(from).where(Expressions.allOf(c.targetPredicate.orNull(), where));
