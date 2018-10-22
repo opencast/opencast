@@ -573,7 +573,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve opt out status for series '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not retrieve opt out status for series '{}'", seriesId, e);
       throw new SeriesServiceDatabaseException(e);
     } finally {
       if (em != null)

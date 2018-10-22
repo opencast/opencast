@@ -112,7 +112,6 @@ import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -291,7 +290,7 @@ public class SeriesEndpoint implements ManagedService {
       seriesAccessJson.put("transitions", transitionsJson);
       seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
-      logger.error("Unable to get ACL from series {}: {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get ACL from series {}", seriesId, e);
       return RestUtil.R.serverError();
     }
 
@@ -358,14 +357,13 @@ public class SeriesEndpoint implements ManagedService {
     try {
       seriesIdsArray = (JSONArray) parser.parse(seriesIds);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse series ids {} : {}", seriesIds, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse series ids {} ", seriesIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (NullPointerException e) {
       logger.warn("Unable to parse series ids because it was null {}", seriesIds);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.warn("Unable to parse series ids because it was the wrong class {} : {}", seriesIds,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse series ids because it was the wrong class {}", seriesIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -377,8 +375,7 @@ public class SeriesEndpoint implements ManagedService {
       } catch (NotFoundException e) {
         result.addNotFound(seriesId.toString());
       } catch (Exception e) {
-        logger.error("Could not update opt out status of series {}: {}", seriesId.toString(),
-                ExceptionUtils.getStackTrace(e));
+        logger.error("Could not update opt out status of series {}", seriesId.toString(), e);
         result.addServerError(seriesId.toString());
       }
     }
@@ -547,7 +544,7 @@ public class SeriesEndpoint implements ManagedService {
     try {
       results = searchIndex.getByQuery(query);
     } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the themes: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("The admin UI Search Index was not able to get the themes", e);
       return RestUtil.R.serverError();
     }
 
@@ -594,7 +591,7 @@ public class SeriesEndpoint implements ManagedService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to delete the series '{}' due to: {}", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to delete the series '{}' due to", id, e);
       return Response.serverError().build();
     }
   }
@@ -615,10 +612,10 @@ public class SeriesEndpoint implements ManagedService {
     try {
       seriesIdsArray = (JSONArray) parser.parse(seriesIdsContent);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.error("Unable to parse '{}' because: {}", seriesIdsContent, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to parse '{}'", seriesIdsContent, e);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}' to a JSON array because: {}", seriesIdsContent, ExceptionUtils.getMessage(e));
+      logger.error("Unable to cast '{}' to a JSON array", seriesIdsContent, e);
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -630,7 +627,7 @@ public class SeriesEndpoint implements ManagedService {
       } catch (NotFoundException e) {
         result.addNotFound(seriesId.toString());
       } catch (Exception e) {
-        logger.error("Unable to remove the series '{}': {}", seriesId.toString(), ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to remove the series '{}'", seriesId.toString(), e);
         result.addServerError(seriesId.toString());
       }
     }
@@ -774,7 +771,7 @@ public class SeriesEndpoint implements ManagedService {
 
       return okJsonList(series, offset, limit, result.getHitCount());
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -871,7 +868,7 @@ public class SeriesEndpoint implements ManagedService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
     }
     throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
@@ -905,8 +902,7 @@ public class SeriesEndpoint implements ManagedService {
     } catch (NotFoundException e) {
       return Response.status(NOT_FOUND).build();
     } catch (SeriesException e) {
-      logger.warn("Could not update series property for series {} property {}:{} : {}", seriesId, name,
-              value, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not update series property for series {} property {}:{}", seriesId, name, value, e);
     }
     throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
@@ -932,13 +928,10 @@ public class SeriesEndpoint implements ManagedService {
     try {
       seriesService.deleteSeriesProperty(seriesId, propertyName);
       return Response.status(NO_CONTENT).build();
-    } catch (UnauthorizedException e) {
-      throw e;
-    } catch (NotFoundException e) {
+    } catch (UnauthorizedException | NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not delete series '{}' property '{}' query: {}", seriesId, propertyName,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not delete series '{}' property '{}' query", seriesId, propertyName, e);
     }
     throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
   }
@@ -969,7 +962,7 @@ public class SeriesEndpoint implements ManagedService {
 
       themeId = series.get().getTheme();
     } catch (SearchIndexException e) {
-      logger.error("Unable to get series {}: {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get series {}", seriesId, e);
       throw new WebApplicationException(e);
     }
 
@@ -984,7 +977,7 @@ public class SeriesEndpoint implements ManagedService {
 
       return getSimpleThemeJsonResponse(themeOpt.get());
     } catch (SearchIndexException e) {
-      logger.error("Unable to get theme {}: {}", themeId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get theme {}", themeId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1005,10 +998,10 @@ public class SeriesEndpoint implements ManagedService {
       seriesService.updateSeriesProperty(seriesID, THEME_KEY, Long.toString(themeId));
       return getSimpleThemeJsonResponse(themeOpt.get());
     } catch (SeriesException e) {
-      logger.error("Unable to update series theme {}: {}", themeId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update series theme {}", themeId, e);
       throw new WebApplicationException(e);
     } catch (SearchIndexException e) {
-      logger.error("Unable to get theme {}: {}", themeId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get theme {}", themeId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1025,7 +1018,7 @@ public class SeriesEndpoint implements ManagedService {
       seriesService.deleteSeriesProperty(seriesID, THEME_KEY);
       return Response.noContent().build();
     } catch (SeriesException e) {
-      logger.error("Unable to remove theme from series {}: {}", seriesID, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to remove theme from series {}", seriesID, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1093,7 +1086,7 @@ public class SeriesEndpoint implements ManagedService {
       events = searchIndex.getByQuery(query);
       elementsCount += events.getHitCount();
     } catch (SearchIndexException e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
 

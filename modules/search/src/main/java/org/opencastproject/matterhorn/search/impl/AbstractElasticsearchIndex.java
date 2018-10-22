@@ -34,7 +34,6 @@ import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
@@ -184,7 +183,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     try {
       createIndex(index);
     } catch (SearchIndexException e) {
-      logger.error("Unable to re-create the index after a clear: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to re-create the index after a clear", e);
     }
   }
 

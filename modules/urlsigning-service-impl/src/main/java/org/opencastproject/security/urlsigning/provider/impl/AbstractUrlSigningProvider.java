@@ -242,7 +242,7 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
       return ((keyEntry != null) && (StringUtils.equals(keyEntry.getOrganization(), ANY_ORGANIZATION)
               || StringUtils.equals(keyEntry.getOrganization(), orgId)));
     } catch (URISyntaxException e) {
-      getLogger().debug("Unable to support url {} because: {}", baseUrl, ExceptionUtils.getStackTrace(e));
+      getLogger().debug("Unable to support url {} because", baseUrl, e);
       return false;
     }
   }

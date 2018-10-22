@@ -23,7 +23,6 @@ package org.opencastproject.migration;
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.data.Opt.none;
-import static java.lang.String.format;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -60,7 +59,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.osgi.service.cm.ConfigurationException;
@@ -217,15 +215,13 @@ public class SchedulerMigrationService {
       }
       logger.info("Scheduler transaction | end");
     } catch (Exception e) {
-      final String stackTrace = ExceptionUtils.getStackTrace(e);
-      logger.error(format("Scheduler transaction | error\n%s", stackTrace));
+      logger.error("Scheduler transaction | error", e);
       if (tx != null) {
         logger.error("Scheduler transaction | rollback transaction");
         try {
           tx.rollback();
         } catch (Exception e2) {
-          final String stackTrace2 = ExceptionUtils.getStackTrace(e2);
-          logger.error(format("Scheduler transaction | error doing rollback\n%s", stackTrace2));
+          logger.error("Scheduler transaction | error doing rollback", e2);
         }
       }
     } finally {

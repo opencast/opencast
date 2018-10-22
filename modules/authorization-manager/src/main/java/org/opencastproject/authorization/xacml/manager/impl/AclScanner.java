@@ -36,7 +36,6 @@ import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -215,7 +214,7 @@ public class AclScanner implements ArtifactInstaller {
         } catch (NotFoundException e) {
           logger.warn("Unable to delete managec acl {}: Managed acl already deleted!", id);
         } catch (AclServiceException e) {
-          logger.error("Unable to delete managed acl {}: {}", id, ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to delete managed acl {}", id, e);
         }
       } else {
         logger.debug("No Acl found with the id {}.", id);

@@ -35,7 +35,6 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.StreamOp;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +77,7 @@ public class ExternalApiRoleProvider implements RoleProvider {
       in = getClass().getResourceAsStream(rolesFile);
       roles = new TreeSet<>(IOUtils.readLines(in, "UTF-8"));
     } catch (IOException e) {
-      logger.error("Unable to read available roles: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to read available roles", e);
     } finally {
       IOUtils.closeQuietly(in);
     }

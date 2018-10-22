@@ -243,7 +243,7 @@ public class WowzaAdaptiveStreamingDistributionService extends AbstractDistribut
                 DEFAULT_STREAMING_SCHEME, DEFAULT_STREAMING_URL);
         logger.info("Streaming URL set to \"{}\"", streamingUri);
       } catch (URISyntaxException e) {
-        logger.warn("Streaming URL {} could not be parsed: {}", readStreamingUrl, ExceptionUtils.getStackTrace(e));
+        logger.warn("Streaming URL {} could not be parsed", readStreamingUrl, e);
       }
 
       try {

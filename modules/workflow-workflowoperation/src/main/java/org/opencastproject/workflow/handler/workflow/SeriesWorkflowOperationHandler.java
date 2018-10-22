@@ -280,7 +280,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
         // setting the URI to a new source so the checksum will most like be invalid
         episodeCatalog.setChecksum(null);
       } catch (Exception e) {
-        logger.error("Unable to update episode catalog isPartOf field: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to update episode catalog isPartOf field", e);
         throw new WorkflowOperationException(e);
       }
     }
@@ -342,7 +342,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
         if (acl != null)
           authorizationService.setAcl(mediaPackage, AclScope.Series, acl);
       } catch (Exception e) {
-        logger.error("Unable to update series ACL: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to update series ACL", e);
         throw new WorkflowOperationException(e);
       }
     }

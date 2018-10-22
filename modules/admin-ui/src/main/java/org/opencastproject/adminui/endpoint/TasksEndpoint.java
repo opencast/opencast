@@ -54,7 +54,6 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +134,7 @@ public class TasksEndpoint {
         }
       }
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get available workflow definitions: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get available workflow definitions", e);
       return RestUtil.R.serverError();
     }
 
@@ -175,7 +174,7 @@ public class TasksEndpoint {
     try {
       wfd = workflowService.getWorkflowDefinitionById(workflowId);
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflow definition {}: {}", workflowId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get workflow definition {}", workflowId, e);
       return RestUtil.R.serverError();
     }
 

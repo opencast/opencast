@@ -29,7 +29,6 @@ import org.opencastproject.message.broker.api.theme.SerializableTheme;
 import org.opencastproject.message.broker.api.theme.ThemeItem;
 import org.opencastproject.security.api.User;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,8 +76,7 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
           theme.setWatermarkPosition(serializableTheme.getWatermarkPosition());
           getSearchIndex().addOrUpdate(theme);
         } catch (SearchIndexException e) {
-          logger.error("Error storing the theme {} to the search index: {}", serializableTheme.getId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error storing the theme {} to the search index", serializableTheme.getId(), e);
           return;
         }
         break;
@@ -91,8 +89,7 @@ public class ThemeMessageReceiverImpl extends BaseMessageReceiverImpl<ThemeItem>
           logger.debug("Theme {} removed from {} search index", themeItem.getThemeId(),
                   getSearchIndex().getIndexName());
         } catch (SearchIndexException e) {
-          logger.error("Error deleting the group {} from the search index: {}", themeItem.getThemeId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error deleting the group {} from the search index", themeItem.getThemeId(), e);
           return;
         }
         return;

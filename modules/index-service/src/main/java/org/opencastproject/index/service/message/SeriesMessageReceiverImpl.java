@@ -37,7 +37,6 @@ import org.opencastproject.util.data.Option;
 import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +75,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           series.setCreator(getSecurityService().getUser().getName());
           SeriesIndexUtils.updateSeries(series, dc);
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index: {}", seriesId,
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving series {} from the search index", seriesId, e);
           return;
         }
 
@@ -86,8 +84,8 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           SeriesIndexUtils.updateEventSeriesTitles(series, organization, getSecurityService().getUser(),
                   getSearchIndex());
         } catch (SearchIndexException e) {
-          logger.error("Error updating the series name of series {} from the associated events: {}",
-                  series.getIdentifier(), ExceptionUtils.getStackTrace(e));
+          logger.error("Error updating the series name of series {} from the associated events",
+                  series.getIdentifier(), e);
         }
 
         // Persist the series
@@ -107,8 +105,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
 
           series.setAccessPolicy(AccessControlParser.toJsonSilent(seriesItem.getAcl()));
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index: {}", seriesItem.getSeriesId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
           return;
         }
 
@@ -123,8 +120,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           series = SeriesIndexUtils.getOrCreate(seriesItem.getSeriesId(), organization, user, getSearchIndex());
           series.setOptOut(seriesItem.getOptOut());
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index: {}", seriesItem.getSeriesId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
           return;
         }
 
@@ -142,8 +138,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           series = SeriesIndexUtils.getOrCreate(seriesItem.getSeriesId(), organization, user, getSearchIndex());
           series.setTheme(Opt.nul(seriesItem.getPropertyValue()).bind(Strings.toLong).orNull());
         } catch (SearchIndexException e) {
-          logger.error("Error retrieving series {} from the search index: {}", seriesItem.getSeriesId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error retrieving series {} from the search index", seriesItem.getSeriesId(), e);
           return;
         }
 
@@ -158,8 +153,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
           getSearchIndex().delete(Series.DOCUMENT_TYPE, seriesItem.getSeriesId().concat(organization));
           logger.debug("Series {} removed from search index", seriesItem.getSeriesId());
         } catch (SearchIndexException e) {
-          logger.error("Error deleting the series {} from the search index: {}", seriesItem.getSeriesId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error deleting the series {} from the search index", seriesItem.getSeriesId(), e);
           return;
         }
         return;
@@ -176,7 +170,7 @@ public class SeriesMessageReceiverImpl extends BaseMessageReceiverImpl<SeriesIte
       getSearchIndex().addOrUpdate(series);
       logger.debug("Series {} updated in the search index", seriesId);
     } catch (SearchIndexException e) {
-      logger.error("Error storing the series {} to the search index: {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error storing the series {} to the search index", seriesId, e);
     }
   }
 

@@ -42,7 +42,6 @@ import com.google.common.util.concurrent.Service.State;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
@@ -164,7 +163,7 @@ public class StaticFileServiceImpl implements StaticFileService {
       Files.createDirectories(file.getParent());
       Files.copy(progressInputStream, file);
     } catch (IOException e) {
-      logger.error("Unable to save file '{}' to {} because: {}", filename, file, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to save file '{}' to {}", filename, file, e);
       throw e;
     }
 

@@ -166,7 +166,7 @@ public class StaticFileRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Unable to retrieve file with uuid {} because: {}", uuid, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to retrieve file with uuid {}", uuid, e);
       return Response.serverError().build();
     }
   }
@@ -239,7 +239,7 @@ public class StaticFileRestService {
     } catch (WebApplicationException e) {
       return e.getResponse();
     } catch (Exception e) {
-      logger.error("Unable to store file because: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to store file", e);
       return Response.serverError().build();
     } finally {
       IOUtils.closeQuietly(inputStream);
@@ -273,7 +273,7 @@ public class StaticFileRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to retrieve static file URL from {} because: {}", uuid, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to retrieve static file URL from {}", uuid, e);
       return Response.serverError().build();
     }
   }
@@ -290,7 +290,7 @@ public class StaticFileRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to delete static file {} because: {}", uuid, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to delete static file {}", uuid, e);
       return Response.serverError().build();
     }
   }

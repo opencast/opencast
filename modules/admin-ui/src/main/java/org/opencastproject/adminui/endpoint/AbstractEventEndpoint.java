@@ -158,7 +158,6 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -421,10 +420,10 @@ public abstract class AbstractEventEndpoint {
     try {
       eventIdsJsonArray = (JSONArray) parser.parse(eventIdsContent);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.error("Unable to parse '{}' because: {}", eventIdsContent, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to parse '{}'", eventIdsContent, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}' because: {}", eventIdsContent, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to cast '{}'", eventIdsContent, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -539,14 +538,14 @@ public abstract class AbstractEventEndpoint {
         fields.add(technicalMetadataToJson.apply(getSchedulerService().getTechnicalMetadata(eventId)));
       } catch (final NotFoundException e) {
         if (!ignoreNonScheduled) {
-          logger.warn("Unable to find id {}", eventId, ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to find id {}", eventId, e);
           return notFound("Cannot find an event with id '%s'.", eventId);
         }
       } catch (final UnauthorizedException e) {
-        logger.warn("Unauthorized access to event ID {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.warn("Unauthorized access to event ID {}", eventId, e);
         return Response.status(Status.BAD_REQUEST).build();
       } catch (final SchedulerException e) {
-        logger.warn("Scheduler exception accessing event ID {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.warn("Scheduler exception accessing event ID {}", eventId, e);
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
@@ -576,8 +575,7 @@ public abstract class AbstractEventEndpoint {
     } catch (ParseException e) {
       return RestUtil.R.badRequest("The UTC dates in the scheduling object is not valid");
     } catch (SchedulerException e) {
-      logger.error("Unable to update scheduling technical metadata of event {}: {}", eventId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update scheduling technical metadata of event {}", eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
       return RestUtil.R.badRequest(e.getMessage());
@@ -673,7 +671,7 @@ public abstract class AbstractEventEndpoint {
       return Response.ok(org.opencastproject.util.Jsons.arr(commentArr).toJson(), MediaType.APPLICATION_JSON_TYPE)
               .build();
     } catch (EventCommentException e) {
-      logger.error("Unable to get comments from event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get comments from event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -721,7 +719,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve comment {}: {}", commentId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not retrieve comment {}", commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -772,7 +770,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to update the comments catalog on event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update the comments catalog on event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -829,11 +827,10 @@ public abstract class AbstractEventEndpoint {
         return ok();
       }
     } catch (AclServiceException e) {
-      logger.error("Error applying acl '{}' to event '{}' because: {}",
-              accessControlList, eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error applying acl '{}' to event '{}'", accessControlList, eventId, e);
       return serverError();
     } catch (SchedulerException e) {
-      logger.error("Error applying ACL to scheduled event {} because {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error applying ACL to scheduled event {}", eventId, e);
       return serverError();
     }
   }
@@ -868,7 +865,7 @@ public abstract class AbstractEventEndpoint {
       return Response.created(getCommentUrl(eventId, createdComment.getId().get()))
               .entity(createdComment.toJson().toJson()).build();
     } catch (Exception e) {
-      logger.error("Unable to create a comment on the event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to create a comment on the event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -899,7 +896,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not resolve comment {}: {}", commentId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not resolve comment {}", commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -926,8 +923,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to delete comment {} on event {}: {}",
-              commentId, eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to delete comment {} on event {}", commentId, eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -969,8 +965,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not remove event comment reply {} from comment {}: {}",
-              replyId, commentId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not remove event comment reply {} from comment {}", replyId, commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1020,8 +1015,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not update event comment reply {} from comment {}: {}",
-              replyId, commentId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not update event comment reply {} from comment {}", replyId, commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1068,7 +1062,7 @@ public abstract class AbstractEventEndpoint {
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
       return Response.ok(updatedComment.toJson().toJson()).build();
     } catch (Exception e) {
-      logger.warn("Could not create event comment reply on comment {}: {}", comment, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not create event comment reply on comment {}", comment, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1764,9 +1758,8 @@ public abstract class AbstractEventEndpoint {
         transitionsJson.add(AccessInformationUtil.serializeEpisodeACLTransition(trans));
       }
     } catch (AclServiceException e) {
-      logger.error(
-              "There was an error while trying to get the ACL transitions for series '{}' from the ACL service: {}",
-              eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("There was an error while trying to get the ACL transitions for series '{}' from the ACL service",
+        eventId, e);
       return RestUtil.R.serverError();
     }
 
@@ -1775,7 +1768,7 @@ public abstract class AbstractEventEndpoint {
       if (optEvent.get().getAccessPolicy() != null)
         activeAcl = AccessControlParser.parseAcl(optEvent.get().getAccessPolicy());
     } catch (Exception e) {
-      logger.error("Unable to parse access policy because: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to parse access policy", e);
     }
     Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, activeAcl);
 
@@ -1880,15 +1873,11 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (JSONException e) {
       return RestUtil.R.badRequest("The transition object is not valid");
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException | ParseException e) {
       // That should never happen
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (AclServiceException e) {
-      logger.error("Unable to update transtion {} of event {}: {}",
-              transitionId, eventId, ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (ParseException e) {
-      // That should never happen
+      logger.error("Unable to update transition {} of event {}", transitionId, eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -1959,14 +1948,13 @@ public abstract class AbstractEventEndpoint {
     try {
       eventIdsArray = (JSONArray) parser.parse(eventIds);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse event ids {} : {}", eventIds, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse event ids {} ", eventIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (NullPointerException e) {
       logger.warn("Unable to parse event ids because it was null {}", eventIds);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.warn("Unable to parse event ids because it was the wrong class {} : {}", eventIds,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse event ids because it was the wrong class {}", eventIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -1981,7 +1969,7 @@ public abstract class AbstractEventEndpoint {
       } catch (NotFoundException e) {
         result.addNotFound(eventId);
       } catch (Exception e) {
-        logger.error("Could not update opt out status of event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.error("Could not update opt out status of event {}", eventId, e);
         result.addServerError(eventId);
       }
     }
@@ -2005,8 +1993,7 @@ public abstract class AbstractEventEndpoint {
       getAclService().deleteEpisodeTransition(transitionId);
       return Response.noContent().build();
     } catch (AclServiceException e) {
-      logger.error("Error while trying to delete transition '{}' from event '{}': {}",
-              transitionId, eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error while trying to delete transition '{}' from event '{}'", transitionId, eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -2079,7 +2066,7 @@ public abstract class AbstractEventEndpoint {
         }
       }
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get available workflow definitions: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get available workflow definitions", e);
       return RestUtil.R.serverError();
     }
 
@@ -2190,8 +2177,8 @@ public abstract class AbstractEventEndpoint {
       }
       return Response.noContent().build();
     } catch (Exception e) {
-      logger.error("Unable to find conflicting events for {}, {}, {}: {}",
-              device, startDate, endDate, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find conflicting events for {}, {}, {}",
+              device, startDate, endDate, e);
       return RestUtil.R.serverError();
     }
   }
@@ -2562,7 +2549,7 @@ public abstract class AbstractEventEndpoint {
         }
         return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, clientIP));
       } catch (UrlSigningException e) {
-        logger.warn("Unable to sign url '{}': {}", url, ExceptionUtils.getStackTrace(e));
+        logger.warn("Unable to sign url '{}'", url, e);
       }
     }
     return url;

@@ -40,7 +40,6 @@ import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.lang3.CharUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -184,7 +183,7 @@ public class EmailSchedulerConflictNotifier implements ConflictNotifier, Managed
       smptService.send(message);
       logger.info("E-mail scheduler conflict notification sent to {}", recipient);
     } catch (MessagingException e) {
-      logger.error("Unable to send email scheduler conflict notification: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to send email scheduler conflict notification", e);
     }
   }
 

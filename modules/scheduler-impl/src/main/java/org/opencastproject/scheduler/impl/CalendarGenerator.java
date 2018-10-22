@@ -50,7 +50,6 @@ import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,7 +198,7 @@ public class CalendarGenerator {
       event.getProperties().add(agentsAttachment);
 
     } catch (Exception e) {
-      logger.error("Unable to add event '{}' to recording calendar: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to add event '{}' to recording calendar", eventId, e);
       return false;
     }
 
@@ -235,7 +234,7 @@ public class CalendarGenerator {
         seriesDC = seriesService.getSeries(seriesID);
         series.put(seriesID, seriesDC);
       } catch (SeriesException e) {
-        logger.error("Error loading DublinCoreCatalog for series '{}': {}", seriesID, ExceptionUtils.getStackTrace(e));
+        logger.error("Error loading DublinCoreCatalog for series '{}'", seriesID, e);
         return null;
       }
     }
@@ -243,7 +242,7 @@ public class CalendarGenerator {
     try {
       return seriesDC.toXmlString();
     } catch (IOException e) {
-      logger.error("Error serializing DublinCoreCatalog of series '{}': {}", seriesID, ExceptionUtils.getStackTrace(e));
+      logger.error("Error serializing DublinCoreCatalog of series '{}'", seriesID, e);
       return null;
     }
   }

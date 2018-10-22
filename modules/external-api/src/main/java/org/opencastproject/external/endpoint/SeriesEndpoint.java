@@ -29,7 +29,6 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -87,7 +86,6 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -332,7 +330,7 @@ public class SeriesEndpoint {
         }
       }).toList()));
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -598,10 +596,9 @@ public class SeriesEndpoint {
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
     } catch (ParseException e) {
-      logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}' because: {}",
-              id, type, metadataJSON, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
-              metadataJSON, ExceptionUtils.getStackTrace(e)));
+              metadataJSON, e.getMessage()));
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     }
@@ -766,7 +763,7 @@ public class SeriesEndpoint {
     } catch (NotFoundException e) {
       return ApiResponses.notFound("Cannot find a series with id '%s'.", id);
     } catch (Exception e) {
-      logger.error("Unable to delete the series '{}' due to: {}", id, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to delete the series '{}' due to", id, e);
       return Response.serverError().build();
     }
   }
@@ -786,12 +783,10 @@ public class SeriesEndpoint {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, externalIndex);
       return ApiResponses.Json.ok(acceptHeader, metadataList.toJSON());
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to update series '{}' with metadata '{}' because: {}",
-              seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
-      logger.error("Unable to update series '{}' with metadata '{}' because: {}",
-              seriesID, metadataJSON, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.serverError();
     }
   }
@@ -818,14 +813,13 @@ public class SeriesEndpoint {
     try {
       metadataList = deserializeMetadataList(metadataParam);
     } catch (ParseException e) {
-      logger.debug("Unable to parse series metadata '{}' because: {}", metadataParam, ExceptionUtils.getStackTrace(e));
-      return R.badRequest(String.format("Unable to parse metadata because '%s'", e.toString()));
+      logger.debug("Unable to parse series metadata '{}'", metadataParam, e);
+      return R.badRequest(String.format("Unable to parse metadata because '%s'", e.getMessage()));
     } catch (NotFoundException e) {
       // One of the metadata fields could not be found in the catalogs or one of the catalogs cannot be found.
       return R.badRequest(e.getMessage());
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to create series with metadata '{}' because: {}", metadataParam,
-              ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to create series with metadata '{}'", metadataParam, e);
       return R.badRequest(e.getMessage());
     }
     Map<String, String> options = new TreeMap<>();
@@ -842,11 +836,10 @@ public class SeriesEndpoint {
     try {
       acl = AclUtils.deserializeJsonToAcl(aclParam, false);
     } catch (ParseException e) {
-      logger.debug("Unable to parse acl '{}' because: '{}'", aclParam, ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to parse acl '{}'", aclParam, e);
       return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", aclParam, e.getMessage()));
     } catch (IllegalArgumentException e) {
-      logger.debug("Unable to create new series with acl '{}' because: '{}'", aclParam,
-              ExceptionUtils.getStackTrace(e));
+      logger.debug("Unable to create new series with acl '{}'", aclParam, e);
       return R.badRequest(e.getMessage());
     }
 
@@ -855,8 +848,8 @@ public class SeriesEndpoint {
       return ApiResponses.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)),
                                        obj(f("identifier", v(seriesId, BLANK))));
     } catch (IndexServiceException e) {
-      logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}' because: ",
-              metadataParam, aclParam, themeIdParam, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}'",
+              metadataParam, aclParam, themeIdParam, e);
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -954,7 +947,7 @@ public class SeriesEndpoint {
     try {
       acl = (JSONArray) parser.parse(aclJson);
     } catch (ParseException e) {
-      logger.debug("Could not parse ACL ({}): {}", aclJson, getStackTrace(e));
+      logger.debug("Could not parse ACL ({})", aclJson, e);
       return R.badRequest("Could not parse ACL");
     }
 
@@ -989,7 +982,7 @@ public class SeriesEndpoint {
     try {
       props = (JSONObject) parser.parse(propertiesJson);
     } catch (ParseException e) {
-      logger.debug("Could not parse properties ({}): {}", propertiesJson, getStackTrace(e));
+      logger.debug("Could not parse properties ({})", propertiesJson, e);
       return R.badRequest("Could not parse series properties");
     }
 
@@ -1027,10 +1020,10 @@ public class SeriesEndpoint {
         try {
           createdFromDate = new Date(DateTimeSupport.fromUTC(createdFrom));
         } catch (IllegalStateException e) {
-          logger.error("Unable to parse createdFrom parameter '{}':{}", createdFrom, ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to parse createdFrom parameter '{}'", createdFrom, e);
           throw new IllegalArgumentException("Unable to parse createdFrom parameter.");
         } catch (java.text.ParseException e) {
-          logger.error("Unable to parse createdFrom parameter '{}':{}", createdFrom, ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to parse createdFrom parameter '{}'", createdFrom, e);
           throw new IllegalArgumentException("Unable to parse createdFrom parameter.");
         }
       }
@@ -1039,10 +1032,10 @@ public class SeriesEndpoint {
         try {
           createdToDate = new Date(DateTimeSupport.fromUTC(createdTo));
         } catch (IllegalStateException e) {
-          logger.error("Unable to parse createdTo parameter '{}':{}", createdTo, ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to parse createdTo parameter '{}'", createdTo, e);
           throw new IllegalArgumentException("Unable to parse createdTo parameter.");
         } catch (java.text.ParseException e) {
-          logger.error("Unable to parse createdTo parameter '{}':{}", createdTo, ExceptionUtils.getStackTrace(e));
+          logger.error("Unable to parse createdTo parameter '{}'", createdTo, e);
           throw new IllegalArgumentException("Unable to parse createdTo parameter.");
         }
       }
