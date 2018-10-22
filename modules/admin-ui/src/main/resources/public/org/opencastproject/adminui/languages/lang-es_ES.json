@@ -2139,8 +2139,8 @@
       "DESCRIPTIONS": {
          "GENERAL": {
             "MAIN_MENU": "Menú principal",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Seleccionar el filtro del panel siguiente",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Seleccionar el filtro del panel anterior",
             "REMOVE_FILTERS": "Borrar todos los filtros",
             "EVENT_VIEW": "Eventos",
             "SERIES_VIEW": "Series",
@@ -2165,7 +2165,7 @@
             "CUT_SELECTED_SEGMENT": "Cortar",
             "PLAY_CURRENT_SEGMENT": "Reproducir segmento actual",
             "CLEAR_LIST": "Borrar segmento",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Reproducir segmento con previo",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          }
       }
