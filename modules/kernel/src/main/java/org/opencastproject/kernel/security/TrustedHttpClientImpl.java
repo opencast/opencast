@@ -54,6 +54,7 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -371,7 +372,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
       // Set the user/pass
       final UsernamePasswordCredentials creds = new UsernamePasswordCredentials(user, pass);
-      httpClient.getCredentialsProvider().setCredentials(AuthScope.ANY, creds);
+      AuthScope authScope = new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST);
+      httpClient.getCredentialsProvider().setCredentials(authScope, creds);
       // Run the request (the http client handles the multiple back-and-forth requests)
       try {
         Opt<HttpUriRequest> optSignedHttpUriRequest = getSignedUrl(httpUriRequest);

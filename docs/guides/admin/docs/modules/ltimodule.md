@@ -67,8 +67,8 @@ Configure and test an LTI tool in the LMS
 Configure an LTI tool in the LMS with these values:
 
 * LTI launch URL: `OPENCAST-URL/lti`
-* LTI key: the value chosen for CONSUMERKEY in `mh_default_org.xml`
-* LTI secret: the value chosen for CONSUMERSECRET in `mh_default_org.xml`
+* LTI key: the value chosen for CONSUMERKEY in `org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg`
+* LTI secret: the value chosen for CONSUMERSECRET in `org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg`
 
 In a clustered Opencast system, choose the URL of the presentation server where the media module and player are available.
 
