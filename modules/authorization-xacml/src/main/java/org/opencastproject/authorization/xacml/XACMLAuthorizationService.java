@@ -44,14 +44,17 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -59,7 +62,7 @@ import javax.xml.bind.JAXBException;
 /**
  * A XACML implementation of the {@link AuthorizationService}.
  */
-public class XACMLAuthorizationService implements AuthorizationService {
+public class XACMLAuthorizationService implements AuthorizationService, ManagedService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(XACMLAuthorizationService.class);
@@ -75,6 +78,31 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** The series service */
   protected SeriesService seriesService;
+
+  private static final String CONFIG_MERGE_MODE = "merge.mode";
+
+  /** Definition of how merging of series and episode ACLs work */
+  private MergeMode mergeMode = MergeMode.OVERRIDE;
+
+  enum MergeMode {
+    OVERRIDE, ROLES, ACTIONS
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      mergeMode = MergeMode.OVERRIDE;
+      return;
+    }
+    final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
+            MergeMode.OVERRIDE.toString());
+    try {
+      mergeMode = MergeMode.valueOf(mode.toUpperCase());
+    } catch (IllegalArgumentException e) {
+      logger.warn("Invalid value set for ACL merge mode, defaulting to {}", MergeMode.OVERRIDE);
+      mergeMode = MergeMode.OVERRIDE;
+    }
+  }
 
   @Override
   public Tuple<AccessControlList, AclScope> getActiveAcl(final MediaPackage mp) {
@@ -94,24 +122,43 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   @Override
   public Tuple<AccessControlList, AclScope> getAcl(final MediaPackage mp, final AclScope scope) {
-    List<Tuple<AclScope, MediaPackageElementFlavor>> scopes = new ArrayList<>(3);
+    Optional<AccessControlList> episode = Optional.empty();
+    Optional<AccessControlList> series = Optional.empty();
 
     // Start with the requested scope but fall back to the less specific scope if it does not exist.
     // The order is: episode -> series -> general (deprecated) -> global
-    if (AclScope.Episode.equals(scope)) {
-      scopes.add(tuple(AclScope.Episode, XACML_POLICY_EPISODE));
+    if (AclScope.Episode.equals(scope) || AclScope.Merged.equals(scope)) {
+      for (Attachment xacml : mp.getAttachments(XACML_POLICY_EPISODE)) {
+        episode = loadAcl(xacml.getURI());
+      }
     }
-    if (AclScope.Episode.equals(scope) || AclScope.Series.equals(scope)) {
-      scopes.add(tuple(AclScope.Series, XACML_POLICY_SERIES));
+    if (Arrays.asList(AclScope.Episode, AclScope.Series, AclScope.Merged).contains(scope)) {
+      for (Attachment xacml : mp.getAttachments(XACML_POLICY_SERIES)) {
+        series = loadAcl(xacml.getURI());
+      }
     }
 
-    for (Tuple<AclScope, MediaPackageElementFlavor> currentScope: scopes) {
-      for (Attachment xacml : mp.getAttachments(currentScope.getB())) {
-        Optional<AccessControlList> acl = loadAcl(xacml.getURI());
-        if (acl.isPresent()) {
-          return tuple(acl.get(), currentScope.getA());
-        }
+    if (episode.isPresent() && series.isPresent()) {
+      logger.debug("Found event and series ACL for media package {}", mp.getIdentifier());
+      switch (mergeMode) {
+        case ACTIONS:
+          logger.debug("Merging ACLs based on individual actions");
+          return tuple(series.get().mergeActions(episode.get()), AclScope.Merged);
+        case ROLES:
+          logger.debug("Merging ACLs based on roles");
+          return tuple(series.get().merge(episode.get()), AclScope.Merged);
+        default:
+          logger.debug("Episode ACL overrides series ACL");
+          return tuple(episode.get(), AclScope.Merged);
       }
+    }
+    if (episode.isPresent()) {
+      logger.debug("Found event ACL for media package {}", mp.getIdentifier());
+      return tuple(episode.get(), AclScope.Episode);
+    }
+    if (series.isPresent()) {
+      logger.debug("Found series ACL for media package {}", mp.getIdentifier());
+      return tuple(series.get(), AclScope.Series);
     }
 
     logger.debug("Falling back to global default ACL");

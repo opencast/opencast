@@ -6,6 +6,7 @@
             value="Provides translation between access control entries and xacml documents"/>
   <service>
     <provide interface="org.opencastproject.security.api.AuthorizationService"/>
+    <provide interface="org.osgi.service.cm.ManagedService"/>
   </service>
   <reference name="workspace" interface="org.opencastproject.workspace.api.Workspace"
              bind="setWorkspace"/>
