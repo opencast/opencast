@@ -136,7 +136,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 		r3.className = 'lt70';
 		r4.className = 'gt70';
 
-		r1.innerHTML = paella.dictionary.translate("Search relevance:");
+		r1.innerText = paella.dictionary.translate("Search relevance:");
 		r2.innerHTML = "&lt; 30%";
 		r3.innerHTML = "&lt; 70%";
 		r4.innerHTML = "&gt; 70%";
@@ -153,7 +153,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 	loadSegmentText:function() {
 		var self = this;	
 		this.setLoading(true);
-		this.divResults.innerHTML = "";
+		this.divResults.innerText = "";
 				
 		if (self._episode.segments === undefined) {
 			paella.debug.log("Segment Text data not available");
@@ -199,7 +199,7 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 		
 		
 		var textResultText = document.createElement('a');
-		textResultText.innerHTML = "<span class='time'>" + paella.utils.timeParse.secondsToTime(segment.time/1000) + "</span> " + segment.text;
+		textResultText.innerHTML = "<span class='time'>" + paella.utils.timeParse.secondsToTime(segment.time/1000) + "</span> " + paella.AntiXSS.htmlEscape(segment.text);
 		divResultText.appendChild(textResultText);
 		divEntry.appendChild(divResultText);
 
@@ -298,16 +298,16 @@ paella.plugins.TranscriptionTabBarPlugin  = Class.create(paella.TabBarPlugin,{
 	
 	
     setNoActualResultAvailable:function(searchValue) {
-     	this.divSearch.innerHTML = paella.dictionary.translate("Results for '{0}' (no actual results for '{1}' found)").replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
+     	this.divSearch.innerText = paella.dictionary.translate("Results for '{0}' (no actual results for '{1}' found)").replace(/\{0\}/g,this.lastHit).replace(/\{1\}/g,searchValue);
      	
     },
 
     setResultAvailable:function(searchValue) {
-     	this.divSearch.innerHTML =  paella.dictionary.translate("Results for '{0}'").replace(/\{0\}/g,searchValue);
+     	this.divSearch.innerText =  paella.dictionary.translate("Results for '{0}'").replace(/\{0\}/g,searchValue);
     },
     
     setNotSearch:function() {
-     	this.divSearch.innerHTML="";
+     	this.divSearch.innerText="";
     }	
 });
 

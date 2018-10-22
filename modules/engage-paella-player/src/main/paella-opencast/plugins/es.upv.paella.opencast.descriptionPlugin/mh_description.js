@@ -97,15 +97,15 @@ paella.plugins.MHDescriptionPlugin  = Class.create(paella.TabBarPlugin,{
 		var divPresenter = document.createElement('div'); divPresenter.className = 'showMHDescriptionTabBarElement';
 		var divDescription = document.createElement('div'); divDescription.className = 'showMHDescriptionTabBarElement';
 
-		divDate.innerHTML = paella.dictionary.translate("Date")+': <span class="showMHDescriptionTabBarValue">'+this.desc.date+'</span>';
-		divContributor.innerHTML = paella.dictionary.translate("Contributor")+': <span class="showMHDescriptionTabBarValue">'+this.desc.contributor+'</span>';
-		divLanguage.innerHTML = paella.dictionary.translate("Language")+': <span class="showMHDescriptionTabBarValue">'+this.desc.language+'</span>';
-		divViews.innerHTML = paella.dictionary.translate("Views")+': <span class="showMHDescriptionTabBarValue">'+this.desc.views+'</span>';			
-		divTitle.innerHTML = paella.dictionary.translate("Title")+': <span class="showMHDescriptionTabBarValue">'+this.desc.title+'</span>';
-		divSubject.innerHTML = paella.dictionary.translate("Subject")+': <span class="showMHDescriptionTabBarValue">'+this.desc.subject+'</span>';
-		divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="index.html?q='+this.desc.presenter+'">'+this.desc.presenter+'</a></span>';
-		divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="index.html?series='+this.desc.serieId+'">'+this.desc.serie+'</a></span>';
-		divDescription.innerHTML = paella.dictionary.translate("Description")+': <span class="showMHDescriptionTabBarValue">'+this.desc.description+'</span>';
+		divDate.innerHTML = paella.dictionary.translate("Date")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.date)+'</span>';
+		divContributor.innerHTML = paella.dictionary.translate("Contributor")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.contributor)+'</span>';
+		divLanguage.innerHTML = paella.dictionary.translate("Language")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.language)+'</span>';
+		divViews.innerHTML = paella.dictionary.translate("Views")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.views)+'</span>';			
+		divTitle.innerHTML = paella.dictionary.translate("Title")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.title)+'</span>';
+		divSubject.innerHTML = paella.dictionary.translate("Subject")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.subject)+'</span>';
+		divPresenter.innerHTML = paella.dictionary.translate("Presenter")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4001" href="index.html?q='+this.desc.presenter+'">'+paella.AntiXSS.htmlEscape(this.desc.presenter)+'</a></span>';
+		divSeries.innerHTML = paella.dictionary.translate("Series")+': <span class="showMHDescriptionTabBarValue"><a tabindex="4002" href="index.html?series='+this.desc.serieId+'">'+paella.AntiXSS.htmlEscape(this.desc.serie)+'</a></span>';
+		divDescription.innerHTML = paella.dictionary.translate("Description")+': <span class="showMHDescriptionTabBarValue">'+paella.AntiXSS.htmlEscape(this.desc.description)+'</span>';
 
 		//---------------------------//			
 		var divLeft = document.createElement('div'); 			
