@@ -123,8 +123,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
     }
 
     //An episode or its ACL has been updated. Construct the MediaPackage and publish it to OAI-PMH.
-    logger.debug("Handling update event for media package {}",
-            snapshotItem.getMediapackage().getIdentifier().compact());
+    logger.debug("Handling update event for media package {}", snapshotItem.getId());
 
     // We must be an administrative user to make a query to the OaiPmhPublicationService
     final User prevUser = securityService.getUser();
@@ -158,7 +157,7 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
           // we don't want to wait for job completion here because it will block the message queue
         } catch (Exception e) {
           logger.error("Unable to update OAI-PMH publication for the media package {} in repository {}",
-                  snapshotItem.getMediapackage().getIdentifier().compact(), searchResultItem.getRepository(), e);
+                  snapshotItem.getId(), searchResultItem.getRepository(), e);
         }
       }
     } finally {

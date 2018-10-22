@@ -64,7 +64,7 @@ angular.module('adminNg.directives')
           var ADMIN_EDITOR_PREVIEWMODE_DEFAULT = 'admin.editor.previewmode.default';
           AuthService.getUser().$promise.then(function(user) {
             if (angular.isDefined(user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT])) {
-              scope.previewMode = user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT].toUpperCase() === 'TRUE';
+              scope.previewMode = user.org.properties[ADMIN_EDITOR_PREVIEWMODE_DEFAULT].toUpperCase() !== 'FALSE';
             }
           });
         }

@@ -61,7 +61,7 @@ custom publication channels in the configuration files `etc/listproviders/public
 ### Internal Channel
 
     <operation
-      id="publish-engage"
+      id="publish-configure"
       exception-handler-workflow="partial-error"
       description="Publish to internal channel">
       <configurations>
