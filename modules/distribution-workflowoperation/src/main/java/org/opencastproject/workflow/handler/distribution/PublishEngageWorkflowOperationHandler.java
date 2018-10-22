@@ -75,6 +75,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,7 +85,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
-
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition for handling "engage publication" operations
@@ -109,6 +110,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   private static final String STREAMING_TARGET_SUBFLAVOR = "streaming-target-subflavor";
   private static final String CHECK_AVAILABILITY = "check-availability";
   private static final String STRATEGY = "strategy";
+  private static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
+
+  private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
 
   /** The default path to the player **/
   protected static final String DEFAULT_PLAYER_PATH = "/engage/ui/watch.html";
@@ -233,6 +237,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
     String republishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
+    String mergeForceFlavorsStr = StringUtils.trimToEmpty(
+            StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
@@ -249,6 +255,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       logger.warn("No tags or flavors have been specified, so nothing will be published to the engage publication channel");
       return createResult(mediaPackage, Action.CONTINUE);
     }
+
+    // Parse forced flavors
+    List<MediaPackageElementFlavor> mergeForceFlavors = Arrays.stream(StringUtils.split(mergeForceFlavorsStr, ", "))
+            .map(MediaPackageElementFlavor::parseFlavor).collect(Collectors.toList());
 
     // Parse the download target flavor
     MediaPackageElementFlavor downloadSubflavor = null;
@@ -368,7 +378,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         switch (republishStrategy) {
           case ("merge"):
             // merge() returns merged mediapackage or null mediaPackage is not published
-            mediaPackageForSearch = merge(mediaPackageForSearch);
+            mediaPackageForSearch = merge(mediaPackageForSearch, mergeForceFlavors);
             if (mediaPackageForSearch == null) {
               logger.info("Skipping republish for {} since it is not currently published", mediaPackage.getIdentifier().toString());
               return createResult(mediaPackage, Action.SKIP);
@@ -670,12 +680,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return merged mediapackage or null if a published medipackage was not found
    * @throws WorkflowOperationException
    */
-  protected MediaPackage merge(MediaPackage mediaPackageForSearch) throws WorkflowOperationException {
-    MediaPackage mergedMediaPackage = null;
-    mergedMediaPackage = mergePackages(mediaPackageForSearch,
-            getDistributedMediapackage(mediaPackageForSearch.toString()));
-
-    return mergedMediaPackage;
+  protected MediaPackage merge(MediaPackage mediaPackageForSearch, List<MediaPackageElementFlavor> forceFlavors)
+          throws WorkflowOperationException {
+    return mergePackages(mediaPackageForSearch,
+            getDistributedMediapackage(mediaPackageForSearch.toString()),
+            forceFlavors);
   }
 
   /**
@@ -693,7 +702,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    *          the mediapackage that is currently published
    * @return the merged mediapackage
    */
-  protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp) {
+  protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp,
+          List<MediaPackageElementFlavor> forceFlavors) {
     if (publishedMp == null)
       return updatedMp;
 
@@ -701,6 +711,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     for (MediaPackageElement element : publishedMp.elements()) {
       String type = element.getElementType().toString().toLowerCase();
       if (updatedMp.getElementsByFlavor(element.getFlavor()).length == 0) {
+        if (forceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f))) {
+          logger.info("Forcing removal of {} {} due to the absence of a new element with flavor {}",
+                  type, element.getIdentifier(), element.getFlavor().toString());
+          continue;
+        }
         logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
