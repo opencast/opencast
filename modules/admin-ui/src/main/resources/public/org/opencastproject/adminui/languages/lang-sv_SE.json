@@ -111,8 +111,8 @@
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Bearbetning kunde inte avbrytas.",
       "EVENTS_PROCESSING_ACTION_STOP": "Behandlingen stoppades.",
       "EVENTS_PROCESSING_ACTION_NOT_STOP": "Bearbetning kunde inte avbrytas.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Tog bort arbetsflödet.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Arbetsflödet kunde inte tas bort.",
       "SERIES_UPDATED_NB": "{{ number }} serier har uppdaterats",
       "SERIES_UPDATED_ALL": "Alla serier har uppdaterats",
       "SERIES_NOT_UPDATED": "Serien kunde inte sparas",
@@ -473,11 +473,11 @@
                "SERIES": "Filter för den här serien",
                "STATUS": "Filter for this event status",
                "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
-               "EDITOR": "Open video Editor",
-               "COMMENTS": "View comments",
+               "DETAILS": "Öppna eventdetaljer",
+               "DELETE": "Ta bort händelse",
+               "PREVIEW": "Öppna förhandsgranskningsspelaren",
+               "EDITOR": "Öppna videoredigeraren",
+               "COMMENTS": "Visa kommentarer",
                "PAUSED_WORKFLOW": "View paused workflow"
             }
          },
@@ -581,7 +581,7 @@
                   "START_TIME": "Starttid",
                   "TIMEZONE": "Tidszon",
                   "END_DATE": "Slutdatum",
-                  "END_TIME": "End time",
+                  "END_TIME": "Sluttid",
                   "DURATION": "Längd"
                },
                "SCHEDULE_SINGLE": {
@@ -941,7 +941,7 @@
             "TOOLTIP": {
                "SERIES": "Filter events for this series",
                "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "DELETE": "Ta bort serier"
             }
          },
          "DETAILS": {
@@ -1048,7 +1048,7 @@
             "BLACKLIST_TO": "Svartlistad tills",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
+               "NAME": "Filtrera händelserna för den här platsen",
                "DETAILS": "Open location details",
                "DELETE": "Ta bort plats (avregistrera capture agent)"
             }
@@ -1189,7 +1189,7 @@
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "DETAILS": "Öppna gruppdetaljer",
-               "DELETE": "Delete group"
+               "DELETE": "Ta bort grupp"
             }
          },
          "DETAILS": {
@@ -1452,8 +1452,8 @@
             "USAGE": "Användning",
             "ACTION": "Åtgärder",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Ta bort tema",
+               "DETAILS": "Öppna temadetaljer"
             }
          },
          "DETAILS": {
@@ -1594,8 +1594,8 @@
       "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Tidslinje",
       "ZOOMLEVEL": "Zoomnivå",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "PREVIEW_MODE": "Förhandsgranskningsläge",
+      "PREVIEW_MODE_TOOLTIP": "Spela enbart de utvalda segmenten",
       "ZOOM": "Zooma",
       "BUTTONS": {
          "CLOSE": "Stäng",
