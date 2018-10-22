@@ -100,7 +100,6 @@ For the individual tabs, it is possible to further provide access:
 |ROLE_UI_EVENTS_DETAILS_METADATA_EDIT    |Allow the user to edit *Metadata*        |
 |ROLE_UI_EVENTS_DETAILS_ACL_EDIT         |Allow the user to edit *Access Policy*   |
 |ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT   |Allow the user to edit *Workflows*       |
-|ROLE_UI_EVENTS_DETAILS_WORKFLOWS_PAUSE  |Allow the user to pause *Workflows*      |
 |ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE |Allow the user to delete *Workflows*     |
 |ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT  |Allow the user to edit *Scheduling*      |
 |ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE  |Allow the user to create comments        |
