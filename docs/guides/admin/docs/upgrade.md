@@ -18,7 +18,12 @@ How to Upgrade
 Database Migration
 ------------------
 
-*So far, this is not required*
+As part of performance optimizations, a foreign key constraint was added to one table. This requires a database schema
+update. As with all database migrations, we recommend to create a database backup before attempting the upgrade.
+
+You can find the database upgrade script in `docs/upgrade/6_to_7/`. This script is suitable for both, MariaDB and
+MySQL.
+
 
 ActiveMQ Migration
 ------------------

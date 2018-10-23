@@ -21,6 +21,7 @@
 package org.opencastproject.assetmanager.impl.persistence;
 
 import static com.entwinemedia.fn.Stream.$;
+import static com.mysema.query.types.PathMetadataFactory.forVariable;
 
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.impl.VersionImpl;
@@ -30,6 +31,7 @@ import com.entwinemedia.fn.data.ListBuilders;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.types.Expression;
+import com.mysema.query.types.path.PathInits;
 
 import javax.persistence.EntityManager;
 
@@ -44,11 +46,11 @@ public final class AssetDtos {
    * Create base join for a {@link AssetDtos} query.
    */
   public static JPAQuery baseJoin(EntityManager em) {
-    final QAssetDto assetDto = QAssetDto.assetDto;
+    final QAssetDto assetDto = new QAssetDto(AssetDto.class, forVariable("assetDto"), new PathInits("snapshot"));
     final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
     return new JPAQuery(em, Database.TEMPLATES)
             .from(assetDto)
-            .leftJoin(snapshotDto).on(snapshotDto.id.eq(assetDto.snapshotId));
+            .innerJoin(snapshotDto).on(snapshotDto.id.eq(assetDto.snapshot.id));
   }
 
   /**

@@ -384,6 +384,7 @@ CREATE TABLE oc_assets_asset (
   size BIGINT NOT NULL,
   storage_id VARCHAR(256) NOT NULL DEFAULT 'local-filesystem',
   --
+  CONSTRAINT FK_oc_assets_asset_snapshot_id FOREIGN KEY (snapshot_id) REFERENCES oc_assets_snapshot (id) ON DELETE CASCADE,
   INDEX IX_oc_assets_asset_checksum (checksum),
   INDEX IX_oc_assets_asset_mediapackage_element_id (mediapackage_element_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

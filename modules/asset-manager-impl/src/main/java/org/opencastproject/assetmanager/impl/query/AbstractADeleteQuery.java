@@ -180,13 +180,6 @@ HAVING v = (SELECT count(*)
 //                              .count()))
 //              .list(e2.mediaPackageId);
 // </BLOCK>
-      // delete assets from database
-      final JPADeleteClause qAssets = jpa
-              .delete(Q_ASSET)
-              .where(Q_ASSET.snapshotId.in(
-                      new JPASubQuery().from(Q_SNAPSHOT).where(where).list(Q_SNAPSHOT.id)));
-      am.getDb().logDelete(formatQueryName(c.name, "delete assets"), qAssets);
-      qAssets.execute();
       // main delete query
       final JPADeleteClause qMain = jpa.delete(Q_SNAPSHOT).where(where);
       am.getDb().logDelete(formatQueryName(c.name, "main"), qMain);
