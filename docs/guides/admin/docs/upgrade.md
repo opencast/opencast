@@ -31,6 +31,32 @@ ActiveMQ Migration
 *So gar, this is not required*
 
 
+Removal of Deprecated Access Control Ruleset
+--------------------------------------------
+
+Opencast 7 finally removes the long-since deprecated `security/xacml` flavor for access control lists. This had not been
+used since before Opencast 1.2 (we could not track down its exact deprecation date due to its age). Additionally, all
+rule-sets which had been modified since had also been automnatically been updated to `security/xacml+series` which
+serves as replacement for the old flavor.
+
+In case Opencast still encounters such a rule set, it will now be ignored and access will be denied by default. A simple
+update of the permissions would fix this if that is required.
+
+Due to the extreme unlikeliness of anyone encountering this problem, there is no automatic migration. In case you run a
+system migrated from a pre-1.2 Matterhorn, you can make sure that there are no old rule-sets left using the following
+SQL queries:
+
+```sql
+-- Check OAI-PMH publications:
+select * from oc_oaipmh_elements where flavor = 'security/xacml';
+-- Check engage publications:
+select * from oc_search where mediapackage_xml like '%"security/xacml"%';
+-- Check asset manager:
+select * from oc_assets_snapshot where mediapackage_xml like '%"security/xacml"%';
+```
+
+
+
 Configuration Changes
 ---------------------
 
