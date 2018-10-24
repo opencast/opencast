@@ -37,6 +37,7 @@ import org.opencastproject.security.impl.jpa.JpaGroup;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
+import org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 
@@ -58,6 +59,7 @@ import javax.ws.rs.core.Response;
 public class JpaGroupRoleProviderTest {
 
   private JpaGroupRoleProvider provider = null;
+  private GroupRoleEndpoint endpoint = null;
   private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
   private static JpaOrganization org2 = new JpaOrganization("org2", "org2", "127.0.0.1", 80, "admin", "anon", null);
 
@@ -84,6 +86,10 @@ public class JpaGroupRoleProviderTest {
     provider.setMessageSender(messageSender);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
+
+    endpoint = new GroupRoleEndpoint();
+    endpoint.setJpaGroupRoleProvider(provider);
+
   }
 
   @After
@@ -159,13 +165,13 @@ public class JpaGroupRoleProviderTest {
 
     try {
       // try add ROLE_USER
-      Response updateGroupResponse = provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
+      Response updateGroupResponse = endpoint.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
               "ROLE_USER, " + SecurityConstants.GLOBAL_ADMIN_ROLE, null);
       assertNotNull(updateGroupResponse);
       assertEquals(HttpStatus.SC_FORBIDDEN, updateGroupResponse.getStatus());
 
       // try remove ROLE_ADMIN
-      updateGroupResponse = provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
+      updateGroupResponse = endpoint.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
               "ROLE_USER", null);
       assertNotNull(updateGroupResponse);
       assertEquals(HttpStatus.SC_FORBIDDEN, updateGroupResponse.getStatus());
@@ -197,16 +203,16 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
 
-    Response removeGroupResponse = provider.removeGroup(group.getGroupId());
+    Response removeGroupResponse = endpoint.removeGroup(group.getGroupId());
     assertNotNull(removeGroupResponse);
     assertEquals(HttpStatus.SC_FORBIDDEN, removeGroupResponse.getStatus());
   }
 
   @Test
   public void testDuplicateGroupCreation() {
-    Response response = provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    Response response = endpoint.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
     assertEquals(HttpStatus.SC_CREATED, response.getStatus());
-    response = provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    response = endpoint.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
     assertEquals(HttpStatus.SC_CONFLICT, response.getStatus());
   }
 
