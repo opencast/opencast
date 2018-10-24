@@ -3,9 +3,9 @@ module.exports = function (config) {
         basePath : './',
 
         files : [
-            '../../main/webapp/scripts/lib/jquery-1.10.2.js',
-            '../../main/webapp/scripts/lib/jquery-ui.js',
             // bower:js
+            '../../../bower_components/jquery/jquery.js',
+            '../../../bower_components/jquery-ui/jquery-ui.js',
             '../../../bower_components/angular/angular.js',
             '../../../bower_components/angular-route/angular-route.js',
             '../../../bower_components/angular-resource/angular-resource.js',
@@ -17,12 +17,12 @@ module.exports = function (config) {
             '../../../bower_components/angular-local-storage/dist/angular-local-storage.js',
             '../../../bower_components/angular-wizard/dist/angular-wizard.js',
             '../../../bower_components/angular-hotkeys/build/hotkeys.js',
+            '../../../bower_components/angular-ui-sortable/sortable.js',
             '../../../bower_components/ng-file-upload/angular-file-upload.js',
             '../../../bower_components/angular-mocks/angular-mocks.js',
             // endbower
             '../../main/webapp/scripts/lib/chosen.jquery.js',
             '../../main/webapp/scripts/lib/angular-chosen.js',
-            '../../main/webapp/scripts/lib/angular-sortable.js',
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
             '../../main/webapp/scripts/lib/moment-with-locales.js',
