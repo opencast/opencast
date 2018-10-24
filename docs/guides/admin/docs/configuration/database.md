@@ -105,6 +105,13 @@ Alternatively, you can import the script directly from the command line:
 
     mysql -u opencast -p opencast < …/docs/scripts/ddl/mysql5.sql
 
+Now, ensure the MariaDB [`wait_timeout`](https://mariadb.com/kb/en/library/server-system-variables/) in `mariadb.cnf`
+or `mysql.cnf` is bigger than `org.opencastproject.db.jdbc.pool.max.idle.time` in Opencast's `custom.properties`.
+Raising the `max_connections` in `mariadb.cnf` parameter might be required, too, depending on your installation's size.
+Reload the configuration into MariaDB, then connect to your database as user `opencast` and verify the values by
+executing `SHOW  VARIABLES LIKE %_timeout;`. If you encounter `MySQLNonTransientConnectionException`s, for instance,
+_"A PooledConnection that has already signaled a Connection error is still in use."_ in your Opencast logs, it is most
+likely because of an incompatible MariaDB configuration.
 
 ### Step 3: Configure Opencast
 
