@@ -21,11 +21,9 @@
 
 package org.opencastproject.mediapackage.selector;
 
-import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.TrackSupport;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -119,11 +117,9 @@ public class AudioElementSelector extends AbstractMediaPackageElementSelector<Tr
 
     // Look for a track containing audio
     for (Track t : candidates) {
-      if (TrackSupport.byType(t.getStreams(), AudioStream.class).length > 0) {
-        if (!foundAudio && (audioFlavor == null || audioFlavor.equals(t.getFlavor()))) {
-          result.add(t);
-          foundAudio = true;
-        }
+      if (t.hasAudio() && !foundAudio && (audioFlavor == null || audioFlavor.equals(t.getFlavor()))) {
+        result.add(t);
+        foundAudio = true;
       }
     }
     return result;

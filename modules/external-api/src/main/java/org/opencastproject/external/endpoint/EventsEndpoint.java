@@ -1440,20 +1440,17 @@ public class EventsEndpoint implements ManagedService {
 
         if (videoStreams.length > 0) {
           // Only supporting one stream, like in many other places...
-          final Stream stream = videoStreams[0];
-          if (stream instanceof VideoStream) {
-            final VideoStream videoStream = (VideoStream) stream;
-            if (videoStream.getBitRate() != null)
-              trackInfo.add(f("bitrate", v(videoStream.getBitRate())));
-            if (videoStream.getFrameRate() != null)
-              trackInfo.add(f("framerate", v(videoStream.getFrameRate())));
-            if (videoStream.getFrameCount() != null)
-              trackInfo.add(f("framecount", v(videoStream.getFrameCount())));
-            if (videoStream.getFrameWidth() != null)
-              trackInfo.add(f("width", v(videoStream.getFrameWidth())));
-            if (videoStream.getFrameHeight() != null)
-              trackInfo.add(f("height", v(videoStream.getFrameHeight())));
-          }
+          final VideoStream videoStream = videoStreams[0];
+          if (videoStream.getBitRate() != null)
+            trackInfo.add(f("bitrate", v(videoStream.getBitRate())));
+          if (videoStream.getFrameRate() != null)
+            trackInfo.add(f("framerate", v(videoStream.getFrameRate())));
+          if (videoStream.getFrameCount() != null)
+            trackInfo.add(f("framecount", v(videoStream.getFrameCount())));
+          if (videoStream.getFrameWidth() != null)
+            trackInfo.add(f("width", v(videoStream.getFrameWidth())));
+          if (videoStream.getFrameHeight() != null)
+            trackInfo.add(f("height", v(videoStream.getFrameHeight())));
         }
 
         tracks.add(obj(f("id", v(track.getIdentifier(), BLANK)), f("mediatype", v(track.getMimeType(), BLANK)),
