@@ -512,13 +512,10 @@ angular.module('adminNg.services')
             minute: parseInt(endDateTime.format('mm'))
           };
 
-
-          if (!orgProperties.hasOwnProperty('admin.event.new.preselect_day')
-            || orgProperties.hasOwnProperty('admin.event.new.preselect_day')
-            && orgProperties['admin.event.new.preselect_day'] === true) {
-            defaults.presentableWeekdays = chosenSlot.format('dd');
-          } else {
+          if (orgProperties['admin.event.new.preselect_day'] === 'false') {
             defaults.presentableWeekdays = '';
+          } else {
+            defaults.presentableWeekdays = chosenSlot.format('dd');
           }
 
           if (self.captureAgents.length === 0) {
