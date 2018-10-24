@@ -2,7 +2,7 @@
   "name": "adminui",
   "version": "0.0.0",
   "dependencies": {
-    "jquery": "1.12",
+    "jquery": "components/jquery#1.12",
     "jquery-ui": "1.12",
     "angular": "1.5.11",
     "angular-route": "1.5.11",
