@@ -86,7 +86,7 @@ public class AssetManagerMessageReceiverImpl extends BaseMessageReceiverImpl<Ass
     // Load or create the corresponding recording event
     final Event event;
     try {
-      event = getOrCreateEvent(mp.getIdentifier().toString(), organization, user, getSearchIndex());
+      event = getOrCreateEvent(msg.getId(), organization, user, getSearchIndex());
       final AccessControlList acl = msg.getAcl();
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(getSecurityService().getOrganization()).getAcls();
       for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
