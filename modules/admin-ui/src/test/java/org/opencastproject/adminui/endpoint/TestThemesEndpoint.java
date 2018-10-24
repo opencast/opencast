@@ -23,7 +23,7 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
-import org.opencastproject.adminui.impl.index.AdminUISearchIndex;
+import org.opencastproject.adminui.index.AdminUISearchIndex;
 import org.opencastproject.index.service.impl.index.series.Series;
 import org.opencastproject.index.service.impl.index.series.SeriesSearchQuery;
 import org.opencastproject.index.service.impl.index.theme.ThemeSearchQuery;

@@ -31,7 +31,7 @@
              interface="org.opencastproject.index.service.message.MessageReceiverLockService"
              cardinality="1..1" policy="static" bind="setMessageReceiverLockService"/>
   <reference name="search-index" cardinality="1..1"
-             interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex" policy="static"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex" policy="static"
              bind="setSearchIndex"/>
 
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService" cardinality="1..1"

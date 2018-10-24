@@ -22,7 +22,7 @@
              policy="static"/>
   <reference bind="setAdminUISearchIndex"
              cardinality="1..1"
-             interface="org.opencastproject.adminui.impl.index.AdminUISearchIndex"
+             interface="org.opencastproject.adminui.index.AdminUISearchIndex"
              name="AdminUISearchIndex"
              policy="static"/>
   <reference bind="setComposerService"

@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adminui.impl.index;
+package org.opencastproject.adminui.index;
 
 import org.opencastproject.index.service.api.EventIndex;
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
@@ -33,8 +33,6 @@ import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.ComponentException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,9 +41,6 @@ import java.util.List;
  * A search index implementation based on ElasticSearch.
  */
 public class AdminUISearchIndex extends AbstractSearchIndex implements EventIndex {
-
-  /** Logging facility */
-  private static final Logger logger = LoggerFactory.getLogger(AdminUISearchIndex.class);
 
   /** The name of this index */
   private static final String INDEX_NAME = "adminui";
