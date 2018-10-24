@@ -39,6 +39,7 @@ import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.storage.Source;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 
@@ -46,14 +47,18 @@ import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.collect.Sets;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAssetManager implements TieredStorageAssetManager {
@@ -62,7 +67,10 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
           Sets.newHashSet(MediaPackageElement.Type.Attachment, MediaPackageElement.Type.Catalog, MediaPackageElement.Type.Track);
 
   /** Log facility */
-  private static final Logger logger = LoggerFactory.getLogger(AbstractAssetManager.class);
+  private static final Logger logger = LoggerFactory.getLogger(AbstractAssetManagerWithTieredStorage.class);
+
+  // Base name of manifest file
+  private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
   public Opt<AssetStore> getAssetStore(String storeId) {
     if (getLocalAssetStore().getStoreType().equals(storeId)) {
@@ -131,6 +139,7 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
 
           try {
             copyAssetsToStore(s, targetStore);
+            copyManifest(s, targetStore);
           } catch (Exception e) {
             chuck(e);
           }
@@ -409,4 +418,71 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
   public Opt<String> getSnapshotRetrievalCost(final Version version, final String mpId) {
     throw new NotImplementedException("");
   }
+
+  private void copyManifest(Snapshot snap, AssetStore targetStore) throws IOException, NotFoundException {
+    final String mpId = snap.getMediaPackage().getIdentifier().toString();
+    final String orgId = snap.getOrganizationId();
+    final Version version = snap.getVersion();
+
+    AssetStore currentStore = getAssetStore(snap.getStorageId()).get();
+    Opt<String> manifestOpt = findManifestBaseName(snap, MANIFEST_DEFAULT_NAME, currentStore);
+    if (manifestOpt.isNone())
+      return; // Nothing to do, already moved to long-term storage
+
+    // Copy the manifest file
+    String manifestBaseName = manifestOpt.get();
+    StoragePath pathToManifest = new StoragePath(orgId, mpId, version, manifestBaseName);
+
+    // Already copied?
+    if (!targetStore.contains(pathToManifest)) {
+      Opt<InputStream> inputStreamOpt;
+      InputStream inputStream = null;
+      String manifestFileName = null;
+      try {
+        inputStreamOpt = currentStore.get(pathToManifest);
+        if (inputStreamOpt.isNone()) // This should never happen because it has been tested before
+          throw new NotFoundException(
+                  String.format("Unexpected error. Manifest %s not found in current asset store", manifestBaseName));
+
+        inputStream = inputStreamOpt.get();
+        manifestFileName = UUID.randomUUID().toString() + ".xml";
+        URI manifestTmpUri = getWorkspace().putInCollection("archive", manifestFileName, inputStream);
+        targetStore.put(pathToManifest, Source.mk(manifestTmpUri, Opt.<Long> none(), Opt.some(MimeTypes.XML)));
+      } finally {
+        IOUtils.closeQuietly(inputStream);
+        try {
+          // Make sure to clean up the temporary file
+          getWorkspace().deleteFromCollection("archive", manifestFileName);
+        } catch (NotFoundException e) {
+          // This is OK, we are deleting it anyway
+        } catch (IOException e) {
+          // This usually happens when the collection directory cannot be deleted
+          // because another process is running at the same time and wrote a file there
+          // after it was tested but before it was actually deleted. We will consider this ok.
+          // Does the error message mention the manifest file name?
+          if (e.getMessage().indexOf(manifestFileName) > -1) {
+            logger.warn("The manifest file {} didn't get deleted from the archive collection: {}",
+                    manifestBaseName, e);
+          }
+          // Else the error is related to the file-archive collection, which is fine
+        }
+      }
+    }
+  }
+
+  Opt<String> findManifestBaseName(Snapshot snap, String manifestName, AssetStore store) {
+    StoragePath path = new StoragePath(snap.getOrganizationId(), snap.getMediaPackage().getIdentifier().toString(),
+            snap.getVersion(), manifestName);
+    // If manifest_.xml, etc not found, return previous name (copied from the EpsiodeServiceImpl logic)
+    if (!store.contains(path)) {
+      // If first call, manifest is not found, which probably means it has already been moved
+      if (MANIFEST_DEFAULT_NAME.equals(manifestName))
+        return Opt.none(); // No manifest found in current store
+      else
+        return Opt.some(manifestName.substring(0, manifestName.length() - 1));
+    }
+    // This is the same logic as when building the manifest name: manifest, manifest_, manifest__, etc
+    return findManifestBaseName(snap, manifestName + "_", store);
+  }
+
 }
