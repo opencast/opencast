@@ -129,7 +129,7 @@ public class EventTest {
   @Ignore
   @Test
   public void testValueOf() throws ParseException, IOException, JSONException, XMLStreamException, JAXBException {
-    Event event = Event.valueOf(IOUtils.toInputStream(eventXml));
+    Event event = Event.valueOf(IOUtils.toInputStream(eventXml), Event.createUnmarshaller());
     assertEquals(id, event.getIdentifier());
     assertEquals(title, event.getTitle());
     assertEquals(description, event.getDescription());
