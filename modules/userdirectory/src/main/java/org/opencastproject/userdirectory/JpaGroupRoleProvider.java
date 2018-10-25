@@ -70,7 +70,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 
 /**
- * Manages and locates users using JPA. The REST concerns have been refactored to the GroupRoleEndpoint
+ * Manages and locates users using JPA.
  */
 public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
 
@@ -413,7 +413,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   /**
-   * Retrieves a group list based on input constraints. Called by GroupRoleEndpoint.
+   * Retrieves a group list based on input constraints.
    *
    * @param limit
    *          the int amount to limit the results
@@ -429,8 +429,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
   }
 
   /**
-   * Returns a XML representation of the list of groups available the current user's organization. Used by
-   * GroupRoleEndpoint.
+   * Returns a XML representation of the list of groups available the current user's organization.
    *
    * @param limit
    *          the int amount to limit the results

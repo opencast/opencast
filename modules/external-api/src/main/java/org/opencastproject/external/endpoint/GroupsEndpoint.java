@@ -24,12 +24,17 @@ import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.external.common.ApiResponses;
@@ -74,7 +79,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 @Path("/")
 @RestService(name = "externalapigroups", title = "External API Groups Service", notes = "", abstractText = "Provides resources and operations related to the groups")
@@ -169,7 +173,8 @@ public class GroupsEndpoint {
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
-      throw new WebApplicationException(e);
+      logger.error("Unable to delete group {}", id, e);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -191,7 +196,7 @@ public class GroupsEndpoint {
       indexService.updateGroup(id, name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     }
@@ -206,8 +211,8 @@ public class GroupsEndpoint {
           @RestParameter(name = "description", description = "Group Description", isRequired = false, type = STRING),
           @RestParameter(name = "roles", description = "Comma-separated list of roles", isRequired = false, type = STRING),
           @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, reponses = {
-                  @RestResponse(description = "A new group is created.", responseCode = HttpServletResponse.SC_CREATED),
-                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+                  @RestResponse(description = "A new group is created.", responseCode = SC_CREATED),
+                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = SC_BAD_REQUEST) })
   public Response createGroup(@HeaderParam("Accept") String acceptHeader, @FormParam("name") String name,
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
@@ -215,13 +220,13 @@ public class GroupsEndpoint {
       indexService.createGroup(name, description, roles, members);
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (ConflictException e) {
       return Response.status(SC_CONFLICT).build();
     }
-    return Response.status(Status.CREATED).build();
+    return Response.status(SC_CREATED).build();
   }
 
   @POST
@@ -230,9 +235,9 @@ public class GroupsEndpoint {
   @RestQuery(name = "addgroupmember", description = "Adds a member to a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, reponses = {
-                          @RestResponse(description = "The member was already member of the group.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The member has been added.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                          @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+                          @RestResponse(description = "The member was already member of the group.", responseCode = SC_OK),
+                          @RestResponse(description = "The member has been added.", responseCode = SC_NO_CONTENT),
+                          @RestResponse(description = "The specified group does not exist.", responseCode = SC_NOT_FOUND) })
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
     try {
@@ -247,7 +252,7 @@ public class GroupsEndpoint {
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
             logger.warn(e.getMessage());
-            return Response.status(Status.BAD_REQUEST).build();
+            return Response.status(SC_BAD_REQUEST).build();
           } catch (UnauthorizedException ex) {
             return Response.status(SC_FORBIDDEN).build();
           }
@@ -291,7 +296,7 @@ public class GroupsEndpoint {
                     StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
           } catch (IllegalArgumentException e) {
             logger.warn(e.getMessage());
-            return Response.status(Status.BAD_REQUEST).build();
+            return Response.status(SC_BAD_REQUEST).build();
           } catch (UnauthorizedException ex) {
             return Response.status(SC_FORBIDDEN).build();
           }

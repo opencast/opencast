@@ -22,12 +22,12 @@
 package org.opencastproject.userdirectory.endpoint;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.http.HttpStatus.SC_CONFLICT;
 
 import org.opencastproject.security.api.JaxbGroupList;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -40,6 +40,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,11 +58,9 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 /**
- * A REST EndPoint for JpaGroupRoleProvider. This endpoint class factors out the REST concerns of the
- * JpaGroupRoleProvider.
+ * A REST EndPoint for JpaGroupRoleProvider.
  */
 @Path("/")
 @RestService(name = "groups", title = "Internal group manager", abstractText = "This service offers the ability to manage the groups for internal accounts.", notes = {
@@ -98,30 +97,29 @@ public class GroupRoleEndpoint {
   }
 
   @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("groups.json")
-  @RestQuery(name = "allgroupsasjson", description = "Returns a list of groups", returnDescription = "Returns a JSON representation of the list of groups available the current user's organization", restParameters = {
+  @Produces({ MediaType.TEXT_XML, MediaType.APPLICATION_JSON })
+  @Path("groups.{format:xml|json}")
+  @RestQuery(name = "allgroup", description = "Returns a list of groups", returnDescription = "Returns a JSON or XML representation of the list of groups available the current user's organization", pathParameters = {
+          @RestParameter(description = "The output format (json or xml) of the response body.", isRequired = true, name = "format", type = RestParameter.Type.STRING) }, restParameters = {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public JaxbGroupList getGroupsAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
+  public Response getGroupsAsJsonOrXml(@PathParam("format") String format, @QueryParam("limit") int limit,
+          @QueryParam("offset") int offset)
           throws IOException {
-    return jpaGroupRoleProvider.getGroupsAsXml(limit, offset);
-  }
-
-  @GET
-  @Produces(MediaType.APPLICATION_XML)
-  @Path("groups.xml")
-  @RestQuery(name = "allgroupsasxml", description = "Returns a list of groups", returnDescription = "Returns a XML representation of the list of groups available the current user's organization", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public JaxbGroupList getGroupsAsXml(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws IOException {
-    return jpaGroupRoleProvider.getGroupsAsXml(limit, offset);
+    try {
+      final String type = "json".equals(format) ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_XML;
+      JaxbGroupList list = jpaGroupRoleProvider.getGroupsAsXml(limit, offset);
+      return Response.ok().entity(list).type(type).build();
+    } catch (Exception e) {
+      logger.info(e.getMessage(), e);
+      return Response.serverError().entity(buildUnexpectedErrorMessage(e)).build();
+    }
   }
 
   @DELETE
   @Path("{id}")
-  @RestQuery(name = "removegrouop", description = "Remove a group", returnDescription = "Return no content", pathParameters = { @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
+  @RestQuery(name = "removegroup", description = "Remove a group", returnDescription = "Return no content", pathParameters = {
+          @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "Group deleted"),
           @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
@@ -156,13 +154,13 @@ public class GroupRoleEndpoint {
       jpaGroupRoleProvider.createGroup(name, description, roles, users);
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (ConflictException e) {
       return Response.status(SC_CONFLICT).build();
     }
-    return Response.status(Status.CREATED).build();
+    return Response.status(SC_CREATED).build();
   }
 
   @PUT
@@ -183,10 +181,32 @@ public class GroupRoleEndpoint {
       jpaGroupRoleProvider.updateGroup(groupId, name, description, roles, users);
     } catch (IllegalArgumentException e) {
       logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
+      return Response.status(SC_BAD_REQUEST).build();
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     }
     return Response.ok().build();
+  }
+
+  /**
+   * Borrowed from FileUploadRestService.java
+   *
+   * Builds an error message in case of an unexpected error in an endpoint method, includes the exception type and
+   * message if existing.
+   *
+   * TODO append stack trace
+   *
+   * @param e
+   *          Exception that was thrown
+   * @return error message
+   */
+  private String buildUnexpectedErrorMessage(Exception e) {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Unexpected error (").append(e.getClass().getName()).append(")");
+    String message = e.getMessage();
+    if (StringUtils.isNotBlank(message)) {
+      sb.append(": ").append(message);
+    }
+    return sb.toString();
   }
 }

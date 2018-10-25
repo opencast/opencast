@@ -68,7 +68,7 @@ public interface IndexService {
   }
 
   SearchResult<Group> getGroups(String filter, Opt<Integer> limit, Opt<Integer> offset, Opt<String> sort,
-          AbstractSearchIndex index) throws SearchIndexException;
+          AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException;
 
   /**
    * Get a single group

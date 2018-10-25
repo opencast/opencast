@@ -166,8 +166,6 @@ import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 
 public class IndexServiceImpl implements IndexService {
 
@@ -1360,7 +1358,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public SearchResult<Group> getGroups(String filter, Opt<Integer> optLimit, Opt<Integer> optOffset,
-          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException {
+          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException {
     GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
 
     // Parse the filters
@@ -1400,7 +1398,7 @@ public class IndexServiceImpl implements IndexService {
             query.sortByRoles(criterion.getOrder());
             break;
           default:
-            throw new WebApplicationException(Status.BAD_REQUEST);
+            throw new IllegalArgumentException("Unknown group index " + criterion.getFieldName());
         }
       }
     }
