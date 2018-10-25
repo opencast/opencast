@@ -28,6 +28,7 @@ import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -283,6 +284,27 @@ public final class UserDirectoryPersistenceUtil {
       return (JpaOrganization) query.getSingleResult();
     } catch (NoResultException e) {
       return null;
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Return specific users by their user names
+   * @param userNames list of user names
+   * @param organizationId organization to search for
+   * @param emf the entity manager factory
+   * @return the list of users that was found
+   */
+  public static List<JpaUser> findUsersByUserName(Collection<String> userNames, String organizationId, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("User.findAllByUserNames");
+      q.setParameter("names", userNames);
+      q.setParameter("org", organizationId);
+      return q.getResultList();
     } finally {
       if (em != null)
         em.close();

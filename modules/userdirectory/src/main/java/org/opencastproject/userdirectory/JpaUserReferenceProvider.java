@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -164,6 +165,17 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
     String orgId = securityService.getOrganization().getId();
     List<User> users = new ArrayList<User>();
     for (JpaUserReference userRef : findUserReferencesByQuery(orgId, query, limit, offset, emf)) {
+      users.add(userRef.toUser(PROVIDER_NAME));
+    }
+    return users.iterator();
+  }
+
+  @Override
+  public Iterator<User> findUsers(Collection<String> userNames) {
+    String orgId = securityService.getOrganization().getId();
+    List<User> users = new ArrayList<>();
+    final List<JpaUserReference> usersByName = findUsersByUserName(orgId, userNames, emf);
+    for (JpaUserReference userRef : usersByName) {
       users.add(userRef.toUser(PROVIDER_NAME));
     }
     return users.iterator();
@@ -374,6 +386,27 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
       Query q = em.createNamedQuery("UserReference.findByQuery").setMaxResults(limit).setFirstResult(offset);
       q.setParameter("query", query.toUpperCase());
       q.setParameter("org", orgId);
+      return q.getResultList();
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * Returns user references for specific user names (and an organization)
+   * @param orgId The organization to search for
+   * @param names The names to search for
+   * @param emf the entity manager factory
+   * @return the user references list
+   */
+  private List<JpaUserReference> findUsersByUserName(String orgId, Collection<String> names, EntityManagerFactory emf) {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query q = em.createNamedQuery("UserReference.findAllByUserNames");
+      q.setParameter("org", orgId);
+      q.setParameter("names", names);
       return q.getResultList();
     } finally {
       if (em != null)

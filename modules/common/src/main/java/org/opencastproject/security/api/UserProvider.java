@@ -21,7 +21,10 @@
 
 package org.opencastproject.security.api;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Provides access to users and roles.
@@ -84,6 +87,24 @@ public interface UserProvider {
    *           if the query is <code>null</code>
    */
   Iterator<User> findUsers(String query, int offset, int limit);
+
+  /**
+   * Find a list of users by their user names
+   *
+   * Note that the default implementation of this might be slow, as it calls <code>loadUser</code> on every single user.
+   * @param userNames A list of user names
+   * @return A list of resolved user objects
+   */
+  default Iterator<User> findUsers(Collection<String> userNames) {
+    List<User> result = new ArrayList<>(0);
+    for (String name : userNames) {
+      final User e = loadUser(name);
+      if (e != null) {
+        result.add(e);
+      }
+    }
+    return result.iterator();
+  }
 
   /**
    * Discards any cached value for given user name.
