@@ -44,7 +44,6 @@ import org.opencastproject.util.StreamHelper;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.tika.parser.audio.AudioParser;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -101,7 +100,7 @@ public class MediaInspectionServiceImplTest {
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.replay(workspace);
-      return some(new MediaInspector(workspace, new AudioParser(), binary));
+      return some(new MediaInspector(workspace, binary));
     }
     return none();
   }
