@@ -56,7 +56,7 @@ paella.plugins.EpisodesFromSeries = Class.create(paella.ButtonPlugin,{
 		episodesFromSeriesTitle.id = 'episodesFromSeriesTitle';
 		episodesFromSeriesTitle.className = 'episodesFromSeriesTitle';
 		if (serieId) {
-			episodesFromSeriesTitle.innerHTML = "<span class='episodesFromSeriesTitle_Bold'>" +paella.dictionary.translate("Videos in this series:")+"</span> " + serieTitle;
+			episodesFromSeriesTitle.innerHTML = "<span class='episodesFromSeriesTitle_Bold'>" +paella.dictionary.translate("Videos in this series:")+"</span> " + paella.AntiXSS.htmlEscape(serieTitle);
 		}
 		else {
 			episodesFromSeriesTitle.innerHTML = "<span class='episodesFromSeriesTitle_Bold'>" +paella.dictionary.translate("Available videos:")+"</span>";			
@@ -140,10 +140,10 @@ var SearchEpisode = Class.create({
 		this.recordingEntryID =	 domElement.id + "_entry_";
 
 
-		domElement.innerHTML = "";
+		domElement.innerText = "";
 		// loading div
 		this.divLoading = this.createDOMElement('div', thisClass.recordingEntryID + "_loading", "recordings_loading");
-		this.divLoading.innerHTML = paella.dictionary.translate("Searching...");
+		this.divLoading.innerText = paella.dictionary.translate("Searching...");
 		domElement.appendChild(this.divLoading);
 
 		// header div
@@ -252,17 +252,17 @@ var SearchEpisode = Class.create({
 							params.sid = this.param_sid;
 							thisClass.doSearch(params, divList);
 						});
-						divPrevLink.innerHTML = paella.dictionary.translate("Previous");
+						divPrevLink.innerText = paella.dictionary.translate("Previous");
 						divPrev.appendChild(divPrevLink);
 					} else {
-						divPrev.innerHTML = paella.dictionary.translate("Previous");
+						divPrev.innerText = paella.dictionary.translate("Previous");
 					}
 					divNavigation.appendChild(divPrev);
 
 					var divPage = document.createElement('div');
 					divPage.id = thisClass.recordingEntryID + "_header_navigation_page";
 					divPage.className = "recordings_header_navigation_page";
-					divPage.innerHTML = paella.dictionary.translate("Page:");
+					divPage.innerText = paella.dictionary.translate("Page:");
 					divNavigation.appendChild(divPage);
 
 					// take care for the page buttons
@@ -275,12 +275,12 @@ var SearchEpisode = Class.create({
 						divPageId.className = "recordings_header_navigation_pageid";
 
 						if (!spanBeforeSet && currentPage >= 5 && i > 1 && (currentPage - (offsetPages + 2) != 1)) {
-							divPageId.innerHTML = "...";
+							divPageId.innerText = "...";
 							i = currentPage - (offsetPages + 1);
 							spanBeforeSet = true;
 						}
 						else if (!spanAfterSet && (i - offsetPages) > currentPage && maxPage - 1 > i && i > 4) {
-							divPageId.innerHTML = "...";
+							divPageId.innerText = "...";
 							i = maxPage - 1;
 							spanAfterSet = true;
 						}
@@ -299,10 +299,10 @@ var SearchEpisode = Class.create({
 									params.sid = this.param_sid;
 									thisClass.doSearch(params, divList);
 								});
-								divPageIdLink.innerHTML = i;
+								divPageIdLink.innerText = i;
 								divPageId.appendChild(divPageIdLink);
 							} else {
-								divPageId.innerHTML = i;
+								divPageId.innerText = i;
 							}
 						}
 						divNavigation.appendChild(divPageId);
@@ -326,10 +326,10 @@ var SearchEpisode = Class.create({
 							params.sid = this.param_sid;
 							thisClass.doSearch(params, divList);
 						});
-						divNextLink.innerHTML = paella.dictionary.translate("Next");
+						divNextLink.innerText = paella.dictionary.translate("Next");
 						divNext.appendChild(divNextLink);
 					} else {
-						divNext.innerHTML = paella.dictionary.translate("Next");
+						divNext.innerText = paella.dictionary.translate("Next");
 					}
 					divNavigation.appendChild(divNext);
 
@@ -358,7 +358,7 @@ var SearchEpisode = Class.create({
 	},
 
 	setResults:function(results) {
-		this.divResults.innerHTML = results;
+		this.divResults.innerText = results;
 	},
 
 	getUrlOfAttachmentWithType:function(recording, type) {
@@ -423,7 +423,7 @@ var SearchEpisode = Class.create({
 		var titleResultText = document.createElement('a');
 		titleResultText.setAttribute("tabindex", "-1");
 		titleResultText.id = rootID+"_text_title";
-		titleResultText.innerHTML = recording.dcTitle;
+		titleResultText.innerText = recording.dcTitle;
 		titleResultText.className = "recordings_entry_text_title";
 		titleResultText.href = "watch.html?id=" + recording.id;
 		divResultTitleText.appendChild(titleResultText);
@@ -443,7 +443,7 @@ var SearchEpisode = Class.create({
 		var authorResultText = document.createElement('a');
 		authorResultText.setAttribute("tabindex", "-1");		
 		authorResultText.id = rootID+"_text_title";
-		authorResultText.innerHTML = author;
+		authorResultText.innerText = author;
 		authorResultText.className = "recordings_entry_text_title";
 		if (author_search != "") {
 			authorResultText.href = "index.html?q=" + encodeURIComponent(author_search);
@@ -478,7 +478,7 @@ var SearchEpisode = Class.create({
 		var divResultDateText = document.createElement('div');
 		divResultDateText.id = rootID+"_text_date";
 		divResultDateText.className = "recordings_entry_text_date";
-		divResultDateText.innerHTML = timeDate;
+		divResultDateText.innerText = timeDate;
 		divResultText.appendChild(divResultDateText);
 
 		divEntry.appendChild(divResultText);
