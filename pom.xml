@@ -151,6 +151,7 @@
     <module>modules/publication-service-oaipmh-remote</module>
     <module>modules/publication-service-youtube-remote</module>
     <module>modules/publication-service-youtube-v3</module>
+    <module>modules/rest-test-environment</module>
     <module>modules/runtime-info</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
@@ -796,6 +797,11 @@
         <groupId>javax.ws.rs</groupId>
         <artifactId>jsr311-api</artifactId>
         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-bundle</artifactId>
+        <version>1.19.4</version>
       </dependency>
       <!-- JPA -->
       <dependency>

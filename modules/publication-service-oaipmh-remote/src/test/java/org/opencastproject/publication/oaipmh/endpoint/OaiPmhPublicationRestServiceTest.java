@@ -22,8 +22,8 @@ package org.opencastproject.publication.oaipmh.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
-import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
+import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 import static org.opencastproject.util.UrlSupport.uri;
 
 import org.opencastproject.job.api.Job;
@@ -33,11 +33,11 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.publication.oaipmh.remote.OaiPmhPublicationServiceRemoteImpl;
-import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import com.entwinemedia.fn.data.ListBuilders;
 

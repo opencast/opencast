@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.rest;
+package org.opencastproject.test.rest;
 
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Monadics.mlist;

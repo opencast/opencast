@@ -27,11 +27,11 @@ import static org.junit.Assert.assertThat;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.UNKNOWN_AGENT;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.loadAgents;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.toJson;
-import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
-import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
+import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.capture.admin.api.Agent;
-import org.opencastproject.rest.RestServiceTestEnv;
+import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.ParseException;
