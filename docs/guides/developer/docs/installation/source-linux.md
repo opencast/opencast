@@ -4,10 +4,10 @@ Developer installation guide
 These instructions outline how to install Opencast on a Linux system.
 
 
-1.Get Opencast source:
+1.Get Opencast Source
 --------------------
 
-You can get the Opencast source code  by cloning the Git
+You can get the Opencast source code by cloning the Git
 repository.
 
 Cloning the Git repository:
@@ -56,10 +56,10 @@ website:
 3.ActiveMQ Configuration
 --------------------
 
-Opencast comes with a basic configuration for Activemq. Please follow the first
+Opencast comes with a basic configuration for ActiveMQ. Please follow the first
 configuration step to copy the XML file. [Message Broker Configuration](https://docs.opencast.org/develop/admin/configuration/message-broker/).
 
-4.Build and start Opencast
+4.Build and Start Opencast
 --------------------
 
 Automatically build Opencast and how to start it.
@@ -85,6 +85,6 @@ to disable the trimming.
     cd opencast-dir
     mvn clean install -DtrimStackTrace=false
 
-5.Modify code and build changes
+5.Modify Code and Build Changes
 --------------------
 After you modified your code you can go back to step 4 to rebuild Opencast.
