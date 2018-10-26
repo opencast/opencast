@@ -87,6 +87,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import javax.xml.bind.Unmarshaller;
+
 public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractSearchIndex.class);
@@ -528,11 +530,12 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new GroupQueryBuilder(query));
 
     try {
+      Unmarshaller unmarshaller = Group.createUnmarshaller();
       return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Group>() {
         @Override
         public Group apply(SearchMetadataCollection metadata) {
           try {
-            return GroupIndexUtils.toGroup(metadata);
+            return GroupIndexUtils.toGroup(metadata, unmarshaller);
           } catch (IOException e) {
             return chuck(e);
           }

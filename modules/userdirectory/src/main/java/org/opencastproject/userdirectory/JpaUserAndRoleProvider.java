@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -164,6 +165,13 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
       throw new IllegalArgumentException("Query must be set");
     String orgId = securityService.getOrganization().getId();
     List<JpaUser> users = UserDirectoryPersistenceUtil.findUsersByQuery(orgId, query, limit, offset, emf);
+    return Monadics.mlist(users).map(addProviderName).iterator();
+  }
+
+  @Override
+  public Iterator<User> findUsers(Collection<String> userNames) {
+    String orgId = securityService.getOrganization().getId();
+    List<JpaUser> users = UserDirectoryPersistenceUtil.findUsersByUserName(userNames, orgId, emf);
     return Monadics.mlist(users).map(addProviderName).iterator();
   }
 

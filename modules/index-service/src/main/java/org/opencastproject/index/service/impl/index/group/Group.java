@@ -236,6 +236,22 @@ public class Group implements IndexObject {
   }
 
   /**
+   * Create an unmarshaller for groups, which can be re-used for performance (from a single thread)
+   * @return An unmarshaller for groups
+   * @throws IOException if something went from with the creation
+   */
+  public static Unmarshaller createUnmarshaller() throws IOException {
+    try {
+      if (context == null) {
+        createJAXBContext();
+      }
+      return context.createUnmarshaller();
+    } catch (JAXBException e) {
+      throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    }
+  }
+
+  /**
    * Reads the group from the input stream.
    *
    * @param xml
@@ -243,12 +259,11 @@ public class Group implements IndexObject {
    * @return the deserialized group
    * @throws IOException
    */
-  public static Group valueOf(InputStream xml) throws IOException {
+  public static Group valueOf(InputStream xml, Unmarshaller unmarshaller) throws IOException {
     try {
       if (context == null) {
         createJAXBContext();
       }
-      Unmarshaller unmarshaller = context.createUnmarshaller();
       return unmarshaller.unmarshal(new StreamSource(xml), Group.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
