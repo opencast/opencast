@@ -1,34 +1,22 @@
 Developer installation guide
 ===========================
 
-These instructions outline how to install an all in one Opencast system on Linux.
+These instructions outline how to install Opencast on a Linux system.
 
 
-Get Opencast source:
+1.Get Opencast source:
+--------------------
 
-You can get the Opencast source code by either downloading a tarball of the source code or by cloning the Git
-repository. The latter option is more flexible, it is easier to upgrade and in general preferred for developers. The
-prior option, the tarball download, needs less tools and you do not have to download nearly as much as with Git.
-
-Using the tarball:
-
-Select the tarball for the version you want to install
-from the [GitHub releases section](https://github.com/opencast/opencast/releases).
-
-    # Download desired tarball
-    curl -OL https://github.com/opencast/opencast/archive/[...].tar.gz
-    tar xf [...].tar.gz
-    cd opencast--[...]
+You can get the Opencast source code  by cloning the Git
+repository.
 
 Cloning the Git repository:
 
     git clone https://github.com/opencast/opencast.git
     cd opencast
-    git tag   <-  List all available versions
-    git checkout TAG   <-  Switch to desired version
+    git checkout develop
 
-
-Install Dependencies
+2.Install Dependencies
 --------------------
 
 Please make sure to install the following dependencies.
@@ -43,24 +31,17 @@ Required:
     tar
     bzip2
 
-Required (not necessarily on the same machine):
+Required as a service for running Opencast:
 
     ActiveMQ >= 5.10 (older versions untested)
 
-Required for text extraction (recommended):
+Required for some services. Some tests may be skipped and some features
+may not be usable if they are not installed. Hence, it's generally a good idea to
+install them.
 
     tesseract >= 3
-
-Required for hunspell based text filtering (optional):
-
     hunspell >= 1.2.8
-
-Required for audio normalization (optional):
-
     sox >= 14.4
-
-Required for animate service (optional):
-
     synfig
 
 ### Dependency Download
@@ -72,49 +53,38 @@ website:
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
 * [Get Apache ActiveMQ](http://activemq.apache.org/download.html)
 
+3.ActiveMQ Configuration
+--------------------
 
-Building Opencast
------------------
+Opencast comes with a basic configuration for Activemq. Please follow the first
+configuration step to copy the XML file. [Message Broker Configuration](https://docs.opencast.org/develop/admin/configuration/message-broker/).
 
-Automatically build all Opencast modules and assemble distributions for different server types:
+4.Build and start Opencast
+--------------------
+
+Automatically build Opencast and how to start it.
+The -Pdev argument decreases the build time and skips the creation of multiple
+distribution tarballs by summarizing them into one.
 
     cd opencast-dir
-    mvn clean install
-    
-Useful Commands
---------
-If you need a quick build of Opencast for test purposes, you can also use the following command to skip the Opencast building tests.
+    mvn clean install -Pdev
+    cd build/opencast-*
+    ./bin/start-opencast
+
+### Useful Commands for Building Opencast
+
+If you need a quick build of Opencast for test purposes, you can also use the
+following command to skip the Opencast building tests.
 
     cd opencast-dir
     mvn clean install -DskipTests=true
 
-To see the whole Stacktrace of the installation you can use the following command to disable the trimming.
+To see the whole stacktrace of the installation you can use the following command
+to disable the trimming.
 
     cd opencast-dir
     mvn clean install -DtrimStackTrace=false
-    
-In addition, you can use the -Pdev argument to increase the build time and skip the creation of multiple packages by summarizing them into one.
 
-Deploy all-in-one distribution:
---------
-
-    cd build/
-    mv opencast-dist-allinone-*/ /opt/opencast
-
-ActiveMQ Configuration
----------
-
-Opencast comes with a basic configuration for Activemq. Please follow the first Step to copy the XML file.[Message Broker Configuration](../configuration/message-broker.md).
-
-
-Running Opencast
-------------------
-
-To start Opencast, run .../bin/start-opencast
-
-    /../opencast/bin/start-opencast
-
-As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
-administration interface.
-
-
+5.Modify code and build changes
+--------------------
+After you modified your code you can go back to step 4 to rebuild Opencast.
