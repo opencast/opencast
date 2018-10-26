@@ -101,6 +101,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
@@ -165,9 +166,6 @@ import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 public class IndexServiceImpl implements IndexService {
 
@@ -1360,7 +1358,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public SearchResult<Group> getGroups(String filter, Opt<Integer> optLimit, Opt<Integer> optOffset,
-          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException {
+          Opt<String> optSort, AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException {
     GroupSearchQuery query = new GroupSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
 
     // Parse the filters
@@ -1400,7 +1398,7 @@ public class IndexServiceImpl implements IndexService {
             query.sortByRoles(criterion.getOrder());
             break;
           default:
-            throw new WebApplicationException(Status.BAD_REQUEST);
+            throw new IllegalArgumentException("Unknown group index " + criterion.getFieldName());
         }
       }
     }
@@ -1428,23 +1426,24 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Response removeGroup(String id) throws NotFoundException {
-    return jpaGroupRoleProvider.removeGroup(id);
+  public void removeGroup(String id) throws NotFoundException, UnauthorizedException, Exception {
+    jpaGroupRoleProvider.removeGroup(id);
   }
 
   @Override
-  public Response updateGroup(String id, String name, String description, String roles, String members)
-          throws NotFoundException {
-    return jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
+  public void updateGroup(String id, String name, String description, String roles, String members)
+          throws NotFoundException, UnauthorizedException {
+    jpaGroupRoleProvider.updateGroup(id, name, description, roles, members);
   }
 
   @Override
-  public Response createGroup(String name, String description, String roles, String members) {
+  public void createGroup(String name, String description, String roles, String members)
+          throws IllegalArgumentException, UnauthorizedException, ConflictException {
     if (StringUtils.isEmpty(roles))
       roles = "";
     if (StringUtils.isEmpty(members))
       members = "";
-    return jpaGroupRoleProvider.createGroup(name, description, roles, members);
+    jpaGroupRoleProvider.createGroup(name, description, roles, members);
   }
 
   @Override

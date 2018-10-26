@@ -24,6 +24,14 @@ import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
+import static javax.servlet.http.HttpServletResponse.SC_CREATED;
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
@@ -37,6 +45,8 @@ import org.opencastproject.index.service.impl.index.group.Group;
 import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -67,6 +77,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 @Path("/")
@@ -154,7 +165,17 @@ public class GroupsEndpoint {
                   @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id)
           throws NotFoundException {
-    return indexService.removeGroup(id);
+    try {
+      indexService.removeGroup(id);
+      return Response.noContent().build();
+    } catch (NotFoundException e) {
+      return Response.status(SC_NOT_FOUND).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
+    } catch (Exception e) {
+      logger.error("Unable to delete group {}", id, e);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
   }
 
   @PUT
@@ -171,7 +192,15 @@ public class GroupsEndpoint {
   public Response updateGroup(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("name") String name, @FormParam("description") String description,
           @FormParam("roles") String roles, @FormParam("members") String members) throws Exception {
-    return indexService.updateGroup(id, name, description, roles, members);
+    try {
+      indexService.updateGroup(id, name, description, roles, members);
+    } catch (IllegalArgumentException e) {
+      logger.warn(e.getMessage());
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(SC_FORBIDDEN).build();
+    }
+    return Response.ok().build();
   }
 
   @POST
@@ -182,12 +211,22 @@ public class GroupsEndpoint {
           @RestParameter(name = "description", description = "Group Description", isRequired = false, type = STRING),
           @RestParameter(name = "roles", description = "Comma-separated list of roles", isRequired = false, type = STRING),
           @RestParameter(name = "members", description = "Comma-separated list of members", isRequired = false, type = STRING) }, reponses = {
-                  @RestResponse(description = "A new group is created.", responseCode = HttpServletResponse.SC_CREATED),
-                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+                  @RestResponse(description = "A new group is created.", responseCode = SC_CREATED),
+                  @RestResponse(description = "The request is invalid or inconsistent.", responseCode = SC_BAD_REQUEST) })
   public Response createGroup(@HeaderParam("Accept") String acceptHeader, @FormParam("name") String name,
           @FormParam("description") String description, @FormParam("roles") String roles,
           @FormParam("members") String members) {
-    return indexService.createGroup(name, description, roles, members);
+    try {
+      indexService.createGroup(name, description, roles, members);
+    } catch (IllegalArgumentException e) {
+      logger.warn(e.getMessage());
+      return Response.status(SC_BAD_REQUEST).build();
+    } catch (UnauthorizedException e) {
+      return Response.status(SC_FORBIDDEN).build();
+    } catch (ConflictException e) {
+      return Response.status(SC_CONFLICT).build();
+    }
+    return Response.status(SC_CREATED).build();
   }
 
   @POST
@@ -196,9 +235,9 @@ public class GroupsEndpoint {
   @RestQuery(name = "addgroupmember", description = "Adds a member to a group.", returnDescription = "", pathParameters = {
           @RestParameter(name = "groupId", description = "The group id", isRequired = true, type = STRING) }, restParameters = {
                   @RestParameter(name = "member", description = "Member Name", isRequired = true, type = STRING) }, reponses = {
-                          @RestResponse(description = "The member was already member of the group.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The member has been added.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                          @RestResponse(description = "The specified group does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+                          @RestResponse(description = "The member was already member of the group.", responseCode = SC_OK),
+                          @RestResponse(description = "The member has been added.", responseCode = SC_NO_CONTENT),
+                          @RestResponse(description = "The specified group does not exist.", responseCode = SC_NOT_FOUND) })
   public Response addGroupMember(@HeaderParam("Accept") String acceptHeader, @PathParam("groupId") String id,
           @FormParam("member") String member) {
     try {
@@ -208,8 +247,16 @@ public class GroupsEndpoint {
         Set<String> members = group.getMembers();
         if (!members.contains(member)) {
           group.addMember(member);
-          return indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                  StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+          try {
+            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
+                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+          } catch (IllegalArgumentException e) {
+            logger.warn(e.getMessage());
+            return Response.status(SC_BAD_REQUEST).build();
+          } catch (UnauthorizedException ex) {
+            return Response.status(SC_FORBIDDEN).build();
+          }
+          return Response.ok().build();
         } else {
           return ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, "Member is already member of group");
         }
@@ -244,8 +291,16 @@ public class GroupsEndpoint {
         if (members.contains(memberId)) {
           members.remove(memberId);
           group.setMembers(members);
-          return indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
-                  StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+          try {
+            indexService.updateGroup(group.getIdentifier(), group.getName(), group.getDescription(),
+                    StringUtils.join(group.getRoles(), ","), StringUtils.join(group.getMembers(), ","));
+          } catch (IllegalArgumentException e) {
+            logger.warn(e.getMessage());
+            return Response.status(SC_BAD_REQUEST).build();
+          } catch (UnauthorizedException ex) {
+            return Response.status(SC_FORBIDDEN).build();
+          }
+          return Response.ok().build();
         } else {
           return ApiResponses.notFound("Cannot find member '%s' in group '%s'.", memberId, id);
         }
