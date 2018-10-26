@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,6 +64,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.xml.bind.Unmarshaller;
 
 /**
  * Utility implementation to deal with the conversion of recording events and its corresponding index data structures.
@@ -87,14 +90,15 @@ public final class EventIndexUtils {
    *
    * @param metadata
    *          the search metadata
+   * @param unmarshaller the unmarshaller to use
    * @return the search result item
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Event toRecordingEvent(SearchMetadataCollection metadata) throws IOException {
+  public static Event toRecordingEvent(SearchMetadataCollection metadata, Unmarshaller unmarshaller) throws IOException {
     Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
     String eventJson = (String) metadataMap.get(EventIndexSchema.OBJECT).getValue();
-    return Event.valueOf(IOUtils.toInputStream(eventJson));
+    return Event.valueOf(IOUtils.toInputStream(eventJson, Charset.defaultCharset()), unmarshaller);
   }
 
   /**
