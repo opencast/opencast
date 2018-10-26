@@ -60,7 +60,9 @@ pages:
         - Dropdowns: 'modules/admin-ui/style/dropdowns.md'
         - Alerts and Indicators: 'modules/admin-ui/style/alerts-indicators.md'
         - References: 'modules/admin-ui/style/references.md'
-   - Capture Agent: 'modules/capture-agent.md'
+   - Capture Agent:
+     - Capture Agent: 'modules/capture-agent/capture-agent.md'
+     - Test Cases: 'modules/capture-agent/testcases.md'
    - Player:
       - Architecture: 'modules/player/architecture.md'
       - Core Reference: 'modules/player/core.reference.md'
