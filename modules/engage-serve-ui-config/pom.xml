@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>opencast-engage-serve-ui-config</artifactId>
+  <artifactId>opencast-user-interface-configuration</artifactId>
   <packaging>bundle</packaging>
-  <name>Opencast :: engage-serve-ui-config</name>
+  <name>Opencast :: user-interface-configuration</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -50,7 +50,7 @@
               *
             </Import-Package>
             <Export-Package>
-              org.opencastproject.engage.serveuiconfig;version=${project.version},
+              org.opencastproject.uiconfig;version=${project.version},
             </Export-Package>
             <Service-Component>
               OSGI-INF/uiconfig.xml

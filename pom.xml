@@ -93,7 +93,6 @@
     <module>modules/email-template-service-impl</module>
     <module>modules/event-comment</module>
     <module>modules/engage-paella-player</module>
-    <module>modules/engage-serve-ui-config</module>
     <module>modules/engage-theodul-api</module>
     <module>modules/engage-theodul-core</module>
     <module>modules/engage-theodul-plugin-archetype</module>
@@ -214,6 +213,7 @@
     <module>modules/userdirectory-ldap</module>
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
+    <module>modules/user-interface-configuration</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
     <module>modules/videoeditor-api</module>

@@ -186,7 +186,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-serve-ui-config/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-theodul-core/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-engage-theodul-plugin-controls/${project.version}</bundle>
@@ -264,6 +263,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-ibm-watson-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-transcription-service-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-user-interface-configuration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-videoeditor-api/${project.version}</bundle>

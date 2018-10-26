@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.engage.serveuiconfig;
+package org.opencastproject.uiconfig;
 
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.ConfigurationException;
@@ -71,7 +71,7 @@ public class UIConfigRest {
   private static final Logger logger = LoggerFactory.getLogger(UIConfigRest.class);
 
   /** Konfiguration KEY for the ui config folder */
-  private static final String UI_CONFIG_FOLDER_PROPERTY = "org.opencastproject.engage.serveuiconfig.uiconfigfolder";
+  private static final String UI_CONFIG_FOLDER_PROPERTY = "org.opencastproject.uiconfig.folder";
 
   /** Default Path for the ui configuration folder (relative to ${karaf.etc}) */
   private static final String UI_CONFIG_FOLDER_DEFAULT = "ui-config";
@@ -100,7 +100,7 @@ public class UIConfigRest {
       String karafetc = cc.getBundleContext().getProperty("karaf.etc");
 
       if (StringUtils.isBlank(karafetc)) {
-        throw new ConfigurationException("org.opencastproject.engage.serveuiconfig.uiconfigfolder not set and unable to"
+        throw new ConfigurationException(UI_CONFIG_FOLDER_PROPERTY + " not set and unable to"
                                          + " fall back to default location based on ${karaf.etc}");
       }
 
