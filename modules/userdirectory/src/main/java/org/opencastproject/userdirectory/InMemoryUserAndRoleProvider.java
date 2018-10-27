@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -158,6 +157,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
         inMemoryUsers.add(digestUser);
       }
 
+      /* Deactivated due to security issue (CVE-2018-16154)
       String caUsername = organization.getProperties().get(CAPTURE_AGENT_USER_KEY);
       String caUserPass = organization.getProperties().get(CAPTURE_AGENT_PASSWORD_KEY);
       if (caUsername != null && caUserPass != null) {
@@ -186,6 +186,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
                 jaxbOrganization, caRoleList);
         inMemoryUsers.add(caUser);
       }
+      */
     }
   }
 

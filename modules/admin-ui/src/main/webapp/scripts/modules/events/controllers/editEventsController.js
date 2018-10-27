@@ -22,10 +22,10 @@
 
 // Controller for the "edit scheduled events" wizard
 angular.module('adminNg.controllers')
-  .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'SeriesResource',
+  .controller('EditEventsCtrl', ['$scope', 'Table', 'Notifications', 'EventBulkEditResource', 'ResourcesListResource',
     'CaptureAgentsResource', 'EventsSchedulingResource', 'JsHelper', 'SchedulingHelperService', 'WizardHandler',
     'Language', '$translate', 'decorateWithTableRowSelection','$timeout', 'Modal',
-    function ($scope, Table, Notifications, EventBulkEditResource, SeriesResource, CaptureAgentsResource,
+    function ($scope, Table, Notifications, EventBulkEditResource, ResourcesListResource, CaptureAgentsResource,
       EventsSchedulingResource, JsHelper, SchedulingHelperService, WizardHandler, Language, $translate,
       decorateWithTableRowSelection, $timeout, Modal) {
       var me = this;
@@ -51,11 +51,12 @@ angular.module('adminNg.controllers')
       var tzOffset = (new Date()).getTimezoneOffset() / -60;
       $scope.tz = 'UTC' + (tzOffset < 0 ? '-' : '+') + tzOffset;
 
-      // Get available series
+      // Get available series (use SeriesListProvider here since request is currently much faster)
       $scope.seriesResults = {};
-      SeriesResource.query().$promise.then(function(results) {
-        angular.forEach(results.rows, function(row) {
-          $scope.seriesResults[row.title] = row.id;
+
+      $scope.seriesLoaded = ResourcesListResource.query({ resource: 'SERIES' }).$promise.then(function (series) {
+        series.forEach(function(element) {
+          $scope.seriesResults[element.value] = element.name;
         });
       });
 
@@ -266,7 +267,7 @@ angular.module('adminNg.controllers')
 
       $scope.checkingConflicts = false;
 
-      var nextWizardStep = function() {
+      $scope.nextWizardStep = function() {
         WizardHandler.wizard('editEventsWz').next();
       };
 
@@ -289,30 +290,10 @@ angular.module('adminNg.controllers')
         }
       };
 
-
       // This is triggered after the user selected some events in the first wizard step
       $scope.clearFormAndContinue = function() {
         $scope.conflictCheckingEnabled = true;
-        $scope.metadataRows = [
-          {
-            id: 'title',
-            label: 'EVENTS.EVENTS.DETAILS.METADATA.TITLE',
-            readOnly: false,
-            required: false,
-            type: 'text',
-            value: getMetadataPart(getterForMetadata('title'))
-          },
-          {
-            id: 'isPartOf',
-            collection: $scope.seriesResults,
-            label: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
-            readOnly: false,
-            required: false,
-            translatable: false,
-            type: 'text',
-            value: getMetadataPart(getterForMetadata('isPartOf'))
-          },
-        ];
+
         $scope.scheduling = {
           timezone: JsHelper.getTimeZoneName(),
           location: getCaById(getMetadataPart(function(row) { return row.agent_id; })),
@@ -330,7 +311,32 @@ angular.module('adminNg.controllers')
           },
           weekday: getSchedulingPart(function(entry) {return fromJsWeekday(new Date(entry.start.date).getDay()).key;})
         };
-        nextWizardStep();
+
+        return $scope.seriesLoaded.then(function() {
+
+          $scope.metadataRows = [
+            {
+              id: 'title',
+              label: 'EVENTS.EVENTS.DETAILS.METADATA.TITLE',
+              readOnly: false,
+              required: false,
+              type: 'text',
+              value: getMetadataPart(getterForMetadata('title'))
+            },
+            {
+              id: 'isPartOf',
+              collection: $scope.seriesResults,
+              label: 'EVENTS.EVENTS.DETAILS.METADATA.SERIES',
+              readOnly: false,
+              required: false,
+              translatable: false,
+              type: 'text',
+              value: getMetadataPart(getterForMetadata('isPartOf'))
+            }
+          ];
+
+          $scope.nextWizardStep();
+        });
       };
 
       $scope.metadataRows = [];
@@ -475,7 +481,7 @@ angular.module('adminNg.controllers')
           }
         });
         $timeout(function() {
-          nextWizardStep();
+          $scope.nextWizardStep();
         });
       };
 

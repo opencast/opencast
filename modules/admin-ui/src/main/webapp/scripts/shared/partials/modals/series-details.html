@@ -57,7 +57,6 @@
 
   <!-- Metadata view -->
   <div class="modal-content" data-modal-tab-content="metadata">
-    <p class="tab-desc"></p>
     <div class="modal-body">
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -84,7 +83,6 @@
 
   <!-- Extended metadata view -->
   <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
-    <p class="tab-desc"></p>
     <div class="modal-body">
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -111,7 +109,6 @@
 
   <!-- Permission view -->
   <div class="modal-content" data-modal-tab-content="permissions" data-level="1">
-    <p class="tab-desc"></p>
     <div class="modal-body">
 
       <div data-admin-ng-notifications="" context="series-acl"></div>
@@ -260,7 +257,6 @@
   <div class="modal-content" data-modal-tab-content="theme" data-level="1">
     <div class="modal-body">
       <div data-admin-ng-notifications="" type="warning" context="series-theme"></div>
-      <p class="tab-desc"></p>
       <div class="full-col">
         <div class="obj quick-actions">
           <header translate="CONFIGURATION.NAVIGATION.THEMES"><!-- Theme --></header>

@@ -57,10 +57,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -264,6 +267,33 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     } else {
       return (User) user;
     }
+  }
+
+  @Override
+  public Iterator<User> loadUsers(Collection<String> userNames) {
+    Organization org = securityService.getOrganization();
+    Map<String, User> result = new HashMap<>(userNames.size());
+    Set<String> remainingNames = new HashSet<>(userNames);
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId)) {
+        continue;
+      }
+      for (Iterator<User> it = userProvider.findUsers(remainingNames); it.hasNext();) {
+        User user = it.next();
+        User priorUser = result.get(user.getUsername());
+        if (priorUser != null) {
+          result.put(user.getUsername(), mergeUsers(priorUser, user));
+        } else {
+          result.put(user.getUsername(), user);
+        }
+        // Return super users without merging to avoid unnecessary requests to other user providers
+        if (InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(userProvider.getName())) {
+          remainingNames.remove(user.getUsername());
+        }
+      }
+    }
+    return result.values().iterator();
   }
 
   /** Load a user of an organization. */

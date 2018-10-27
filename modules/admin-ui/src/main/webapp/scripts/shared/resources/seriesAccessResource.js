@@ -42,7 +42,7 @@ angular.module('adminNg.resources')
 
         return $.param({
           acl      : angular.toJson({acl: data.acl}),
-          override : true
+          override : data.override
         });
       }
     }
