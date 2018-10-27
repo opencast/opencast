@@ -179,7 +179,7 @@
       "VIDEO_CUT_PROCESSING": "La vidéo est en cours de traitement…",
       "SERVER_UNRESPONSIVE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
       "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être affiché, pendant qu’il y a un flux de travail actif ou une transaction."
+      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -440,11 +440,11 @@
          },
          "NAVIGATION": {
             "EVENTS": "Événements",
-            "SERIES": "Série",
+            "SERIES": "Séries",
             "OVERVIEW": "Aperçu"
          },
          "UPLOAD": "Envoyer",
-         "ADD_SERIES": "Ajouter série",
+         "ADD_SERIES": "Ajouter une série",
          "ADD_EVENT": "Ajouter événement",
          "TABLE": {
             "CAPTION": "Événements",
@@ -494,7 +494,7 @@
             "UPLOADING": "Transfert",
             "INGESTING": "Préparation",
             "PENDING": "En attente",
-            "PROCESSING": "Traitement en cours",
+            "PROCESSING": "En cours",
             "PAUSED": "Suspendu",
             "PROCESSED": "Terminé",
             "RECORDING_FAILURE": "Erreur d'enregistrement",
@@ -758,7 +758,7 @@
                "CAPTION": "Détails de l'événement",
                "TITLE": "Titre",
                "ID": "UID",
-               "SERIES": "Série",
+               "SERIES": "Séries",
                "RECORDING_DATE": "Date d'enregistrement",
                "SUBJECT": "Sujet",
                "DESCRIPTION": "Description",
@@ -1784,7 +1784,7 @@
             "LABEL": "Statut",
             "PAUSED": "Suspendu",
             "QUEUED": "En attente",
-            "RUNNING": "Traitement en cours",
+            "RUNNING": "En cours",
             "WAITING": "En Attente"
          }
       },
