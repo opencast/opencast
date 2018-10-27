@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "扩展元数据",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "扩展元数据"
                }
             },
             "ACCESS": {
                "CAPTION": "访问权限",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "模板"
                },

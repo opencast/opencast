@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Udvidet metadata",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Udvidet metadata"
                }
             },
             "ACCESS": {
                "CAPTION": "Adgangspolitik",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Skabeloner"
                },

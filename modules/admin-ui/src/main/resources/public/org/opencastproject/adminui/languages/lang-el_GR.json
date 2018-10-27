@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Εκτεταμένα μεταδεδομένα",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Εκτεταμένα μεταδεδομένα"
                }
             },
             "ACCESS": {
                "CAPTION": "Πολιτική πρόσβασης",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Πρότυπα"
                },

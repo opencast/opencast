@@ -195,7 +195,7 @@
       "VIDEO_TOO_MANY_AUDIOS": "Vous ne pouvez pas avoir plus d'un flux audio sur un seul flux vidéo",
       "SERVER_UNRESPONSIVE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
       "SERVICE_UNAVAILABLE": "Oups! Le serveur semble être injoignable. Veuillez réessayer ultérieurement.",
-      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être affiché, pendant qu’il y a un flux de travail actif ou une transaction."
+      "ACTIVE_TRANSACTION": "Cet événement ne peut pas être modifié, pendant qu’il y a un flux de travail actif ou une transaction."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Actions",
@@ -501,11 +501,11 @@
          },
          "NAVIGATION": {
             "EVENTS": "Événements",
-            "SERIES": "Série",
+            "SERIES": "Séries",
             "OVERVIEW": "Aperçu"
          },
          "UPLOAD": "Envoyer",
-         "ADD_SERIES": "Ajouter série",
+         "ADD_SERIES": "Ajouter une série",
          "ADD_EVENT": "Ajouter événement",
          "TABLE": {
             "CAPTION": "Événements",
@@ -557,7 +557,7 @@
             "UPLOADING": "Transfert",
             "INGESTING": "Préparation",
             "PENDING": "En attente",
-            "PROCESSING": "Traitement en cours",
+            "PROCESSING": "En cours",
             "PAUSED": "Suspendu",
             "PROCESSED": "Terminé",
             "RECORDING_FAILURE": "Erreur d'enregistrement",
@@ -823,7 +823,7 @@
                "CAPTION": "Détails de l'événement",
                "TITLE": "Titre",
                "ID": "UID",
-               "SERIES": "Série",
+               "SERIES": "Séries",
                "RECORDING_DATE": "Date d'enregistrement",
                "SUBJECT": "Sujet",
                "DESCRIPTION": "Description",
@@ -893,7 +893,7 @@
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instancié",
-                  "RUNNING": "Traitement en cours",
+                  "RUNNING": "En cours",
                   "PAUSED": "Suspendu",
                   "SUCCEEDED": "Réussi",
                   "FAILED": "Echoué",
@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Métadonnées étendues",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Métadonnées étendues"
                }
             },
             "ACCESS": {
                "CAPTION": "Droits d'accès",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Modèles "
                },
@@ -1658,7 +1656,7 @@
          "STATUS": {
             "QUEUED": "En attente",
             "PAUSED": "Suspendu",
-            "RUNNING": "Traitement en cours",
+            "RUNNING": "En cours",
             "FINISHED": "Terminé",
             "FAILED": "Echoué",
             "DELETED": "Supprimé",
@@ -1979,7 +1977,7 @@
             "LABEL": "Statut",
             "PAUSED": "Suspendu",
             "QUEUED": "En attente",
-            "RUNNING": "Traitement en cours",
+            "RUNNING": "En cours",
             "WAITING": "En Attente"
          }
       },
@@ -2143,9 +2141,9 @@
             "SELECT_PREVIOUS_DASHBOARD_FILTER": "Sélectionner le filtre précédent du tableau de bord",
             "REMOVE_FILTERS": "Supprimer tous les filtres",
             "EVENT_VIEW": "Événements",
-            "SERIES_VIEW": "Série",
+            "SERIES_VIEW": "Séries",
             "NEW_EVENT": "Ajouter événement",
-            "NEW_SERIES": "Ajouter série",
+            "NEW_SERIES": "Ajouter une série",
             "CHEAT_SHEET": "Raccourcis clavier"
          },
          "PLAYER": {

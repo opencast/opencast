@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Utökad metadata",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Utökad metadata"
                }
             },
             "ACCESS": {
                "CAPTION": "Åtkomstpolicy",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Mallar"
                },

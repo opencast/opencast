@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Metadatos extendidos",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Metadatos extendidos"
                }
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Plantillas"
                },

@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Razširjeni metapodatki",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Razširjeni metapodatki"
                }
             },
             "ACCESS": {
                "CAPTION": "Pravilnik o dostopu",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Predloge"
                },

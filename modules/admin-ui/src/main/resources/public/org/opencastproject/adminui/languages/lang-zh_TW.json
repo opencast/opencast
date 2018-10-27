@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "擴展後設資料",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "擴展後設資料"
                }
             },
             "ACCESS": {
                "CAPTION": "存取權限",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "樣板"
                },
