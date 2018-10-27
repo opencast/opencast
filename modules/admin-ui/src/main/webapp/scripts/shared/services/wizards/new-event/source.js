@@ -512,7 +512,11 @@ angular.module('adminNg.services')
             minute: parseInt(endDateTime.format('mm'))
           };
 
-          defaults.presentableWeekdays = chosenSlot.format('dd');
+          if (orgProperties['admin.event.new.preselect_day'] === 'false') {
+            defaults.presentableWeekdays = '';
+          } else {
+            defaults.presentableWeekdays = chosenSlot.format('dd');
+          }
 
           if (self.captureAgents.length === 0) {
             //No capture agents, so user can only upload files
