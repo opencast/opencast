@@ -19,9 +19,9 @@
     <script type=application/javascript src=versions.js></script>
     <script type=application/javascript>
       function init() {
-        var admin = '';
-        var user = '';
-        var developer = '';
+        var admin = '',
+            user = '',
+            developer = '';
         for (var i=0; i<versions.length; i++) {
           admin += '<li role="presentation"><a role="menuitem" tabindex="-1" '
             + 'href="' + versions[i] + '/admin">' + versions[i] + '</a></li>';
@@ -165,8 +165,19 @@
         <div class="col-md-6">
           <h4>Bugs</h4>
           <p>Please report <em>security</em> related bugs by sending an email to
-          <a href="mailto:security@opencast.org">security@opencast.org</a>.</p>
-          <p>Everything else should be filed as a ticket in our <a href="https://opencast.jira.com">issue tracker</a>.</p>
+          <a href="mailto:security@opencast.org">security@opencast.org</a>.
+          Everything else should be filed as a ticket in our <a href="https://opencast.jira.com">issue tracker</a>.</p>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Translations</h4>
+          <p>You can help translating Opencast to your language on
+          <a href=https://crowdin.com/project/opencast-community>crowdin.com/project/opencast-community</a>.
+          Simply request to join the project on Crowdin and start translating.  If you are interested in translating a
+          language which is not a target language right now, please ask on the developers list and we will add the
+          language.</p>
         </div>
       </div>
 
