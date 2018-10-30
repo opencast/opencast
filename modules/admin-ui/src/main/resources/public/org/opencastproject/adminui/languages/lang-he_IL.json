@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "מטא-נתונים מורחב",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "מטה-נתונים מורחב"
                }
             },
             "ACCESS": {
                "CAPTION": "מדיניות גישה",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "תבניות"
                },

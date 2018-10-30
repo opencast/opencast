@@ -81,7 +81,7 @@
       "USERS_GUIDE": "用户指南",
       "DOCUMENTATION": "文档",
       "REST_DOC": "REST API 文档",
-      "HOTKEY_CHEAT_SHEET": "Keyboard Shortcuts"
+      "HOTKEY_CHEAT_SHEET": "快捷键"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "访问权限已新增",
@@ -127,7 +127,7 @@
       "SERIES_NOT_UPDATED_ALL": "所有系列均无法保存",
       "EVENTS_DELETED": "事件已删除",
       "EVENTS_NOT_DELETED": "事件无法删除",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "The event could not be deleted, because you don't have the permission to do so.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "无法删除该事件, 因为您没有权限这样做。",
       "SERIES_DELETED": "该系列已被删除",
       "SERIES_NOT_DELETED": "该系列无法删除",
       "USER_BLACKLIST_CREATED": "黑名单已创建",
@@ -138,7 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "黑名单无法删除",
       "LOCATION_DELETED": "位置已删除",
       "LOCATION_NOT_DELETED": "位置无法删除",
-      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "无法删除该位置, 因为您没有权限这样做。",
       "LOCATION_BLACKLIST_CREATED": "黑名单已创建",
       "LOCATION_BLACKLIST_NOT_CREATED": "黑名单无法创建",
       "LOCATION_BLACKLIST_SAVED": "黑名单已保存",
@@ -155,10 +155,10 @@
       "EMAIL_SENT": "邮件已发送",
       "EMAIL_NOT_SENT": "邮件无法发送",
       "CONFLICT_DETECTED": "排程有冲突：该新事件与已存在的某个事件有重叠，请更改位置、日期或时间。",
-      "CONFLICT_BULK_DETECTED": "Scheduling conflict: changing the events results in conflicts. Please change the location, dates or times.",
+      "CONFLICT_BULK_DETECTED": "计划冲突: 请更改会导致冲突的事件。请更改地点、日期或时间。",
       "CONFLICT_ALREADY_ENDED": "排程错误 ︰ 该事件已结束。",
       "CONFLICT_END_BEFORE_START": "排程错误 ︰ 结束时间必须要迟于开始时间。",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
+      "CONFLICT_IN_THE_PAST": "该计划无法更新: 无法预订已经过去的事件。",
       "INVALID_ACL_RULES": "规则必须含有一个拥有读取和/或写入权限的有效角色。",
       "MISSING_ACL_RULES": "至少有一个角色必须具有读取和写入权限。",
       "SAVED_ACL_RULES": "访问权限已保存",
@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "扩展元数据",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "扩展元数据"
                }
             },
             "ACCESS": {
                "CAPTION": "访问权限",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "模板"
                },

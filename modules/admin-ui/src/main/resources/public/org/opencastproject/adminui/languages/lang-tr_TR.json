@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Genişletişmiş meta verisi",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Genişletişmiş meta verisi"
                }
             },
             "ACCESS": {
                "CAPTION": "Erişim İlkesi",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Şablonlar"
                },

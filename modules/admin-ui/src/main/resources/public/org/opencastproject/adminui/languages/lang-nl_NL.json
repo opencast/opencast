@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Uitgebreide metadata",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Uitgebreide metadata"
                }
             },
             "ACCESS": {
                "CAPTION": "Toegangspolicy",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Sjablonen"
                },
