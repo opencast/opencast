@@ -413,10 +413,8 @@
                         data-disable-search-threshold="8"
                         data-search_contains="true"
                         ng-model="wizard.step.ud.workflow"
-                        ng-options="w.title disable when 
-                          ((wizard.getStateControllerByName('source').ud.type==='UPLOAD' && !w.tags.includes('upload-ng')) ||
-                                  (wizard.getStateControllerByName('source').ud.type.startsWith('SCHEDULE') && !w.tags.includes('schedule-ng')))
-                          for (obj, w) in wizard.step.workflows"
+                        ng-options="w.title for (obj, w) in wizard.step.workflows |
+                                  filter: wizard.getStateControllerByName('source').ud.type==='UPLOAD' ? 'upload-ng' : 'schedule-ng'"
                         data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
                         no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                     >
