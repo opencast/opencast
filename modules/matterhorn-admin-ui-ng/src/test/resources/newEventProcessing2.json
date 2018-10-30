@@ -2,6 +2,7 @@
     {
         "id": "full-html5",
         "title": "Full HTML5",
+        "tags": ["quick_actions","test"],
         "description": "Test description",
         "configuration_panel": "<h2>Test</h2>"
     }
