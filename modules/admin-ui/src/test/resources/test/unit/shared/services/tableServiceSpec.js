@@ -34,7 +34,8 @@ describe('Table', function () {
         var params = {
             columns: [{
                 name: 'name',
-                label: 'NAME'
+                label: 'NAME',
+                sortable: true
             }],
             caption: 'CAPTION',
             resource: 'tables',
@@ -134,7 +135,7 @@ describe('Table', function () {
         it('sets the sort params', function () {
             $httpBackend.whenGET('/admin-ng/users/users.json?limit=10&offset=0&sort=email:ASC')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
-            Table.sortBy({ name: 'email' });
+            Table.sortBy({ name: 'email', sortable: true });
             $httpBackend.flush();
             expect(Table.predicate).toEqual('email');
             expect(Table.reverse).toBe(false);
@@ -144,7 +145,7 @@ describe('Table', function () {
             spyOn(Storage, 'put');
             $httpBackend.whenGET('/admin-ng/users/users.json?limit=10&offset=0&sort=email:DESC')
                 .respond(JSON.stringify(getJSONFixture('admin-ng/users/users.json')));
-            Table.sortBy({ name: 'email' });
+            Table.sortBy({ name: 'email', sortable: true });
             $httpBackend.flush();
             expect(Storage.put).toHaveBeenCalledWith('sorter', 'users', 'email',  { name : 'email', priority : 0, order : 'DESC' });
         });
