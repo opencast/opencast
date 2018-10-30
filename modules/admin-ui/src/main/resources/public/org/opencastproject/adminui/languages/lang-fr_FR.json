@@ -224,7 +224,7 @@
          "GENERAL": {
             "CAPTION": "Général",
             "SUMMARY": "({{ count }} événements sélectionnés)",
-            "CANNOTSTART": "Les événements en surbrillance ne peuvent être traitées à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
+            "CANNOTSTART": "Les événements en surbrillance ne peuvent être traités à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
          },
          "TASKS": {
             "CAPTION": "Tâche",
