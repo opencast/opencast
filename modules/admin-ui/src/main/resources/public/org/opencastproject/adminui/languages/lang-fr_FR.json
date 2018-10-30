@@ -242,7 +242,7 @@
          "GENERAL": {
             "CAPTION": "Général",
             "SUMMARY": "({{ count }} événements sélectionnés)",
-            "CANNOTSTART": "Les événements en surbrillance ne peuvent être traitées à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
+            "CANNOTSTART": "Les événements en surbrillance ne peuvent être traités à l'heure actuelle. Désélectionnez-les ou réessayez plus tard."
          },
          "TASKS": {
             "CAPTION": "Tâche",
@@ -261,11 +261,11 @@
          "CONFLICT_CHECK_RUNNING": "Vérification de conflits est en cours…",
          "GENERAL": {
             "CAPTION": "Général",
-            "CANNOTSTART": "Les événements surlignés ne peuvent pas être traités, seuls les événements planifiés sont pris en charge.",
+            "CANNOTSTART": "Les événements en surbrillance ne peuvent pas être traités, seuls les événements planifiés sont pris en charge.",
             "NOCHANGES": "Aucun changement aux événements détectés !",
             "CONFLICT_FIRST_EVENT": "Événement modifié",
             "CONFLICT_SECOND_EVENT": "Événement en conflit",
-            "CANNOTEDITSCHEDULE": "Pour les événements sélectionnés, vous n’avez pas l’autorisation de modifier les planning . Vous pouvez continuer, mais vous ne pourrez pas éditer les informations des événements programmés."
+            "CANNOTEDITSCHEDULE": "Pour les événements sélectionnés, vous n’avez pas l’autorisation de modifier les planning . Vous pouvez continuer, mais vous ne pourrez pas modifier les informations des événements programmés."
          },
          "METADATA": {
             "EDIT": "Éditer les métadonnées"

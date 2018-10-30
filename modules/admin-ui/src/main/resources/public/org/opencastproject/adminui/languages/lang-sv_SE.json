@@ -535,13 +535,13 @@
                "START": "Filter för detta startdatum",
                "SERIES": "Filter för den här serien",
                "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
+               "LOCATION": "Filtrera för den här platsen",
                "DETAILS": "Öppna eventdetaljer",
                "DELETE": "Ta bort händelse",
                "EDITOR": "Öppna videoredigeraren",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Visa kommentarer",
-               "PAUSED_WORKFLOW": "View paused workflow"
+               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde"
             }
          },
          "SCHEDULING_STATUS": {
@@ -1851,7 +1851,7 @@
       "PROFILES": {
          "FILTERS_HEADER": "Sparade filter-set",
          "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
+         "REMOVE": "Ta bort sparat filter",
          "EMPTY": "Inga sparade filter än",
          "SAVE_FILTERS": "Spara",
          "FILTER_HEADER": "Spara filter-set",

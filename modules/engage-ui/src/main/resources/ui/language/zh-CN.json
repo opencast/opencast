@@ -36,6 +36,6 @@
   "login_success": "登录成功。",
   "login_failed": "登录失败！",
   "not_logged_in": "未登录",
-  "live_in_progress": "Live (in progress)",
-  "live_not_in_progress": "Live (not in progress)"
+  "live_in_progress": "直播 (进行中)",
+  "live_not_in_progress": "直播 (未进行中)"
 }
