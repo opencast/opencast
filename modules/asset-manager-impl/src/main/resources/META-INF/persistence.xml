@@ -8,10 +8,11 @@
   <persistence-unit name="org.opencastproject.assetmanager.impl" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
+
     <class>org.opencastproject.assetmanager.impl.persistence.PropertyDto</class>
+    <class>org.opencastproject.assetmanager.impl.persistence.SnapshotDto</class>
     <class>org.opencastproject.assetmanager.impl.persistence.AssetDto</class>
     <class>org.opencastproject.assetmanager.impl.persistence.VersionClaimDto</class>
-    <class>org.opencastproject.assetmanager.impl.persistence.SnapshotDto</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />

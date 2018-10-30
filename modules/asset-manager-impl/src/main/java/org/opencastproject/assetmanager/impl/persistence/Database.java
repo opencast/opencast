@@ -207,7 +207,7 @@ public class Database implements EntityPaths {
         for (MediaPackageElement e : pmp.getElements()) {
           final AssetDto a = AssetDto.mk(
                   e.getIdentifier(),
-                  snapshotDto.getId(),
+                  snapshotDto,
                   e.getChecksum().toString(),
                   Opt.nul(e.getMimeType()),
                   storageId,
@@ -237,7 +237,7 @@ public class Database implements EntityPaths {
         Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
         //Update the assets
         new JPAUpdateClause(em, a, TEMPLATES)
-                .where(a.snapshotId.eq(s.get().getSnapshotDto().getId()))
+                .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()))
                 .set(a.storageId, storageId)
                 .execute();
       }
@@ -253,7 +253,7 @@ public class Database implements EntityPaths {
         Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
         // Update the asset store id
         new JPAUpdateClause(em, a, TEMPLATES)
-                .where(a.snapshotId.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
+                .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
                 .set(a.storageId, storageId).execute();
       }
     }.toFn());
@@ -280,13 +280,12 @@ public class Database implements EntityPaths {
     return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Medium>>() {
       @Override public Opt<AssetDtos.Medium> apply(EntityManager em) {
         final QAssetDto assetDto = QAssetDto.assetDto;
-        final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
         final Tuple result = AssetDtos.baseJoin(em)
-                .where(snapshotDto.mediaPackageId.eq(mpId)
+                .where(assetDto.snapshot.mediaPackageId.eq(mpId)
                                .and(assetDto.mediaPackageElementId.eq(mpeId))
-                               .and(snapshotDto.version.eq(version.value())))
+                               .and(assetDto.snapshot.version.eq(version.value())))
                         // if no version has been specified make sure to get the latest by ordering
-                .orderBy(snapshotDto.version.desc())
+                .orderBy(assetDto.snapshot.version.desc())
                 .uniqueResult(Medium.select);
         return Opt.nul(result).map(AssetDtos.Medium.fromTuple);
       }

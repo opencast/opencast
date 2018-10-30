@@ -69,7 +69,7 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     assertStoreSize(mpCount * versionCount * 2);
     if (RUN_RAW_QUERIES) {
       delete(Q_PROPERTY, Q_PROPERTY.mediaPackageId.eq(mp[0]));
-      delete(Q_ASSET, Q_ASSET.snapshotId.in(new JPASubQuery().from(Q_SNAPSHOT).where(Q_SNAPSHOT.mediaPackageId.eq(mp[0])).list(Q_SNAPSHOT.id)));
+      delete(Q_ASSET, Q_ASSET.snapshot.id.in(new JPASubQuery().from(Q_SNAPSHOT).where(Q_SNAPSHOT.mediaPackageId.eq(mp[0])).list(Q_SNAPSHOT.id)));
       delete(Q_SNAPSHOT, Q_SNAPSHOT.mediaPackageId.eq(mp[0]));
     } else {
       assertEquals(versionCount, q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0])).run());
@@ -92,7 +92,7 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     assertStoreSize(6 * 2);
     if (RUN_RAW_QUERIES) {
       assertEquals(3, delete(Q_ASSET,
-                             Q_ASSET.snapshotId.in(
+                             Q_ASSET.snapshot.id.in(
                                      new JPASubQuery().from(Q_SNAPSHOT).where(
                                              Q_SNAPSHOT.version.eq(
                                                      new JPASubQuery().from(Q_SNAPSHOT).unique(Q_SNAPSHOT.version.min())))
@@ -149,7 +149,7 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
       */
       assertEquals(2, delete(
               Q_ASSET,
-              Q_ASSET.snapshotId.in(
+              Q_ASSET.snapshot.id.in(
                       new JPASubQuery()
                               .from(Q_SNAPSHOT, Q_PROPERTY)
                               .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId)
