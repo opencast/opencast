@@ -183,7 +183,7 @@ Upgrading Major Versions
 ------------------------
 
 While these packages will automatically upgrade you to the latest point version in a release series, they do not
-automatically upgrade you to the latest major version. In other words, if you install `opencast3-admin` you get the
+automatically upgrade you to the latest major version. In other words, if you install `opencast-3-admin` you get the
 latest 3.x release, not the latest 4.x release. To upgrade from one version to another you first stop Opencast:
 
  - On a SysV-init based system

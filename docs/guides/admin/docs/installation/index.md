@@ -21,7 +21,7 @@ Building on most other Unix-like operating systems should be very much alike.
 Installation from Repository
 ----------------------------
 
-There is an RPM repository available for some operating systems. It provides packages containing pre-configured and
+There is a package repository available for some operating systems. It provides packages containing pre-configured and
 pre-built Opencast installations.
 
  - [RedHat Enterprise Linux](rpm-rhel-sl-centos.md)
