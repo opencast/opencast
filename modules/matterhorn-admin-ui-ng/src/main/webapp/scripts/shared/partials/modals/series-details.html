@@ -10,10 +10,10 @@
         <a ng-click="openTab('metadata')" data-modal-tab="metadata" ng-class="{ active: tab == 'metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
           <!-- Metadata -->
         </a>
-        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">
+        <a ng-if="metadata.entries.length > 0" ng-click="openTab('extended-metadata')" data-modal-tab="extended-metadata" ng-class="{ active: tab == 'extended-metadata' }" translate="EVENTS.SERIES.DETAILS.TABS.EXTENDED_METADATA" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">
           <!-- Metadata II -->
         </a>
-        <!--<a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_EXTMETADATA_VIEW">Participation</a>-->
+        <!--<a ng-click="openTab('participation')" data-modal-tab="participation" ng-class="{ active: tab == 'participation' }" translate="EVENTS.SERIES.DETAILS.TABS.PARTICIPATION" with-role="ROLE_UI_SERIES_DETAILS_METADATA_VIEW">Participation</a>-->
 <!--         <a ng-click="openTab('events')" data-modal-tab="events" ng-class="{ active: tab == 'events' }" translate="EVENTS.SERIES.DETAILS.TABS.EVENTS">Events</a> -->
         <a ng-click="openTab('permissions')" data-modal-tab="permissions" ng-class="{ active: tab == 'permissions' }" translate="EVENTS.SERIES.DETAILS.TABS.PERMISSIONS" with-role="ROLE_UI_SERIES_DETAILS_ACL_VIEW">
           <!-- Access Policy -->
@@ -61,7 +61,7 @@
                             <tr ng-repeat="row in catalog.fields">
                                 <td translate="{{ row.label }}"></td>
                                 <td admin-ng-editable
-                                    required-role="ROLE_UI_EVENTS_DETAILS_METADATA_EDIT"
+                                    required-role="ROLE_UI_SERIES_DETAILS_METADATA_EDIT"
                                     params="row" save="getSaveFunction(catalog.flavor)"></td>
                             </tr>
                         </table>
@@ -248,7 +248,7 @@
                                                         data-disable-search-threshold="8"
                                                         data-search_contains="true"
                                                         ng-model="policy.role"
-                                                        ng-change="accessSave(policy)"
+                                                        ng-change="accessChanged(policy.role)"
                                                         ng-options="id as id for (id, type) in roles"
                                                         ng-get-more="getMoreRoles"
                                                         data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"

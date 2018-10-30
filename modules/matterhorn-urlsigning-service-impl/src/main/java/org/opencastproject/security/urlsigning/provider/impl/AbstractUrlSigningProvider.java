@@ -229,6 +229,12 @@ public abstract class AbstractUrlSigningProvider implements UrlSigningProvider, 
 
   @Override
   public boolean accepts(String baseUrl) {
+
+    // Don't accept URLs without an organization context
+    // (for example from the ServiceRegistry JobProducerHeartbeat)
+    if (securityService.getOrganization() == null)
+      return false;
+
     String orgId = securityService.getOrganization().getId();
     try {
       new URI(baseUrl);

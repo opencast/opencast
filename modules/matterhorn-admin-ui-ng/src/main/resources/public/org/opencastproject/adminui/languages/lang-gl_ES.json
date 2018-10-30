@@ -566,7 +566,7 @@
                },
                "SCHEDULE_MULTIPLE": {
                   "CAPTION": "Programar múltiples eventos",
-                  "REPEATS": "Repeticións",
+                  "REPEATS": "Repetir",
                   "REPEAT_ON": "Repetir",
                   "WEEKDAYS": "Días da semana"
                }
@@ -581,7 +581,7 @@
                   "CAPTION": "Adxuntos",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -589,7 +589,7 @@
                      "CAPTION": "Detalles do adxunto",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -602,7 +602,7 @@
                   "CAPTION": "Catálogos",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -610,7 +610,7 @@
                      "CAPTION": "Detalles do catálogo",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -623,14 +623,14 @@
                   "CAPTION": "Arquivos multimedia",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
                      "TITLE": "Detalles dos arquivos multimedia",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "URL": "URL",
                      "RECORDING_DATE": "Data de gravación",
                      "FLAVOR": "Sabor",
@@ -659,7 +659,7 @@
                   "CHANNEL": "Canle",
                   "ID": "Id.",
                   "TYPE": "Tipo",
-                  "MIMETYPE": "Tipo MIME",
+                  "MIMETYPE": "Tipo Mime",
                   "TAGS": "Etiquetas",
                   "LINK": "Ligazón",
                   "DETAILS": {
@@ -667,7 +667,7 @@
                      "CAPTION": "Detalles de publicación",
                      "ID": "Id.",
                      "TYPE": "Tipo",
-                     "MIMETYPE": "Tipo MIME",
+                     "MIMETYPE": "Tipo Mime",
                      "TAGS": "Etiquetas",
                      "URL": "URL",
                      "SIZE": "Tamaño",
@@ -735,7 +735,7 @@
                "CAPTION": "Detalles do evento",
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "RECORDING_DATE": "Data de gravación",
                "SUBJECT": "Tema",
                "DESCRIPTION": "Descrición",
@@ -788,9 +788,9 @@
                "TITLE": "Título",
                "STATE": "Estado",
                "STARTED": "Iniciado",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "SUBMITTED": "Enviado",
-               "MIMETYPE": "Tipo MIME",
+               "MIMETYPE": "Tipo Mime",
                "URL": "URL",
                "CONFIGURATION": "Configuración",
                "NO_CONFIGURATION": "Non existen parámetros de configuración para o fluxo de traballo seleccionado.",
@@ -813,7 +813,7 @@
                "TITLE": "Detalles dos arquivos multimedia",
                "ID": "Id.",
                "TYPE": "Tipo",
-               "MIMETYPE": "Tipo MIME",
+               "MIMETYPE": "Tipo Mime",
                "URL": "URL",
                "RECORDING_DATE": "Data de gravación",
                "TAGS": "Etiquetas",
@@ -900,7 +900,7 @@
          },
          "TABLE": {
             "CAPTION": "Series",
-            "TITLE": "Serie",
+            "TITLE": "Series",
             "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Creado",
@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "PUBLISHERS": "Editor(es)",
                "ORGANIZERS": "Organizador(es)",
                "CONTRIBUTORS": "Colaborador(es)",
@@ -972,7 +972,7 @@
                   "CAPTION": "Mensaxes",
                   "CREATION_DATE": "Data de Creación",
                   "SENDER": "Remitente",
-                  "SUBJECT": "Asunto"
+                  "SUBJECT": "Tema"
                }
             },
             "EVENTS": {
@@ -1313,7 +1313,7 @@
                "BUMPER": "Secuencia de apertura",
                "TRAILER": "Secuencia de peche",
                "TITLE": "Título",
-               "LICENSE": "Licenza",
+               "LICENSE": "Licencia",
                "WATERMARK": "Marca de auga",
                "USAGE": "Uso"
             },
@@ -1380,7 +1380,7 @@
             },
             "MESSAGE": {
                "NAME": "Nome",
-               "SUBJECT": "Asunto",
+               "SUBJECT": "Tema",
                "MESSAGE": "Mensaxe"
             },
             "SUMMARY": {
@@ -1834,7 +1834,7 @@
    "DASHBOARD": {
       "RUNNING": "Procesando",
       "FINISHED": "Finalizado",
-      "PAUSED": "En pausa",
+      "PAUSED": "Pausado",
       "FAILED": "Errado",
       "FINISHED_WITH_COMMENTS": "Pendente",
       "SCHEDULED": "Programado",

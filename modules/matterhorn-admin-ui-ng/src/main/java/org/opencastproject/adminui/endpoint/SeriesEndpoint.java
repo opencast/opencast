@@ -100,7 +100,6 @@ import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
-import org.opencastproject.workflow.api.ConfiguredWorkflowRef;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
@@ -980,8 +979,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      if (getAclService()
-              .applyAclToSeries(seriesId, accessControlList, override, Option.<ConfiguredWorkflowRef> none()))
+      if (getAclService().applyAclToSeries(seriesId, accessControlList, override, Option.none()))
         return ok();
       else {
         logger.warn("Unable to find series '{}' to apply the ACL.", seriesId);

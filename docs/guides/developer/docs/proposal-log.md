@@ -1,17 +1,10 @@
 Opencast Proposals
 ==================
 
-All important decisions for Opencast have to be made on list. To do that committers may send proposals (marked with
-`#proposal`) to list on which other committers may then vote. Opencast uses lazy consensus meaning that no response
-signals agreement. Apart from that committers may vote with:
+All important decisions for Opencast have to be made on list. For more details, please have a look at out [documentation
+about decision making](decision-making/index.md).
 
- - `+1` yes, agree - also willing to help bring about the proposed action
- - `+0` yes, agree - not willing or able to help bring about the proposed action
- - `-0` no, disagree - but will not oppose the action going forward
- - `-1` veto, disagree - opposes the action going forward and must propose an alternate action to address the issue or a
-   justification for not addressing the issue
-
-A proposal is accepted when no veto (`-1`) is voted within a time spawn of 72 hours (not counting weekends) after being sent to list.
+The following list contains a list of passed proposals for reference.
 
 Passed Proposals
 ----------------
@@ -22,11 +15,20 @@ Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on November 17, 2017
 ```no-highlight
 Hi all,
 
-Per the discussion in the meeting today, we need to set a policy regarding what is expected of our Crowdin translators prior to joining the translation team.  My proposal is that they must write a brief, understandable sentence regarding why they want to help translate Opencast via the Crowdin UI.  This is an optional field in the workflow where they request to be a translator (ie, no new tools or fields) which is sometimes filled in, but mostly left blank.  Something like
+Per the discussion in the meeting today, we need to set a policy regarding what
+is expected of our Crowdin translators prior to joining the translation team.
+My proposal is that they must write a brief, understandable sentence regarding
+why they want to help translate Opencast via the Crowdin UI.  This is an
+optional field in the workflow where they request to be a translator (ie, no new
+tools or fields) which is sometimes filled in, but mostly left blank.  Something
+like
 
 'I want to help translate $project into [language]'
 
-would be sufficient.  This filters out the bots, yet is simple enough that someone with Google translate ought to be able to work something out.  Once this passes I will update the Crowdin and Opencast docs regarding the requirements, and then we should be good to go.
+would be sufficient.  This filters out the bots, yet is simple enough that
+someone with Google translate ought to be able to work something out.  Once this
+passes I will update the Crowdin and Opencast docs regarding the requirements,
+and then we should be good to go.
 
 Proposal closes EOD 2017-11-17.
 ```
@@ -137,16 +139,18 @@ Lars
 Proposed by Stephen Marquard <stephen.marquard@uct.ac.za>, passed on June 9, 2017
 
 ```no-highlight
-To reduce the overhead involved in improving our documentation, I #propose that minor fixes
-to documentation may be committed to either maintenance branches or develop without requiring
-a JIRA issue or pull request.
+To reduce the overhead involved in improving our documentation, I #propose that
+minor fixes to documentation may be committed to either maintenance branches or
+develop without requiring a JIRA issue or pull request.
 
-Markdown docs can be edited directly on bitbucket (and git should we move to that), which is 
-a very fast and convenient way for developers to fix documentation.
+Markdown docs can be edited directly on bitbucket (and git should we move to
+that), which is a very fast and convenient way for developers to fix
+documentation.
 
-Constraints: documentation fixes committed in this way should be minor changes only;
-for example fixing typos, layout, formatting, links or small changes to existing content, 
-but no significant new content (which should continue to go through the usual review process).
+Constraints: documentation fixes committed in this way should be minor changes
+only; for example fixing typos, layout, formatting, links or small changes to
+existing content, but no significant new content (which should continue to go
+through the usual review process).
 ```
 
 ### Requiring Java 1.8 for 3.0

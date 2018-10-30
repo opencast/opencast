@@ -279,7 +279,7 @@ operation should be executed. This so-called execution condition is a boolean ex
     <relation> ::= <relation-factor> <rel-literal> <relation-factor>
     <relation-factor> ::= <operation> | <number>
     <operation> ::= <number> <op-literal> <number>
-    <rel-literal> ::= ">=" | ">" | "<=" | "<" | "=" | "!="
+    <rel-literal> ::= ">=" | ">" | "<=" | "<" | "==" | "!="
     <op-literal> ::= "+" | "-" | "*" | "/"
     <bool-literal> ::= "true" | "false"
 

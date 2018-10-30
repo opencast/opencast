@@ -1663,4 +1663,12 @@
       </releases>
     </repository>
   </repositories>
+
+  <distributionManagement>
+    <site>
+      <!-- Note that we do not deploy the site using maven, so this is totally fake -->
+      <id>fakesite.opencast.org</id>
+      <url>http://fakesite.opencast.org</url>
+    </site>
+  </distributionManagement>
 </project>

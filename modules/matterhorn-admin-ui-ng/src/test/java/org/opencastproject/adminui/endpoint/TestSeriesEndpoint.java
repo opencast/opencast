@@ -352,20 +352,30 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     final SearchResult<Series> ascSeriesSearchResult = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(ascSeriesSearchResult.getItems()).andReturn(ascSeriesItems);
     EasyMock.expect(ascSeriesSearchResult.getHitCount()).andReturn((long) ascSeriesItems.length);
+    EasyMock.expect(ascSeriesSearchResult.getDocumentCount()).andReturn((long) ascSeriesItems.length);
+    EasyMock.expect(ascSeriesSearchResult.getSearchTime()).andReturn(0L);
     final SearchResult<Series> descSeriesSearchResult = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(descSeriesSearchResult.getItems()).andReturn(descSeriesItems);
     EasyMock.expect(descSeriesSearchResult.getHitCount()).andReturn((long) descSeriesItems.length);
+    EasyMock.expect(descSeriesSearchResult.getDocumentCount()).andReturn((long) descSeriesItems.length);
+    EasyMock.expect(descSeriesSearchResult.getSearchTime()).andReturn(0L);
     // Create an empty search result.
     final SearchResult<Series> emptySearchResult = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(emptySearchResult.getPageSize()).andReturn(0L).anyTimes();
+    EasyMock.expect(emptySearchResult.getDocumentCount()).andReturn(0L);
+    EasyMock.expect(emptySearchResult.getSearchTime()).andReturn(0L);
     // Create a single search result for series 1.
     final SearchResult<Series> oneSearchResult = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(oneSearchResult.getPageSize()).andReturn(1L).anyTimes();
     EasyMock.expect(oneSearchResult.getItems()).andReturn(new SearchResultItem[] { item1 }).anyTimes();
+    EasyMock.expect(oneSearchResult.getDocumentCount()).andReturn(1L);
+    EasyMock.expect(oneSearchResult.getSearchTime()).andReturn(0L);
     // Create a single search result for series 2.
     final SearchResult<Series> twoSearchResult = EasyMock.createMock(SearchResult.class);
     EasyMock.expect(twoSearchResult.getPageSize()).andReturn(1L).anyTimes();
     EasyMock.expect(twoSearchResult.getItems()).andReturn(new SearchResultItem[] { item2 }).anyTimes();
+    EasyMock.expect(twoSearchResult.getDocumentCount()).andReturn(2L);
+    EasyMock.expect(twoSearchResult.getSearchTime()).andReturn(0L);
 
     adminuiSearchIndex = EasyMock.createMock(AdminUISearchIndex.class);
 

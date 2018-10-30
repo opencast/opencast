@@ -1,6 +1,80 @@
 Opencast 4.x
 ============
 
+Opencast 4.4
+------------
+
+*Released on May 31, 2018*
+
+- [[MH-12923]](https://opencast.jira.com/browse/MH-12923) - ServiceRegistry does not close db connction
+- [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+
+Opencast 4.3
+------------
+
+*Released on March 28, 2018*
+
+- [[MH-12774]](https://opencast.jira.com/browse/MH-12744) - Fix differences in provided security configurations
+- [[MH-12773]](https://opencast.jira.com/browse/MH-12773) - Fix that non-admins cannot add new assets
+- [[MH-12772]](https://opencast.jira.com/browse/MH-12772) - Fix acces to assets for non-admins
+- [[MH-12789]](https://opencast.jira.com/browse/MH-12789) - Remove tabs and trailing spaces in LTI tools
+- [[MH-12790]](https://opencast.jira.com/browse/MH-12790) - Make LTI respect player configuration
+
+Opencast 4.2
+------------
+
+*Released on March 14, 2018*
+
+- [[MH-12766]](https://opencast.jira.com/browse/MH-12766) - Metadata view and edit roles where at some places set incorrectly
+- [[MH-12765]](https://opencast.jira.com/browse/MH-12765) - Navigating through series in the series details modal causes failing attempts to save ACLs
+- [[MH-12758]](https://opencast.jira.com/browse/MH-12758) - Changing the ACLs does not trigger AssetManagerDecorators
+- [[MH-12747]](https://opencast.jira.com/browse/MH-12747) - Heartbeat is broken
+- [[MH-12745]](https://opencast.jira.com/browse/MH-12745) - Fix heartbeat config logging
+- [[MH-12743]](https://opencast.jira.com/browse/MH-12743) - OAIPMH-Republish-Operation tries to republish to ASW3
+- [[MH-12728]](https://opencast.jira.com/browse/MH-12728) - Add LAST-MODIFIED to ical event properties
+- [[MH-12727]](https://opencast.jira.com/browse/MH-12727) - OptimisticLockException on worker node can cause jobs to be stuck in DISPATCHING state
+- [[MH-12725]](https://opencast.jira.com/browse/MH-12725) - Series/Events ACL update causes scheduled recordings in the series/the events to disappear from CA calendar
+- [[MH-12717]](https://opencast.jira.com/browse/MH-12717) - Series metadata update causes scheduled recordings in the series to disappear from CA calendar
+- [[MH-12711]](https://opencast.jira.com/browse/MH-12711) - XACML Parser should be more robust
+- [[MH-12707]](https://opencast.jira.com/browse/MH-12707) - Fix problem with non-strict mode in URL-Signing
+- [[MH-12706]](https://opencast.jira.com/browse/MH-12706) - Old zombie workflows cannot be stopped, suspended etc.
+- [[MH-12668]](https://opencast.jira.com/browse/MH-12668) - Update admin ui build pipeline
+- [[MH-12651]](https://opencast.jira.com/browse/MH-12651) - Scheduling repeating events through Admin UI is very slow
+
+Opencast 4.1
+------------
+
+*Released on Februar 7, 2018*
+
+- [[MH-12695]](https://opencast.jira.com/browse/MH-12695) - Improve Synchronization in WorkflowService
+- [[MH-12689]](https://opencast.jira.com/browse/MH-12689) - Flickering filter: When loading the page, all filters briefly appear and disappear again
+- [[MH-12687]](https://opencast.jira.com/browse/MH-12687) - Date filters not working
+- [[MH-12685]](https://opencast.jira.com/browse/MH-12685) - Performance issue in filters
+- [[MH-12682]](https://opencast.jira.com/browse/MH-12682) - TimelinePreview Concurrency Problem
+- [[MH-12676]](https://opencast.jira.com/browse/MH-12676) - List provider service implementation is not thread-safe
+- [[MH-12673]](https://opencast.jira.com/browse/MH-12673) - Content-Type is not set for JavaScript files
+- [[MH-12664]](https://opencast.jira.com/browse/MH-12664) - Ensure series can be deleted
+- [[MH-12662]](https://opencast.jira.com/browse/MH-12662) - Special characters in modal window titles are double-escaped
+- [[MH-12657]](https://opencast.jira.com/browse/MH-12657) - Users of non-admin groups cannot create events
+- [[MH-12652]](https://opencast.jira.com/browse/MH-12652) - Scheduler service needs to restrict queries to episodes owned by it
+- [[MH-12641]](https://opencast.jira.com/browse/MH-12641) - Asset manager conflict checks are very slow
+- [[MH-12638]](https://opencast.jira.com/browse/MH-12638) - Migration bundle needs to have a higher runlevel
+- [[MH-12637]](https://opencast.jira.com/browse/MH-12637) - Remove event id from episode DC catalog during migration
+- [[MH-12632]](https://opencast.jira.com/browse/MH-12632) - Make index rebuild robust
+- [[MH-12631]](https://opencast.jira.com/browse/MH-12631) - Drop the ORGANIZER field from the ical feed
+- [[MH-12627]](https://opencast.jira.com/browse/MH-12627) - Start Task copies files into workspace
+- [[MH-12620]](https://opencast.jira.com/browse/MH-12620) - Document ActiveMQ memory requirements
+- [[MH-12610]](https://opencast.jira.com/browse/MH-12610) - Navigating through events in the event details modal causes failing attempts to save ACLs
+- [[MH-12609]](https://opencast.jira.com/browse/MH-12609) - As a user, I expect scheduling of events to be working
+- [[MH-12606]](https://opencast.jira.com/browse/MH-12606) - Using "Start Task" with a workflow containing an embedded script in the configuration which somehow modifies the input parameters does not update those values properly
+- [[MH-12602]](https://opencast.jira.com/browse/MH-12602) - External API gives 500 error for migrated series that do not have creator field
+- [[MH-12601]](https://opencast.jira.com/browse/MH-12601) - Fast Workflow Does Not Attach Series Metadata
+- [[MH-12582]](https://opencast.jira.com/browse/MH-12582) - Editor WOH should not encode videos unless it is strictly necessary (to save time and resources)
+- [[MH-12495]](https://opencast.jira.com/browse/MH-12495) - Job dispatching with loads needs optimization
+- [[MH-12476]](https://opencast.jira.com/browse/MH-12476) - Delay start of job dispatching on startup
+- [[MH-10016]](https://opencast.jira.com/browse/MH-10016) - Cannot Change Default Workflow
+
 Opencast 4.0
 ------------
 
@@ -84,7 +158,7 @@ Opencast 4.0
 - [[MH-12454]](https://opencast.jira.com/browse/MH-12454) - PathSupport.changeFileExtension does not properly handle files with no extension
 - [[MH-12453]](https://opencast.jira.com/browse/MH-12453) - TimelinePreview Path Handling
 - [[MH-12451]](https://opencast.jira.com/browse/MH-12451) - Lock file utility method should throw exceptions
-- [[MH-12450]](https://opencast.jira.com/browse/MH-12450) - Clean up *EncoderEngine code
+- [[MH-12450]](https://opencast.jira.com/browse/MH-12450) - Clean up \*EncoderEngine code
 - [[MH-12449]](https://opencast.jira.com/browse/MH-12449) - Ensure temporary files are deleted on composer failure
 - [[MH-12448]](https://opencast.jira.com/browse/MH-12448) - Remove unconfigured send-mail WOH
 - [[MH-12447]](https://opencast.jira.com/browse/MH-12447) - OAI-PMH autorepublish fails if series was deleted
@@ -167,6 +241,44 @@ Opencast 4.0
 
 Opencast 3.x
 ============
+
+Opencast 3.7
+------------
+*Released on Oct 16, 2018*
+
+- [[MH-12982](https://opencast.jira.com/browse/MH-12982)] - 3.0 database upgrade error
+- [[MH-13022](https://opencast.jira.com/browse/MH-13022)] - Fix LTI highly trusted keys being discarded
+- [[MH-13034](https://opencast.jira.com/browse/MH-13034)] - Add lis_person_sourcedid back as LTI source field for the username
+- [[MH-13082](https://opencast.jira.com/browse/MH-13082)] - Fix LTI security vulnerability and refactor LTI and OAuth classes
+- [[MH-13152](https://opencast.jira.com/browse/MH-13152)] - Reduce Workflow Messages, backport of Lars fix for >=r/5.x
+- [[MH-13156](https://opencast.jira.com/browse/MH-13156)] - Set the auth scheme to digest for inter-server communication
+
+
+Opencast 3.6
+------------
+*Released on May 31, 2018*
+
+- [[MH-12910]](https://opencast.jira.com/browse/MH-12910) - When switching between branches with different module naming schemes, the git tree is left unclean sometimes
+- [[MH-12860]](https://opencast.jira.com/browse/MH-12860) - Opencast does not build at DEBUG logging level
+- [[MH-12841]](https://opencast.jira.com/browse/MH-12841) - Opencast is ignoring permissions
+- [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast admins
+- [[MH-12830]](https://opencast.jira.com/browse/MH-12830) - Fix mvn site generation
+- [[MH-12743]](https://opencast.jira.com/browse/MH-12743) - OAIPMH-Republish-Operation tries to republish to ASW3
+- [[MH-12441]](https://opencast.jira.com/browse/MH-12441) - Fix multi-server configuration docs and config details
+- [[MH-12091]](https://opencast.jira.com/browse/MH-12091) - Create a Capture Agent digest user with its own role
+
+
+Opencast 3.5
+------------
+*Released on February 6, 2018*
+
+- [[MH-12620]](https://opencast.jira.com/browse/MH-12620) - Document ActiveMQ memory requirements
+- [[MH-12606]](https://opencast.jira.com/browse/MH-12606) - Using "Start Task" with a workflow containing an embedded script in the configuration which somehow modifies the input parameters does not update those values properly
+- [[MH-12582]](https://opencast.jira.com/browse/MH-12582) - Editor WOH should not encode videos unless it is strictly necessary (to save time and resources)
+- [[MH-12495]](https://opencast.jira.com/browse/MH-12495) - Job dispatching with loads needs optimization
+- [[MH-12487]](https://opencast.jira.com/browse/MH-12487) - Add job load settings to the default encoding profles
+- [[MH-12399]](https://opencast.jira.com/browse/MH-12399) - Oaipmh Retract very slow
+
 
 Opencast 3.4
 ------------

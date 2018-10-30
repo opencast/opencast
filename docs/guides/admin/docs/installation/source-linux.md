@@ -41,7 +41,7 @@ Please make sure to install the following dependencies. Note that not all depend
 
 Required:
 
-    java-devel / openjdk >= 1.8.0
+    java-1.8.0-openjdk-devel.x86_64 / openjdk-8-jdk
     ffmpeg >= 3.2.4
     maven >= 3.1
     unzip

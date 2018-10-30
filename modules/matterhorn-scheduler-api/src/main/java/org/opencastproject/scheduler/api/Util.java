@@ -19,18 +19,16 @@
  *
  */
 
-package org.opencastproject.scheduler.impl;
+package org.opencastproject.scheduler.api;
 
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.joda.time.DateTimeConstants;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -42,6 +40,8 @@ public final class Util {
    * Giving a start time and end time with a recurrence rule and a timezone, all periods of the recurrence rule are
    * calculated taken daylight saving time into account.
    *
+   *  NOTE: Do not modify this without making the same modifications to the copy of this method in IndexServiceImplTest
+   *  I would have moved this to the scheduler-api bundle, but that would introduce a circular dependency :(
    *
    * @param start
    *          the start date time
@@ -57,28 +57,28 @@ public final class Util {
   public static List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
     final TimeZone utc = TimeZone.getTimeZone("UTC");
     TimeZone.setDefault(tz);
-    DateTime seed = new DateTime(start);
-    DateTime period = new DateTime();
+    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(start);
+    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime();
 
     Calendar endCalendar = Calendar.getInstance(utc);
     endCalendar.setTime(end);
     Calendar calendar = Calendar.getInstance(utc);
-    calendar.setTime(seed);
+    calendar.setTime(periodStart);
     calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
     calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
     calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-    period.setTime(calendar.getTime().getTime() + duration);
+    periodEnd.setTime(calendar.getTime().getTime() + duration);
     duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
 
-    List<Period> periods = new ArrayList<Period>();
+    List<Period> events = new LinkedList<>();
 
     TimeZone.setDefault(utc);
-    for (Object date : rRule.getRecur().getDates(seed, period, Value.DATE_TIME)) {
+    for (Object date : rRule.getRecur().getDates(periodStart, periodEnd, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
       Date d = (Date) date;
       Calendar cDate = Calendar.getInstance(utc);
 
       // Adjust for DST, if start of event
-      if (tz.inDaylightTime(seed)) { // Event starts in DST
+      if (tz.inDaylightTime(periodStart)) { // Event starts in DST
         if (!tz.inDaylightTime(d)) { // Date not in DST?
           d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
         }
@@ -89,10 +89,13 @@ public final class Util {
       }
       cDate.setTime(d);
 
-      periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
+      TimeZone.setDefault(null);
+      Period p = new Period(new net.fortuna.ical4j.model.DateTime(cDate.getTime()),
+              new net.fortuna.ical4j.model.DateTime(cDate.getTimeInMillis() + duration));
+      events.add(p);
+      TimeZone.setDefault(utc);
     }
-
     TimeZone.setDefault(null);
-    return periods;
+    return events;
   }
 }

@@ -631,7 +631,7 @@
                      "ID": "ID",
                      "TYPE": "Typ",
                      "MIMETYPE": "MimeType",
-                     "URL": "URL",
+                     "URL": "URI",
                      "RECORDING_DATE": "Inspelningsdatum",
                      "FLAVOR": "Smak",
                      "TAGS": "Taggar",
@@ -669,7 +669,7 @@
                      "TYPE": "Typ",
                      "MIMETYPE": "MimeType",
                      "TAGS": "Taggar",
-                     "URL": "URL",
+                     "URL": "URI",
                      "SIZE": "Storlek",
                      "CHANNEL": "Kanal",
                      "REFERENCE": "Referens"
@@ -780,7 +780,7 @@
                }
             },
             "WORKFLOWS": {
-               "ACTIONS": "Aktioner",
+               "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
                "DESCRIPTION": "",
                "ID": "ID",
@@ -791,7 +791,7 @@
                "SERIES": "Serie",
                "SUBMITTED": "Skickad",
                "MIMETYPE": "MimeType",
-               "URL": "URL",
+               "URL": "URI",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Det finns inga konfigurationsparameter för den valda workflowdefinitionen.",
                "WORKFLOW": "Workflow"
@@ -814,7 +814,7 @@
                "ID": "ID",
                "TYPE": "Typ",
                "MIMETYPE": "MimeType",
-               "URL": "URL",
+               "URL": "URI",
                "RECORDING_DATE": "Inspelningsdatum",
                "TAGS": "Taggar",
                "DURATION": "Längd",

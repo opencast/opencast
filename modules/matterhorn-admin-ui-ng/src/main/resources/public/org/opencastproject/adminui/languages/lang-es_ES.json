@@ -511,7 +511,7 @@
             "MEDIA": {
                "TRIM_MEDIA": "Cortar vídeos",
                "MEDIA": "Archivos multimedia",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -538,7 +538,7 @@
                   "END_DATE": "aaaa-mm-dd"
                },
                "UPLOAD": {
-                  "CAPTION": "Subir",
+                  "CAPTION": "Subida",
                   "RECORDING_ELEMENTS": "Elementos de la grabación",
                   "SEGMENTABLE": {
                      "SHORT": "Diapositivas",
@@ -628,7 +628,7 @@
                   "LINK": "Enlace",
                   "DETAILS": {
                      "TITLE": "Detalles de los archivos multimedia",
-                     "ID": "Identificador",
+                     "ID": "ID",
                      "TYPE": "Tipo",
                      "MIMETYPE": "Tipo MIME",
                      "URL": "URL",
@@ -708,7 +708,7 @@
                "REPLY": "Responder",
                "REPLY_TO": "Responder a",
                "CANCEL_REPLY": "Cancelar",
-               "DELETE": "Eliminar",
+               "DELETE": "Suprimir",
                "REASON": "Motivo",
                "REASONS": {
                   "CUTTING": "Pendiente de cortar",
@@ -735,7 +735,7 @@
                "CAPTION": "Detalles del evento",
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "RECORDING_DATE": "Fecha de grabación",
                "SUBJECT": "Tema",
                "DESCRIPTION": "Descripción",
@@ -783,12 +783,12 @@
                "ACTIONS": "Acciones",
                "DETAILS": "Detalles",
                "DESCRIPTION": "",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "TITLE": "Título",
                "STATE": "Estado",
                "STARTED": "Iniciado",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "SUBMITTED": "Enviado",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -811,7 +811,7 @@
             },
             "MEDIA_DETAILS": {
                "TITLE": "Detalles de los archivos multimedia",
-               "ID": "Identificador",
+               "ID": "ID",
                "TYPE": "Tipo",
                "MIMETYPE": "Tipo MIME",
                "URL": "URL",
@@ -900,7 +900,7 @@
          },
          "TABLE": {
             "CAPTION": "Series",
-            "TITLE": "Serie",
+            "TITLE": "Series",
             "CREATORS": "Organizador(es)",
             "CONTRIBUTORS": "Colaborador(es)",
             "CREATED": "Fecha de creación",
@@ -945,7 +945,7 @@
             "METADATA": {
                "TITLE": "Título",
                "ID": "UID",
-               "SERIES": "Serie",
+               "SERIES": "Series",
                "PUBLISHERS": "Editor(es)",
                "ORGANIZERS": "Organizador(es)",
                "CONTRIBUTORS": "Colaborador(es)",
@@ -972,7 +972,7 @@
                   "CAPTION": "Mensajes",
                   "CREATION_DATE": "Fecha de creación",
                   "SENDER": "Remitente",
-                  "SUBJECT": "Asunto"
+                  "SUBJECT": "Tema"
                }
             },
             "EVENTS": {
@@ -1344,7 +1344,7 @@
             "WATERMARK": {
                "CAPTION": "Marca de agua",
                "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
-               "ACTIVE": "Activada"
+               "ACTIVE": "Activado"
             },
             "USAGE": {
                "CAPTION": "Uso",
@@ -1380,7 +1380,7 @@
             },
             "MESSAGE": {
                "NAME": "Nombre",
-               "SUBJECT": "Asunto",
+               "SUBJECT": "Tema",
                "MESSAGE": "Mensaje"
             },
             "SUMMARY": {
@@ -1414,48 +1414,48 @@
                "CAPTION": "Cortinilla (principio)",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Vídeo predefinido que se anexa al principio de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar cortinilla",
                "SELECT": "Seleccionar",
                "UPLOAD_LABEL": "Subir vídeo",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "TRAILER": {
                "CAPTION": "Cortinilla (final)",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Vídeo predefinido que se anexa al final de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar cortinilla",
                "UPLOAD_LABEL": "Subir vídeo",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "TITLE": {
                "CAPTION": "Título",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Diapositiva predefinida que se adjunta al principio o al final de la grabación y contiene metadatos descriptivos.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar la diapositiva de título",
                "BACKGROUND": "Fondo",
                "EXTRACT": "Extraer fondo",
-               "UPLOAD": "Subir",
+               "UPLOAD": "Subida",
                "UPLOAD_LABEL": "Subir imagen",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "WATERMARK": {
                "CAPTION": "Marca de agua",
                "FILE_UPLOADED": "Archivo subido: ",
                "DESCRIPTION": "Imagen semitransparente que se superpone sobre cada fotograma de la grabación.",
-               "ACTIVE": "Activada",
+               "ACTIVE": "Activado",
                "ENABLE": "Activar marca de agua",
                "TOP_LEFT": "Esquina superior izquierda",
                "TOP_RIGHT": "Esquina superior derecha",
                "BOTTOM_LEFT": "Esquina inferior izquierda",
                "BOTTOM_RIGHT": "Esquina inferior derecha",
-               "UPLOAD": "Subir",
+               "UPLOAD": "Subida",
                "POSITION": "Posición y vista previa de la marca de agua",
                "FILEUPLOAD_DESCRIPTION": "El archivo debería tener un canal alfa (fondo transparente). Los tipos de archivo soportados son: .PNG, .GIF, .SVG, .WEBP",
                "UPLOAD_LABEL": "Subir imagen",
-               "UPLOAD_BUTTON": "Subir"
+               "UPLOAD_BUTTON": "Subida"
             },
             "SUMMARY": {
                "CAPTION": "Resumen"

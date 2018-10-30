@@ -140,6 +140,11 @@ public class OsgiAssetManager implements AssetManager {
   }
 
   @Override
+  public Snapshot takeSnapshot(MediaPackage mp) {
+    return delegate.takeSnapshot(mp);
+  }
+
+  @Override
   public Opt<Asset> getAsset(Version version, String mpId, String mpeId) {
     return delegate.getAsset(version, mpId, mpeId);
   }

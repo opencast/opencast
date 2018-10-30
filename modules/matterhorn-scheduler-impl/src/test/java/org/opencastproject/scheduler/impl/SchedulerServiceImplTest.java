@@ -22,6 +22,8 @@
 package org.opencastproject.scheduler.impl;
 
 import static net.fortuna.ical4j.model.Component.VEVENT;
+import static org.easymock.EasyMock.capture;
+import static org.easymock.EasyMock.eq;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -86,6 +88,7 @@ import org.opencastproject.mediapackage.identifier.UUIDIdBuilderImpl;
 import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
+import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -119,8 +122,10 @@ import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.FileSupport;
@@ -153,6 +158,8 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -187,6 +194,7 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.FutureTask;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -199,6 +207,10 @@ public class SchedulerServiceImplTest {
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
   private AssetManager assetManager;
+  private static OrganizationDirectoryService orgDirectoryService;
+
+  private User currentUser = null;
+  private Organization currentOrg = null;
 
   private static SchedulerServiceImpl schedSvc;
 
@@ -286,7 +298,7 @@ public class SchedulerServiceImplTest {
             authorizationService.getAcl(EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(AclScope.class)))
             .andReturn(Option.some(acl)).anyTimes();
 
-    OrganizationDirectoryService orgDirectoryService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
+    orgDirectoryService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
     EasyMock.expect(orgDirectoryService.getOrganizations())
             .andReturn(Arrays.asList((Organization) new DefaultOrganization())).anyTimes();
 
@@ -1680,6 +1692,16 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
+  public void testRecurringRecording() throws Exception {
+    RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA");
+
+    //GDLGDL Needs test
+    /*List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
+            , start, new Date(start.getTime() + hours(48)),
+            new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));*/
+  }
+
+  @Test
   public void testGetArchivedOnly() throws Exception {
     MediaPackage mediaPackage = generateEvent(Opt.some("1"));
     Version version = assetManager.takeSnapshot("test", mediaPackage).getVersion();
@@ -1870,6 +1892,39 @@ public class SchedulerServiceImplTest {
               new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA"), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
+    }
+    {
+      //Event A starts before event B, and ends during event B
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23) + minutes(30)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts during event B, and ends after event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(30)), new Date(currentTime + hours(25) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A starts at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24)), new Date(currentTime + hours(24) + minutes(30)));
+      assertEquals(1, conflicts.size());
+
+      //Event A ends at the same time as event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(25)));
+      assertEquals(1, conflicts.size());
+
+      //Event A is contained entirely within event B
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(24) + minutes(50)));
+      assertEquals(1, conflicts.size());
+
+      //Event A contains event B entirely
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(26)));
+      assertEquals(1, conflicts.size());
+
+      //Event A ends with less than one minute before event B starts
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(24) - seconds(1)));
+      assertEquals(1, conflicts.size());
+
+      //Event A begins than one minute after event B ends
+      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(25) + seconds(1)), new Date(currentTime + hours(27)));
+      assertEquals(1, conflicts.size());
     }
   }
 
@@ -2176,6 +2231,72 @@ public class SchedulerServiceImplTest {
     }
   }
 
+  @Test
+  public void testRepopulateIndexMultitenant() throws Exception {
+    List<Organization> orgList = Arrays.asList(
+            (Organization) new DefaultOrganization(),
+            createOrganization("org1", "Org 1"),
+            createOrganization("org2", "Org 2"));
+
+    List<User> usersList = Arrays.asList(
+            createUser(orgList.get(0), "user1", Arrays.asList(orgList.get(0).getAdminRole())),
+            createUser(orgList.get(1), "user2", Arrays.asList(orgList.get(1).getAdminRole())),
+            createUser(orgList.get(2), "user3", Arrays.asList(orgList.get(2).getAdminRole())));
+
+    currentUser = usersList.get(0);
+    currentOrg = currentUser.getOrganization();
+
+    EventCatalogUIAdapter episodeAdapter = EasyMock.createMock(EventCatalogUIAdapter.class);
+    EasyMock.expect(episodeAdapter.getFlavor()).andReturn(MediaPackageElements.EPISODE).anyTimes();
+    EasyMock.expect(episodeAdapter.getOrganization()).andAnswer(() -> { return currentOrg.getId(); }).anyTimes();
+    EasyMock.replay(episodeAdapter);
+    schedSvc.addCatalogUIAdapter(episodeAdapter);
+
+    EasyMock.reset(orgDirectoryService);
+    EasyMock.expect(orgDirectoryService.getOrganizations()).andReturn(orgList).anyTimes();
+    EasyMock.expect(orgDirectoryService.getOrganization(EasyMock.anyString())).andAnswer(() -> {
+      String orgId = (String) EasyMock.getCurrentArguments()[0];
+      return orgList.stream().filter(org -> org.getId().equalsIgnoreCase(orgId)).findFirst().orElse(null);
+    }).anyTimes();
+
+    SecurityService securityService = schedSvc.getSecurityService();
+    EasyMock.reset(securityService);
+    EasyMock.expect(securityService.getUser()).andAnswer(() -> currentUser).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andAnswer(() -> currentOrg).anyTimes();
+    securityService.setUser(EasyMock.anyObject(User.class));
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.replay(orgDirectoryService, securityService);
+
+    MessageSender messageSender = schedSvc.getMessageSender();
+    EasyMock.reset(messageSender);
+    Capture<SchedulerItem> schedulerItemsCapture = Capture.newInstance(CaptureType.ALL);
+    messageSender.sendObjectMessage(eq(SchedulerItem.SCHEDULER_QUEUE), eq(MessageSender.DestinationType.Queue),
+            capture(schedulerItemsCapture));
+    EasyMock.expectLastCall().anyTimes();
+    EasyMock.replay(messageSender);
+
+    // create test events for each organization
+    for (User user : usersList) {
+      currentUser = user;
+      currentOrg = user.getOrganization();
+      createEvents("Event", "ca_" + currentOrg.getId(), 1, schedSvc, false, false);
+    }
+    currentUser = usersList.get(0);
+    currentOrg = currentUser.getOrganization();
+    schedulerItemsCapture.reset();
+
+    schedSvc.repopulate("adminui");
+    assertTrue(schedulerItemsCapture.hasCaptured());
+    List<DublinCoreCatalog> dublincoreCatalogs = new ArrayList<>();
+    for (SchedulerItem schedulerItem : schedulerItemsCapture.getValues()) {
+      if (schedulerItem.getType() == SchedulerItem.Type.UpdateCatalog) {
+        DublinCoreCatalog snapshotDC = schedulerItem.getEvent();
+        dublincoreCatalogs.add(snapshotDC);
+      }
+    }
+    assertEquals(orgList.size(), dublincoreCatalogs.size());
+  }
+
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)
           throws URISyntaxException, IOException {
     String catalogId = UUID.randomUUID().toString();
@@ -2237,8 +2358,8 @@ public class SchedulerServiceImplTest {
     long offset = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
       MediaPackage mp = generateEvent(Opt.<String> none());
-      Date startDateTime = new Date(offset + 10 * 1000);
-      Date endDateTime = new Date(offset + 3610000);
+      Date startDateTime = new Date(offset + 10 * 1000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
+      Date endDateTime = new Date(offset + 3610000 + i * SchedulerServiceImpl.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
       offset = endDateTime.getTime();
       final DublinCoreCatalog event = generateEvent(agent, Opt.<String> none(), Opt.some(titlePrefix + "-" + i),
               startDateTime, endDateTime);
@@ -2485,5 +2606,52 @@ public class SchedulerServiceImplTest {
                     tuple("eclipselink.ddl-generation.output-mode", "database"),
                     tuple("eclipselink.logging.level.sql", "FINE"), tuple("eclipselink.logging.parameters", "true")),
             PersistenceUtil.mkTestPersistenceProvider());
+  }
+
+  /**
+   * Create a mocked organization.
+   * @param id the organization identifier
+   * @param name the organization name
+   * @return a mocked organization
+   */
+  static Organization createOrganization(String id, String name) {
+    Organization org = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(org.getId()).andReturn(id).anyTimes();
+    EasyMock.expect(org.getName()).andReturn(name).anyTimes();
+    EasyMock.expect(org.getAdminRole()).andReturn("ROLE_ADMIN_" + id.toUpperCase().replaceAll(" ", "_")).anyTimes();
+    EasyMock.expect(org.getProperties()).andReturn(Collections.EMPTY_MAP).anyTimes();
+    EasyMock.expect(org.getServers()).andReturn(Collections.EMPTY_MAP).anyTimes();
+    EasyMock.replay(org);
+    return org;
+  }
+
+  /**
+   * Create a mocked user.
+   * @param org the organization the user belongs to
+   * @param username the username
+   * @param roles the users role names
+   * @return a mocked user
+   */
+  static User createUser(Organization org, String username, List<String> roles) {
+    Set<Role> rolesList = roles.stream().map(roleName -> {
+      Role r = EasyMock.createNiceMock(Role.class);
+      EasyMock.expect(r.getName()).andReturn(roleName).anyTimes();
+      EasyMock.expect(r.getOrganization()).andReturn(org).anyTimes();
+      EasyMock.replay(r);
+      return r;
+    }).collect(Collectors.toSet());
+
+    User user = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(user.getName()).andReturn(username).anyTimes();
+    EasyMock.expect(user.getUsername()).andReturn(username).anyTimes();
+    EasyMock.expect(user.getOrganization()).andReturn(org).anyTimes();
+    EasyMock.expect(user.getRoles()).andReturn(rolesList).anyTimes();
+    EasyMock.expect(user.hasRole(EasyMock.anyString())).andAnswer(() -> {
+      String role = (String) EasyMock.getCurrentArguments()[0];
+      return roles.contains(role);
+    }).anyTimes();
+
+    EasyMock.replay(user);
+    return user;
   }
 }

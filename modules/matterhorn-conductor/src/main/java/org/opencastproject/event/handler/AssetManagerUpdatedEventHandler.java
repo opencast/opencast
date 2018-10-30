@@ -21,7 +21,6 @@
 
 package org.opencastproject.event.handler;
 
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -222,7 +221,7 @@ public class AssetManagerUpdatedEventHandler {
 
         try {
           // Update the asset manager with the modified mediapackage
-          assetManager.takeSnapshot(DEFAULT_OWNER, mp);
+          assetManager.takeSnapshot(snapshot.getOwner(), mp);
         } catch (AssetManagerException e) {
           logger.error("Error updating mediapackage {}: {}", mp, e.getMessage());
         }

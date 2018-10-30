@@ -50,6 +50,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Locale;
 
+import javax.ws.rs.core.MediaType;
+
 public class SeriesEndpointTest {
 
   private static final RestServiceTestEnv rt = testEnvForClasses(localhostRandomPort(), TestSeriesEndpoint.class);
@@ -62,7 +64,7 @@ public class SeriesEndpointTest {
     InputStreamReader reader = new InputStreamReader(stream);
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
     JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).when().get(rt.host("/series.json")).asString());
+            .contentType(MediaType.APPLICATION_JSON).when().get(rt.host("/series.json")).asString());
     Assert.assertEquals(expected, actual);
   }
 

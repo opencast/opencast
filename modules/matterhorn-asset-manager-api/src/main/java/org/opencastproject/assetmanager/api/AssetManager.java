@@ -62,6 +62,16 @@ public interface AssetManager {
   Snapshot takeSnapshot(String owner, MediaPackage mp);
 
   /**
+   * Take a versioned snapshot of a media package using the owner of the last snapshot or the default owner if it
+   * does not exist.
+   *
+   * @param mediaPackage
+   *          The media package to snapshot
+   * @return A new snapshot
+   */
+  Snapshot takeSnapshot(MediaPackage mediaPackage);
+
+  /**
    * Get the asset that is uniquely identified by the triple {version, media package ID, media package element ID}.
    *
    * @param version the version

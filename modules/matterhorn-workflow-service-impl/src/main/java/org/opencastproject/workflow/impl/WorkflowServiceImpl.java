@@ -1030,13 +1030,22 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   private void removeTempFiles(WorkflowInstance workflowInstance) throws WorkflowDatabaseException,
           UnauthorizedException, NotFoundException {
-    logger.info("Removing temporary files for workflow %s", workflowInstance);
+    logger.info("Removing temporary files for workflow {}", workflowInstance);
+    if (null == workflowInstance.getMediaPackage()) {
+      logger.warn("Workflow instance {} does not have an media package set", workflowInstance.getId());
+      return;
+    }
     for (MediaPackageElement elem : workflowInstance.getMediaPackage().getElements()) {
+      if (null == elem.getURI()) {
+        logger.warn("Mediapackage element {} from the media package {} does not have an URI set",
+                elem.getIdentifier(), workflowInstance.getMediaPackage().getIdentifier().compact());
+        continue;
+      }
       try {
-        logger.debug("Removing temporary file %s for workflow %s", elem.getURI(), workflowInstance);
+        logger.debug("Removing temporary file {} for workflow {}", elem.getURI(), workflowInstance);
         workspace.delete(elem.getURI());
       } catch (IOException e) {
-        logger.warn("Unable to delete mediapackage element ", e);
+        logger.warn("Unable to delete mediapackage element", e);
       } catch (NotFoundException e) {
         // File was probably already deleted before...
       }
@@ -1317,26 +1326,30 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
       }
 
-      // Before we persist this, extract the metadata
-      final MediaPackage updatedMediaPackage = workflowInstance.getMediaPackage();
-      populateMediaPackageMetadata(updatedMediaPackage);
-      String seriesId = updatedMediaPackage.getSeries();
-      if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
-        // If the mediapackage contains a series, find the series ACLs and add the security information to the
-        // mediapackage
-        try {
+      MediaPackage updatedMediaPackage = null;
+      try {
+
+        // Before we persist this, extract the metadata
+        updatedMediaPackage = workflowInstance.getMediaPackage();
+
+        populateMediaPackageMetadata(updatedMediaPackage);
+
+        String seriesId = updatedMediaPackage.getSeries();
+        if (seriesId != null && workflowInstance.getCurrentOperation() != null) {
+          // If the mediapackage contains a series, find the series ACLs and add the security information to the
+          // mediapackage
+
           AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage,
-                 AclScope.Series);
+          Option<AccessControlList> activeSeriesAcl = authorizationService.getAcl(updatedMediaPackage, AclScope.Series);
           if (activeSeriesAcl.isNone() || !AccessControlUtil.equals(activeSeriesAcl.get(), acl))
             authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
-        } catch (SeriesException e) {
-          throw new WorkflowDatabaseException(e);
-        } catch (NotFoundException e) {
-          logger.warn("Series %s not found, unable to set ACLs", seriesId);
-        } catch (Exception e) {
-          logger.error("Error reading ACL from series {}: {}", seriesId, e);
         }
+      } catch (SeriesException e) {
+        throw new WorkflowDatabaseException(e);
+      } catch (NotFoundException e) {
+        logger.warn("Metadata for mediapackage {} could not be updated because it wasn't found", updatedMediaPackage, e);
+      } catch (Exception e) {
+        logger.error("Metadata for mediapackage {} could not be updated", updatedMediaPackage, e);
       }
 
       // Synchronize the job status with the workflow
@@ -1391,8 +1404,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Update both workflow and workflow job
       try {
         job = serviceRegistry.updateJob(job);
-        messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-                WorkflowItem.updateInstance(workflowInstance));
+
+        WorkflowOperationInstance op = workflowInstance.getCurrentOperation();
+        // Update index used for UI. Note that we only need certain metadata and we can safely filter out workflow
+        // updates for running operations since we updated the metadata right before these operations and will do so
+        // again right after those operations.
+        if (op == null || op.getState() != OperationState.RUNNING) {
+          messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue, WorkflowItem.updateInstance(workflowInstance));
+        }
+
         index(workflowInstance);
       } catch (ServiceRegistryException e) {
         logger.error(

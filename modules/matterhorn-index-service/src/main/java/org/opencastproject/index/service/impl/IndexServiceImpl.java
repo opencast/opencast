@@ -75,8 +75,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.Id;
-import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -124,9 +122,7 @@ import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
-import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -136,7 +132,6 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -150,10 +145,10 @@ import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -956,43 +951,11 @@ public class IndexServiceImpl implements IndexService {
         }
         return mediaPackage.getIdentifier().compact();
       case SCHEDULE_MULTIPLE:
-        List<Period> periods = calculatePeriods(start.toDate(), end.toDate(), duration, rRule, tz);
-        int i = 1;
-        int length = Integer.toString(periods.size()).length();
-        List<String> ids = new ArrayList<>();
-        String initialTitle = dc.getFirst(DublinCore.PROPERTY_TITLE);
-        for (Period period : periods) {
-          Date startDate = new Date(period.getStart().getTime());
-          Date endDate = new Date(period.getEnd().getTime());
-          Id id = new IdImpl(UUID.randomUUID().toString());
-
-          // Set the new media package identifier
-          eventHttpServletRequest.getMediaPackage().get().setIdentifier(id);
-
-          // Update dublincore title and temporal
-          String newTitle = initialTitle + String.format(" %0" + length + "d", i++);
-          dc.set(DublinCore.PROPERTY_TITLE, newTitle);
-          DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
-                  Precision.Second);
-          dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
-          mediaPackage = updateDublincCoreCatalog(eventHttpServletRequest.getMediaPackage().get(), dc);
-          mediaPackage.setTitle(newTitle);
-
-          try {
-            schedulerService.addEvent(startDate, endDate, captureAgentId, presenterUsernames, mediaPackage,
-                    configuration, (Map) caProperties, Opt.none(), Opt.none(), SchedulerService.ORIGIN);
-          } finally {
-            for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
-              try {
-                workspace.delete(mediaPackage.getIdentifier().toString(), mediaPackageElement.getIdentifier());
-              } catch (NotFoundException | IOException e) {
-                logger.warn("Failed to delete media package element", e);
-              }
-            }
-          }
-          ids.add(id.compact());
-        }
-        return StringUtils.join(ids, ",");
+        List<Period> periods = schedulerService.calculatePeriods(rRule, start.toDate(), end.toDate(), duration, tz);
+        Map<String, Period> scheduled = new LinkedHashMap<>();
+         scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
+                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+        return StringUtils.join(scheduled.keySet(), ",");
       default:
         logger.warn("Unknown source type {}", type);
         throw new IllegalArgumentException("Unknown source type");
@@ -1078,65 +1041,6 @@ public class IndexServiceImpl implements IndexService {
       }
     }
     return mp;
-  }
-
-  /**
-   * Giving a start time and end time with a recurrence rule and a timezone, all periods of the recurrence rule are
-   * calculated taken daylight saving time into account.
-   *
-   *
-   * @param start
-   *          the start date time
-   * @param end
-   *          the end date
-   * @param duration
-   *          the duration
-   * @param rRule
-   *          the recurrence rule
-   * @param tz
-   *          the timezone
-   * @return a list of scheduling periods
-   */
-  protected List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    final TimeZone utc = TimeZone.getTimeZone("UTC");
-    TimeZone.setDefault(tz);
-    DateTime seed = new DateTime(start);
-    DateTime period = new DateTime();
-
-    Calendar endCalendar = Calendar.getInstance(utc);
-    endCalendar.setTime(end);
-    Calendar calendar = Calendar.getInstance(utc);
-    calendar.setTime(seed);
-    calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
-    calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
-    calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-    period.setTime(calendar.getTime().getTime() + duration);
-    duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
-
-    List<Period> periods = new ArrayList<>();
-
-    TimeZone.setDefault(utc);
-    for (Object date : rRule.getRecur().getDates(seed, period, Value.DATE_TIME)) {
-      Date d = (Date) date;
-      Calendar cDate = Calendar.getInstance(utc);
-
-      // Adjust for DST, if start of event
-      if (tz.inDaylightTime(seed)) { // Event starts in DST
-        if (!tz.inDaylightTime(d)) { // Date not in DST?
-          d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
-        }
-      } else { // Event doesn't start in DST
-        if (tz.inDaylightTime(d)) {
-          d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
-        }
-      }
-      cDate.setTime(d);
-
-      periods.add(new Period(new DateTime(cDate.getTime()), new DateTime(cDate.getTimeInMillis() + duration)));
-    }
-
-    TimeZone.setDefault(null);
-    return periods;
   }
 
   /**

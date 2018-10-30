@@ -284,7 +284,7 @@ public final class ResourceRequestUtil {
       try {
         String requestedPath = new URI(resourceUri).getPath();
         String policyPath = new URI(policy.getResource()).getPath();
-        if (!policyPath.equals(requestedPath)) {
+        if (!policyPath.endsWith(requestedPath)) {
           resourceRequest.setStatus(Status.Forbidden);
           resourceRequest.setRejectionReason(String.format(
                   "Forbidden because resource trying to be accessed '%s' doesn't match policy resource '%s'", resourceUri,

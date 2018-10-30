@@ -39,7 +39,6 @@
     <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
-    <sec:intercept-url pattern="/archive/archive/mediapackage/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW, ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW, ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW" />
     <sec:intercept-url pattern="/admin-ng/event/*/asset/assets.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
@@ -99,6 +98,7 @@
     <sec:intercept-url pattern="/admin-ng/resources/providers.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/THEMES.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
 
     <sec:intercept-url pattern="/email/template/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EMAILTEMPLATES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
@@ -127,6 +127,7 @@
     <sec:intercept-url pattern="/admin-ng/event/new/conflicts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/optouts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_STATUS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_EDIT" />
+    <sec:intercept-url pattern="/admin-ng/event/*/assets" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
@@ -274,7 +275,7 @@
     <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
 
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />    
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
 
     <!-- Everything else is for the admin users -->
     <sec:intercept-url pattern="/admin-ng" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI, ROLE_COURSE_ADMIN" />
@@ -317,7 +318,7 @@
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
 
-    <!-- Shibooleth log out
+    <!-- Shibboleth log out
          Please specifiy the URL to return to after logging out
     <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
     -->
@@ -439,16 +440,6 @@
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <!-- This is required for LTI. If you are using LTI and have enabled the oauthProtectedResourceFilter  -->
-  <!-- in the list of authenticationFilters above, set custom values for CONSUMERKEY and CONSUMERSECRET. -->
-
-  <bean name="oAuthConsumerDetailsService" class="org.opencastproject.kernel.security.OAuthSingleConsumerDetailsService">
-    <constructor-arg index="0" ref="userDetailsService" />
-    <constructor-arg index="1" value="CONSUMERKEY" />
-    <constructor-arg index="2" value="CONSUMERSECRET" />
-    <constructor-arg index="3" value="constructorName" />
-  </bean>
-
   <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">
     <property name="consumerDetailsService" ref="oAuthConsumerDetailsService" />
     <property name="tokenServices">
@@ -457,24 +448,7 @@
     <property name="nonceServices">
       <bean class="org.springframework.security.oauth.provider.nonce.InMemoryNonceServices" />
     </property>
-    <property name="authHandler">
-      <bean class="org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler">
-        <constructor-arg index="0" ref="userDetailsService" />
-
-        <!-- Uncomment to trust usernames from the LTI consumer identified by CONSUMERKEY.           -->
-        <!-- Users from untrusted systems will be prefixed with "lti:" and the consumer domain name. -->
-
-        <!--
-        <constructor-arg index="1" ref="securityService" />
-        <constructor-arg index="2">
-          <list>
-            <value>CONSUMERKEY</value>
-          </list>
-        </constructor-arg>
-        -->
-
-      </bean>
-    </property>
+    <property name="authHandler" ref="ltiLaunchAuthenticationHandler" />
   </bean>
 
   <!-- ###################### -->
@@ -529,6 +503,11 @@
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
 
+  <osgi:reference id="oAuthConsumerDetailsService" cardinality="1..1"
+                  interface="org.springframework.security.oauth.provider.ConsumerDetailsService" />
+
+  <osgi:reference id="ltiLaunchAuthenticationHandler" cardinality="1..1"
+                  interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler" />
 
   <!-- ############################# -->
   <!-- # Spring Security Internals # -->

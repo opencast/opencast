@@ -37,6 +37,8 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.api.query.ARecord;
+import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
@@ -52,7 +54,6 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.RequireUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
@@ -105,7 +106,9 @@ public abstract class AbstractAssetManager implements AssetManager {
   /* ------------------------------------------------------------------------------------------------------------------ */
 
   @Override public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
-    RequireUtil.notEmpty(owner, "owner");
+    if (owner == null)
+      return takeSnapshot(mp);
+
     return handleException(new P1Lazy<Snapshot>() {
       @Override public Snapshot get1() {
         try {
@@ -116,6 +119,22 @@ public abstract class AbstractAssetManager implements AssetManager {
         }
       }
     });
+  }
+
+  @Override
+  public Snapshot takeSnapshot(MediaPackage mediaPackage) {
+    final String mediaPackageId = mediaPackage.getIdentifier().toString();
+    AQueryBuilder queryBuilder = createQuery();
+    AResult result = queryBuilder.select(queryBuilder.snapshot())
+            .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
+    Opt<ARecord> record = result.getRecords().head();
+    if (record.isSome()) {
+      Opt<Snapshot> snapshot = record.get().getSnapshot();
+      if (snapshot.isSome()) {
+        return takeSnapshot(snapshot.get().getOwner(), mediaPackage);
+      }
+    }
+    return takeSnapshot(DEFAULT_OWNER, mediaPackage);
   }
 
   @Override public void setAvailability(Version version, String mpId, Availability availability) {

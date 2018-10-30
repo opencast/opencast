@@ -23,7 +23,8 @@ module.exports = function (grunt) {
   // Configurable paths for the application
   var appConfig = {
     app: require('./bower.json').appPath,
-    dist: 'target/grunt/webapp'
+    dist: 'target/grunt/webapp',
+    staging: 'target/grunt/.tmp'
   };
 
   // Define the configuration for all the tasks
@@ -64,7 +65,7 @@ module.exports = function (grunt) {
         },
         files: [
           '<%= yeoman.app %>/{,*/}*.html',
-          '.tmp/styles/{,*/}*.css',
+          '<%= yeoman.staging %>/styles/{,*/}*.css',
           '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
         ]
       }
@@ -182,13 +183,13 @@ module.exports = function (grunt) {
         files: [{
           dot: true,
           src: [
-            '.tmp',
+            '<%= yeoman.staging %>',
             '<%= yeoman.dist %>/{,*/}*',
             '!<%= yeoman.dist %>/.git{,*/}*'
           ]
         }]
       },
-      server: '.tmp'
+      server: '<%= yeoman.staging %>'
     },
 
     // Add vendor prefixed styles
@@ -204,17 +205,17 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: '.tmp/styles/',
+          cwd: '<%= yeoman.staging %>/styles/',
           src: '{,*/}*.css',
-          dest: '.tmp/styles/'
+          dest: '<%= yeoman.staging %>/styles/'
         }]
       },
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/styles/',
+          cwd: '<%= yeoman.staging %>/styles/',
           src: '{,*/}*.css',
-          dest: '.tmp/styles/'
+          dest: '<%= yeoman.staging %>/styles/'
         }]
       }
     },
@@ -229,7 +230,7 @@ module.exports = function (grunt) {
         devDependencies: true,
         src: '<%= karma.options.configFile %>',
         ignorePath:  /\.\.\//,
-        fileTypes:{
+        fileTypes: {
           js: {
             block: /(([\s\t]*)\/{2}\s*?bower:\s*?(\S*))(\n|\r|.)*?(\/{2}\s*endbower)/gi,
               detect: {
@@ -259,7 +260,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: '<%= yeoman.app %>/styles',
                 src: ['*.scss'],
-                dest: '.tmp/styles',
+                dest: '<%= yeoman.staging %>/styles',
                 ext: '.css'
             }]
         },
@@ -268,7 +269,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: '<%= yeoman.app %>/styles',
                 src: ['*.scss'],
-                dest: '.tmp/styles',
+                dest: '<%= yeoman.staging %>/styles',
                 ext: '.css'
             }]
         }
@@ -292,6 +293,7 @@ module.exports = function (grunt) {
     useminPrepare: {
       html: ['<%= yeoman.app %>/index.html', '<%= yeoman.app %>/index.html'],
       options: {
+        staging: '<%= yeoman.staging %>',
         dest: '<%= yeoman.dist %>',
         flow: {
           html: {
@@ -345,9 +347,9 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true,
-          cwd: '.tmp/concat/scripts',
+          cwd: '<%= yeoman.staging %>/concat/scripts',
           src: '*.js',
-          dest: '.tmp/concat/scripts'
+          dest: '<%= yeoman.staging %>/concat/scripts'
         }]
       }
     },
@@ -369,7 +371,7 @@ module.exports = function (grunt) {
           ]
         }, {
           expand: true,
-          cwd: '.tmp/images',
+          cwd: '<%= yeoman.staging %>/images',
           dest: '<%= yeoman.dist %>/images',
           src: ['generated/*']
         }, {
@@ -396,7 +398,7 @@ module.exports = function (grunt) {
       styles: {
         expand: true,
         cwd: '<%= yeoman.app %>/styles',
-        dest: '.tmp/styles/',
+        dest: '<%= yeoman.staging %>/styles/',
         src: '{,*/}*.css'
       }
     },

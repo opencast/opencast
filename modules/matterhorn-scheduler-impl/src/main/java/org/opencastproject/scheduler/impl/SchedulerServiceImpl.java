@@ -40,6 +40,7 @@ import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Log.getHumanReadableTimeString;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
+import static org.opencastproject.util.RequireUtil.requireTrue;
 import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.assetmanager.api.Asset;
@@ -62,21 +63,30 @@ import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.PropertySchema;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.index.IndexProducer;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
+import org.opencastproject.mediapackage.identifier.Id;
+import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.Blacklist;
 import org.opencastproject.scheduler.api.ConflictHandler;
 import org.opencastproject.scheduler.api.ConflictNotifier;
@@ -93,6 +103,7 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
@@ -102,12 +113,15 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
+import org.opencastproject.util.XmlNamespaceBinding;
+import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
@@ -121,6 +135,7 @@ import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -138,7 +153,9 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -148,6 +165,8 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -163,6 +182,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceImpl.class);
+
+  /** The minimum separation between one event ending and the next starting */
+  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
 
   /** The last modifed cache configuration key */
   private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
@@ -615,6 +637,166 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       throw e;
     } catch (Exception e) {
       logger.error("Failed to create event with id '{}': {}", mediaPackageId, getStackTrace(e));
+      throw new SchedulerException(e);
+    }
+  }
+
+
+  public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
+          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
+          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
+          throws UnauthorizedException, SchedulerConflictException, SchedulerTransactionLockException, SchedulerException {
+    List<Period> periods = calculatePeriods(rRule, start, end, duration, tz);
+    return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
+            modificationOrigin, optOut, schedulingSource, Opt.<String> none());
+  }
+
+
+  private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
+          Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
+          Map<String, String> caMetadata, String modificationOrigin, Opt<Boolean> optOutStatus,
+          Opt<String> schedulingSource, Opt<String> trxId)
+                  throws SchedulerException {
+    notNull(periods, "periods");
+    requireTrue(periods.size() > 0, "periods");
+    notEmpty(captureAgentId, "captureAgentId");
+    notNull(userIds, "userIds");
+    notNull(templateMp, "mediaPackages");
+    notNull(wfProperties, "wfProperties");
+    notNull(caMetadata, "caMetadata");
+    notEmpty(modificationOrigin, "modificationOrigin");
+    notNull(optOutStatus, "optOutStatus");
+    notNull(schedulingSource, "schedulingSource");
+    notNull(trxId, "trxId");
+
+    Map<String, Period> scheduledEvents = new LinkedHashMap<>();
+
+    try {
+      LinkedList<Id> ids = new LinkedList<>();
+      AQueryBuilder qb = assetManager.createQuery();
+      Predicate p = null;
+      //While we don't have a list of IDs equal to the number of periods
+      while (ids.size() <= periods.size()) {
+        //Create a list of IDs equal to the number of periods, along with a set of AM predicates
+        while (ids.size() <= periods.size()) {
+          Id id = new IdImpl(UUID.randomUUID().toString());
+          ids.add(id);
+          Predicate np = qb.mediaPackageId(id.compact());
+          //Haha, p = np jokes with the AM query language. Ha. Haha. Ha.  (Sob...)
+          if (null == p) {
+            p = np;
+          } else {
+            p = p.or(np);
+          }
+        }
+        //Select the list of ids which alread exist.  Hint: this needs to be zero
+        AResult result = qb.select(qb.nothing()).where(withOrganization(qb).and(p).and(qb.version().isLatest())).run();
+        //If there is conflict, clear the list and start over
+        if (result.getTotalSize() > 0) {
+          ids.clear();
+        }
+      }
+
+
+      Opt<String> seriesId = Opt.nul(StringUtils.trimToNull(templateMp.getSeries()));
+      // Get opt out status
+      boolean optOut = getOptOutStatus(seriesId, optOutStatus);
+
+      if (trxId.isNone()) {
+        // Check for locked transactions
+        if (schedulingSource.isSome() && persistence.hasTransaction(schedulingSource.get())) {
+          logger.warn("Unable to add events, source '{}' is currently locked due to an active transaction!",
+                  schedulingSource.get());
+          throw new SchedulerTransactionLockException("Unable to add event, locked source " + schedulingSource.get());
+        }
+
+        // Check for conflicting events if not opted out
+        if (!optOut) {
+          List<MediaPackage> conflictingEvents = findConflictingEvents(periods, captureAgentId, TimeZone.getDefault());
+          if (conflictingEvents.size() > 0) {
+            logger.info("Unable to add events, conflicting events found: {}", conflictingEvents);
+            throw new SchedulerConflictException("Unable to add event, conflicting events found");
+          }
+        }
+      }
+
+      //counter for index into the list of mediapackages
+      int counter = 0;
+      for (Period event : periods) {
+        MediaPackage mediaPackage = (MediaPackage) templateMp.clone();
+        Date startDate = new Date(event.getStart().getTime());
+        Date endDate = new Date(event.getEnd().getTime());
+        Id id = ids.get(counter);
+
+        //Get, or make, the DC catalog
+        DublinCoreCatalog dc;
+        Opt<DublinCoreCatalog> dcOpt = DublinCoreUtil.loadEpisodeDublinCore(workspace,
+                templateMp);
+        if (dcOpt.isSome()) {
+          dc = dcOpt.get();
+          dc = (DublinCoreCatalog) dc.clone();
+          // make sure to bind the OC_PROPERTY namespace
+          dc.addBindings(XmlNamespaceContext
+                  .mk(XmlNamespaceBinding.mk(DublinCores.OC_PROPERTY_NS_PREFIX, DublinCores.OC_PROPERTY_NS_URI)));
+        } else {
+          dc = DublinCores.mkOpencastEpisode().getCatalog();
+        }
+
+        // Set the new media package identifier
+        mediaPackage.setIdentifier(id);
+
+        // Update dublincore title and temporal
+        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE) + String.format(" %0" + Integer.toString(periods.size()).length() + "d", ++counter);
+        dc.set(DublinCore.PROPERTY_TITLE, newTitle);
+        DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
+                Precision.Second);
+        dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+        mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
+        mediaPackage.setTitle(newTitle);
+
+        String mediaPackageId = mediaPackage.getIdentifier().compact();
+        //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
+        Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        cal.setTime(event.getStart());
+        Date startDateTime = cal.getTime();
+        cal.setTime(event.getEnd());
+        Date endDateTime = cal.getTime();
+        // Load dublincore and acl for update
+        Opt<DublinCoreCatalog> dublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage);
+        Option<AccessControlList> acl = authorizationService.getAcl(mediaPackage, AclScope.Episode);
+
+        // Get updated agent properties
+        Map<String, String> finalCaProperties = getFinalAgentProperties(caMetadata, wfProperties, captureAgentId,
+                seriesId, dublinCore);
+
+        // Persist asset
+        String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
+                captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl.toOpt().getOr(new AccessControlList()));
+        persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
+                Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource, trxId);
+
+        if (trxId.isNone()) {
+          // Send updates
+          sendUpdateAddEvent(mediaPackageId, acl.toOpt(), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+                  Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
+
+          // Update last modified
+          touchLastEntry(captureAgentId);
+        }
+        scheduledEvents.put(mediaPackageId, event);
+        for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
+          try {
+            workspace.delete(mediaPackage.getIdentifier().toString(), mediaPackageElement.getIdentifier());
+          } catch (NotFoundException | IOException e) {
+            logger.warn("Failed to delete media package element", e);
+          }
+        }
+      }
+      return scheduledEvents;
+    } catch (SchedulerException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Failed to create events: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
   }
@@ -1207,6 +1389,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return searchInternal(startsFrom, startsTo, endFrom, endTo, alreadyScheduledEvents);
   }
 
+  /*
+   * Returns a list of events which start and/or end within a given date range.  So you could search for things which
+   * start on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at
+   * Epoch and ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any
+   * edge cases.  Use checkScheduleConflicts instead.
+   */
   private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
                                             Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
     final List<ARecord> result = new ArrayList<>();
@@ -1232,6 +1420,52 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return Stream.mk(result).bind(recordToMp).toList();
   }
 
+  /*
+   * Returns a list of conflicting mediapackages.  This method checks for containment, starts-during, and ends-during.
+   */
+  private List<MediaPackage> checkScheduleConflicts(Date checkStart, Date checkEnd, ARecord[] records) {
+    final List<ARecord> result = new ArrayList<>();
+    for (final ARecord r : records) {
+      final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+      final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+      /*
+      If the potential event starts during event r OR
+      If the potential event ends during event r OR
+      If the potential event begins before, and ends after event r (ie, containment) OR
+      If the potential event begins or ends within the minimum separation distance of event r
+      */
+      if (checkStart.after(start) && checkStart.before(end)
+       || checkEnd.after(start) && checkEnd.before(end)
+       || checkStart.before(start) && checkEnd.after(end)
+       || eventWithinMinimumSeparation(checkStart, checkEnd, start, end)) {
+        result.add(r);
+      }
+    }
+    result.sort(new Comparator<ARecord>() {
+      @Override
+      public int compare(ARecord o1, ARecord o2) {
+        Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+        return start1.compareTo(start2);
+      }
+    });
+    return Stream.mk(result).bind(recordToMp).toList();
+  }
+
+  /**
+   * Returns true of checkStart is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates, or checkEnd
+   * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
+   */
+  private boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
+    if (Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+        || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS) {
+      return true;
+    }
+    return false;
+  }
+
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
           throws SchedulerException {
@@ -1241,17 +1475,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private List<MediaPackage> findConflictingEvents(Date startDate, Date endDate, ARecord[] alreadyScheduledEvents)
           throws SchedulerException {
-    final List<MediaPackage> events = new ArrayList<>();
-    // overlap
-    events.addAll(searchInternal(Opt.<Date> none(), Opt.some(startDate), Opt.some(endDate),
-            Opt.<Date> none(), alreadyScheduledEvents));
-    // start between
-    events.addAll(searchInternal(Opt.some(startDate), Opt.some(endDate), Opt.<Date> none(),
-            Opt.<Date> none(), alreadyScheduledEvents));
-    // end between
-    events.addAll(searchInternal(Opt.<Date> none(), Opt.<Date> none(), Opt.some(startDate),
-            Opt.some(endDate), alreadyScheduledEvents));
-    return events;
+    return checkScheduleConflicts(startDate, endDate, alreadyScheduledEvents);
   }
 
   private List<String> preCollisionEventCheck(String trxId, String schedulingSource) throws SchedulerException {
@@ -1338,57 +1562,41 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(end, "end");
     notNull(tz, "timeZone");
 
+    final List<Period> periods = calculatePeriods(rrule, start, end, duration, tz);
+    return findConflictingEvents(periods, captureAgentId, tz);
+  }
+
+    private List<MediaPackage> findConflictingEvents(List<Period> periods, String captureAgentId, TimeZone tz)
+          throws SchedulerException {
+    notEmpty(captureAgentId, "captureAgentId");
+    notNull(periods, "periods");
+    requireTrue(periods.size() > 0, "periods");
+
     try {
       final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureAgentId));
-      final TimeZone timeZone = TimeZone.getDefault();
-      final TimeZone utc = TimeZone.getTimeZone("UTC");
-      TimeZone.setDefault(tz);
-      net.fortuna.ical4j.model.DateTime seed = new net.fortuna.ical4j.model.DateTime(start);
-      net.fortuna.ical4j.model.DateTime period = new net.fortuna.ical4j.model.DateTime();
-
-      Calendar endCalendar = Calendar.getInstance(utc);
-      endCalendar.setTime(end);
-      Calendar calendar = Calendar.getInstance(utc);
-      calendar.setTime(seed);
-      calendar.set(Calendar.DAY_OF_MONTH, endCalendar.get(Calendar.DAY_OF_MONTH));
-      calendar.set(Calendar.MONTH, endCalendar.get(Calendar.MONTH));
-      calendar.set(Calendar.YEAR, endCalendar.get(Calendar.YEAR));
-      period.setTime(calendar.getTime().getTime() + duration);
-      duration = duration % (DateTimeConstants.MILLIS_PER_DAY);
+      final TimeZone utc = TimeZone.getTimeZone("utc");
 
       Set<MediaPackage> events = new HashSet<>();
 
-      TimeZone.setDefault(utc);
-      for (Object date : rrule.getRecur().getDates(seed, period, net.fortuna.ical4j.model.parameter.Value.DATE_TIME)) {
-        Date d = (Date) date;
-        Calendar cDate = Calendar.getInstance(utc);
-
-        // Adjust for DST, if start of event
-        if (tz.inDaylightTime(seed)) { // Event starts in DST
-          if (!tz.inDaylightTime(d)) { // Date not in DST?
-            d.setTime(d.getTime() + tz.getDSTSavings()); // Adjust for Fall back one hour
-          }
-        } else { // Event doesn't start in DST
-          if (tz.inDaylightTime(d)) {
-            d.setTime(d.getTime() - tz.getDSTSavings()); // Adjust for Spring forward one hour
-          }
-        }
-        cDate.setTime(d);
-
-        TimeZone.setDefault(timeZone);
-        final Date startDate = cDate.getTime();
-        final Date endDate = new Date(cDate.getTimeInMillis() + duration);
+      for (Period event : periods) {
+        TimeZone.setDefault(utc);
+        final Date startDate = event.getStart();
+        final Date endDate = event.getEnd();
 
         events.addAll(findConflictingEvents(startDate, endDate, alreadyScheduledEvents));
-        TimeZone.setDefault(utc);
       }
 
-      TimeZone.setDefault(timeZone);
+      TimeZone.setDefault(null);
       return new ArrayList<>(events);
     } catch (Exception e) {
       logger.error("Failed to search for conflicting events: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
+  }
+
+  @Override
+  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
+    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 
   @Override
@@ -1453,10 +1661,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
         Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
         Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+        Date lastModified = record.getSnapshot().get().getArchivalDate();
 
         // Add the entry to the calendar, skip it with a warning if adding fails
         try {
-          cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, toPropertyString(caMetadata));
+          cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
         } catch (Exception e) {
           logger.warn("Error adding event '{}' to calendar, event is not recorded: {}", record.getMediaPackageId(),
                   getStackTrace(e));
@@ -1929,6 +2138,36 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return Opt.none();
 
     return record.bind(recordToMp);
+  }
+
+  /**
+   *
+   * @param mp
+   *          the mediapackage to update
+   * @param dc
+   *          the dublincore metadata to use to update the mediapackage
+   * @return the updated mediapackage
+   * @throws IOException
+   *           Thrown if an IO error occurred adding the dc catalog file
+   * @throws MediaPackageException
+   *           Thrown if an error occurred updating the mediapackage or the mediapackage does not contain a catalog
+   */
+  private MediaPackage updateDublincCoreCatalog(MediaPackage mp, DublinCoreCatalog dc)
+          throws IOException, MediaPackageException {
+    try (InputStream inputStream = IOUtils.toInputStream(dc.toXmlString(), "UTF-8")) {
+      // Update dublincore catalog
+      Catalog[] catalogs = mp.getCatalogs(MediaPackageElements.EPISODE);
+      if (catalogs.length > 0) {
+        Catalog catalog = catalogs[0];
+        URI uri = workspace.put(mp.getIdentifier().toString(), catalog.getIdentifier(), "dublincore.xml", inputStream);
+        catalog.setURI(uri);
+        // setting the URI to a new source so the checksum will most like be invalid
+        catalog.setChecksum(null);
+      } else {
+        throw new MediaPackageException("Unable to find catalog");
+      }
+    }
+    return mp;
   }
 
   private TechnicalMetadata getTechnicalMetadata(ARecord record, Props p) {
@@ -2509,82 +2748,94 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(indexName, "indexName");
 
     final String destinationId = SchedulerItem.SCHEDULER_QUEUE_PREFIX + WordUtils.capitalize(indexName);
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                int current = 1;
+    final Organization organization = new DefaultOrganization();
+    final User user = SecurityUtil.createSystemUser(systemUserName, organization);
+    SecurityUtil.runAs(securityService, organization, user, new Effect0() {
+      @Override
+      protected void run() {
+        int current = 0;
 
-                AQueryBuilder query = assetManager.createQuery();
-                Props p = new Props(query);
-                AResult result = query
-                        .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-                                p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
-                                p.reviewStatus().target(), p.recordingStatus().target(),
-                                p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
-                        .where(withOrganization(query).and(query.hasPropertiesOf(p.namespace()))
-                                .and(withVersion(query)))
-                        .run();
-                final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
-                logger.info(
-                        "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
-                        indexName, total);
-                final int responseInterval = (total < 100) ? 1 : (total / 100);
-                try {
-                  for (ARecord record : result.getRecords()) {
-                    String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
-                    boolean optOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
-                    Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-                    Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-                    Set<String> presenters = getPresenters(
-                        record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-                    boolean blacklisted = isBlacklisted(record.getMediaPackageId(), start, end, agentId, presenters);
-                    Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
-                            .group(toKey, toValue);
-                    ReviewStatus reviewStatus = record.getProperties()
-                        .apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
-                    Date reviewDate = record.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG)).orNull();
-                    Opt<String> recordingStatus = record.getProperties()
-                            .apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
-                    Opt<Long> lastHeard = record.getProperties()
-                            .apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
+        AQueryBuilder query = assetManager.createQuery();
+        Props p = new Props(query);
+        AResult result = query
+                .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
+                        p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
+                        p.reviewStatus().target(), p.recordingStatus().target(),
+                        p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
+                .where(query.hasPropertiesOf(p.namespace()).and(withVersion(query)))
+                .run();
+        final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
+        logger.info(
+                "Re-populating '{}' index with scheduled events. There are {} scheduled events to add to the index.",
+                indexName, total);
+        final int responseInterval = (total < 100) ? 1 : (total / 100);
+        try {
+          for (ARecord record : result.getRecords()) {
+            current++;
+            if (record.getSnapshot().isNone()) {
+              logger.warn("Doesn't found a media package for an scheuled event {}", record.getMediaPackageId());
+              continue;
+            }
+            try {
+              Snapshot snapshot = record.getSnapshot().get();
+              Organization org = orgDirectoryService.getOrganization(snapshot.getOrganizationId());
+              User orgSystemUser = SecurityUtil.createSystemUser(systemUserName, org);
+              securityService.setOrganization(org);
+              securityService.setUser(orgSystemUser);
 
-                    Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.getSnapshot().get());
-                    Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.getSnapshot().get());
+              String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
+              boolean optOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
+              Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+              Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+              Set<String> presenters = getPresenters(
+                  record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
+              boolean blacklisted = isBlacklisted(record.getMediaPackageId(), start, end, agentId, presenters);
+              Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
+                      .group(toKey, toValue);
+              ReviewStatus reviewStatus = record.getProperties()
+                  .apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
+              Date reviewDate = record.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG)).orNull();
+              Opt<String> recordingStatus = record.getProperties()
+                      .apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
+              Opt<Long> lastHeard = record.getProperties()
+                      .apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
 
-                    sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
-                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
+              Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
+              Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
-                    if (((current % responseInterval) == 0) || (current == total)) {
-                      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                              IndexRecreateObject
-                                      .update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
-                    }
-                    if (recordingStatus.isSome() && lastHeard.isSome())
-                      sendRecordingUpdate(
-                              new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
-                    current++;
-                  }
-                } catch (Exception e) {
-                  logger.warn("Unable to index scheduled instances: {}", e);
-                  throw new ServiceException(e.getMessage());
-                }
-              }
-            });
+              sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
+                      Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
 
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                        IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
-              }
-            });
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                      SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
+              messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                      SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
+              if (recordingStatus.isSome() && lastHeard.isSome())
+                sendRecordingUpdate(
+                        new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
+            } finally {
+              securityService.setOrganization(organization);
+              securityService.setUser(user);
+            }
+            if (((current % responseInterval) == 0) || (current == total)) {
+              messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                      IndexRecreateObject.update(indexName, IndexRecreateObject.Service.Scheduler, total, current));
+            }
+          }
+        } catch (Exception e) {
+          logger.warn("Unable to index scheduled instances:", e);
+          throw new ServiceException(e.getMessage());
+        }
+      }
+    });
+
+    SecurityUtil.runAs(securityService, organization, user, new Effect0() {
+      @Override
+      protected void run() {
+        messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+                IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Scheduler));
+      }
+    });
   }
 
   @Override

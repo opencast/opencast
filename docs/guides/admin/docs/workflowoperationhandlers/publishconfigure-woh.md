@@ -74,7 +74,7 @@ Operation Examples
 ### Internal Channel
 
     <operation
-      id="publish-engage"
+      id="publish-configure"
       exception-handler-workflow="ng-partial-error"
       description="Publish to internal channel">
       <configurations>

@@ -178,10 +178,7 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
-      AgentImpl agent = getAgentEntity(name, org, em);
-      if (agent == null)
-        throw new NotFoundException();
-      return agent;
+      return getAgentEntity(name, org, em);
     } finally {
       if (em != null)
         em.close();
@@ -199,14 +196,14 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          the entity manager
    * @return the agent or <code>null</code> if no agent has been found
    */
-  protected AgentImpl getAgentEntity(String name, String organization, EntityManager em) {
+  protected AgentImpl getAgentEntity(String name, String organization, EntityManager em) throws NotFoundException {
     try {
       Query q = em.createNamedQuery("Agent.get");
       q.setParameter("id", name);
       q.setParameter("org", organization);
       return (AgentImpl) q.getSingleResult();
     } catch (NoResultException e) {
-      return null;
+      throw new NotFoundException(e);
     }
   }
 
@@ -505,35 +502,32 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
-      em = emf.createEntityManager();
-      tx = em.getTransaction();
-      tx.begin();
-      AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
-
+      //This is the cached last-heard-from time
+      Long cachedLastHeardFrom = -1L;
       // Update the last seen property from the agent cache
-      if (existing != null && updateFromCache) {
+      if (updateFromCache) {
         try {
-          Tuple3<String, Properties, Long> cachedAgent = getAgentFromCache(existing.getName(),
-                  existing.getOrganization());
-          if (agent != null && cachedAgent != null) {
-            agent.setLastHeardFrom(cachedAgent.getC());
-          }
+          cachedLastHeardFrom = getAgentFromCache(agent.getName(), agent.getOrganization()).getC();
         } catch (NotFoundException e) {
           // That's fine
         }
       }
 
-      if (existing == null) {
-        em.persist(agent);
-      } else {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      try {
+        AgentImpl existing = getAgentEntity(agent.getName(), agent.getOrganization(), em);
         existing.setConfiguration(agent.getConfiguration());
         if (!AgentState.UNKNOWN.equals(agent.getState())) {
-          existing.setLastHeardFrom(agent.getLastHeardFrom());
+          existing.setLastHeardFrom(Math.max(cachedLastHeardFrom, agent.getLastHeardFrom()));
         }
         existing.setState(agent.getState());
         existing.setSchedulerRoles(agent.getSchedulerRoles());
         existing.setUrl(agent.getUrl());
         em.merge(existing);
+      } catch (NotFoundException e) {
+        em.persist(agent);
       }
       tx.commit();
       if (updateFromCache) {
