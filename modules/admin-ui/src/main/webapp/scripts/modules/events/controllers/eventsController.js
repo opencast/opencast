@@ -48,41 +48,47 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'title',
-        label: 'EVENTS.EVENTS.TABLE.TITLE'
+        label: 'EVENTS.EVENTS.TABLE.TITLE',
+        sortable: true
       }, {
         name:  'presenter',
-        label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
+        label: 'EVENTS.EVENTS.TABLE.PRESENTERS',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsSeriesCell.html',
         name:  'series_name',
-        label: 'EVENTS.EVENTS.TABLE.SERIES'
+        label: 'EVENTS.EVENTS.TABLE.SERIES',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsTechnicalDateCell.html',
         name:  'technical_date',
-        label: 'EVENTS.EVENTS.TABLE.DATE'
+        label: 'EVENTS.EVENTS.TABLE.DATE',
+        sortable: true
       }, {
         name:  'technical_start',
-        label: 'EVENTS.EVENTS.TABLE.START'
+        label: 'EVENTS.EVENTS.TABLE.START',
+        sortable: true
       }, {
         name:  'technical_end',
-        label: 'EVENTS.EVENTS.TABLE.STOP'
+        label: 'EVENTS.EVENTS.TABLE.STOP',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsLocationCell.html',
         name:  'location',
-        label: 'EVENTS.EVENTS.TABLE.LOCATION'
+        label: 'EVENTS.EVENTS.TABLE.LOCATION',
+        sortable: true
       }, {
         name:  'published',
         label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'modules/events/partials/publishedCell.html',
-        dontSort: true
+        template: 'modules/events/partials/publishedCell.html'
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
-        label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
+        label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventActionsCell.html',
-        label:    'EVENTS.EVENTS.TABLE.ACTION',
-        dontSort: true
+        label:    'EVENTS.EVENTS.TABLE.ACTION'
       }],
       caption:    'EVENTS.EVENTS.TABLE.CAPTION',
       resource:   'events',

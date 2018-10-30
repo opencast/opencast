@@ -29,17 +29,19 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'name',
-        label: 'USERS.GROUPS.TABLE.NAME'
+        label: 'USERS.GROUPS.TABLE.NAME',
+        sortable: true
       }, {
         name:  'description',
-        label: 'USERS.GROUPS.TABLE.DESCRIPTION'
+        label: 'USERS.GROUPS.TABLE.DESCRIPTION',
+        sortable: true
       }, {
         name:  'role',
-        label: 'USERS.GROUPS.TABLE.ROLE'
+        label: 'USERS.GROUPS.TABLE.ROLE',
+        sortable: true
       }, {
         template: 'modules/users/partials/groupActionsCell.html',
-        label:    'USERS.USERS.TABLE.ACTION',
-        dontSort: true
+        label:    'USERS.USERS.TABLE.ACTION'
       }],
       caption:    'USERS.GROUPS.TABLE.CAPTION',
       resource:   'groups',

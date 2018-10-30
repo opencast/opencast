@@ -29,19 +29,24 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'name',
-        label: 'USERS.USERS.TABLE.NAME'
+        label: 'USERS.USERS.TABLE.NAME',
+        sortable: true
       }, {
         name:  'username',
-        label: 'USERS.USERS.TABLE.USERNAME'
+        label: 'USERS.USERS.TABLE.USERNAME',
+        sortable: true
       }, {
         name:  'email',
-        label: 'USERS.USERS.TABLE.EMAIL'
+        label: 'USERS.USERS.TABLE.EMAIL',
+        sortable: true
       }, {
         name:  'roles',
-        label: 'USERS.USERS.TABLE.ROLES'
+        label: 'USERS.USERS.TABLE.ROLES',
+        sortable: true
       }, {
         name:  'provider',
-        label: 'USERS.USERS.TABLE.PROVIDER'
+        label: 'USERS.USERS.TABLE.PROVIDER',
+        sortable: true
       }, {
         //     name:  'blacklist_from',
         //     label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
@@ -50,8 +55,7 @@ angular.module('adminNg.controllers')
         //     label: 'USERS.USERS.TABLE.BLACKLIST_TO'
         // }, {
         template: 'modules/users/partials/userActionsCell.html',
-        label:    'USERS.USERS.TABLE.ACTION',
-        dontSort: true
+        label:    'USERS.USERS.TABLE.ACTION'
       }],
       caption:    'USERS.USERS.TABLE.CAPTION',
       resource:   'users',

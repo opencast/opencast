@@ -27,36 +27,44 @@ angular.module('adminNg.controllers')
       columns: [{
         name:     'online',
         template: 'modules/systems/partials/serverStatusCell.html',
-        label:    'SYSTEMS.SERVERS.TABLE.STATUS'
+        label:    'SYSTEMS.SERVERS.TABLE.STATUS',
+        sortable: true
       }, {
         name:  'hostname',
-        label: 'SYSTEMS.SERVERS.TABLE.HOST_NAME'
+        label: 'SYSTEMS.SERVERS.TABLE.HOST_NAME',
+        sortable: true
       }, {
         name:  'cores',
-        label: 'SYSTEMS.SERVERS.TABLE.CORES'
+        label: 'SYSTEMS.SERVERS.TABLE.CORES',
+        sortable: true
       }, {
         name:  'completed',
-        label: 'SYSTEMS.SERVERS.TABLE.COMPLETED'
+        label: 'SYSTEMS.SERVERS.TABLE.COMPLETED',
+        sortable: true
       }, {
         name:  'running',
-        label: 'SYSTEMS.SERVERS.TABLE.RUNNING'
+        label: 'SYSTEMS.SERVERS.TABLE.RUNNING',
+        sortable: true
       }, {
         name:  'queued',
-        label: 'SYSTEMS.SERVERS.TABLE.QUEUED'
+        label: 'SYSTEMS.SERVERS.TABLE.QUEUED',
+        sortable: true
       }, {
         name:  'meanRunTime',
-        label: 'SYSTEMS.SERVERS.TABLE.MEAN_RUN_TIME'
+        label: 'SYSTEMS.SERVERS.TABLE.MEAN_RUN_TIME',
+        sortable: true
       }, {
         name:  'meanQueueTime',
-        label: 'SYSTEMS.SERVERS.TABLE.MEAN_QUEUE_TIME'
+        label: 'SYSTEMS.SERVERS.TABLE.MEAN_QUEUE_TIME',
+        sortable: true
       }, {
         name:     'maintenance',
         template: 'modules/systems/partials/serverMaintenanceCell.html',
-        label:    'SYSTEMS.SERVERS.TABLE.MAINTENANCE'
+        label:    'SYSTEMS.SERVERS.TABLE.MAINTENANCE',
+        sortable: true
         //}, {
         //    template: 'modules/systems/partials/serverActionsCell.html',
-        //    label:    'SYSTEMS.SERVERS.TABLE.ACTION',
-        //    dontSort: true
+        //    label:    'SYSTEMS.SERVERS.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.SERVERS.TABLE.CAPTION',
       resource:   'servers',

@@ -27,32 +27,39 @@ angular.module('adminNg.controllers')
       columns: [{
         name:  'status',
         label: 'SYSTEMS.SERVICES.TABLE.STATUS',
-        translate: true
+        translate: true,
+        sortable: true
       }, {
         name:  'name',
-        label: 'SYSTEMS.SERVICES.TABLE.NAME'
+        label: 'SYSTEMS.SERVICES.TABLE.NAME',
+        sortable: true
       }, {
         name:  'hostname',
-        label: 'SYSTEMS.SERVICES.TABLE.HOST_NAME'
+        label: 'SYSTEMS.SERVICES.TABLE.HOST_NAME',
+        sortable: true
       }, {
         name:  'completed',
-        label: 'SYSTEMS.SERVICES.TABLE.COMPLETED'
+        label: 'SYSTEMS.SERVICES.TABLE.COMPLETED',
+        sortable: true
       }, {
         name:  'running',
-        label: 'SYSTEMS.SERVICES.TABLE.RUNNING'
+        label: 'SYSTEMS.SERVICES.TABLE.RUNNING',
+        sortable: true
       }, {
         name:  'queued',
-        label: 'SYSTEMS.SERVICES.TABLE.QUEUED'
+        label: 'SYSTEMS.SERVICES.TABLE.QUEUED',
+        sortable: true
       }, {
         name:  'meanRunTime',
-        label: 'SYSTEMS.SERVICES.TABLE.MEAN_RUN_TIME'
+        label: 'SYSTEMS.SERVICES.TABLE.MEAN_RUN_TIME',
+        sortable: true
       }, {
         name:  'meanQueueTime',
-        label: 'SYSTEMS.SERVICES.TABLE.MEAN_QUEUE_TIME'
+        label: 'SYSTEMS.SERVICES.TABLE.MEAN_QUEUE_TIME',
+        sortable: true
       }, {
         template: 'modules/systems/partials/serviceActionsCell.html',
-        label:    'SYSTEMS.SERVICES.TABLE.ACTION',
-        dontSort: true
+        label:    'SYSTEMS.SERVICES.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.SERVICES.TABLE.CAPTION',
       resource:   'services',
