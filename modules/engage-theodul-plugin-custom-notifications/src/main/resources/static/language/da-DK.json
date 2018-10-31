@@ -1,6 +1,6 @@
 {
-    "value_locale": "en",
-    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "value_locale": "da",
+    "value_dateFormatFull": "Dd MMMM ÅÅÅÅ, t:mm:ss",
     "error_videoLoading": "Videoen indlæses, vent et øjeblik.",
     "error_audioLoading": "Lyden indlæses, vent et øjeblik.",
     "msg_videoLoadedSuccessfully": "Videoen er indlæst.",
