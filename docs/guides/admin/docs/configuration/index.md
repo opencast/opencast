@@ -17,7 +17,6 @@ General Configuration
 - [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)
 - [Message Broker Configuration](message-broker.md)
 - [Metadata Configuration](metadata.md)
-- [Manual Asset Upload Configuration](asset-upload-ui/index.md)
 - [Multi Tenancy Configuration](multi.tenancy.md)
 - [Authentication, Autorization and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
@@ -31,4 +30,8 @@ General Configuration
     - [Workflow Operation Handler](../workflowoperationhandlers/index.md)
 - [External API Configuration](external-api.md)
 - [OAI-PMH Configuration](oaipmh.md)
-- [Admin UI Configuration](ui.md)
+- Admin UI Configuration
+    - [Event Filters](admin-ui/event-filters.md)
+    - [Manual Asset Upload](admin-ui/asset-upload.md)
+    - [Languages](admin-ui/languages.md)
+    - [Thumbnails](admin-ui/thumbnails.md)
