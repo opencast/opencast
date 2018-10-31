@@ -1,6 +1,6 @@
 {
     "value_locale": "en",
-    "value_dateFormatFull": "MMMM Do YYYY, h:mm:ss a",
+    "value_dateFormatFull": "Dd MMMM ÅÅÅÅ, t:mm:ss",
     "title": "Titel",
     "noTitle": "Ingen titel",
     "creator": "Kreatør",
