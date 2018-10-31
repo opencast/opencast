@@ -143,7 +143,7 @@ To configure the flavor and tags of the thumbnail image attachments you can set 
 
     # Default: */search+preview
     #thumbnail.publish.flavor=*/search+preview
-    
+
     # Default: engage-download
     #thumbnail.publish.tags=engage-download
 
@@ -153,6 +153,4 @@ The OAI-PMH channel can be configured:
 
     # Default: default
     #oaipmh.channel=default
-
-
 
