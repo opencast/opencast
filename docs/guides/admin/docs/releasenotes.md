@@ -80,6 +80,10 @@ Configuration changes
 - The role `ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW` for viewing the publications (previously general) tab in the event
   details modal has been renamed to `ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW` for consistency.
 
+- The introduction of Capture Agent Access Management implies that unprivileged users do not have access to any capture
+  agents anymore. Before Opencast 6.0, unprivileged users had access to all capture agents. In case you are working
+  with unprivileged users that shall be allowed to access capture agents in means of scheduling events or editing
+  scheduled events, you will need to configure their access permissions to capture agents appropriately.
 
 Release Schedule
 ----------------
