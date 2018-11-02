@@ -1,0 +1,8 @@
+{
+	"Error loading video! No video tracks found": "Das Video konnte nicht geladen werden, da keine Videospuren gefunden wurden",
+	"Error loading video {0}": "Das Video {0} konnte nicht geladen werden",
+	"CAPTIONS_undefined": "Unbekannte Sprache",
+	"CAPTIONS_es": "Spanisch",
+	"CAPTIONS_en": "Englisch",
+	"CAPTIONS_de": "Deutsch"
+}

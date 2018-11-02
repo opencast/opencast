@@ -1414,8 +1414,15 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       // Update both workflow and workflow job
       try {
         job = serviceRegistry.updateJob(job);
-        messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
-                WorkflowItem.updateInstance(workflowInstance));
+
+        WorkflowOperationInstance op = workflowInstance.getCurrentOperation();
+
+        // Update index used for UI. Note that we only need certain metadata and we can safely filter out workflow
+        // updates for running operations since we updated the metadata right before these operations and will do so
+        // again right after those operations.
+        if (op == null || op.getState() != OperationState.RUNNING) {
+          messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue, WorkflowItem.updateInstance(workflowInstance));
+        }
         index(workflowInstance);
       } catch (ServiceRegistryException e) {
         logger.error(

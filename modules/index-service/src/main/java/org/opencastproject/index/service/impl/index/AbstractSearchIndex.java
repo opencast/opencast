@@ -87,6 +87,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
+import javax.xml.bind.Unmarshaller;
+
 public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
 
   private static final Logger logger = LoggerFactory.getLogger(AbstractSearchIndex.class);
@@ -498,11 +500,12 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new EventQueryBuilder(query));
 
     try {
+      Unmarshaller unmarshaller = Event.createUnmarshaller();
       return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Event>() {
         @Override
         public Event apply(SearchMetadataCollection metadata) {
           try {
-            return EventIndexUtils.toRecordingEvent(metadata);
+            return EventIndexUtils.toRecordingEvent(metadata, unmarshaller);
           } catch (IOException e) {
             return chuck(e);
           }
@@ -528,11 +531,12 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new GroupQueryBuilder(query));
 
     try {
+      Unmarshaller unmarshaller = Group.createUnmarshaller();
       return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Group>() {
         @Override
         public Group apply(SearchMetadataCollection metadata) {
           try {
-            return GroupIndexUtils.toGroup(metadata);
+            return GroupIndexUtils.toGroup(metadata, unmarshaller);
           } catch (IOException e) {
             return chuck(e);
           }
@@ -555,11 +559,12 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     // Create the request builder
     SearchRequestBuilder requestBuilder = getSearchRequestBuilder(query, new SeriesQueryBuilder(query));
     try {
+      Unmarshaller unmarshaller = Series.createUnmarshaller();
       return executeQuery(query, requestBuilder, new Fn<SearchMetadataCollection, Series>() {
         @Override
         public Series apply(SearchMetadataCollection metadata) {
           try {
-            return SeriesIndexUtils.toSeries(metadata);
+            return SeriesIndexUtils.toSeries(metadata, unmarshaller);
           } catch (IOException e) {
             return chuck(e);
           }

@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
+import javax.xml.bind.Unmarshaller;
+
 /**
  * Utility implementation to deal with the conversion of groups and its corresponding index data structures.
  */
@@ -59,10 +61,10 @@ public final class GroupIndexUtils {
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Group toGroup(SearchMetadataCollection metadata) throws IOException {
+  public static Group toGroup(SearchMetadataCollection metadata, Unmarshaller unmarshaller) throws IOException {
     Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
     String groupXml = (String) metadataMap.get(GroupIndexSchema.OBJECT).getValue();
-    return Group.valueOf(IOUtils.toInputStream(groupXml));
+    return Group.valueOf(IOUtils.toInputStream(groupXml), unmarshaller);
   }
 
   /**

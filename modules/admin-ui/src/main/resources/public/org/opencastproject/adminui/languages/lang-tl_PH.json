@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Pinalawig na metadata",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Pinalawig na metadata"
                }
             },
             "ACCESS": {
                "CAPTION": "Patakaran sa pag-access",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Mga template"
                },

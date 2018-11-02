@@ -22,12 +22,13 @@ package org.opencastproject.message.broker.api.assetmanager;
 
 import static com.entwinemedia.fn.Prelude.chuck;
 
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -42,6 +43,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -292,17 +294,16 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
    * @return Builds a {@link AssetManagerItem} for taking a media package snapshot.
    */
   public static TakeSnapshot add(Workspace workspace, MediaPackage mp, AccessControlList acl, long version, Date date) {
-    String dc = null;
-    Opt<DublinCoreCatalog> episodeDublincore = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp);
-    if (episodeDublincore.isSome()) {
-      try {
-        dc = episodeDublincore.get().toXmlString();
-      } catch (IOException e) {
-        throw new IllegalStateException(
-                String.format("Not able to serialize the episode dublincore catalog %s.", episodeDublincore.get()), e);
+    String dcXml = null;
+    for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+      try (InputStream in = workspace.read(catalog.getURI())) {
+        dcXml = IOUtils.toString(in, StandardCharsets.UTF_8);
+      } catch (Exception e) {
+        throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                mp.getIdentifier()), e);
       }
     }
-    return new TakeSnapshot(mp.getIdentifier().compact(), MediaPackageParser.getAsXml(mp), dc,
+    return new TakeSnapshot(mp.getIdentifier().compact(), MediaPackageParser.getAsXml(mp), dcXml,
             AccessControlParser.toJsonSilent(acl), version, date);
   }
 

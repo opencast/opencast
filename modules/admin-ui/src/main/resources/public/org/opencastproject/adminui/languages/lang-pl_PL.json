@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Rozszerzone metadane",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Rozszerzone metadane"
                }
             },
             "ACCESS": {
                "CAPTION": "Zasady dostępu",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Szablony"
                },

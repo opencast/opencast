@@ -74,8 +74,8 @@
       }
    },
    "MEDIAMODULE": "媒體模組",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "SYSTEM_NOTIFICATIONS": "系統警告和通知",
+   "LANGUAGE": "選擇語言",
    "HELP": {
       "HELP": "幫助",
       "USERS_GUIDE": "使用說明",
@@ -116,10 +116,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "無法恢復處理。",
       "EVENTS_PROCESSING_ACTION_NONE": "正在中止處理..。",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "無法中止處理。",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "EVENTS_PROCESSING_ACTION_STOP": "正在中止處理..。",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "無法中止處理。",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "刪除工作流",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "無法刪除工作流。",
       "SERIES_UPDATED_NB": "{{ number }} 系列已成功更新",
       "SERIES_UPDATED_ALL": "已成功更新所有系列",
       "SERIES_NOT_UPDATED": "該系列無法儲存",
@@ -435,7 +435,7 @@
                   "START_TIME": "開始時間",
                   "TIMEZONE": "時區",
                   "END_DATE": "結束日期",
-                  "END_TIME": "End time",
+                  "END_TIME": "結束時間",
                   "DURATION": "持續時間"
                },
                "SCHEDULE_SINGLE": {
@@ -532,16 +532,16 @@
             "PUBLISHED": "已發佈",
             "WEEKDAY": "Weekday",
             "TOOLTIP": {
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "EDITOR": "Open video Editor",
+               "START": "篩選此開始日期",
+               "SERIES": "此系列的篩選器",
+               "STATUS": "篩選此事件狀態",
+               "LOCATION": "此位置的篩選器",
+               "DETAILS": "檢視事件詳細內容",
+               "DELETE": "刪除事件",
+               "EDITOR": "打開視頻編輯器",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow"
+               "COMMENTS": "檢視註解",
+               "PAUSED_WORKFLOW": "查看暫停的工作流"
             }
          },
          "SCHEDULING_STATUS": {
@@ -579,14 +579,14 @@
             "PUBLICATIONS": {
                "CAPTION": "出版",
                "NO_PUBLICATIONS_AVAILABLE": "此事件沒有發佈",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "PUBLICATION_DESCRIPTION": "此事件已發佈到以下發布管道:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "此事件當前未進行",
                "SCHEDULING_STATUS": "狀態",
                "READY_FOR_RECORDING": "準備錄製",
                "OPTED_OUT": "選擇退出",
                "CUSTOM": "自定義",
                "ENGAGE": "播放",
-               "ENGAGE_LIVE": "Engage Live",
+               "ENGAGE_LIVE": "即時轉播",
                "EXTERNAL_API": "外部 API 出版物",
                "YOUTUBE": "YouTube 的影音視訊",
                "OAIPMH": "OAI-PMH",
@@ -644,7 +644,7 @@
                   "START_TIME": "開始時間",
                   "TIMEZONE": "時區",
                   "END_DATE": "結束日期",
-                  "END_TIME": "End time",
+                  "END_TIME": "結束時間",
                   "DURATION": "持續時間"
                },
                "SCHEDULE_SINGLE": {
@@ -886,10 +886,10 @@
                "NO_CONFIGURATION": "選定的工作流程，不存在設定參數。",
                "WORKFLOW": "工作流程",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "停止執行工作流實例",
+                  "ABORT": "中止執行工作流實例 (不再重試失敗的操作)",
+                  "RETRY": "重試工作流實例的執行",
+                  "DELETE": "刪除工作流實例"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instantiated",
@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "擴展後設資料",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "擴展後設資料"
                }
             },
             "ACCESS": {
                "CAPTION": "存取權限",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "樣板"
                },
@@ -1019,7 +1017,7 @@
             "THEME": {
                "CAPTION": "主題",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "您可以選擇使用主題來標示視頻。主題可以定義前後段視頻、浮水印和標題幻燈片 (包括中繼資料)。"
                },
                "TITLE": "主題",
                "LABEL": "無主題",
@@ -1040,9 +1038,9 @@
             "EVENTS": "事件",
             "ACTION": "操作",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "SERIES": "篩選此系列的事件",
+               "DETAILS": "檢視事件詳細內容",
+               "DELETE": "刪除系列"
             }
          },
          "DETAILS": {
@@ -1149,9 +1147,9 @@
             "BLACKLIST_TO": "直到黑名單",
             "ACTION": "操作",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "篩選此位置的事件",
+               "DETAILS": "打開位置詳細資訊",
+               "DELETE": "刪除位置 (登出)"
             }
          },
          "DETAILS": {
@@ -1245,7 +1243,7 @@
             "BLACKLIST_TO": "直到黑名單",
             "ACTION": "操作",
             "TOOLTIP": {
-               "DELETE": "Delete user",
+               "DELETE": "刪除使用者",
                "DETAILS": "Open user details"
             }
          },

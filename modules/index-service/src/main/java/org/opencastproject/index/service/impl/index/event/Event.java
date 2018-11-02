@@ -1352,15 +1352,15 @@ public class Event implements IndexObject {
    *
    * @param xml
    *          the input stream
+   * @param unmarshaller the unmarshaller to use
    * @return the deserialized recording event
    * @throws IOException
    */
-  public static Event valueOf(InputStream xml) throws IOException {
+  public static Event valueOf(InputStream xml, Unmarshaller unmarshaller) throws IOException {
     try {
       if (context == null) {
         createJAXBContext();
       }
-      Unmarshaller unmarshaller = context.createUnmarshaller();
       return unmarshaller.unmarshal(new StreamSource(xml), Event.class).getValue();
     } catch (JAXBException e) {
       throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
@@ -1472,6 +1472,22 @@ public class Event implements IndexObject {
       return writer.toString();
     } catch (JAXBException e) {
       throw new IllegalStateException(e.getLinkedException() != null ? e.getLinkedException() : e);
+    }
+  }
+
+  /**
+   * Create an unmarshaller for events
+   * @return an unmarshaller for events
+   * @throws IOException
+   */
+  public static Unmarshaller createUnmarshaller() throws IOException {
+    try {
+      if (context == null) {
+        createJAXBContext();
+      }
+      return context.createUnmarshaller();
+    } catch (JAXBException e) {
+      throw new IOException(e.getLinkedException() != null ? e.getLinkedException() : e);
     }
   }
 

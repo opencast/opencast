@@ -27,6 +27,7 @@ angular.module('adminNg.resources')
       params: { ext: 'acls.json' },
       method: 'GET',
       isArray: false,
+      cancellable: true,
       transformResponse: function (data) {
         return ResourceHelper.parseResponse(data, function (r) {
           var row = {};

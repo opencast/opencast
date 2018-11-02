@@ -1,5 +1,4 @@
 <div class="modal-content" ng-class="{active: isCurrentTab('metadata')}" data-modal-tab-content="metadata" data-level="1">
-  <p class="tab-description" translate="EVENTS.SERIES.NEW.METADATA.DESCRIPTION"><!-- Description --></p>
   <div class="modal-body">
     <div class="full-col">
       <div class="obj tbl-list">
@@ -51,7 +50,6 @@
 <div class="modal-content" data-modal-tab-content="access" data-level="1">
   <div class="modal-body">
 
-    <p class="tab-description" translate="EVENTS.SERIES.NEW.ACCESS.DESCRIPTION"><!-- Description --></p>
     <div data-admin-ng-notifications="" context="series-acl"></div>
     <div data-admin-ng-notifications="" type="warning" context="series-acl"></div>
 
@@ -88,7 +86,7 @@
                                   ng-change="wizard.step.changeBaseAcl()"
                                   ng-model="wizard.step.ud.id"
                                   ng-options="id as name for (id, name) in wizard.step.acls"
-                                  data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                   />
                         </div>
@@ -137,7 +135,7 @@
                                   ng-options="id as id for (id, type) in wizard.step.roles"
                                   data-placeholder=" "
                                   no-results-text="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
-                                  data-placeholder="{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}">
+                                  placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.ACCESS.ROLES.LABEL' | translate }}'">
                             <option value=""></option>
                           </select>
                         </td>
@@ -187,7 +185,7 @@
                       ng-change="wizard.step.themeSave()"
                       ng-model="wizard.step.ud.theme"
                       ng-options="id as list.name for (id, list) in wizard.step.themes"
-                      data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                      placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}'"
                       no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
                       >
                       <option value=""></option>
@@ -213,7 +211,7 @@
           <table class="main-tbl">
             <tr ng-repeat="userEntry in wizard.states[0].stateController.getUserEntries()" ng-if="userEntry.presentableValue">
               <td>{{ userEntry.label | translate }}</td>
-              <td>{{ userEntry.presentableValue }}</td>
+              <td>{{ userEntry.presentableValue | translate }}</td>
               <tr>
           </table>
         </div>
@@ -263,13 +261,16 @@
         </div>
       </div>
 
-      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').ud.theme !== ''">
+      <div class="obj tbl-list" ng-if="wizard.getStateControllerByName('theme').ud.theme 
+          && wizard.getStateControllerByName('theme').themes.hasOwnProperty(wizard.getStateControllerByName('theme').ud.theme)">
         <header class="no-expand" translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></header>
         <div class="obj-container">
           <table class="main-tbl">
             <tr>
               <td translate="EVENTS.SERIES.NEW.THEME.CAPTION"><!-- Caption --></td>
-              <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">{{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}</td>
+              <td ng-if="wizard.getStateControllerByName('theme').ud.theme && wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme]">
+                {{wizard.getStateControllerByName('theme').themes[wizard.getStateControllerByName('theme').ud.theme].name}}
+              </td>
 
             </tr>
           </table>

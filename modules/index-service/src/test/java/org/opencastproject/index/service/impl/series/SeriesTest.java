@@ -109,7 +109,7 @@ public class SeriesTest {
   @Ignore
   @Test
   public void testValueOf() throws ParseException, IOException, JSONException, XMLStreamException, JAXBException {
-    Series series = Series.valueOf(IOUtils.toInputStream(seriesXml));
+    Series series = Series.valueOf(IOUtils.toInputStream(seriesXml), Series.createUnmarshaller());
     assertEquals(id, series.getIdentifier());
     assertEquals(title, series.getTitle());
     assertEquals(description, series.getDescription());

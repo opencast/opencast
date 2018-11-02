@@ -61,7 +61,7 @@
                                          ng-change="wizard.step.changeBaseAcl()"
                                          ng-model="wizard.step.ud.id"
                                          ng-options="id as name for (id, name) in wizard.step.acls"
-                                         data-placeholder="{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                         placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                          />
                         </div>
@@ -108,7 +108,7 @@
                                          ng-model="policy.role"
                                          ng-get-more="wizard.step.getMoreRoles"
                                          ng-options="id as id for (id, type) in wizard.step.roles"
-                                         data-placeholder="{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}"
+                                         placeholder-text-single="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.LABEL' | translate }}'"
                                          no-results-text="'{{ 'USERS.ACLS.NEW.ACCESS.ROLES.EMPTY' | translate }}'"
                                          />
                         </td>

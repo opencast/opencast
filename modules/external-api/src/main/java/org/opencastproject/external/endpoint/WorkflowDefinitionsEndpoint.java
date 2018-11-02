@@ -78,7 +78,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0 })
-@RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = "", abstractText = "Provides resources and operations related to the workflow definitions")
+@RestService(name = "externalapiworkflowdefinitions", title = "External API Workflow Definitions Service", notes = {}, abstractText = "Provides resources and operations related to the workflow definitions")
 public class WorkflowDefinitionsEndpoint {
 
   /**

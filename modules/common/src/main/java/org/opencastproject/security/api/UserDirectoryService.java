@@ -21,7 +21,10 @@
 
 package org.opencastproject.security.api;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * A marker interface for federation of all {@link UserProvider}s.
@@ -45,6 +48,23 @@ public interface UserDirectoryService {
    *           if no organization is set for the current thread
    */
   User loadUser(String userName);
+
+  /**
+   * Loads multiple users by a list of user names.
+   *
+   * @param userNames
+   *          the user names to look for
+   * @return the users
+   * @throws IllegalStateException
+   *           if no organization is set for the current thread
+   */
+  default Iterator<User> loadUsers(Collection<String> userNames) {
+    List<User> result = new ArrayList<>(userNames.size());
+    for (String userName : userNames) {
+      result.add(loadUser(userName));
+    }
+    return result.iterator();
+  }
 
   /**
    * Return the found user's as an iterator.

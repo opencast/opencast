@@ -44,14 +44,20 @@ angular.module('adminNg.services')
       me.ud[mainMetadataName] = mainData;
       if (mainData && mainData.fields) {
         for (i = 0; i < mainData.fields.length; i++) {
+          var field = mainData.fields[i];
+          // preserve default value, if set
+          if (field.hasOwnProperty('value') && field.value) {
+            field.presentableValue = me.extractPresentableValue(field);
+            me.ud[mainMetadataName].fields[field.id] = field;
+          }
           // just hooking the tab index up here, as this is already running through all elements
-          mainData.fields[i].tabindex = i + 1;
-          if (mainData.fields[i].required) {
-            me.updateRequiredMetadata(mainData.fields[i].id, mainData.fields[i].value);
-            if (mainData.fields[i].type === 'boolean') {
+          field.tabindex = i + 1;
+          if (field.required) {
+            me.updateRequiredMetadata(field.id, field.value);
+            if (field.type === 'boolean') {
               // set all boolean fields to false by default
-              mainData.fields[i].value = false;
-              me.requiredMetadata[mainData.fields[i].id] = true;
+              field.value = false;
+              me.requiredMetadata[field.id] = true;
             }
           }
         }
@@ -72,6 +78,36 @@ angular.module('adminNg.services')
       return result;
     };
 
+    this.extractPresentableValue = function (field) {
+      var actualValue = field.value;
+      var presentableValue = '';
+      if (field.collection) {
+        if (angular.isArray(actualValue)) {
+          angular.forEach(actualValue, function (item, index) {
+            presentableValue += item;
+            if ((index + 1) < actualValue.length) {
+              presentableValue += ', ';
+            }
+          });
+          field.presentableValue = presentableValue;
+        } else {
+          if (field.collection.hasOwnProperty(actualValue)) {
+            presentableValue = field.collection[actualValue];
+          } else {
+            // this should work in older browsers, albeit looking clumsy
+            var matchingKey = Object.keys(field.collection)
+              .filter(function(key) {return field.collection[key] === actualValue;})[0];
+            presentableValue = field.type === 'ordered_text'
+              ? JSON.parse(matchingKey)['label']
+              : matchingKey;
+          }
+        }
+      } else {
+        presentableValue = actualValue;
+      }
+      return presentableValue;
+    };
+
     this.save = function (scope) {
       //FIXME: This should be nicer, rather propagate the id and values
       //instead of looking for them in the parent scope.
@@ -79,24 +115,7 @@ angular.module('adminNg.services')
           fieldId = params.id,
           value = params.value;
 
-      if (params.collection) {
-        if (angular.isArray(value)) {
-          var presentableValue = '';
-
-          angular.forEach(value, function (item, index) {
-            presentableValue += item;
-            if ((index + 1) < value.length) {
-              presentableValue += ', ';
-            }
-          });
-
-          params.presentableValue = presentableValue;
-        } else {
-          params.presentableValue = params.collection[value];
-        }
-      } else {
-        params.presentableValue = value;
-      }
+      params.presentableValue = me.extractPresentableValue(params);
 
       me.ud[mainMetadataName].fields[fieldId] = params;
 

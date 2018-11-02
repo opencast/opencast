@@ -73,9 +73,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -221,6 +226,12 @@ public class GroupsEndpoint {
       return RestUtil.R.serverError();
     }
 
+    List<String> userNames = Arrays.stream(results.getItems()).flatMap(item -> item.getSource().getMembers().stream())
+      .collect(Collectors.toList());
+
+    final Map<String, User> users = new HashMap<>(userNames.size());
+    userDirectoryService.loadUsers(userNames).forEachRemaining(user -> users.put(user.getUsername(), user));
+
     List<JValue> groupsJSON = new ArrayList<>();
     for (SearchResultItem<Group> item : results.getItems()) {
       Group group = item.getSource();
@@ -229,7 +240,8 @@ public class GroupsEndpoint {
       fields.add(f("name", v(group.getName(), Jsons.BLANK)));
       fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
       fields.add(f("role", v(group.getRole())));
-      fields.add(f("users", membersToJSON(group.getMembers())));
+      fields.add(
+        f("users", membersToJSON(group.getMembers().stream().map(users::get).filter(Objects::nonNull).iterator())));
       groupsJSON.add(obj(fields));
     }
 
@@ -316,9 +328,10 @@ public class GroupsEndpoint {
       throw new NotFoundException("Group " + groupId + " does not exist.");
 
     Group group = groupOpt.get();
+    Iterator<User> users = userDirectoryService.loadUsers(group.getMembers());
     return RestUtils.okJson(obj(f("id", v(group.getIdentifier())), f("name", v(group.getName(), Jsons.BLANK)),
-            f("description", v(group.getDescription(), Jsons.BLANK)), f("role", v(group.getRole(), Jsons.BLANK)),
-            f("roles", rolesToJSON(group.getRoles())), f("users", membersToJSON(group.getMembers()))));
+      f("description", v(group.getDescription(), Jsons.BLANK)), f("role", v(group.getRole(), Jsons.BLANK)),
+      f("roles", rolesToJSON(group.getRoles())), f("users", membersToJSON(users))));
   }
 
   /**
@@ -344,18 +357,18 @@ public class GroupsEndpoint {
    *          the members source
    * @return a JSON array ({@link JValue}) with the given members
    */
-  private JValue membersToJSON(Set<String> members) {
+  private JValue membersToJSON(Iterator<User> members) {
     List<JValue> membersJSON = new ArrayList<>();
 
-    for (String username : members) {
-      User user = userDirectoryService.loadUser(username);
-      String name = username;
+    while (members.hasNext()) {
+      User user = members.next();
+      String name = user.getUsername();
 
-      if (user != null && StringUtils.isNotBlank(user.getName())) {
+      if (StringUtils.isNotBlank(user.getName())) {
         name = user.getName();
       }
 
-      membersJSON.add(obj(f("username", v(username)), f("name", v(name))));
+      membersJSON.add(obj(f("username", v(user.getUsername())), f("name", v(name))));
     }
 
     return arr(membersJSON);

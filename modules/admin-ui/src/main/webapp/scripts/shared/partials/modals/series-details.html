@@ -27,7 +27,6 @@
   <a ng-click="showAdjacent()" ng-if="hasAdjacent()"><i class="arrow fa fa-chevron-right"></i></a>
 
   <div class="modal-content" data-modal-tab-content="metadata">
-    <p class="tab-desc"></p>
     <div class="modal-body">
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -53,7 +52,6 @@
   </div>
 
   <div class="modal-content" data-modal-tab-content="extended-metadata" ng-if="metadata.entries.length > 0">
-    <p class="tab-desc"></p>
     <div class="modal-body">
       <div data-admin-ng-notification="" type="warning" show="metadata.locked" message="{{ metadata.locked }}"></div>
       <div class="full-col">
@@ -170,7 +168,6 @@
     </div> -->
 
     <div class="modal-content" data-modal-tab-content="permissions" data-level="1">
-      <p class="tab-desc"></p>
       <div class="modal-body">
 
         <div data-admin-ng-notifications="" context="series-acl"></div>
@@ -208,7 +205,7 @@
                                       ng-change="changeBaseAcl()"
                                       ng-model="baseAclId"
                                       ng-options="id as name for (id, name) in acls"
-                                      data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                      placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                       />
                             </div>
@@ -259,7 +256,7 @@
                                         ng-change="accessChanged(policy.role)"
                                         ng-options="id as id for (id, type) in roles"
                                         ng-get-more="getMoreRoles"
-                                        data-placeholder="{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                        placeholder-text-single="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                         no-results-text="'{{ 'EVENTS.SERIES.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                         />
                               </td>
@@ -290,7 +287,6 @@
     <div class="modal-content" data-modal-tab-content="theme" data-level="1">
       <div class="modal-body">
         <div data-admin-ng-notifications="" type="warning" context="series-theme"></div>
-        <p class="tab-desc"></p>
         <div class="full-col">
           <div class="obj quick-actions">
             <header translate="CONFIGURATION.NAVIGATION.THEMES"><!-- Theme --></header>
@@ -311,7 +307,7 @@
                           ng-change="themeSave()"
                           ng-model="selectedTheme.id"
                           ng-options="id as name for (id, name) in themes"
-                          data-placeholder="{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}"
+                          placeholder-text-single="'{{ 'EVENTS.SERIES.NEW.THEME.LABEL' | translate }}'"
                           no-results-text="'{{ 'EVENTS.SERIES.NEW.THEME.EMPTY' | translate }}'"
                           >
                           <option value=""></option>

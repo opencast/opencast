@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Pinahaba na metadata",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Pinalawak na metadata"
                }
             },
             "ACCESS": {
                "CAPTION": "Patakaran ng pag-akses",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Ang mga Template"
                },

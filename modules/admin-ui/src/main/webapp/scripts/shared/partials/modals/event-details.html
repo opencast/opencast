@@ -87,7 +87,7 @@
           <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in episodeCatalog.fields track by $index">
+              <tr ng-repeat="(idx, row) in episodeCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>
@@ -260,7 +260,7 @@
                           data-disable-search-threshold="0"
                           ng-model="source.start.hour"
                           ng-change="onTemporalValueChange('start')"
-                          data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                          placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
                           />
                     <select chosen
@@ -269,7 +269,7 @@
                             data-disable-search-threshold="0"
                             ng-model="source.start.minute"
                             ng-change="onTemporalValueChange('start')"
-                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
                             />
                 </td>
@@ -286,7 +286,7 @@
                           data-disable-search-threshold="0"
                           ng-model="source.duration.hour"
                           ng-change="onTemporalValueChange('duration')"
-                          data-placeholder="{{ 'WIZARD.DURATION.HOURS' | translate }}"
+                          placeholder-text-single="'{{ 'WIZARD.DURATION.HOURS' | translate }}'"
                           ng-options="h.index as h.value for h in hours"
                           />
 
@@ -296,7 +296,7 @@
                             data-disable-search-threshold="0"
                             ng-model="source.duration.minute"
                             ng-change="onTemporalValueChange('duration')"
-                            data-placeholder="{{ 'WIZARD.DURATION.MINUTES' | translate }}"
+                            placeholder-text-single="'{{ 'WIZARD.DURATION.MINUTES' | translate }}'"
                             ng-options="m.index as m.value for m in minutes"
                             />
                 </td>
@@ -313,7 +313,7 @@
                           data-disable-search-threshold="0"
                           ng-model="source.end.hour"
                           ng-change="onTemporalValueChange('end')"
-                          data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}"
+                          placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                           ng-options="h.index as h.value for h in hours"
                           />
                     <select chosen
@@ -322,7 +322,7 @@
                             data-disable-search-threshold="0"
                             ng-model="source.end.minute"
                             ng-change="onTemporalValueChange('end')"
-                            data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
                             ng-options="m.index as m.value for m in minutes"
                             />
                       <span ng-bind="source.end.date"
@@ -347,7 +347,7 @@
                           data-disable-search-threshold="0"
                           ng-model="source.device"
                           ng-options="value.name for (id, value) in captureAgents | filter:currentAgentOrAccess"
-                          data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}"
+                          placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
                           />
                 </td>
                 <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
@@ -490,7 +490,7 @@
                         <td>
                           <div class="obj-container padded">
                             <select chosen
-                                    pre-select-from="workflowDefinitions"
+                                    pre-select-from="workflowDefinitionIds"
                                     data-width="'100%'"
                                     ng-model="workflow.id"
                                     ng-change="changeWorkflow(false)"
@@ -498,7 +498,7 @@
                                     data-search_contains="true"
                                     ng-disabled="!$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT') || !hasCurrentAgentAccess()"
                                     ng-options="w.id as w.title for w in workflowDefinitions | orderBy: 'displayOrder':true"
-                                    data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
+                                    placeholder-text-single="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}'"
                                     no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                                     />
                               <div class="obj-container padded">{{ workflows.workflow.description }}</div>
@@ -551,7 +551,6 @@
   </div>
 
   <div class="modal-content" data-modal-tab-content="access">
-    <p class="tab-desc"></p>
     <div class="modal-body">
       <div data-admin-ng-notification="" type="warning" show="access.episode_access.locked" message="{{ metadata.locked }}"></div>
       <div data-admin-ng-notifications="" type="error" context="event-acl"></div>
@@ -589,7 +588,7 @@
                                       ng-change="changeBaseAcl()"
                                       ng-model="baseAclId"
                                       ng-options="id as name for (id, name) in acls"
-                                      data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}"
+                                      placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
                                       />
                             </div>
@@ -642,7 +641,7 @@
                                       ng-change="accessChanged(policy.role)"
                                       ng-options="id as id for (id, type) in roles"
                                       ng-get-more="getMoreRoles"
-                                      data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}"
+                                      placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ROLES.EMPTY' | translate }}'"
                                       />
                             </td>
@@ -746,7 +745,7 @@
                           data-disable-search-threshold="0"
                           ng-model="myComment.reason"
                           ng-options="value | translate for (id, value) in components.eventCommentReasons"
-                          data-placeholder="{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}"
+                          placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.COMMENTS.SELECTPLACEHOLDER' | translate }}'"
                           >
                           <option value=""></option>
                   </select>

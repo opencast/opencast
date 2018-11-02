@@ -15,40 +15,20 @@
       "properties": {
         "property": [
           {
-            "key": "engageui.link_mobile_redirect.url",
-            "$": "http:\/\/opencast.org\/matterhorn\/"
-          },
-          {
             "key": "trim.select_item_at_current_time",
             "$": "y"
-          },
-          {
-            "key": "engageui.links_media_module.enable",
-            "$": "true"
           },
           {
             "key": "trim.set_current_time_as_outpoint",
             "$": "o"
           },
           {
-            "key": "engageui.link_download.enable",
-            "$": "false"
-          },
-          {
             "key": "logo_large",
             "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
           },
           {
-            "key": "login.display_defaults",
-            "$": "false"
-          },
-          {
             "key": "trim.play_ending_of_current_segment",
             "$": "n"
-          },
-          {
-            "key": "engageui.link_mobile_redirect.description",
-            "$": "For more information have a look at the official site."
           },
           {
             "key": "trim.previous_marker",
@@ -57,10 +37,6 @@
           {
             "key": "trim.delete_selected_segment",
             "$": "delete"
-          },
-          {
-            "key": "adminui.chunksize",
-            "$": "2024"
           },
           {
             "key": "adminui.user.external_role_display",
@@ -83,10 +59,6 @@
             "$": "space"
           },
           {
-            "key": "engageui.annotations.enable",
-            "$": "false"
-          },
-          {
             "key": "org.opencastproject.oaipmh.server.hosturl",
             "$": "http:\/\/mhallinone-sbox.ethz.ch"
           },
@@ -97,10 +69,6 @@
           {
             "key": "trim.previous_frame",
             "$": "left"
-          },
-          {
-            "key": "engageui.link_mobile_redirect.enable",
-            "$": "false"
           },
           {
             "key": "trim.split_at_current_time",
@@ -161,40 +129,20 @@
             "properties": {
               "property": [
                 {
-                  "key": "engageui.link_mobile_redirect.url",
-                  "$": "http:\/\/opencast.org\/matterhorn\/"
-                },
-                {
                   "key": "trim.select_item_at_current_time",
                   "$": "y"
-                },
-                {
-                  "key": "engageui.links_media_module.enable",
-                  "$": "true"
                 },
                 {
                   "key": "trim.set_current_time_as_outpoint",
                   "$": "o"
                 },
                 {
-                  "key": "engageui.link_download.enable",
-                  "$": "false"
-                },
-                {
                   "key": "logo_large",
                   "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
                 },
                 {
-                  "key": "login.display_defaults",
-                  "$": "false"
-                },
-                {
                   "key": "trim.play_ending_of_current_segment",
                   "$": "n"
-                },
-                {
-                  "key": "engageui.link_mobile_redirect.description",
-                  "$": "For more information have a look at the official site."
                 },
                 {
                   "key": "trim.previous_marker",
@@ -203,10 +151,6 @@
                 {
                   "key": "trim.delete_selected_segment",
                   "$": "delete"
-                },
-                {
-                  "key": "adminui.chunksize",
-                  "$": "2024"
                 },
                 {
                   "key": "adminui.user.external_role_display",
@@ -229,10 +173,6 @@
                   "$": "space"
                 },
                 {
-                  "key": "engageui.annotations.enable",
-                  "$": "false"
-                },
-                {
                   "key": "org.opencastproject.oaipmh.server.hosturl",
                   "$": "http:\/\/mhallinone-sbox.ethz.ch"
                 },
@@ -243,10 +183,6 @@
                 {
                   "key": "trim.previous_frame",
                   "$": "left"
-                },
-                {
-                  "key": "engageui.link_mobile_redirect.enable",
-                  "$": "false"
                 },
                 {
                   "key": "trim.split_at_current_time",
@@ -300,40 +236,20 @@
             "properties": {
               "property": [
                 {
-                  "key": "engageui.link_mobile_redirect.url",
-                  "$": "http:\/\/opencast.org\/matterhorn\/"
-                },
-                {
                   "key": "trim.select_item_at_current_time",
                   "$": "y"
-                },
-                {
-                  "key": "engageui.links_media_module.enable",
-                  "$": "true"
                 },
                 {
                   "key": "trim.set_current_time_as_outpoint",
                   "$": "o"
                 },
                 {
-                  "key": "engageui.link_download.enable",
-                  "$": "false"
-                },
-                {
                   "key": "logo_large",
                   "$": "\/engage\/ui\/img\/mh_logos\/MatterhornLogo_large.png"
                 },
                 {
-                  "key": "login.display_defaults",
-                  "$": "false"
-                },
-                {
                   "key": "trim.play_ending_of_current_segment",
                   "$": "n"
-                },
-                {
-                  "key": "engageui.link_mobile_redirect.description",
-                  "$": "For more information have a look at the official site."
                 },
                 {
                   "key": "trim.previous_marker",
@@ -342,10 +258,6 @@
                 {
                   "key": "trim.delete_selected_segment",
                   "$": "delete"
-                },
-                {
-                  "key": "adminui.chunksize",
-                  "$": "2024"
                 },
                 {
                   "key": "adminui.user.external_role_display",
@@ -368,10 +280,6 @@
                   "$": "space"
                 },
                 {
-                  "key": "engageui.annotations.enable",
-                  "$": "false"
-                },
-                {
                   "key": "org.opencastproject.oaipmh.server.hosturl",
                   "$": "http:\/\/mhallinone-sbox.ethz.ch"
                 },
@@ -382,10 +290,6 @@
                 {
                   "key": "trim.previous_frame",
                   "$": "left"
-                },
-                {
-                  "key": "engageui.link_mobile_redirect.enable",
-                  "$": "false"
                 },
                 {
                   "key": "trim.split_at_current_time",

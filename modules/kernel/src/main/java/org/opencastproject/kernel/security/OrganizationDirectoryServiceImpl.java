@@ -28,7 +28,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
 import org.opencastproject.kernel.security.persistence.OrganizationDatabaseException;
-import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryListener;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -50,7 +49,6 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -99,29 +97,12 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   /** The list of directory listeners */
   private final List<OrganizationDirectoryListener> listeners = new ArrayList<OrganizationDirectoryListener>();
 
-  /**
-   * The default organization. This is a hack needed by the capture agent implementation see MH-9363
-   */
-  private final Organization defaultOrganization = new DefaultOrganization();
-
-  /**
-   * The list of organizations to handle later. This is a hack needed by the capture agent implementation see MH-9363
-   */
-  private final Map<String, Dictionary> unhandledOrganizations = new HashMap<String, Dictionary>();
-
   private OrgCache cache;
 
   /** OSGi DI */
   public void setOrgPersistence(OrganizationDatabase setOrgPersistence) {
     this.persistence = setOrgPersistence;
     this.cache = new OrgCache(60000, persistence);
-    for (Entry<String, Dictionary> entry : unhandledOrganizations.entrySet()) {
-      try {
-        updated(entry.getKey(), entry.getValue());
-      } catch (ConfigurationException e) {
-        logger.error(e.getMessage());
-      }
-    }
   }
 
   /**
@@ -134,10 +115,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   @Override
   public Organization getOrganization(final String id) throws NotFoundException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Returning default organization for id {}", id);
-      return defaultOrganization;
-    }
     Organization org = cache.get(id);
     if (org == null)
       throw new NotFoundException();
@@ -146,10 +123,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   @Override
   public Organization getOrganization(final URL url) throws NotFoundException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Returning default organization for url {}", url);
-      return defaultOrganization;
-    }
     Organization org = cache.get(url);
     if (org == null)
       throw new NotFoundException();
@@ -158,12 +131,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   @Override
   public List<Organization> getOrganizations() {
-    if (persistence == null) {
-      logger.debug("No persistence available: Returning only default organization");
-      List<Organization> orgs = new ArrayList<Organization>();
-      orgs.add(defaultOrganization);
-      return orgs;
-    }
     return cache.getAll();
   }
 
@@ -191,11 +158,6 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   @Override
   @SuppressWarnings("rawtypes")
   public void updated(String pid, Dictionary properties) throws ConfigurationException {
-    if (persistence == null) {
-      logger.debug("No persistence available: Ignoring organization update for pid='{}'", pid);
-      unhandledOrganizations.put(pid, properties);
-      return;
-    }
     logger.debug("Updating organization pid='{}'", pid);
 
     // Gather the properties

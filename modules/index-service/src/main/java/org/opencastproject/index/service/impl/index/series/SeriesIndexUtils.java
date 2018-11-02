@@ -47,10 +47,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.bind.Unmarshaller;
 
 /**
  * Utility implementation to deal with the conversion of series and its corresponding index data structures.
@@ -70,14 +73,15 @@ public final class SeriesIndexUtils {
    *
    * @param metadata
    *          the search metadata
+   * @param unmarshaller the unmarshaller to use
    * @return the search result item
    * @throws IOException
    *           if unmarshalling fails
    */
-  public static Series toSeries(SearchMetadataCollection metadata) throws IOException {
+  public static Series toSeries(SearchMetadataCollection metadata, Unmarshaller unmarshaller) throws IOException {
     Map<String, SearchMetadata<?>> metadataMap = metadata.toMap();
     String seriesXml = (String) metadataMap.get(SeriesIndexSchema.OBJECT).getValue();
-    return Series.valueOf(IOUtils.toInputStream(seriesXml));
+    return Series.valueOf(IOUtils.toInputStream(seriesXml, Charset.defaultCharset()), unmarshaller);
   }
 
   /**

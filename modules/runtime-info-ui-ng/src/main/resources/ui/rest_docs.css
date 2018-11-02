@@ -13,7 +13,7 @@ h1 {
   background-color: #2075b1;
   margin: 0px;
   padding: 15px;
-  font-size: larger;
+  font-size: 16px;
   color: white;
 }
 
@@ -44,7 +44,7 @@ li {
 }
 
 ul {
-  font-size: smaller;
+  font-size: 12px;
   color: #333;
   padding: 20px 0;
 }
@@ -59,8 +59,14 @@ a:hover {
   color: gray;
 }
 
-li a span {
+li .path {
   display: inline-block;
   width: 200px;
-    font-family: monospace;
+  font-family: monospace;
+}
+
+li .desc {
+  display: inline-block;
+  min-width: 200px;
+  padding-left: 20px;
 }

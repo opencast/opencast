@@ -158,7 +158,7 @@
       "CONFLICT_BULK_DETECTED": "Conflito de programación: o cambio dos eventos xera conflitos. Por favor mude a localización, datas ou horarios.",
       "CONFLICT_ALREADY_ENDED": "Erro de programación: O evento xa rematou.",
       "CONFLICT_END_BEFORE_START": "Erro de programación: O final ten que ser máis tarde que o comezo.",
-      "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
+      "CONFLICT_IN_THE_PAST": "Non se puido actualizar a programación: non se pode programar un evento no pasado.",
       "INVALID_ACL_RULES": "As regras deben conter un nome de rol válido e permiso(s) de lectura e/ou escritura.",
       "MISSING_ACL_RULES": "Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
       "SAVED_ACL_RULES": "Regras de acceso gardadas.",
@@ -174,7 +174,7 @@
       "THEME_NAME_ALREADY_TAKEN": "Este nome xa está en uso",
       "THEME_NAME_EMPTY": "O nome non pode estar baleiro",
       "BUMPER_UPLOAD_ERROR": "Error na subida de arquivos",
-      "BUMPER_REQUIRED": "You must upload a bumper",
+      "BUMPER_REQUIRED": "É necesario subir unha secuencia de peche",
       "TRAILER_UPLOAD_ERROR": "Error na subida de arquivos",
       "TITLE_UPLOAD_ERROR": "Error na subida de arquivos",
       "LICENSE_UPLOAD_ERROR": "Error na subida de arquivos",
@@ -190,9 +190,9 @@
       "VIDEO_CUT_NOT_SAVED": "Non se puideron gardar os datos de edición",
       "VIDEO_CUT_SAVED": "Datos de edición gardados",
       "VIDEO_CUT_PROCESSING": "Estase a procesar o vídeo…",
-      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
-      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
+      "THUMBNAIL_CHANGE_FAILED": "Non se puido cambiar a miniatura.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "Non se seleccionaron pistas de vídeo para procesar",
+      "VIDEO_TOO_MANY_AUDIOS": "Non se pode ter máis dunha pista de audio por cada pista de vídeo",
       "SERVER_UNRESPONSIVE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "SERVICE_UNAVAILABLE": "Ui! Parece que o servidor non responde. Por favor, inténteo de novo máis tarde.",
       "ACTIVE_TRANSACTION": "Este evento non se pode editar mentres exista un fluxo de traballo ou unha transacción activos."
@@ -459,7 +459,7 @@
                "CAPTION": "Envío de recursos",
                "SELECT_TYPE": "Seleccionar o tipo do recurso",
                "ADD": "Engadir Recurso",
-               "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
+               "NO_OPTIONS": "Non se proporcionou unha lista de recursos para esta sección da páxina web!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Apuntamentos de clase",
                   "CAPTIONS_DFXP": "Subtítulos DFXP",
@@ -834,7 +834,7 @@
                "SOURCE": "Orixe",
                "CREATED": "Creado",
                "CREATED_BY": "Creado por",
-               "PUBLISHER": "Publisher",
+               "PUBLISHER": "Editor",
                "LICENSE": "Licenza",
                "CONTRIBUTORS": "Colaborador(es)",
                "RIGHTS": "Permisos",
@@ -892,13 +892,13 @@
                   "DELETE": "Borrar a instancia de fluxo do traballo"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
+                  "INSTANTIATED": "Instanciado",
                   "RUNNING": "Procesando",
                   "PAUSED": "Pausado",
-                  "SUCCEEDED": "Succeeded",
+                  "SUCCEEDED": "Finalizado",
                   "FAILED": "Errado",
-                  "SKIPPED": "Skipped",
-                  "RETRY": "Retry"
+                  "SKIPPED": "Omitido",
+                  "RETRY": "Reintentar"
                }
             },
             "WORKFLOW_INSTANCES": {
@@ -923,7 +923,7 @@
                   "TITLE": "Título",
                   "STATE": "Estado",
                   "DESCRIPTION": "Descrición",
-                  "EXECUTION_HOST": "Execution Host",
+                  "EXECUTION_HOST": "Servidor",
                   "JOB": "Traballo",
                   "TIME_IN_QUEUE": "Tempo na cola",
                   "STARTED": "Iniciado",
@@ -931,8 +931,8 @@
                   "RETRY_STRATEGY": "Reintentar estratexia",
                   "FAILED_ATTEMPTS": "Intentos fallidos",
                   "MAX_ATTEMPTS": "Máx.",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "EXCEPTION_HANDLER_WORKFLOW": "Fluxo de Traballo para Manexar Excepcións",
+                  "FAIL_ON_ERROR": "Fallar en Caso de Erro"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Metadatos extendidos",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Metadatos extendidos"
                }
             },
             "ACCESS": {
                "CAPTION": "Política de acceso",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Modelos"
                },
@@ -1251,7 +1249,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear usuario",
-            "EDITCAPTION": "User details - {{username}}",
+            "EDITCAPTION": "Detalles do usuario - {{username}}",
             "TABS": {
                "USER": "Usuario",
                "ROLES": "Roles",
@@ -1295,7 +1293,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear grupo",
-            "EDITCAPTION": "Group details - {{name}}",
+            "EDITCAPTION": "Detalles do grupo - {{name}}",
             "TABS": {
                "GROUP": "Grupo",
                "ROLES": "Roles",
@@ -1376,7 +1374,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Detalles da política de acceso  - {{name}}",
             "TABS": {
                "SUMMARY": "Resumo",
                "METADATA": "Metadatos",
@@ -1559,7 +1557,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Crear estilo",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "Detalles do estilo - {{name}}",
             "GENERAL": {
                "CAPTION": "Xeral",
                "NAME": "Nome",
@@ -1661,11 +1659,11 @@
             "RUNNING": "Procesando",
             "FINISHED": "Finalizado",
             "FAILED": "Errado",
-            "DELETED": "Deleted",
-            "INSTANTIATED": "Instantiated",
-            "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
+            "DELETED": "Borrado",
+            "INSTANTIATED": "Instanciado",
+            "DISPATCHING": "Asignando",
+            "RESTART": "Reiniciar",
+            "CANCELED": "Cancelado",
             "WAITING": "Esperando"
          }
       },
@@ -1730,10 +1728,10 @@
       },
       "AREAS": {
          "METADATA": "Metadatos",
-         "THUMBNAIL": "Thumbnail",
+         "THUMBNAIL": "Miniatura",
          "COMMENTS": "Comentarios",
          "SEGMENTS": "Segmentos",
-         "TRACKS": "Tracks"
+         "TRACKS": "Pistas"
       },
       "ACTIONS": {
          "SPLIT": "Dividir",
@@ -1750,71 +1748,71 @@
          "REMOVE_SEGMENT": "Eliminar segmento",
          "USE_SEGMENT": "Usar este segmento",
          "START": "Inicio",
-         "END": "End"
+         "END": "Fin"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
+         "DESCRIPTION": "Xenérase automaticamente unha miniatura por defecto, que se emprega para representar visualmente o evento. Se se desexa usar unha miniatura diferente, pode extraerse unha do vídeo na posición actual ou subir unha imaxe.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
-                  "LABEL": "Extract from video",
-                  "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
+                  "LABEL": "Extraer do vídeo",
+                  "TOOLTIP": "Extraer a minuatura do vídeo na posición actual"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
-                  "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
+                  "LABEL": "Extraer do vídeo esquerdo",
+                  "TOOLTIP": "Extraer a miniatura do vídeo esquerdo na posición actual"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
-                  "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
+                  "LABEL": "Extraer do vídeo dereito",
+                  "TOOLTIP": "Extraer a miniatura do vídeo dereito na posición actual"
                }
             },
             "UPLOAD": {
                "LABEL": "Subir imaxe",
-               "TOOLTIP": "Upload a thumbnail image"
+               "TOOLTIP": "Subir unha imaxe para a miniatura"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
-               "TOOLTIP": "Use the default thumbnail that is generated automatically"
+               "LABEL": "Usar miniatura por defecto",
+               "TOOLTIP": "Usar a miniatura por defecto que se crea automaticamente"
             }
          },
          "PREVIEW": {
-            "NOT_AVAILABLE": "No preview available",
-            "OUTDATED": "The preview is outdated since segments were changed. It will be updated as soon as you save your changes."
+            "NOT_AVAILABLE": "Non hai vista previa dispoñible",
+            "OUTDATED": "A vista previa está obsoleta porque cambiaron os segmentos. Actualizarase unha vez que se garden os cambios."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Estase a usar a miniatura por defecto.",
+            "SNAPSHOT": "A miniatura actual foi extraída do vídeo.",
+            "UPLOAD": "Estase a usar unha miniatura subida ó servidor."
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
+         "DESCRIPTION": "Pódense desmarcar pistas para que non sigan sendo procesadas. Teña en conta que é necesario (re-)publicar o evento para que os cambios se apliquen.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
+            "NO_VIDEO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de vídeo",
+            "NO_AUDIO_TRACK_SELECTED": "Debe seleccionarse polo menos unha pista de audio"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "Pista"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "Pista de vídeo",
+            "NOT_AVAILABLE": "Non hai pistas de vídeo dispoñibles",
+            "NO_PREVIEW_AVAILABLE": "Non se atopou unha imaxe de vista previa",
+            "NO_TRACK_SELECTED": "Non se seleccionou unha pista de vídeo",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Click to disable",
-               "UNHIDE": "This video track is currently disabled. Click to enable."
+               "HIDE": "Esta pista de vídeo está activada. Facer clic para desactivar",
+               "UNHIDE": "Esta pista de vídeo está desactivada. Facer clic para activar."
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "HEADER": "Pista de audio",
+            "NOT_AVAILABLE": "Non hai pistas de audio dispoñibles",
+            "NO_PREVIEW_AVAILABLE": "Non se atopou unha imaxe de vista previa",
+            "NO_TRACK_SELECTED": "Non se seleccionou unha pista de audio",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Esta pista de audio está activada. Facer clic para desactivar",
+               "UNHIDE": "Esta pista de audio está desactivada. Facer clic para activar"
             }
          }
       },
@@ -1897,7 +1895,7 @@
             "LABEL": "Creador"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Editor"
          },
          "HOSTNAME": {
             "LABEL": "Nome do servidor"
@@ -2139,8 +2137,8 @@
       "DESCRIPTIONS": {
          "GENERAL": {
             "MAIN_MENU": "Menú principal",
-            "SELECT_NEXT_DASHBOARD_FILTER": "Select next dashboard filter",
-            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Select previous dashboard filter",
+            "SELECT_NEXT_DASHBOARD_FILTER": "Seleccionar o filtro do panel seguinte",
+            "SELECT_PREVIOUS_DASHBOARD_FILTER": "Seleccionar o filtro do panel anterior",
             "REMOVE_FILTERS": "Limpar todos os filtros",
             "EVENT_VIEW": "Eventos",
             "SERIES_VIEW": "Series",
@@ -2158,14 +2156,14 @@
             "NEXT_SEGMENT": "Seguinte segmento / Saltar ó fin",
             "VOLUME_UP": "Subir volume",
             "VOLUME_DOWN": "Baixar volume",
-            "MUTE": "Mute/unmute"
+            "MUTE": "Activar/desactivar son"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dividir",
             "CUT_SELECTED_SEGMENT": "Cortar",
             "PLAY_CURRENT_SEGMENT": "Reproducir segmento actual",
             "CLEAR_LIST": "Borrar segmento",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Reproducir segmento con previo",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          }
       }

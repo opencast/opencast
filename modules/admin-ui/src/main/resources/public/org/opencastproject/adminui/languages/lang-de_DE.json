@@ -662,7 +662,7 @@
                "TYPE": "Typ",
                "SIZE": "Größe",
                "DETAILS": "Details",
-               "STREAMS": "Spuren",
+               "STREAMS": "Streams",
                "PREVIEW": "Vorschau",
                "ATTACHMENTS": {
                   "TITLE": "Anhänge",
@@ -987,14 +987,12 @@
             },
             "METADATA_EXTENDED": {
                "CAPTION": "Erweiterte Metadaten",
-               "DESCRIPTION": "",
                "METADATA": {
                   "TITLE": "Erweiterte Metadaten"
                }
             },
             "ACCESS": {
                "CAPTION": "Zugriffsrechte",
-               "DESCRIPTION": "",
                "TEMPLATES": {
                   "TITLE": "Vorlagen"
                },

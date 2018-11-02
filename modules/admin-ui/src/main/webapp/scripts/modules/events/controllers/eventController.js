@@ -157,6 +157,8 @@ angular.module('adminNg.controllers')
                 if (el.is('[type=checkbox]') || el.is('[type=radio]')) {
                   if (value === 'true' || value === true) {
                     el.attr('checked','checked');
+                  } else {
+                    el.removeAttr('checked');
                   }
                 } else {
                   el.val(value);
@@ -377,6 +379,11 @@ angular.module('adminNg.controllers')
             }
           });
 
+          $scope.setWorkflowDefinitions = function (workflowDefinitions) {
+            $scope.workflowDefinitions = workflowDefinitions;
+            $scope.workflowDefinitionIds = workflowDefinitions.map(function (w) {return w.id;});
+          };
+
           $scope.workflow = {};
           $scope.workflows = EventWorkflowsResource.get({ id: id }, function () {
             if (angular.isDefined($scope.workflows.workflow)) {
@@ -385,7 +392,7 @@ angular.module('adminNg.controllers')
               $scope.workflowDefinitionsObject = NewEventProcessingResource.get({
                 tags: 'schedule'
               }, function () {
-                $scope.workflowDefinitions = $scope.workflowDefinitionsObject.workflows;
+                $scope.setWorkflowDefinitions($scope.workflowDefinitionsObject.workflows);
                 $scope.changeWorkflow(true);
                 setWorkflowConfig();
               });
@@ -569,6 +576,8 @@ angular.module('adminNg.controllers')
           EventSchedulingResource.save({
             id: $scope.resourceId,
             entries: $scope.source
+          }, function () {
+            fetchChildResources($scope.resourceId);
           });
         }, me.conflictsDetected);
       }

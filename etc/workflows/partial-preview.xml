@@ -159,13 +159,13 @@
          to a resolution optimized for the video editor here -->
 
     <operation
-      id="tag"
-      description="Tag uploaded thumbnail for publication">
+      id="image-convert"
+      description="Convert uploaded thumbnail to thumbnail preview image">
       <configurations>
         <configuration key="source-flavors">thumbnail/source</configuration>
         <configuration key="target-flavor">thumbnail/preview</configuration>
         <configuration key="target-tags">preview</configuration>
-        <configuration key="copy">true</configuration>
+        <configuration key="encoding-profiles">editor.thumbnail.preview.downscale</configuration>
       </configurations>
     </operation>
 

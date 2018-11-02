@@ -1,0 +1,13 @@
+{
+    "value_locale": "da",
+    "value_dateFormatFull": "Dd MMMM ÅÅÅÅ, t:mm:ss",
+    "error_videoLoading": "Videoen indlæses, vent et øjeblik.",
+    "error_audioLoading": "Lyden indlæses, vent et øjeblik.",
+    "msg_videoLoadedSuccessfully": "Videoen er indlæst.",
+    "msg_audioLoadedSuccessfully": "Lyden er indlæst.",
+    "msg_videoBuffering": "Videoen mellemlagres, vent et øjeblik.",
+    "msg_videoBufferedSuccessfullyAndAutoplaying": "Videoen er mellemlagret og autoafspilles nu.",
+    "msg_videoBufferedSuccessfully": "Videoen er mellemlagret.",
+    "error": "Fejl",
+    "error_AudioCodecNotSupported": "Fejl: Lyd-codec'et understøttes ikke af denne browser"
+}
