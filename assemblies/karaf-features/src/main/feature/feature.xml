@@ -146,6 +146,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-working-file-repository-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workspace-impl/${project.version}</bundle>
+
+    <feature start-level="80">opencast-security-cas</feature>
   </feature>
 
   <feature name="opencast-allinone">
