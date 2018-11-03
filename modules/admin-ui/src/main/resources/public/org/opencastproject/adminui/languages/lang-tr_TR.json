@@ -74,8 +74,8 @@
       }
    },
    "MEDIAMODULE": "Ortam Modülü",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "SYSTEM_NOTIFICATIONS": "Sistem uyarıları ve bildirimleri",
+   "LANGUAGE": "Dil seç",
    "HELP": {
       "HELP": "Yardım",
       "USERS_GUIDE": "Kullanım Kılavuzu",
@@ -116,10 +116,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "İşleme devam edilemedi.",
       "EVENTS_PROCESSING_ACTION_NONE": "İşlem iptal ediliyor...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "İşlem iptal edilemedi.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "EVENTS_PROCESSING_ACTION_STOP": "İşlem durduruldu.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "İşlem durdurulamadı.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Silinen iş akışı.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "İş akışı silinemedi.",
       "SERIES_UPDATED_NB": "{{ number }} serileri başarıyla güncellendi",
       "SERIES_UPDATED_ALL": "Tüm seriler başarıyla güncellendi",
       "SERIES_NOT_UPDATED": "Seriler kaydedilemedi",
@@ -435,7 +435,7 @@
                   "START_TIME": "Başlangıç zamanı",
                   "TIMEZONE": "Zaman dilimi",
                   "END_DATE": "Bitiş tarihi",
-                  "END_TIME": "End time",
+                  "END_TIME": "Bitiş Zamanı",
                   "DURATION": "Süre"
                },
                "SCHEDULE_SINGLE": {
@@ -461,12 +461,12 @@
                "ADD": "Varlık Ekle",
                "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
-                  "CLASS_HANDOUT_NOTES": "Class handout notes",
-                  "CAPTIONS_DFXP": "Captions DFXP",
-                  "CAPTIONS_WEBVTT": "Captions WebVTT",
+                  "CLASS_HANDOUT_NOTES": "Sınıfta verilen ders kağatları hakkında notlar",
+                  "CAPTIONS_DFXP": "Altyazı DFXP",
+                  "CAPTIONS_WEBVTT": "Altyazı WebVTT",
                   "PREVIEW_IMAGE": "Resim önizleme",
-                  "SMIL": "Smil catalog",
-                  "TRACK_PARTS": "Track parts"
+                  "SMIL": "Smil Katalog",
+                  "TRACK_PARTS": "Kayıt parçası"
                }
             },
             "ACCESS": {
@@ -532,9 +532,9 @@
             "PUBLISHED": "Yayınlandı",
             "WEEKDAY": "Weekday",
             "TOOLTIP": {
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
+               "START": "Bu başlangıç tarihi için filtre",
+               "SERIES": "Bu dizi için filtre",
+               "STATUS": "Bu etkinlik durumu için filtre",
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
                "DELETE": "Delete event",
@@ -587,7 +587,7 @@
                "CUSTOM": "Özel",
                "ENGAGE": "Katıl",
                "ENGAGE_LIVE": "Engage Live",
-               "EXTERNAL_API": "External API Publication",
+               "EXTERNAL_API": "Harici API Yayıni",
                "YOUTUBE": "Youtube",
                "OAIPMH": "OAI-PMH",
                "SELECT_WORKFLOW": "İş akışı seçin",
@@ -681,7 +681,7 @@
                      "TAGS": "Etiketler",
                      "URL": "Bağlantı",
                      "SIZE": "Boyut",
-                     "CHECKSUM": "Checksum",
+                     "CHECKSUM": "Sağlama toplamı",
                      "REFERENCE": "Referans"
                   }
                },
@@ -702,7 +702,7 @@
                      "TAGS": "Etiketler",
                      "URL": "Bağlantı Adresi",
                      "SIZE": "Boyut",
-                     "CHECKSUM": "Checksum",
+                     "CHECKSUM": "Sağlama toplamı",
                      "REFERENCE": "Referans"
                   }
                },
@@ -801,17 +801,17 @@
                "REASONS": {
                   "CUTTING": "Kesme gerekli",
                   "REVIEW": "İnceleme gerekli",
-                  "ASYNC": "A/V tracks asynchronous",
+                  "ASYNC": "A / V parçaları eşzamansız",
                   "AUDIO_ISSUE": "Eksik ya da bozuk ses parçası",
                   "CANCELED": "Etkinlik iptal edildi",
                   "CONFLICTING_METADATA": "Çakışan metaveri",
-                  "IMPROPER_POINT": "Improper in or out point",
+                  "IMPROPER_POINT": "Hatalı giriş ve çıkış noktası",
                   "MISSING_AGREEMENT": "Anlaşma eksik",
                   "OTHER": "Diğer",
-                  "PRIVACY": "Privacy concern",
-                  "SEGMENTATION": "Inaccurate segmentation",
+                  "PRIVACY": "Gizlilik endişeleri",
+                  "SEGMENTATION": "Yanlış segmentasyon",
                   "UNKNOWN_CREATOR": "Oluşturan bilinmiyor",
-                  "VIDEO_ISSUE": "Video distorted or cropped",
+                  "VIDEO_ISSUE": "Bozuk veya kırpılmış video",
                   "WRONG_INPUT_FORMAT": "Girilen dosya formatı desteklenmiyor",
                   "WRONG_METADATA": "Metaveri'nin düzeltilmeye ihtiyacı var",
                   "WRONG_SERIES_PUBLICATION": "Yanlış seri veya yanlış yayın kanalı",
@@ -843,7 +843,7 @@
                "COPYRIGHT": "Telif Hakkı",
                "VISIBILITY": "Görünürlük",
                "PUBLIC": "Genel hedef",
-               "OS": "Processing operating system",
+               "OS": "İşleyen işletim sistemi",
                "LOCKED": {
                   "RUNNING": "İşlemler bir etkinlik üzerinde çalışırken düzenleme meta verisine izin verilmez"
                }
