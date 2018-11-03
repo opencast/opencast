@@ -410,7 +410,7 @@
                },
                "UPLOAD": {
                   "CAPTION": "Upload",
-                  "RECORDING_ELEMENTS": "Recording elements",
+                  "RECORDING_ELEMENTS": "Optagelseselementer",
                   "RECORDING_METADATA": "Optagelsesmetadata",
                   "SEGMENTABLE": {
                      "SHORT": "Diaser",
@@ -465,7 +465,7 @@
                   "CAPTIONS_DFXP": "Undertekster DFXP",
                   "CAPTIONS_WEBVTT": "Undertekster WebVTT",
                   "PREVIEW_IMAGE": "Billedeksempel",
-                  "SMIL": "Smilkatalog",
+                  "SMIL": "SMIL-katalog",
                   "TRACK_PARTS": "Spordele"
                }
             },
@@ -555,7 +555,7 @@
             "BLACKLISTED": "Sortlistet",
             "RECORDING": "Optager",
             "UPLOADING": "Uploader",
-            "INGESTING": "Ingesting",
+            "INGESTING": " ",
             "PENDING": "Afventende",
             "PROCESSING": "I gang",
             "PAUSED": "På pause",
@@ -1029,7 +1029,7 @@
          },
          "TABLE": {
             "CAPTION": "Serier",
-            "TITLE": "Series",
+            "TITLE": "Serier",
             "HAS_EVENTS": "Indeholder begivenheder",
             "CREATORS": "Organisator(-er)",
             "CONTRIBUTORS": "Bidragyder(-e)",
@@ -1171,7 +1171,7 @@
                "NO_CONFIGURATION": "Ingen opsætning til rådighed"
             },
             "CAPABILITIES": {
-               "CAPTION": "Capabilities",
+               "CAPTION": "Evner",
                "NO_CAPABILITIES": "Ingen kapaciteter til rådighed"
             }
          }
@@ -1884,8 +1884,8 @@
          },
          "COMMENTS": {
             "LABEL": "Kommentarer",
-            "NONE": "None",
-            "OPEN": "Open",
+            "NONE": "Ingen",
+            "OPEN": "Åbne",
             "RESOLVED": "Løst"
          },
          "CONTRIBUTORS": {
@@ -1895,7 +1895,7 @@
             "LABEL": "Kreatør"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Udgiver"
          },
          "HOSTNAME": {
             "LABEL": "Værtsnavn"
@@ -2163,19 +2163,19 @@
             "CUT_SELECTED_SEGMENT": "Klip",
             "PLAY_CURRENT_SEGMENT": "Afspil aktuelle segment",
             "CLEAR_LIST": "Ryd segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Genafspil segment med pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slut på segment"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Optager",
          "ERROR": "Fejl",
-         "IDLE": "Idle",
+         "IDLE": "Ikke aktiv",
          "OFFLINE": "Offline",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
+         "SHUTTING_DOWN": "Lukker ned",
+         "UNKNOWN": "Ukendt",
          "UPLOADING": "Uploader"
       }
    }
