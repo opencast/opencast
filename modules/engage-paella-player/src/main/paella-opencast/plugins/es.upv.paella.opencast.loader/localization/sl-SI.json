@@ -1,8 +1,8 @@
 {
-	"Error loading video! No video tracks found": "Error loading video! No video tracks found",
-	"Error loading video {0}": "Error loading video {0}",
-	"CAPTIONS_undefined": "Unknown language",
-	"CAPTIONS_es": "Spanish",
-	"CAPTIONS_en": "English",
-	"CAPTIONS_de": "German"
+	"Error loading video! No video tracks found": "Napaka pri nalaganju video datoteke! Ni bilo najdenih video datotek",
+	"Error loading video {0}": "Napaka pri nalaganju videa {0}",
+	"CAPTIONS_undefined": "Neznani jezik",
+	"CAPTIONS_es": "Špansko",
+	"CAPTIONS_en": "Angleško",
+	"CAPTIONS_de": "Nemško"
 }
