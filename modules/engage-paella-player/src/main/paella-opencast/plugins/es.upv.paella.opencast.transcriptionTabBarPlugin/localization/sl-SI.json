@@ -1,7 +1,7 @@
 {
-	"Transcription": "Transcription",
-	"Search in this event": "Search in this event",
-	"Search relevance:": "Search relevance:",
-	"Results for '{0}' (no actual results for '{1}' found)": "Results for '{0}' (no actual results for '{1}' found)",
-	"Results for '{0}'": "Results for '{0}'"
+	"Transcription": "Prepis",
+	"Search in this event": "Išči v tem posnetku",
+	"Search relevance:": "Iskanje ustreznosti:",
+	"Results for '{0}' (no actual results for '{1}' found)": "Zadetki za {0} (za {1} ni bilo ustreznih zadetkov)",
+	"Results for '{0}'": "Zadetki za {0}"
 }

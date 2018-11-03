@@ -36,6 +36,6 @@
   "login_success": "Prijava uspešna.",
   "login_failed": "Prijava ni uspela.",
   "not_logged_in": "Ni prijavljeno",
-  "live_in_progress": "Live (in progress)",
-  "live_not_in_progress": "Live (not in progress)"
+  "live_in_progress": "Prenos v živo (aktiven)",
+  "live_not_in_progress": "Prenos v živo (neaktiven)"
 }
