@@ -34,8 +34,8 @@ angular.module('adminNg.resources')
           var row = {};
           row.id = r.id;
           row.title = r.title;
-          row.creator = r.organizers.join(', ');
-          row.contributors = r.contributors.join(', ');
+          row.creators = r.organizers;
+          row.contributors = r.contributors;
           row.createdDateTime = Language.formatDate('short', r.creation_date);
           row.managed_acl = r.managedAcl;
           row.type = 'SERIES';

@@ -33,10 +33,12 @@ angular.module('adminNg.controllers')
         label: 'EVENTS.SERIES.TABLE.TITLE',
         sortable: true
       }, {
-        name:  'creator',
+        template: 'modules/events/partials/seriesCreatorsCell.html',
+        name:  'creators',
         label: 'EVENTS.SERIES.TABLE.CREATORS',
         sortable: true
       }, {
+        template: 'modules/events/partials/seriesContributorsCell.html',
         name:  'contributors',
         label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS',
         sortable: true
