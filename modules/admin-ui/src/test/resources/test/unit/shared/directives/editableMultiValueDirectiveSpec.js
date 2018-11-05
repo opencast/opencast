@@ -64,6 +64,22 @@ describe('adminNg.directives.adminNgEditableMultiValue', function () {
         expect(element.scope().params.value).not.toContain('Value 1');
     });
 
+    it('allows entering multiple values at once separated by a given delimiter', function () {
+        element.find('input').scope().params.delimiter = ';';
+
+        element.click();
+        element.find('input').val('a;b;c').trigger('change');
+
+        var enter = $.Event('keyup');
+        enter.keyCode = 13;
+        element.find('input').trigger(enter);
+
+        expect(element.scope().params.value).toContain('a');
+        expect(element.scope().params.value).toContain('b');
+        expect(element.scope().params.value).toContain('c');
+        expect(element.scope().params.value).not.toContain('a;b;c');
+    });
+
     describe('#leaveEditMode', function () {
 
         it('leaves edit mode', function () {

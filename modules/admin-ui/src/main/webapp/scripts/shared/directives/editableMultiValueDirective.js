@@ -33,6 +33,8 @@
  * `required` and `value`.
  * The "save" attribute is a reference to a save function used to persist the
  * values.
+ * The "delimiter" attribute specifies at what character the input string
+ * is to be split into multiple individual values.
  *
  * @example
    <doc:example>
@@ -66,15 +68,22 @@ angular.module('adminNg.directives')
       };
 
       scope.addValue = function (model, value) {
-        if (value && model.indexOf(value) === -1) {
-          model.push(value);
-          scope.editMode = false;
+        if (value) {
+          var newValues = scope.params.delimiter
+            ? value.split(scope.params.delimiter)
+            : [value];
+          angular.forEach(newValues, function (newValue) {
+            newValue = newValue.trim();
+            if (newValue && model.indexOf(newValue) === -1) {
+              model.push(newValue);
+            }
+          });
         }
         scope.submit();
       };
 
-      scope.removeValue = function (model, value) {
-        model.splice(model.indexOf(value), 1);
+      scope.removeValue = function (model, index) {
+        model.splice(index, 1);
         scope.submit();
       };
 

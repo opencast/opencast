@@ -156,7 +156,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 metadataField.isReadOnly(), metadataField.isRequired(),
                 getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
-                metadataField.getOrder(), metadataField.getNamespace());
+                metadataField.getDelimiter(), metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
           iterableTextField.setValue(Arrays.asList(value));
         }
@@ -169,7 +169,7 @@ public class DublinCoreMetadataCollection extends AbstractMetadataCollection {
                 metadataField.isReadOnly(), metadataField.isRequired(),
                 getCollectionIsTranslatable(metadataField, listProvidersService),
                 getCollection(metadataField, listProvidersService), metadataField.getCollectionID(),
-                metadataField.getOrder(), metadataField.getNamespace());
+                metadataField.getDelimiter(), metadataField.getOrder(), metadataField.getNamespace());
         if (StringUtils.isNotBlank(value)) {
           mixedIterableTextField.setValue(Arrays.asList(value));
         }

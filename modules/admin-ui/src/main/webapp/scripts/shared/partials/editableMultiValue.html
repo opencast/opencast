@@ -19,7 +19,7 @@
   <span ng-show="editMode" class="ng-multi-value"
                            ng-repeat="value in params.value">
     {{ value | translate }}
-    <a ng-mousedown="removeValue(params.value, value)">
+    <a ng-mousedown="removeValue(params.value, $index)">
       <i class="fa fa-times"></i>
     </a>
   </span>

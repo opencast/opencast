@@ -231,8 +231,8 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
     removeField(current);
     MetadataField<Iterable<String>> field = MetadataField.createIterableStringMetadataField(current.getInputID(),
             Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
-            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getOrder(),
-            current.getNamespace());
+            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getDelimiter(),
+            current.getOrder(), current.getNamespace());
     field.setValue(value);
     addField(field);
   }
