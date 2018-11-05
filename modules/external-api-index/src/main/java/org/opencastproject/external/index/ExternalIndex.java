@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.external.impl.index;
+package org.opencastproject.external.index;
 
 import org.opencastproject.index.service.impl.index.AbstractSearchIndex;
 import org.opencastproject.index.service.impl.index.event.Event;

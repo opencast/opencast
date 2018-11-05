@@ -3,14 +3,14 @@
                immediate="true"
                activate="activate"
                deactivate="deactivate"
-               name="org.opencastproject.external.impl.index.ExternalIndex">
+               name="org.opencastproject.external.index.ExternalIndex">
 
-  <implementation class="org.opencastproject.external.impl.index.ExternalIndex"/>
-  <property name="service.description" value="org.opencastproject.external.impl.index.ExternalIndex"/>
+  <implementation class="org.opencastproject.external.index.ExternalIndex"/>
+  <property name="service.description" value="org.opencastproject.external.index.ExternalIndex"/>
   <property name="service.pid" value="ch.entwine.matterhorn.external.search"/>
   <service>
     <provide interface="org.opencastproject.matterhorn.search.SearchIndex"/>
-    <provide interface="org.opencastproject.external.impl.index.ExternalIndex"/>
+    <provide interface="org.opencastproject.external.index.ExternalIndex"/>
   </service>
 
   <reference name="MessageSender" interface="org.opencastproject.message.broker.api.MessageSender"
