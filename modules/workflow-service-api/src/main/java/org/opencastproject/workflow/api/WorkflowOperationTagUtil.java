@@ -22,6 +22,7 @@
 package org.opencastproject.workflow.api;
 
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,7 +55,8 @@ public final class WorkflowOperationTagUtil {
   private static final String MINUS = "-";
 
   public static TagDiff createTagDiff(final String tagList) {
-    final String[] targetTags = StringUtils.split(tagList, ",");
+    final ArrayList<String> targetTags = new ArrayList<>();
+    ((ArrayList) targetTags).addAll(Collections.toList(StringUtils.split(tagList, ",")));
 
     final List<String> removeTags = new ArrayList<>();
     final List<String> addTags = new ArrayList<>();
