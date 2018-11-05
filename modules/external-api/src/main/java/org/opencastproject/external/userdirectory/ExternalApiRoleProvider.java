@@ -21,6 +21,8 @@
 
 package org.opencastproject.external.userdirectory;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.Organization;
@@ -72,14 +74,10 @@ public class ExternalApiRoleProvider implements RoleProvider {
 
   protected void activate(ComponentContext cc) {
     String rolesFile = ExternalGroupLoader.ROLES_PATH_PREFIX + File.separator + ExternalGroupLoader.EXTERNAL_APPLICATIONS_ROLES_FILE;
-    InputStream in = null;
-    try {
-      in = getClass().getResourceAsStream(rolesFile);
-      roles = new TreeSet<>(IOUtils.readLines(in, "UTF-8"));
+    try (InputStream in = getClass().getResourceAsStream(rolesFile)) {
+      roles = new TreeSet<>(IOUtils.readLines(in, UTF_8));
     } catch (IOException e) {
       logger.error("Unable to read available roles", e);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
     logger.info("Activated External API role provider");
   }

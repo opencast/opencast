@@ -54,7 +54,6 @@ import org.opencastproject.util.PropertiesUtil;
 
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.osgi.service.cm.ConfigurationException;
@@ -282,7 +281,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     setupSecurityService();
     setupEventCatalogUIAdapters();
     Properties properties = new Properties();
-    properties.load(IOUtils.toInputStream(IOUtils.toString(getClass().getResource("/events-endpoint.properties"))));
+    properties.load(getClass().getResourceAsStream("/events-endpoint.properties"));
     updated((Hashtable) properties);
   }
 

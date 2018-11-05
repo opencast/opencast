@@ -20,6 +20,8 @@
  */
 package org.opencastproject.external.userdirectory;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
@@ -152,16 +154,12 @@ public class ExternalGroupLoader {
   private Set<String> loadRoles(String roleFileName) throws IllegalStateException, IOException {
     String propertiesFile = UrlSupport.concat(ROLES_PATH_PREFIX, roleFileName);
 
-    InputStream rolesIS = null;
-    try {
       // Load the properties
-      rolesIS = getClass().getResourceAsStream(propertiesFile);
-      return new TreeSet<String>(IOUtils.readLines(rolesIS));
+    try (InputStream rolesIS = getClass().getResourceAsStream(propertiesFile)) {
+      return new TreeSet<>(IOUtils.readLines(rolesIS, UTF_8));
     } catch (IOException e) {
       logger.error("Error loading roles from file {}", propertiesFile);
       throw e;
-    } finally {
-      IOUtils.closeQuietly(rolesIS);
     }
 
   }
