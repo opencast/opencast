@@ -11,8 +11,7 @@ Issue Tracker
 -------------
 
 Opencast uses [Jira](https://opencast.jira.com) for tracking issues. Each pull request should be accompanied by a ticket
-in Jira. The issue identifier should also be used in the title of the pull request and the commits. E.g.: `MH-12345,
-Fixing Something Somewhere`.
+in Jira. The issue identifier should also be used in the title of the pull request and the commit message.
 
 
 Bug Fixes and Feature
@@ -37,18 +36,18 @@ Tests
 When building Opencast, a set of unit tests is automatically run on the code. Passing these tests is a hard requirement.
 These (and a few more) tests are also run automatically on our CI system. Again, all tests need to pass.
 
-If the CI tests on your pull request fail and you are sure it is not your patch that did break it, please complain.
-Errors happen and committers can easily trigger a new build. But your patch will not be merged without these tests
-passing.
+If the CI tests on your pull request fail and you are sure it is not caused by your patch, please complain. Errors
+happen and committers can easily trigger a new build. But your patch will not be merged without these tests passing.
 
 Additionally, a reviewer will be assigned to your pull request to ensure that there are no further issues. Once
-everything is fine, the reviewer will merge the pull request.
+everything is fine, the reviewer will merge the pull request. The assignment may take some time. This is normal, so do
+not be concerned.
 
 
 Checklist
 ---------
 
-- [ ] Jira ticket created
+- [ ] Jira ticket created (use ticket number in pull request and commit messages)
 - [ ] Pull request has a proper title and description
 - [ ] Appropriate documentation is included
 - [ ] Code passes automatic tests
