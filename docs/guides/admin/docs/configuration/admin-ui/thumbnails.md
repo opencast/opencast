@@ -18,7 +18,8 @@ As both the video editor and your workflows need to work together to enable full
 the Admin UI comes with a number of configuration options that allows this feature to be integrated into
 your workflow configuration.
 
-This page describes the configuration options the Admin UI considering the thumbnails.
+This page describes the configuration options of the Admin UI relevant for the thumbnail support of the video editor.
+These options can be adjusted in the configuration file `etc/org.opencastproject.adminui.cfg`.
 
 Thumbnail Preview
 -----------------
@@ -63,20 +64,21 @@ The default thumbnail image is extracted from a track identified by the followin
 In this example, the default thumbnail would be extracted from the track with the flavor `presenter/source` or, if
 no such track is available, a track with the flavor `presentation/source`.
 
-The relative position within the cutted video where the default thumbnail is extracted can be configured:
+The relative position within the edited video where the default thumbnail is extracted can be configured:
 
     # Default: 1.0
     #thumbnail.default.position=1.0
 
-Opencast will set the following processing settings for the event being edited: `thumbnailType` is set to `0`
-to indicate that the default thumbnail is used. `thumbnailPosition` is set to the absolute position of the
-uncutted video where the default thumbnail should be extracted.
+Opencast will set the following processing settings for the event being edited:
+
+  - `thumbnailType` is set to `0` to indicate that the default thumbnail is used
+  - `thumbnailPosition` is set to the absolute position of the video where the default thumbnail should be extracted
 
 Snapshot Thumbnail
 ------------------
 
 In case the user is not happy with the automatically generated default thumbnail, the user can extract a thumbnail
-at an arbitrary position withhin the uncutted version of the video.
+at an arbitrary position withhin the video.
 
 The snapshot thumbnail will be extracted from tracks identified by the following configuration properties:
 
@@ -89,10 +91,12 @@ The snapshot thumbnail will be extracted from tracks identified by the following
 Note that the user can choose between "Extract from video", "Extract from left video" and "Extract from right video".
 In any case, the video editor ensures that the correct source track flavor is used.
 
-Opencast will set the following processing settings for the event being edited: `thumbnailType` is set to `1`
-to indicate that a snapshot thumbnail is used. `thumbnailPosition` is set to the absolute position of the
-uncutted video where the snapshot thumbnail should be extracted. Additionally, `thumbnailTrack` is set to either type
-of the flavor of the source track which would be `presenter` or `presentation` in this example.
+Opencast will set the following processing settings for the event being edited:
+
+  - `thumbnailType` is set to `1` to indicate that a snapshot thumbnail is used
+  - `thumbnailPosition` is set to the absolute position of the video where the snapshot thumbnail should be extracted
+  - `thumbnailTrack` is set to the type of the flavor of the source track which is `presenter` or `presentation`
+    in this example.
 
 Uploaded Thumbnail
 ------------------
@@ -112,10 +116,13 @@ Additionally, the following tags are added to the attachment:
     # Default: archive
     #thumbnail.uploaded.tags=archive
 
-**IMPORTANT:** Please ensure that all workflows in your setup will always included this attachment in their snapshots.
+**IMPORTANT:** Please ensure that all workflows in your setup will always include this attachment when taking
+snapshots using the workflow operation [snapshot](../../workflowoperationhandlers/snapshot-woh.md) by setting its
+configuration key `source-tags` and/or `source-flavor` appropriately.
 
-Opencast will set the following processing settings for the event being edited: `thumbnailType` is set to `2`
-to indicate that an uploaded thumbnail is used.
+Opencast will set the following processing settings for the event being edited:
+
+  - `thumbnailType` is set to `2` to indicate that an uploaded thumbnail is used
 
 Automatic Distribution
 ----------------------
@@ -124,7 +131,7 @@ To avoid the situation that a user needs to start a workflow just to update the 
 Opencast supports automatic distribution of thumbnail images for publication channels that support incremental
 publication.
 
-Currenlty, this is supported for External API publication channels (created by WOH publish-configure) and OAI-PMH
+Currently, this is supported for External API publication channels (created by WOH publish-configure) and OAI-PMH
 publication channels (created by WOH publish-oaipmh).
 
 The automatic distribution of thumbnail images can be enabled in the configuration:

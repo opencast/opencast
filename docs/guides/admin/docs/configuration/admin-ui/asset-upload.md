@@ -32,7 +32,7 @@ Two source types are enabled by default for use in the Admin UI.
        "flavorSubType":"source", "multiple":false, "displayOrder": 2}
 
 Source upload options as displayed in the Admin UI Create event:
-    ![assetUploadSource](assetUploadSource.png)
+    ![assetUploadSource](images/assetUploadSource.png)
 
 Asset flavor and sub-flavor are used by default Opencast workflows. When you add new asset types, you may need to adjust
 workflows to process the new asset flavor.
