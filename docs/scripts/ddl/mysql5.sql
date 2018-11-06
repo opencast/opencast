@@ -238,18 +238,6 @@ CREATE TABLE oc_scheduled_extended_event (
   CONSTRAINT FK_oc_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_scheduled_transaction (
-  id VARCHAR(128) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  source VARCHAR(255) NOT NULL,
-  last_modified DATETIME NOT NULL,
-  PRIMARY KEY (id, organization),
-  CONSTRAINT UNQ_oc_scheduled_transaction UNIQUE (id, organization, source),
-  CONSTRAINT FK_oc_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_scheduled_transaction_source ON oc_scheduled_transaction (source);
-
 CREATE TABLE oc_search (
   id VARCHAR(128) NOT NULL,
   series_id VARCHAR(128),

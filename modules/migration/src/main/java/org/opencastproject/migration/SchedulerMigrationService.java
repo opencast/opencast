@@ -24,25 +24,14 @@ import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.data.Opt.none;
 
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageException;
-import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
-import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
-import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
-import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.scheduler.api.SchedulerService.SchedulerTransaction;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -50,42 +39,22 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Equality;
 import com.entwinemedia.fn.data.Opt;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
-import org.joda.time.Interval;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.util.UUID;
 
 import javax.sql.DataSource;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * This class provides index and DB migrations to Opencast.
@@ -186,182 +155,7 @@ public class SchedulerMigrationService {
   }
 
   private void migrateScheduledEvents() throws SQLException {
-    SchedulerTransaction tx = null;
-    ResultSet result = null;
-    Statement stm = null;
-    try (Connection connection = dataSource.getConnection()) {
-      logger.info("Scheduler transaction | start");
-      tx = schedulerService.createTransaction("opencast");
-      stm = connection.createStatement();
-      result = stm.executeQuery("SELECT id, access_control, blacklisted, capture_agent_metadata, dublin_core, mediapackage_id, opt_out, review_date, review_status FROM mh_scheduled_event");
-      List<Event> events = transform(result);
-      for (Event event : events) {
-        // Outdated events have to be removed just before schedule time.
-        // Filtering in advance is dangerous because the whole process lasts very long
-        if (!isOutdated(event)) {
-          schedule(tx, event);
-          logger.info("Migrated event '{}'", event.mediaPackageId);
-        } else {
-          logger.info("Ignoring outdated event '{}'", event.mediaPackageId);
-        }
-      }
-      tx.commit();
 
-      // Update review status
-      for (Event event : events) {
-        if (!isOutdated(event)) {
-          schedulerService.updateReviewStatus(event.mediaPackageId, event.reviewStatus);
-        }
-      }
-      logger.info("Scheduler transaction | end");
-    } catch (Exception e) {
-      logger.error("Scheduler transaction | error", e);
-      if (tx != null) {
-        logger.error("Scheduler transaction | rollback transaction");
-        try {
-          tx.rollback();
-        } catch (Exception e2) {
-          logger.error("Scheduler transaction | error doing rollback", e2);
-        }
-      }
-    } finally {
-      if (result != null)
-        result.close();
-      if (stm != null)
-        stm.close();
-    }
-  }
-
-  void schedule(SchedulerTransaction tx, Event event) {
-    final Map<String, String> wfProperties = Collections.emptyMap();
-    final Map<String, String> caMetadata = PropertiesUtil.toMap(event.captureAgentProperites);
-    final MediaPackage mp = mkMediaPackage();
-    mp.setIdentifier(new IdImpl(event.mediaPackageId));
-    // create the catalog
-    final DublinCoreCatalog dc = event.dublinCore;
-    mp.setSeries(dc.getFirst(DublinCore.PROPERTY_IS_PART_OF));
-    // and make them available for download in the workspace
-    dc.setURI(storeInWs(event.mediaPackageId, dc.getIdentifier(), "dc-episode.xml", inputStream(dc)));
-    // add them to the media package
-    mp.add(dc);
-    // add acl to the media package
-    for (AccessControlList acl : event.accessControlList) {
-      try {
-        authorizationService.setAcl(mp, AclScope.Episode, acl);
-      } catch (MediaPackageException e) {
-        logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
-      }
-    }
-    //
-    // add to scheduler service
-    Tuple<Date, Date> schedulingDate = getSchedulingDate(dc);
-    String caId = dc.getFirst(DublinCore.PROPERTY_SPATIAL);
-    try {
-      tx.addEvent(schedulingDate.getA(), schedulingDate.getB(), caId, Collections.<String> emptySet(), mp, wfProperties,
-              caMetadata, Opt.some(event.optOut));
-    } catch (UnauthorizedException e) {
-      logger.error("Not authorized to schedule an event", e);
-      chuck(e);
-    } catch (SchedulerException e) {
-      logger.warn("Not able to schedule event.", e);
-      chuck(e);
-    } catch (NotFoundException e) {
-      logger.error("Transaction disappeared");
-      chuck(e);
-    }
-  }
-
-  /**
-   * Transform the event result set into {@link Event}s.
-   */
-  List<Event> transform(ResultSet resultSet) {
-    try {
-      List<Event> events = new ArrayList<>();
-      while (resultSet.next()) {
-        DublinCoreCatalog dc = readDublinCoreSilent(resultSet.getString(5));
-        dc.setIdentifier(UUID.randomUUID().toString());
-        dc.setFlavor(MediaPackageElements.EPISODE);
-        dc.remove(DublinCore.PROPERTY_IDENTIFIER);
-        Properties properties = parseProperties(resultSet.getString(4));
-        AccessControlList acl = resultSet.getString(2) != null
-                ? AccessControlParser.parseAclSilent(resultSet.getString(2)) : null;
-        events.add(new Event(resultSet.getLong(1), resultSet.getString(6), dc, properties, acl, resultSet.getBoolean(7),
-                ReviewStatus.valueOf(resultSet.getString(9)), resultSet.getDate(8)));
-      }
-      return events;
-    } catch (Exception e) {
-      return chuck(e);
-    }
-  }
-
-  Properties parseProperties(String serializedProperties) {
-    try {
-      Properties caProperties = new Properties();
-      caProperties.load(new StringReader(serializedProperties));
-      return caProperties;
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  MediaPackage mkMediaPackage() {
-    try {
-      return mpbf.newMediaPackageBuilder().createNew();
-    } catch (MediaPackageException e) {
-      return chuck(e);
-    }
-  }
-
-  DublinCoreCatalog readDublinCoreSilent(String serializedForm) {
-    try {
-      return DublinCoreXmlFormat.read(serializedForm);
-    } catch (IOException | SAXException | ParserConfigurationException e) {
-      return chuck(e);
-    }
-  }
-
-  InputStream inputStream(DublinCoreCatalog dc) {
-    try {
-      return IOUtils.toInputStream(dc.toXmlString());
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  /** Serialize a DublinCore catalog to a byte array. Use UTF-8 charset. */
-  byte[] serialize(DublinCoreCatalog dc) {
-    try {
-      return dc.toXmlString().getBytes(StandardCharsets.UTF_8);
-    } catch (IOException e) {
-      return chuck(e);
-    }
-  }
-
-  URI storeInWs(String mpId, String mpeId, String fileName, InputStream data) {
-    try {
-      return workspace.put(mpId, mpeId, fileName, data);
-    } catch (IOException e) {
-      chuck(e);
-    }
-    return null;
-  }
-
-  Tuple<Date, Date> getSchedulingDate(DublinCoreCatalog dc) {
-    String eventId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-    DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(dc.getFirst(DublinCore.PROPERTY_TEMPORAL));
-    if (!period.hasStart()) {
-      logger.error("Couldn't get startdate from event {}!", eventId);
-    }
-    if (!period.hasEnd()) {
-      logger.error("Couldn't get enddate from event {}!", eventId);
-    }
-    return Tuple.tuple(period.getStart(), period.getEnd());
-  }
-
-  boolean isOutdated(Event event) {
-    Tuple<Date, Date> schedulingDate = getSchedulingDate(event.dublinCore);
-    Interval interval = new Interval(new DateTime(schedulingDate.getA()), new DateTime(schedulingDate.getB()));
-    return interval.containsNow() || interval.isBeforeNow();
   }
 
   // CHECKSTYLE:OFF

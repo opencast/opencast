@@ -28,7 +28,6 @@ import static org.easymock.EasyMock.replay;
 import static org.opencastproject.migration.SchedulerMigrationService.CFG_ORGANIZATION;
 
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerService.SchedulerTransaction;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
@@ -74,11 +73,8 @@ public class SchedulerMigrationServiceTest {
     expect(securityService.getUser()).andReturn(new JaxbUser()).anyTimes();
     replay(securityService);
 
-    SchedulerTransaction schedulerTransaction = createNiceMock(SchedulerTransaction.class);
-    replay(schedulerTransaction);
 
     SchedulerService schedulerService = createNiceMock(SchedulerService.class);
-    expect(schedulerService.createTransaction(anyString())).andReturn(schedulerTransaction).anyTimes();
     expect(schedulerService.search(anyObject(Opt.class), anyObject(Opt.class), anyObject(Opt.class),
             anyObject(Opt.class), anyObject(Opt.class))).andReturn(new ArrayList<>());
     replay(schedulerService);

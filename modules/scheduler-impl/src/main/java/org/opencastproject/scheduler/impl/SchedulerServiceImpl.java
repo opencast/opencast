@@ -22,7 +22,6 @@ package org.opencastproject.scheduler.impl;
 
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
-import static java.lang.String.format;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
 import static org.opencastproject.assetmanager.api.fn.Properties.getStringOpt;
 import static org.opencastproject.scheduler.api.SchedulerService.ReviewStatus.UNSENT;
@@ -48,7 +47,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
-import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
@@ -87,20 +85,14 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.scheduler.api.Blacklist;
 import org.opencastproject.scheduler.api.ConflictHandler;
 import org.opencastproject.scheduler.api.ConflictNotifier;
-import org.opencastproject.scheduler.api.ConflictResolution;
-import org.opencastproject.scheduler.api.ConflictResolution.Strategy;
-import org.opencastproject.scheduler.api.ConflictingEvent;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
-import org.opencastproject.scheduler.api.SchedulerEvent;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
@@ -122,13 +114,11 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.ListBuilders;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -143,7 +133,6 @@ import org.apache.commons.lang3.text.WordUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Interval;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -157,7 +146,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
@@ -198,10 +186,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** Namespace keys */
   private static final String WORKFLOW_NAMESPACE = SchedulerService.JOB_TYPE + ".workflow.configuration";
-  private static final String TRX_WORKFLOW_NAMESPACE = SchedulerService.JOB_TYPE + ".trx.workflow.configuration";
   private static final String CA_NAMESPACE = SchedulerService.JOB_TYPE + ".ca.configuration";
-  private static final String TRX_CA_NAMESPACE = SchedulerService.JOB_TYPE + ".trx.ca.configuration";
-  protected static final String TRX_NAMESPACE = SchedulerService.JOB_TYPE + ".trx";
 
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
@@ -216,9 +201,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private static final String START_DATE_CONFIG = "start";
   private static final String END_DATE_CONFIG = "end";
   private static final String OPTOUT_CONFIG = "optout";
-  private static final String TRANSACTION_ID_CONFIG = "transaction_id";
   private static final String VERSION = "version";
-  private static final String DELETE_LATEST = "delete_latest";
   private static final String LAST_MODIFIED_ORIGIN = "last_modified_origin";
   private static final String LAST_MODIFIED_DATE = "last_modified_date";
   private static final String LAST_CONFLICT = "last_conflict";
@@ -263,9 +246,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
-
-  /** The transaction cleaner */
-  private TransactionCleaner transactionCleaner;
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
@@ -393,48 +373,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public void activate(ComponentContext cc) throws Exception {
     super.activate();
     systemUserName = SecurityUtil.getSystemUserName(cc);
-    removeTransactionsAfterRestart();
-    transactionCleaner = new TransactionCleaner(this, securityService, orgDirectoryService, systemUserName);
-    transactionCleaner.schedule();
     logger.info("Activating Scheduler Service");
   }
 
-  /**
-   * Remove incomplete transactions after a restart
-   */
-  private void removeTransactionsAfterRestart() {
-    logger.info("Checking for incomplete transactions from a shutdown or restart.");
-    for (final Organization org : orgDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(systemUserName, org), () -> {
-        try {
-          for (String transactionID : persistence.getTransactions()) {
-            try {
-              SchedulerTransaction transaction = getTransaction(transactionID);
-              logger.info("Rolling back transaction with id: {}", transactionID);
-              transaction.rollback();
-              logger.info("Finished rolling back transaction with id: {}", transactionID);
-            } catch (NotFoundException e) {
-              logger.info("Unable to find the transaction with id {}, so it wasn't rolled back.", transactionID);
-            } catch (UnauthorizedException e) {
-              logger.error("Unable to delete transaction with id: {} using organization {} because", transactionID,
-                      org, e);
-            } catch (Exception e) {
-              logger.error("Unable to rollback transaction because", e);
-            }
-          }
-        } catch (SchedulerServiceDatabaseException e) {
-          logger.error("Unable to get transactions to cleanup incomplete transactions because", e);
-        }
-      });
-    }
-    logger.info("Finished checking for incomplete transactions from a shutdown or a restart.");
-  }
-
-  /** Callback from OSGi on service deactivation. */
+   /** Callback from OSGi on service deactivation. */
   @Override
   public void deactivate() {
     super.deactivate();
-    transactionCleaner.shutdown();
   }
 
   @Override
@@ -459,88 +404,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public SchedulerTransaction getTransaction(String id) throws NotFoundException, SchedulerException {
-    try {
-      String source = persistence.getTransactionSource(id);
-      return new SchedulerTransactionImpl(id, source);
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Unable to get the transaction source: {}", getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public SchedulerTransaction getTransactionBySource(String source) throws NotFoundException, SchedulerException {
-    try {
-      String id = persistence.getTransactionId(source);
-      return new SchedulerTransactionImpl(id, source);
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Unable to get transaction by source: {}", getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public boolean hasActiveTransaction(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      TrxProps trxP = new TrxProps(query);
-      AResult result = query.select(p.source().target(), trxP.source().target())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(query.version().isLatest()))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
-      // Check for active transactions
-      Opt<String> source = record.get().getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
-      if (source.isSome() && persistence.hasTransaction(source.get()))
-        return true;
-
-      return false;
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Failed to check for active transaction of event with mediapackage '{}': {}", mediaPackageId,
-              getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public synchronized SchedulerTransaction createTransaction(String schedulingSource) throws SchedulerException {
-    logger.debug(format("Transaction for source %s | create", schedulingSource));
-    try {
-      boolean hasTransaction = persistence.hasTransaction(schedulingSource);
-      if (hasTransaction)
-        throw new SchedulerConflictException("Transaction already exists");
-
-      SchedulerTransaction transaction = new SchedulerTransactionImpl(schedulingSource);
-      persistence.storeTransaction(transaction.getId(), schedulingSource);
-      logger.info(format("Transaction for source %s | created | id=%s", transaction.getId(), schedulingSource));
-      return transaction;
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error(format("Transaction for source %s | error | %s", schedulingSource, getStackTrace(e)));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
   public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
           Opt<Boolean> optOutStatus, Opt<String> schedulingSource, String modificationOrigin)
                   throws UnauthorizedException, SchedulerException {
     addEventInternal(startDateTime, endDateTime, captureAgentId, userIds, mediaPackage, wfProperties, caMetadata,
-            modificationOrigin, optOutStatus, schedulingSource, Opt.<String> none());
+            modificationOrigin, optOutStatus, schedulingSource);
   }
 
   private void addEventInternal(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          String modificationOrigin, Opt<Boolean> optOutStatus, Opt<String> schedulingSource, Opt<String> trxId)
+          String modificationOrigin, Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
                   throws SchedulerException {
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
@@ -552,7 +426,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(modificationOrigin, "modificationOrigin");
     notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
-    notNull(trxId, "trxId");
     if (endDateTime.before(startDateTime))
       throw new IllegalArgumentException("The end date is before the start date");
 
@@ -560,7 +433,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       AQueryBuilder query = assetManager.createQuery();
-      // TODO this query runs twice if called from SchedulerTransactionImpl#addEvent
       AResult result = query.select(query.nothing())
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())))
               .run();
@@ -575,22 +447,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Get opt out status
       boolean optOut = getOptOutStatus(seriesId, optOutStatus);
 
-      if (trxId.isNone()) {
-        // Check for locked transactions
-        if (schedulingSource.isSome() && persistence.hasTransaction(schedulingSource.get())) {
-          logger.warn("Unable to add event '{}', source '{}' is currently locked due to an active transaction!",
-                  mediaPackageId, schedulingSource.get());
-          throw new SchedulerTransactionLockException("Unable to add event, locked source " + schedulingSource.get());
-        }
-
-        // Check for conflicting events if not opted out
-        if (!optOut) {
-          List<MediaPackage> conflictingEvents = findConflictingEvents(captureAgentId, startDateTime, endDateTime);
-          if (conflictingEvents.size() > 0) {
-            logger.info("Unable to add event {}, conflicting events found: {}", mediaPackageId, conflictingEvents);
-            throw new SchedulerConflictException(
-                    "Unable to add event, conflicting events found for event " + mediaPackageId);
-          }
+      // Check for conflicting events if not opted out
+      if (!optOut) {
+        List<MediaPackage> conflictingEvents = findConflictingEvents(captureAgentId, startDateTime, endDateTime);
+        if (conflictingEvents.size() > 0) {
+          logger.info("Unable to add event {}, conflicting events found: {}", mediaPackageId, conflictingEvents);
+          throw new SchedulerConflictException(
+                  "Unable to add event, conflicting events found for event " + mediaPackageId);
         }
       }
 
@@ -608,17 +471,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                                           acl);
       persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
               Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
-              Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource, trxId);
+              Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
 
-      if (trxId.isNone()) {
-        // Send updates
-        sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime),
-                Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
-                Opt.some(optOut));
+      // Send updates
+      sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime),
+              Opt.some(endDateTime), Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties),
+              Opt.some(optOut));
 
-        // Update last modified
-        touchLastEntry(captureAgentId);
-      }
+      // Update last modified
+      touchLastEntry(captureAgentId);
     } catch (SchedulerException e) {
       throw e;
     } catch (Exception e) {
@@ -631,18 +492,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
-          throws UnauthorizedException, SchedulerConflictException, SchedulerTransactionLockException, SchedulerException {
+          throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     List<Period> periods = calculatePeriods(rRule, start, end, duration, tz);
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
-            modificationOrigin, optOut, schedulingSource, Opt.<String> none());
+            modificationOrigin, optOut, schedulingSource);
   }
 
 
   private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
           Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, String modificationOrigin, Opt<Boolean> optOutStatus,
-          Opt<String> schedulingSource, Opt<String> trxId)
-                  throws SchedulerException {
+          Opt<String> schedulingSource) throws SchedulerException {
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
     notEmpty(captureAgentId, "captureAgentId");
@@ -653,7 +513,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(modificationOrigin, "modificationOrigin");
     notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
-    notNull(trxId, "trxId");
 
     Map<String, Period> scheduledEvents = new LinkedHashMap<>();
 
@@ -688,21 +547,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Get opt out status
       boolean optOut = getOptOutStatus(seriesId, optOutStatus);
 
-      if (trxId.isNone()) {
-        // Check for locked transactions
-        if (schedulingSource.isSome() && persistence.hasTransaction(schedulingSource.get())) {
-          logger.warn("Unable to add events, source '{}' is currently locked due to an active transaction!",
-                  schedulingSource.get());
-          throw new SchedulerTransactionLockException("Unable to add event, locked source " + schedulingSource.get());
-        }
-
-        // Check for conflicting events if not opted out
-        if (!optOut) {
-          List<MediaPackage> conflictingEvents = findConflictingEvents(periods, captureAgentId, TimeZone.getDefault());
-          if (conflictingEvents.size() > 0) {
-            logger.info("Unable to add events, conflicting events found: {}", conflictingEvents);
-            throw new SchedulerConflictException("Unable to add event, conflicting events found");
-          }
+      // Check for conflicting events if not opted out
+      if (!optOut) {
+        List<MediaPackage> conflictingEvents = findConflictingEvents(periods, captureAgentId, TimeZone.getDefault());
+        if (conflictingEvents.size() > 0) {
+          logger.info("Unable to add events, conflicting events found: {}", conflictingEvents);
+          throw new SchedulerConflictException("Unable to add event, conflicting events found");
         }
       }
 
@@ -759,16 +609,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
                 captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl);
         persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
-                Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource, trxId);
+                Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
 
-        if (trxId.isNone()) {
-          // Send updates
-          sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
-                  Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
+        // Send updates
+        sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
+                Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
 
-          // Update last modified
-          touchLastEntry(captureAgentId);
-        }
+        // Update last modified
+        touchLastEntry(captureAgentId);
         scheduledEvents.put(mediaPackageId, event);
         for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
           try {
@@ -793,13 +641,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption, String modificationOrigin)
                   throws NotFoundException, UnauthorizedException, SchedulerException {
     updateEventInternal(mpId, modificationOrigin, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
-            wfProperties, caMetadata, optOutOption, Opt.<String> none());
+            wfProperties, caMetadata, optOutOption);
   }
 
   private void updateEventInternal(final String mpId, String modificationOrigin, Opt<Date> startDateTime,
           Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage,
-          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption,
-          Opt<String> trxId) throws NotFoundException, SchedulerException {
+          Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption
+  ) throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
     notEmpty(modificationOrigin, "modificationOrigin");
     notNull(startDateTime, "startDateTime");
@@ -810,7 +658,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
     notNull(optOutOption, "optOutStatus");
-    notNull(trxId, "trxId");
 
     try {
       AQueryBuilder query = assetManager.createQuery();
@@ -851,37 +698,27 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         optOut = Opt.some(getOptOutStatus(seriesId, optOutToUpdate));
       }
 
-      if (trxId.isNone()) {
-        // Check for locked transactions
-        Opt<String> source = record.getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
-        if (source.isSome() && persistence.hasTransaction(source.get())) {
-          logger.warn("Unable to update event '{}', source '{}' is currently locked due to an active transaction!",
-                  mpId, source.get());
-          throw new SchedulerTransactionLockException("Unable to update event, locked source " + source.get());
-        }
+      // Set to opted out
+      boolean isNewOptOut = optOut.isSome() && optOut.get();
 
-        // Set to opted out
-        boolean isNewOptOut = optOut.isSome() && optOut.get();
+      // Changed to ready for recording
+      boolean readyForRecording = optOut.isSome() && !optOut.get();
 
-        // Changed to ready for recording
-        boolean readyForRecording = optOut.isSome() && !optOut.get();
+      // Has a conflict related property be changed?
+      boolean propertyChanged = captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome();
 
-        // Has a conflict related property be changed?
-        boolean propertyChanged = captureAgentId.isSome() || startDateTime.isSome() || endDateTime.isSome();
-
-        // Check for conflicting events
-        if (!isNewOptOut && (readyForRecording || (propertyChanged && !oldOptOut))) {
-          List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
-                  startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
+      // Check for conflicting events
+      if (!isNewOptOut && (readyForRecording || (propertyChanged && !oldOptOut))) {
+        List<MediaPackage> conflictingEvents = $(findConflictingEvents(captureAgentId.getOr(agentId),
+                startDateTime.getOr(start), endDateTime.getOr(end))).filter(new Fn<MediaPackage, Boolean>() {
                     @Override
                     public Boolean apply(MediaPackage mp) {
-                      return !mpId.equals(mp.getIdentifier().compact());
-                    }
+                    return !mpId.equals(mp.getIdentifier().compact());
+                  }
                   }).toList();
-          if (conflictingEvents.size() > 0) {
-            logger.info("Unable to update event {}, conflicting events found: {}", mpId, conflictingEvents);
-            throw new SchedulerConflictException("Unable to update event, conflicting events found for event " + mpId);
-          }
+        if (conflictingEvents.size() > 0) {
+          logger.info("Unable to update event {}, conflicting events found: {}", mpId, conflictingEvents);
+          throw new SchedulerConflictException("Unable to update event, conflicting events found for event " + mpId);
         }
       }
 
@@ -946,30 +783,25 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               some(dublinCore.getOr(dublinCoreOpt.get())), wfProperties.getOr(wfProps),
               finalCaProperties.getOr(caProperties), optOut.getOr(oldOptOut), acl.getOr(new AccessControlList()));
 
-      if (trxId.isNone()) {
-        String oldChecksum = record.getProperties().apply(Properties.getString(CHECKSUM));
-        if (checksum.equals(oldChecksum)) {
-          logger.debug("Updated event {} has same checksum, ignore update", mpId);
-          return;
-        }
+      String oldChecksum = record.getProperties().apply(Properties.getString(CHECKSUM));
+      if (checksum.equals(oldChecksum)) {
+        logger.debug("Updated event {} has same checksum, ignore update", mpId);
+        return;
       }
 
       // Update asset
       persistEvent(mpId, modificationOrigin, checksum, startDateTime, endDateTime, captureAgentId, userIds,
-              mediaPackage, wfProperties, finalCaProperties, optOut, Opt.<String> none(), trxId);
+              mediaPackage, wfProperties, finalCaProperties, optOut, Opt.<String> none());
 
-      if (trxId.isNone()) {
-        // Send updates
-        sendUpdateAddEvent(mpId, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
-                finalCaProperties, optOut);
-
-        // Update last modified
-        if (propertiesChanged || dublinCoreChanged || optOutOption.isSome() || startDateTime.isSome()
-                || endDateTime.isSome()) {
-          touchLastEntry(agentId);
-          for (String agent : captureAgentId) {
-            touchLastEntry(agent);
-          }
+      // Send updates
+      sendUpdateAddEvent(mpId, acl, dublinCore, startDateTime, endDateTime, userIds, Opt.some(agentId),
+              finalCaProperties, optOut);
+      // Update last modified
+      if (propertiesChanged || dublinCoreChanged || optOutOption.isSome() || startDateTime.isSome()
+              || endDateTime.isSome()) {
+        touchLastEntry(agentId);
+        for (String agent : captureAgentId) {
+          touchLastEntry(agent);
         }
       }
     } catch (NotFoundException e) {
@@ -1070,14 +902,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Opt<ARecord> recordOpt = result.getRecords().head();
       long deletedProperties = 0;
       if (recordOpt.isSome()) {
-        // Check for locked transactions
-        Opt<String> source = recordOpt.get().getProperties().apply(Properties.getStringOpt(SOURCE_CONFIG));
-        if (source.isSome() && persistence.hasTransaction(source.get())) {
-          logger.warn("Unable to remove event '{}', source '{}' is currently locked due to an active transaction!",
-                  mediaPackageId, source.get());
-          throw new SchedulerTransactionLockException("Unable to remove event, locked source " + source.get());
-        }
-
         String agentId = recordOpt.get().getProperties().apply(Properties.getString(AGENT_CONFIG));
 
         // Delete all properties
@@ -1137,7 +961,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AQueryBuilder query = assetManager.createQuery();
       Props p = new Props(query);
       AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withVersion(query))
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
                       .and(query.hasPropertiesOf(p.namespace())))
               .run();
       Opt<ARecord> record = result.getRecords().head();
@@ -1193,7 +1017,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AQueryBuilder query = assetManager.createQuery();
       Props p = new Props(query);
       AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withVersion(query))
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
                       .and(query.hasPropertiesOf(p.namespace())))
               .run();
       Opt<ARecord> record = result.getRecords().head();
@@ -1288,71 +1112,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  public void updateBlacklist(Blacklist blacklist) throws SchedulerException {
-    try {
-      List<Tuple<String, Boolean>> updated = persistence.updateBlacklist(blacklist);
-      for (Tuple<String, Boolean> tuple : updated) {
-        messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-                SchedulerItem.updateBlacklist(tuple.getA(), tuple.getB()));
-      }
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Failed to update blacklist: {}", getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  @Override
-  public boolean isBlacklisted(String mediaPackageId) throws NotFoundException, SchedulerException {
-    notEmpty(mediaPackageId, "mediaPackageId");
-
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query
-              .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-                      p.presenters().target())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(withVersion(query))
-                      .and(query.hasPropertiesOf(p.namespace()))))
-              .run();
-
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
-      Opt<MediaPackage> mp = record.bind(recordToMp);
-      if (mp.isNone())
-        throw new NotFoundException();
-
-      String agentId = record.get().getProperties().apply(Properties.getString(AGENT_CONFIG));
-      Date start = record.get().getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-      Date end = record.get().getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-      Set<String> presenters = getPresenters(
-          record.get().getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-      return isBlacklisted(mediaPackageId, start, end, agentId, presenters);
-    } catch (NotFoundException e) {
-      throw e;
-    } catch (Exception e) {
-      logger.error("Failed to get blacklist status of event with mediapackage '{}': {}", mediaPackageId,
-              getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
-  private boolean isBlacklisted(String mediaPackageId, Date start, Date end, String agentId,
-          Collection<String> presenters) throws SchedulerException {
-    try {
-      boolean isBlacklisted = false;
-      if (persistence.isBlacklisted(agentId, start, end)
-              || persistence.isBlacklisted(new ArrayList<>(presenters), start, end))
-        isBlacklisted = true;
-      return isBlacklisted;
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Failed to get blacklist status of event with mediapackage '{}': {}", mediaPackageId,
-              getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-  }
-
   /*
    * FIXME: This query is unsafe since it may fetch many many rows. It would be better to do conflict checking directly
    * in the database instead of fetching all scheduled events for the capture agent and then doing the checks in memory.
@@ -1362,7 +1121,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private ARecord[] getScheduledEvents(Opt<String> captureAgentId) {
     AQueryBuilder query = assetManager.createQuery();
     Props p = new Props(query);
-    Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(withVersion(query));
+    Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace()));
     for (String agentId : captureAgentId) {
       predicate = predicate.and(p.agent().eq(agentId));
     }
@@ -1438,87 +1197,27 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
-          throws SchedulerException {
-    final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureDeviceID));
-    return findConflictingEvents(startDate, endDate, alreadyScheduledEvents);
-  }
-
-  private List<MediaPackage> findConflictingEvents(Date startDate, Date endDate, ARecord[] alreadyScheduledEvents)
-          throws SchedulerException {
-    return checkScheduleConflicts(startDate, endDate, alreadyScheduledEvents);
-  }
-
-  private List<String> preCollisionEventCheck(String trxId, String schedulingSource) throws SchedulerException {
+      throws SchedulerException {
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      TrxProps trxP = new TrxProps(query);
-
-      Predicate isSourceWithTrx = trxP.source().eq(schedulingSource).and(trxP.transactionId().eq(trxId));
-      Predicate hasProperties = p.agent().exists().and(p.start().exists()).and(p.end().exists());
-      Predicate isNotSource = p.source().eq(schedulingSource).not().and(hasProperties);
-      Predicate isNotOptedOut = p.optOut().eq(false).or(trxP.optOut().eq(false));
-
-      ASelectQuery select = query
-              .select(trxP.optOut().target(), p.optOut().target(), p.agent().target(), p.start().target(),
-                      p.end().target(), trxP.agent().target(), trxP.start().target(), trxP.end().target(),
-                      trxP.transactionId().target())
-              .where(withOrganization(query).and(isSourceWithTrx.or(isNotSource)).and(query.version().isLatest())
-                      .and(isNotOptedOut));
-
-      AResult result = select.run();
-
-      // Check for conflicts
-      List<String> conflictingRecords = new ArrayList<>();
-      Map<String, List<Interval>> invervalMap = new HashMap<>();
-      for (ARecord record : result.getRecords()) {
-        String agentId;
-        Date start;
-        Date end;
-        Opt<String> optTrxId = record.getProperties().apply(Properties.getStringOpt(TRANSACTION_ID_CONFIG));
-        if (optTrxId.isSome() && trxId.equals(optTrxId.get())) {
-          agentId = record.getProperties().filter(filterByNamespace._2(trxP.namespace()))
-                  .apply(Properties.getString(AGENT_CONFIG));
-          start = record.getProperties().filter(filterByNamespace._2(trxP.namespace()))
-                  .apply(Properties.getDate(START_DATE_CONFIG));
-          end = record.getProperties().filter(filterByNamespace._2(trxP.namespace()))
-                  .apply(Properties.getDate(END_DATE_CONFIG));
-        } else {
-          agentId = record.getProperties().filter(filterByNamespace._2(p.namespace()))
-                  .apply(Properties.getString(AGENT_CONFIG));
-          start = record.getProperties().filter(filterByNamespace._2(p.namespace()))
-                  .apply(Properties.getDate(START_DATE_CONFIG));
-          end = record.getProperties().filter(filterByNamespace._2(p.namespace()))
-                  .apply(Properties.getDate(END_DATE_CONFIG));
-        }
-
-        Interval currentInterval = new Interval(start.getTime(), end.getTime());
-
-        List<Interval> intervals = invervalMap.get(agentId);
-        if (intervals == null)
-          intervals = new ArrayList<>();
-
-        boolean overlaps = false;
-        for (Interval i : intervals) {
-          if (!i.overlaps(currentInterval))
-            continue;
-
-          overlaps = true;
-          break;
-        }
-
-        if (!overlaps) {
-          intervals.add(currentInterval);
-        } else {
-          conflictingRecords.add(record.getMediaPackageId());
-        }
-
-        invervalMap.put(agentId, intervals);
-      }
-
-      return conflictingRecords;
+      Set<String> eventIds = persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
+      final AQueryBuilder query = assetManager.createQuery();
+      final Predicate predicate = withOrganization(query)
+          .and(withOwner(query))
+          .and(query.mediaPackageIds(eventIds.toArray(new String[0])));
+      final Props p = new Props(query);
+      final List<ARecord> records = query.select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
+          query.propertiesOf(CA_NAMESPACE)).where(predicate).run().getRecords().toList();
+      return Stream.mk(records).sort(
+          new Comparator<ARecord>() {
+            @Override
+            public int compare(ARecord o1, ARecord o2) {
+              Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+              Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
+              return start1.compareTo(start2);
+            }
+          }
+      ).bind(recordToMp).toList();
     } catch (Exception e) {
-      logger.error("Failed to search for conflicting events: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
   }
@@ -1576,7 +1275,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AQueryBuilder query = assetManager.createQuery();
       Props p = new Props(query);
       Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
-              .and(withVersion(query)).and(p.end().ge(DateTime.now().minusHours(1).toDate()));
+              .and(p.end().ge(DateTime.now().minusHours(1).toDate()));
       for (String agentId : captureAgentId) {
         predicate = predicate.and(p.agent().eq(agentId));
       }
@@ -1895,20 +1594,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           final Opt<Date> startDateTime, final Opt<Date> endDateTime, final Opt<String> captureAgentId,
           final Opt<Set<String>> userIds, final Opt<MediaPackage> mediaPackage,
           final Opt<Map<String, String>> wfProperties, final Opt<Map<String, String>> caProperties,
-          final Opt<Boolean> optOut, final Opt<String> schedulingSource, final Opt<String> trxId) {
+          final Opt<Boolean> optOut, final Opt<String> schedulingSource) throws SchedulerServiceDatabaseException {
     AQueryBuilder query = assetManager.createQuery();
-    final Props p;
-    final String workflowNamespace;
-    final String caNamespace;
-    if (trxId.isNone()) {
-      p = new Props(query);
-      workflowNamespace = WORKFLOW_NAMESPACE;
-      caNamespace = CA_NAMESPACE;
-    } else {
-      p = new TrxProps(query);
-      workflowNamespace = TRX_WORKFLOW_NAMESPACE;
-      caNamespace = TRX_CA_NAMESPACE;
-    }
+    final Props p = new Props(query);
+    final String workflowNamespace = WORKFLOW_NAMESPACE;
+    final String caNamespace = CA_NAMESPACE;
 
     // Store scheduled mediapackage
     for (MediaPackage mpToUpdate : mediaPackage) {
@@ -1967,11 +1657,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     assetManager.setProperty(p.checksum().mk(mpId, checksum));
 
     // Remove last conflicts
-    if (trxId.isNone()) {
-      final AQueryBuilder q = assetManager.createQuery();
-      q.delete(SNAPSHOT_OWNER, new Props(q).lastConflict().target())
-              .where(withOrganization(q).and(q.mediaPackageId(mpId))).run();
-    }
+    final AQueryBuilder q = assetManager.createQuery();
+    q.delete(SNAPSHOT_OWNER, new Props(q).lastConflict().target())
+            .where(withOrganization(q).and(q.mediaPackageId(mpId))).run();
   }
 
   private void sendUpdateAddEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
@@ -2082,7 +1770,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     AQueryBuilder query = assetManager.createQuery();
     Props p = new Props(query);
     AResult result = query.select(query.snapshot())
-            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withVersion(query))
+            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
                     .and(query.hasPropertiesOf(p.namespace())))
             .run();
     Opt<ARecord> record = result.getRecords().head();
@@ -2131,19 +1819,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
     final Opt<String> recordingStatus = record.getProperties()
             .apply(Properties.getStringOpt(p.recordingStatus().name()));
-    String caNamespace = CA_NAMESPACE;
-    String wfNamespace = WORKFLOW_NAMESPACE;
-    if (TRX_NAMESPACE.equals(p.namespace())) {
-      caNamespace = TRX_CA_NAMESPACE;
-      wfNamespace = TRX_WORKFLOW_NAMESPACE;
-    } else {
-      caNamespace = CA_NAMESPACE;
-      wfNamespace = WORKFLOW_NAMESPACE;
-    }
     final Opt<Long> lastHeard = record.getProperties().apply(Properties.getLongOpt(p.recordingLastHeard().name()));
-    final Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(caNamespace)).group(toKey,
+    final Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE)).group(toKey,
             toValue);
-    final Map<String, String> wfProperties = record.getProperties().filter(filterByNamespace._2(wfNamespace))
+    final Map<String, String> wfProperties = record.getProperties().filter(filterByNamespace._2(WORKFLOW_NAMESPACE))
             .group(toKey, toValue);
 
     Recording recording = null;
@@ -2160,14 +1839,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private Predicate withOwner(AQueryBuilder query) {
     return query.owner().eq(SNAPSHOT_OWNER);
-  }
-
-  private Predicate withVersion(AQueryBuilder query) {
-    Props p = new Props(query);
-    TrxProps trxProps = new TrxProps(query);
-    Predicate latestVersion = trxProps.transactionId().notExists().and(query.version().isLatest());
-    Predicate secondLastVersion = trxProps.transactionId().exists().and(query.version().eq(p.version()));
-    return latestVersion.or(secondLastVersion);
   }
 
   private Set<String> getPresenters(String presentersString) {
@@ -2189,422 +1860,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     String organization = securityService.getOrganization().getId();
     return Stream.$(eventCatalogUIAdapters).filter(eventOrganizationFilter._2(organization)).map(uiAdapterToFlavor)
             .filter(isNotEpisodeDublinCore).toList();
-  }
-
-  @Override
-  public synchronized void cleanupTransactions() throws UnauthorizedException, SchedulerException {
-    logger.info("Cleanup transactions | start");
-    List<String> transactions;
-    try {
-      transactions = persistence.getTransactions();
-    } catch (SchedulerServiceDatabaseException e) {
-      logger.error("Unable to get transactions: {}", getStackTrace(e));
-      throw new SchedulerException(e);
-    }
-
-    logger.info("Cleanup transaction | checking {} transactions...", transactions.size());
-    for (String trxId : transactions) {
-      try {
-        Date lastModified = persistence.getTransactionLastModified(trxId);
-        if (lastModified.getTime() + transactionOffsetMillis < new Date().getTime()) {
-          logger.info("Cleanup transactions | rollback outdated transaction {}", trxId);
-          SchedulerTransaction t = getTransaction(trxId);
-          t.rollback();
-        } else {
-          logger.info("Cleanup transactions | nothing to do");
-        }
-      } catch (NotFoundException e) {
-        logger.info("Cleanup transaction | transaction '{}' has been removed in the meantime.", trxId);
-      } catch (Exception e) {
-        logger.warn("Cleanup transaction | unable to cleanup transaction with id '{}': {}", trxId, getStackTrace(e));
-      }
-    }
-    logger.info("Cleanup transactions | end");
-  }
-
-  private final class SchedulerTransactionImpl implements SchedulerTransaction {
-
-    private final String id;
-
-    private final String schedulingSource;
-
-    /**
-     * Create a new scheduler transaction with a new id
-     *
-     * @param schedulingSource
-     *          the scheduling source
-     */
-    SchedulerTransactionImpl(String schedulingSource) {
-      this.id = UUID.randomUUID().toString();
-      this.schedulingSource = schedulingSource;
-    }
-
-    /**
-     * Create a new scheduler transaction with a given id
-     *
-     * @param id
-     *          the transaction identifier
-     * @param schedulingSource
-     *          the scheduling source
-     */
-    SchedulerTransactionImpl(String id, String schedulingSource) {
-      this.id = id;
-      this.schedulingSource = schedulingSource;
-    }
-
-    @Override
-    public String getId() {
-      return id;
-    }
-
-    @Override
-    public String getSource() {
-      return schedulingSource;
-    }
-
-    @Override
-    public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
-            MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-            Opt<Boolean> optOut) throws NotFoundException, UnauthorizedException, SchedulerException {
-      try {
-        if (!persistence.hasTransaction(schedulingSource))
-          throw new NotFoundException("No transaction found with id " + id);
-      } catch (SchedulerServiceDatabaseException e) {
-        logger.error("Unable to get transaction {}", id);
-        throw new SchedulerException(e);
-      }
-
-      // Search for existing mediapackage with same id and organization
-      final String mpId = mediaPackage.getIdentifier().compact();
-      AQueryBuilder query = assetManager.createQuery();
-      TrxProps trxp = new TrxProps(query);
-      Predicate predicate = withOrganization(query).and(query.mediaPackageId(mpId).and(query.version().isLatest()));
-
-      // Check if already a transaction on the same source is available for the given mediapackage
-      AResult result = query.select(query.nothing()).where(predicate.and(trxp.transactionId().exists())).run();
-      if (result.getRecords().head().isSome())
-        throw new SchedulerException("Only one invocation per transaction and mediapackage identifier allowed!");
-
-      result = query.select(query.nothing()).where(predicate).run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone()) {
-        // Add event
-        addEventInternal(startDateTime, endDateTime, captureAgentId, userIds, mediaPackage, wfProperties, caMetadata,
-                schedulingSource, optOut, Opt.some(schedulingSource), Opt.some(id));
-      } else {
-        // Update event
-        try {
-          updateEventInternal(mpId, schedulingSource, Opt.some(startDateTime), Opt.some(endDateTime),
-                  Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
-                  Opt.some(caMetadata), Opt.some(optOut), Opt.some(id));
-          assetManager.setProperty(trxp.source().mk(mpId, schedulingSource));
-        } catch (NotFoundException e) {
-          logger.error("Unable to find previous found event {}: {}", mpId, getStackTrace(e));
-          throw new SchedulerException(e);
-        }
-      }
-
-      // Add transaction identifier to asset
-      assetManager.setProperty(trxp.transactionId().mk(mpId, id));
-    }
-
-    @Override
-    public void commit() throws NotFoundException, SchedulerConflictException, SchedulerException {
-      logger.info(format("Transaction for source %s | commit start | id=%s", schedulingSource, id));
-      try {
-        if (!persistence.hasTransaction(schedulingSource)) {
-          throw new NotFoundException("No transaction found with id " + id);
-        }
-      } catch (SchedulerServiceDatabaseException e) {
-        logger.error("Unable to get transaction {}", id);
-        throw new SchedulerException(e);
-      }
-
-      // Check for collision events
-      List<String> collisionEvents = preCollisionEventCheck(id, schedulingSource);
-      if (collisionEvents.size() > 0) {
-        logger.error("Unable to add events, conflicting events found: {}", collisionEvents);
-        throw new SchedulerConflictException("Unable to add events, conflicting events found: " + collisionEvents);
-      }
-
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      TrxProps trxP = new TrxProps(query);
-
-      // Get transaction events
-      AResult result = query
-              .select(query.snapshot(), p.agent().target(), p.checksum().target(), p.lastModifiedOrigin().target(),
-                      p.lastConflict().target(), trxP.allProperties(),
-                      query.propertiesOf(TRX_CA_NAMESPACE, TRX_WORKFLOW_NAMESPACE))
-              .where(withOrganization(query).and(query.version().isLatest()).and(trxP.transactionId().eq(id))).run();
-
-      List<ConflictingEvent> conflictRecords = new ArrayList<>();
-      for (ARecord record : result.getRecords()) {
-        // Check for conflicts and persist transaction event
-        handleTransactionEvent(query, p, trxP, record, conflictRecords);
-      }
-
-      // Notify conflicting events
-      if (!conflictRecords.isEmpty()) {
-        for (ConflictNotifier c : conflictNotifiers) {
-          c.notifyConflicts(conflictRecords);
-        }
-      }
-
-      // Cleanup episodes and properties from transaction
-      cleanupTransaction(query, p, trxP);
-
-      // Delete transaction
-      try {
-        persistence.deleteTransaction(id);
-      } catch (SchedulerServiceDatabaseException e) {
-        logger.error("Unable to delete transaction {}", id);
-        throw new SchedulerException(e);
-      }
-      logger.info(format("Transaction for source %s | commit end | id=%s", schedulingSource, id));
-    }
-
-    private void handleTransactionEvent(AQueryBuilder query, Props p, TrxProps trxP, ARecord record,
-            List<ConflictingEvent> conflictRecords) throws SchedulerException {
-      Opt<String> currentOrigin = record.getProperties().apply(Properties.getStringOpt(p.lastModifiedOrigin().name()));
-      String newOrigin = record.getProperties().apply(Properties.getString(trxP.lastModifiedOrigin().name()));
-      Opt<String> currentChecksum = record.getProperties().apply(Properties.getStringOpt(p.checksum().name()));
-      String newChecksum = record.getProperties().apply(Properties.getString(trxP.checksum().name()));
-      Opt<String> lastConflict = record.getProperties().apply(Properties.getStringOpt(p.lastConflict().name()));
-      String[] conflicts = lastConflict.isSome() ? StringUtils.split(lastConflict.get(), ";") : null;
-      List<Property> trxProperties = record.getProperties().filter(filterByNamespace._2(trxP.namespace())).toList();
-      List<Property> trxCAProperties = record.getProperties().filter(filterByNamespace._2(TRX_CA_NAMESPACE))
-              .toList(ListBuilders.SMA);
-      List<Property> trxWorkflowProperties = record.getProperties().filter(filterByNamespace._2(TRX_WORKFLOW_NAMESPACE))
-              .toList(ListBuilders.SMA);
-      Opt<String> newAgentId = record.getProperties().apply(Properties.getStringOpt(trxP.agent().name()));
-      Opt<Date> start = record.getProperties().apply(Properties.getDateOpt(trxP.start().name()));
-      Opt<Date> end = record.getProperties().apply(Properties.getDateOpt(trxP.end().name()));
-      boolean optOut = record.getProperties().apply(Properties.getBoolean(trxP.optOut().name()));
-      Set<String> presenters = getPresenters(
-          record.getProperties().apply(getStringOpt(trxP.presenters().name())).getOr(""));
-      Opt<AccessControlList> acl = loadEpisodeAclFromAsset(record.getSnapshot().get());
-      Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.getSnapshot().get());
-
-      // Check for same origin and checksum
-      if (currentOrigin.isSome() && !currentOrigin.get().equals(newOrigin) && currentChecksum.isSome()
-              && !currentChecksum.get().equals(newChecksum)) {
-        // Check for already fixed conflict
-        if (lastConflict.isSome() && currentChecksum.get().equals(conflicts[0]) && newChecksum.equals(conflicts[1])) {
-          // ignore already handled conflict
-          assetManager.setProperty(trxP.deleteLatest().mk(record.getMediaPackageId(), true));
-          logger.debug("Ignoring already handled conflict of event {}", record.getMediaPackageId());
-          return;
-        }
-        SchedulerEvent newSchedulerEvent = new SchedulerEventImpl(record.getMediaPackageId(),
-                record.getSnapshot().get().getVersion().toString(), record.getSnapshot().get().getMediaPackage(),
-                getTechnicalMetadata(record, trxP));
-
-        ARecord oldRecord = query
-                .select(query.snapshot(), p.allProperties(), query.propertiesOf(CA_NAMESPACE, WORKFLOW_NAMESPACE))
-                .where(withOrganization(query).and(query.mediaPackageId(record.getMediaPackageId()))
-                        .and(withVersion(query)).and(query.hasPropertiesOf(p.namespace())))
-                .run().getRecords().head2();
-        SchedulerEvent oldSchedulerEvent = new SchedulerEventImpl(oldRecord.getMediaPackageId(),
-                oldRecord.getSnapshot().get().getVersion().toString(), oldRecord.getSnapshot().get().getMediaPackage(),
-                getTechnicalMetadata(oldRecord, p));
-        ConflictResolution conflictResolution = conflictHandler.handleConflict(newSchedulerEvent, oldSchedulerEvent);
-        if (Strategy.OLD.equals(conflictResolution.getConflictStrategy())) {
-          conflictRecords.add(new ConflictingEventImpl(Strategy.OLD, oldSchedulerEvent, newSchedulerEvent));
-          // Ignore new episode and add last conflict
-          assetManager.setProperty(p.lastConflict().mk(record.getMediaPackageId(),
-                  currentChecksum.get().concat(";").concat(newChecksum)));
-          assetManager.setProperty(trxP.deleteLatest().mk(record.getMediaPackageId(), true));
-          return;
-        } else if (Strategy.NEW.equals(conflictResolution.getConflictStrategy())) {
-          conflictRecords.add(new ConflictingEventImpl(Strategy.NEW, oldSchedulerEvent, newSchedulerEvent));
-        } else {
-          // Override new event with data from merged conflict
-          SchedulerEvent mergedEvent = conflictResolution.getEvent();
-          TechnicalMetadata technicalMetadata = mergedEvent.getTechnicalMetadata();
-
-          List<Property> mergedProperties = new ArrayList<>();
-          mergedProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), trxP.start().name()),
-                  Value.mk(technicalMetadata.getStartDate())));
-          mergedProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), trxP.end().name()),
-                  Value.mk(technicalMetadata.getEndDate())));
-          mergedProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), trxP.agent().name()),
-                  Value.mk(technicalMetadata.getAgentId())));
-          mergedProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), trxP.presenters().name()),
-                  Value.mk(StringUtils.join(technicalMetadata.getPresenters(), ","))));
-          mergedProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), trxP.optOut().name()),
-                  Value.mk(technicalMetadata.isOptOut())));
-
-          for (Property prop : trxProperties) {
-            // skip start, end, agent, presenters, optout
-            PropertyName fqn = prop.getId().getFqn();
-            if (fqn.equals(trxP.start().name()) || fqn.equals(trxP.end().name()) || fqn.equals(trxP.agent().name())
-                    || fqn.equals(trxP.presenters().name()) || fqn.equals(trxP.optOut().name()))
-              continue;
-            mergedProperties.add(prop);
-          }
-          trxProperties = mergedProperties;
-
-          trxWorkflowProperties.clear();
-          for (Entry<String, String> entry : technicalMetadata.getWorkflowProperties().entrySet()) {
-            trxWorkflowProperties
-                    .add(Property.mk(PropertyId.mk(record.getMediaPackageId(), TRX_WORKFLOW_NAMESPACE, entry.getKey()),
-                            Value.mk(entry.getValue())));
-          }
-          trxCAProperties.clear();
-          for (Entry<String, String> entry : technicalMetadata.getCaptureAgentConfiguration().entrySet()) {
-            trxCAProperties.add(Property.mk(PropertyId.mk(record.getMediaPackageId(), TRX_CA_NAMESPACE, entry.getKey()),
-                    Value.mk(entry.getValue())));
-          }
-
-          start = Opt.nul(technicalMetadata.getStartDate());
-          end = Opt.nul(technicalMetadata.getEndDate());
-          presenters = technicalMetadata.getPresenters();
-          optOut = technicalMetadata.isOptOut();
-          newAgentId = Opt.nul(technicalMetadata.getAgentId());
-
-          // Delete latest version of the current event
-          query.delete(SNAPSHOT_OWNER, query.snapshot())
-                  .where(withOrganization(query).and(query.mediaPackageId(record.getMediaPackageId()))
-                          .and(trxP.transactionId().eq(id)).and(query.version().isLatest()))
-                  .run();
-
-          // Store merged mediapackage
-          Snapshot snapshot = assetManager.takeSnapshot(SNAPSHOT_OWNER, mergedEvent.getMediaPackage());
-          acl = loadEpisodeAclFromAsset(snapshot);
-          dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
-        }
-      }
-
-      // Read old properties before overriding them
-      Opt<String> oldAgentId = record.getProperties().apply(Properties.getStringOpt(p.agent().name()));
-
-      // persist the transaction event
-      persistTransactionEvent(query, p, trxP, record, trxProperties, trxCAProperties, trxWorkflowProperties);
-
-      // Send updates to message queue
-      sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, start, end, Opt.nul(presenters), newAgentId,
-              Opt.some($(trxCAProperties).group(toKey, toValue)), Opt.some(optOut));
-
-      // Touch last entries
-      if (oldAgentId.isSome())
-        touchLastEntry(oldAgentId.get());
-
-      if (newAgentId.isSome())
-        touchLastEntry(newAgentId.get());
-    }
-
-    private void persistTransactionEvent(AQueryBuilder query, Props p, TrxProps trxP, ARecord record,
-            List<Property> trxProperties, List<Property> trxCAProperties, List<Property> trxWorkflowProperties) {
-      // Override properties
-      for (Property prop : trxProperties) {
-        // ignore transaction id
-        if (trxP.transactionId().name().getName().equals(prop.getId().getName()))
-          continue;
-        assetManager.setProperty(
-                Property.mk(PropertyId.mk(prop.getId().getMediaPackageId(), p.namespace(), prop.getId().getName()),
-                        prop.getValue()));
-      }
-      // Remove last conflicts
-      query.delete(SNAPSHOT_OWNER, p.lastConflict().target())
-              .where(withOrganization(query).and(query.mediaPackageId(record.getMediaPackageId()))).run();
-      Properties.removeProperties(assetManager, SNAPSHOT_OWNER, securityService.getOrganization().getId(),
-              record.getMediaPackageId(), CA_NAMESPACE);
-      for (Property prop : trxCAProperties) {
-        assetManager.setProperty(
-                Property.mk(PropertyId.mk(prop.getId().getMediaPackageId(), CA_NAMESPACE, prop.getId().getName()),
-                        prop.getValue()));
-      }
-      Properties.removeProperties(assetManager, SNAPSHOT_OWNER, securityService.getOrganization().getId(),
-              record.getMediaPackageId(), WORKFLOW_NAMESPACE);
-      for (Property prop : trxWorkflowProperties) {
-        assetManager.setProperty(
-                Property.mk(PropertyId.mk(prop.getId().getMediaPackageId(), WORKFLOW_NAMESPACE, prop.getId().getName()),
-                        prop.getValue()));
-      }
-    }
-
-    private void cleanupTransaction(AQueryBuilder query, Props p, TrxProps trxP) {
-      // Store the result of all episodes from the same scheduling source that were not part
-      // of the current transaction, to send deletion messages after successful deletion
-      final AResult result = query.select(query.nothing())
-              .where(withOrganization(query).and(p.source().eq(schedulingSource)).and(trxP.transactionId().notExists())
-                      .and(query.version().isLatest()))
-              .run();
-
-      // CERV-905 Delete all episodes from the same scheduling source that were not part
-      // of the current transaction. These are the ones that did not appear in
-      // the third-party data source (e.g. ETH VVZ) anymore.
-      query.delete(SNAPSHOT_OWNER, query.snapshot())
-              .where(withOrganization(query).and(p.source().eq(schedulingSource)).and(trxP.transactionId().notExists()))
-              .run();
-      // CERV-900 Also delete all former versions of events of the current transaction to save storage space
-      query.delete(SNAPSHOT_OWNER, query.snapshot()).where(withOrganization(query).and(trxP.transactionId().eq(id))
-              .and(query.version().isLatest().not()).and(trxP.deleteLatest().eq(true).not())).run();
-      // Also delete latest version of events of the current transaction with a delete latest flag
-      query.delete(SNAPSHOT_OWNER, query.snapshot()).where(withOrganization(query).and(trxP.transactionId().eq(id))
-              .and(query.version().isLatest()).and(trxP.deleteLatest().eq(true))).run();
-      // Delete all event properties with the current scheduling source and without any transaction id
-      query.delete(SNAPSHOT_OWNER,
-              query.propertiesOf(p.namespace(), trxP.namespace(), WORKFLOW_NAMESPACE, TRX_WORKFLOW_NAMESPACE,
-                      CA_NAMESPACE, TRX_CA_NAMESPACE))
-              .where(withOrganization(query).and(p.source().eq(schedulingSource)).and(trxP.transactionId().notExists()))
-              .run();
-      // Remove transaction properties
-      query.delete(SNAPSHOT_OWNER, query.propertiesOf(trxP.namespace(), TRX_WORKFLOW_NAMESPACE, TRX_CA_NAMESPACE))
-              .where(withOrganization(query).and(p.source().eq(schedulingSource)).and(trxP.transactionId().eq(id)))
-              .run();
-      for (ARecord record : result.getRecords()) {
-        messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-                SchedulerItem.delete(record.getMediaPackageId()));
-      }
-    }
-
-    @Override
-    public void rollback() throws NotFoundException, SchedulerException {
-      try {
-        if (!persistence.hasTransaction(schedulingSource)) {
-          throw new NotFoundException("No transaction found with id " + id);
-        }
-      } catch (SchedulerServiceDatabaseException e) {
-        logger.error("Unable to get transaction {}", id);
-        throw new SchedulerException(e);
-      }
-
-      // Remove transaction versions and properties
-      AQueryBuilder query = assetManager.createQuery();
-      TrxProps trxP = new TrxProps(query);
-
-      // Delete the latest version first
-      query.delete(SNAPSHOT_OWNER, query.snapshot()).where(withOrganization(query).and(query.version().isLatest())
-              .and(trxP.source().eq(schedulingSource)).and(trxP.transactionId().exists())).run();
-      // Then delete the properties
-      query.delete(SNAPSHOT_OWNER, query.propertiesOf(trxP.namespace(), TRX_WORKFLOW_NAMESPACE, TRX_CA_NAMESPACE))
-              .where(withOrganization(query).and(trxP.source().eq(schedulingSource)).and(trxP.transactionId().exists()))
-              .run();
-
-      // Delete transaction
-      try {
-        persistence.deleteTransaction(id);
-      } catch (SchedulerServiceDatabaseException e) {
-        logger.error("Unable to delete transaction {}", id);
-        throw new SchedulerException(e);
-      }
-    }
-
-    @Override
-    public int hashCode() {
-      return getId().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (obj instanceof SchedulerTransaction) {
-        return getId().equals(((SchedulerTransaction) obj).getId());
-      }
-      return false;
-    }
-
   }
 
   private static class Props extends PropertySchema {
@@ -2679,22 +1934,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   }
 
-  private static class TrxProps extends Props {
-
-    TrxProps(AQueryBuilder q) {
-      super(q, TRX_NAMESPACE);
-    }
-
-    public PropertyField<String> transactionId() {
-      return stringProp(TRANSACTION_ID_CONFIG);
-    }
-
-    public PropertyField<Boolean> deleteLatest() {
-      return booleanProp(DELETE_LATEST);
-    }
-
-  }
-
   @Override
   public void repopulate(final String indexName) {
     notEmpty(indexName, "indexName");
@@ -2712,7 +1951,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
                       p.reviewStatus().target(), p.recordingStatus().target(),
                       p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
-              .where(query.hasPropertiesOf(p.namespace()).and(withVersion(query)))
+              .where(query.hasPropertiesOf(p.namespace()))
               .run();
       final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
       logger.info(
@@ -2739,7 +1978,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
             Set<String> presenters = getPresenters(
                 record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-            boolean blacklisted = isBlacklisted(record.getMediaPackageId(), start, end, agentId, presenters);
             Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
                     .group(toKey, toValue);
             ReviewStatus reviewStatus = record.getProperties()
@@ -2757,7 +1995,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                     Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
 
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateBlacklist(record.getMediaPackageId(), blacklisted));
+                    SchedulerItem.updateBlacklist(record.getMediaPackageId(), false));
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                     SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
             if (recordingStatus.isSome() && lastHeard.isSome())

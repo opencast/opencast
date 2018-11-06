@@ -35,20 +35,8 @@ import javax.persistence.UniqueConstraint;
 @IdClass(EventIdPK.class)
 @Entity(name = "ExtendedEvent")
 @NamedQueries({
-        // Job queries
         @NamedQuery(name = "ExtendedEvent.findAll", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"),
         @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.organization = :org")
-        // @NamedQuery(name = "ExtendedEvent.countRespones", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewDate IS NOT NULL"),
-        // @NamedQuery(name = "ExtendedEvent.countConfirmed", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewStatus =
-        // org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.CONFIRMED"),
-        // @NamedQuery(name = "ExtendedEvent.countConfirmedByDateRange", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewDate >= :start AND e.reviewDate < :end AND e.reviewStatus
-        // = org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.CONFIRMED"),
-        // @NamedQuery(name = "ExtendedEvent.countUnconfirmed", query =
-        // "SELECT COUNT(e) FROM ExtendedEvent e WHERE e.reviewStatus =
-        // org.opencastproject.scheduler.api.SchedulerService$ReviewStatus.UNCONFIRMED")
 })
 @Table(name = "oc_scheduled_extended_event", uniqueConstraints = {
         @UniqueConstraint(columnNames = { "mediapackage_id", "organization" }) })

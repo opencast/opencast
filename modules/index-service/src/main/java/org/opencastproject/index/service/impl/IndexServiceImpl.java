@@ -2159,18 +2159,4 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
 
-  @Override
-  public boolean hasActiveTransaction(String eventId)
-          throws NotFoundException, UnauthorizedException, IndexServiceException {
-    try {
-      return schedulerService.hasActiveTransaction(eventId);
-    } catch (SchedulerException e) {
-      logger.error("Unable to get active transaction for scheduled event {} because {}", eventId, getStackTrace(e));
-      throw new IndexServiceException("Unable to get active transaction for scheduled event " + eventId);
-    } catch (NotFoundException e) {
-      logger.trace("The event was not found by the scheduler so it can't be in an active transaction.");
-      return false;
-    }
-  }
-
 }

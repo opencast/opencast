@@ -27,15 +27,12 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.Prelude;
-
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -84,85 +81,6 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(1, dates.size());
     lastModified = dates.get(agentId);
     Assert.assertTrue(lastModified.after(now));
-  }
-
-  @Test
-  public void testTransactions() throws Exception {
-    String id = "uuid";
-    String source = "source";
-
-    try {
-      schedulerDatabase.getTransactionId(source);
-      Assert.fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedulerDatabase.getTransactionSource(id);
-      Assert.fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedulerDatabase.getTransactionLastModified(id);
-      Assert.fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    Assert.assertFalse(schedulerDatabase.hasTransaction(source));
-
-    schedulerDatabase.storeTransaction(id, source);
-
-    Assert.assertTrue(schedulerDatabase.hasTransaction(source));
-
-    try {
-      Assert.assertEquals(id, schedulerDatabase.getTransactionId(source));
-    } catch (NotFoundException e) {
-      Assert.fail();
-    }
-
-    try {
-      Assert.assertEquals(source, schedulerDatabase.getTransactionSource(id));
-    } catch (NotFoundException e) {
-      Assert.fail();
-    }
-
-    Prelude.sleep(500L);
-
-    Date now = new Date();
-
-    try {
-      Date date = schedulerDatabase.getTransactionLastModified(id);
-      Assert.assertTrue(now.after(date));
-    } catch (NotFoundException e) {
-      Assert.fail();
-    }
-
-    Prelude.sleep(500L);
-
-    schedulerDatabase.storeTransaction(id, source);
-
-    try {
-      Date date = schedulerDatabase.getTransactionLastModified(id);
-      Assert.assertTrue(now.before(date));
-    } catch (NotFoundException e) {
-      Assert.fail();
-    }
-
-    List<String> transactions = schedulerDatabase.getTransactions();
-    Assert.assertEquals(1, transactions.size());
-
-    try {
-      schedulerDatabase.deleteTransaction(id);
-    } catch (NotFoundException e) {
-      Assert.fail();
-    }
-
-    transactions = schedulerDatabase.getTransactions();
-    Assert.assertEquals(0, transactions.size());
   }
 
 }

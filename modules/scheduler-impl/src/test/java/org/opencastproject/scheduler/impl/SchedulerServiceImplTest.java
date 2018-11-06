@@ -108,8 +108,6 @@ import org.opencastproject.scheduler.api.SchedulerEvent;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
-import org.opencastproject.scheduler.api.SchedulerService.SchedulerTransaction;
-import org.opencastproject.scheduler.api.SchedulerTransactionLockException;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
@@ -365,7 +363,6 @@ public class SchedulerServiceImplTest {
 
   @After
   public void tearDown() throws Exception {
-    schedSvc.cleanupTransactions();
     workspace.clean();
   }
 
@@ -590,751 +587,6 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void testTransactionCommit() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    try {
-      schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<Boolean> none(),
-              Opt.some("new"), "new");
-    } catch (SchedulerTransactionLockException e) {
-      fail("Transaction create lock not working!");
-    }
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(2, result.getSize());
-
-    trx.commit();
-
-    query = assetManager.createQuery();
-    result = query.select(query.snapshot(), query.properties())
-            .where(query.organizationId().eq(new DefaultOrganization().getId())
-                    .and(query.mediaPackageId(mp.getIdentifier().compact()))
-                    .and(query.hasPropertiesOf(SchedulerServiceImpl.TRX_NAMESPACE).not()))
-            .run();
-    assertEquals(1, result.getSize());
-    ARecord record = result.getRecords().head2();
-    assertEquals(VersionImpl.mk(1), record.getSnapshot().get().getVersion());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-      fail("Deleted transaction found!");
-    } catch (NotFoundException e) {
-      assertNotNull(e);
-    }
-  }
-
-  @Test
-  public void testTransactionCommitCleanup() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-    MediaPackage mp2 = generateEvent(Opt.<String> none());
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query.select(query.snapshot(), query.properties())
-            .where(query.organizationId().eq(new DefaultOrganization().getId()).and(query.version().isLatest())).run();
-    assertEquals(1, result.getSize());
-
-    trx.commit();
-
-    query = assetManager.createQuery();
-    result = query.select(query.snapshot(), query.properties())
-            .where(query.organizationId().eq(new DefaultOrganization().getId()).and(query.version().isLatest())).run();
-    assertEquals(1, result.getSize());
-
-    trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-    trx.addEvent(start, end, captureDeviceID, userIds, mp2, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    query = assetManager.createQuery();
-    result = query.select(query.snapshot(), query.properties())
-            .where(query.organizationId().eq(new DefaultOrganization().getId()).and(query.version().isLatest())).run();
-    assertEquals(2, result.getSize());
-
-    trx.commit();
-
-    query = assetManager.createQuery();
-    result = query.select(query.snapshot(), query.properties())
-            .where(query.organizationId().eq(new DefaultOrganization().getId()).and(query.version().isLatest())).run();
-    assertEquals(1, result.getSize());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-      fail("Deleted transaction found!");
-    } catch (NotFoundException e) {
-      assertNotNull(e);
-    }
-  }
-
-  @Test
-  public void testTransactionCommitCollision() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    MediaPackage mp2 = generateEvent(Opt.<String> none());
-    try {
-      schedSvc.addEvent(start, end, captureDeviceID, userIds, mp2, wfPropertiesUpdated, caProperties, Opt.some(false),
-              Opt.some("existing"), SchedulerService.ORIGIN);
-    } catch (SchedulerTransactionLockException e) {
-      fail("Transaction create lock not working!");
-    }
-
-    /* Test transaction collision of already existing event and new transaction event */
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    Opt<ARecord> record = result.getRecords().head();
-    assertFalse(record.isSome());
-
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.some(false));
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    try {
-      trx.commit();
-      fail("Pre-conflict detection not working!");
-    } catch (SchedulerConflictException e) {
-      assertNotNull(e);
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-    } catch (NotFoundException e) {
-      fail("Transaction found!");
-    }
-
-    /* Test transaction collision of already existing event and new opted out transaction event */
-
-    MediaPackage mp4 = (MediaPackage) mp.clone();
-    mp4.setIdentifier(new IdImpl("newuuid"));
-
-    SchedulerTransaction trx2 = schedSvc.createTransaction("optedout");
-    assertEquals("optedout", trx2.getSource());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp4.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertFalse(record.isSome());
-
-    trx2.addEvent(start, end, captureDeviceID, userIds, mp4, wfPropertiesUpdated, caProperties, Opt.some(true));
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp4.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    try {
-      trx2.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    /* Test transaction collision of two transaction events */
-
-    schedSvc.removeEvent(mp2.getIdentifier().compact());
-
-    MediaPackage mp3 = generateEvent(Opt.<String> none());
-    trx.addEvent(start, end, captureDeviceID, userIds, mp3, wfPropertiesUpdated, caProperties, Opt.some(false));
-
-    try {
-      trx.commit();
-      fail("Pre-conflict detection not working!");
-    } catch (SchedulerConflictException e) {
-      assertNotNull(e);
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-    } catch (NotFoundException e) {
-      fail("Transaction found!");
-    }
-
-    /* Test transaction collision of two transaction events but one opted out */
-
-    MediaPackage mp5 = (MediaPackage) mp.clone();
-    mp5.setIdentifier(new IdImpl("newuuid2"));
-
-    SchedulerTransaction trx3 = schedSvc.createTransaction("optedout2");
-    assertEquals("optedout2", trx3.getSource());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp5.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertFalse(record.isSome());
-
-    trx3.addEvent(start, end, captureDeviceID, userIds, mp5, wfPropertiesUpdated, caProperties, Opt.some(false));
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp5.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    MediaPackage mp6 = generateEvent(Opt.<String> none());
-    trx.addEvent(start, end, captureDeviceID, userIds, mp6, wfPropertiesUpdated, caProperties, Opt.some(true));
-
-    try {
-      trx3.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-  }
-
-  @Test
-  public void testTransactionCommitConflict() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog extendedEvent = generateExtendedEvent(Opt.<String> none(), "extended");
-    addDublinCore(Opt.<String> none(), mp, extendedEvent);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    addAcl(Opt.<String> none(), mp, acl);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<Boolean> none());
-
-    try {
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    Opt<ARecord> record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(0), record.get().getSnapshot().get().getVersion());
-
-    schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-            Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)), SchedulerService.ORIGIN);
-
-    // Update with same checksum
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.some(true));
-
-    try {
-      // works because of same checksum
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(1), record.get().getSnapshot().get().getVersion());
-    assertTrue(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals("new", record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    // Update with different checksum
-    schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-            Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)), SchedulerService.ORIGIN);
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(1), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertTrue(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("checksum")).isSome());
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals(SchedulerService.ORIGIN, record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.some(true));
-
-    try {
-      // creates conflict
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(1), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertTrue(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("last_conflict")).isSome());
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals(SchedulerService.ORIGIN, record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    // Commit again with no changes
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.some(true));
-
-    try {
-      // ignores conflict
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(1), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertTrue(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("last_conflict")).isSome());
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals(SchedulerService.ORIGIN, record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    // Commit again with changes
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, "newdevice", userIds, mp, wfProperties, caProperties, Opt.some(true));
-
-    try {
-      // override from existing
-      // creates new conflict
-      testConflictHandler.setStrategy(Strategy.OLD);
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(1), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertTrue(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("last_conflict")).isSome());
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals("demo",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("agent")));
-    assertEquals(SchedulerService.ORIGIN, record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    // Commit again with new changes
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, "newdevice", userIds, mp, wfProperties, caProperties, Opt.some(false));
-
-    try {
-      // override from transaction
-      testConflictHandler.setStrategy(Strategy.NEW);
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(5), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("last_conflict")).isSome());
-    assertEquals("newdevice",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("agent")));
-    assertEquals("new",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals("new", record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-
-    // Commit again with new changes
-    trx = schedSvc.createTransaction("new2");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.some(true));
-
-    try {
-      // merge opt out only and keep agent id
-      testConflictHandler.setStrategy(Strategy.MERGED);
-      trx.commit();
-    } catch (SchedulerConflictException e) {
-      fail("Pre-conflict detection not working!");
-    }
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-    assertEquals(new VersionImpl(7), record.get().getSnapshot().get().getVersion());
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getBoolean("optout")));
-    assertFalse(record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getStringOpt("last_conflict")).isSome());
-    assertEquals(captureDeviceID,
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("agent")));
-    assertEquals("new2",
-            record.get().getProperties().apply(org.opencastproject.assetmanager.api.fn.Properties.getString("source")));
-    assertEquals("new2", record.get().getProperties()
-            .apply(org.opencastproject.assetmanager.api.fn.Properties.getString("last_modified_origin")));
-  }
-
-  @Test
-  public void testTransactionRollback() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    try {
-      schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties,
-              Opt.<Boolean> none(), Opt.some(SchedulerService.ORIGIN), SchedulerService.ORIGIN);
-    } catch (SchedulerTransactionLockException e) {
-      fail("Unable to add event!");
-    }
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(2, result.getSize());
-
-    trx.rollback();
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(1, result.getSize());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-      fail("Deleted transaction found!");
-    } catch (NotFoundException e) {
-      assertNotNull(e);
-    }
-
-    trx = schedSvc.createTransaction("new");
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    assertEquals(2, result.getSize());
-    assertEquals(new VersionImpl(2), result.getRecords().tail().head2().getSnapshot().get().getVersion());
-    assertEquals(new VersionImpl(0), result.getRecords().head2().getSnapshot().get().getVersion());
-
-    try {
-      schedSvc.getMediaPackage(mp.getIdentifier().compact());
-    } catch (NotFoundException e) {
-      fail("Detection of second last element doesn't work!");
-    }
-  }
-
-  @Test
-  public void testTransactionCleanup() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    Opt<ARecord> record = result.getRecords().head();
-    assertFalse(record.isSome());
-
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertTrue(record.isSome());
-
-    schedSvc.transactionOffsetMillis = 0;
-    schedSvc.cleanupTransactions();
-
-    query = assetManager.createQuery();
-    result = query
-            .select(query.snapshot(), query.properties()).where(query.organizationId()
-                    .eq(new DefaultOrganization().getId()).and(query.mediaPackageId(mp.getIdentifier().compact())))
-            .run();
-    record = result.getRecords().head();
-    assertFalse(record.isSome());
-
-    try {
-      schedSvc.getTransaction(trx.getId());
-      fail("Deleted transaction found!");
-    } catch (NotFoundException e) {
-      assertNotNull(e);
-    }
-  }
-
-  @Test
-  public void testTransactionConflicts() throws Exception {
-    Date start = new Date();
-    Date end = new Date(System.currentTimeMillis() + 60000);
-    String captureDeviceID = "demo";
-    String seriesId = "series1";
-    Set<String> userIds = new HashSet<>();
-    userIds.add("user1");
-    userIds.add("user2");
-    MediaPackage mp = generateEvent(Opt.<String> none());
-    mp.setSeries(seriesId);
-    DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    Map<String, String> caProperties = generateCaptureAgentMetadata("demo");
-
-    try {
-      schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties,
-              Opt.<Boolean> none(), Opt.some("new"), SchedulerService.ORIGIN);
-    } catch (SchedulerTransactionLockException e) {
-      fail("Transaction create lock not working!");
-    }
-
-    Assert.assertFalse(schedSvc.hasActiveTransaction(mp.getIdentifier().compact()));
-
-    SchedulerTransaction trx = schedSvc.createTransaction("new");
-    assertEquals("new", trx.getSource());
-
-    SchedulerTransaction trx2 = schedSvc.createTransaction("new2");
-    assertEquals("new2", trx2.getSource());
-
-    try {
-      schedSvc.createTransaction("new");
-      fail("Duplicated transaction created!");
-    } catch (SchedulerConflictException e) {
-      assertNotNull(e);
-    }
-
-    try {
-      schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-              Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-              Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)), SchedulerService.ORIGIN);
-      fail("Transaction update lock not working!");
-    } catch (SchedulerTransactionLockException e) {
-      assertNotNull(e);
-    }
-
-    try {
-      schedSvc.removeEvent(mp.getIdentifier().compact());
-      fail("Transaction delete lock not working!");
-    } catch (SchedulerTransactionLockException e) {
-      assertNotNull(e);
-    }
-
-    try {
-      MediaPackage mp2 = generateEvent(Opt.<String> none());
-      schedSvc.addEvent(start, end, captureDeviceID, userIds, mp2, wfPropertiesUpdated, caProperties,
-              Opt.<Boolean> none(), Opt.some("new"), SchedulerService.ORIGIN);
-      fail("Transaction create lock not working!");
-    } catch (SchedulerTransactionLockException e) {
-      assertNotNull(e);
-    }
-
-    SchedulerTransaction trx3 = schedSvc.getTransaction(trx.getId());
-    assertEquals(trx, trx3);
-
-    mp = generateEvent(Opt.<String> none());
-    event = generateEvent(captureDeviceID, new Date(), end);
-    addDublinCore(Opt.<String> none(), mp, event);
-    trx.addEvent(start, end, captureDeviceID, userIds, mp, wfPropertiesUpdated, caProperties, Opt.<Boolean> none());
-
-    Assert.assertTrue(schedSvc.hasActiveTransaction(mp.getIdentifier().compact()));
-
-    trx.commit();
-
-    Assert.assertFalse(schedSvc.hasActiveTransaction(mp.getIdentifier().compact()));
-
-    try {
-      MediaPackage mp2 = generateEvent(Opt.<String> none());
-      Date startDate = new Date(System.currentTimeMillis() + 600000);
-      Date endDate = new Date(System.currentTimeMillis() + 660000);
-      schedSvc.addEvent(startDate, endDate, captureDeviceID, userIds, mp2, wfPropertiesUpdated, caProperties,
-              Opt.<Boolean> none(), Opt.some("new"), SchedulerService.ORIGIN);
-    } catch (SchedulerTransactionLockException e) {
-      fail("Transaction create lock not working!");
-    }
-  }
-
-  @Test
   public void testReviewStatus() throws Exception {
     String mediapackageId = "id";
     try {
@@ -1523,18 +775,12 @@ public class SchedulerServiceImplTest {
     checkEvent(mediaPackage.getIdentifier().compact(), initalCaProps, initialTitle);
 
     Assert.assertFalse(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
-    Assert.assertFalse(schedSvc.isBlacklisted(mediaPackage.getIdentifier().compact()));
 
     // do opt out update
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
             Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)), SchedulerService.ORIGIN);
     Assert.assertTrue(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
-
-    // TODO blacklist
-    // // do blacklist update
-    // schedSvc.updateBlacklist(null);
-    // Assert.assertTrue(schedSvc.isBlacklisted(mediaPackage.getIdentifier().compact()));
   }
 
   @Test
@@ -1750,13 +996,6 @@ public class SchedulerServiceImplTest {
 
     try {
       schedSvc.isOptOut(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.isBlacklisted(mediaPackageId);
       fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
@@ -2129,40 +1368,30 @@ public class SchedulerServiceImplTest {
   }
 
   /**
-   * Test that opted out and blacklisted events don't end up in the calendar but regular events do.
+   * Test that opted out events don't end up in the calendar but regular events do.
    *
    * @throws Exception
    */
   @Test
-  public void testGetCalendarInputRegularOptedOutBlacklistedExpectsOnlyRegularEvents() throws Exception {
+  public void testGetCalendarInputRegularOptedOutExpectsOnlyRegularEvents() throws Exception {
     int optedOutCount = 3;
-    int blacklistedCount = 5;
     int bothCount = 7;
     int regularCount = 9;
     String optedOutPrefix = "OptedOut";
-    String blacklistedPrefix = "Blacklisted";
     String bothPrefix = "Both";
     String regularPrefix = "Regular";
 
-    List<String> optedOutEvents = createEvents(optedOutPrefix, "DeviceA", optedOutCount, schedSvc, true, false);
+    List<String> optedOutEvents = createEvents(optedOutPrefix, "DeviceA", optedOutCount, schedSvc, true);
     assertEquals(optedOutCount, optedOutEvents.size());
-    List<String> blacklistedEvents = createEvents(blacklistedPrefix, "DeviceB", blacklistedCount, schedSvc, false,
-            true);
-    assertEquals(blacklistedCount, blacklistedEvents.size());
-    List<String> bothOptedOutEventsAndBlacklisted = createEvents(bothPrefix, "DeviceC", bothCount, schedSvc, true,
-            true);
-    assertEquals(bothCount, bothOptedOutEventsAndBlacklisted.size());
-    List<String> regularEvents = createEvents(regularPrefix, "DeviceD", regularCount, schedSvc, false, false);
+    List<String> regularEvents = createEvents(regularPrefix, "DeviceD", regularCount, schedSvc, false);
     assertEquals(regularCount, regularEvents.size());
 
-    checkEventStatus(schedSvc, optedOutEvents, true, false);
-    checkEventStatus(schedSvc, blacklistedEvents, false, true);
-    checkEventStatus(schedSvc, bothOptedOutEventsAndBlacklisted, true, true);
-    checkEventStatus(schedSvc, regularEvents, false, false);
+    checkEventStatus(schedSvc, optedOutEvents, true);
+    checkEventStatus(schedSvc, regularEvents, false);
 
     String calendar = schedSvc.getCalendar(Opt.<String> none(), Opt.<String> none(), Opt.<Date> none());
 
-    assertEquals("All of the regular events should be in the calendar.", regularCount + blacklistedCount,
+    assertEquals("All of the regular events should be in the calendar.", regularCount,
             getCountFromString("BEGIN:VEVENT", calendar));
   }
 
@@ -2284,7 +1513,7 @@ public class SchedulerServiceImplTest {
     for (User user : usersList) {
       currentUser = user;
       currentOrg = user.getOrganization();
-      createEvents("Event", "ca_" + currentOrg.getId(), 1, schedSvc, false, false);
+      createEvents("Event", "ca_" + currentOrg.getId(), 1, schedSvc, false);
     }
     currentUser = usersList.get(0);
     currentOrg = currentUser.getOrganization();
@@ -2359,16 +1588,15 @@ public class SchedulerServiceImplTest {
     return count;
   }
 
-  private void checkEventStatus(SchedulerService schedulerService, List<String> events, boolean optedOut,
-          boolean blacklisted) throws NotFoundException, SchedulerException, UnauthorizedException {
+  private void checkEventStatus(SchedulerService schedulerService, List<String> events, boolean optedOut)
+      throws NotFoundException, SchedulerException, UnauthorizedException {
     for (String eventId : events) {
       assertEquals(optedOut, schedulerService.isOptOut(eventId));
-      assertEquals(false, schedulerService.isBlacklisted(eventId)); // TODO blacklist = blacklisted
     }
   }
 
   private List<String> createEvents(String titlePrefix, String agent, int number, SchedulerService schedulerService,
-          boolean optedout, boolean blacklisted) throws Exception {
+          boolean optedout) throws Exception {
     List<String> events = new ArrayList<>();
     long offset = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
@@ -2381,8 +1609,6 @@ public class SchedulerServiceImplTest {
       addDublinCore(Opt.<String> none(), mp, event);
       schedulerService.addEvent(startDateTime, endDateTime, agent, Collections.<String> emptySet(), mp, wfProperties,
               Collections.<String, String> emptyMap(), Opt.nul(optedout), Opt.<String> none(), SchedulerService.ORIGIN);
-      // TODO blacklisted
-      // schedulerServiceImpl.updateBlacklist(null);
       events.add(mp.getIdentifier().compact());
     }
     return events;

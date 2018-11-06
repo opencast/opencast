@@ -57,147 +57,6 @@ public interface SchedulerService {
     UNSENT, UNCONFIRMED, CONFIRMED
   }
 
-  interface SchedulerTransaction {
-
-    /**
-     * Returns the transaction identifier
-     *
-     * @return the transaction identifier
-     */
-    String getId();
-
-    /**
-     * Returns the scheduling source
-     *
-     * @return the scheduling source
-     */
-    String getSource();
-
-    /**
-     * Creates new event using specified mediapackage, workflow configuration and capture agent configuration. The
-     * mediapackage id is used as the event's identifier.
-     *
-     * Default capture agent properties are created from agentId and DublinCore. Following values are generated:
-     * <ul>
-     * <li>event.title (mapped from dc:title)</li>
-     * <li>event.series (mapped from mediaPackage#getSeries())</li>
-     * <li>event.location (mapped from captureAgentId)</li>
-     * </ul>
-     *
-     * @param startDateTime
-     *          the event start time
-     * @param endDateTime
-     *          the event end time
-     * @param captureAgentId
-     *          the capture agent id
-     * @param userIds
-     *          the list of user identifiers of speakers/lecturers
-     * @param mediaPackage
-     *          the mediapackage
-     * @param wfProperties
-     *          the workflow configuration
-     * @param caMetadata
-     *          the capture agent configuration
-     * @param optOut
-     *          the optional opt out status
-     * @throws NotFoundException
-     *           if the scheduler transaction cannot be found anymore
-     * @throws UnauthorizedException
-     *           if the caller is not authorized to take this action
-     * @throws SchedulerException
-     *           if creating new events failed
-     */
-    void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
-            MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-            Opt<Boolean> optOut) throws NotFoundException, UnauthorizedException, SchedulerException;
-
-    /**
-     * Commit the current scheduler transaction, writing any unflushed changes to the persistence layer.
-     *
-     * @throws NotFoundException
-     *           if the scheduler transaction cannot be found anymore
-     * @throws UnauthorizedException
-     *           if the caller is not authorized to take this action
-     * @throws SchedulerConflictException
-     *           if there are conflicting events
-     * @throws SchedulerException
-     *           if committing the transaction failed
-     */
-    void commit() throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
-
-    /**
-     * Roll back the current scheduler transaction.
-     *
-     * @throws NotFoundException
-     *           if the scheduler transaction cannot be found anymore
-     * @throws UnauthorizedException
-     *           if the caller is not authorized to take this action
-     * @throws SchedulerException
-     *           if rolling back the transaction failed
-     */
-    void rollback() throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  }
-
-  /**
-   * Returns the scheduling transaction from the given identifier.
-   *
-   * @param id
-   *          the transaction identifier
-   * @return the scheduler transaction
-   * @throws NotFoundException
-   *           if scheduler transaction with specified ID cannot be found
-   * @throws SchedulerException
-   *           if getting scheduler transaction failed
-   */
-  SchedulerTransaction getTransaction(String id) throws NotFoundException, SchedulerException;
-
-  /**
-   * Returns the scheduling transaction from the given source.
-   *
-   * @param schedulingSource
-   *          The scheduling source
-   * @return the scheduler transaction
-   * @throws NotFoundException
-   *           if scheduler transaction with specified source cannot be found
-   * @throws SchedulerException
-   *           if getting scheduler transaction failed
-   */
-  SchedulerTransaction getTransactionBySource(String schedulingSource) throws NotFoundException, SchedulerException;
-
-  /**
-   * Returns whether the given event has an active transaction or not
-   *
-   * @param mediaPackageId
-   *          the event identifier
-   * @return whether the event has an active transaction <code>true</code> or not <code>false</code>
-   */
-  boolean hasActiveTransaction(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException;
-
-  /**
-   * Starts a scheduling transaction on the given scheduling source.
-   *
-   * @param schedulingSource
-   *          the scheduling source
-   * @return the scheduler transaction
-   * @throws UnauthorizedException
-   *           if the caller is not authorized to take this action
-   * @throws SchedulerConflictException
-   *           if the transaction already exists
-   * @throws SchedulerException
-   *           if creating new scheduler transaction failed
-   */
-  SchedulerTransaction createTransaction(String schedulingSource)
-          throws UnauthorizedException, SchedulerConflictException, SchedulerException;
-
-  /**
-   * Cleanup outdated transactions.
-   *
-   * @throws SchedulerException
-   *           if cleaning up transactions failed
-   */
-  void cleanupTransactions() throws UnauthorizedException, SchedulerException;
 
   /**
    * Creates new event using specified mediapackage, workflow configuration and capture agent configuration. The
@@ -234,15 +93,13 @@ public interface SchedulerService {
    *           if the caller is not authorized to take this action
    * @throws SchedulerConflictException
    *           if there are conflicting events
-   * @throws SchedulerTransactionLockException
-   *           if there is a conflict with an open transaction
    * @throws SchedulerException
    *           if creating new events failed
    */
   void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
           Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin) throws UnauthorizedException,
-                  SchedulerConflictException, SchedulerTransactionLockException, SchedulerException;
+                  SchedulerConflictException, SchedulerException;
 
   /**
    * Creates a group of new event using specified mediapackage, workflow configuration and capture agent configuration.
@@ -286,16 +143,13 @@ public interface SchedulerService {
    *           if the caller is not authorized to take this action
    * @throws SchedulerConflictException
    *           if there are conflicting events
-   * @throws SchedulerTransactionLockException
-   *           if there is a conflict with an open transaction
    * @throws SchedulerException
    *           if creating new events failed
    */
   Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String,
           String> wfProperties, Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource,
-          String modificationOrigin) throws UnauthorizedException,
-          SchedulerConflictException, SchedulerTransactionLockException, SchedulerException;
+          String modificationOrigin) throws UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Updates event with specified ID.
@@ -333,16 +187,13 @@ public interface SchedulerService {
    *           if the current user is not authorized to perform this action
    * @throws SchedulerConflictException
    *           if there are conflicting events
-   * @throws SchedulerTransactionLockException
-   *           if there is a conflict with an open transaction
    * @throws SchedulerException
    *           if exception occurred
    */
   void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
           Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut, String modificationOrigin)
-                  throws NotFoundException, UnauthorizedException, SchedulerConflictException,
-                  SchedulerTransactionLockException, SchedulerException;
+                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Removes event with specified ID.
@@ -353,13 +204,11 @@ public interface SchedulerService {
    *           if event with specified ID cannot be found
    * @throws UnauthorizedException
    *           if the current user is not authorized to perform this action
-   * @throws SchedulerTransactionLockException
-   *           if there is a conflict with an open transaction
    * @throws SchedulerException
    *           if exception occurred
    */
   void removeEvent(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerTransactionLockException, SchedulerException;
+          throws NotFoundException, UnauthorizedException, SchedulerException;
 
   /**
    * Retrieves mediapackage associated with specified event ID.
@@ -568,22 +417,6 @@ public interface SchedulerService {
   List<MediaPackage> findConflictingEvents(String captureAgentId, RRule rrule, Date startDate, Date endDate,
           long duration, TimeZone timezone) throws UnauthorizedException, SchedulerException;
 
-  /**
-   * PM
-   */
-
-  /**
-   * Returns the blacklist status of an event with the given mediapackage id
-   *
-   * @param mediaPackageId
-   *          ID of event for which blacklist status will be retrieved
-   * @return the blacklist status
-   * @throws NotFoundException
-   *           if event with specified ID cannot be found
-   * @throws SchedulerException
-   *           if exception occurred
-   */
-  boolean isBlacklisted(String mediaPackageId) throws NotFoundException, UnauthorizedException, SchedulerException;
 
   /**
    * CA

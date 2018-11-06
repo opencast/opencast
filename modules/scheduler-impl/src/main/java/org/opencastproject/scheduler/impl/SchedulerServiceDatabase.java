@@ -21,12 +21,9 @@
 
 package org.opencastproject.scheduler.impl;
 
-import org.opencastproject.scheduler.api.Blacklist;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -66,86 +63,6 @@ public interface SchedulerServiceDatabase {
    */
   Map<String, Date> getLastModifiedDates() throws SchedulerServiceDatabaseException;
 
-  /**
-   * Get a {@link List} of active transaction identifiers.
-   *
-   * @return a list of active transaction identifiers
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  List<String> getTransactions() throws SchedulerServiceDatabaseException;
-
-  /**
-   * Get the transaction identifier by the source
-   *
-   * @param source
-   *          the source
-   * @return the transaction identifier
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  String getTransactionId(String source) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Get the transaction source by the identifier
-   *
-   * @param id
-   *          the transaction identifier
-   * @return the source
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  String getTransactionSource(String id) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Get the transaction last modified date by the transaction identifier
-   *
-   * @param id
-   *          the transaction identifier
-   * @return the transaction last modified date
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  Date getTransactionLastModified(String id) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  /**
-   * Returns whether the source has an active transaction or not
-   *
-   * @param source
-   *          the source
-   * @return whether the source has an active transaction <code>true</code> or not <code>false</code>
-   */
-  boolean hasTransaction(String source) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Stores the given transaction
-   *
-   * @param id
-   *          the transaction identifier
-   * @param source
-   *          the transaction source
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void storeTransaction(String id, String source) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Delete the transaction by the given identifier
-   *
-   * @param id
-   *          the transaction identifier
-   * @throws NotFoundException
-   *           if the transaction could not be found
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  void deleteTransaction(String id) throws NotFoundException, SchedulerServiceDatabaseException;
 
   /**
    * Removes the extended event from persistent storage.
@@ -158,38 +75,5 @@ public interface SchedulerServiceDatabase {
    *           if exception occurred
    */
   void deleteEvent(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
-
-  // TODO
-  List<Tuple<String, Boolean>> updateBlacklist(Blacklist blacklist) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the blacklist status of the agent with the given ID
-   *
-   * @param agentId
-   *          the agent identifier
-   * @param start
-   *          the start date
-   * @param end
-   *          the end date
-   * @return the blacklist status
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  boolean isBlacklisted(String agentId, Date start, Date end) throws SchedulerServiceDatabaseException;
-
-  /**
-   * Returns the blacklist status of the given presenters
-   *
-   * @param presenters
-   *          the list of presenters
-   * @param start
-   *          the start date
-   * @param end
-   *          the end date
-   * @return the blacklist status
-   * @throws SchedulerServiceDatabaseException
-   *           if exception occurred
-   */
-  boolean isBlacklisted(List<String> presenters, Date start, Date end) throws SchedulerServiceDatabaseException;
 
 }
