@@ -38,8 +38,7 @@ angular.module('adminNg.controllers')
         label: 'CONFIGURATION.EMAIL_TEMPLATES.TABLE.CREATED'
       }, {
         template: 'modules/configuration/partials/emailtemplateActionsCell.html',
-        label:    'CONFIGURATION.EMAIL_TEMPLATES.TABLE.ACTION',
-        dontSort: true
+        label:    'CONFIGURATION.EMAIL_TEMPLATES.TABLE.ACTION'
       }],
       caption:    'CONFIGURATION.EMAIL_TEMPLATES.TABLE.CAPTION',
       resource:   'emailtemplates',

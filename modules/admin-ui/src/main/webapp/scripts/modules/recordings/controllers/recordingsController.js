@@ -31,14 +31,17 @@ angular.module('adminNg.controllers')
         name:  'status',
         template: 'modules/recordings/partials/recordingStatusCell.html',
         label: 'RECORDINGS.RECORDINGS.TABLE.STATUS',
-        translate: true
+        translate: true,
+        sortable: true
       }, {
         template: 'modules/recordings/partials/recordingsNameCell.html',
         name:  'name',
-        label: 'RECORDINGS.RECORDINGS.TABLE.NAME'
+        label: 'RECORDINGS.RECORDINGS.TABLE.NAME',
+        sortable: true
       }, {
         name:  'updated',
-        label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED'
+        label: 'RECORDINGS.RECORDINGS.TABLE.UPDATED',
+        sortable: true
         //}, {
         //    name:  'blacklist_from',
         //    label: 'USERS.USERS.TABLE.BLACKLIST_FROM'
@@ -47,8 +50,7 @@ angular.module('adminNg.controllers')
         //    label: 'USERS.USERS.TABLE.BLACKLIST_TO'
       }, {
         template: 'modules/recordings/partials/recordingActionsCell.html',
-        label:    'RECORDINGS.RECORDINGS.TABLE.ACTION',
-        dontSort: true
+        label:    'RECORDINGS.RECORDINGS.TABLE.ACTION'
       }],
       caption:    'RECORDINGS.RECORDINGS.TABLE.CAPTION',
       resource:   'recordings',

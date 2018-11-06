@@ -16,11 +16,11 @@
           ng-repeat="column in table.columns"
           ng-style="column.style"
           ng-if="!column.deactivated"
-          ng-class="{ 'col-sort': table.predicate === column.name, 'no-sort': column.dontSort }"
+          ng-class="{ 'col-sort': table.predicate === column.name, 'sortable': column.sortable }"
           ng-click="table.sortBy(column)">
         <span>
           {{ column.label | translate }}
-          <i ng-if="!column.dontSort"
+          <i ng-if="column.sortable"
              class="sort"
              ng-class="{ asc: table.predicate === column.name && !table.reverse, desc: table.predicate === column.name && table.reverse }"></i>
         </span>

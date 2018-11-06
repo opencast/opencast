@@ -26,33 +26,40 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'id',
-        label: 'SYSTEMS.JOBS.TABLE.ID'
+        label: 'SYSTEMS.JOBS.TABLE.ID',
+        sortable: true
       }, {
         name:  'status',
         label: 'SYSTEMS.JOBS.TABLE.STATUS',
-        translate: true
+        translate: true,
+        sortable: true
       }, {
         name:  'operation',
-        label: 'SYSTEMS.JOBS.TABLE.OPERATION'
+        label: 'SYSTEMS.JOBS.TABLE.OPERATION',
+        sortable: true
       }, {
         name:  'type',
-        label: 'SYSTEMS.JOBS.TABLE.TYPE'
+        label: 'SYSTEMS.JOBS.TABLE.TYPE',
+        sortable: true
       }, {
         name:  'processingHost',
-        label: 'SYSTEMS.JOBS.TABLE.HOST_NAME'
+        label: 'SYSTEMS.JOBS.TABLE.HOST_NAME',
+        sortable: true
       }, {
         name:  'submitted',
-        label: 'SYSTEMS.JOBS.TABLE.SUBMITTED'
+        label: 'SYSTEMS.JOBS.TABLE.SUBMITTED',
+        sortable: true
       }, {
         name:  'started',
-        label: 'SYSTEMS.JOBS.TABLE.STARTED'
+        label: 'SYSTEMS.JOBS.TABLE.STARTED',
+        sortable: true
       }, {
         name:  'creator',
-        label: 'SYSTEMS.JOBS.TABLE.CREATOR'
+        label: 'SYSTEMS.JOBS.TABLE.CREATOR',
+        sortable: true
         //}, {
         //    template: 'modules/systems/partials/jobActionsCell.html',
-        //    label:    'SYSTEMS.JOBS.TABLE.ACTION',
-        //    dontSort: true
+        //    label:    'SYSTEMS.JOBS.TABLE.ACTION'
       }],
       caption:    'SYSTEMS.JOBS.TABLE.CAPTION',
       resource:   'jobs',

@@ -222,7 +222,7 @@ angular.module('adminNg.services')
           for (var i = 0; i < me.columns.length; i++) {
             var column = me.columns[i];
 
-            if (!column.dontSort) {
+            if (column.sortable) {
               me.sortBy(column);
               break;
             }
@@ -239,7 +239,7 @@ angular.module('adminNg.services')
 
       this.sortBy = function (column) {
         // Avoid sorting by action column
-        if (angular.isUndefined(column) || column.dontSort) {
+        if (angular.isUndefined(column) || !column.sortable) {
           return;
         }
 
