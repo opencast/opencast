@@ -71,8 +71,8 @@ The relative position within the edited video where the default thumbnail is ext
 
 Opencast will set the following processing settings for the event being edited:
 
-  - `thumbnailType` is set to `0` to indicate that the default thumbnail is used
-  - `thumbnailPosition` is set to the absolute position of the video where the default thumbnail should be extracted
+    - `thumbnailType` is set to `0` to indicate that the default thumbnail is used
+    - `thumbnailPosition` is set to the absolute position of the video where the default thumbnail should be extracted
 
 Snapshot Thumbnail
 ------------------
@@ -93,9 +93,9 @@ In any case, the video editor ensures that the correct source track flavor is us
 
 Opencast will set the following processing settings for the event being edited:
 
-  - `thumbnailType` is set to `1` to indicate that a snapshot thumbnail is used
-  - `thumbnailPosition` is set to the absolute position of the video where the snapshot thumbnail should be extracted
-  - `thumbnailTrack` is set to the type of the flavor of the source track which is `presenter` or `presentation`
+    - `thumbnailType` is set to `1` to indicate that a snapshot thumbnail is used
+    - `thumbnailPosition` is set to the absolute position of the video where the snapshot thumbnail should be extracted
+    - `thumbnailTrack` is set to the type of the flavor of the source track which is `presenter` or `presentation`
     in this example.
 
 Uploaded Thumbnail
@@ -122,7 +122,7 @@ configuration key `source-tags` and/or `source-flavor` appropriately.
 
 Opencast will set the following processing settings for the event being edited:
 
-  - `thumbnailType` is set to `2` to indicate that an uploaded thumbnail is used
+    - `thumbnailType` is set to `2` to indicate that an uploaded thumbnail is used
 
 Automatic Distribution
 ----------------------
