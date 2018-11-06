@@ -2,6 +2,7 @@
   "name": "opencast-lit-tools",
   "private": true,
   "scripts": {
+    "i18n": "./i18n.js",
     "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/resources/",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
