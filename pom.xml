@@ -7,37 +7,37 @@
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
-  <url>http://opencast.org</url>
+  <url>https://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
-    <json-simple.version>1.1.1</json-simple.version>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
-    <eclipselink.version>2.6.4</eclipselink.version>
+
+    <!-- library version specifications -->
+    <aws.version>1.11.49_1</aws.version>
     <commons-collections.version>4.2</commons-collections.version>
     <commons-compress.version>1.18</commons-compress.version>
-    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
-    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
-    <aws.version>1.11.49_1</aws.version>
-    <guava.version>23.0</guava.version>
-    <jmeter.version>2.4</jmeter.version>
-    <osgi.compendium.version>5.0.0</osgi.compendium.version>
-    <osgi.core.version>5.0.0</osgi.core.version>
-    <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.1.6</karaf.version>
-    <pax.web.version>6.0.11</pax.web.version>
     <cxf.version>3.2.6</cxf.version>
-    <jackson.version>2.9.7</jackson.version>
+    <eclipselink.version>2.6.4</eclipselink.version>
     <functional.version>1.4.2</functional.version>
+    <guava.version>23.0</guava.version>
+    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
+    <jackson.version>2.9.7</jackson.version>
     <jdk.version>1.8</jdk.version>
+    <json-simple.version>1.1.1</json-simple.version>
+    <karaf.version>4.1.6</karaf.version>
     <mina.version>2.0.19</mina.version>
     <node.version>v8.12.0</node.version>
     <npm.version>6.4.1</npm.version>
+    <osgi.compendium.version>5.0.0</osgi.compendium.version>
+    <osgi.core.version>5.0.0</osgi.core.version>
+    <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
+    <pax.web.version>6.0.11</pax.web.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
