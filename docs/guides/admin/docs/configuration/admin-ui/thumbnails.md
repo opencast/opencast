@@ -78,7 +78,7 @@ Snapshot Thumbnail
 ------------------
 
 In case the user is not happy with the automatically generated default thumbnail, the user can extract a thumbnail
-at an arbitrary position withhin the video.
+at an arbitrary position within the video.
 
 The snapshot thumbnail will be extracted from tracks identified by the following configuration properties:
 
