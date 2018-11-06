@@ -23,17 +23,13 @@ package org.opencastproject.scheduler.impl;
 import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.assetmanager.api.fn.Properties.getStringOpt;
 import static org.opencastproject.scheduler.api.SchedulerService.ReviewStatus.UNSENT;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.filterByNamespace;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.isNotEpisodeDublinCore;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.toKey;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.toReviewStatus;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.toValue;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Log.getHumanReadableTimeString;
@@ -45,20 +41,12 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
-import org.opencastproject.assetmanager.api.Property;
-import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.fn.ARecords;
-import org.opencastproject.assetmanager.api.fn.Properties;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.assetmanager.api.query.PropertySchema;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.Catalog;
@@ -96,6 +84,7 @@ import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
 import org.opencastproject.scheduler.api.Util;
+import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
@@ -122,6 +111,7 @@ import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.gson.Gson;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.ValidationException;
@@ -146,7 +136,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -160,6 +149,8 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link SchedulerService}.
@@ -184,28 +175,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The workflow configuration prefix */
   public static final String WORKFLOW_CONFIG_PREFIX = "org.opencastproject.workflow.config.";
 
-  /** Namespace keys */
-  private static final String WORKFLOW_NAMESPACE = SchedulerService.JOB_TYPE + ".workflow.configuration";
-  private static final String CA_NAMESPACE = SchedulerService.JOB_TYPE + ".ca.configuration";
-
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
-  /** Configuration keys */
-  private static final String RECORDING_LAST_HEARD_CONFIG = "recording_last_heard";
-  private static final String RECORDING_STATE_CONFIG = "recording_state";
-  private static final String REVIEW_DATE_CONFIG = "review_date";
-  private static final String REVIEW_STATUS_CONFIG = "review_status";
-  private static final String SOURCE_CONFIG = "source";
-  private static final String PRESENTERS_CONFIG = "presenters";
-  private static final String AGENT_CONFIG = "agent";
-  private static final String START_DATE_CONFIG = "start";
-  private static final String END_DATE_CONFIG = "end";
-  private static final String OPTOUT_CONFIG = "optout";
-  private static final String VERSION = "version";
-  private static final String LAST_MODIFIED_ORIGIN = "last_modified_origin";
-  private static final String LAST_MODIFIED_DATE = "last_modified_date";
-  private static final String LAST_CONFLICT = "last_conflict";
-  private static final String CHECKSUM = "checksum";
+  /**
+   * Deserializes properties stored in string columns of the extended event table
+   * @param props Properties as retrieved from the DB
+   * @return deserialized key-value pairs
+   */
+  private static Map<String,String> deserializeExtendedEventProperties(String props) {
+    if (props == null || props.trim().isEmpty()) {
+      return new HashMap<>();
+    }
+    return (Map<String, String>)new Gson().fromJson(props, Map.class);
+  }
 
   /** The last modified cache */
   protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder()
@@ -661,15 +643,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
+
       ASelectQuery select = query
-              .select(query.snapshot(), p.start().target(), p.end().target(),
-                      query.propertiesOf(WORKFLOW_NAMESPACE, CA_NAMESPACE), p.agent().target(), p.source().target(),
-                      p.checksum().target(), p.optOut().target(), p.presenters().target())
+              .select(query.snapshot())
               .where(withOrganization(query).and(query.mediaPackageId(mpId).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace()))));
+                  .and(withOwner(query))));
       Opt<ARecord> optEvent = select.run().getRecords().head();
-      if (optEvent.isNone())
+      Opt<ExtendedEventDto> optExtEvent = persistence.getEvent(mpId);
+      if (optEvent.isNone() || optExtEvent.isNone())
         throw new NotFoundException("No event found while updating event " + mpId);
 
       ARecord record = optEvent.get();
@@ -680,17 +661,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (dublinCoreOpt.isNone())
         throw new NotFoundException("No dublincore found while updating event " + mpId);
 
-      verifyActive(mpId, record);
+      final ExtendedEventDto extendedEventDto = optExtEvent.get();
+      Date start = extendedEventDto.getStartDate();
+      Date end = extendedEventDto.getEndDate();
 
-      Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-      Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
+      verifyActive(mpId, record, end);
 
       if ((startDateTime.isSome() || endDateTime.isSome()) && endDateTime.getOr(end).before(startDateTime.getOr(start)))
         throw new SchedulerException("The end date is before the start date");
 
-      String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
+      String agentId = extendedEventDto.getCaptureAgentId();
       Opt<String> seriesId = Opt.nul(record.getSnapshot().get().getMediaPackage().getSeries());
-      boolean oldOptOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
+      boolean oldOptOut = extendedEventDto.getOptOut();
 
       // Get opt out status
       Opt<Boolean> optOut = Opt.none();
@@ -722,11 +704,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
       }
 
-      Set<String> presenters = getPresenters(record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-      Map<String, String> wfProps = record.getProperties().filter(filterByNamespace._2(WORKFLOW_NAMESPACE)).group(toKey,
-              toValue);
-      Map<String, String> caProperties = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE)).group(toKey,
-              toValue);
+      Set<String> presenters = getPresenters(Opt.nul(extendedEventDto.getPresenters()).getOr(""));
+      Map<String, String> wfProps = deserializeExtendedEventProperties(extendedEventDto.getWorkflowProperties());
+      Map<String, String> caProperties = deserializeExtendedEventProperties(extendedEventDto.getCaptureAgentProperties());
 
       boolean propertiesChanged = false;
       boolean dublinCoreChanged = false;
@@ -783,7 +763,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               some(dublinCore.getOr(dublinCoreOpt.get())), wfProperties.getOr(wfProps),
               finalCaProperties.getOr(caProperties), optOut.getOr(oldOptOut), acl.getOr(new AccessControlList()));
 
-      String oldChecksum = record.getProperties().apply(Properties.getString(CHECKSUM));
+      String oldChecksum = extendedEventDto.getChecksum();
       if (checksum.equals(oldChecksum)) {
         logger.debug("Updated event {} has same checksum, ignore update", mpId);
         return;
@@ -863,24 +843,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  /**
-   * Verifies if existing event is found and has not already ended
-   *
-   * @param record
-   *          the record
-   * @throws SchedulerException
-   *           if event has ended or is not found
-   */
-  private void verifyActive(String eventId, ARecord record) throws SchedulerException {
-    Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-    Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-    if (start == null || end == null) {
+  private void verifyActive(String eventId, ARecord record, Date end) throws SchedulerException {
+    if (end == null) {
       throw new IllegalArgumentException("Start and/or end date for event ID " + eventId + " is not set");
     }
     // TODO: Assumption of no TimeZone adjustment because catalog temporal is local to server
     if (new Date().after(end)) {
-      logger.info("Event ID {} has already ended as its end time was {} and current time is {}", new Object[] { eventId,
-              DateTimeSupport.toUTC(end.getTime()), DateTimeSupport.toUTC(new Date().getTime()) });
+      logger.info("Event ID {} has already ended as its end time was {} and current time is {}", eventId,
+          DateTimeSupport.toUTC(end.getTime()), DateTimeSupport.toUTC(new Date().getTime()));
       throw new SchedulerException("Event ID " + eventId + " has already ended at "
               + DateTimeSupport.toUTC(end.getTime()) + " and now is " + DateTimeSupport.toUTC(new Date().getTime()));
     }
@@ -888,36 +858,24 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public synchronized void removeEvent(String mediaPackageId)
-          throws NotFoundException, UnauthorizedException, SchedulerException {
+          throws NotFoundException, SchedulerException {
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
       // Check if there are properties only from scheduler
       AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(p.agent().target(), p.source().target())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace())))
-              .run();
-      Opt<ARecord> recordOpt = result.getRecords().head();
       long deletedProperties = 0;
-      if (recordOpt.isSome()) {
-        String agentId = recordOpt.get().getProperties().apply(Properties.getString(AGENT_CONFIG));
-
-        // Delete all properties
-        deletedProperties = query.delete(SNAPSHOT_OWNER, query.propertiesOf(p.namespace(), WORKFLOW_NAMESPACE, CA_NAMESPACE))
-                .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
-                .name("delete all properties")
-                .willRemoveWholeMediaPackage(true)
-                .run();
-
+      Opt<ExtendedEventDto> extEvtOpt = persistence.getEvent(mediaPackageId);
+      if (extEvtOpt.isSome()) {
+        String agentId = extEvtOpt.get().getCaptureAgentId();
+        persistence.deleteEvent(mediaPackageId);
         if (StringUtils.isNotEmpty(agentId))
           touchLastEntry(agentId);
       }
 
       // Delete scheduler snapshot
       long deletedSnapshots = query.delete(SNAPSHOT_OWNER, query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query)))
               .name("delete episode")
               .willRemoveWholeMediaPackage(true)
               .run();
@@ -940,13 +898,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      Opt<MediaPackage> mp = getEventMediaPackage(mediaPackageId);
-      if (mp.isNone())
-        throw new NotFoundException();
-
-      return mp.get();
-    } catch (NotFoundException e) {
-      throw e;
+      return getEventMediaPackage(mediaPackageId);
+    } catch (RuntimeNotFoundException e) {
+      throw e.getWrappedException();
     } catch (Exception e) {
       logger.error("Failed to get mediapackage of event '{}': {}", mediaPackageId, getStackTrace(e));
       throw new SchedulerException(e);
@@ -959,10 +913,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
       AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
-                      .and(query.hasPropertiesOf(p.namespace())))
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
+              .and(query.version().isLatest()))
               .run();
       Opt<ARecord> record = result.getRecords().head();
       if (record.isNone())
@@ -987,20 +940,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query
-              .select(p.optOut().target(), p.agent().target(), p.start().target(), p.end().target(),
-                      p.presenters().target(), p.recordingStatus().target(), p.recordingLastHeard().target(),
-                      query.propertiesOf(CA_NAMESPACE), query.propertiesOf(WORKFLOW_NAMESPACE))
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace())))
-              .run();
-      final Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
+      final Opt<ExtendedEventDto> extEvt = persistence.getEvent(mediaPackageId);
+      if (extEvt.isNone())
         throw new NotFoundException();
 
-      return getTechnicalMetadata(record.get(), p);
+      return getTechnicalMetadata(extEvt.get());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1015,10 +959,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
       AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
-                      .and(query.hasPropertiesOf(p.namespace())))
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
+                  .and(query.version().isLatest()))
               .run();
       Opt<ARecord> record = result.getRecords().head();
       if (record.isNone())
@@ -1042,18 +985,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(query.propertiesOf(WORKFLOW_NAMESPACE))
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace())))
-              .run();
-
-      Opt<ARecord> record = result.getRecords().head();
+      Opt<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
       if (record.isNone())
         throw new NotFoundException();
-
-      return record.get().getProperties().group(toKey, toValue);
+      return deserializeExtendedEventProperties(record.get().getWorkflowProperties());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1068,18 +1003,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(query.propertiesOf(CA_NAMESPACE))
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace())))
-              .run();
-
-      Opt<ARecord> record = result.getRecords().head();
+      Opt<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
       if (record.isNone())
         throw new NotFoundException();
-
-      return record.get().getProperties().group(toKey, toValue);
+      return deserializeExtendedEventProperties(record.get().getCaptureAgentProperties());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1093,16 +1020,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      Opt<Property> optOut = query
-              .select(p.optOut().target()).where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
-                      .and(query.version().isLatest()).and(p.optOut().exists()))
-              .run().getRecords().bind(ARecords.getProperties).head();
-      if (optOut.isNone())
+      Opt<ExtendedEventDto> optExtEvt = persistence.getEvent(mediaPackageId);
+      if (optExtEvt.isNone())
         throw new NotFoundException();
 
-      return optOut.get().getValue().get(Value.BOOLEAN);
+      return optExtEvt.get().getOptOut();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1112,111 +1034,65 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  /*
-   * FIXME: This query is unsafe since it may fetch many many rows. It would be better to do conflict checking directly
-   * in the database instead of fetching all scheduled events for the capture agent and then doing the checks in memory.
-   * Unfortunately, the current database schema is not suitable to do this in an efficient manner. Especially the generic
-   * concept of 'properties' would lead to many nested queries.
-   */
-  private ARecord[] getScheduledEvents(Opt<String> captureAgentId) {
-    AQueryBuilder query = assetManager.createQuery();
-    Props p = new Props(query);
-    Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace()));
-    for (String agentId : captureAgentId) {
-      predicate = predicate.and(p.agent().eq(agentId));
+  @Override
+  public int getEventCount() throws SchedulerException {
+    try {
+      return persistence.countEvents();
+    } catch (Exception e) {
+      logger.error("Failed to search for events: {}", getStackTrace(e));
+      throw new SchedulerException(e);
     }
-    return query.select(query.snapshot(), p.start().target(), p.end().target()).where(predicate).run().getRecords().toList().toArray(new ARecord[0]);
   }
 
   @Override
   public List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo,
           Opt<Date> endFrom, Opt<Date> endTo) throws SchedulerException {
-    final ARecord[] alreadyScheduledEvents = getScheduledEvents(captureAgentId);
-    return searchInternal(startsFrom, startsTo, endFrom, endTo, alreadyScheduledEvents);
+    try {
+      return persistence.search(captureAgentId, startsFrom, startsTo, endFrom, endTo, Opt.none()).parallelStream()
+          .map(ExtendedEventDto::getMediaPackageId)
+          .map(this::getEventMediaPackage).collect(Collectors.toList());
+    } catch (Exception e) {
+      logger.error("Failed to search for events: {}", getStackTrace(e));
+      throw new SchedulerException(e);
+    }
   }
 
-  /*
-   * Returns a list of events which start and/or end within a given date range.  So you could search for things which
-   * start on Tuesday between 0900 and 1000, and end between 1500 and 1600, and you could get an event which started at
-   * Epoch and ended at 1559 on Tuesday.  This is *NOT* appropriate for conflict checking, and does not check for any
-   * edge cases.  Use checkScheduleConflicts instead.
-   */
-  private List<MediaPackage> searchInternal(Opt<Date> startsFrom, Opt<Date> startsTo,
-                                            Opt<Date> endFrom, Opt<Date> endTo, ARecord[] records) {
-    final List<ARecord> result = new ArrayList<>();
-    for (final ARecord r : records) {
-      final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-      final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-      if (startsFrom.isSome() && start.before(startsFrom.get())
-              || startsTo.isSome() && start.after(startsTo.get())
-              || endFrom.isSome() && end.before(endFrom.get())
-              || endTo.isSome() && end.after(endTo.get())) {
-        continue;
+  @Override
+  public Opt<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException {
+    try {
+      final Date now = new Date();
+      List<ExtendedEventDto> result = persistence.search(Opt.some(captureAgentId), Opt.none(), Opt.some(now), Opt.some(now), Opt.none(), Opt.some(1));
+      if (result.isEmpty()) {
+        return Opt.none();
       }
-      result.add(r);
+      return Opt.some(getEventMediaPackage(result.get(0).getMediaPackageId()));
+    } catch (Exception e) {
+      logger.error("Failed to search for events: {}", getStackTrace(e));
+      throw new SchedulerException(e);
     }
-    result.sort(new Comparator<ARecord>() {
-      @Override
-      public int compare(ARecord o1, ARecord o2) {
-        Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-        Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-        return start1.compareTo(start2);
-      }
-    });
-    return Stream.mk(result).bind(recordToMp).toList();
   }
 
-  /*
-   * Returns a list of conflicting mediapackages.  This method checks for containment, starts-during, and ends-during.
-   */
-  private List<MediaPackage> checkScheduleConflicts(Date checkStart, Date checkEnd, ARecord[] records) {
-    final List<ARecord> result = new ArrayList<>();
-    for (final ARecord r : records) {
-      final Date start = r.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-      final Date end = r.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-      /*
-      If the potential event starts during event r OR
-      If the potential event ends during event r OR
-      If the potential event begins before, and ends after event r (ie, containment) OR
-      If the potential event begins or ends within the minimum separation distance of event r
-      */
-      if (Util.schedulingIntervalsOverlap(checkStart, checkEnd, start, end)) {
-        result.add(r);
+  @Override
+  public Opt<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException {
+    try {
+      final Date now = new Date();
+      List<ExtendedEventDto> result = persistence.search(Opt.some(captureAgentId), Opt.some(now), Opt.none(), Opt.none(), Opt.none(), Opt.some(1));
+      if (result.isEmpty()) {
+        return Opt.none();
       }
+      return Opt.some(getEventMediaPackage(result.get(0).getMediaPackageId()));
+    } catch (Exception e) {
+      logger.error("Failed to search for events: {}", getStackTrace(e));
+      throw new SchedulerException(e);
     }
-    result.sort(new Comparator<ARecord>() {
-      @Override
-      public int compare(ARecord o1, ARecord o2) {
-        Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-        Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-        return start1.compareTo(start2);
-      }
-    });
-    return Stream.mk(result).bind(recordToMp).toList();
   }
 
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
       throws SchedulerException {
     try {
-      Set<String> eventIds = persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
-      final AQueryBuilder query = assetManager.createQuery();
-      final Predicate predicate = withOrganization(query)
-          .and(withOwner(query))
-          .and(query.mediaPackageIds(eventIds.toArray(new String[0])));
-      final Props p = new Props(query);
-      final List<ARecord> records = query.select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-          query.propertiesOf(CA_NAMESPACE)).where(predicate).run().getRecords().toList();
-      return Stream.mk(records).sort(
-          new Comparator<ARecord>() {
-            @Override
-            public int compare(ARecord o1, ARecord o2) {
-              Date start1 = o1.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-              Date start2 = o2.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-              return start1.compareTo(start2);
-            }
-          }
-      ).bind(recordToMp).toList();
+      return persistence.getEvents(captureDeviceID, startDate, endDate, Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS)
+          .parallelStream().map(this::getEventMediaPackage).collect(Collectors.toList());
     } catch (Exception e) {
       throw new SchedulerException(e);
     }
@@ -1242,17 +1118,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     requireTrue(periods.size() > 0, "periods");
 
     try {
-      final ARecord[] alreadyScheduledEvents = getScheduledEvents(Opt.some(captureAgentId));
-      final TimeZone utc = TimeZone.getTimeZone("utc");
-
       Set<MediaPackage> events = new HashSet<>();
 
       for (Period event : periods) {
-        TimeZone.setDefault(utc);
+        TimeZone.setDefault(tz);
         final Date startDate = event.getStart();
         final Date endDate = event.getEnd();
 
-        events.addAll(findConflictingEvents(startDate, endDate, alreadyScheduledEvents));
+        events.addAll(findConflictingEvents(captureAgentId, startDate, endDate));
       }
 
       TimeZone.setDefault(null);
@@ -1271,31 +1144,33 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public String getCalendar(Opt<String> captureAgentId, Opt<String> seriesId, Opt<Date> cutoff)
           throws SchedulerException {
-    try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      Predicate predicate = withOrganization(query).and(withOwner(query)).and(query.hasPropertiesOf(p.namespace())).and(p.optOut().eq(false))
-              .and(p.end().ge(DateTime.now().minusHours(1).toDate()));
-      for (String agentId : captureAgentId) {
-        predicate = predicate.and(p.agent().eq(agentId));
-      }
-      for (String series : seriesId) {
-        predicate = predicate.and(query.seriesId().eq(series));
-      }
-      for (Date d : cutoff) {
-        predicate = predicate.and(p.start().le(d));
-      }
-      ASelectQuery select = query.select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-              query.propertiesOf(CA_NAMESPACE)).where(predicate);
-      Stream<ARecord> records = select.run().getRecords();
 
-      CalendarGenerator cal = new CalendarGenerator(seriesService);
-      for (ARecord record : records) {
-        Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
+    try {
+      final Map<String, ExtendedEventDto> searchResult = persistence.search(captureAgentId, Opt.none(), cutoff,
+          Opt.some(DateTime.now().minusHours(1).toDate()), Opt.none(), Opt.none()).stream()
+          .collect(Collectors.toMap(ExtendedEventDto::getMediaPackageId, Function.identity()));
+      final AQueryBuilder query = assetManager.createQuery();
+      final AResult result = query.select(query.snapshot())
+          .where(withOrganization(query).and(query.mediaPackageIds(searchResult.keySet().toArray(new String[0])))
+              .and(withOwner(query)).and(query.version().isLatest()))
+          .run();
+
+      final CalendarGenerator cal = new CalendarGenerator(seriesService);
+      for (final ARecord record : result.getRecords()) {
+        final Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
 
         // If the event media package is empty, skip the event
         if (optMp.isNone()) {
           logger.warn("Mediapackage for event '{}' can't be found, event is not recorded", record.getMediaPackageId());
+          continue;
+        }
+
+        if (searchResult.get(record.getMediaPackageId()).getOptOut()) {
+          logger.debug("event '{}' is opted out. Skipping.", record.getMediaPackageId());
+          continue;
+        }
+
+        if (seriesId.isSome() && !seriesId.get().equals(optMp.get().getSeries())) {
           continue;
         }
 
@@ -1305,8 +1180,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           continue;
         }
 
-        Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE)).group(toKey,
-                toValue);
+        final Map<String, String> caMetadata = deserializeExtendedEventProperties(searchResult.get(record.getMediaPackageId()).getCaptureAgentProperties());
 
         // If the even properties are empty, skip the event
         if (caMetadata.isEmpty()) {
@@ -1314,10 +1188,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           continue;
         }
 
-        String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
-        Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-        Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-        Date lastModified = record.getSnapshot().get().getArchivalDate();
+        final String agentId = searchResult.get(record.getMediaPackageId()).getCaptureAgentId();
+        final Date start = searchResult.get(record.getMediaPackageId()).getStartDate();
+        final Date end = searchResult.get(record.getMediaPackageId()).getEndDate();
+        final Date lastModified = record.getSnapshot().get().getArchivalDate();
 
         // Add the entry to the calendar, skip it with a warning if adding fails
         try {
@@ -1350,21 +1224,32 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(reviewStatus, "reviewStatus");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(query.nothing())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace()))))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
       Date now = new Date();
-      assetManager.setProperty(p.reviewDate().mk(mediaPackageId, now));
-      assetManager.setProperty(p.reviewStatus().mk(mediaPackageId, reviewStatus.toString()));
+      if (persistence.getEvent(mediaPackageId).isNone()) {
+        throw new NotFoundException("Cannot update review status of non-existing event " + mediaPackageId);
+      }
+      persistence.storeEvent(
+          mediaPackageId,
+          securityService.getOrganization().getId(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.some(reviewStatus.toString()),
+          Opt.some(now),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none()
+      );
+
       messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateReviewStatus(mediaPackageId, reviewStatus, now));
+          SchedulerItem.updateReviewStatus(mediaPackageId, reviewStatus, now));
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1379,17 +1264,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(p.reviewStatus().target())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace()))))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
+      Opt<ExtendedEventDto> extEvt = persistence.getEvent(mediaPackageId);
+      if (extEvt.isNone()) {
         throw new NotFoundException();
-
-      return record.get().getProperties().apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
+      }
+      return Opt.nul(extEvt.get().getReviewStatus()).map(toReviewStatus).getOr(UNSENT);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1430,19 +1309,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     logger.info("Starting to look for scheduled recordings that have finished before {}.",
             DateTimeSupport.toUTC(end.getMillis()));
 
-    List<MediaPackage> finishedEvents;
+    List<ExtendedEventDto> finishedEvents;
     try {
-      finishedEvents = search(Opt.<String> none(), Opt.<Date> none(), Opt.<Date> none(), Opt.<Date> none(),
-              Opt.some(end.toDate()));
+      finishedEvents = persistence.search(Opt.<String> none(), Opt.<Date> none(), Opt.<Date> none(), Opt.<Date> none(),
+              Opt.some(end.toDate()), Opt.none());
       logger.debug("Found {} events from search.", finishedEvents.size());
-    } catch (SchedulerException e) {
+    } catch (Exception e) {
       logger.error("Unable to search for finished events: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
 
     int recordingsRemoved = 0;
-    for (MediaPackage event : finishedEvents) {
-      String eventId = event.getIdentifier().compact();
+    for (ExtendedEventDto extEvt : finishedEvents) {
+      final String eventId = extEvt.getMediaPackageId();
       try {
         removeEvent(eventId);
         logger.debug("Sucessfully removed scheduled event with id " + eventId);
@@ -1468,40 +1347,40 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(p.recordingStatus().target(), p.recordingLastHeard().target())
-              .where(withOrganization(query).and(query.mediaPackageId(id).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace()))))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
+      final Opt<ExtendedEventDto> optExtEvt = persistence.getEvent(id);
+
+      if (optExtEvt.isNone())
         throw new NotFoundException();
 
-      Opt<String> recordingState = record.get().getProperties().apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
-      Opt<Long> lastHeard = record.get().getProperties().apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
-
-      if (recordingState.isSome() && lastHeard.isSome()) {
-        Recording r = new RecordingImpl(id, recordingState.get(), lastHeard.get());
-        if (state.equals(r.getState())) {
-          logger.debug("Recording state not changed");
-          // Reset the state anyway so that the last-heard-from time is correct...
-          r.setState(state);
-        } else {
-          logger.debug("Setting Recording {} to state {}.", id, state);
-          r.setState(state);
-          sendRecordingUpdate(r);
-        }
-        assetManager.setProperty(p.recordingStatus().mk(id, r.getState()));
-        assetManager.setProperty(p.recordingLastHeard().mk(id, r.getLastCheckinTime()));
-        return true;
-      } else {
-        Recording r = new RecordingImpl(id, state);
-        assetManager.setProperty(p.recordingStatus().mk(id, r.getState()));
-        assetManager.setProperty(p.recordingLastHeard().mk(id, r.getLastCheckinTime()));
+      final String prevRecordingState = optExtEvt.get().getRecordingState();
+      final Recording r = new RecordingImpl(id, state);
+      if (!state.equals(prevRecordingState)) {
+        logger.debug("Setting Recording {} to state {}.", id, state);
         sendRecordingUpdate(r);
-        return true;
+      } else {
+        logger.debug("Recording state not changed");
       }
+
+      persistence.storeEvent(
+          id,
+          securityService.getOrganization().getId(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.some(r.getState()),
+          Opt.some(r.getLastCheckinTime()),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none(),
+          Opt.none()
+      );
+      return true;
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1515,20 +1394,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(id, "id");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(p.recordingStatus().target(), p.recordingLastHeard().target())
-              .where(withOrganization(query).and(query.mediaPackageId(id)).and(query.version().isLatest())
-                      .and(query.hasPropertiesOf(p.namespace())).and(p.recordingStatus().exists())
-                      .and(p.recordingLastHeard().exists()))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone() || record.get().getProperties().isEmpty())
-        throw new NotFoundException();
+      Opt<ExtendedEventDto> extEvt = persistence.getEvent(id);
 
-      String recordingState = record.get().getProperties().apply(Properties.getString(RECORDING_STATE_CONFIG));
-      Long lastHeard = record.get().getProperties().apply(Properties.getLong(RECORDING_LAST_HEARD_CONFIG));
-      return new RecordingImpl(id, recordingState, lastHeard);
+      if (extEvt.isNone() || extEvt.get().getRecordingState() == null) {
+        throw new NotFoundException();
+      }
+
+      return new RecordingImpl(id, extEvt.get().getRecordingState(), extEvt.get().getRecordingLastHeard());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1542,20 +1414,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(id, "id");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(query.nothing()).where(withOrganization(query)
-              .and(query.mediaPackageId(id).and(query.version().isLatest())).and(query.hasPropertiesOf(p.namespace())))
-              .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
-        throw new NotFoundException();
-
-      query = assetManager.createQuery();
-      p = new Props(query);
-      final Predicate predicate = withOrganization(query).and(query.mediaPackageId(id));
-      query.delete(SNAPSHOT_OWNER, p.recordingStatus().target()).where(predicate).run();
-      query.delete(SNAPSHOT_OWNER, p.recordingLastHeard().target()).where(predicate).run();
+      persistence.resetRecordingState(id);
 
       messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
               SchedulerItem.deleteRecordingState(id));
@@ -1570,20 +1429,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public Map<String, Recording> getKnownRecordings() throws SchedulerException {
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
-      AResult result = query.select(p.recordingStatus().target(), p.recordingLastHeard().target())
-              .where(withOrganization(query).and(query.version().isLatest()).and(query.hasPropertiesOf(p.namespace()))
-                      .and(p.recordingStatus().exists()).and(p.recordingLastHeard().exists()))
-              .run();
-      Map<String, Recording> recordings = new HashMap<>();
-      for (ARecord record : result.getRecords()) {
-        String recordingState = record.getProperties().apply(Properties.getString(RECORDING_STATE_CONFIG));
-        Long lastHeard = record.getProperties().apply(Properties.getLong(RECORDING_LAST_HEARD_CONFIG));
-        recordings.put(record.getMediaPackageId(),
-                new RecordingImpl(record.getMediaPackageId(), recordingState, lastHeard));
-      }
-      return recordings;
+      return persistence.getKnownRecordings().parallelStream()
+          .collect(
+              Collectors.toMap(ExtendedEventDto::getMediaPackageId,
+              dto -> new RecordingImpl(dto.getMediaPackageId(), dto.getRecordingState(), dto.getRecordingLastHeard()))
+          );
     } catch (Exception e) {
       logger.error("Failed to get known recording states: {}", getStackTrace(e));
       throw new SchedulerException(e);
@@ -1595,71 +1445,31 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           final Opt<Set<String>> userIds, final Opt<MediaPackage> mediaPackage,
           final Opt<Map<String, String>> wfProperties, final Opt<Map<String, String>> caProperties,
           final Opt<Boolean> optOut, final Opt<String> schedulingSource) throws SchedulerServiceDatabaseException {
-    AQueryBuilder query = assetManager.createQuery();
-    final Props p = new Props(query);
-    final String workflowNamespace = WORKFLOW_NAMESPACE;
-    final String caNamespace = CA_NAMESPACE;
-
     // Store scheduled mediapackage
     for (MediaPackage mpToUpdate : mediaPackage) {
-      Snapshot snapshot = assetManager.takeSnapshot(SNAPSHOT_OWNER, mpToUpdate);
-      assetManager.setProperty(p.version().mk(mpId, snapshot.getVersion()));
-    }
-    // Store scheduled start date
-    for (Date start : startDateTime) {
-      assetManager.setProperty(p.start().mk(mpId, start));
-    }
-    // Store scheduled end date
-    for (Date end : endDateTime) {
-      assetManager.setProperty(p.end().mk(mpId, end));
-    }
-    // Store capture agent id
-    for (String agent : captureAgentId) {
-      assetManager.setProperty(p.agent().mk(mpId, agent));
-    }
-    // Store the user identifiers
-    for (Set<String> users : userIds) {
-      assetManager.setProperty(p.presenters().mk(mpId, StringUtils.join(users, ",")));
-    }
-    // Store opt out status
-    for (Boolean optOutToUpdate : optOut) {
-      assetManager.setProperty(p.optOut().mk(mpId, optOutToUpdate));
+      assetManager.takeSnapshot(SNAPSHOT_OWNER, mpToUpdate);
     }
 
-    // Store capture agent properties
-    for (Map<String, String> props : caProperties) {
-      Properties.removeProperties(assetManager, SNAPSHOT_OWNER, securityService.getOrganization().getId(), mpId,
-              caNamespace);
-      for (Entry<String, String> entry : props.entrySet()) {
-        assetManager
-                .setProperty(Property.mk(PropertyId.mk(mpId, caNamespace, entry.getKey()), Value.mk(entry.getValue())));
-      }
-    }
-
-    // Store workflow properties
-    for (Map<String, String> props : wfProperties) {
-      Properties.removeProperties(assetManager, SNAPSHOT_OWNER, securityService.getOrganization().getId(), mpId,
-              workflowNamespace);
-      for (Entry<String, String> entry : props.entrySet()) {
-        assetManager.setProperty(
-                Property.mk(PropertyId.mk(mpId, workflowNamespace, entry.getKey()), Value.mk(entry.getValue())));
-      }
-    }
-
-    // Store scheduling source
-    for (String source : schedulingSource) {
-      assetManager.setProperty(p.source().mk(mpId, source));
-    }
-
-    // Store last modified source/date and checksum
-    assetManager.setProperty(p.lastModifiedOrigin().mk(mpId, modificationOrigin));
-    assetManager.setProperty(p.lastModifiedDate().mk(mpId, new Date()));
-    assetManager.setProperty(p.checksum().mk(mpId, checksum));
-
-    // Remove last conflicts
-    final AQueryBuilder q = assetManager.createQuery();
-    q.delete(SNAPSHOT_OWNER, new Props(q).lastConflict().target())
-            .where(withOrganization(q).and(q.mediaPackageId(mpId))).run();
+    // Store extended event
+    persistence.storeEvent(
+        mpId,
+        securityService.getOrganization().getId(),
+        captureAgentId,
+        startDateTime,
+        endDateTime,
+        schedulingSource,
+        Opt.none(),
+        Opt.none(),
+        Opt.none(),
+        Opt.none(),
+        userIds.isSome() ? Opt.some(String.join(",", userIds.get())) : Opt.none(),
+        optOut,
+        Opt.some(modificationOrigin),
+        Opt.some(new Date()),
+        Opt.some(checksum),
+        wfProperties,
+        caProperties
+    );
   }
 
   private void sendUpdateAddEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
@@ -1766,18 +1576,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return wfPropertiesString.toString();
   }
 
-  private Opt<MediaPackage> getEventMediaPackage(String mediaPackageId) {
+  private MediaPackage getEventMediaPackage(String mediaPackageId) {
     AQueryBuilder query = assetManager.createQuery();
-    Props p = new Props(query);
     AResult result = query.select(query.snapshot())
-            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId))
-                    .and(query.hasPropertiesOf(p.namespace())))
+            .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
+            .and(query.version().isLatest()))
             .run();
     Opt<ARecord> record = result.getRecords().head();
     if (record.isNone())
-      return Opt.none();
+      throw new RuntimeNotFoundException(new NotFoundException());
 
-    return record.bind(recordToMp);
+    return record.bind(recordToMp).get();
   }
 
   /**
@@ -1810,26 +1619,22 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return mp;
   }
 
-  private TechnicalMetadata getTechnicalMetadata(ARecord record, Props p) {
-    final String agentId = record.getProperties().apply(Properties.getString(p.agent().name()));
-    final boolean optOut = record.getProperties().apply(Properties.getBoolean(p.optOut().name()));
-    final Date start = record.getProperties().apply(Properties.getDate(p.start().name()));
-    final Date end = record.getProperties().apply(Properties.getDate(p.end().name()));
-    final Set<String> presenters = getPresenters(
-        record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-    final Opt<String> recordingStatus = record.getProperties()
-            .apply(Properties.getStringOpt(p.recordingStatus().name()));
-    final Opt<Long> lastHeard = record.getProperties().apply(Properties.getLongOpt(p.recordingLastHeard().name()));
-    final Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE)).group(toKey,
-            toValue);
-    final Map<String, String> wfProperties = record.getProperties().filter(filterByNamespace._2(WORKFLOW_NAMESPACE))
-            .group(toKey, toValue);
+  private TechnicalMetadata getTechnicalMetadata(ExtendedEventDto extEvt) {
+    final String agentId = extEvt.getCaptureAgentId();
+    final boolean optOut = extEvt.getOptOut();
+    final Date start = extEvt.getStartDate();
+    final Date end = extEvt.getEndDate();
+    final Set<String> presenters = getPresenters(Opt.nul(extEvt.getPresenters()).getOr(""));
+    final Opt<String> recordingStatus = Opt.nul(extEvt.getRecordingState());
+    final Opt<Long> lastHeard = Opt.nul(extEvt.getRecordingLastHeard());
+    final Map<String, String> caMetadata = deserializeExtendedEventProperties(extEvt.getCaptureAgentProperties());
+    final Map<String, String> wfProperties = deserializeExtendedEventProperties(extEvt.getWorkflowProperties());
 
     Recording recording = null;
     if (recordingStatus.isSome() && lastHeard.isSome())
-      recording = new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get());
+      recording = new RecordingImpl(extEvt.getMediaPackageId(), recordingStatus.get(), lastHeard.get());
 
-    return new TechnicalMetadataImpl(record.getMediaPackageId(), agentId, start, end, optOut, presenters, wfProperties,
+    return new TechnicalMetadataImpl(extEvt.getMediaPackageId(), agentId, start, end, optOut, presenters, wfProperties,
             caMetadata, Opt.nul(recording));
   }
 
@@ -1862,78 +1667,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             .filter(isNotEpisodeDublinCore).toList();
   }
 
-  private static class Props extends PropertySchema {
-
-    Props(AQueryBuilder q) {
-      super(q, SchedulerService.JOB_TYPE);
-    }
-
-    protected Props(AQueryBuilder q, String namespace) {
-      super(q, namespace);
-    }
-
-    public PropertyField<String> source() {
-      return stringProp(SOURCE_CONFIG);
-    }
-
-    public PropertyField<String> recordingStatus() {
-      return stringProp(RECORDING_STATE_CONFIG);
-    }
-
-    public PropertyField<Long> recordingLastHeard() {
-      return longProp(RECORDING_LAST_HEARD_CONFIG);
-    }
-
-    public PropertyField<String> reviewStatus() {
-      return stringProp(REVIEW_STATUS_CONFIG);
-    }
-
-    public PropertyField<Date> reviewDate() {
-      return dateProp(REVIEW_DATE_CONFIG);
-    }
-
-    public PropertyField<String> presenters() {
-      return stringProp(PRESENTERS_CONFIG);
-    }
-
-    public PropertyField<String> agent() {
-      return stringProp(AGENT_CONFIG);
-    }
-
-    public PropertyField<Date> start() {
-      return dateProp(START_DATE_CONFIG);
-    }
-
-    public PropertyField<Date> end() {
-      return dateProp(END_DATE_CONFIG);
-    }
-
-    public PropertyField<Boolean> optOut() {
-      return booleanProp(OPTOUT_CONFIG);
-    }
-
-    public PropertyField<Version> version() {
-      return versionProp(VERSION);
-    }
-
-    public PropertyField<String> lastModifiedOrigin() {
-      return stringProp(LAST_MODIFIED_ORIGIN);
-    }
-
-    public PropertyField<String> lastConflict() {
-      return stringProp(LAST_CONFLICT);
-    }
-
-    public PropertyField<Date> lastModifiedDate() {
-      return dateProp(LAST_MODIFIED_DATE);
-    }
-
-    public PropertyField<String> checksum() {
-      return stringProp(CHECKSUM);
-    }
-
-  }
-
   @Override
   public void repopulate(final String indexName) {
     notEmpty(indexName, "indexName");
@@ -1945,13 +1678,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       int current = 0;
 
       AQueryBuilder query = assetManager.createQuery();
-      Props p = new Props(query);
       AResult result = query
-              .select(query.snapshot(), p.agent().target(), p.start().target(), p.end().target(),
-                      p.optOut().target(), p.presenters().target(), p.reviewDate().target(),
-                      p.reviewStatus().target(), p.recordingStatus().target(),
-                      p.recordingLastHeard().target(), query.propertiesOf(CA_NAMESPACE))
-              .where(query.hasPropertiesOf(p.namespace()))
+              .select(query.snapshot())
+              .where(query.owner().eq(SNAPSHOT_OWNER).and(query.version().isLatest()))
               .run();
       final int total = (int) Math.min(result.getSize(), Integer.MAX_VALUE);
       logger.info(
@@ -1965,28 +1694,32 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             logger.warn("Doesn't found a media package for an scheuled event {}", record.getMediaPackageId());
             continue;
           }
+          final Snapshot snapshot = record.getSnapshot().get();
+          Opt<ExtendedEventDto> optExtEvt = persistence.getEvent(record.getMediaPackageId(), snapshot.getOrganizationId());
+          if (optExtEvt.isNone()) {
+            logger.warn("Could not find extended event for scheduled event {} of organization {}",
+                record.getMediaPackageId(),
+                snapshot.getOrganizationId()
+            );
+            continue;
+          }
           try {
-            Snapshot snapshot = record.getSnapshot().get();
             Organization org = orgDirectoryService.getOrganization(snapshot.getOrganizationId());
             User orgSystemUser = SecurityUtil.createSystemUser(systemUserName, org);
             securityService.setOrganization(org);
             securityService.setUser(orgSystemUser);
 
-            String agentId = record.getProperties().apply(Properties.getString(AGENT_CONFIG));
-            boolean optOut = record.getProperties().apply(Properties.getBoolean(OPTOUT_CONFIG));
-            Date start = record.getProperties().apply(Properties.getDate(START_DATE_CONFIG));
-            Date end = record.getProperties().apply(Properties.getDate(END_DATE_CONFIG));
-            Set<String> presenters = getPresenters(
-                record.getProperties().apply(getStringOpt(PRESENTERS_CONFIG)).getOr(""));
-            Map<String, String> caMetadata = record.getProperties().filter(filterByNamespace._2(CA_NAMESPACE))
-                    .group(toKey, toValue);
-            ReviewStatus reviewStatus = record.getProperties()
-                .apply(getStringOpt(REVIEW_STATUS_CONFIG)).map(toReviewStatus).getOr(UNSENT);
-            Date reviewDate = record.getProperties().apply(Properties.getDateOpt(REVIEW_DATE_CONFIG)).orNull();
-            Opt<String> recordingStatus = record.getProperties()
-                    .apply(Properties.getStringOpt(RECORDING_STATE_CONFIG));
-            Opt<Long> lastHeard = record.getProperties()
-                    .apply(Properties.getLongOpt(RECORDING_LAST_HEARD_CONFIG));
+            final ExtendedEventDto extEvt = optExtEvt.get();
+            String agentId = extEvt.getCaptureAgentId();
+            boolean optOut = extEvt.getOptOut();
+            Date start = extEvt.getStartDate();
+            Date end = extEvt.getEndDate();
+            Set<String> presenters = getPresenters(Opt.nul(extEvt.getPresenters()).getOr(""));
+            Map<String, String> caMetadata = deserializeExtendedEventProperties(extEvt.getCaptureAgentProperties());
+            ReviewStatus reviewStatus = Opt.nul(extEvt.getReviewStatus()).map(toReviewStatus).getOr(UNSENT);
+            Date reviewDate = extEvt.getReviewDate();
+            Opt<String> recordingStatus = Opt.nul(extEvt.getRecordingState());
+            Opt<Long> lastHeard = Opt.nul(extEvt.getRecordingLastHeard());
 
             Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
             Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);

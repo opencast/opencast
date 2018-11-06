@@ -29,7 +29,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.Gson;
 
+import org.joda.time.DateTime;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,6 +156,171 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   }
 
   @Override
+  public void storeEvent(String mediapackageId, String organizationId, Opt<String> captureAgentId, Opt<Date> start,
+          Opt<Date> end, Opt<String> source, Opt<String> recordingState, Opt<Long> recordingLastHeard,
+          Opt<String> reviewStatus, Opt<Date> reviewDate, Opt<String> presenters, Opt<Boolean> optOut,
+          Opt<String> lastModifiedOrigin, Opt<Date> lastModifiedDate, Opt<String> checksum,
+          Opt<Map<String, String>> workflowProperties, Opt<Map<String, String>> caProperties
+  ) throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      Opt<ExtendedEventDto> entityOpt = getExtendedEventDto(mediapackageId, organizationId, em);
+      ExtendedEventDto entity = entityOpt.getOr(new ExtendedEventDto());
+      entity.setMediaPackageId(mediapackageId);
+      entity.setOrganization(securityService.getOrganization().getId());
+      if (captureAgentId.isSome()) {
+        entity.setCaptureAgentId(captureAgentId.get());
+      }
+      if (start.isSome()) {
+        entity.setStartDate(start.get());
+      }
+      if (end.isSome()) {
+        entity.setEndDate(end.get());
+      }
+      if (source.isSome()) {
+        entity.setSource(source.get());
+      }
+      if (recordingState.isSome()) {
+        entity.setRecordingState(recordingState.get());
+      }
+      if (recordingLastHeard.isSome()) {
+        entity.setRecordingLastHeard(recordingLastHeard.get());
+      }
+      if (reviewStatus.isSome()) {
+        entity.setReviewStatus(reviewStatus.get());
+      }
+      if (reviewDate.isSome()) {
+        entity.setReviewDate(reviewDate.get());
+      }
+      if (presenters.isSome()) {
+        entity.setPresenters(presenters.get());
+      }
+      if (optOut.isSome()) {
+        entity.setOptOut(optOut.get());
+      }
+      if (lastModifiedOrigin.isSome()) {
+        entity.setLastModifiedOrigin(lastModifiedOrigin.get());
+      }
+      if (lastModifiedDate.isSome()) {
+        entity.setLastModifiedDate(lastModifiedDate.get());
+      }
+      if (checksum.isSome()) {
+        entity.setChecksum(checksum.get());
+      }
+      Gson gson = new Gson();
+      if (workflowProperties.isSome()) {
+        entity.setWorkflowProperties(gson.toJson(workflowProperties.get()));
+      }
+      if (caProperties.isSome()) {
+        entity.setCaptureAgentProperties(gson.toJson(caProperties.get()));
+      }
+
+      if (entityOpt.isNone()) {
+        em.persist(entity);
+      } else {
+        em.merge(entity);
+      }
+      tx.commit();
+    } catch (Exception e) {
+      logger.error("Could not store extendecd event: {}", getStackTrace(e));
+      if (tx.isActive())
+        tx.rollback();
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<String> getEvents(String captureAgentId, Date start, Date end, int separationMillis) throws SchedulerServiceDatabaseException {
+    final Date extendedStart = Date.from(start.toInstant().minusMillis(separationMillis));
+    final Date extendedEnd = Date.from(end.toInstant().plusMillis(separationMillis));
+    final EntityManager em = emf.createEntityManager();
+    final Query query = em.createNamedQuery("ExtendedEvent.findEvents")
+        .setParameter("org", securityService.getOrganization().getId())
+        .setParameter("ca", captureAgentId)
+        .setParameter("start", extendedStart)
+        .setParameter("end", extendedEnd);
+    try {
+      return query.getResultList();
+    } catch (Exception e) {
+      logger.error("Could not get events.", e);
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<ExtendedEventDto> search(
+      Opt<String> captureAgentId,
+      Opt<Date> optStartsFrom,
+      Opt<Date> optStartsTo,
+      Opt<Date> optEndFrom,
+      Opt<Date> optEndTo,
+      Opt<Integer> limit) throws SchedulerServiceDatabaseException {
+    final EntityManager em = emf.createEntityManager();
+    final Date startsFrom = optStartsFrom.getOr(new Date(0));
+    // A better value would be a Date initialized with Long.MAX_VALUE, but that leads to the DB (at least MySQL)
+    // returning zero results.
+    final Date farIntoTheFuture = DateTime.now().plusYears(30).toDate();
+    final Date startsTo = optStartsTo.getOr(farIntoTheFuture);
+    final Date endFrom = optEndFrom.getOr(new Date(0));
+    final Date endTo = optEndTo.getOr(farIntoTheFuture);
+
+    final Query query;
+    if (captureAgentId.isSome()) {
+      query = em.createNamedQuery("ExtendedEvent.searchEventsCA")
+          .setParameter("org", securityService.getOrganization().getId())
+          .setParameter("ca", captureAgentId.get())
+          .setParameter("startFrom", startsFrom)
+          .setParameter("startTo", startsTo)
+          .setParameter("endFrom", endFrom)
+          .setParameter("endTo", endTo);
+    } else {
+      query = em.createNamedQuery("ExtendedEvent.searchEvents")
+          .setParameter("org", securityService.getOrganization().getId())
+          .setParameter("startFrom", startsFrom)
+          .setParameter("startTo", startsTo)
+          .setParameter("endFrom", endFrom)
+          .setParameter("endTo", endTo);
+    }
+    try {
+      if (limit.isSome()) {
+        return query.setMaxResults(limit.get()).getResultList();
+      }
+      return query.getResultList();
+    } catch (Exception e) {
+      logger.error("Could not get events.", e);
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  @Override
+  public List<ExtendedEventDto> getKnownRecordings() throws SchedulerServiceDatabaseException {
+    final EntityManager em = emf.createEntityManager();
+    final Query query = em.createNamedQuery("ExtendedEvent.knownRecordings")
+        .setParameter("org", securityService.getOrganization().getId());
+    try {
+      return query.getResultList();
+    } catch (Exception e) {
+      logger.error("Could not get events.", e);
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      em.close();
+    }
+  }
+
+  @Override
   public void deleteEvent(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -161,7 +328,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       em = emf.createEntityManager();
       tx = em.getTransaction();
       tx.begin();
-      Opt<ExtendedEventDto> entity = getExtendedEventDto(mediapackageId, em);
+      final String orgId = securityService.getOrganization().getId();
+      Opt<ExtendedEventDto> entity = getExtendedEventDto(mediapackageId, orgId, em);
       if (entity.isNone()) {
         throw new NotFoundException("Event with ID " + mediapackageId + " does not exist");
       }
@@ -180,6 +348,66 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     }
   }
 
+  @Override
+  public Opt<ExtendedEventDto> getEvent(String mediapackageId, String orgId) throws SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      return getExtendedEventDto(mediapackageId, orgId, em);
+    } catch (Exception e) {
+      logger.error("Could not search for event {} of organziation {}:  {}", mediapackageId, orgId, e.getStackTrace());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+
+  @Override
+  public Opt<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException {
+    try {
+      final String orgId = securityService.getOrganization().getId();
+      return getEvent(mediapackageId, orgId);
+    } catch (SchedulerServiceDatabaseException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Could not search for event {}: {}", mediapackageId, e.getStackTrace());
+      throw new SchedulerServiceDatabaseException(e);
+    }
+  }
+
+  @Override
+  public void resetRecordingState(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException {
+    EntityManager em = null;
+    EntityTransaction tx = null;
+    try {
+      em = emf.createEntityManager();
+      tx = em.getTransaction();
+      tx.begin();
+      final String orgId = securityService.getOrganization().getId();
+      Opt<ExtendedEventDto> entity = getExtendedEventDto(mediapackageId, orgId, em);
+      if (entity.isNone()) {
+        throw new NotFoundException("Event with ID " + mediapackageId + " does not exist");
+      }
+      entity.get().setRecordingState(null);
+      entity.get().setRecordingLastHeard(null);
+      em.merge(entity.get());
+      tx.commit();
+    } catch (NotFoundException e) {
+      throw e;
+    } catch (Exception e) {
+      if (tx.isActive())
+        tx.rollback();
+      logger.error("Could not reset recording state for event: {}  {}", mediapackageId, e.getStackTrace());
+      throw new SchedulerServiceDatabaseException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  @Override
   public int countEvents() throws SchedulerServiceDatabaseException {
     EntityManager em = emf.createEntityManager();
     Query query = em.createNamedQuery("ExtendedEvent.countAll");
@@ -194,17 +422,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     }
   }
 
-  /**
-   * Gets an extended event by its ID, using the current organizational context.
-   *
-   * @param id
-   *          the mediapackage identifier
-   * @param em
-   *          an open entity manager
-   * @return the extended entity option
-   */
-  private Opt<ExtendedEventDto> getExtendedEventDto(String id, EntityManager em) {
-    String orgId = securityService.getOrganization().getId();
+  private Opt<ExtendedEventDto> getExtendedEventDto(String id, String orgId, EntityManager em) {
     return Opt.nul(em.find(ExtendedEventDto.class, new EventIdPK(id, orgId)));
   }
 }

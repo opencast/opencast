@@ -212,9 +212,11 @@ public class SchedulerServiceImplTest {
   private static UnitTestWorkspace workspace;
   private AssetManager assetManager;
   private static OrganizationDirectoryService orgDirectoryService;
+  private SecurityService securityService;
 
-  private User currentUser = null;
-  private Organization currentOrg = null;
+  private User currentUser = new JaxbUser("admin", "provider", new DefaultOrganization(),
+      new JaxbRole("admin", new DefaultOrganization(), "test"));
+  private Organization currentOrg = new DefaultOrganization();
 
   private static SchedulerServiceImpl schedSvc;
 
@@ -267,16 +269,6 @@ public class SchedulerServiceImplTest {
     wfPropertiesUpdated.put("test", "false");
     wfPropertiesUpdated.put("skip", "true");
 
-    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getUser()).andReturn(new JaxbUser("admin", "provider", new DefaultOrganization(),
-            new JaxbRole("admin", new DefaultOrganization(), "test"))).anyTimes();
-    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
-
-    schedulerDatabase = new SchedulerServiceDatabaseImpl();
-    schedulerDatabase.setEntityManagerFactory(mkEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
-    schedulerDatabase.setSecurityService(securityService);
-    schedulerDatabase.activate(null);
-
     workspace = new UnitTestWorkspace();
 
     MessageSender messageSender = EasyMock.createNiceMock(MessageSender.class);
@@ -322,15 +314,13 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(componentContext.getBundleContext()).andReturn(bundleContext).anyTimes();
 
     EasyMock.replay(messageSender, baseMessageMock, messageReceiver, authorizationService,
-            securityService, extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
+            extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
     testConflictHandler = new TestConflictHandler();
 
     schedSvc = new SchedulerServiceImpl();
 
     schedSvc.setAuthorizationService(authorizationService);
-    schedSvc.setSecurityService(securityService);
-    schedSvc.setPersistence(schedulerDatabase);
     schedSvc.setWorkspace(workspace);
     schedSvc.setMessageSender(messageSender);
     schedSvc.setMessageReceiver(messageReceiver);
@@ -344,6 +334,14 @@ public class SchedulerServiceImplTest {
 
   @Before
   public void setUp() throws Exception {
+
+
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(currentUser).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(currentOrg).anyTimes();
+    EasyMock.replay(securityService);
+    schedSvc.setSecurityService(securityService);
+
     String seriesIdentifier = Long.toString(System.currentTimeMillis());
     DublinCoreCatalog seriesCatalog = getSampleSeriesDublinCoreCatalog(seriesIdentifier);
     List<DublinCoreCatalog> seriesCatalogs = new ArrayList<>();
@@ -357,6 +355,13 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(seriesService);
     schedSvc.setSeriesService(seriesService);
 
+
+    schedulerDatabase = new SchedulerServiceDatabaseImpl();
+    schedulerDatabase.setEntityManagerFactory(mkEntityManagerFactory(SchedulerServiceDatabaseImpl.PERSISTENCE_UNIT));
+    schedulerDatabase.setSecurityService(securityService);
+    schedulerDatabase.activate(null);
+    schedSvc.setPersistence(schedulerDatabase);
+
     assetManager = mkAssetManager();
     schedSvc.setAssetManager(assetManager);
   }
@@ -364,13 +369,13 @@ public class SchedulerServiceImplTest {
   @After
   public void tearDown() throws Exception {
     workspace.clean();
+    schedulerDatabase = null;
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
     schedSvc = null;
     FileSupport.deleteQuietly(baseDir, true);
-    schedulerDatabase = null;
   }
 
   protected static DublinCoreCatalog getSampleSeriesDublinCoreCatalog(String seriesID) {
@@ -1446,10 +1451,9 @@ public class SchedulerServiceImplTest {
     schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
             Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
     {
-      final RichAResult r = enrich(q.select(q.snapshot(), q.properties()).run());
+      final RichAResult r = enrich(q.select(q.snapshot()).run());
       assertEquals("The asset manager should contain one episode", 1, r.getSize());
       assertEquals("Episode ID", mpId, r.getRecords().head2().getMediaPackageId());
-      assertFalse("The episode should have some properties", r.getProperties().isEmpty());
     }
     // remove event
     schedSvc.removeEvent(mpId);
@@ -1457,11 +1461,6 @@ public class SchedulerServiceImplTest {
       schedSvc.getMediaPackage(mpId);
       Assert.fail("No media package should be found since it has been deleted before");
     } catch (NotFoundException ignore) {
-    }
-    {
-      final RichAResult r = enrich(q.select(q.snapshot(), q.properties()).run());
-      assertTrue("The asset manager should not contain any properties anymore", r.getProperties().isEmpty());
-      assertTrue("The asset manager should not contain any episodes anymore", r.getSnapshots().isEmpty());
     }
   }
 
@@ -1764,7 +1763,7 @@ public class SchedulerServiceImplTest {
 
       @Override
       protected String getCurrentOrgId() {
-        return DefaultOrganization.DEFAULT_ORGANIZATION_ID;
+        return currentOrg.getId();
       }
     };
   }

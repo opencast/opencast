@@ -1010,6 +1010,68 @@ public class SchedulerRestService {
   }
 
   @GET
+  @Path("currentRecording/{agent}")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "currentrecording", description = "Get the current capture event as XML", returnDescription = "The current capture event as XML", pathParameters = {
+      @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "current event is in the body of response"),
+      @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no current recording") })
+  public Response currentRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
+    try {
+      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isNone()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageParser.getAsXml(current.get())).build();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the current recording for agent '{}': {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("upcomingRecording/{agent}")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "upcomingrecording", description = "Get the upcoming capture event as XML", returnDescription = "The upcoming capture event as XML", pathParameters = {
+      @RestParameter(name = "agent", isRequired = true, type = Type.STRING, description = "The agent identifier") }, reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "upcoming event is in the body of response"),
+      @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no upcoming recording") })
+  public Response upcomingRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
+    try {
+      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isNone()) {
+        return Response.noContent().build();
+      } else {
+        return Response.ok(MediaPackageParser.getAsXml(upcoming.get())).build();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the upcoming recording for agent '{}': {}", agentId, e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("eventCount")
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(name = "eventcount", description = "Get the number of scheduled events", returnDescription = "The number of scheduled events", reponses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The event count") })
+  public Response eventCount() throws UnauthorizedException {
+    try {
+      return Response.ok("" + service.getEventCount()).build();
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      logger.error("Unable to get the event count: {}", e);
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
   @Produces({ MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON })
   @Path("recordings.{type:xml|json}")
   @RestQuery(name = "recordingsaslist", description = "Searches recordings and returns result as XML or JSON", returnDescription = "XML or JSON formated results",
@@ -1242,13 +1304,12 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      List<MediaPackage> search = service.search(Opt.some(agentId), Opt.<Date> none(), Opt.some(new Date()),
-              Opt.some(new Date()), Opt.<Date> none());
-      if (search.isEmpty()) {
+      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isNone()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
-        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
+        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, current.get()).get();
         return Response.ok(catalog.toJson()).build();
       }
     } catch (NotFoundException e) {
@@ -1273,13 +1334,12 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      List<MediaPackage> search = service.search(Opt.some(agentId), Opt.some(new Date()), Opt.<Date> none(),
-              Opt.<Date> none(), Opt.<Date> none());
-      if (search.isEmpty()) {
+      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isNone()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
-        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
+        DublinCoreCatalog catalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, upcoming.get()).get();
         return Response.ok(catalog.toJson()).build();
       }
     } catch (NotFoundException e) {
@@ -1435,15 +1495,14 @@ public class SchedulerRestService {
       MediaPackage mp;
       DublinCoreCatalog eventCatalog;
       try {
-        List<MediaPackage> search = service.search(Opt.some(agentId), Opt.<Date> none(), Opt.some(new Date()),
-                Opt.some(new Date()), Opt.<Date> none());
-        if (search.isEmpty()) {
+        Opt<MediaPackage> current = service.getCurrentRecording(agentId);
+        if (current.isNone()) {
           logger.info("No recording to stop found for agent '{}'!", agentId);
           return Response.notModified().build();
         } else {
-          mp = search.get(0);
-          eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, search.get(0)).get();
-          eventId = search.get(0).getIdentifier().compact();
+          mp = current.get();
+          eventCatalog = DublinCoreUtil.loadEpisodeDublinCore(workspace, mp).get();
+          eventId = mp.getIdentifier().compact();
         }
       } catch (Exception e) {
         logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);

@@ -359,6 +359,15 @@ public interface SchedulerService {
    */
 
   /**
+   * Returns the number of scheduled events.
+   *
+   * @return the number of scheduled events
+   * @throws SchedulerException
+   *           if exception occurred
+   */
+  int getEventCount()  throws SchedulerException, UnauthorizedException;
+
+  /**
    * Retrieves all events matching given filter.
    *
    * @param captureAgentId
@@ -376,7 +385,29 @@ public interface SchedulerService {
    *           if exception occurred
    */
   List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo, Opt<Date> endFrom,
-          Opt<Date> endTo) throws UnauthorizedException, SchedulerException;
+          Opt<Date> endTo) throws SchedulerException, UnauthorizedException;
+
+  /**
+   * Retrieves the currently active recording for the given capture agent (if any).
+   *
+   * @param captureAgentId
+   *          The id of the agent to get the current recording of.
+   * @return The currently active recording or none, if agent is currently idle
+   * @throws SchedulerException
+   *           In case the current recording cannot be retrieved.
+   */
+  Opt<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
+
+  /**
+   * Retrieves the upcoming recording for the given capture agent (if any).
+   *
+   * @param captureAgentId
+   *          The id of the agent to get the upcoming recording of.
+   * @return The cupcoming recording or none, if there is none.
+   * @throws SchedulerException
+   *           In case the upcoming recording cannot be retrieved.
+   */
+  Opt<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
 
   /**
    * Returns list of all conflicting events, i.e. all events that ends after start date and begins before end date.

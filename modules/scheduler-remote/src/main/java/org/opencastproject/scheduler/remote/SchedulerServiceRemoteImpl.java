@@ -673,6 +673,26 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
+  public int getEventCount() throws SchedulerException, UnauthorizedException {
+    final HttpGet get = new HttpGet(UrlSupport.concat("eventCount"));
+    final HttpResponse response = getResponse(get, SC_OK, SC_UNAUTHORIZED);
+    try {
+      if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get event count");
+        throw new UnauthorizedException("Unauthorized to get event count");
+      }
+      final String countString = EntityUtils.toString(response.getEntity(), UTF_8);
+      return Integer.parseInt(countString);
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get event count from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  @Override
   public String getScheduleLastModified(String agentId) throws SchedulerException {
     HttpGet get = new HttpGet(UrlSupport.concat(agentId, "lastmodified"));
     HttpResponse response = getResponse(get, SC_OK);
@@ -734,6 +754,56 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       closeConnection(response);
     }
     throw new SchedulerException("Unable to get recordings from remote scheduler service");
+  }
+
+  @Override
+  public Opt<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+    HttpGet get = new HttpGet(UrlSupport.concat("currentRecording", captureAgentId));
+    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    try {
+      if (SC_OK == response.getStatusLine().getStatusCode()) {
+        String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
+        MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
+        logger.info("Successfully get current recording of agent {} from the remote scheduler service", captureAgentId);
+        return Opt.some(event);
+      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get current recording of agent {}", captureAgentId);
+        throw new UnauthorizedException("Unauthorized to get current recording of agent " + captureAgentId);
+      } else {
+        return Opt.none();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get current recording from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
+  }
+
+  @Override
+  public Opt<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+    HttpGet get = new HttpGet(UrlSupport.concat("upcomingRecording", captureAgentId));
+    HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
+    try {
+      if (SC_OK == response.getStatusLine().getStatusCode()) {
+        String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
+        MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
+        logger.info("Successfully get upcoming recording of agent {} from the remote scheduler service", captureAgentId);
+        return Opt.some(event);
+      } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
+        logger.info("Unauthorized to get upcoming recording of agent {}", captureAgentId);
+        throw new UnauthorizedException("Unauthorized to get upcoming recording of agent " + captureAgentId);
+      } else {
+        return Opt.none();
+      }
+    } catch (UnauthorizedException e) {
+      throw e;
+    } catch (Exception e) {
+      throw new SchedulerException("Unable to get upcoming recording from remote scheduler service: " + e);
+    } finally {
+      closeConnection(response);
+    }
   }
 
   @Override
