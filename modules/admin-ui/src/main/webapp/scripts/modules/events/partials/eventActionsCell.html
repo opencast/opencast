@@ -5,6 +5,15 @@
    with-role="ROLE_UI_EVENTS_DETAILS_VIEW">
 </a>
 
+
+<a ng-if="row.series_id"
+   data-open-modal="series-details"
+   data-resource-id="{{ row.series_id }}"
+   class="more-series"
+   title="{{ 'EVENTS.SERIES.TABLE.TOOLTIP.DETAILS' | translate }}"
+   with-role="ROLE_UI_SERIES_DETAILS_VIEW">
+</a>
+
 <!-- Remove button for published events. -->
 <a class="remove"
    ng-click="row.checkedDelete()"

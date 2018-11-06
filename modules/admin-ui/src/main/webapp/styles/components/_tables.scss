@@ -239,7 +239,10 @@
 
             &.more {
                 @include build-icon(auto, auto, more-icon, 19px, 15px);
+            }
 
+            &.more-series {
+                @include build-icon(auto, auto, more-series-icon, 19px, 15px);
             }
 
             &.time {
