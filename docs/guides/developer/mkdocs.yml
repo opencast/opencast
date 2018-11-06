@@ -16,7 +16,7 @@ extra_css:
 
 # This needs to be listed in order to populate the left navigation and the TOC
 # Items will appear in this order
-pages:
+nav:
 - Home: 'index.md'
 - Development Process:
    - Development: 'development-process.md'

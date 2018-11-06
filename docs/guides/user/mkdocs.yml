@@ -13,7 +13,7 @@ site_dir: 'site'
 # This needs to be listed in order to populate the left navigation and the TOC
 # Items will appear in this order
 
-pages:
+nav:
 - Introduction: 'index.md'
 - Log-in: 'login.md'
 - Events: 'events.md'

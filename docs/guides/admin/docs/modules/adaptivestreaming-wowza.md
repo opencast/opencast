@@ -52,7 +52,7 @@ This structure always follows the same pattern:
   distributes.
 
 The organization ID is automatically assigned based on the server's DNS name
-([more info](../configuration/multi.tenancy)). Each organization (or *tenant*) is
+([more info](../configuration/multi.tenancy.md)). Each organization (or *tenant*) is
 independent from the others defined in the system. For the media distribution, that means that each organization's
 media content is stored in separate directories, so the streaming applications should also be different, as we will see
 below.

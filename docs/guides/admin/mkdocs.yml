@@ -13,7 +13,7 @@ site_dir: 'site'
 # This needs to be listed in order to populate the left navigation and the TOC
 # Items will appear in this order
 
-pages:
+nav:
 - Home: 'index.md'
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
@@ -76,6 +76,7 @@ pages:
    - Search Index: 'modules/searchindex.md'
    - Stream Security: 'modules/stream-security.md'
    - Text Extraction: 'modules/textextraction.md'
+   - Timeline Previews: 'modules/timelinepreviews.md'
    - Transcripts (IBM Watson): 'modules/watsontranscripts.md'
    - Video Editor:
       - Setup: 'modules/videoeditor.setup.md'

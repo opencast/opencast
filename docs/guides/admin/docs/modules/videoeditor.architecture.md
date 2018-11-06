@@ -74,7 +74,7 @@ and namespace extensions have been made to make sure that Opencast is able to fi
 The **waveform** operation creates an image showing the temporal audio activity within the recording. This is be done
 with a probably well known waveform (see example image).
 
-![Waveform image example](../configuration/workflowoperationhandler/waveform.png)
+![Waveform image example](../workflowoperationhandlers/waveform.png)
 
 The operation does not need an additional module, as it is not very work intensive to create such an image. The
 operation needs and audio-only file to create the image and it provides an PNG image.
