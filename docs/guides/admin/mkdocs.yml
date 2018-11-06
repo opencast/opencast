@@ -42,7 +42,6 @@ pages:
    - Asset Manager: 'configuration/asset-manager.md'
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
-   - Manual Asset Upload: 'configuration/asset-upload-ui/index.md'
    - Encoding: 'configuration/encoding.md'
    - Load: 'configuration/load.md'
    - Log: 'configuration/log.md'
@@ -60,7 +59,11 @@ pages:
    - Workflow: 'configuration/workflow.md'
    - External API: 'configuration/external-api.md'
    - OAI-PMH: 'configuration/oaipmh.md'
-   - Admin UI Configuration: 'configuration/ui.md'
+   - Admin UI Configuration:
+      - Event Filters: 'configuration/admin-ui/event-filters.md'
+      - Manual Asset Upload: 'configuration/admin-ui/asset-upload.md'
+      - Languages: 'configuration/admin-ui/languages.md'
+      - Thumbnails: 'configuration/admin-ui/thumbnails.md'
 - Version Support: 'version-support.md'
 - Modules:
    - Overview: 'modules/index.md'

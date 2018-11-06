@@ -133,8 +133,10 @@ public final class ThumbnailImpl {
     }
   }
 
-  private final MediaPackageElementFlavor sourceFlavor;
   private final MediaPackageElementFlavor previewFlavor;
+  private final String previewProfileDownscale;
+  private final MediaPackageElementFlavor uploadedFlavor;
+  private final List<String> uploadedTags;
   private final MediaPackageElementFlavor publishFlavor;
   private final List<String> publishTags;
   private final Workspace workspace;
@@ -145,8 +147,9 @@ public final class ThumbnailImpl {
   private final String oaiPmhChannel;
   private final String encodingProfile;
   private final double defaultPosition;
-  private final MediaPackageElementFlavor defaultTrackPrimary;
-  private final MediaPackageElementFlavor defaultTrackSecondary;
+  private final String sourceFlavorSubtype;
+  private final MediaPackageElementFlavor sourceFlavorPrimary;
+  private final MediaPackageElementFlavor sourceFlavorSecondary;
   private String tempThumbnailFileName;
   private final String tempThumbnailId;
   private URI tempThumbnail;
@@ -158,15 +161,20 @@ public final class ThumbnailImpl {
     final OaiPmhPublicationService oaiPmhPublicationService,
     final ConfigurablePublicationService configurablePublicationService, final AssetManager assetManager,
     final ComposerService composerService) {
-    this.sourceFlavor = flavor(config.getThumbnailSourceFlavorType(), config.getThumbnailSourceFlavorSubtype());
     this.previewFlavor = parseFlavor(config.getThumbnailPreviewFlavor());
+    this.previewProfileDownscale = config.getThumbnailPreviewProfileDownscale();
+    this.uploadedFlavor = parseFlavor(config.getThumbnailUploadedFlavor());
+    this.uploadedTags = Arrays.asList(config.getThumbnailUploadedTags().split(","));
     this.publishFlavor = parseFlavor(config.getThumbnailPublishFlavor());
     this.publishTags = Arrays.asList(config.getThumbnailPublishTags().split(","));
     this.oaiPmhChannel = config.getOaipmhChannel();
     this.encodingProfile = config.getThumbnailEncodingProfile();
     this.defaultPosition = config.getThumbnailDefaultPosition();
-    this.defaultTrackPrimary = flavor(config.getThumbnailDefaultTrackPrimary(), config.getThumbnailSourceFlavorSubtype());
-    this.defaultTrackSecondary = flavor(config.getThumbnailDefaultTrackSecondary(), config.getThumbnailSourceFlavorSubtype());
+    this.sourceFlavorSubtype = config.getThumbnailSourceFlavorSubtype();
+    this.sourceFlavorPrimary = flavor(config.getThumbnailSourceFlavorTypePrimary(),
+      config.getThumbnailSourceFlavorSubtype());
+    this.sourceFlavorSecondary = flavor(config.getThumbnailSourceFlavorTypeSecondary(),
+      config.getThumbnailSourceFlavorSubtype());
     this.workspace = workspace;
     this.oaiPmhPublicationService = oaiPmhPublicationService;
     this.assetManager = assetManager;
@@ -272,24 +280,25 @@ public final class ThumbnailImpl {
   private Track getPrimaryOrSecondaryTrack(final MediaPackage mp) throws MediaPackageException {
 
     final Optional<Track> track = Optional.ofNullable(
-      Arrays.stream(mp.getTracks(defaultTrackPrimary)).findFirst()
-        .orElse(Arrays.stream(mp.getTracks(defaultTrackSecondary)).findFirst()
+      Arrays.stream(mp.getTracks(sourceFlavorPrimary)).findFirst()
+        .orElse(Arrays.stream(mp.getTracks(sourceFlavorSecondary)).findFirst()
           .orElse(null)));
 
     if (track.isPresent()) {
       return track.get();
     } else {
-      throw new MediaPackageException("Cannot find stream with primary or secondaŕy default flavor.");
+      throw new MediaPackageException("Cannot find track with primary or secondary source flavor.");
     }
   }
 
   private void archive(final MediaPackage mp) {
-    final Attachment sourceAttachment = AttachmentImpl.fromURI(tempThumbnail);
-    sourceAttachment.setIdentifier(tempThumbnailId);
-    sourceAttachment.setFlavor(sourceFlavor);
-    sourceAttachment.setMimeType(this.tempThumbnailMimeType);
-    Arrays.stream(mp.getElementsByFlavor(sourceFlavor)).forEach(mp::remove);
-    mp.add(sourceAttachment);
+    final Attachment attachment = AttachmentImpl.fromURI(tempThumbnail);
+    attachment.setIdentifier(tempThumbnailId);
+    attachment.setFlavor(uploadedFlavor);
+    attachment.setMimeType(this.tempThumbnailMimeType);
+    uploadedTags.forEach(attachment::addTag);
+    Arrays.stream(mp.getElementsByFlavor(uploadedFlavor)).forEach(mp::remove);
+    mp.add(attachment);
   }
 
   private Tuple<URI, MediaPackageElement> updateInternalPublication(final MediaPackage mp, final boolean downscale)
@@ -298,7 +307,7 @@ public final class ThumbnailImpl {
     final Predicate<Attachment> priorFilter = attachment -> previewFlavor.matches(attachment.getFlavor());
     final String conversionProfile;
     if (downscale) {
-      conversionProfile = "editor.thumbnail.preview.downscale";
+      conversionProfile = previewProfileDownscale;
     } else {
       conversionProfile = null;
     }
@@ -429,7 +438,7 @@ public final class ThumbnailImpl {
     try {
 
       // Remove any uploaded thumbnails
-      Arrays.stream(mp.getElementsByFlavor(sourceFlavor)).forEach(mp::remove);
+      Arrays.stream(mp.getElementsByFlavor(uploadedFlavor)).forEach(mp::remove);
 
       final Tuple<URI, MediaPackageElement> internalPublicationResult = updateInternalPublication(mp, false);
       deletionUris.add(internalPublicationResult.getA());
@@ -472,7 +481,7 @@ public final class ThumbnailImpl {
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException {
 
-    final MediaPackageElementFlavor trackFlavor = flavor(trackFlavorType, sourceFlavor.getSubtype());
+    final MediaPackageElementFlavor trackFlavor = flavor(trackFlavorType, sourceFlavorSubtype);
     final Optional<Track> track = Arrays.stream(mp.getTracks(trackFlavor)).findFirst();
 
     if (!track.isPresent()) {
