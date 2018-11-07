@@ -45,7 +45,7 @@ describe('Edit events controller', function () {
         // These are the requests that are necessary to construct the modal.
         $httpBackend.expectGET('/admin-ng/resources/SERIES.json').respond(JSON.stringify(getJSONFixture('admin-ng/resources/SERIES.json')));
         $httpBackend.expectGET('/admin-ng/capture-agents/agents.json?inputs=true').respond(JSON.stringify(getJSONFixture('admin-ng/capture-agents/agents.json')));
-        $httpBackend.expectPOST('/admin-ng/event/scheduling.json').respond(JSON.stringify(getJSONFixture('admin-ng/event/scheduling.json')));
+        $httpBackend.expectPOST('/admin-ng/event/scheduling.json').respond(200, getJSONFixture('admin-ng/event/scheduling.json'));
         $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
         $httpBackend.flush();
         spyOn($scope, 'nextWizardStep');
@@ -78,8 +78,11 @@ describe('Edit events controller', function () {
             $scope.clearFormAndContinue().then(function() {
 
                 expect($scope.scheduling).not.toBe({});
+                expect(Object.keys($scope.scheduling).length).toBe(2);
                 // Agent is non-ambiguous
-                expect($scope.scheduling.location.id).toBe("agent1");
+                expect($scope.scheduling['FR']).not.toBe(undefined);
+                expect($scope.scheduling['FR']).not.toBe({});
+                expect($scope.scheduling['FR'].location.id).toBe("agent1");
                 // Yadda yadda, test the rest of the data. :)
 
                 expect($scope.conflictCheckingEnabled).toBe(true);
