@@ -144,6 +144,7 @@ public class UIConfigRest {
       InputStream configFileStream = new FileInputStream(configFile);
       long fileLength = configFile.length();
 
+      // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
       return RestUtil.R.ok(configFileStream, getMimeType(filename), Option.some(fileLength), Option.some(filename));
     }
     catch (FileNotFoundException e)
