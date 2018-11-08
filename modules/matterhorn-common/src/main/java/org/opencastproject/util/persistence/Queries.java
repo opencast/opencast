@@ -140,7 +140,7 @@ public final class Queries {
    * are recognized and set as a timestamp ({@link javax.persistence.TemporalType#TIMESTAMP}.
    */
   public static <A extends Query> A setParams(A q, Object... params) {
-    for (int i = 1; i <= params.length; i++) {
+    for (int i = 0; i < params.length; i++) {
       final Object value = params[i];
       if (value instanceof Date) {
         q.setParameter(i, (Date) value, TemporalType.TIMESTAMP);
