@@ -19,10 +19,11 @@
 
     <!-- library version specifications -->
     <aws.version>1.11.49_1</aws.version>
+    <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-collections.version>4.2</commons-collections.version>
     <commons-compress.version>1.18</commons-compress.version>
     <cxf.version>3.2.6</cxf.version>
-    <eclipselink.version>2.6.4</eclipselink.version>
+    <eclipselink.version>2.7.1</eclipselink.version>
     <functional.version>1.4.2</functional.version>
     <guava.version>23.0</guava.version>
     <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
@@ -30,14 +31,14 @@
     <jackson.version>2.9.7</jackson.version>
     <jdk.version>1.8</jdk.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <karaf.version>4.1.6</karaf.version>
+    <karaf.version>4.2.0</karaf.version>
     <mina.version>2.0.19</mina.version>
     <node.version>v8.12.0</node.version>
     <npm.version>6.4.1</npm.version>
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <pax.web.version>6.0.11</pax.web.version>
+    <pax.web.version>7.0.0</pax.web.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
@@ -652,9 +653,9 @@
           <version>2.5.2</version>
         </plugin>
         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -668,8 +669,13 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>5.3.1</version>
+        <artifactId>activemq-client</artifactId>
+        <version>5.15.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activeio-core</artifactId>
+        <version>3.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
