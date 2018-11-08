@@ -137,6 +137,47 @@ public class SeriesRestService {
   /** Suffix to mark descending ordering of results */
   public static final String DESCENDING_SUFFIX = "_DESC";
 
+  private static final String SAMPLE_DUBLIN_CORE = "<?xml version=\"1.0\"?>\n"
+          + "<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" "
+          + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+          + "    xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" "
+          + "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+          + "    xmlns:dcterms=\"http://purl.org/dc/terms/\" "
+          + "    xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n"
+          + "  <dcterms:title xml:lang=\"en\">\n"
+          + "    Land and Vegetation: Key players on the Climate Scene\n"
+          + "  </dcterms:title>\n"
+          + "  <dcterms:subject>"
+          + "    climate, land, vegetation\n"
+          + "  </dcterms:subject>\n"
+          + "  <dcterms:description xml:lang=\"en\">\n"
+          + "    Introduction lecture from the Institute for\n"
+          + "    Atmospheric and Climate Science.\n"
+          + "  </dcterms:description>\n"
+          + "  <dcterms:publisher>\n"
+          + "    ETH Zurich, Switzerland\n"
+          + "  </dcterms:publisher>\n"
+          + "  <dcterms:identifier>\n"
+          + "    10.0000/5819\n"
+          + "  </dcterms:identifier>\n"
+          + "  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n"
+          + "    2007-12-05\n"
+          + "  </dcterms:modified>\n"
+          + "  <dcterms:format xsi:type=\"dcterms:IMT\">\n"
+          + "    video/x-dv\n"
+          + "  </dcterms:format>\n"
+          + "</dublincore>";
+
+  private static final String SAMPLE_ACCESS_CONTROL_LIST =
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                  + "<acl xmlns=\"http://org.opencastproject.security\">\n"
+                  + "  <ace>\n"
+                  + "    <role>admin</role>\n"
+                  + "    <action>delete</action>\n"
+                  + "    <allow>true</allow>\n"
+                  + "  </ace>\n"
+                  + "</acl>";
+
   /**
    * OSGi callback for setting series service.
    *
@@ -276,8 +317,9 @@ public class SeriesRestService {
   @POST
   @Path("/")
   @RestQuery(name = "updateSeries", description = "Updates a series", returnDescription = "No content.", restParameters = {
-          @RestParameter(name = "series", isRequired = true, defaultValue = "${this.sampleDublinCore}", description = "The series document", type = TEXT),
-          @RestParameter(name = "acl", isRequired = false, defaultValue = "${this.sampleAccessControlList}", description = "The access control list for the series", type = TEXT) }, reponses = {
+          @RestParameter(name = "series", isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE, description = "The series document", type = TEXT),
+          @RestParameter(name = "acl", isRequired = false, defaultValue = SAMPLE_ACCESS_CONTROL_LIST, description = "The access control list "
+                  + "for the series", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
@@ -328,12 +370,18 @@ public class SeriesRestService {
 
   @POST
   @Path("/{seriesID:.+}/accesscontrol")
-  @RestQuery(name = "updateAcl", description = "Updates the access control list for a series", returnDescription = "No content.", restParameters = { @RestParameter(name = "acl", isRequired = true, defaultValue = "${this.sampleAccessControlList}", description = "The access control list for the series", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-          @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
+  @RestQuery(name = "updateAcl", description = "Updates the access control list for a series",
+          returnDescription = "No content.",
+    restParameters = {
+      @RestParameter(name = "acl", isRequired = true, defaultValue = SAMPLE_ACCESS_CONTROL_LIST, description = "The access control list for the series", type = TEXT)
+    }, pathParameters = {
+      @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+  }, reponses = {
+      @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+      @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
+      @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
+      @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
+      @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
   public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl)
           throws UnauthorizedException {
     if (accessControl == null) {
@@ -880,24 +928,6 @@ public class SeriesRestService {
     } catch (SeriesException e) {
       return R.serverError();
     }
-  }
-
-  /**
-   * Generates sample Dublin core.
-   *
-   * @return sample Dublin core
-   */
-  public String getSampleDublinCore() {
-    return "<?xml version=\"1.0\"?>\n<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n  xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n  <dcterms:title xml:lang=\"en\">\n    Land and Vegetation: Key players on the Climate Scene\n    </dcterms:title>\n  <dcterms:subject>\n    climate, land, vegetation\n    </dcterms:subject>\n  <dcterms:description xml:lang=\"en\">\n    Introduction lecture from the Institute for\n    Atmospheric and Climate Science.\n    </dcterms:description>\n  <dcterms:publisher>\n    ETH Zurich, Switzerland\n    </dcterms:publisher>\n  <dcterms:identifier>\n    10.0000/5819\n    </dcterms:identifier>\n  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n    2007-12-05\n    </dcterms:modified>\n  <dcterms:format xsi:type=\"dcterms:IMT\">\n    video/x-dv\n    </dcterms:format>\n  <oc:promoted>\n    true\n  </oc:promoted>\n</dublincore>";
-  }
-
-  /**
-   * Generates sample access control list.
-   *
-   * @return sample ACL
-   */
-  public String getSampleAccessControlList() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"http://org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
   }
 
 }

@@ -1071,16 +1071,6 @@
         <artifactId>commons-csv</artifactId>
         <version>1.5</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
-        <version>1.8.3</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils-core</artifactId>
-        <version>1.8.3</version>
-      </dependency>
       <!-- Querydsl -->
       <dependency>
         <groupId>com.mysema.querydsl</groupId>

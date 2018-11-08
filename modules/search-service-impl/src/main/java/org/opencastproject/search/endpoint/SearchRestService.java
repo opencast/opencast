@@ -81,28 +81,32 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   /** The service registry */
   private ServiceRegistry serviceRegistry;
 
-  public String getSampleMediaPackage() {
-    return "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\"><title>t1</title>\n"
-            + "  <metadata>\n"
-            + "    <catalog id=\"catalog-1\" type=\"dublincore/episode\">\n"
-            + "      <mimetype>text/xml</mimetype>\n"
-            + "      <url>https://opencast.jira.com/svn/MH/trunk/modules/kernel/src/test/resources/dublincore.xml</url>\n"
-            + "      <checksum type=\"md5\">2b8a52878c536e64e20e309b5d7c1070</checksum>\n"
-            + "    </catalog>\n"
-            + "    <catalog id=\"catalog-3\" type=\"metadata/mpeg-7\" ref=\"track:track-1\">\n"
-            + "      <mimetype>text/xml</mimetype>\n"
-            + "      <url>https://opencast.jira.com/svn/MH/trunk/modules/kernel/src/test/resources/mpeg7.xml</url>\n"
-            + "      <checksum type=\"md5\">2b8a52878c536e64e20e309b5d7c1070</checksum>\n"
-            + "    </catalog>\n"
-            + "  </metadata>\n" + "</mediapackage>";
-  }
+  private static final String SAMPLE_MEDIA_PACKAGE = "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\""
+          + "start=\"2007-12-05T13:40:00\" duration=\"1004400000\">\n"
+          + "  <title>t1</title>\n"
+          + "  <metadata>\n"
+          + "    <catalog id=\"catalog-1\" type=\"dublincore/episode\">\n"
+          + "      <mimetype>text/xml</mimetype>\n"
+          + "      <url>https://opencast.jira.com/svn/MH/trunk/modules/kernel/src/test/resources/dublincore.xml</url>\n"
+          + "      <checksum type=\"md5\">2b8a52878c536e64e20e309b5d7c1070</checksum>\n"
+          + "    </catalog>\n"
+          + "    <catalog id=\"catalog-3\" type=\"metadata/mpeg-7\" ref=\"track:track-1\">\n"
+          + "      <mimetype>text/xml</mimetype>\n"
+          + "      <url>https://opencast.jira.com/svn/MH/trunk/modules/kernel/src/test/resources/mpeg7.xml</url>\n"
+          + "      <checksum type=\"md5\">2b8a52878c536e64e20e309b5d7c1070</checksum>\n"
+          + "    </catalog>\n"
+          + "  </metadata>\n"
+          + "</mediapackage>";
 
   @POST
   @Path("add")
   @Produces(MediaType.APPLICATION_XML)
-  @RestQuery(name = "add", description = "Adds a mediapackage to the search index.", restParameters = { @RestParameter(description = "The media package to add to the search index.", isRequired = true, name = "mediapackage", type = RestParameter.Type.TEXT, defaultValue = "${this.sampleMediaPackage}") }, reponses = {
-          @RestResponse(description = "XML encoded receipt is returned", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
+  @RestQuery(name = "add", description = "Adds a mediapackage to the search index.",
+    restParameters = {
+      @RestParameter(description = "The media package to add to the search index.", isRequired = true, name = "mediapackage", type = RestParameter.Type.TEXT, defaultValue = SAMPLE_MEDIA_PACKAGE)
+    }, reponses = {
+      @RestResponse(description = "XML encoded receipt is returned", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "There has been an internal error and the mediapackage could not be added", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "The job receipt")
   public Response add(@FormParam("mediapackage") MediaPackageImpl mediaPackage) throws SearchException {
     try {
       Job job = searchService.add(mediaPackage);

@@ -58,8 +58,8 @@ public class StatusData {
    * @throws IllegalArgumentException
    *           if the response code is out of range (e.g. &lt;100 or &gt;1100)
    */
-  public StatusData(RestResponse restResponse, RestDocData restDocData) throws IllegalArgumentException {
-    this(restResponse.responseCode(), restDocData.processMacro(restResponse.description()));
+  public StatusData(RestResponse restResponse) throws IllegalArgumentException {
+    this(restResponse.responseCode(), restResponse.description());
   }
 
   /**
