@@ -115,7 +115,6 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               name = "mediapackage",
               isRequired = true,
               type = Type.TEXT,
-              defaultValue = "${this.sampleMediaPackage}",
               description = "The media package to add to the search index.")},
       reponses = {
           @RestResponse(
@@ -141,7 +140,6 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               name = "mediapackage",
               isRequired = true,
               type = Type.TEXT,
-              defaultValue = "${this.sampleMediaPackage}",
               description = "The media package to take a snapshot from.")},
       reponses = {
           @RestResponse(
