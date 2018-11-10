@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "ערוך",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "מטא-נתונים",
-            "SCHEDULING": "תזמון"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "תזמן מספר ארועים",
                   "REPEATS": "חזרות",
                   "REPEAT_ON": "חזור על",
-                  "WEEKDAYS": "ימי השבוע"
+                  "WEEKDAYS": "ימי השבוע",
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "אין שרותים זמינים לתזמון לכידה"
             },

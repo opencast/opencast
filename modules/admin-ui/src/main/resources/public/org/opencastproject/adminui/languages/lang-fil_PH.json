@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "I-edit",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Ang metadata",
-            "SCHEDULING": "Ang pag iskedyul"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "Ang iskedyul ng ibat-ibang mga kaganapan",
                   "REPEATS": "Ang mga uulitin",
                   "REPEAT_ON": "Ang mga uulitin sa",
-                  "WEEKDAYS": "Ang mga araw ng lingo"
+                  "WEEKDAYS": "Ang mga araw ng lingo",
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "Ang mga ahente ay walang makuha na magagamit para sa pag-iiskedyul"
             },

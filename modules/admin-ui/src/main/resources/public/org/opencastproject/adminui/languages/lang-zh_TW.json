@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "編輯",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "後設資料",
-            "SCHEDULING": "排程"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "多個事件的排程",
                   "REPEATS": "重複",
                   "REPEAT_ON": "重複的",
-                  "WEEKDAYS": "平日"
+                  "WEEKDAYS": "平日",
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "沒有可定時錄製的製播器可用"
             },
