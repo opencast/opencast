@@ -32,7 +32,7 @@ public class SerializableTheme implements Serializable {
   private static final long serialVersionUID = 618342361307578393L;
 
   private final long id;
-  private final Date creationDate;
+  private final long creationDate;
   private final boolean isDefault;
   private final String creator;
   private final String name;
@@ -58,7 +58,7 @@ public class SerializableTheme implements Serializable {
           String licenseSlideBackground, String licenseSlideDescription, boolean watermarkActive, String watermarkFile,
           String watermarkPosition) {
     this.id = id;
-    this.creationDate = creationDate;
+    this.creationDate = creationDate.getTime();
     this.isDefault = isDefault;
     this.creator = creator;
     this.name = name;
@@ -83,7 +83,7 @@ public class SerializableTheme implements Serializable {
   }
 
   public Date getCreationDate() {
-    return creationDate;
+    return new Date(creationDate);
   }
 
   public String getCreator() {

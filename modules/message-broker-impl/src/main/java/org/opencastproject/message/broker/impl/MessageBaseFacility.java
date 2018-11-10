@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.Connection;
@@ -106,7 +106,7 @@ public class MessageBaseFacility {
     try {
       /* Create a ConnectionFactory for establishing connections to the Active MQ broker */
       ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory(url);
-      connectionFactory.setTrustedPackages(Arrays.asList("org.opencastproject.message.broker.api", "java.util"));
+      connectionFactory.setTrustedPackages(Collections.singletonList("org.opencastproject.message.broker.api"));
       if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
         connectionFactory.setUserName(username);
         connectionFactory.setPassword(password);
