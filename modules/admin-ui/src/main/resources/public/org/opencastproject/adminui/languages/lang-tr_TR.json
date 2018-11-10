@@ -416,7 +416,7 @@
                   "CAPTIONS_DFXP": "Altyazı DFXP",
                   "CAPTIONS_WEBVTT": "Altyazı WebVTT",
                   "PREVIEW_IMAGE": "Resim önizleme",
-                  "SMIL": "Smil Katalog",
+                  "SMIL": "SMIL Katalog",
                   "TRACK_PARTS": "Kayıt parçası"
                }
             },
@@ -472,13 +472,13 @@
                "START": "Bu başlangıç tarihi için filtre",
                "SERIES": "Bu dizi için filtre",
                "STATUS": "Bu etkinlik durumu için filtre",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
-               "EDITOR": "Open video Editor",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow"
+               "LOCATION": "Yere göre filtrele",
+               "DETAILS": "Etkinlik detaylarını görüntüle",
+               "DELETE": "Etkinliği sil",
+               "PREVIEW": "Önizleme oynatıcısını aç",
+               "EDITOR": "Video editörünü aç",
+               "COMMENTS": "Yorumları görüntüle",
+               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle"
             }
          },
          "SCHEDULING_STATUS": {
@@ -516,8 +516,8 @@
             "GENERAL": {
                "PUBLICATION_STATUS": "Yayınlar",
                "NO_PUBLICATIONS_AVAILABLE": "Etkinliğin hiçbir yayını yok",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "PUBLICATION_DESCRIPTION": "Bu etkinlik aşağıdaki yayın kanallarına yayınlanmıştır:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "Bu etkinlik su anda devam etmiyor",
                "SCHEDULING_STATUS": "Durum",
                "READY_FOR_RECORDING": "Kayıt için hazır",
                "OPTED_OUT": "Vazgeçildi",
@@ -581,7 +581,7 @@
                   "START_TIME": "Başlangıç zamanı",
                   "TIMEZONE": "Zaman dilimi",
                   "END_DATE": "Bitiş tarihi",
-                  "END_TIME": "End time",
+                  "END_TIME": "Bitiş zamanı",
                   "DURATION": "Süre"
                },
                "SCHEDULE_SINGLE": {
@@ -819,10 +819,10 @@
                "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
                "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "Bu yürütme iş akışını durdur",
+                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
+                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
+                  "DELETE": "Bu iş akışını sil"
                }
             },
             "WORKFLOW_DETAILS": {
@@ -919,7 +919,7 @@
             "THEME": {
                "CAPTION": "Şablon",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Videolarınızı markalamak için temaları isteğe bağlı olarak kullanabilirsiniz. Temalar, tampon ve fragman videolarını, filigranları ve meta verileri içeren başlık slaytlarını tanımlayabilir."
                },
                "TITLE": "Şablon",
                "LABEL": "Şablon yok",
@@ -939,9 +939,9 @@
             "EVENTS": "Etkinlikler",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "SERIES": "Bu seri için etkinlikleri filtrele",
+               "DETAILS": "Seri ayrıntılarını aç",
+               "DELETE": "Seriyi sil"
             }
          },
          "DETAILS": {
@@ -1048,9 +1048,9 @@
             "BLACKLIST_TO": "Tarihine kadar Kara listeye alındı",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "Etkinlikleri bu lokasyona göre filtrele",
+               "DETAILS": "Lokasyon detaylarını aç",
+               "DELETE": "Lokasyonu sil (yakalama aracısı kaydını kaldır)"
             }
          },
          "DETAILS": {
@@ -1144,8 +1144,8 @@
             "BLACKLIST_TO": "Tarihine kadar Kara listeye alındı",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Kullanıcıyı Sil",
+               "DETAILS": "Kullanıcı detaylarını aç"
             }
          },
          "DETAILS": {
@@ -1188,8 +1188,8 @@
             "ROLE": "Rol",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "Grup ayrıntılarını aç",
+               "DELETE": "Grubu sil"
             }
          },
          "DETAILS": {
@@ -1232,8 +1232,8 @@
             "IN_USE": "Kullanımda",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "Erişim ilkesini sil",
+               "DETAILS": "Erişim ilke ayrıntılarını aç"
             }
          },
          "NEW": {
@@ -1452,8 +1452,8 @@
             "USAGE": "Kullanım",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Temayı sil",
+               "DETAILS": "Tema detaylarını aç"
             }
          },
          "DETAILS": {
@@ -1585,17 +1585,17 @@
             "SANITIZE": "Başarısız servisi temizle",
             "ACTION": "Eylemler",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "Servisi sanitize et (servisi normal durumuna döndür)"
             }
          }
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Uyarı: Bazı değişiklikler kaydedilmedi. Video editörü bırakırsanız, bu değişiklikler kaybolur. Gerçekten devam etmek istiyor musunuz?",
       "TIMELINE": "Zaman tüneli",
       "ZOOMLEVEL": "Yakınlaştırma Düzeyi",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "PREVIEW_MODE": "Önizleme modu",
+      "PREVIEW_MODE_TOOLTIP": "Yalnızca seçili segmentleri oynat",
       "ZOOM": "Yakınlaştır",
       "BUTTONS": {
          "CLOSE": "Kapat",
@@ -1663,8 +1663,8 @@
       "PLACEHOLDER": "Ara…",
       "PROFILES": {
          "FILTERS_HEADER": "Filtreleme ayarları kaydedildi",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
+         "EDIT": "Filtre setini düzenle",
+         "REMOVE": "Kayıtlı filtreyi kaldır",
          "EMPTY": "Henüz kaydedilmiş filtreleme yok",
          "SAVE_FILTERS": "Kaydet",
          "FILTER_HEADER": "Filtre setini kaydet",

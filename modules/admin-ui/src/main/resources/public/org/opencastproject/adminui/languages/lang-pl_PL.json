@@ -68,8 +68,8 @@
       }
    },
    "MEDIAMODULE": "Galeria",
-   "SYSTEM_NOTIFICATIONS": "System warnings and notifications",
-   "LANGUAGE": "Select language",
+   "SYSTEM_NOTIFICATIONS": "Ostrzeżenia i uwagi systemowe",
+   "LANGUAGE": "Wybierz język",
    "HELP": {
       "HELP": "Pomoc",
       "USERS_GUIDE": "Podręcznik użytkownika",
@@ -109,10 +109,10 @@
       "EVENTS_PROCESSING_ACTION_NOT_RETRY": "Nie można wznowić przetwarzania.",
       "EVENTS_PROCESSING_ACTION_NONE": "Przerywanie przetwarzania...",
       "EVENTS_PROCESSING_ACTION_NOT_NONE": "Nie udało się przerwać przetwarzania.",
-      "EVENTS_PROCESSING_ACTION_STOP": "Processing stopped.",
-      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Processing could not be stopped.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Deleted Workflow.",
-      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Workflow could not be deleted.",
+      "EVENTS_PROCESSING_ACTION_STOP": "Przetwarzanie zatrzymane.",
+      "EVENTS_PROCESSING_ACTION_NOT_STOP": "Nie można zatrzymać przetwarzania.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW": "Skasowano ciąg przetwarzania.",
+      "EVENTS_PROCESSING_DELETE_WORKFLOW_FAILED": "Plan przetwarzania nagrania nie mógł zostać usunięty.",
       "SERIES_UPDATED_NB": "Seria {{ number }} została pomyślnie zaktualizowana",
       "SERIES_UPDATED_ALL": "Wszystkie serie zostały pomyślnie zaktualizowane",
       "SERIES_NOT_UPDATED": "Nie udało się zapisać serii",
@@ -387,7 +387,7 @@
                   "START_TIME": "Godzina rozpoczęcia",
                   "TIMEZONE": "Strefa czasowa",
                   "END_DATE": "Data zakończenia",
-                  "END_TIME": "End time",
+                  "END_TIME": "Czas zakończenia",
                   "DURATION": "Czas trwania"
                },
                "SCHEDULE_SINGLE": {
@@ -474,11 +474,11 @@
                "STATUS": "Filter for this event status",
                "LOCATION": "Filter for this location",
                "DETAILS": "Open event details",
-               "DELETE": "Delete event",
-               "PREVIEW": "Open preview player",
-               "EDITOR": "Open video Editor",
-               "COMMENTS": "View comments",
-               "PAUSED_WORKFLOW": "View paused workflow"
+               "DELETE": "Usuń wydarzenie",
+               "PREVIEW": "Otwórz podgląd",
+               "EDITOR": "Otwórz Edytor wideo",
+               "COMMENTS": "Pokaż komentarze",
+               "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań"
             }
          },
          "SCHEDULING_STATUS": {
@@ -516,14 +516,14 @@
             "GENERAL": {
                "PUBLICATION_STATUS": "Publikacje",
                "NO_PUBLICATIONS_AVAILABLE": "To wydarzenie nie ma publikacji",
-               "PUBLICATION_DESCRIPTION": "This event has been published to the following publication channels:",
-               "LIVE_EVENT_NOT_IN_PROGRESS": "This event is not currently in progress",
+               "PUBLICATION_DESCRIPTION": "To wydarzenie zostało opublikowane w następujących kanałach:",
+               "LIVE_EVENT_NOT_IN_PROGRESS": "To wydarzenie nie jest obecnie w toku",
                "SCHEDULING_STATUS": "Status",
                "READY_FOR_RECORDING": "Gotowy do nagrywania",
                "OPTED_OUT": "Wykluczone",
                "CUSTOM": "Niestandardowe",
                "ENGAGE": "Engage",
-               "ENGAGE_LIVE": "Engage Live",
+               "ENGAGE_LIVE": "Transmisja na żywo",
                "EXTERNAL_API": "Publiczne API",
                "YOUTUBE": "YouTube",
                "OAIPMH": "OAI-PMH",
@@ -581,7 +581,7 @@
                   "START_TIME": "Godzina rozpoczęcia",
                   "TIMEZONE": "Strefa czasowa",
                   "END_DATE": "Data zakończenia",
-                  "END_TIME": "End time",
+                  "END_TIME": "Czas zakończenia",
                   "DURATION": "Czas trwania"
                },
                "SCHEDULE_SINGLE": {
@@ -776,7 +776,7 @@
                "LANGUAGE": "Język",
                "COPYRIGHT": "Prawa autorskie",
                "VISIBILITY": "Widoczność",
-               "PUBLIC": "Public target",
+               "PUBLIC": "Cel publiczny",
                "OS": "System operacyjny wykonujący pracę",
                "LOCKED": {
                   "RUNNING": "Edytowanie metadanych nie jest dozwolone jeśli dla wydarzenia uruchomione są operacje"
@@ -819,10 +819,10 @@
                "NO_CONFIGURATION": "Nie ma parametrów dla wybranej definicji przepływu pracy.",
                "WORKFLOW": "Przepływ pracy",
                "TOOLTIP": {
-                  "STOP": "Stop execution workflow instance",
-                  "ABORT": "Abort execution of workflow instance (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow instance",
-                  "DELETE": "Delete workflow instance"
+                  "STOP": "Zatrzymaj wykonywanie instancji ciągu zadaniowego",
+                  "ABORT": "Przewij wykonywanie ciągu zadaniowego (nie ponawiaj nieudanych operacji)",
+                  "RETRY": "Ponów wykonanie intancji ciągu zadaniowego",
+                  "DELETE": "Skasuj instancje ciągu zadaniowego"
                }
             },
             "WORKFLOW_DETAILS": {
@@ -939,7 +939,7 @@
             "EVENTS": "Wydarzenia",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "SERIES": "Filter events for this series",
+               "SERIES": "Filtrowanie wydarzeń dla tej serii",
                "DETAILS": "Open series details",
                "DELETE": "Delete series"
             }
@@ -1054,26 +1054,26 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Location details - {{resourceId}}",
+            "HEADER": "Szczegóły lokalizacji - {{resourceId}}",
             "TAB": {
                "GENERAL": "Ogólne",
                "CONFIGURATION": "Konfiguracja",
-               "CAPABILITIES": "Capabilities"
+               "CAPABILITIES": "Możliwości"
             },
             "GENERAL": {
                "CAPTION": "Ogólne",
                "NAME": "Imię",
                "URL": "Url",
                "STATUS": "Status",
-               "UPDATE": "Last heard from"
+               "UPDATE": "Ostatnia wiadomość od"
             },
             "CONFIGURATION": {
                "CAPTION": "Konfiguracja",
-               "NO_CONFIGURATION": "No configuration provided"
+               "NO_CONFIGURATION": "Nie dostarczono konfiguracji"
             },
             "CAPABILITIES": {
-               "CAPTION": "Capabilities",
-               "NO_CAPABILITIES": "No capabilities provided"
+               "CAPTION": "Możliwości",
+               "NO_CAPABILITIES": "Nie dostarczono informacji o możliwościach"
             }
          }
       },
@@ -1154,13 +1154,13 @@
             "TABS": {
                "USER": "Użytkownik",
                "ROLES": "Role",
-               "EXTERNALROLES": "External Roles",
-               "EFFECTIVEROLES": "Effective Roles"
+               "EXTERNALROLES": "Role zewnętrzne",
+               "EFFECTIVEROLES": "Role efektywne"
             },
             "DESCRIPTION": {
-               "ROLES": "Roles and groups that can be or are already assigned to the user.",
-               "EXTERNALROLES": "The list of external roles assigned to the user granted by the external role provider(s).",
-               "EFFECTIVEROLES": "The list of effective roles directly assigned to the user and the roles indirectly loaded through group membership."
+               "ROLES": "Role i grupy, które mogą lub już są przypisane do użytkownika.",
+               "EXTERNALROLES": "Lista ról zewnętrznych przypisanych do użytkownika przez zewnętrzny system zarządzania użytkownikami.",
+               "EFFECTIVEROLES": "Lista efektywnych ról bezpośrednio przypisanych użytkownikowi i ról pośrednio przypisanych przez członkostwo w grupach."
             },
             "FORM": {
                "USERNAME": "Nazwa Użytkownika",
@@ -1503,7 +1503,7 @@
                "FILE_UPLOADED": "Pliki wysłane: ",
                "DESCRIPTION": "Półprzezroczysty obraz, który jest nałożony na każdej klatce nagrania.",
                "ACTIVE": "Aktywne",
-               "ENABLE": "Enable watermark",
+               "ENABLE": "Włącz znak wodny",
                "TOP_LEFT": "Lewy górny róg",
                "TOP_RIGHT": "Prawy góry róg",
                "BOTTOM_LEFT": "Lewy dolny",
@@ -1593,7 +1593,7 @@
    "VIDEO_TOOL": {
       "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
       "TIMELINE": "Oś czasu",
-      "ZOOMLEVEL": "Zoom Level",
+      "ZOOMLEVEL": "Powiększenie",
       "PREVIEW_MODE": "Preview Mode",
       "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
       "ZOOM": "Powiększenie",
@@ -1601,7 +1601,7 @@
          "CLOSE": "Zamknij",
          "SAVE": "Zapisz",
          "PROCESS": "Zapisz & przetwarzaj",
-         "ADD_COMMENT": "Add Comment"
+         "ADD_COMMENT": "Dodaj komentarz"
       },
       "TABS": {
          "PLAY": "Odtwarzanie",
@@ -1612,22 +1612,22 @@
       "AREAS": {
          "METADATA": "Metadane",
          "COMMENTS": "Komentarze",
-         "SEGMENTS": "Segments"
+         "SEGMENTS": "Segmenty"
       },
       "ACTIONS": {
          "SPLIT": "Podziel",
          "CUT": "Wytnij",
          "REPLAY_SEGMENT": "Powtórzenie segmentu",
          "REPLAY_END_OF_SEGMENT": "Koniec segmentu",
-         "REPLAY_SEGMENT_WITH_PREROLL": "Check transition",
+         "REPLAY_SEGMENT_WITH_PREROLL": "Sprawdzenie przejścia",
          "UNDO": "Cofnij",
          "REDO": "Wykonaj ponownie",
          "CLEAR_SEGMENTS": "Wyczyść segmenty",
-         "CLEAR_SELECTED_SEGMENT": "Clear selected segment"
+         "CLEAR_SELECTED_SEGMENT": "Wyczyść zaznaczony segment"
       },
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Usuń segment",
-         "USE_SEGMENT": "Use this Segment"
+         "USE_SEGMENT": "Użyj tego segmentu"
       },
       "PLAYER": {
          "PLAY": "Odtwarzaj",
@@ -1650,7 +1650,7 @@
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
-         "PLACEHOLDER": "Please select a filter…",
+         "PLACEHOLDER": "Proszę wybrać filtr…",
          "NO_OPTIONS": "Nie wybrano filtrowania"
       },
       "FILTER_VALUE_SELECTION": {
