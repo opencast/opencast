@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
@@ -144,11 +143,11 @@ public class WaveformServiceImplTest {
   @Test
   public void testProcess() throws Exception {
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject()))
+    EasyMock.expect(workspace.get(EasyMock.anyObject()))
             .andReturn(new File(audioTrack.getURI()));
-    Capture filenameCapture = new Capture();
+    Capture<String> filenameCapture = Capture.newInstance();
     EasyMock.expect(workspace.putInCollection(
-            EasyMock.anyString(), (String) EasyMock.capture(filenameCapture), (InputStream) EasyMock.anyObject()))
+            EasyMock.anyString(), EasyMock.capture(filenameCapture), EasyMock.anyObject()))
             .andReturn(new URI("waveform.png"));
     EasyMock.replay(workspace);
 

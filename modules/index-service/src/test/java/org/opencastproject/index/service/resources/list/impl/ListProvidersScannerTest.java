@@ -65,8 +65,8 @@ public class ListProvidersScannerTest {
     String listName = "BLACKLISTS.USERS.REASONS";
     File file = new File(
             ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-GoodProperties.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = new Capture<>();
-    Capture<String> captureListName = new Capture<>();
+    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
+    Capture<String> captureListName = Capture.newInstance();
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
     EasyMock.expectLastCall();
@@ -92,8 +92,8 @@ public class ListProvidersScannerTest {
     String listName = "BLACKLISTS.USERS.REASONS";
     File file = new File(
             ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-GoodProperties.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = new Capture<>();
-    Capture<String> captureListName = new Capture<>();
+    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
+    Capture<String> captureListName = Capture.newInstance();
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
     EasyMock.expectLastCall();
@@ -165,8 +165,8 @@ public class ListProvidersScannerTest {
     String listName = "BLACKLISTS.USERS.REASONS";
     File file = new File(
             ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-WithOrg.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = new Capture<>();
-    Capture<String> captureListName = new Capture<>();
+    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
+    Capture<String> captureListName = Capture.newInstance();
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
     EasyMock.expectLastCall();

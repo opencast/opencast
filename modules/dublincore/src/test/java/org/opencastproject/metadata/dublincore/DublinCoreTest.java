@@ -550,7 +550,7 @@ public class DublinCoreTest {
       Assert.assertFalse(e instanceof NullPointerException);
     }
     try {
-      dc.add(null, EasyMock.createNiceMock(DublinCoreValue.class));
+      dc.add(null, (DublinCoreValue) EasyMock.createNiceMock(DublinCoreValue.class));
     } catch (Exception e) {
       // throw assertion if it happens to be a nullpointer, never a null pointer!
       Assert.assertFalse(e instanceof NullPointerException);
