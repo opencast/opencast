@@ -413,8 +413,7 @@
                         data-disable-search-threshold="8"
                         data-search_contains="true"
                         ng-model="wizard.step.ud.workflow"
-                        ng-options="w.title for (obj, w) in wizard.step.workflows |
-                                  filter: wizard.getStateControllerByName('source').ud.type==='UPLOAD' ? 'upload-ng' : 'schedule-ng'"
+                        ng-options="w.title for (obj, w) in wizard.step.workflows"
                         data-placeholder="{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW' | translate }}"
                         no-results-text="'{{ 'EVENTS.EVENTS.NEW.PROCESSING.SELECT_WORKFLOW_EMPTY' | translate }}'"
                     >

@@ -1749,8 +1749,7 @@ public abstract class AbstractEventEndpoint {
       for (WorkflowDefinition wflDef : workflowsDefinitions) {
         if (wflDef.containsTag(tags)) {
 
-          actions.add(obj(f("id", v(wflDef.getId())), f("tags", arr(wflDef.getTags())),
-                  f("title", v(nul(wflDef.getTitle()).getOr(""))),
+          actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
                   f("description", v(nul(wflDef.getDescription()).getOr(""))),
                   f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr("")))));
         }
