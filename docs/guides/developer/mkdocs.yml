@@ -19,6 +19,7 @@ extra_css:
 pages:
 - Home: 'index.md'
 - Development Process:
+   - Installation: 'installation/source-linux.md'
    - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
