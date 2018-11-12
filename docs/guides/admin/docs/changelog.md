@@ -1,6 +1,20 @@
 Opencast 4.x
 ============
 
+Opencast 4.5
+------------
+
+*Released on Oktober 30, 2018*
+
+- [[NOJIRA]](https://github.com/opencast/opencast/pull/453) - Fix wrong example in publish-configure documentation
+- [[MH-13075]](https://opencast.jira.com/browse/MH-13075) - make ACL entries unique prior to running ACL comparisons
+- [[MH-13068]](https://opencast.jira.com/browse/MH-13068) - workflow delete instance stability improvement
+- [[MH-13055]](https://opencast.jira.com/browse/MH-13055) - Stop making events with no ACL public on ingest
+- [[MH-13032]](https://opencast.jira.com/browse/MH-13032) - Asset Upload fix for missing reset()
+- [[MH-12953]](https://opencast.jira.com/browse/MH-12953) - stop loading editor.json twice
+- [[NOJIRA]](https://github.com/opencast/opencast/pull/273) - Update the release process docs
+
+
 Opencast 4.4
 ------------
 
