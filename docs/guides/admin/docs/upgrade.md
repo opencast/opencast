@@ -1,11 +1,9 @@
-Update Opencast 5.1 to 5.2
-=================
-Opencast 5.2 minor release introduces several security patches. One of them requires a configuration update.
-The [configuration changes](#configuration-changes-since-opencast-52) section has been updated to track the new changes.
+Upgrading Opencast from 4.x to 5
+================================
 
-
-Upgrading Opencast from 4.x to 5.0
-==================================
+> Note about 5.2 release:
+> Opencast 5.2 introduces several security fixes. One of them requires a configuration update.  The [configuration
+> changes](#configuration-changes-since-opencast-52) section has been updated to track the new changes.
 
 This guide describes how to upgrade Opencast 4.x to 5.0. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
@@ -85,15 +83,18 @@ Several service job load values were updated. You can find these configuration f
 service configuration files.
 
 ### Configuration changes since Opencast 5.2
-The tenant security configuration (e.g. `etc/security/mh_default_org.xml`) has been changed in between Opencast 5.1 and 5.2
-([[MH-13082](https://opencast.jira.com/browse/MH-13082)][[#449](https://github.com/opencast/opencast/pull/449)]).
+
+The tenant security configuration (e.g. `etc/security/mh_default_org.xml`) has been changed in between Opencast 5.1 and
+5.2 ([[MH-13082](https://opencast.jira.com/browse/MH-13082)][[#449](https://github.com/opencast/opencast/pull/449)]).
 The LTI OAuth configuration part was moved to separate configuration files.
 
 > **NOTE:** All Opencast nodes must adapt the configuration changes, regardless of whether the LTI is used or not
 
-The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` introduces the LTI authentication configurations.
-It is now possible to define multiple trusted OAuth consumer keys.
-Some other security related configurations are also added. Please consult the [LTI configuration guide](modules/ltimodule/#configure-lti-optional) for the complete documentation.
+The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` introduces the LTI
+authentication configurations.  It is now possible to define multiple trusted OAuth consumer keys.
+Some other security related configurations are also added. Please consult the [LTI configuration
+guide](modules/ltimodule/#configure-lti-optional) for the complete documentation.
 
-In the configuration file `etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` one or more OAuth consumer keys and their secrets can be defined.
-Please consult the [LTI configuration guide](modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
+In the configuration file `etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` one or more OAuth
+consumer keys and their secrets can be defined.  Please consult the [LTI configuration
+guide](modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
