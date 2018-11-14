@@ -291,6 +291,11 @@ public abstract class AbstractEventEndpoint {
 
   }
 
+  /**
+   * this is a test comment
+   * @return
+   */
+
   @GET
   @Path("catalogAdapters")
   @Produces(MediaType.APPLICATION_JSON)
