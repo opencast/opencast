@@ -29,7 +29,7 @@
                interface="org.opencastproject.util.ReadinessIndicator" target="(artifact=dictionary)"/>
   </scr:component>
 
-  <scr:component name="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" immediate="true"
+  <scr:component name="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint" immediate="false"
                  activate="activate">
     <implementation class="org.opencastproject.textanalyzer.impl.endpoint.TextAnalysisRestEndpoint"/>
     <property name="service.description" value="Text Analysis REST Endpoint"/>

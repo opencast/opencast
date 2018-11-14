@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+  name="org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint" 
+  immediate="false" activate="activate">
+  <implementation class="org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint" />
+
+  <!-- Register as a REST endpoint -->
+  <property name="service.description" value="Group Role REST EndPoint" />
+
+  <property name="opencast.service.type" value="org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint" />
+  <property name="opencast.service.jobproducer" value="false" />
+  <property name="opencast.service.path" value="/groups" />
+
+  <service>
+    <provide interface="org.opencastproject.userdirectory.endpoint.GroupRoleEndpoint" />
+  </service>
+
+  <reference name="JpaGroupRoleProvider" interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"
+    cardinality="1..1" policy="static" bind="setJpaGroupRoleProvider" />
+
+</scr:component>

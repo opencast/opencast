@@ -359,9 +359,8 @@ assume the final release should be based on `3.0-rc2`.
     [graphical user interface](https://github.com/opencast/opencast/releases) to upload the distribution tarballs
     manually.
 
-14. Write a short paragraph about the changes to the new version, then email it to the QA Coordinator to update the
-    Opencast website.
-
+14. Update [the website](https://github.com/opencast/opencast.github.io) with a pull request, or directly if you have
+    the appropriate permissions.
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
 who need access to avoid general discussions on that list. In case you do not already have permissions to post on this

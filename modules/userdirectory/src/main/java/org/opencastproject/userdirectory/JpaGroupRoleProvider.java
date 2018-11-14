@@ -21,14 +21,6 @@
 
 package org.opencastproject.userdirectory;
 
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_CREATED;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.http.HttpStatus.SC_CONFLICT;
-
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
@@ -58,11 +50,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.utils.UserDirectoryUtils;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.doc.rest.RestParameter;
-import org.opencastproject.util.doc.rest.RestParameter.Type;
-import org.opencastproject.util.doc.rest.RestQuery;
-import org.opencastproject.util.doc.rest.RestResponse;
-import org.opencastproject.util.doc.rest.RestService;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
@@ -81,33 +68,10 @@ import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 /**
- * Manages and locates users using JPA. Note that this also provides a REST endpoint to manage user roles. Since this is
- * not intended to be production code, the REST concerns have not be factored into a separate class. Feel free to
- * refactor.
+ * Manages and locates users using JPA.
  */
-@Path("/")
-@RestService(name = "groups", title = "Internal group manager", abstractText = "This service offers the ability to manage the groups for internal accounts.", notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-        "If the service is down or not working it will return a status 503, this means the the underlying service is "
-                + "not working and is either restarting or has failed",
-                "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                        + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                        + "error occurred: <a href=\"https://opencast.jira.com\">Opencast Issue Tracker</a>" })
 public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleProvider, GroupProvider {
 
   /** The logger */
@@ -448,24 +412,34 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     return p.matcher(str).matches();
   }
 
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("groups.json")
-  @RestQuery(name = "allgroupsasjson", description = "Returns a list of groups", returnDescription = "Returns a JSON representation of the list of groups available the current user's organization", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public JaxbGroupList getGroupsAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
+  /**
+   * Retrieves a group list based on input constraints.
+   *
+   * @param limit
+   *          the int amount to limit the results
+   * @param offset
+   *          the offset to start this result set at
+   * @return the JaxbGroupList of results
+   * @throws IOException
+   *           if unexpected IO exception occurs
+   */
+  public JaxbGroupList getGroupsAsJson(int limit, int offset)
           throws IOException {
     return getGroupsAsXml(limit, offset);
   }
 
-  @GET
-  @Produces(MediaType.APPLICATION_XML)
-  @Path("groups.xml")
-  @RestQuery(name = "allgroupsasxml", description = "Returns a list of groups", returnDescription = "Returns a XML representation of the list of groups available the current user's organization", restParameters = {
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, reponses = { @RestResponse(responseCode = SC_OK, description = "The groups.") })
-  public JaxbGroupList getGroupsAsXml(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
+  /**
+   * Returns a XML representation of the list of groups available the current user's organization.
+   *
+   * @param limit
+   *          the int amount to limit the results
+   * @param offset
+   *          the offset to start this result set at
+   * @return the JaxbGroupList of results
+   * @throws IOException
+   *           if unexpected IO exception occurs
+   */
+  public JaxbGroupList getGroupsAsXml(int limit, int offset)
           throws IOException {
     if (limit < 1)
       limit = 100;
@@ -478,40 +452,43 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
     return groupList;
   }
 
-  @DELETE
-  @Path("{id}")
-  @RestQuery(name = "removegrouop", description = "Remove a group", returnDescription = "Return no content", pathParameters = { @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Group deleted"),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to remove a group with the admin role."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found."),
-          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An internal server error occured.") })
-  public Response removeGroup(@PathParam("id") String groupId) {
+  /**
+   * Remove a group by id
+   *
+   * @param groupId
+   *          the id of the group to remove
+   * @throws Exception
+   *           unexpected error occurred
+   * @throws UnauthorizedException
+   *           user is not authorized to remove this group
+   * @throws NotFoundException
+   *           the group was not found
+   */
+  public void removeGroup(String groupId) throws NotFoundException, UnauthorizedException, Exception {
     String orgId = securityService.getOrganization().getId();
-    try {
-      removeGroup(groupId, orgId);
-      return Response.noContent().build();
-    } catch (NotFoundException e) {
-      return Response.status(SC_NOT_FOUND).build();
-    } catch (UnauthorizedException e) {
-      return Response.status(SC_FORBIDDEN).build();
-    } catch (Exception e) {
-      throw new WebApplicationException(e);
-    }
+    removeGroup(groupId, orgId);
   }
 
-  @POST
-  @Path("")
-  @RestQuery(name = "createGroup", description = "Add a group", returnDescription = "Return the status codes", restParameters = {
-          @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = false, type = Type.TEXT) }, reponses = {
-                  @RestResponse(responseCode = SC_CREATED, description = "Group created"),
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long"),
-                  @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a group with the admin role."),
-                  @RestResponse(responseCode = SC_CONFLICT, description = "An group with this name already exists.") })
-  public Response createGroup(@FormParam("name") String name, @FormParam("description") String description,
-          @FormParam("roles") String roles, @FormParam("users") String users) {
+  /**
+   * Create a new group
+   *
+   * @param name
+   *          the name of the group
+   * @param description
+   *          a description of the group
+   * @param roles
+   *          the roles of the group
+   * @param users
+   *          the users in the group
+   * @throws IllegalArgumentException
+   *           if missing or bad parameters
+   * @throws UnauthorizedException
+   *           if user does not have rights to create group
+   * @throws ConflictException
+   *           if group already exists
+   */
+  public void createGroup(String name, String description, String roles, String users)
+          throws IllegalArgumentException, UnauthorizedException, ConflictException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
     HashSet<JpaRole> roleSet = new HashSet<JpaRole>();
@@ -532,33 +509,32 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
 
     JpaGroup existingGroup = UserDirectoryPersistenceUtil.findGroup(groupId, organization.getId(), emf);
     if (existingGroup != null)
-      return Response.status(SC_CONFLICT).build();
+      throw new ConflictException("group already exists");
 
-    try {
-      addGroup(new JpaGroup(groupId, organization, name, description, roleSet, members));
-    } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (UnauthorizedException e) {
-      return Response.status(SC_FORBIDDEN).build();
-    }
-    return Response.status(Status.CREATED).build();
+    addGroup(new JpaGroup(groupId, organization, name, description, roleSet, members));
+
   }
 
-  @PUT
-  @Path("{id}")
-  @RestQuery(name = "updateGroup", description = "Update a group", returnDescription = "Return the status codes", pathParameters = { @RestParameter(name = "id", description = "The group identifier", isRequired = true, type = Type.STRING) }, restParameters = {
-          @RestParameter(name = "name", description = "The group name", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "description", description = "The group description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "roles", description = "A comma seperated string of additional group roles", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "users", description = "A comma seperated string of group members", isRequired = true, type = Type.TEXT) }, reponses = {
-          @RestResponse(responseCode = SC_OK, description = "Group updated"),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a group with the admin role."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Group not found"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Name too long") })
-  public Response updateGroup(@PathParam("id") String groupId, @FormParam("name") String name,
-          @FormParam("description") String description, @FormParam("roles") String roles,
-          @FormParam("users") String users) throws NotFoundException {
+  /**
+   * Update a group
+   *
+   * @param groupId
+   *          the id of the group to update
+   * @param name
+   *          the name to update
+   * @param description
+   *          the description to update
+   * @param roles
+   *          the roles to update
+   * @param users
+   *          the users to update
+   * @throws NotFoundException
+   *           if the group is not found
+   * @throws UnauthorizedException
+   *           if the user does not have rights to update the group
+   */
+  public void updateGroup(String groupId, String name, String description, String roles, String users)
+          throws NotFoundException, UnauthorizedException {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
 
     JpaGroup group = UserDirectoryPersistenceUtil.findGroup(groupId, organization.getId(), emf);
@@ -609,17 +585,7 @@ public class JpaGroupRoleProvider extends AbstractIndexProducer implements RoleP
         userDirectoryService.invalidate(member);
       }
     }
-
-    try {
-      addGroup(group);
-    } catch (IllegalArgumentException e) {
-      logger.warn(e.getMessage());
-      return Response.status(Status.BAD_REQUEST).build();
-    } catch (UnauthorizedException ex) {
-      return Response.status(SC_FORBIDDEN).build();
-    }
-
-    return Response.ok().build();
+    addGroup(group);
   }
 
   @Override

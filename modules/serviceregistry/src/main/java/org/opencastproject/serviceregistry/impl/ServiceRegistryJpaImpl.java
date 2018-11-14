@@ -1120,12 +1120,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       fromDb.setProcessorServiceRegistration(processingService);
     }
     if (Status.RUNNING.equals(status) && !Status.WAITING.equals(fromDbStatus)) {
-      jpaJob.setDateStarted(now);
-      jpaJob.setQueueTime(now.getTime() - job.getDateCreated().getTime());
-      fromDb.setDateStarted(now);
-      fromDb.setQueueTime(now.getTime() - job.getDateCreated().getTime());
-      job.setDateStarted(now);
-      job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+      if (job.getDateStarted() == null) {
+        jpaJob.setDateStarted(now);
+        jpaJob.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+        fromDb.setDateStarted(now);
+        fromDb.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+        job.setDateStarted(now);
+        job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+      }
     } else if (Status.FAILED.equals(status)) {
       // failed jobs may not have even started properly
       if (job.getDateCompleted() == null) {

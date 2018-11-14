@@ -41,21 +41,22 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.collections4.IteratorUtils;
-import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.core.Response;
-
 public class JpaGroupRoleProviderTest {
+  @Rule
+  public ExpectedException thrown = ExpectedException.none();
 
   private JpaGroupRoleProvider provider = null;
   private static JpaOrganization org1 = new JpaOrganization("org1", "org1", "localhost", 80, "admin", "anon", null);
@@ -84,6 +85,7 @@ public class JpaGroupRoleProviderTest {
     provider.setMessageSender(messageSender);
     provider.setEntityManagerFactory(newTestEntityManagerFactory(JpaUserAndRoleProvider.PERSISTENCE_UNIT));
     provider.activate(null);
+
   }
 
   @After
@@ -150,7 +152,7 @@ public class JpaGroupRoleProviderTest {
     JpaUser user = new JpaUser("user", "pass1", org1, "User", "user@localhost", "opencast", true,
             Collections.set(new JpaRole("ROLE_USER", org1)));
 
-    // Set the security sevice
+    // Set the security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
@@ -159,23 +161,21 @@ public class JpaGroupRoleProviderTest {
 
     try {
       // try add ROLE_USER
-      Response updateGroupResponse = provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
-              "ROLE_USER, " + SecurityConstants.GLOBAL_ADMIN_ROLE, null);
-      assertNotNull(updateGroupResponse);
-      assertEquals(HttpStatus.SC_FORBIDDEN, updateGroupResponse.getStatus());
+      thrown.expect(UnauthorizedException.class);
+      provider.updateGroup(group.getGroupId(),
+              group.getName(), group.getDescription(), "ROLE_USER, " + SecurityConstants.GLOBAL_ADMIN_ROLE, null);
 
       // try remove ROLE_ADMIN
-      updateGroupResponse = provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(),
-              "ROLE_USER", null);
-      assertNotNull(updateGroupResponse);
-      assertEquals(HttpStatus.SC_FORBIDDEN, updateGroupResponse.getStatus());
+      thrown.expect(UnauthorizedException.class);
+      provider.updateGroup(group.getGroupId(), group.getName(), group.getDescription(), "ROLE_USER", null);
+
     } catch (NotFoundException e) {
       fail("The existing group isn't found");
     }
   }
 
   @Test
-  public void testRemoveGroupNotAllowedAsNonAdminUser() throws UnauthorizedException {
+  public void testRemoveGroupNotAllowedAsNonAdminUser() throws NotFoundException, Exception {
     JpaGroup group = new JpaGroup("test", org1, "Test", "Test group", Collections.set(
             new JpaRole(SecurityConstants.GLOBAL_ADMIN_ROLE, org1)));
     try {
@@ -197,17 +197,17 @@ public class JpaGroupRoleProviderTest {
     EasyMock.replay(securityService);
     provider.setSecurityService(securityService);
 
-    Response removeGroupResponse = provider.removeGroup(group.getGroupId());
-    assertNotNull(removeGroupResponse);
-    assertEquals(HttpStatus.SC_FORBIDDEN, removeGroupResponse.getStatus());
+    thrown.expect(UnauthorizedException.class);
+    provider.removeGroup(group.getGroupId());
   }
 
   @Test
-  public void testDuplicateGroupCreation() {
-    Response response = provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
-    assertEquals(HttpStatus.SC_CREATED, response.getStatus());
-    response = provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
-    assertEquals(HttpStatus.SC_CONFLICT, response.getStatus());
+  public void testDuplicateGroupCreation() throws IllegalArgumentException, UnauthorizedException, ConflictException {
+    // create the group, not exception thrown
+    provider.createGroup("Test 1", "Test group", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
+    // try create again and expect a conflict
+    thrown.expect(ConflictException.class);
+    provider.createGroup("Test 1", "Test group 2", "ROLE_ASTRO_101_SPRING_2011_STUDENT", "admin");
   }
 
   @Test
