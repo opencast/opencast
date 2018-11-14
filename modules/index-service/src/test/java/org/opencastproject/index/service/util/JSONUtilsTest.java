@@ -35,7 +35,6 @@ import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.json.JValue;
@@ -140,7 +139,7 @@ public class JSONUtilsTest {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+      public Map<String, String> getList(String listName, ResourceListQuery query)
               throws ListProviderException {
         return ListProviderUtil.filterMap(license, query);
       }

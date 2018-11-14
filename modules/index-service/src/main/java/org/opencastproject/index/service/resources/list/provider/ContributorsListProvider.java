@@ -30,7 +30,6 @@ import org.opencastproject.index.service.impl.index.series.SeriesIndexSchema;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.ListProviderUtil;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.data.Option;
@@ -89,7 +88,7 @@ public class ContributorsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     if (listName.equalsIgnoreCase(USERNAMES)) {
       return getListWithUserNames(query);
     } else if (listName.equalsIgnoreCase(NAMES_TO_USERNAMES)) {

@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.resources.list.api;
 
 import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.security.api.Organization;
 
 import java.util.Map;
 
@@ -43,11 +42,9 @@ public interface ResourceListProvider {
    *          the list name
    * @param query
    *          the list query
-   * @param organization
-   *          the organization context
    * @return the key-value list for the generator resource
    */
-  Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException;
 
   /**

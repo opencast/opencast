@@ -21,11 +21,12 @@
 
 package org.opencastproject.index.service.resources.list.impl;
 
+import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.DEFAULT_ORG;
+
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -91,9 +92,9 @@ public class ListProvidersScanner implements ArtifactInstaller {
    */
   private class SingleResourceListProviderImpl implements ResourceListProvider {
     private String listName;
-    private String orgId = "";
+    private String orgId;
     private Map<String, String> list;
-    private boolean isTranslatable = true;
+    private boolean translatable;
     private String defaultKey;
 
     /**
@@ -104,10 +105,18 @@ public class ListProvidersScanner implements ArtifactInstaller {
      * @param list
      *          The list of properties to expose.
      */
-    SingleResourceListProviderImpl(String listName, Map<String, String> list, boolean isTranslatable) {
+    SingleResourceListProviderImpl(String listName, Map<String, String> list, boolean translatable) {
       this.listName = listName;
       this.list = list;
-      this.isTranslatable = isTranslatable;
+      this.orgId = DEFAULT_ORG;
+      this.translatable = translatable;
+    }
+
+    SingleResourceListProviderImpl(String listName, Map<String, String> list, String organizationId, boolean translatable) {
+      this.listName = listName;
+      this.list = list;
+      this.orgId = organizationId;
+      this.translatable = translatable;
     }
 
     public String getListName() {
@@ -124,21 +133,16 @@ public class ListProvidersScanner implements ArtifactInstaller {
     }
 
     @Override
-    public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+    public Map<String, String> getList(String listName, ResourceListQuery query)
             throws ListProviderException {
-      logger.debug("Getting list " + listName + " query " + query + " org " + organization);
-      if (this.listName.equals(listName) && "".equals(this.orgId)) {
-        return Collections.unmodifiableMap(list);
-      } else if (this.listName.equals(listName) && organization != null && organization.getId().equals(this.orgId)) {
-        return Collections.unmodifiableMap(list);
-      } else {
-        return null;
-      }
+      logger.debug("Getting list " + listName + " query " + query + " org " + orgId);
+
+      return this.listName.equals(listName) ? Collections.unmodifiableMap(list) : null;
     }
 
     @Override
     public boolean isTranslatable(String listName) {
-      return isTranslatable;
+      return translatable;
     }
 
     public void setDefault(String defaultKey) {
@@ -195,14 +199,20 @@ public class ListProvidersScanner implements ArtifactInstaller {
         }
       }
 
-      SingleResourceListProviderImpl listProvider = new SingleResourceListProviderImpl(listName, list, translatable);
+      SingleResourceListProviderImpl listProvider;
+
       if (StringUtils.isNotBlank(orgId)) {
-        listProvider.setOrg(orgId);
+        listProvider = new SingleResourceListProviderImpl(listName, list, orgId, translatable);
+        listProvidersService.addProvider(listProvider.getListName(), listProvider, orgId);
+      } else {
+        listProvider = new SingleResourceListProviderImpl(listName, list, translatable);
+        listProvidersService.addProvider(listProvider.getListName(), listProvider, DEFAULT_ORG);
       }
+
       if (StringUtils.isNotBlank(defaultKey)) {
         listProvider.setDefault(defaultKey);
       }
-      listProvidersService.addProvider(listProvider.getListName(), listProvider);
+
       fileToListNames.put(artifact.getAbsolutePath(), listProvider.getListName());
   }
 

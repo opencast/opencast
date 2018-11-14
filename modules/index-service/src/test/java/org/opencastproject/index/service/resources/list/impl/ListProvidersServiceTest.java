@@ -27,7 +27,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.index.service.util.ListProviderUtil;
-import org.opencastproject.security.api.Organization;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,7 +55,7 @@ public class ListProvidersServiceTest {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
 
         Map<String, String> filteredList = new HashMap<String, String>();
 

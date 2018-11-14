@@ -26,7 +26,6 @@ import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -78,7 +77,7 @@ public class EventCommentsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
 

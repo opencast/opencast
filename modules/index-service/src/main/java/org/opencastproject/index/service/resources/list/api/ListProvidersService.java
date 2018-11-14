@@ -44,7 +44,7 @@ public interface ListProvidersService {
    * @return a list of tuple id - value from the given source
    */
   Map<String, String> getList(String providerName, ResourceListQuery query, Organization organization,
-          boolean inverseValueKey) throws ListProviderException;
+                              boolean inverseValueKey) throws ListProviderException;
 
   /**
    * Defines if keys and values of the given list should be translated in the administrative user interface.
@@ -56,6 +56,7 @@ public interface ListProvidersService {
    *              if no list provider found for the given list name
    */
   boolean isTranslatable(String listName) throws ListProviderException;
+  boolean isTranslatable(String listName, String organizationId) throws ListProviderException;
 
   /**
    * Defines the key of a default value in the given list.
@@ -67,6 +68,7 @@ public interface ListProvidersService {
    *              if no list provider found for the given list name
    */
   String getDefault(String listName) throws ListProviderException;
+  String getDefault(String listName, String organizationId) throws ListProviderException;
 
   /**
    * Adds an source to the service
@@ -78,6 +80,8 @@ public interface ListProvidersService {
    */
   void addProvider(String name, ResourceListProvider provider);
 
+  void addProvider(String name, ResourceListProvider provider, String organizationId);
+
   /**
    * Removes the given source
    *
@@ -85,6 +89,8 @@ public interface ListProvidersService {
    *          The provider to remove
    */
   void removeProvider(String name);
+
+  void removeProvider(String name, String organizationId);
 
   /**
    * Returns if the given source name is or not available
@@ -94,6 +100,8 @@ public interface ListProvidersService {
    * @return true if a source with the given name is available in the service
    */
   boolean hasProvider(String name);
+
+  boolean hasProvider(String name, String organizationId);
 
   /**
    * Returns the resources list providers available

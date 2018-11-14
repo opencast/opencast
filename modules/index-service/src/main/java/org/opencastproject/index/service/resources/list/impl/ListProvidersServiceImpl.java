@@ -24,6 +24,7 @@ package org.opencastproject.index.service.resources.list.impl;
 import static org.opencastproject.index.service.util.ListProviderUtil.invertMap;
 
 import org.opencastproject.index.service.exception.ListProviderException;
+import org.opencastproject.index.service.exception.ListProviderNotFoundException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
@@ -32,11 +33,50 @@ import org.opencastproject.security.api.Organization;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ListProvidersServiceImpl implements ListProvidersService {
 
-  private Map<String, ResourceListProvider> providers = new ConcurrentHashMap<String, ResourceListProvider>();
+  static final String DEFAULT_ORG = "mh_default_org";
+  private Map<ResourceTuple, ResourceListProvider> providers = new ConcurrentHashMap<>();
+
+  /**
+   * Instances of this class represent unique keys for the parent {@link ConcurrentHashMap},
+   * made up of both a provider ID and its associated organisation ID.
+   */
+  static class ResourceTuple {
+    private final String resourceName;
+    private final String organizationId;
+
+    ResourceTuple(String resourceName, String organizationId) {
+      this.resourceName = resourceName;
+      this.organizationId = organizationId;
+    }
+
+
+    public String getResourceName() {
+      return resourceName;
+    }
+
+    public String getOrganizationId() {
+      return organizationId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ResourceTuple that = (ResourceTuple) o;
+      return Objects.equals(resourceName, that.resourceName)
+              && Objects.equals(organizationId, that.organizationId);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(resourceName, organizationId);
+    }
+  }
 
   /** OSGi callback for provider. */
   public void addProvider(ResourceListProvider provider) {
@@ -52,53 +92,90 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     }
   }
 
-  @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization,
-          boolean inverseValueKey) throws ListProviderException {
-    ResourceListProvider provider = providers.get(listName);
-    if (provider == null)
-      throw new ListProviderException("No resources list found with the name " + listName);
-    Map<String, String> list = provider.getList(listName, query, organization);
-    if (inverseValueKey) {
-      list = invertMap(list);
-    }
-
-    return list;
+  /**
+   *
+   * @param resourceName the name of the provider
+   * @param organizationId the unique identifier of the organisation the provider is linked to
+   * @return the queried list provider
+   * @throws ListProviderNotFoundException if no list provider matches query
+   */
+  private ResourceListProvider getProvider(String resourceName, String organizationId)
+          throws ListProviderNotFoundException {
+    ResourceTuple key = new ResourceTuple(resourceName, organizationId);
+    if (providers.get(key) != null) return providers.get(key);
+    else throw new ListProviderNotFoundException("No provider found for organisation <"
+            + organizationId + "> with the name " + resourceName);
   }
 
   @Override
-  public boolean isTranslatable(String listName) throws ListProviderException {
-    ResourceListProvider provider = providers.get(listName);
-    if (provider == null)
-      throw new ListProviderException("No resources list found with the name " + listName);
+  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization,
+          boolean inverseValueKey) throws ListProviderException {
+    ResourceListProvider provider = organization != null
+            ? getProvider(listName, organization.getId()) : getProvider(listName, DEFAULT_ORG);
+    Map<String, String> list = provider.getList(listName, query);
+    return inverseValueKey ? invertMap(list) : list;
+  }
+
+  @Override
+  public boolean isTranslatable(String listName) throws ListProviderNotFoundException {
+    ResourceListProvider provider = getProvider(listName, DEFAULT_ORG);
     return provider.isTranslatable(listName);
   }
 
   @Override
-  public String getDefault(String listName) throws ListProviderException {
-    ResourceListProvider provider = providers.get(listName);
-    if (provider == null)
-      throw new ListProviderException("No resources list found with the name " + listName);
+  public boolean isTranslatable(String listName, String organizationId) throws ListProviderNotFoundException {
+    ResourceListProvider provider = getProvider(listName, organizationId);
+    return provider.isTranslatable(listName);
+  }
+
+  @Override
+  public String getDefault(String listName) throws ListProviderNotFoundException {
+    ResourceListProvider provider = getProvider(listName, DEFAULT_ORG);
+    return provider.getDefault();
+  }
+
+  @Override
+  public String getDefault(String listName, String organizationId) throws ListProviderException {
+    ResourceListProvider provider = getProvider(listName, organizationId);
     return provider.getDefault();
   }
 
   @Override
   public void addProvider(String listName, ResourceListProvider provider) {
-    providers.put(listName, provider);
+    providers.put(new ResourceTuple(listName, DEFAULT_ORG), provider);
+  }
+
+  @Override
+  public void addProvider(String listName, ResourceListProvider provider, String organizationId) {
+    providers.put(new ResourceTuple(listName, organizationId), provider);
   }
 
   @Override
   public void removeProvider(String name) {
-    providers.remove(name);
+    providers.remove(new ResourceTuple(name, DEFAULT_ORG));
+  }
+
+  @Override
+  public void removeProvider(String name, String organizationId) {
+    providers.remove(new ResourceTuple(name, organizationId));
   }
 
   @Override
   public boolean hasProvider(String name) {
-    return providers.containsKey(name);
+    return providers.containsKey(new ResourceTuple(name, DEFAULT_ORG));
+  }
+
+  @Override
+  public boolean hasProvider(String name, String organizationId) {
+    return providers.containsKey(new ResourceTuple(name, organizationId));
   }
 
   @Override
   public List<String> getAvailableProviders() {
-    return new ArrayList<String>(providers.keySet());
+    List<String> sources = new ArrayList<>();
+    for (Map.Entry<ResourceTuple, ResourceListProvider> entry : providers.entrySet()) {
+      sources.add(entry.getKey().getResourceName());
+    }
+    return sources;
   }
 }

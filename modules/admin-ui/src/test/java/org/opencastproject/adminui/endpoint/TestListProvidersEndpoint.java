@@ -27,7 +27,6 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.util.ListProviderUtil;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
@@ -64,7 +63,7 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
         return ListProviderUtil.filterMap(baseMap, query);
       }
 
