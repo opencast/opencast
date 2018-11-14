@@ -63,7 +63,7 @@ import org.apache.commons.io.input.TeeInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.params.BasicHttpParams;
+import org.apache.http.client.utils.URIBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +76,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -424,16 +425,20 @@ public final class WorkspaceImpl implements Workspace {
 
   /** Create a get request to the given URI. */
   private HttpGet createGetRequest(final URI src, final File dst, Tuple<String, String>... params) throws IOException {
-    final String url = src.toString();
-    final HttpGet get = new HttpGet(url);
-    // if the destination file already exists add the If-None-Match header
-    if (dst.isFile() && dst.length() > 0) {
-      get.setHeader("If-None-Match", md5(dst));
+    try {
+      URIBuilder builder = new URIBuilder(src.toString());
+      for (final Tuple<String, String> a : params) {
+        builder.setParameter(a.getA(), a.getB());
+      }
+      final HttpGet get = new HttpGet(builder.build());
+      // if the destination file already exists add the If-None-Match header
+      if (dst.isFile() && dst.length() > 0) {
+        get.setHeader("If-None-Match", md5(dst));
+      }
+      return get;
+    } catch (URISyntaxException e) {
+      throw new IOException(e);
     }
-    for (final Tuple<String, String> a : params) {
-      get.setParams(new BasicHttpParams().setParameter(a.getA(), a.getB()));
-    }
-    return get;
   }
 
   /**
@@ -496,15 +501,10 @@ public final class WorkspaceImpl implements Workspace {
   private static File downloadTo(final HttpResponse response, final File dst) throws IOException {
     // ignore return value
     dst.createNewFile();
-    InputStream in = null;
-    OutputStream out = null;
-    try {
-      in = response.getEntity().getContent();
-      out = new FileOutputStream(dst);
-      IOUtils.copyLarge(in, out);
-    } finally {
-      IoSupport.closeQuietly(in);
-      IoSupport.closeQuietly(out);
+    try (InputStream in = response.getEntity().getContent()) {
+      try (OutputStream out = new FileOutputStream(dst)) {
+        IOUtils.copyLarge(in, out);
+      }
     }
     return dst;
   }
@@ -528,12 +528,8 @@ public final class WorkspaceImpl implements Workspace {
     if (!file.isFile())
       throw new IllegalArgumentException("File " + file.getAbsolutePath() + " can not be read");
 
-    InputStream in = null;
-    try {
-      in = new FileInputStream(file);
+    try (InputStream in = new FileInputStream(file)) {
       return DigestUtils.md5Hex(in);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
   }
 
@@ -605,7 +601,6 @@ public final class WorkspaceImpl implements Workspace {
 
     // Determine the target location in the workspace
     File workspaceFile = null;
-    FileOutputStream out = null;
     synchronized (lock) {
       workspaceFile = toWorkspaceFile(uri);
       FileUtils.touch(workspaceFile);
@@ -621,14 +616,10 @@ public final class WorkspaceImpl implements Workspace {
       File workingFileRepoCopy = new File(workingFileRepoDirectory, safeFileName);
       FileSupport.link(workingFileRepoCopy, workspaceFile, true);
     } else {
-      InputStream tee = null;
-      try {
-        out = new FileOutputStream(workspaceFile);
-        tee = new TeeInputStream(in, out, true);
-        wfr.put(mediaPackageID, mediaPackageElementID, fileName, tee);
-      } finally {
-        IOUtils.closeQuietly(tee);
-        IOUtils.closeQuietly(out);
+      try (FileOutputStream out = new FileOutputStream(workspaceFile)) {
+        try (InputStream tee = new TeeInputStream(in, out, true)) {
+          wfr.put(mediaPackageID, mediaPackageElementID, fileName, tee);
+        }
       }
     }
     // wait until the file appears on the WFR node
