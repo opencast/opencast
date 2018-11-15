@@ -473,7 +473,7 @@ public class ToolsEndpoint implements ManagedService {
         final String audioPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewAudioSubtype()))
-          .map(MediaPackageElement::getURI).map(URI::toString)
+          .map(MediaPackageElement::getURI).map(this::signUrl)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo audio = new SourceTrackSubInfo(e.hasAudio(), audioPreview,
@@ -482,7 +482,7 @@ public class ToolsEndpoint implements ManagedService {
         final String videoPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewVideoSubtype()))
-          .map(MediaPackageElement::getURI).map(URI::toString)
+          .map(MediaPackageElement::getURI).map(this::signUrl)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo video = new SourceTrackSubInfo(e.hasVideo(), videoPreview,
