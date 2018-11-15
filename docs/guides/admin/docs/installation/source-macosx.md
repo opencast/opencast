@@ -48,6 +48,7 @@ Required:
     jdk 8
     ffmpeg >= 3.2.4
     maven >= 3.1
+    python >= 2.6, < 3.0
 
 Required (not necessarily on the same machine):
 
