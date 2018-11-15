@@ -473,7 +473,7 @@ public class ToolsEndpoint implements ManagedService {
         final String audioPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewAudioSubtype()))
-          .map(MediaPackageElement::getURI).map(URI::toString)
+          .map(MediaPackageElement::getURI).map(this::signUrl)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo audio = new SourceTrackSubInfo(e.hasAudio(), audioPreview,
@@ -482,7 +482,7 @@ public class ToolsEndpoint implements ManagedService {
         final String videoPreview = Arrays.stream(internalPub.getAttachments())
           .filter(a -> a.getFlavor().getType().equals(e.getFlavor().getType()))
           .filter(a -> a.getFlavor().getSubtype().equals(this.adminUIConfiguration.getPreviewVideoSubtype()))
-          .map(MediaPackageElement::getURI).map(URI::toString)
+          .map(MediaPackageElement::getURI).map(this::signUrl)
           .findAny()
           .orElse(null);
         final SourceTrackSubInfo video = new SourceTrackSubInfo(e.hasVideo(), videoPreview,
@@ -542,7 +542,7 @@ public class ToolsEndpoint implements ManagedService {
               f("position", thumbnail.getDefaultPosition()),
               f("defaultPosition", thumbnail.getDefaultPosition()),
               f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
-              f("url", signUrl(distElement.getURI().toString()))))));
+              f("url", signUrl(distElement.getURI()))))));
         } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
           final String value = Streams.asString(current.openStream());
           if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
@@ -571,7 +571,7 @@ public class ToolsEndpoint implements ManagedService {
         f("type", thumbnailSource.name()),
         f("position", position.getAsDouble()),
         f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signUrl(distributedElement.getURI().toString()))
+        f("url", signUrl(distributedElement.getURI()))
       ))));
     } catch (IOException | FileUploadException e) {
       logger.error("Error reading request body: {}", getStackTrace(e));
@@ -1028,11 +1028,12 @@ public class ToolsEndpoint implements ManagedService {
     return segments;
   }
 
-  private String signUrl(String baseUrl) {
-    if (urlSigningService.accepts(baseUrl)) {
-      logger.trace("URL signing service has accepted '{}'", baseUrl);
+  private String signUrl(URI baseUrl) {
+    String url = baseUrl.toString();
+    if (urlSigningService.accepts(url)) {
+      logger.trace("URL signing service has accepted '{}'", url);
       try {
-        URI signedUrl = new URI(urlSigningService.sign(baseUrl, expireSeconds, null, null));
+        URI signedUrl = new URI(urlSigningService.sign(url, expireSeconds, null, null));
         return signedUrl.toString();
       } catch (URISyntaxException e) {
         logger.error("Error while trying to sign the preview urls because: {}", getStackTrace(e));
@@ -1042,8 +1043,8 @@ public class ToolsEndpoint implements ManagedService {
         throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
       }
     } else {
-      logger.trace("URL signing service did not accept '{}'", baseUrl);
-      return baseUrl;
+      logger.trace("URL signing service did not accept '{}'", url);
+      return url;
     }
   }
 
