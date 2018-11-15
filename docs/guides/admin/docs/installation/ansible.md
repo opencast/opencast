@@ -6,7 +6,8 @@ configuration.  These scripts should handle most common installation setups, and
 quickly and easily set up Opencast for testing.  These scripts are also a good base upon which to build your own, local
 configuration management scripts.
 
-The Ansible scripts are tested on Debian 8+, Ubuntu 16.04+, and CentOS 7+, but may also work on other systems.
+The Ansible scripts are tested on long term stable releases of Debian, Ubuntu, and CentOS.  Currently this is Debian 8,
+Ubuntu 16.04, and 18.04, and CentOS 7.  Other releases, and distributions should work, but are untested.
 
 
 Setup
@@ -30,7 +31,7 @@ get by mail after the registration to successfully complete this manual. The pla
 Testing Use
 -----------
 
-The scripts can be found [here](https://github.com/gregorydlogan/oc-config-management).  If you are familiar with `git`
+The scripts can be found [here](https://github.com/opencast/oc-config-management).  If you are familiar with `git`
 make a local clone, otherwise download a zip file of the scripts.  Read through the documentation, which contains
 additional setup steps.
 
@@ -49,7 +50,7 @@ Similar to testing, you need to read the documentation and perform the additiona
 differences between testing and production use are:
 
  - Setting different passwords for all password options in `group_vars/all.yml`.  These scripts default to the common
-   passwords used worldwide by Opencast.  You do not want to use these passwords in production.
+   passwords used by default by Opencast.  You do not want to use these passwords in production.
  - Changing `install_mariadb` to `false`.  These scripts install MariaDB from your distribution's package manager by
    default, but some institutions may want to use an institution-wide MariaDB instance.  If this is true for you, set
    this value to `false` to prevent installation of MariaDB.  The database schema will still be imported, although you
