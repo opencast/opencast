@@ -2502,12 +2502,14 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Services in WARNING state triggered by current job
       List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(job);
 
-      // Sets all related services to error state
+      // The related services are already in WARNING state and max attempts is reached
       for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
-        logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
-                currentService.getHost());
-        relatedService.setServiceState(ERROR, job.toJob().getSignature());
-        updateServiceState(em, relatedService);
+        if (!currentService.equals(relatedService) && getHistorySize(relatedService) >= maxAttemptsBeforeErrorState) {
+          logger.info("State set to ERROR for related service {} on host {}", relatedService.getServiceType(),
+                  relatedService.getHost());
+          relatedService.setServiceState(ERROR, job.toJob().getSignature());
+          updateServiceState(em, relatedService);
+        }
       }
 
     }
