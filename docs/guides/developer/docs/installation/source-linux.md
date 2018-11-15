@@ -24,6 +24,7 @@ Required:
     java-1.8.0-openjdk-devel.x86_64 / openjdk-8-jdk (other jdk versions untested / Oracle JDK strongly not recommended)
     ffmpeg >= 3.2.4
     maven >= 3.1
+    python >= 2.6, < 3.0
     unzip
     gcc-c++
     tar
