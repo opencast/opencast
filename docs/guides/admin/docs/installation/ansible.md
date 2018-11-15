@@ -1,4 +1,4 @@
-Install via Script using the Repository (Debian, Ubuntu)
+Install via Script using the Repository
 ===========================================================================
 
 Installing Opencast can be complex, so we have built a set of Ansible scripts to handle the installation and 
@@ -17,6 +17,10 @@ These scripts use [Ansible](https://docs.ansible.com/ansible/latest/installation
 allows you to easily and automatically manage large numbers of machines via SSH.  Install Ansible before continuing
 with this guide.
 
+The scripts can be found [here](https://github.com/opencast/oc-config-management).  If you are familiar with `git`
+make a local clone, otherwise download a zip file of the scripts.  Read through the documentation, which contains
+additional setup steps.
+
 
 Registration
 ------------
@@ -28,20 +32,52 @@ get by mail after the registration to successfully complete this manual. The pla
 [Please visit https://pkg.opencast.org](https://pkg.opencast.org)
 
 
-Testing Use
------------
+Host Setup
+----------
 
-The scripts can be found [here](https://github.com/opencast/oc-config-management).  If you are familiar with `git`
-make a local clone, otherwise download a zip file of the scripts.  Read through the documentation, which contains
-additional setup steps.
+All of the machines defined in your `hosts` file must have a user (by default here, named `ansible`) who matches all of
+the following conditions
 
-Once you have set up your host configuration in `hosts`, run 
-`ansible-playbook -K -i hosts opencast.yml --extra-vars "repo_username=[your_username] repo_password=[your_password]"`.
-If you are uncomfortable with your username and password on the commandline, you can set those variables in 
-`group_vars/all.yml`.
+- Accepts your SSH key.  You should be able to run `ssh ansible@$hostname` and be logged in without a password.
+- Has sudo access, and has the same password on each machine.
 
+Each host must also have Python installed.  This is an Ansible requirement, but on some variants (Ubuntu) it is missing
+for some installs.
+
+
+Authentication Setup
+--------------------
+
+Open `group_vars/all.yml` in your favorite text editor, and fill in the `repo_username` and `repo_password` fields with
+your credentials for the package repository.  Ensure the `ansible_user` value matches the username for the user you
+configured above.  The rest of the keys are pre-populated with the common passwords used by default with Opencast.  For
+testing purposes these are fine, but you are encouraged to change them anyway. Once you have changed them use
+[Ansible Vault](https://docs.ansible.com/ansible/2.7/user_guide/vault.html) to protect the authentication data!  The
+most basic way is to run `ansible-vault encrypt group_vars/all.yml`.  It will prompt you for a password which will be
+required to decrypt this data for use at runtime.  To avoid the prompt for the vault password please consult the
+[Ansible Vault documentation](https://docs.ansible.com/ansible/2.7/user_guide/vault.html#providing-vault-passwords),
+and modify the `ansible-playbook` command below accordingly.
+
+
+Deploying Opencast
+------------------
+
+To deploy Opencast after protecting your authentication data with Ansible Vault run
+`ansible-playbook -K -i hosts --vault-id @prompt opencast.yml`.  This will prompt you for the `sudo` password for the
+cluster, and the vault password for your authentication data.
+
+Alternatively, if you want to just start testing without protecting your credentials, or changing the default logins
+you can skip the Authentication Setup section above and instead run
+`ansible-playbook -K -i hosts opencast.yml --extra-vars "repo_username=[your_username] repo_password=[your_password]"`
+instead.  This will deploy Opencast with the default credentials, using your repository username and password.  This
+method runs the risk of exposing your repository credentials on a multi-user system however, so it is not recommended.
+
+
+Reconfiguring Opencast
+----------------------
 If you successfully install Opencast, but notice you have made a mistake in your configuration you can use the `config`
 advanced option.  Read the script documentation for more detail.
+
 
 Production Use
 --------------
@@ -50,15 +86,20 @@ Similar to testing, you need to read the documentation and perform the additiona
 differences between testing and production use are:
 
  - Setting different passwords for all password options in `group_vars/all.yml`.  These scripts default to the common
-   passwords used by default by Opencast.  You do not want to use these passwords in production.
+   passwords used by default by Opencast.  You do not want to use these passwords in production.  Remember to use
+   `ansible-vault`, or some other secret management system to protect your authorization data!
  - Changing `install_mariadb` to `false`.  These scripts install MariaDB from your distribution's package manager by
    default, but some institutions may want to use an institution-wide MariaDB instance.  If this is true for you, set
-   this value to `false` to prevent installation of MariaDB.  The database schema will still be imported, although you
+   this value to `false` to prevent installation of MariaDB.  The database tables will still be imported, although you
    may need to create the schema itself manually.
  - Changing `handle_network_mounts` to `false`.  These scripts install NFS from your distribution's package manager by
    default, but some institutions may want to use an appliance, or want to manage NFS themselves.  If this is true for
    you, set this value to `false` to prevent installation of NFS on the fileserver, and the creation of mounts on the 
    Opencast nodes.
+ - Reconfiguring most things (ie, using the `config` advanced option) aside from the authentication data will likely
+   break your install.  These playbooks target basic installation rather than major changes.  Test first, then
+   transition to a new instance for production.
+
 
 Upgrading Major Versions
 ------------------------
