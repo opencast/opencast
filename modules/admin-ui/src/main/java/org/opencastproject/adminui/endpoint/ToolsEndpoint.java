@@ -1028,6 +1028,10 @@ public class ToolsEndpoint implements ManagedService {
     return segments;
   }
 
+  private String signUrl(URI baseURI) {
+    return signUrl(baseURI.toString());
+  }
+
   private String signUrl(String baseUrl) {
     if (urlSigningService.accepts(baseUrl)) {
       logger.trace("URL signing service has accepted '{}'", baseUrl);
