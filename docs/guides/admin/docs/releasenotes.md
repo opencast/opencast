@@ -80,6 +80,10 @@ Configuration changes
 - The role `ROLE_UI_EVENTS_DETAILS_GENERAL_VIEW` for viewing the publications (previously general) tab in the event
   details modal has been renamed to `ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW` for consistency.
 
+- The introduction of capture agent access management implies that unprivileged users do not have access to any capture
+  agents by default.  To allow otherwise unprivileged users to interact with event scheduling, you need to configure
+  their access permissions appropriately. For more details, take a look at the [capture agent access management
+  documentation](../../user/advanced/capture-agent-access/).
 
 Release Schedule
 ----------------
