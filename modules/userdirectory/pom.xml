@@ -145,6 +145,7 @@
               OSGI-INF/admin-user-and-group-loader.xml,
               OSGI-INF/custom-role-provider.xml,
               OSGI-INF/group-role-provider.xml,
+              OSGI-INF/group-role-endpoint.xml,
               OSGI-INF/organization-role-provider.xml,
               OSGI-INF/user-and-role-directory-service.xml,
               OSGI-INF/user-reference-provider.xml,

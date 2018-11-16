@@ -254,16 +254,10 @@ public abstract class AbstractAssetManager implements AssetManager {
     }
   }
 
-  /** Check if element <code>e</code> is already part of the history and in the local store. */
+  /** Check if element <code>e</code> is already part of the history. */
   private Opt<StoragePath> findAssetInVersions(final String checksum) throws Exception {
-    return getDb().findAssetByChecksum(checksum).filter(new Fn<AssetDtos.Full, Boolean>() {
-      @Override public Boolean apply(AssetDtos.Full dto) {
-        if (getLocalAssetStore().getStoreType().equals(dto.getStorageId())) {
-          return true;
-        }
-        return false;
-      }
-    }).map(new Fn<AssetDtos.Full, StoragePath>() {
+    return getDb().findAssetByChecksumAndStore(checksum, getLocalAssetStore().getStoreType())
+            .map(new Fn<AssetDtos.Full, StoragePath>() {
       @Override public StoragePath apply(AssetDtos.Full dto) {
         return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
       }

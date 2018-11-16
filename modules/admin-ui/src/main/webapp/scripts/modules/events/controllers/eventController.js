@@ -576,6 +576,8 @@ angular.module('adminNg.controllers')
           EventSchedulingResource.save({
             id: $scope.resourceId,
             entries: $scope.source
+          }, function () {
+            fetchChildResources($scope.resourceId);
           });
         }, me.conflictsDetected);
       }

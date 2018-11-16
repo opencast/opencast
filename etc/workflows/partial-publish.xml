@@ -123,28 +123,28 @@
     </operation>
 
     <operation
-      id="tag"
+      id="image-convert"
       if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presenter_work_video}"
       exception-handler-workflow="partial-error"
-      description="Tagging uploaded thumbnail for presenter track">
+      description="Convert uploaded thumbnail to search result thumbnail (presenter track)">
       <configurations>
         <configuration key="source-flavors">thumbnail/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="target-flavor">presenter/search+preview</configuration>
-        <configuration key="copy">true</configuration>
+        <configuration key="encoding-profiles">search-cover.http.downscale</configuration>
       </configurations>
     </operation>
 
     <operation
-        id="tag"
-        if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presentation_work_video}"
-        exception-handler-workflow="partial-error"
-        description="Tagging uploaded thumbnail for presentation track">
+      id="image-convert"
+      if="NOT (${uploadedSearchPreview}) AND ${thumbnailType}==1 AND ${presentation_work_video}"
+      exception-handler-workflow="partial-error"
+      description="Convert uploaded thumbnail to search result thumbnail (presentation track)">
       <configurations>
         <configuration key="source-flavors">thumbnail/source</configuration>
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="target-flavor">presentation/search+preview</configuration>
-        <configuration key="copy">true</configuration>
+        <configuration key="encoding-profiles">search-cover.http.downscale</configuration>
       </configurations>
     </operation>
 

@@ -44,6 +44,8 @@ angular.module('adminNg.controllers')
       if (state.stateController.isAccessState) {
         accessController = state.stateController;
       } else if (state.stateController.isMetadataState) {
+        // MH-12854 get latest collections (series)
+        state.stateController.reset({resetDefaults: true});
         metadata = state.stateController;
       }
     });

@@ -584,8 +584,10 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       job.setDateCreated(now);
     }
     if (Status.RUNNING.equals(status)) {
-      job.setDateStarted(now);
-      job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+      if (job.getDateStarted() == null) {
+        job.setDateStarted(now);
+        job.setQueueTime(now.getTime() - job.getDateCreated().getTime());
+      }
     } else if (Status.FAILED.equals(status)) {
       // failed jobs may not have even started properly
       job.setDateCompleted(now);

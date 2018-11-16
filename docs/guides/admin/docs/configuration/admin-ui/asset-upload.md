@@ -32,7 +32,7 @@ Two source types are enabled by default for use in the Admin UI.
        "flavorSubType":"source", "multiple":false, "displayOrder": 2}
 
 Source upload options as displayed in the Admin UI Create event:
-    ![assetUploadSource](assetUploadSource.png)
+    ![assetUploadSource](images/assetUploadSource.png)
 
 Asset flavor and sub-flavor are used by default Opencast workflows. When you add new asset types, you may need to adjust
 workflows to process the new asset flavor.
@@ -103,17 +103,17 @@ How to Upload Assets in the Admin UI
 After enabling an upload option, a new navigation area becomes visible in the "Create event", called "Asset Upload".
 Assets can be uploaded to new events. The "Asset Upload" navigation disapears for scheduled events.
 Assets cannot be uploaded for scheduled events until after the scheduled event is processed.
-    ![assetUpload](assetUpload.png)
+    ![assetUpload](images/assetUpload.png)
 
 The manually uploaded assets appear in the Create event summary
-    ![assetUploadSummary](assetUploadSummary.png)
+    ![assetUploadSummary](images/assetUploadSummary.png)
 
 To Upload an asset to an existing event, go into the existing event details Assets tab, and click "Add Asset >" link
-    ![assetUploadExistingEvent](assetUploadExistingEvent.png)
+    ![assetUploadExistingEvent](images/assetUploadExistingEvent.png)
 
 The option selection is the same as for Create event, execpt the "Add Asset" button automatically executes the workflow
 defined by `EVENTS.EVENTS.NEW.UPLOAD_ASSET.WORKFLOWDEFID`
-    ![assetUploadExistingOptions](assetUploadExistingOptions.png)
+    ![assetUploadExistingOptions](images/assetUploadExistingOptions.png)
 
 How to Create a New Asset Option
 --------------------------------

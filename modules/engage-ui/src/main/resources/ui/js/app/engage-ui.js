@@ -675,20 +675,16 @@ function($, bootbox, _, alertify) {
                     };
 
                     if (data.mediapackage.media && data.mediapackage.media.track) {
-                    	// Check if there's a 'live' track
-                        for (var i = 0; i < data.mediapackage.media.track.length; i++) {
-                            var track = data.mediapackage.media.track[i];
-                            if (track.live) {
-                            	// Is event in progress?
-                            	var start = new Date(data.mediapackage.start);
-                            	var end = new Date(start.getTime() + parseInt (data.mediapackage.duration));
-                            	var now = new Date(); 
-                                if (now < start || now > end) {
-                                	live = msg_live_not_in_progress;
-                                	canLaunch = false;
-                                } else live = msg_live_in_progress;
-                                break;
-                            }
+                        // Check if there's a 'live' track
+                        if (data.mediapackage.media.track.live) {
+                            // Is event in progress?
+                            var start = new Date(data.mediapackage.start);
+                            var end = new Date(start.getTime() + parseInt (data.mediapackage.duration));
+                            var now = new Date();
+                            if (now < start || now >= end) {
+                                live = _.escape(msg_live_not_in_progress);
+                                canLaunch = false;
+                            } else live = _.escape(msg_live_in_progress);
                         }
                     }
                     tile = tile + "<div class=\"live\">" + live + "</div>";

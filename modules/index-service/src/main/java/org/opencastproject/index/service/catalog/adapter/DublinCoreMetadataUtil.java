@@ -129,7 +129,7 @@ public final class DublinCoreMetadataUtil {
     List<DublinCoreValue> periodStrings = dc.get(ename);
     Opt<DCMIPeriod> p = Opt.<DCMIPeriod> none();
     for (DublinCoreValue periodString : periodStrings) {
-      p = Opt.some(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
+      p = Opt.nul(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
     }
     return p;
   }

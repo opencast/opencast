@@ -87,7 +87,7 @@
           <header><span translate="EVENTS.EVENTS.DETAILS.METADATA.CAPTION"><!-- Event details --></span></header>
           <div class="obj-container">
             <table class="main-tbl">
-              <tr ng-repeat="row in episodeCatalog.fields track by $index">
+              <tr ng-repeat="(idx, row) in episodeCatalog.fields">
                 <td>
                   <span translate="{{ row.label }}"></span>
                   <i ng-show="row.required" class="required">*</i>

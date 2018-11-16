@@ -505,7 +505,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
                       mpId, additionalParms));
       logger.debug("Url to invoke ibm watson service: {}", httpPost.getURI().toString());
       httpPost.setHeader(HttpHeaders.CONTENT_TYPE, track.getMimeType().toString());
-      httpPost.setEntity(new FileEntity(audioFile));
+      FileEntity fileEntity = new FileEntity(audioFile);
+      fileEntity.setChunked(true);
+      httpPost.setEntity(fileEntity);
       response = httpClient.execute(httpPost);
       int code = response.getStatusLine().getStatusCode();
 
