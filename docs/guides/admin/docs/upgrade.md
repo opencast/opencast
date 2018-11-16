@@ -34,7 +34,7 @@ ActiveMQ Migration
 ------------------
 
 Opencast 5.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
-configuration guide](configuration/message-broker/) to deploy a new configuration. No data migration is required for
+configuration guide](../configuration/message-broker/) to deploy a new configuration. No data migration is required for
 this since the message broker contains only temporary data.
 
 
@@ -93,8 +93,8 @@ The LTI OAuth configuration part was moved to separate configuration files.
 The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` introduces the LTI
 authentication configurations.  It is now possible to define multiple trusted OAuth consumer keys.
 Some other security related configurations are also added. Please consult the [LTI configuration
-guide](modules/ltimodule/#configure-lti-optional) for the complete documentation.
+guide](../modules/ltimodule/#configure-lti-optional) for the complete documentation.
 
 In the configuration file `etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` one or more OAuth
 consumer keys and their secrets can be defined.  Please consult the [LTI configuration
-guide](modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
+guide](../modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
