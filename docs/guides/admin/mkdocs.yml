@@ -43,6 +43,7 @@ nav:
    - Message Broker: 'configuration/message-broker.md'
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
+   - Inbox: 'configuration/inbox.md'
    - Load: 'configuration/load.md'
    - Log: 'configuration/log.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
