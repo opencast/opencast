@@ -45,7 +45,7 @@ angular.module('adminNg.resources')
         var row = {};
         row.id = r.id;
         row.title = r.title;
-        row.presenter = r.presenters.join(', ');
+        row.presenters = r.presenters;
         row.technical_presenter = r.technical_presenters.join(', ');
         if (angular.isDefined(r.series)) {
           row.series_name = r.series.title;
