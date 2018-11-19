@@ -35,12 +35,19 @@ attachment with the flavor as specified in the Admin UI configuration:
 
 When the user chooses a thumbnail in the video editor, this image will be automatically created and published.
 
-The thumbnail preview is automatically downscaled if necessary using the following encoding profile:
+The thumbnail preview is extracted using the following profile:
+
+    # Default: editor.thumbnail.preview
+    #thumbnail.preview.profile=editor.thumbnail.preview
+
+In case that automatic distribution is enabled, a master thumbnail image that will be converted into all of the
+formats required is extracted and the thumbnail preview image will be based on that master image.
+The following encoding profile is then used to downscale the master image:
 
     # Default: editor.thumbnail.preview.downscale
     #thumbnail.preview.profile.downscale=editor.thumbnail.preview.downscale
 
-Note that this image is supposed to be used by the Admin UI only.
+Note that the thumbnail preview image is supposed to be used by the Admin UI only.
 
 Default Thumbnail
 -----------------
@@ -96,7 +103,6 @@ Opencast will set the following processing settings for the event being edited:
     - `thumbnailType` is set to `1` to indicate that a snapshot thumbnail is used
     - `thumbnailPosition` is set to the absolute position of the video where the snapshot thumbnail should be extracted
     - `thumbnailTrack` is set to the type of the flavor of the source track which is `presenter` or `presentation`
-    in this example.
 
 Uploaded Thumbnail
 ------------------
@@ -131,33 +137,61 @@ To avoid the situation that a user needs to start a workflow just to update the 
 Opencast supports automatic distribution of thumbnail images for publication channels that support incremental
 publication.
 
-Currently, this is supported for External API publication channels (created by WOH publish-configure) and OAI-PMH
-publication channels (created by WOH publish-oaipmh).
+Currently, this is supported for configurable publication channels (created by WOH publish-configure) as used by the
+External API and OAI-PMH publication channels (created by WOH publish-oaipmh).
 
 The automatic distribution of thumbnail images can be enabled in the configuration:
 
     # Default: false
-    #thumbnail.auto.distribution=false
+    #thumbnail.distribution.auto=false
 
-If automatic distribution is enabled, Opencast will automatically create and publish the thumbnail.
+If automatic distribution is enabled, Opencast will automatically create and publish the thumbnail. Note that the
+generation of multiple thumbnails is based on a master image that will be extracted using the following encoding
+profile:
 
-The following encoding profile is used for thumbnail extraction (default thumbnail and snapshot thumbnail):
+    # Default: editor.thumbnail.master
+    #thumbnail.master.profile=editor.thumbnail.master
 
-    # Default: search-cover.http
-    #thumbnail.encoding.profile=search-cover.http
+This master image will be converted into all the different formats required.
 
-To configure the flavor and tags of the thumbnail image attachments you can set the following values:
+For the automatic distribution to the OAI-PMH publication channel, the following settings are available:
 
+    # The ID of the OAI-PMH publication channel
+    # Default: oaipmh-default
+    #thumbnail.distribution.oaipmh.channel=oaipmh-default
+
+    # The flavor of the attachment
     # Default: */search+preview
-    #thumbnail.publish.flavor=*/search+preview
+    #thumbnail.distribution.oaipmh.flavor=*/search+preview
 
-    # Default: engage-download
-    #thumbnail.publish.tags=engage-download
+    # Comma-separated list of tags
+    # Default:engage-download
+    #thumbnail.distribution.oaipmh.tags=engage-download
 
-Note here that the publish flavor can contain wildcards which will be applied against the configured source flavor.
+    # Comma-separated list of encoding profiles
+    # Default: search-cover.http.downscale
+    #thumbnail.distribution.oaipmh.profiles=search-cover.http.downscale
 
-The OAI-PMH channel can be configured:
+To enable automatic distribution to the OAI-PMH channel, `thumbnail.distribution.auto` must be set to `true` and
+`thumbnail.distribution.oaipmh.channel` must be set to a non-empty string.
 
-    # Default: default
-    #oaipmh.channel=default
+For the automatic distribution to the OAI-PMH publication channel, the following settings are available:
 
+    # The ID of the configurable publication channel
+    # Default: api
+    #thumbnail.distribution.configurable.channel=api
+
+    # The flavor of the attachment
+    # Default: */search+preview
+    #thumbnail.distribution.configurable.flavor=*/search+preview
+
+    # Comma-separated list of tags
+    # Default:engage-download
+    #thumbnail.distribution.configurable.tags=engage-download
+
+    # Comma-separated list of encoding profiles
+    # Default: search-cover.http.downscale
+    #thumbnail.distribution.configurable.profiles=search-cover.http.downscale
+
+To enable automatic distribution to the configurable publication channel, `thumbnail.distribution.auto` must be set to
+`true` and `thumbnail.distribution.configurable.channel` must be set to a non-empty string.
