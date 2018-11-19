@@ -79,8 +79,6 @@
                           <select chosen
                                   pre-select-from="wizard.step.acls"
                                   data-width="'200px'"
-                                  data-disable-search-threshold="0"
-                                  data-search_contains="true"
                                   tabindex="1"
                                   focushere
                                   ng-change="wizard.step.changeBaseAcl()"
@@ -128,8 +126,6 @@
                         <td>
                           <select chosen
                                   data-width="'360px'"
-                                  data-disable-search-threshold="0"
-                                  data-search_contains="true"
                                   ng-model="policy.role"
                                   ng-get-more="wizard.step.getMoreRoles"
                                   ng-options="id as id for (id, type) in wizard.step.roles"
@@ -181,7 +177,6 @@
                       data-width="'100%'"
                       tabindex="1"
                       focushere
-                      data-disable-search-threshold="0"
                       ng-change="wizard.step.themeSave()"
                       ng-model="wizard.step.ud.theme"
                       ng-options="id as list.name for (id, list) in wizard.step.themes"
