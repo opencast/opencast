@@ -136,6 +136,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -149,6 +151,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -470,7 +473,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-
+  @Override
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
@@ -538,13 +541,16 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
       }
 
+      final Organization org = securityService.getOrganization();
+      final User user = securityService.getUser();
       //counter for index into the list of mediapackages
-      int counter = 0;
-      for (Period event : periods) {
+      final AtomicInteger counter = new AtomicInteger(0);
+      periods.parallelStream().forEach(event -> SecurityUtil.runAs(securityService, org, user, () -> {
+        final int currentCounter = counter.getAndIncrement();
         MediaPackage mediaPackage = (MediaPackage) templateMp.clone();
         Date startDate = new Date(event.getStart().getTime());
         Date endDate = new Date(event.getEnd().getTime());
-        Id id = ids.get(counter);
+        Id id = ids.get(currentCounter);
 
         //Get, or make, the DC catalog
         DublinCoreCatalog dc;
@@ -564,12 +570,16 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         mediaPackage.setIdentifier(id);
 
         // Update dublincore title and temporal
-        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE) + String.format(" %0" + Integer.toString(periods.size()).length() + "d", ++counter);
+        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE) + String.format(" %0" + Integer.toString(periods.size()).length() + "d", currentCounter + 1);
         dc.set(DublinCore.PROPERTY_TITLE, newTitle);
         DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                 Precision.Second);
         dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
-        mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
+        try {
+          mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
         mediaPackage.setTitle(newTitle);
 
         String mediaPackageId = mediaPackage.getIdentifier().compact();
@@ -590,15 +600,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         // Persist asset
         String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
                 captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl);
-        persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
+        try {
+          persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
                 Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        }
 
         // Send updates
         sendUpdateAddEvent(mediaPackageId, some(acl), dublinCore, Opt.some(startDateTime), Opt.some(endDateTime),
                 Opt.some(userIds), Opt.some(captureAgentId), Opt.some(finalCaProperties), Opt.some(optOut));
 
-        // Update last modified
-        touchLastEntry(captureAgentId);
         scheduledEvents.put(mediaPackageId, event);
         for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
           try {
@@ -607,13 +619,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             logger.warn("Failed to delete media package element", e);
           }
         }
-      }
+      }));
       return scheduledEvents;
     } catch (SchedulerException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Failed to create events: {}", getStackTrace(e));
       throw new SchedulerException(e);
+    } finally {
+      // Update last modified
+      if (!scheduledEvents.isEmpty()) {
+        touchLastEntry(captureAgentId);
+      }
     }
   }
 
@@ -1111,11 +1128,31 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 
-    private List<MediaPackage> findConflictingEvents(List<Period> periods, String captureAgentId, TimeZone tz)
+  private boolean checkPeriodOverlap(final List<Period> periods) {
+    final List<Period> sortedPeriods = new ArrayList<>(periods);
+    sortedPeriods.sort(Comparator.comparing(Period::getStart));
+    Period prior = periods.get(0);
+    for (Period current : periods.subList(1, periods.size())) {
+      if (current.getStart().compareTo(prior.getEnd()) < 0) {
+        return true;
+      }
+      prior = current;
+    }
+    return false;
+  }
+
+  private List<MediaPackage> findConflictingEvents(List<Period> periods, String captureAgentId, TimeZone tz)
           throws SchedulerException {
     notEmpty(captureAgentId, "captureAgentId");
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
+
+    // First, check if there are overlaps inside the periods to be added (this is possible if you specify an RRULE via
+    // the external API, for example; the admin ui should prevent this from happening). Then check for conflicts with
+    // existing events.
+    if (checkPeriodOverlap(periods)) {
+      throw new SchedulerException("RRULE periods overlap");
+    }
 
     try {
       Set<MediaPackage> events = new HashSet<>();

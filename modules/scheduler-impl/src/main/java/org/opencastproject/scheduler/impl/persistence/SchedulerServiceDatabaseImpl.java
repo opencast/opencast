@@ -82,8 +82,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     logger.info("Activating persistence manager for scheduler");
   }
 
+  /*
+   * We need to synchronize this method because JPA doesn't support thread-safe atomic upserts.
+   */
   @Override
-  public void touchLastEntry(String agentId) throws SchedulerServiceDatabaseException {
+  public synchronized void touchLastEntry(String agentId) throws SchedulerServiceDatabaseException {
     EntityManager em = null;
     EntityTransaction tx = null;
     try {
@@ -104,7 +107,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
-      logger.error("Could not updated last modifed date of agent {} status: {}", agentId, getStackTrace(e));
+      logger.error("Could not update last modifed date of agent {} status: {}", agentId, getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -171,7 +174,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       Opt<ExtendedEventDto> entityOpt = getExtendedEventDto(mediapackageId, organizationId, em);
       ExtendedEventDto entity = entityOpt.getOr(new ExtendedEventDto());
       entity.setMediaPackageId(mediapackageId);
-      entity.setOrganization(securityService.getOrganization().getId());
+      entity.setOrganization(organizationId);
       if (captureAgentId.isSome()) {
         entity.setCaptureAgentId(captureAgentId.get());
       }
