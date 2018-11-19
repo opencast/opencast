@@ -97,9 +97,6 @@
       </configurations>
     </operation>
 
-    <!-- Once WOH waveform supports setting the image size of the waveform image,
-         those preview images should be way smaller than the preview image used for the timeline
-         as those previews cannot be zoomed -->
     <operation
       id="waveform"
       fail-on-error="false"
@@ -108,6 +105,9 @@
         <configuration key="source-flavor">*/work</configuration>
         <configuration key="target-flavor">*/audio+preview</configuration>
         <configuration key="target-tags">preview</configuration>
+        <configuration key="min-width">688</configuration>
+        <configuration key="max-width">688</configuration>
+        <configuration key="height">58</configuration>
       </configurations>
     </operation>
 

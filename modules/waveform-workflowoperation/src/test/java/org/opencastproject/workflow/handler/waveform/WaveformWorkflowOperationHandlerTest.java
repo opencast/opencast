@@ -92,7 +92,8 @@ public class WaveformWorkflowOperationHandlerTest {
     job.setPayload(MediaPackageElementParser.getAsXml(payload));
 
     WaveformService waveformService = EasyMock.createNiceMock(WaveformService.class);
-    EasyMock.expect(waveformService.createWaveformImage(EasyMock.anyObject())).andReturn(job);
+    EasyMock.expect(waveformService.createWaveformImage(EasyMock.anyObject(), EasyMock.anyInt(), EasyMock.anyInt(),
+      EasyMock.anyInt(), EasyMock.anyInt())).andReturn(job);
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
 

@@ -65,7 +65,15 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
           returnDescription = "Media package attachment for the generated waveform.",
           restParameters = {
             @RestParameter(name = "track", type = RestParameter.Type.TEXT,
-                    description = "Track with at least one audio channel.", isRequired = true)
+                    description = "Track with at least one audio channel.", isRequired = true),
+            @RestParameter(name = "pixelsPerMinute", type = RestParameter.Type.INTEGER,
+                    description = "Width of waveform image in pixels per minute.", isRequired = true),
+            @RestParameter(name = "minWidth", type = RestParameter.Type.INTEGER,
+                    description = "Minimum width of waveform image.", isRequired = true),
+            @RestParameter(name = "maxWidth", type = RestParameter.Type.INTEGER,
+                    description = "Maximum width of waveform image.", isRequired = true),
+            @RestParameter(name = "height", type = RestParameter.Type.INTEGER,
+                    description = "Height of waveform image.", isRequired = true)
           },
           reponses = {
             @RestResponse(description = "Waveform generation job successfully created.",
@@ -75,13 +83,15 @@ public class WaveformServiceEndpoint extends AbstractJobProducerEndpoint {
             @RestResponse(description = "Internal server error.",
                     responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
   })
-  public Response createWaveformImage(@FormParam("track") String track) {
+  public Response createWaveformImage(@FormParam("track") String track,
+    @FormParam("pixelsPerMinute") int pixelsPerMinute, @FormParam("minWidth") int minWidth,
+    @FormParam("maxWidth") int maxWidth, @FormParam("height") int height) {
     try {
       MediaPackageElement sourceTrack = MediaPackageElementParser.getFromXml(track);
       if (!Track.TYPE.equals(sourceTrack.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("Track element must be of type track").build();
 
-      Job job = waveformService.createWaveformImage((Track) sourceTrack);
+      Job job = waveformService.createWaveformImage((Track) sourceTrack, pixelsPerMinute, minWidth, maxWidth, height);
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (WaveformServiceException ex) {
       logger.error("Creating waveform job for track {} failed: {}", track, ExceptionUtils.getStackTrace(ex));

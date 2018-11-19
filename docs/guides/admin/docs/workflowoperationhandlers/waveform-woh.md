@@ -15,12 +15,16 @@ one audio channel.
 Parameter Table
 ---------------
 
-|configuration |example     |description                                                     |
-|--------------|------------|----------------------------------------------------------------|
-|source-flavors|`*/audio`   |Flavor specifying tracks for which a waveform should be created |
-|source-tags   |`edit`      |Tags specifying tracks for which a waveform should be created   |
-|target-flavor |`*/waveform`|Flavor used for the generated waveform                          |
-|target-tags   |`preview`   |Comma-separated list of tags to be added to the waveform        |
+configuration     |example     |description                                                     |default
+------------------|------------|----------------------------------------------------------------|-------
+source-flavors    |`*/audio`   |Flavor specifying tracks for which a waveform should be created |n/a
+source-tags       |`edit`      |Tags specifying tracks for which a waveform should be created   |n/a
+target-flavor     |`*/waveform`|Flavor used for the generated waveform                          |n/a
+target-tags       |`preview`   |Comma-separated list of tags to be added to the waveform        |n/a
+pixels-per-minute |400         |Width of waveform image in pixels per minute                    |200
+min-width         |10000       |Minimum width of waveform image in pixels                       |5000
+max-width         |30000       |Maximum width of waveform image in pixels                       |20000
+height            |60          |Height of waveform image in pixels                              |500
 
 Additional notes:
 
@@ -38,5 +42,9 @@ Operation Example
         <configuration key="source-flavor">*/audio</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
         <configuration key="target-tags">preview</configuration>
+        <configuration key="pixels-per-minute">200</configuration>
+        <configuration key="min-width">5000</configuration>
+        <configuration key="max-width">20000</configuration>
+        <configuration key="height">60</configuration>
       </configurations>
     </operation>
