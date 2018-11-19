@@ -1,5 +1,6 @@
 site_name: Opencast - Developer Guide
-repo_url: https://github.com/opencast/opencast/tree/develop/docs/guides/developer/docs
+repo_url: https://github.com/opencast/opencast
+edit_uri: edit/develop/docs/guides/developer/docs/
 
 # Default theme used is readthedocs
 theme: readthedocs
