@@ -469,11 +469,11 @@
             "NOCONTENT": "Brak danych",
             "PUBLISHED": "Opublikowano",
             "TOOLTIP": {
-               "START": "Filter for this start date",
-               "SERIES": "Filter for this series",
-               "STATUS": "Filter for this event status",
-               "LOCATION": "Filter for this location",
-               "DETAILS": "Open event details",
+               "START": "Filtr do tej daty rozpoczęcia",
+               "SERIES": "Filtr dla tej serii",
+               "STATUS": "Filtr dla statusu tego wydarzenia",
+               "LOCATION": "Filtr dla tej lokalizacji",
+               "DETAILS": "Pokaż szczegóły wydarzenia",
                "DELETE": "Usuń wydarzenie",
                "PREVIEW": "Otwórz podgląd",
                "EDITOR": "Otwórz Edytor wideo",
@@ -919,7 +919,7 @@
             "THEME": {
                "CAPTION": "Motyw",
                "DESCRIPTION": {
-                  "TEXT": "You can optionally use themes to brand your videos. Themes may define bumper and trailer videos, watermarks and title slides including metadata."
+                  "TEXT": "Opcjonalnie można użyć motywów do oznaczenia swoich filmów. Motwy mogą zawierać czołówkę i zakończenie filmu, znaki wodne i slajdy tytułowe zawierające metadane."
                },
                "TITLE": "Motyw",
                "LABEL": "Brak motywu",
@@ -940,8 +940,8 @@
             "ACTION": "Działania",
             "TOOLTIP": {
                "SERIES": "Filtrowanie wydarzeń dla tej serii",
-               "DETAILS": "Open series details",
-               "DELETE": "Delete series"
+               "DETAILS": "Pokaż szczegóły serii",
+               "DELETE": "Usuń serie"
             }
          },
          "DETAILS": {
@@ -1048,9 +1048,9 @@
             "BLACKLIST_TO": "Na czarnej liście do",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "NAME": "Filter events for this location",
-               "DETAILS": "Open location details",
-               "DELETE": "Delete location (unregister capture agent)"
+               "NAME": "Filtrowanie wydarzeń dla tej lokalizacji",
+               "DETAILS": "Pokaż szczegóły lokalizacji",
+               "DELETE": "Usuń lokalizację (wyrejestruj urządzenie nagrywające)"
             }
          },
          "DETAILS": {
@@ -1144,8 +1144,8 @@
             "BLACKLIST_TO": "Na czarnej liście do",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "DELETE": "Delete user",
-               "DETAILS": "Open user details"
+               "DELETE": "Usuń użytkownika",
+               "DETAILS": "Pokaż szczegóły użytkownika"
             }
          },
          "DETAILS": {
@@ -1188,8 +1188,8 @@
             "ROLE": "Rola",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "DETAILS": "Open group details",
-               "DELETE": "Delete group"
+               "DETAILS": "Pokaż szczególy grupy",
+               "DELETE": "Usuń grupę"
             }
          },
          "DETAILS": {
@@ -1232,8 +1232,8 @@
             "IN_USE": "W użyciu",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "DELETE": "Delete access policy",
-               "DETAILS": "Open access policy details"
+               "DELETE": "Usuń politykę dostępu",
+               "DETAILS": "Pokaż szczególy polityki dostępu"
             }
          },
          "NEW": {
@@ -1452,8 +1452,8 @@
             "USAGE": "Wykorzystanie",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "DELETE": "Delete theme",
-               "DETAILS": "Open theme details"
+               "DELETE": "Usuń motyw",
+               "DETAILS": "Pokaż szczegóły motywu"
             }
          },
          "DETAILS": {
@@ -1585,17 +1585,17 @@
             "SANITIZE": "Wyczyść nieudane usługi",
             "ACTION": "Działania",
             "TOOLTIP": {
-               "SANITIZE": "Sanitize service (set service back to state normal)"
+               "SANITIZE": "Zresetuj usługę (ustaw stan na 'normalny')"
             }
          }
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warning: Some of your changes were not saved. If you leave the video editor, these changes will get lost. Do you really want to continue?",
+      "WARNING_UNSAVED": "Uwaga: Niektóre zmiany nie zostały zapisane. Jeśli opuścisz edytor zostaną one stracone. Czy na pewno chcesz zakończyć edycję?",
       "TIMELINE": "Oś czasu",
       "ZOOMLEVEL": "Powiększenie",
-      "PREVIEW_MODE": "Preview Mode",
-      "PREVIEW_MODE_TOOLTIP": "Play selected segments only",
+      "PREVIEW_MODE": "Tryb Podglądu",
+      "PREVIEW_MODE_TOOLTIP": "Odtwórz tylko zaznaczone fragmenty",
       "ZOOM": "Powiększenie",
       "BUTTONS": {
          "CLOSE": "Zamknij",
@@ -1663,8 +1663,8 @@
       "PLACEHOLDER": "Szukaj…",
       "PROFILES": {
          "FILTERS_HEADER": "Zapisane zestawy filtrów",
-         "EDIT": "Edit filter set",
-         "REMOVE": "Remove saved filter",
+         "EDIT": "Edytuj zestaw filtrów",
+         "REMOVE": "Usuń zapisany filtr",
          "EMPTY": "Jeszcze nie zapisano żadnych filtrów",
          "SAVE_FILTERS": "Zapisz",
          "FILTER_HEADER": "Zapisz zestaw filtrów",
