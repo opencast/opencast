@@ -225,7 +225,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.waveform.api.WaveformService#createWaveformImage(org.opencastproject.mediapackage.Track)
+   * @see org.opencastproject.waveform.api.WaveformService#createWaveformImage(org.opencastproject.mediapackage.Track,
+   *         int, int, int, int)
    */
   @Override
   public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height)
