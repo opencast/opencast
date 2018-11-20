@@ -149,7 +149,7 @@ angular.module('adminNg.controllers')
                         if (el.length > 0) {
                             if (el.is('[type=checkbox]') || el.is('[type=radio]')) {
                                 if (value === 'true' || value === true) {
-                                    el.attr('checked', true);
+                                    el.attr('checked', 'checked');
                                 } else {
                                     el.removeAttr('checked');
                                 }
