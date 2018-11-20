@@ -111,7 +111,7 @@
         $('#straightToPublishing').bind('updateConfigUI', function() {
             var publish = $(this).val().toLowerCase() === 'true';
             $('#publicationConfigurationPanel').toggle(publish);
-            $('#holdOrPublishToggle_' + (publish ? 'publish':'hold')).prop('checked', true);
+            $('#holdOrPublishToggle_' + (publish ? 'publish':'hold')).prop('checked', 'checked');
         });
         
         <!-- Remove the line below if you wish to publish to AWS S3 -->
