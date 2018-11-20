@@ -91,6 +91,7 @@ import org.opencastproject.message.broker.api.BaseMessage;
 import org.opencastproject.message.broker.api.MessageReceiver;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
+import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogList;
@@ -1502,7 +1503,7 @@ public class SchedulerServiceImplTest {
 
     MessageSender messageSender = schedSvc.getMessageSender();
     EasyMock.reset(messageSender);
-    Capture<SchedulerItem> schedulerItemsCapture = Capture.newInstance(CaptureType.ALL);
+    Capture<SchedulerItemList> schedulerItemsCapture = Capture.newInstance(CaptureType.ALL);
     messageSender.sendObjectMessage(eq(SchedulerItem.SCHEDULER_QUEUE), eq(MessageSender.DestinationType.Queue),
             capture(schedulerItemsCapture));
     EasyMock.expectLastCall().anyTimes();
@@ -1521,10 +1522,12 @@ public class SchedulerServiceImplTest {
     schedSvc.repopulate("adminui");
     assertTrue(schedulerItemsCapture.hasCaptured());
     List<DublinCoreCatalog> dublincoreCatalogs = new ArrayList<>();
-    for (SchedulerItem schedulerItem : schedulerItemsCapture.getValues()) {
-      if (schedulerItem.getType() == SchedulerItem.Type.UpdateCatalog) {
-        DublinCoreCatalog snapshotDC = schedulerItem.getEvent();
-        dublincoreCatalogs.add(snapshotDC);
+    for (SchedulerItemList schedulerItemList : schedulerItemsCapture.getValues()) {
+      for (SchedulerItem schedulerItem : schedulerItemList.getItems()) {
+        if (schedulerItem.getType() == SchedulerItem.Type.UpdateCatalog) {
+          DublinCoreCatalog snapshotDC = schedulerItem.getEvent();
+          dublincoreCatalogs.add(snapshotDC);
+        }
       }
     }
     assertEquals(orgList.size(), dublincoreCatalogs.size());

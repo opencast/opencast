@@ -64,6 +64,7 @@ import org.opencastproject.message.broker.api.index.AbstractIndexProducer;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject;
 import org.opencastproject.message.broker.api.index.IndexRecreateObject.Service;
 import org.opencastproject.message.broker.api.scheduler.SchedulerItem;
+import org.opencastproject.message.broker.api.scheduler.SchedulerItemList;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -132,12 +133,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -327,6 +328,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** OSGi callback to remove {@link ConflictNotifier} instance. */
   public void removeConflictNotifier(ConflictNotifier conflictNotifier) {
     conflictNotifiers.remove(conflictNotifier);
+  }
+
+  /**
+   * Send a message on the scheduler queue
+   *
+   * This is just a little shorthand because we send a lot of messages.
+   *
+   * @param message message to send
+   */
+  public void sendSchedulerMessage(Serializable message) {
+    messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue, message);
   }
 
   /**
@@ -899,8 +911,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (deletedProperties + deletedSnapshots == 0)
         throw new NotFoundException();
 
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.delete(mediaPackageId));
+      sendSchedulerMessage(SchedulerItemList.singleton(mediaPackageId, SchedulerItem.delete()));
 
     } catch (NotFoundException | SchedulerException e) {
       throw e;
@@ -1285,8 +1296,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt.none()
       );
 
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-          SchedulerItem.updateReviewStatus(mediaPackageId, reviewStatus, now));
+      sendSchedulerMessage(SchedulerItemList
+              .singleton(mediaPackageId, SchedulerItem.updateReviewStatus(reviewStatus, now)));
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1453,8 +1464,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       persistence.resetRecordingState(id);
 
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.deleteRecordingState(id));
+      sendSchedulerMessage(SchedulerItemList.singleton(id, SchedulerItem.deleteRecordingState()));
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1509,40 +1519,43 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     );
   }
 
+  private List<SchedulerItem> updateAddEventItems(Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore, Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters,
+          Opt<String> agentId, Opt<Map<String, String>> properties, Opt<Boolean> optOut) {
+    List<SchedulerItem> items = new ArrayList<>();
+    if (acl.isSome()) {
+      items.add(SchedulerItem.updateAcl(acl.get()));
+    }
+    if (dublinCore.isSome()) {
+      items.add(SchedulerItem.updateCatalog(dublinCore.get()));
+    }
+    if (startTime.isSome()) {
+      items.add(SchedulerItem.updateStart(startTime.get()));
+    }
+    if (endTime.isSome()) {
+      items.add(SchedulerItem.updateEnd(endTime.get()));
+    }
+    if (presenters.isSome()) {
+      items.add(SchedulerItem.updatePresenters(presenters.get()));
+    }
+    if (agentId.isSome()) {
+      items.add(SchedulerItem.updateAgent(agentId.get()));
+    }
+    if (properties.isSome()) {
+      items.add(SchedulerItem.updateProperties(properties.get()));
+    }
+    if (optOut.isSome()) {
+      items.add(SchedulerItem.updateOptOut(optOut.get()));
+    }
+    return items;
+  }
+
   private void sendUpdateAddEvent(String mpId, Opt<AccessControlList> acl, Opt<DublinCoreCatalog> dublinCore,
           Opt<Date> startTime, Opt<Date> endTime, Opt<Set<String>> presenters, Opt<String> agentId,
           Opt<Map<String, String>> properties, Opt<Boolean> optOut) {
-    if (acl.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateAcl(mpId, acl.get()));
-    }
-    if (dublinCore.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateCatalog(mpId, dublinCore.get()));
-    }
-    if (startTime.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateStart(mpId, startTime.get()));
-    }
-    if (endTime.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateEnd(mpId, endTime.get()));
-    }
-    if (presenters.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updatePresenters(mpId, presenters.get()));
-    }
-    if (agentId.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateAgent(mpId, agentId.get()));
-    }
-    if (properties.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateProperties(mpId, properties.get()));
-    }
-    if (optOut.isSome()) {
-      messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue,
-              SchedulerItem.updateOptOut(mpId, optOut.get()));
+    List<SchedulerItem> items = updateAddEventItems(acl, dublinCore, startTime, endTime, presenters, agentId,
+            properties, optOut);
+    if (!items.isEmpty()) {
+      sendSchedulerMessage(new SchedulerItemList(mpId, items.toArray(new SchedulerItem[0])));
     }
   }
 
@@ -1687,12 +1700,19 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     return new HashSet<>(Arrays.asList(StringUtils.split(presentersString, ",")));
   }
 
-  private void sendRecordingUpdate(Recording recording) {
+  private List<SchedulerItem> recordingUpdateMessages(Recording recording) {
     if (RecordingState.UNKNOWN.equals(recording.getState()))
-      return;
+      return Collections.emptyList();
 
-    messageSender.sendObjectMessage(SchedulerItem.SCHEDULER_QUEUE, MessageSender.DestinationType.Queue, SchedulerItem
-            .updateRecordingStatus(recording.getID(), recording.getState(), recording.getLastCheckinTime()));
+    return Collections.singletonList(SchedulerItem
+            .updateRecordingStatus(recording.getState(), recording.getLastCheckinTime()));
+  }
+
+  private void sendRecordingUpdate(Recording recording) {
+    List<SchedulerItem> items = recordingUpdateMessages(recording);
+    if (!items.isEmpty()) {
+      sendSchedulerMessage(new SchedulerItemList(recording.getID(), items.toArray(new SchedulerItem[0])));
+    }
   }
 
   /**
@@ -1761,16 +1781,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
             Opt<AccessControlList> acl = loadEpisodeAclFromAsset(snapshot);
             Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
 
-            sendUpdateAddEvent(record.getMediaPackageId(), acl, dublinCore, Opt.some(start), Opt.some(end),
-                    Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut));
-
+            final List<SchedulerItem> indexItems = Arrays
+                    .asList(SchedulerItem.updateBlacklist(false),
+                            SchedulerItem.updateReviewStatus(reviewStatus, reviewDate));
             messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateBlacklist(record.getMediaPackageId(), false));
-            messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                    SchedulerItem.updateReviewStatus(record.getMediaPackageId(), reviewStatus, reviewDate));
-            if (recordingStatus.isSome() && lastHeard.isSome())
-              sendRecordingUpdate(
-                      new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get()));
+                    new SchedulerItemList(record.getMediaPackageId(), indexItems.toArray(new SchedulerItem[0])));
+            final List<SchedulerItem> schedulerItems = new ArrayList<>(
+                    updateAddEventItems(acl, dublinCore, Opt.some(start), Opt.some(end),
+                            Opt.some(presenters), Opt.some(agentId), Opt.some(caMetadata), Opt.some(optOut)));
+            if (recordingStatus.isSome() && lastHeard.isSome()) {
+              schedulerItems.addAll(recordingUpdateMessages(new RecordingImpl(record.getMediaPackageId(), recordingStatus.get(), lastHeard.get())));
+            }
+            sendSchedulerMessage(new SchedulerItemList(record.getMediaPackageId(), schedulerItems.toArray(new SchedulerItem[0])));
           } finally {
             securityService.setOrganization(organization);
             securityService.setUser(user);

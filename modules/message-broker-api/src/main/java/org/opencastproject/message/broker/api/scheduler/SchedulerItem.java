@@ -21,7 +21,6 @@
 
 package org.opencastproject.message.broker.api.scheduler;
 
-import org.opencastproject.message.broker.api.MessageItem;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
@@ -44,7 +43,7 @@ import java.util.Set;
 /**
  * {@link Serializable} class that represents all of the possible messages sent through a SchedulerService queue.
  */
-public class SchedulerItem implements MessageItem, Serializable {
+public class SchedulerItem implements Serializable {
   private static final long serialVersionUID = 6061069989788904237L;
 
   private static final Gson gson = new Gson();
@@ -53,7 +52,6 @@ public class SchedulerItem implements MessageItem, Serializable {
 
   public static final String SCHEDULER_QUEUE = SCHEDULER_QUEUE_PREFIX + "QUEUE";
 
-  private final String mediaPackageId;
   private final String event;
   private final String properties;
   private final String acl;
@@ -74,146 +72,120 @@ public class SchedulerItem implements MessageItem, Serializable {
   };
 
   /**
-   * @param mediaPackageId
-   *          The unique id for the event to update.
    * @param event
    *          The event details to update to.
    * @return Builds {@link SchedulerItem} for updating a scheduled event.
    */
-  public static SchedulerItem updateCatalog(String mediaPackageId, DublinCoreCatalog event) {
-    return new SchedulerItem(mediaPackageId, event);
+  public static SchedulerItem updateCatalog(DublinCoreCatalog event) {
+    return new SchedulerItem(event);
   }
 
   /**
-   * @param mediaPackageId
-   *          The unique id for the event to update.
    * @param properties
    *          The new properties to update to.
    * @return Builds {@link SchedulerItem} for updating the properties of an event.
    */
-  public static SchedulerItem updateProperties(String mediaPackageId, Map<String, String> properties) {
-    return new SchedulerItem(mediaPackageId, properties);
+  public static SchedulerItem updateProperties(Map<String, String> properties) {
+    return new SchedulerItem(properties);
   }
 
   /**
-   * @param mediaPackageId
-   *          The unique id of the event to delete.
    * @return Builds {@link SchedulerItem} for deleting an event.
    */
-  public static SchedulerItem delete(final String mediaPackageId) {
-    return new SchedulerItem(mediaPackageId, Type.Delete);
+  public static SchedulerItem delete() {
+    return new SchedulerItem(Type.Delete);
   }
 
   /**
-   * @param mediaPackageId
-   *          the mediapackage id
    * @param accessControlList
    *          the access control list
    * @return Builds {@link SchedulerItem} for updating the access control list of an event.
    */
-  public static Serializable updateAcl(String mediaPackageId, AccessControlList accessControlList) {
-    return new SchedulerItem(mediaPackageId, accessControlList);
+  public static SchedulerItem updateAcl(AccessControlList accessControlList) {
+    return new SchedulerItem(accessControlList);
   }
 
   /**
-   * @param mediaPackageId
-   *          the mediapackage id
    * @param optOut
    *          the opt out status
    * @return Builds {@link SchedulerItem} for updating the opt out status of an event.
    */
-  public static SchedulerItem updateOptOut(String mediaPackageId, boolean optOut) {
-    return new SchedulerItem(mediaPackageId, optOut);
+  public static SchedulerItem updateOptOut(boolean optOut) {
+    return new SchedulerItem(optOut, Type.UpdateOptOut);
   }
 
   /**
-   * @param mediapackageId
-   *          the mediapackage id
    * @param blacklisted
    *          the blacklist status
    * @return Builds {@link SchedulerItem} for updating the blacklist status of an event.
    */
-  public static SchedulerItem updateBlacklist(String mediapackageId, boolean blacklisted) {
-    return new SchedulerItem(blacklisted, mediapackageId);
+  public static SchedulerItem updateBlacklist(boolean blacklisted) {
+    return new SchedulerItem(blacklisted, Type.UpdateBlacklist);
   }
 
   /**
-   * @param mediaPackageId
-   *          the mediapackage id
    * @param reviewStatus
    *          the review status
    * @param reviewDate
    *          the review date
    * @return Builds {@link SchedulerItem} for updating the review status of an event.
    */
-  public static SchedulerItem updateReviewStatus(String mediaPackageId, ReviewStatus reviewStatus, Date reviewDate) {
-    return new SchedulerItem(mediaPackageId, reviewStatus, reviewDate);
+  public static SchedulerItem updateReviewStatus(ReviewStatus reviewStatus, Date reviewDate) {
+    return new SchedulerItem(reviewStatus, reviewDate);
   }
 
   /**
-   * @param mediaPackageId
-   *          The event id
    * @param state
    *          The recording state
    * @param lastHeardFrom
    *          The recording last heard from date
    * @return Builds {@link SchedulerItem} for updating a recording.
    */
-  public static SchedulerItem updateRecordingStatus(String mediaPackageId, String state, Long lastHeardFrom) {
-    return new SchedulerItem(mediaPackageId, state, lastHeardFrom);
+  public static SchedulerItem updateRecordingStatus(String state, Long lastHeardFrom) {
+    return new SchedulerItem(state, lastHeardFrom);
   }
 
   /**
-   * @param mpId
-   *        The mediapackage id
    * @param start
    *        The new start time for the event.
    * @return Builds {@link SchedulerItem} for updating the start of an event.
    */
-  public static SchedulerItem updateStart(String mpId, Date start) {
-    return new SchedulerItem(mpId, start, null, Type.UpdateStart);
+  public static SchedulerItem updateStart(Date start) {
+    return new SchedulerItem(start, null, Type.UpdateStart);
   }
 
   /**
-   * @param mpId
-   *        The mediapackage id
    * @param end
    *        The new end time for the event.
    * @return Builds {@link SchedulerItem} for updating the end of an event.
    */
-  public static SchedulerItem updateEnd(String mpId, Date end) {
-    return new SchedulerItem(mpId, null, end, Type.UpdateEnd);
+  public static SchedulerItem updateEnd(Date end) {
+    return new SchedulerItem(null, end, Type.UpdateEnd);
   }
 
   /**
-   * @param mpId
-   *        The mediapackage id
    * @param presenters
    *        The new set of presenters for the event.
    * @return Builds {@link SchedulerItem} for updating the presenters of an event.
    */
-  public static SchedulerItem updatePresenters(String mpId, Set<String> presenters) {
-    return new SchedulerItem(mpId, presenters);
+  public static SchedulerItem updatePresenters(Set<String> presenters) {
+    return new SchedulerItem(presenters);
   }
 
   /**
-   * @param mpId
-   *        The mediapackage id
    * @param agentId
    *        The new agent id for the event.
    * @return Builds {@link SchedulerItem} for updating the agent id of an event.
    */
-  public static SchedulerItem updateAgent(String mpId, String agentId) {
-    return new SchedulerItem(mpId, agentId);
+  public static SchedulerItem updateAgent(String agentId) {
+    return new SchedulerItem(agentId);
   }
 
   /**
-   * @param mediaPackageId
-   *          The unique id of the recording to delete.
    * @return Builds {@link SchedulerItem} for deleting a recording.
    */
-  public static SchedulerItem deleteRecordingState(String mediaPackageId) {
-    return new SchedulerItem(mediaPackageId, Type.DeleteRecordingStatus);
+  public static SchedulerItem deleteRecordingState() {
+    return new SchedulerItem(Type.DeleteRecordingStatus);
   }
 
   /**
@@ -222,8 +194,7 @@ public class SchedulerItem implements MessageItem, Serializable {
    * @param event
    *          The event details to update.
    */
-  public SchedulerItem(String mediaPackageId, DublinCoreCatalog event) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(DublinCoreCatalog event) {
     try {
       this.event = event.toXmlString();
     } catch (IOException e) {
@@ -247,13 +218,10 @@ public class SchedulerItem implements MessageItem, Serializable {
   /**
    * Constructor to build an update properties for an event {@link SchedulerItem}.
    *
-   * @param mediaPackageId
-   *          The id of the event to update.
    * @param properties
    *          The properties to update.
    */
-  public SchedulerItem(String mediaPackageId, Map<String, String> properties) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(Map<String, String> properties) {
     this.event = null;
     this.properties = serializeProperties(properties);
     this.acl = null;
@@ -273,11 +241,8 @@ public class SchedulerItem implements MessageItem, Serializable {
   /**
    * Constructor to build a delete event {@link SchedulerItem}.
    *
-   * @param mediaPackageId
-   *          The id of the event to delete.
    */
-  public SchedulerItem(String mediaPackageId, Type type) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(Type type) {
     this.event = null;
     this.properties = null;
     this.acl = null;
@@ -297,13 +262,10 @@ public class SchedulerItem implements MessageItem, Serializable {
   /**
    * Constructor to build an update access control list event {@link SchedulerItem}.
    *
-   * @param mediaPackageId
-   *          The mediapackage id
    * @param accessControlList
    *          The access control list
    */
-  public SchedulerItem(String mediaPackageId, AccessControlList accessControlList) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(AccessControlList accessControlList) {
     this.event = null;
     this.properties = null;
     try {
@@ -325,69 +287,47 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   /**
-   * Constructor to build an update opt out status event {@link SchedulerItem}.
+   * Constructor to build an update blacklist status event {@link SchedulerItem} or an opt out status event.
    *
-   * @param mediaPackageId
-   *          The mediapackage id
-   * @param optOut
-   *          The opt out status
+   * @param x
+   *          The blacklist status or the opt out status
+   * @param type
+   *          The type of boolean to set
    */
-  public SchedulerItem(String mediaPackageId, boolean optOut) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(boolean x, Type type) {
     this.event = null;
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = null;
+    if (type == Type.UpdateBlacklist) {
+      this.blacklisted = gson.toJson(x);
+    } else {
+      this.blacklisted = null;
+    }
     this.end = -1;
-    this.optOut = gson.toJson(optOut);
+    if (type == Type.UpdateOptOut) {
+      this.optOut = gson.toJson(x);
+    } else {
+      this.optOut = null;
+    }
     this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = -1;
     this.recordingState = null;
     this.start = -1;
     this.lastHeardFrom = null;
-    this.type = Type.UpdateOptOut;
-  }
-
-  /**
-   * Constructor to build an update blacklist status event {@link SchedulerItem}.
-   *
-   * @param blacklisted
-   *          The blacklist status
-   * @param mediaPackageId
-   *          The mediapackage id
-   */
-  public SchedulerItem(boolean blacklisted, String mediaPackageId) {
-    this.mediaPackageId = mediaPackageId;
-    this.event = null;
-    this.properties = null;
-    this.acl = null;
-    this.agentId = null;
-    this.blacklisted = gson.toJson(blacklisted);
-    this.end = -1;
-    this.optOut = null;
-    this.presenters = null;
-    this.reviewStatus = null;
-    this.reviewDate = -1;
-    this.recordingState = null;
-    this.start = -1;
-    this.lastHeardFrom = null;
-    this.type = Type.UpdateBlacklist;
+    this.type = type;
   }
 
   /**
    * Constructor to build an update review status event {@link SchedulerItem}.
    *
-   * @param mediaPackageId
-   *          The mediapackage id
    * @param reviewStatus
    *          The review status
    * @param reviewDate
    *          The review date
    */
-  public SchedulerItem(String mediaPackageId, ReviewStatus reviewStatus, Date reviewDate) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(ReviewStatus reviewStatus, Date reviewDate) {
     this.event = null;
     this.properties = null;
     this.acl = null;
@@ -407,15 +347,12 @@ public class SchedulerItem implements MessageItem, Serializable {
   /**
    * Constructor to build an update recording status event {@link SchedulerItem}.
    *
-   * @param mediaPackageId
-   *          The mediapackage id
    * @param state
    *          the recording status
    * @param lastHeardFrom
    *          the last heard from time
    */
-  public SchedulerItem(String mediaPackageId, String state, Long lastHeardFrom) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(String state, Long lastHeardFrom) {
     this.event = null;
     this.properties = null;
     this.acl = null;
@@ -432,8 +369,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.type = Type.UpdateRecordingStatus;
   }
 
-  public SchedulerItem(String mediaPackageId, Date start, Date end, Type type) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(Date start, Date end, Type type) {
     this.event = null;
     this.acl = null;
     this.agentId = null;
@@ -450,8 +386,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.type = type;
   }
 
-  public SchedulerItem(String mediaPackageId, String agentId) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(String agentId) {
     this.event = null;
     this.acl = null;
     this.agentId = agentId;
@@ -468,8 +403,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.type = Type.UpdateAgentId;
   }
 
-  public SchedulerItem(String mediaPackageId, Set<String> presenters) {
-    this.mediaPackageId = mediaPackageId;
+  public SchedulerItem(Set<String> presenters) {
     this.event = null;
     this.acl = null;
     this.agentId = null;
@@ -485,16 +419,6 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.start = -1;
     this.type = Type.UpdatePresenters;
   }
-
-  @Override
-  public String getId() {
-    return mediaPackageId;
-  }
-
-  public String getMediaPackageId() {
-    return mediaPackageId;
-  }
-
   public DublinCoreCatalog getEvent() {
     if (StringUtils.isBlank(event))
       return null;
