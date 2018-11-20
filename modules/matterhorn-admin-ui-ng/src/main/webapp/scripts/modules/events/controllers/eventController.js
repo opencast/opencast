@@ -151,7 +151,7 @@ angular.module('adminNg.controllers')
                                 if (value === 'true' || value === true) {
                                     el.attr('checked', true);
                                 } else {
-                                    el.attr('checked', false);
+                                    el.removeAttr('checked');
                                 }
                             } else {
                                 el.val(value);
