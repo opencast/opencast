@@ -49,7 +49,7 @@ public class UnitTestWorkspace implements Workspace {
   private final File baseDir;
 
   public UnitTestWorkspace() {
-    baseDir = SchedulerServiceImplTest.baseDir;
+    baseDir = new File(SchedulerServiceImplTest.baseDir, "workspace");
     logger.info("Creating workspace under " + baseDir.getAbsolutePath());
     baseDir.mkdirs();
     clean();
@@ -117,7 +117,8 @@ public class UnitTestWorkspace implements Workspace {
 
   @Override
   public void delete(String mediaPackageID, String mediaPackageElementID) throws NotFoundException, IOException {
-    throw new RuntimeException("Not yet implemented");
+    final File file = IoSupport.file(baseDir.getAbsolutePath(), mediaPackageID, mediaPackageElementID);
+    FileUtils.deleteDirectory(file);
   }
 
   @Override

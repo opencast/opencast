@@ -107,7 +107,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
-      logger.error("Could not update last modifed date of agent {} status: {}", agentId, getStackTrace(e));
+      logger.error("Could not update last modified date of agent {} status: {}", agentId, getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -229,7 +229,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       }
       tx.commit();
     } catch (Exception e) {
-      logger.error("Could not store extendecd event: {}", getStackTrace(e));
+      logger.error("Could not store extended event: {}", getStackTrace(e));
       if (tx.isActive())
         tx.rollback();
       throw new SchedulerServiceDatabaseException(e);
@@ -358,7 +358,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       em = emf.createEntityManager();
       return getExtendedEventDto(mediapackageId, orgId, em);
     } catch (Exception e) {
-      logger.error("Could not search for event {} of organziation {}:  {}", mediapackageId, orgId, e.getStackTrace());
+      logger.error("Could not search for event {} of organization {}:  {}", mediapackageId, orgId, e.getStackTrace());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
