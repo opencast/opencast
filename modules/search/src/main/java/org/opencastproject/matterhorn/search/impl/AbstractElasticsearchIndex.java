@@ -71,6 +71,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -419,8 +420,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *           if the index configuration cannot be found
    */
   protected Settings loadSettings(String index, String indexSettingsPath) throws IOException, SearchIndexException {
-    Settings settings = null;
-
     // Check if a local configuration file is present
     File configFile = new File(PathSupport.concat(new String[] { indexSettingsPath, index, "settings.yml" }));
     if (!configFile.isFile()) {
@@ -428,17 +427,11 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     }
 
     // Finally, try and load the index settings
-    FileInputStream fis = null;
-    try {
-      fis = new FileInputStream(configFile);
-      settings = ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
+    try (FileInputStream fis = new FileInputStream(configFile)) {
+      return ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
     } catch (FileNotFoundException e) {
       throw new IOException("Unable to load elasticsearch settings from " + configFile.getAbsolutePath());
-    } finally {
-      IOUtils.closeQuietly(fis);
     }
-
-    return settings;
   }
 
   /**
@@ -449,40 +442,30 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @param index
    *          the index identifier
    * @return the string containing the configuration
-   * @throws SearchIndexException
-   *           if the index cannot be created
    * @throws IOException
    *           if reading the index mapping fails
    */
-  protected String getIndexSettings(String index) throws SearchIndexException, IOException {
+  protected String getIndexSettings(String index) throws IOException {
     String settings = null;
 
     File configFile = new File(PathSupport.concat(new String[] { indexSettingsPath, index, "settings.json" }));
     if (configFile.isFile()) {
-      FileInputStream fis = null;
-      try {
-        fis = new FileInputStream(configFile);
-        settings = IOUtils.toString(fis);
+      try (FileInputStream fis = new FileInputStream(configFile)) {
+        settings = IOUtils.toString(fis, StandardCharsets.UTF_8);
       } catch (IOException e) {
-        logger.warn("Unable to load index settings from {}: {}", configFile.getAbsolutePath(), e.getMessage());
-      } finally {
-        IOUtils.closeQuietly(fis);
+        logger.warn("Unable to load index settings from {}", configFile.getAbsolutePath(), e);
       }
     }
 
     // If no local settings were found, read them from the bundle resources
     if (settings == null) {
-      InputStream is = null;
       String resourcePath = PathSupport
               .concat(new String[] { "/elasticsearch/", index, "settings.json" });
-      try {
-        is = this.getClass().getResourceAsStream(resourcePath);
+      try (InputStream is = this.getClass().getResourceAsStream(resourcePath)) {
         if (is != null) {
           logger.debug("Reading elastic search index settings '{}' from the bundle resource", index);
-          settings = IOUtils.toString(is);
+          settings = IOUtils.toString(is, StandardCharsets.UTF_8);
         }
-      } finally {
-        IOUtils.closeQuietly(is);
       }
     }
 
@@ -510,30 +493,22 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     File configFile = new File(PathSupport.concat(new String[] { indexSettingsPath, index,
             documentType + "-mapping.json" }));
     if (configFile.isFile()) {
-      FileInputStream fis = null;
-      try {
-        fis = new FileInputStream(configFile);
-        mapping = IOUtils.toString(fis);
+      try (FileInputStream fis = new FileInputStream(configFile)) {
+        mapping = IOUtils.toString(fis, StandardCharsets.UTF_8);
       } catch (IOException e) {
-        logger.warn("Unable to load index mapping from {}: {}", configFile.getAbsolutePath(), e.getMessage());
-      } finally {
-        IOUtils.closeQuietly(fis);
+        logger.warn("Unable to load index mapping from {}", configFile.getAbsolutePath(), e);
       }
     }
 
     // If no local settings were found, read them from the bundle resources
     if (mapping == null) {
-      InputStream is = null;
       String resourcePath = PathSupport
               .concat(new String[] { "/elasticsearch/", index, documentType + "-mapping.json" });
-      try {
-        is = this.getClass().getResourceAsStream(resourcePath);
+      try (InputStream is = this.getClass().getResourceAsStream(resourcePath)) {
         if (is != null) {
           logger.debug("Reading elastic search index mapping '{}' from the bundle resource", documentType);
-          mapping = IOUtils.toString(is);
+          mapping = IOUtils.toString(is, StandardCharsets.UTF_8);
         }
-      } finally {
-        IOUtils.closeQuietly(is);
       }
     }
 
