@@ -27,7 +27,6 @@ import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityConstants;
@@ -35,23 +34,21 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * An in-memory user directory containing the users and roles used by the system.
@@ -85,10 +82,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   public static final String CAPTURE_AGENT_EXTRA_ROLES_KEY = "org.opencastproject.security.capture_agent.roles";
 
   /** The list of in-memory users */
-  private final List<User> inMemoryUsers = new ArrayList<User>();
-
-  /** The organization directory */
-  protected OrganizationDirectoryService orgDirectoryService;
+  private final Map<String, List<User>> inMemoryUsers = new ConcurrentHashMap<>();
 
   /** The security service */
   protected SecurityService securityService;
@@ -124,9 +118,6 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
               + "#                                                    #\n"
               + "######################################################");
     }
-
-    // Create the digest user
-    createSystemUsers();
   }
 
   @Override
@@ -135,64 +126,87 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
   }
 
   /**
-   * Creates the system digest user.
+   * Get a list of all users for the current organization, loading the users from configuration if they had not been
+   * loaded before.
+   *
+   * @return List of users.
    */
-  private void createSystemUsers() {
-    for (Organization organization : orgDirectoryService.getOrganizations()) {
-      JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+  private List<User> getOrganizationUsers() {
+    final Organization organization = securityService.getOrganization();
+    final List<User> users = inMemoryUsers.get(organization.getId());
+    if (users == null) {
+      return createSystemUsers(organization);
+    }
+    return users;
+  }
 
-      // Create the digest auth users with clear text passwords
+  /**
+   * Creates the digest users.
+   *
+   * @param organization
+   *          Organization to set users for
+   * @return List of all users
+   */
+  private synchronized List<User> createSystemUsers(final Organization organization) {
+    List<User> users = inMemoryUsers.get(organization.getId());
+    if (users != null) {
+      logger.trace("Organization users have already been initialized. Aborting.");
+      return users;
+    }
+    users = new ArrayList<>(1);
+    JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
+
+    // Create the system user
+    if (digestUsername != null && digestUserPass != null) {
 
       // Role set for the system user
-      Set<JaxbRole> roleList = new HashSet<JaxbRole>();
+      Set<JaxbRole> roleList = new HashSet<>();
       for (String roleName : SecurityConstants.GLOBAL_SYSTEM_ROLES) {
         roleList.add(new JaxbRole(roleName, jaxbOrganization));
       }
-
-      // Create the system user
-      if (digestUsername != null && digestUserPass != null) {
-        logger.info("Creating the system digest user '{}'", digestUsername);
-        User digestUser = new JaxbUser(digestUsername, digestUserPass, DIGEST_USER_NAME, null, getName(), true,
-                jaxbOrganization, roleList);
-        inMemoryUsers.add(digestUser);
-      }
-
-      /* Deactivated due to security issue (CVE-2018-16154)
-      String caUsername = organization.getProperties().get(CAPTURE_AGENT_USER_KEY);
-      String caUserPass = organization.getProperties().get(CAPTURE_AGENT_PASSWORD_KEY);
-      if (caUsername != null && caUserPass != null) {
-        // Role set for the capture agent user
-        Set<JaxbRole> caRoleList = new HashSet<>();
-        for (String roleName : SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLES) {
-          caRoleList.add(new JaxbRole(roleName, jaxbOrganization));
-        }
-
-        // Add the organization anonymous role to the capture agent user
-        caRoleList.add(new JaxbRole(organization.getAnonymousRole(), jaxbOrganization));
-
-        String caExtraRoles = organization.getProperties().get(CAPTURE_AGENT_EXTRA_ROLES_KEY);
-        // Add any extra custom roles to the CA user
-        if (caExtraRoles != null) {
-          List<String> items = Arrays.asList(caExtraRoles.split("\\s*,\\s*"));
-          for (String item : items) {
-            logger.debug("Adding custom role '{}' to capture agent user {}", item, caUsername);
-            caRoleList.add(new JaxbRole(item, jaxbOrganization));
-          }
-        }
-
-        // Create the capture agent user
-        logger.info("Creating the capture agent digest user '{}'", caUsername);
-        User caUser = new JaxbUser(caUsername, caUserPass, CAPTURE_AGENT_USER_NAME, null, getName(), true,
-                jaxbOrganization, caRoleList);
-        inMemoryUsers.add(caUser);
-      }
-      */
+      User digestUser = new JaxbUser(digestUsername, digestUserPass, DIGEST_USER_NAME, null, getName(), true,
+              jaxbOrganization, roleList);
+      users.add(digestUser);
+      logger.info("Added system digest user '{}' for organization '{}'", digestUsername, organization.getId());
     }
+
+    /* Deactivated due to security issue (CVE-2018-16154)
+    String caUsername = organization.getProperties().get(CAPTURE_AGENT_USER_KEY);
+    String caUserPass = organization.getProperties().get(CAPTURE_AGENT_PASSWORD_KEY);
+    if (caUsername != null && caUserPass != null) {
+      // Role set for the capture agent user
+      Set<JaxbRole> caRoleList = new HashSet<>();
+      for (String roleName : SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLES) {
+        caRoleList.add(new JaxbRole(roleName, jaxbOrganization));
+      }
+
+      // Add the organization anonymous role to the capture agent user
+      caRoleList.add(new JaxbRole(organization.getAnonymousRole(), jaxbOrganization));
+
+      String caExtraRoles = organization.getProperties().get(CAPTURE_AGENT_EXTRA_ROLES_KEY);
+      // Add any extra custom roles to the CA user
+      if (caExtraRoles != null) {
+        List<String> items = Arrays.asList(caExtraRoles.split("\\s*,\\s*"));
+        for (String item : items) {
+          logger.debug("Adding custom role '{}' to capture agent user {}", item, caUsername);
+          caRoleList.add(new JaxbRole(item, jaxbOrganization));
+        }
+      }
+
+      // Create the capture agent user
+      logger.info("Creating the capture agent digest user '{}'", caUsername);
+      User caUser = new JaxbUser(caUsername, caUserPass, CAPTURE_AGENT_USER_NAME, null, getName(), true,
+              jaxbOrganization, caRoleList);
+      inMemoryUsers.add(caUser);
+    }
+    */
+    inMemoryUsers.put(organization.getId(), users);
+    return users;
   }
 
   @Override
   public Iterator<User> getUsers() {
-    return Stream.$(inMemoryUsers).filter(filterByCurrentOrg()).iterator();
+    return getOrganizationUsers().iterator();
   }
 
   /**
@@ -202,11 +216,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public Iterator<Role> getRoles() {
-    Stream<Role> roles = Stream.empty();
-    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
-      roles = roles.append(user.getRoles()).sort(roleComparator);
-    }
-    return roles.iterator();
+    return getOrganizationUsers().stream().flatMap(user -> user.getRoles().stream()).iterator();
   }
 
   /**
@@ -216,11 +226,10 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public User loadUser(String userName) {
-    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
-      if (user.getUsername().equals(userName))
-        return user;
-    }
-    return null;
+    return getOrganizationUsers().stream()
+            .filter(user -> user.getUsername().equals(userName))
+            .findFirst()
+            .orElse(null);
   }
 
   /**
@@ -250,94 +259,59 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
    */
   @Override
   public List<Role> getRolesForUser(String userName) {
-    User user = loadUser(userName);
-    if (user == null)
-      return Collections.emptyList();
-    return Collections.unmodifiableList(new ArrayList<Role>(user.getRoles()));
+    return getOrganizationUsers().stream()
+            .filter(user -> user.getUsername().equals(userName))
+            .flatMap(user -> user.getRoles().stream())
+            .collect(Collectors.toList());
   }
 
   @Override
   public Iterator<User> findUsers(String query, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     // Find all users from the user providers
-    Stream<User> users = Stream.empty();
-    for (User user : Stream.$(inMemoryUsers).filter(filterByCurrentOrg())) {
-      if (like(user.getUsername(), query))
-        users = users.append(Stream.single(user)).sort(userComparator);
-    }
-    return users.drop(offset).apply(limit > 0 ? StreamOp.<User> id().take(limit) : StreamOp.<User> id()).iterator();
+    return getOrganizationUsers().stream()
+            .filter(user -> like(user.getUsername(), query))
+            .sorted(Comparator.comparing(User::getUsername))
+            .skip(offset).limit(limit < 0 ? Long.MAX_VALUE : limit)
+            .iterator();
   }
 
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     // Find all roles from the role providers
-    Stream<Role> roles = Stream.empty();
-    for (Iterator<Role> it = getRoles(); it.hasNext();) {
-      Role role = it.next();
-      if ((like(role.getName(), query) || like(role.getDescription(), query))
-          && !(target == Role.Target.ACL && GLOBAL_SUDO_ROLE.equals(role.getName())))
-        roles = roles.append(Stream.single(role)).sort(roleComparator);
-    }
-
-    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
+    return getOrganizationUsers().stream()
+            .flatMap(user -> user.getRoles().stream())
+            .filter(role -> (like(role.getName(), query) || like(role.getDescription(), query))
+                    && !(target == Role.Target.ACL && GLOBAL_SUDO_ROLE.equals(role.getName())))
+            .sorted(Comparator.comparing(Role::getName))
+            .skip(offset).limit(limit < 0 ? Long.MAX_VALUE : limit)
+            .iterator();
   }
 
-  private boolean like(String string, final String query) {
-    String regex = query.replace("_", ".").replace("%", ".*?");
-    Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    if (null != string) {
-      return p.matcher(string).matches();
-    } else {
+  private boolean like(final String string, final String query) {
+    if (string == null) {
       return false;
     }
+    final String regex = query.replace("_", ".").replace("%", ".*?");
+    final Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    return pattern.matcher(string).matches();
   }
 
   @Override
   public long countUsers() {
-    return Stream.$(inMemoryUsers).filter(filterByCurrentOrg()).getSizeHint();
+    return getOrganizationUsers().size();
   }
 
   @Override
   public void invalidate(String userName) {
     // nothing to do
-  }
-
-  private static final Comparator<Role> roleComparator = new Comparator<Role>() {
-    @Override
-    public int compare(Role role1, Role role2) {
-      return role1.getName().compareTo(role2.getName());
-    }
-  };
-
-  private static final Comparator<User> userComparator = new Comparator<User>() {
-    @Override
-    public int compare(User user1, User user2) {
-      return user1.getUsername().compareTo(user2.getUsername());
-    }
-  };
-
-  private Fn<User, Boolean> filterByCurrentOrg() {
-    return new Fn<User, Boolean>() {
-      @Override
-      public Boolean apply(User user) {
-        return user.getOrganization().equals(securityService.getOrganization());
-      }
-    };
-  }
-
-  /**
-   * Sets a reference to the organization directory service.
-   *
-   * @param organizationDirectory
-   *          the organization directory
-   */
-  void setOrganizationDirectoryService(OrganizationDirectoryService orgDirectoryService) {
-    this.orgDirectoryService = orgDirectoryService;
   }
 
   /**
