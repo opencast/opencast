@@ -5,11 +5,6 @@
   <implementation class="org.opencastproject.userdirectory.JpaGroupRoleProvider"/>
   <property name="service.description" value="Provides a group role directory"/>
 
-  <!-- Also register as a REST endpoint -->
-  <property name="opencast.service.type" value="org.opencastproject.groups"/>
-  <property name="opencast.service.jobproducer" value="false"/>
-  <property name="opencast.service.path" value="/groups"/>
-
   <service>
     <provide interface="org.opencastproject.security.api.RoleProvider"/>
     <provide interface="org.opencastproject.userdirectory.JpaGroupRoleProvider"/>

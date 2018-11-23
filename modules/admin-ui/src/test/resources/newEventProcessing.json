@@ -5,6 +5,7 @@
       {
         "id": "full",
         "title": "Full",
+        "tags": [],
         "description": "",
         "displayOrder": 99,
         "configuration_panel": ""
@@ -12,6 +13,7 @@
       {
         "id": "full-html5",
         "title": "Full HTML5",
+        "tags": ["quick_actions","test"],
         "description": "Test description",
         "displayOrder": 100,
         "configuration_panel": "<h2>Test</h2>"

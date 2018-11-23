@@ -34,10 +34,10 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
     });
 
     it('becomes editable when clicked', function () {
-        expect(element.find('div')).toHaveClass('ng-hide');
+        expect(element.find('div').length).toBe(0);
         element.click();
         $timeout.flush();
-        expect(element.find('div')).not.toHaveClass('ng-hide');
+        expect(element.find('div').length).toBe(1);
     });
 
     it('saves when adding values', function () {
@@ -76,17 +76,30 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
         expect(element.find('datalist').html()).toContain('Item 1');
     });
 
+    describe('#enterEditMode', function () {
+
+        it('enter edit mode', function () {
+            var scope = element.find('ul').scope();
+            scope.editMode = false;
+
+            scope.enterEditMode();
+
+            expect(scope.editMode).toBe(true);
+        });
+    });
+
     describe('#leaveEditMode', function () {
 
         it('leaves edit mode', function () {
-            var scope = element.find('div').scope();
+            var scope = element.find('ul').scope();  // the div & input elements doesn't exist when editMode = false
             scope.editMode = true;
-            scope.value = 'edited';
+            scope.data.value = 'edited';
 
             scope.leaveEditMode();
 
+            expect(element.scope().params.value).not.toContain('edited')
             expect(scope.editMode).toBe(false);
-            expect(scope.value).toEqual('');
+            expect(scope.data.value).toEqual('edited');
         });
     });
 
@@ -94,37 +107,40 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
         it('does not save duplicate values', function () {
             var model = ['unique'];
-            element.find('input').scope().addValue(model, 'unique');
+            element.find('ul').scope().addValue(model, 'unique');
             expect(model).toEqual(['unique']);
         });
     });
 
     describe('#keyUp', function () {
         var event = { target: { value: 'a' } };
+        var scope;
 
         beforeEach(function () {
             event.stopPropagation = jasmine.createSpy();
-            element.find('input').scope().editMode = true;
+            scope = element.find('ul').scope()
+            scope.editMode = true;
+
         });
 
         it('does nothing by default', function () {
-            element.find('input').scope().keyUp(event);
-            expect(element.find('input').scope().editMode).toBe(true);
+            scope.keyUp(event);
+            expect(scope.editMode).toBe(true);
         });
 
         it('stops propagation', function () {
-            element.find('input').scope().keyUp(event);
+            scope.keyUp(event);
             expect(event.stopPropagation).toHaveBeenCalled();
         });
 
         describe('when pressing ESC', function () {
             beforeEach(function () {
                 event.keyCode = 27;
-                element.find('input').scope().keyUp(event);
+                scope.keyUp(event);
             });
 
             it('leaves edit mode', function () {
-                expect(element.find('input').scope().editMode).toBe(false);
+                expect(scope.editMode).toBe(false);
             });
         });
 
@@ -135,35 +151,23 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
             describe('with an item included in the collection', function () {
                 beforeEach(function () {
-                    element.find('input').scope().value = 'item2';
-                    element.find('input').scope().keyUp(event);
+                    scope.data.value = 'item2';
+                    scope.keyUp(event);
                 });
 
-                it('leaves edit mode', function () {
-                    expect(element.find('input').scope().editMode).toBe(false);
+                it('does not leave edit mode', function () {
+                    expect(scope.editMode).toBe(true);
                 });
             });
 
             describe('with an item not included in the collection', function () {
                 beforeEach(function () {
-                    element.find('input').scope().keyUp(event);
+                    scope.keyUp(event);
                 });
 
                 it('does not leave edit mode', function () {
-                    expect(element.find('input').scope().editMode).toBe(true);
+                    expect(scope.editMode).toBe(true);
                 });
-            });
-        });
-
-        describe('when entering more than one character', function () {
-            beforeEach(function () {
-                event.keyCode = 45;
-                event.target.value = 'ab';
-                element.find('input').scope().keyUp(event);
-            });
-
-            it('sets the collection', function () {
-                expect(element.find('input').scope().collection).toBeDefined();
             });
         });
     });
@@ -171,7 +175,7 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
     describe('#submit', function () {
 
         it('saves the value', function () {
-            element.find('input').scope().submit();
+            element.find('ul').scope().submit();
             expect($rootScope.save).toHaveBeenCalled();
         });
     });

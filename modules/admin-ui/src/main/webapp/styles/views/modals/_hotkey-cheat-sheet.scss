@@ -7,6 +7,7 @@
     padding: 2px 9px;
     color: $color-white;
     text-shadow: 1px 1px 0 $color-darkgray;
+    min-width: 32px;
 }
 
 .chord:not(:last-child) {

@@ -28,7 +28,7 @@ MySQL.
 ActiveMQ Migration
 ------------------
 
-*So gar, this is not required*
+*So far, this is not required*
 
 
 Configuration Changes
