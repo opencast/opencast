@@ -6,7 +6,7 @@ Opencast 5
 
 ### Opencast 5.2
 
-*Released on September 13, 2018*
+*Released on November 13, 2018*
 
 - [[MH-13144](https://opencast.jira.com/browse/MH-13144)][[#553](https://github.com/opencast/opencast/pull/553)] -
   only set Job startDate if no set before
