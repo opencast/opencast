@@ -838,7 +838,7 @@
                "SOURCE": "Źródło",
                "CREATED": "Utworzono",
                "CREATED_BY": "Utworzył",
-               "PUBLISHER": "Publisher",
+               "PUBLISHER": "Wydawca",
                "LICENSE": "Licencja",
                "CONTRIBUTORS": "Współpracownik(cy)",
                "RIGHTS": "Prawa",
@@ -876,7 +876,7 @@
                "ACTIONS": "Działania",
                "DETAILS": "Szczegóły",
                "DESCRIPTION": "",
-               "MORE_INFO": "More Information & Actions",
+               "MORE_INFO": "Więcej informacji i Operacje",
                "ID": "Identyfikator",
                "TYPE": "Typ",
                "TITLE": "Tytuł",
@@ -896,7 +896,7 @@
                   "DELETE": "Skasuj instancje ciągu zadaniowego"
                },
                "OPERATION_STATUS": {
-                  "INSTANTIATED": "Instantiated",
+                  "INSTANTIATED": "Uruchomione",
                   "RUNNING": "W toku",
                   "PAUSED": "Zatrzymane",
                   "SUCCEEDED": "Udało się",
@@ -935,8 +935,8 @@
                   "RETRY_STRATEGY": "Strategia Ponawiania",
                   "FAILED_ATTEMPTS": "Nieudane Próby",
                   "MAX_ATTEMPTS": "Maksymalnie",
-                  "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "EXCEPTION_HANDLER_WORKFLOW": "Obsługa Wyjątku",
+                  "FAIL_ON_ERROR": "Przerwij w przypadku błędu"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1034,7 +1034,7 @@
          "TABLE": {
             "CAPTION": "Seria",
             "TITLE": "Seria",
-            "HAS_EVENTS": "Contains events",
+            "HAS_EVENTS": "Zawiera wydarzenia",
             "CREATORS": "Organizator(rzy)",
             "CONTRIBUTORS": "Współpracownik(cy)",
             "CREATED": "Utworzono",
@@ -1253,7 +1253,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz użytkownika",
-            "EDITCAPTION": "User details - {{username}}",
+            "EDITCAPTION": "Dane użytkownika - {{username}}",
             "TABS": {
                "USER": "Użytkownik",
                "ROLES": "Role",
@@ -1297,7 +1297,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz grupę",
-            "EDITCAPTION": "Group details - {{name}}",
+            "EDITCAPTION": "Dane grupy - {{name}}",
             "TABS": {
                "GROUP": "Grupa",
                "ROLES": "Role",
@@ -1378,7 +1378,7 @@
             }
          },
          "DETAILS": {
-            "HEADER": "Access policy details  - {{name}}",
+            "HEADER": "Szczegóły ustawień dostępu - {{name}}",
             "TABS": {
                "SUMMARY": "Podsumowanie",
                "METADATA": "Metadane",
@@ -1561,7 +1561,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Utwórz motyw",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "Ustawienia motywu - {{name}}",
             "GENERAL": {
                "CAPTION": "Ogólne",
                "NAME": "Nazwa",
@@ -1785,9 +1785,9 @@
             "OUTDATED": "Podgląd jest nieaktualny, ponieważ segmenty zostały zmienione. Zostaną zaktualizowane, jak tylko zapiszesz zmiany."
          },
          "CURRENT": {
-            "DEFAULT": "You are currently using the default thumbnail.",
-            "SNAPSHOT": "The current thumbnail has been extracted from the video.",
-            "UPLOAD": "You are currently using an uploaded thumbnail."
+            "DEFAULT": "Obecnie używasz domyślnej miniatury.",
+            "SNAPSHOT": "Obecna miniatura jest kadrem z wideo.",
+            "UPLOAD": "Obenie używasz miniatury załadowanej z pliku."
          }
       },
       "TRACKS": {
@@ -1797,26 +1797,26 @@
             "NO_AUDIO_TRACK_SELECTED": "You must enable at least one audio track"
          },
          "TRACK": {
-            "HEADER": "Track"
+            "HEADER": "Ścieżka"
          },
          "VIDEO": {
-            "HEADER": "Video track",
-            "NOT_AVAILABLE": "No video tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No video track selected",
+            "HEADER": "Ścieżka wideo",
+            "NOT_AVAILABLE": "Brak dostępnych ścieżek wideo",
+            "NO_PREVIEW_AVAILABLE": "Nie znaleziono obrazka podglądu",
+            "NO_TRACK_SELECTED": "Nie wybrano ścieżki wideo",
             "TOOLTIPS": {
                "HIDE": "This video track is currently enabled. Click to disable",
                "UNHIDE": "This video track is currently disabled. Click to enable."
             }
          },
          "AUDIO": {
-            "HEADER": "Audio track",
-            "NOT_AVAILABLE": "No audio tracks available",
-            "NO_PREVIEW_AVAILABLE": "No preview image found",
-            "NO_TRACK_SELECTED": "No audio track selected",
+            "HEADER": "Ścieżka audio",
+            "NOT_AVAILABLE": "Nie dostępnych ścieżek audio",
+            "NO_PREVIEW_AVAILABLE": "Nie znaleziono obrazka podglądu",
+            "NO_TRACK_SELECTED": "Nie wybrano ścieżki audio",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Click to disable",
-               "UNHIDE": "This audio track is currently disabled. Click to enable"
+               "HIDE": "Ścieżka dźwiękowa jest aktualnie włączona. Kliknij aby wyłączyć",
+               "UNHIDE": "Ściezka dżwiękowa jest aktualnie wyłaczona. Kliknij aby włączyć"
             }
          }
       },
@@ -1888,8 +1888,8 @@
          },
          "COMMENTS": {
             "LABEL": "Komentarze",
-            "NONE": "None",
-            "OPEN": "Open",
+            "NONE": "Brak",
+            "OPEN": "Otwórz",
             "RESOLVED": "Rozwiązane"
          },
          "CONTRIBUTORS": {
@@ -1899,7 +1899,7 @@
             "LABEL": "Twórca"
          },
          "PUBLISHER": {
-            "LABEL": "Publisher"
+            "LABEL": "Wydawca"
          },
          "HOSTNAME": {
             "LABEL": "Nazwa hosta"
@@ -2104,14 +2104,14 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
-         "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
+         "TITLE": "Skróty klawiszowe",
+         "HINT": "Ta strona zawiera listę aktualnie dostępnych skrótów klawiaturowych. Mogą one zmieniać się, lub zmieniać znaczenie w różnych miejscach systemu."
       },
       "KEYS": {
          "CTRL": "Ctrl",
          "ALT": "Alt",
          "OPTION": "⌥",
-         "SPACE": "Space",
+         "SPACE": "Spacja",
          "BACKSPACE": "⌫",
          "LEFT": "←",
          "RIGHT": "→",
@@ -2158,28 +2158,28 @@
             "STEP_FORWARD": "Jump 10s forward",
             "PREVIOUS_SEGMENT": "Previous segment/jump to start",
             "NEXT_SEGMENT": "Next segment/jump to end",
-            "VOLUME_UP": "Volume up",
-            "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "VOLUME_UP": "Głośniej",
+            "VOLUME_DOWN": "Ciszej",
+            "MUTE": "Wycisz/włącz dźwięk"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Podziel",
             "CUT_SELECTED_SEGMENT": "Wytnij",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
-            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
+            "PLAY_CURRENT_SEGMENT": "Odtwórz aktualny segment",
+            "CLEAR_LIST": "Wyczyść segment",
+            "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Powtórz segment z końcówką poprzedniego",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Koniec segmentu"
          }
       }
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Nagrywa",
          "ERROR": "Błąd",
-         "IDLE": "Idle",
+         "IDLE": "Bezczynny",
          "OFFLINE": "Nieaktywny",
-         "SHUTTING_DOWN": "Shutting down",
-         "UNKNOWN": "Unknown",
+         "SHUTTING_DOWN": "Wyłączanie",
+         "UNKNOWN": "Nieznany",
          "UPLOADING": "Przesyłanie"
       }
    }
