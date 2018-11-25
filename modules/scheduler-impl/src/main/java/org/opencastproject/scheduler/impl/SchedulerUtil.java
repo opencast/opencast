@@ -23,9 +23,7 @@ package org.opencastproject.scheduler.impl;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 
-import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -281,13 +279,6 @@ public final class SchedulerUtil {
     }
   };
 
-  public static final Fn2<Property, String, Boolean> filterByNamespace = new Fn2<Property, String, Boolean>() {
-    @Override
-    public Boolean apply(Property a, String b) {
-      return b.equals(a.getId().getNamespace());
-    }
-  };
-
   public static final Fn<Snapshot, MediaPackage> episodeToMp = new Fn<Snapshot, MediaPackage>() {
     @Override
     public MediaPackage apply(Snapshot snapshot) {
@@ -302,55 +293,6 @@ public final class SchedulerUtil {
     }
   };
 
-  public static final Fn<Boolean, String> decomposeBooleanValue = new Fn<Boolean, String>() {
-    @Override
-    public String apply(Boolean b) {
-      return b.toString();
-    }
-  };
-
-  public static final Fn<Long, String> decomposeLongValue = new Fn<Long, String>() {
-    @Override
-    public String apply(Long l) {
-      return l.toString();
-    }
-  };
-
-  public static final Fn<Date, String> decomposeDateValue = new Fn<Date, String>() {
-    @Override
-    public String apply(Date d) {
-      return DateTimeSupport.toUTC(d.getTime());
-    }
-  };
-
-  public static final Fn<String, String> decomposeStringValue = new Fn<String, String>() {
-    @Override
-    public String apply(String s) {
-      return s;
-    }
-  };
-
-  public static final Fn<Version, String> decomposeVersionValue = new Fn<Version, String>() {
-    @Override
-    public String apply(Version v) {
-      return v.toString();
-    }
-  };
-
-  public static final Fn<Property, String> toKey = new Fn<Property, String>() {
-    @Override
-    public String apply(Property property) {
-      return property.getId().getName();
-    }
-  };
-
-  public static final Fn<Property, String> toValue = new Fn<Property, String>() {
-    @Override
-    public String apply(Property property) {
-      return property.getValue().decompose(decomposeStringValue, decomposeDateValue, decomposeLongValue,
-              decomposeBooleanValue, decomposeVersionValue);
-    }
-  };
 
   public static final Fn<String, ReviewStatus> toReviewStatus = new Fn<String, ReviewStatus>() {
     @Override

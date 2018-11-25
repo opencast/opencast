@@ -20,24 +20,17 @@
  */
 package org.opencastproject.migration;
 
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
-import static org.opencastproject.migration.SchedulerMigrationService.CFG_ORGANIZATION;
 
-import org.opencastproject.scheduler.api.SchedulerService;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -45,15 +38,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
-
-import java.beans.PropertyVetoException;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.sql.DataSource;
 
 public class SchedulerMigrationServiceTest {
 
@@ -74,24 +58,7 @@ public class SchedulerMigrationServiceTest {
     replay(securityService);
 
 
-    SchedulerService schedulerService = createNiceMock(SchedulerService.class);
-    expect(schedulerService.search(anyObject(Opt.class), anyObject(Opt.class), anyObject(Opt.class),
-            anyObject(Opt.class), anyObject(Opt.class))).andReturn(new ArrayList<>());
-    replay(schedulerService);
-
-    Workspace workspace = createNiceMock(Workspace.class);
-    expect(workspace.put(anyString(), anyString(), anyString(), anyObject(InputStream.class)))
-            .andReturn(new URI("test")).anyTimes();
-    replay(workspace);
-
-    AuthorizationService authorizationService = createNiceMock(AuthorizationService.class);
-    replay(authorizationService);
-
-    schedulerMigrationService.setAuthorizationService(authorizationService);
-    schedulerMigrationService.setOrganizationDirectoryService(orgDirService);
-    schedulerMigrationService.setSchedulerService(schedulerService);
     schedulerMigrationService.setSecurityService(securityService);
-    schedulerMigrationService.setWorkspace(workspace);
   }
 
   @Test
@@ -99,33 +66,11 @@ public class SchedulerMigrationServiceTest {
   public void testSchedulerMigration() throws Exception {
     BundleContext bundleContext = createNiceMock(BundleContext.class);
     expect(bundleContext.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("root").anyTimes();
-    expect(bundleContext.getProperty(CFG_ORGANIZATION)).andReturn("mh_default_org").anyTimes();
 
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bundleContext).anyTimes();
     EasyMock.replay(cc, bundleContext);
 
-    DataSource dataSource = createDataSource("jdbc:mysql://localhost/test_scheduler", "opencast", "opencast");
-
-    schedulerMigrationService.setDataSource(dataSource);
     schedulerMigrationService.activate(cc);
   }
-
-  private DataSource createDataSource(String databaseUrl, String databaseUser, String databasePassword) {
-    final Map<String, String> testEntityManagerProps = new HashMap<>();
-    testEntityManagerProps.put("eclipselink.ddl-generation", "none");
-    testEntityManagerProps.put("eclipselink.ddl-generation.output-mode", "database");
-
-    final ComboPooledDataSource pooledDataSource = new ComboPooledDataSource();
-    try {
-      pooledDataSource.setDriverClass("com.mysql.jdbc.Driver");
-    } catch (PropertyVetoException e) {
-      throw new RuntimeException(e);
-    }
-    pooledDataSource.setJdbcUrl(databaseUrl);
-    pooledDataSource.setUser(databaseUser);
-    pooledDataSource.setPassword(databasePassword);
-    return pooledDataSource;
-  }
-
 }

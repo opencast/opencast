@@ -122,7 +122,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.WordUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeConstants;
 import org.joda.time.DateTimeZone;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.cm.ConfigurationException;
@@ -167,8 +166,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The last modifed cache configuration key */
   private static final String CFG_KEY_LAST_MODIFED_CACHE_EXPIRE = "last_modified_cache_expire";
 
-  /** The transaction cleanup offset configuration key */
-  private static final String CFG_KEY_TRANSACTION_CLEANUP_OFFSET = "transaction_cleanup_offset";
+  /** The maintenance configuration key */
+  private static final String CFG_KEY_MAINTENANCE = "maintenance";
 
   /** The default cache expire time in seconds */
   private static final int DEFAULT_CACHE_EXPIRE = 60;
@@ -196,9 +195,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The last modified cache */
   protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder()
           .expireAfterWrite(DEFAULT_CACHE_EXPIRE, TimeUnit.SECONDS).build();
-
-  /** The transaction cleanup offset in millis */
-  protected int transactionOffsetMillis = DateTimeConstants.MILLIS_PER_DAY * 10;
 
   /** The message broker sender service */
   private MessageSender messageSender;
@@ -238,6 +234,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   /** The system user name */
   private String systemUserName;
+
+  private ComponentContext componentContext;
 
   /**
    * OSGi callback to set message sender.
@@ -369,6 +367,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   public void activate(ComponentContext cc) throws Exception {
     super.activate();
+    this.componentContext = cc;
     systemUserName = SecurityUtil.getSystemUserName(cc);
     logger.info("Activating Scheduler Service");
   }
@@ -382,7 +381,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties != null) {
-      Option<Integer> cacheExpireDuration = OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFED_CACHE_EXPIRE)
+      final Option<Integer> cacheExpireDuration = OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFED_CACHE_EXPIRE)
               .bind(Strings.toInt);
       if (cacheExpireDuration.isSome()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
@@ -391,13 +390,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       } else {
         logger.info("Set last modified cache to default {}", getHumanReadableTimeString(DEFAULT_CACHE_EXPIRE));
       }
-      for (Integer offsetInSeconds : OsgiUtil.getOptCfg(properties, CFG_KEY_TRANSACTION_CLEANUP_OFFSET)
-              .bind(Strings.toInt)) {
-        transactionOffsetMillis = offsetInSeconds * DateTimeConstants.MILLIS_PER_SECOND;
+      final Option<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
+      if (maintenance.getOrElse(false)) {
+        final String name = SchedulerServiceImpl.class.getName();
+        logger.warn("Putting scheduler into maintenance mode. This only makes sense when migrating data. If this is not"
+                + " intended, edit the config file '{}.cfg' accordingly and restart opencast.", name);
+        componentContext.disableComponent(name);
       }
     }
-    logger.info("Set transaction cleanup offset to {}",
-            getHumanReadableTimeString(transactionOffsetMillis / DateTimeConstants.MILLIS_PER_SECOND));
   }
 
   @Override
