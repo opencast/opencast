@@ -37,16 +37,12 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -57,6 +53,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -67,6 +64,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Federates user and role providers, and exposes a spring UserDetailsService so user lookups can be used by spring
@@ -87,10 +86,10 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   public static final String USER_CACHE_EXPIRY_KEY = "org.opencastproject.userdirectory.cache.expiry";
 
   /** The list of user providers */
-  protected List<UserProvider> userProviders = new CopyOnWriteArrayList<UserProvider>();
+  protected List<UserProvider> userProviders = new CopyOnWriteArrayList<>();
 
   /** The list of role providers */
-  protected List<RoleProvider> roleProviders = new CopyOnWriteArrayList<RoleProvider>();
+  protected List<RoleProvider> roleProviders = new CopyOnWriteArrayList<>();
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -101,7 +100,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   private final CacheLoader<Tuple<String, String>, Object> userLoader = new CacheLoader<Tuple<String, String>, Object>() {
     @Override
     public Object load(Tuple<String, String> orgUser) {
-      User user = loadUser.apply(orgUser);
+      final User user = loadUser(orgUser);
       return user == null ? nullToken : user;
     }
   };
@@ -178,7 +177,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    */
   protected synchronized void removeUserProvider(UserProvider userProvider) {
     logger.debug("Removing {} from the list of user providers", userProvider);
-    roleProviders.remove(userProvider);
+    userProviders.remove(userProvider);
   }
 
   /**
@@ -209,21 +208,20 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @see org.opencastproject.security.api.UserDirectoryService#getUsers()
    */
   @Override
-  @SuppressWarnings("unchecked")
   public Iterator<User> getUsers() {
-    Organization org = securityService.getOrganization();
+    final Organization org = securityService.getOrganization();
     if (org == null)
       throw new IllegalStateException("No organization is set");
 
-    // Find all users from the user providers
-    Stream<User> users = Stream.empty();
+    // Get all users from the user providers
+    final List<User> users = new ArrayList<>();
     for (final UserProvider userProvider : userProviders) {
-      String providerOrgId = userProvider.getOrganization();
-      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
-        continue;
-      users = users.append(IteratorUtils.toList(userProvider.getUsers())).sort(userComparator);
+      final String providerOrgId = userProvider.getOrganization();
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        userProvider.getUsers().forEachRemaining(users::add);
+      }
     }
-    return users.iterator();
+    return users.stream().sorted(Comparator.comparing(User::getUsername)).iterator();
   }
 
   /**
@@ -232,20 +230,20 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    * @see org.opencastproject.security.api.RoleDirectoryService#getRoles()
    */
   @Override
-  @SuppressWarnings("unchecked")
   public Iterator<Role> getRoles() {
-    Organization org = securityService.getOrganization();
+    final Organization org = securityService.getOrganization();
     if (org == null)
       throw new IllegalStateException("No organization is set");
 
-    Stream<Role> roles = Stream.empty();
+    // Get all roles from the role providers
+    final List<Role> roles = new ArrayList<>();
     for (RoleProvider roleProvider : roleProviders) {
-      String providerOrgId = roleProvider.getOrganization();
-      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
-        continue;
-      roles = roles.append(IteratorUtils.toList(roleProvider.getRoles())).sort(roleComparator);
+      final String providerOrgId = roleProvider.getOrganization();
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        roleProvider.getRoles().forEachRemaining(roles::add);
+      }
     }
-    return roles.iterator();
+    return roles.stream().sorted(Comparator.comparing(Role::getName)).iterator();
   }
 
   /**
@@ -297,83 +295,80 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   /** Load a user of an organization. */
-  private final Function<Tuple<String, String>, User> loadUser = new Function<Tuple<String, String>, User>() {
-    @Override
-    public User apply(Tuple<String, String> orgUser) {
-      // Collect all of the roles known from each of the user providers for this user
-      User user = null;
-      for (UserProvider userProvider : userProviders) {
-        String providerOrgId = userProvider.getOrganization();
-        if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !orgUser.getA().equals(providerOrgId)) {
-          continue;
-        }
-        User providerUser = userProvider.loadUser(orgUser.getB());
-        if (providerUser == null) {
-          continue;
-        }
-
-        User tmpUser = JaxbUser.fromUser(providerUser);
-        if (user == null) {
-          user = tmpUser;
-        } else {
-          user = mergeUsers(user, tmpUser);
-        }
-
-        // Return super users without merging to avoid unnecessary requests to other user providers
-        if (InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(userProvider.getName())) {
-          user = tmpUser;
-          break;
-        }
+  private User loadUser(Tuple<String, String> orgUser) {
+    // Collect all of the roles known from each of the user providers for this user
+    User user = null;
+    for (UserProvider userProvider : userProviders) {
+      String providerOrgId = userProvider.getOrganization();
+      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !orgUser.getA().equals(providerOrgId)) {
+        continue;
+      }
+      User providerUser = userProvider.loadUser(orgUser.getB());
+      if (providerUser == null) {
+        continue;
       }
 
-      if (user == null)
-        return null;
-
-      // Add additional roles from role providers
-      Set<JaxbRole> roles = new HashSet<JaxbRole>();
-      for (Role role : user.getRoles()) {
-        roles.add(JaxbRole.fromRole(role));
+      User tmpUser = JaxbUser.fromUser(providerUser);
+      if (user == null) {
+        user = tmpUser;
+      } else {
+        user = mergeUsers(user, tmpUser);
       }
 
-      // Consult roleProviders if this is not an internal system user
-      if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
+      // Return super users without merging to avoid unnecessary requests to other user providers
+      if (InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(userProvider.getName())) {
+        user = tmpUser;
+        break;
+      }
+    }
+
+    if (user == null)
+      return null;
+
+    // Add additional roles from role providers
+    Set<JaxbRole> roles = new HashSet<>();
+    for (Role role : user.getRoles()) {
+      roles.add(JaxbRole.fromRole(role));
+    }
+
+    // Consult roleProviders if this is not an internal system user
+    if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
+      for (RoleProvider roleProvider : roleProviders) {
+        for (Role role : roleProvider.getRolesForUser(user.getUsername())) {
+          roles.add(JaxbRole.fromRole(role));
+        }
+      }
+    }
+
+    // Resolve any transitive roles granted via group membership
+    Set<JaxbRole> derivedRoles = new HashSet<>();
+    for (Role role : roles) {
+      if (Role.Type.EXTERNAL_GROUP.equals(role.getType())) {
+        // Load roles granted to this group
+        logger.debug("Resolving transitive roles for user {} from external group {}", user.getUsername(), role.getName());
         for (RoleProvider roleProvider : roleProviders) {
-          for (Role role : roleProvider.getRolesForUser(user.getUsername())) {
-            roles.add(JaxbRole.fromRole(role));
-          }
-        }
-      }
-
-      // Resolve any transitive roles granted via group membership
-      Set<JaxbRole> derivedRoles = new HashSet<JaxbRole>();
-      for (Role role : roles) {
-        if (Role.Type.EXTERNAL_GROUP.equals(role.getType())) {
-          // Load roles granted to this group
-          logger.debug("Resolving transitive roles for user {} from external group {}", user.getUsername(), role.getName());
-          for (RoleProvider roleProvider : roleProviders) {
-            if (roleProvider instanceof GroupProvider) {
-              List<Role> groupRoles = ((GroupProvider) roleProvider).getRolesForGroup(role.getName());
-              if (groupRoles != null) {
-                for (Role groupRole : groupRoles) {
-                  derivedRoles.add(JaxbRole.fromRole(groupRole));
-                }
-                logger.debug("Adding {} derived role(s) for user {} from internal group {}", derivedRoles.size(), user.getUsername(), role.getName());
-              } else {
-                logger.warn("Cannot resolve externallly provided group reference for user {} to internal group {}", user.getUsername(), role.getName());
+          if (roleProvider instanceof GroupProvider) {
+            List<Role> groupRoles = ((GroupProvider) roleProvider).getRolesForGroup(role.getName());
+            if (groupRoles != null) {
+              for (Role groupRole : groupRoles) {
+                derivedRoles.add(JaxbRole.fromRole(groupRole));
               }
+              logger.debug("Adding {} derived role(s) for user {} from internal group {}", derivedRoles.size(), user.getUsername(), role.getName());
+            } else {
+              logger.warn("Cannot resolve externallly provided group reference for user {} to internal group {}", user.getUsername(), role.getName());
             }
           }
         }
       }
-      roles.addAll(derivedRoles);
-
-      // Create and return the final user
-      JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
-              user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
-      mergedUser.setManageable(user.isManageable());
-      return mergedUser;
     }
-  };
+    roles.addAll(derivedRoles);
+
+    // Create and return the final user
+    JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
+            user.getProvider(), user.canLogin(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
+    mergedUser.setManageable(user.isManageable());
+    return mergedUser;
+  }
 
   /**
    * {@inheritDoc}
@@ -390,7 +385,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     // Store the user in the security service
     securityService.setUser(user);
 
-    Set<GrantedAuthority> authorities = new HashSet<GrantedAuthority>();
+    Set<GrantedAuthority> authorities = new HashSet<>();
     for (Role role : user.getRoles()) {
       authorities.add(new SimpleGrantedAuthority(role.getName()));
     }
@@ -423,22 +418,19 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    *          the second user to merge
    * @return a user with a merged set of roles
    */
-  protected User mergeUsers(User user1, User user2) {
-    HashSet<JaxbRole> mergedRoles = new HashSet<JaxbRole>();
-    for (Role role : user1.getRoles()) {
-      mergedRoles.add(JaxbRole.fromRole(role));
-    }
-    for (Role role : user2.getRoles()) {
-      mergedRoles.add(JaxbRole.fromRole(role));
-    }
+  private User mergeUsers(User user1, User user2) {
+    final Set<JaxbRole> mergedRoles = Stream.of(user1, user2)
+            .flatMap((u) -> u.getRoles().stream())
+            .map(JaxbRole::fromRole)
+            .collect(Collectors.toSet());
 
-    String name = StringUtils.isNotBlank(user1.getName()) ? user1.getName() : user2.getName();
-    String email = StringUtils.isNotBlank(user1.getEmail()) ? user1.getEmail() : user2.getEmail();
-    String password = user1.getPassword() == null ? user2.getPassword() : user1.getPassword();
-    boolean manageable = user1.isManageable() || user2.isManageable() ? true : false;
+    final String name = StringUtils.defaultIfBlank(user1.getName(), user2.getName());
+    final String email = StringUtils.defaultIfBlank(user1.getEmail(), user2.getEmail());
+    final String password = StringUtils.defaultString(user1.getPassword(), user2.getPassword());
+    final boolean manageable = user1.isManageable() || user2.isManageable();
 
-    JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());
-    String provider = StringUtils.join(Collections.nonNullList(user1.getProvider(), user2.getProvider()), ",");
+    final JaxbOrganization organization = JaxbOrganization.fromOrganization(user1.getOrganization());
+    final String provider = StringUtils.join(Collections.nonNullList(user1.getProvider(), user2.getProvider()), ",");
 
     JaxbUser jaxbUser = new JaxbUser(user1.getUsername(), password, name, email, provider, organization, mergedRoles);
     jaxbUser.setManageable(manageable);
@@ -456,7 +448,6 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Iterator<User> findUsers(String query, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
@@ -465,18 +456,21 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
 
     // Find all users from the user providers
-    Stream<User> users = Stream.empty();
+    final List<User> users = new ArrayList<>();
     for (final UserProvider userProvider : userProviders) {
       String providerOrgId = userProvider.getOrganization();
-      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
-        continue;
-      users = users.append(IteratorUtils.toList(userProvider.findUsers(query, 0, 0))).sort(userComparator);
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        userProvider.findUsers(query, 0, 0).forEachRemaining(users::add);
+      }
     }
-    return users.drop(offset).apply(limit > 0 ? StreamOp.<User> id().take(limit) : StreamOp.<User> id()).iterator();
+    Stream<User> stream = users.stream().sorted(Comparator.comparing(User::getUsername)).skip(offset);
+    if (limit > 0) {
+      return stream.limit(limit).iterator();
+    }
+    return stream.iterator();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
     if (query == null)
       throw new IllegalArgumentException("Query must be set");
@@ -485,23 +479,23 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
 
     // Find all roles from the role providers
-    Stream<Role> roles = Stream.empty();
+    final List<Role> roles = new ArrayList<>();
     for (RoleProvider roleProvider : roleProviders) {
-      String providerOrgId = roleProvider.getOrganization();
-      if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !org.getId().equals(providerOrgId))
-        continue;
-      roles = roles.append(IteratorUtils.toList(roleProvider.findRoles(query, target, 0, 0))).sort(roleComparator);
+      final String providerOrgId = roleProvider.getOrganization();
+      if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
+        roleProvider.findRoles(query, target, 0, 0).forEachRemaining(roles::add);
+      }
     }
-    return roles.drop(offset).apply(limit > 0 ? StreamOp.<Role> id().take(limit) : StreamOp.<Role> id()).iterator();
+    Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
+    if (limit > 0) {
+      return stream.limit(limit).iterator();
+    }
+    return stream.iterator();
   }
 
   @Override
   public long countUsers() {
-    long sum = 0;
-    for (UserProvider userProvider : userProviders) {
-      sum += userProvider.countUsers();
-    }
-    return sum;
+    return userProviders.stream().mapToLong(UserProvider::countUsers).sum();
   }
 
   @Override
@@ -517,19 +511,5 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     cache.invalidate(tuple(org.getId(), userName));
     logger.trace("Invalidated user {} from user directories", userName);
   }
-
-  private static final Comparator<Role> roleComparator = new Comparator<Role>() {
-    @Override
-    public int compare(Role role1, Role role2) {
-      return role1.getName().compareTo(role2.getName());
-    }
-  };
-
-  private static final Comparator<User> userComparator = new Comparator<User>() {
-    @Override
-    public int compare(User user1, User user2) {
-      return user1.getUsername().compareTo(user2.getUsername());
-    }
-  };
 
 }
