@@ -374,6 +374,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
       "-nostats",
       "-i", mediaFile.getAbsolutePath(),
       "-lavfi", createWaveformFilter(track),
+      "-frames:v", "1",
       "-an", "-vn", "-sn", "-y",
       waveformFilePath
     };
