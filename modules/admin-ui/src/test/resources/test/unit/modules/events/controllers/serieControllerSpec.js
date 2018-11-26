@@ -41,6 +41,7 @@ describe('Serie controller', function () {
         $httpBackend.whenGET('/admin-ng/resources/ACL.ACTIONS.json').respond('{}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=0').respond('{"ROLE_ANONYMOUS": "ROLE_ANONYMOUS"}');
         $httpBackend.whenGET('/admin-ng/resources/ROLES.json?filter=role_target:ACL&limit=100&offset=2').respond('{}');
+        $httpBackend.whenGET('/info/me.json').respond(JSON.stringify(getJSONFixture('info/me.json')));
 
         $controller('SerieCtrl', {$scope: $scope});
     });
@@ -174,7 +175,7 @@ describe('Serie controller', function () {
             expect(SeriesAccessResource.save).toHaveBeenCalledWith({ id: '73f9b7ab-1d8f-4c75-9da1-ceb06736d82c' },
                 {
                     acl : { ace : [ { action : 'read', allow : true, role : 'admin' }, { action : 'write', allow : true, role : 'admin' } ] },
-                    override: true
+                    override: false
                 }
             );
         });

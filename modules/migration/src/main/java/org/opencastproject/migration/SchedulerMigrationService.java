@@ -246,7 +246,11 @@ public class SchedulerMigrationService {
     mp.add(dc);
     // add acl to the media package
     for (AccessControlList acl : event.accessControlList) {
-      authorizationService.setAcl(mp, AclScope.Episode, acl);
+      try {
+        authorizationService.setAcl(mp, AclScope.Episode, acl);
+      } catch (MediaPackageException e) {
+        logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
+      }
     }
     //
     // add to scheduler service

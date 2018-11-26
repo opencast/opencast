@@ -1025,7 +1025,9 @@
             "ADDITIONAL_ACTIONS" : "Additional Actions",
             "ACTION"      : "Actions",
             "NEW"         : "New policy",
-            "DETAILS"     : "Details"
+            "DETAILS"     : "Details",
+            "REPLACE_EVENT_ACLS": "Update event permissions",
+            "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
           },
           "ROLES": {
             "LABEL": "Select a role",

@@ -207,14 +207,14 @@
                             <input type="checkbox"
                                    ng-disabled="aclLocked"
                                    ng-model="policy.read"
-                                   ng-change="accessSave(policy)"
+                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
                           </td>
                           <td class="fit text-center">
                             <input type="checkbox"
                                    ng-disabled="aclLocked"
                                    ng-model="policy.write"
-                                   ng-change="accessSave(policy)"
+                                   ng-change="accessSave()"
                                    ng-disabled="!$root.userIs('ROLE_UI_SERIES_DETAILS_ACL_EDIT')"/>
                           </td>
                           <td class="fit editable" ng-if="hasActions">
@@ -246,6 +246,16 @@
                   </div>
                 </div>
               </div>
+              <footer ng-if="updateMode === 'optional'">
+                <!-- Button to remove all episode ACLs to ensure only the series ACL applies -->
+                <a ng-click="accessSave(true)"
+                   class="submit"
+                   ng-class="{disabled: !validAcl}"
+                   translate="EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS"
+                   title="{{'EVENTS.SERIES.DETAILS.ACCESS.ACCESS_POLICY.REPLACE_EVENT_ACLS_HINT' | translate}}">
+                  <!-- Submit -->
+                </a>
+              </footer>
             </div>
           </li>
         </ul>

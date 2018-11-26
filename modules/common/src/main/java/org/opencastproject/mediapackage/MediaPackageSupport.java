@@ -422,25 +422,6 @@ public final class MediaPackageSupport {
       };
     }
 
-    /**
-     * Return true if the element has a flavor that matches any of the <code>flavors</code>.
-     *
-     * @see MediaPackageElementFlavor#matches(MediaPackageElementFlavor)
-     */
-    public static Function<MediaPackageElement, Boolean> matchesFlavorAny(final List<MediaPackageElementFlavor> flavors) {
-      return new Function<MediaPackageElement, Boolean>() {
-        @Override
-        public Boolean apply(MediaPackageElement mpe) {
-          for (MediaPackageElementFlavor f : flavors) {
-            if (f.matches(mpe.getFlavor())) {
-              return true;
-            }
-          }
-          return false;
-        }
-      };
-    }
-
     public static final Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>> matchesFlavor = new Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>>() {
       @Override
       public Function<MediaPackageElement, Boolean> apply(final MediaPackageElementFlavor flavor) {
@@ -457,10 +438,6 @@ public final class MediaPackageSupport {
         }
       };
     }
-
-    public static final Function<MediaPackageElement, Boolean> isXACML = MediaPackageSupport.Filters
-            .matchesFlavorAny(list(MediaPackageElements.XACML_POLICY, MediaPackageElements.XACML_POLICY_EPISODE,
-                    MediaPackageElements.XACML_POLICY_SERIES));
 
     public static final Function<MediaPackageElement, Boolean> isEpisodeAcl = new Function<MediaPackageElement, Boolean>() {
       @Override

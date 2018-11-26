@@ -91,6 +91,7 @@
       "org.opencastproject.admin.help.restdocs.url": "/rest_docs.html",
       "org.opencastproject.admin.mediamodule.url": "/engage/ui",
       "player": "/engage/theodul/ui/core.html",
+      "admin.series.acl.event.update.mode": "optional",
       "admin.shortcut.editor.split_at_current_time": "v",
       "admin.shortcut.editor.play_ending_of_current_segment": "n",
       "admin.shortcut.editor.clear_list": "ctrl+backspace",

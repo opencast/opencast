@@ -23,6 +23,7 @@ package org.opencastproject.security.api;
 
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.util.data.Tuple;
 
 import java.io.IOException;
@@ -33,15 +34,6 @@ import java.io.InputStream;
  * Provides generation and interpretation of policy documents in media packages
  */
 public interface AuthorizationService {
-
-  /**
-   * Determines whether the current media package contains a security policy.
-   *
-   * @param mp
-   *          the media package
-   * @return whether the current media package contains a security policy
-   */
-  boolean hasPolicy(MediaPackage mp);
 
   /**
    * Determines whether the current user can take the specified action on the media package.
@@ -117,7 +109,8 @@ public interface AuthorizationService {
    *          the tuples of roles to actions
    * @return the mutated (!) media package with attached XACML policy and the XACML attachment
    */
-  Tuple<MediaPackage, Attachment> setAcl(MediaPackage mp, AclScope scope, AccessControlList acl);
+  Tuple<MediaPackage, Attachment> setAcl(MediaPackage mp, AclScope scope, AccessControlList acl)
+          throws MediaPackageException;
 
   /**
    * Remove the XACML of the given scope.

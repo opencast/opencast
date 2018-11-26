@@ -120,17 +120,6 @@ public interface MediaPackageElements {
   /** Series bound XACML policy flavor */
   MediaPackageElementFlavor XACML_POLICY_SERIES = new MediaPackageElementFlavor("security", "xacml+series");
 
-  /**
-   * XACML policy flavor.
-   *
-   * @deprecated use {@link #XACML_POLICY_SERIES} instead.
-   */
-  @Deprecated
-  MediaPackageElementFlavor XACML_POLICY = new MediaPackageElementFlavor("security", "xacml");
-
-  /** Export Files Policy flavor */
-  MediaPackageElementFlavor EXPORT_POLICY = new MediaPackageElementFlavor("security", "acl");
-
   // Other flavors
 
   /** A default flavor for DFXP captions catalogs" */

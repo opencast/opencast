@@ -39,6 +39,7 @@ import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.acl.AclItem;
@@ -178,9 +179,13 @@ public final class AclServiceImpl implements AclService {
           @Override
           public void esome(final AccessControlList acl) {
             // update in episode service
-            MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
-            if (assetManager != null)
-              assetManager.takeSnapshot(mp);
+            try {
+              MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+              if (assetManager != null)
+                assetManager.takeSnapshot(mp);
+            } catch (MediaPackageException e) {
+              logger.error("Error getting ACL from media package", e);
+            }
           }
 
           // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
