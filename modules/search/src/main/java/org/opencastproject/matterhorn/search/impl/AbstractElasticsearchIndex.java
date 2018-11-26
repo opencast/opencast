@@ -53,7 +53,6 @@ import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -331,7 +330,8 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       if (nodeClient == null) {
         if (elasticSearch == null) {
           // configure external Elasticsearch
-          nodeClient = new TransportClient(settings)
+          nodeClient = TransportClient.builder()
+                  .settings(settings).build()
                   .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(externalServerAddress),
                           externalServerPort));
         } else {
@@ -360,7 +360,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
           elasticSearchClients.remove(nodeClient);
           if (elasticSearchClients.isEmpty() && elasticSearch != null) {
             logger.info("Stopping local Elasticsearch node");
-            elasticSearch.stop();
             elasticSearch.close();
             elasticSearch = null;
           }
@@ -465,7 +464,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
     // Finally, try and load the index settings
     try (FileInputStream fis = new FileInputStream(configFile)) {
-      return ImmutableSettings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
+      return Settings.settingsBuilder().loadFromStream(configFile.getName(), fis).build();
     } catch (FileNotFoundException e) {
       throw new IOException("Unable to load elasticsearch settings from " + configFile.getAbsolutePath());
     }
@@ -563,8 +562,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    */
   protected SearchRequestBuilder getSearchRequestBuilder(SearchQuery query, QueryBuilder queryBuilder) {
 
-    SearchRequestBuilder requestBuilder = new SearchRequestBuilder(getSearchClient());
-    requestBuilder.setIndices(getIndexName());
+    SearchRequestBuilder requestBuilder = getSearchClient().prepareSearch(getIndexName());
     requestBuilder.setSearchType(SearchType.QUERY_THEN_FETCH);
     requestBuilder.setPreference("_local");
 

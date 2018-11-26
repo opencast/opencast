@@ -28,7 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.elasticsearch.common.lang3.StringUtils.isNoneBlank;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -242,7 +242,7 @@ public class WorkflowsEndpoint {
 
     // Apply sort
     // TODO: this only uses the last sorting criteria
-    if (StringUtils.isNoneBlank(sort)) {
+    if (isNoneBlank(sort)) {
       Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
       for (SortCriterion criterion : sortCriteria) {
         boolean isASC = criterion.getOrder() != SearchQuery.Order.Descending;

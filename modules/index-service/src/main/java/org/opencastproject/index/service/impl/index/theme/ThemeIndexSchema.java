@@ -30,7 +30,7 @@ import org.opencastproject.matterhorn.search.impl.IndexSchema;
 public interface ThemeIndexSchema extends IndexSchema {
 
   /** The unique identifier */
-  String UID = "uid";
+  String ID = "id";
 
   /** The organization that owns this theme. */
   String ORGANIZATION = "organization";
