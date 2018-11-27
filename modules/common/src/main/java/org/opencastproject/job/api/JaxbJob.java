@@ -30,7 +30,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import java.net.URI;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -111,13 +110,6 @@ public class JaxbJob {
   @XmlElement(name = "jobLoad")
   private Float jobLoad;
 
-  @XmlElement(name = "jobId")
-  @XmlElementWrapper(name = "blockingJobId")
-  private List<Long> blockedJobIds = new LinkedList<Long>();
-
-  @XmlElement(name = "blockingJobId")
-  private Long blockingJobId = null;
-
   /** Default constructor needed by jaxb */
   public JaxbJob() {
   }
@@ -147,15 +139,12 @@ public class JaxbJob {
     this.creator = job.getCreator();
     this.organization = job.getOrganization();
     this.jobLoad = job.getJobLoad();
-    if (job.getBlockedJobIds() != null)
-      this.blockedJobIds = unmodifiableList(job.getBlockedJobIds());
-    this.blockingJobId = job.getBlockingJobId();
   }
 
   public Job toJob() {
     return new JobImpl(id, creator, organization, version, jobType, operation, arguments, status, createdHost,
             processingHost, dateCreated, dateStarted, dateCompleted, queueTime, runTime, payload, parentJobId,
-            rootJobId, dispatchable, uri, jobLoad, blockedJobIds, blockingJobId);
+            rootJobId, dispatchable, uri, jobLoad);
   }
 
   public static Fn<JaxbJob, Job> fnToJob() {
@@ -196,7 +185,7 @@ public class JaxbJob {
             .append(parentJobId, jaxbJob.parentJobId).append(rootJobId, jaxbJob.rootJobId)
             .append(queueTime, jaxbJob.queueTime).append(runTime, jaxbJob.runTime)
             .append(payload, jaxbJob.payload).append(jobLoad, jaxbJob.jobLoad)
-            .append(blockedJobIds, jaxbJob.blockedJobIds).append(blockingJobId, jaxbJob.blockingJobId).isEquals();
+            .isEquals();
   }
 
   @Override
@@ -205,6 +194,6 @@ public class JaxbJob {
             .append(uri).append(operation).append(arguments).append(createdHost).append(processingHost).append(status)
             .append(dateCreated).append(dateStarted).append(dateCompleted).append(parentJobId).append(rootJobId)
             .append(queueTime).append(runTime).append(payload).append(dispatchable).append(jobLoad)
-            .append(blockedJobIds).append(blockingJobId).toHashCode();
+            .toHashCode();
   }
 }

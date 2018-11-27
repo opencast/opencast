@@ -21,7 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
 
@@ -57,8 +56,6 @@ public class JobImpl implements Job {
   private boolean dispatchable = true;
   private URI uri;
   private Float load = 1.0F;
-  private List<Long> blockedJobIds = new ArrayList<>();
-  private Long blockingJobId = null;
 
   public JobImpl() { }
 
@@ -87,10 +84,7 @@ public class JobImpl implements Job {
           Long rootJobId,
           boolean dispatchable,
           URI uri,
-          Float load,
-          List<Long> blockedJobIds,
-          Long blockingJobId
-  ) {
+          Float load) {
     this.id = id;
     this.creator = creator;
     this.organization = organization;
@@ -113,9 +107,6 @@ public class JobImpl implements Job {
     this.dispatchable = dispatchable;
     this.uri = uri;
     this.load = load;
-    if (blockedJobIds != null)
-      this.blockedJobIds.addAll(blockedJobIds);
-    this.blockingJobId = blockingJobId;
   }
 
   @Override
@@ -324,36 +315,6 @@ public class JobImpl implements Job {
   }
 
   @Override
-  public List<Long> getBlockedJobIds() {
-    return unmodifiableList(blockedJobIds);
-  }
-
-  @Override
-  public void setBlockedJobIds(List<Long> list) {
-    this.blockedJobIds = unmodifiableList(list);
-  }
-
-  @Override
-  public void removeBlockedJobsIds() {
-    this.blockedJobIds = emptyList();
-  }
-
-  @Override
-  public Long getBlockingJobId() {
-    return blockingJobId;
-  }
-
-  @Override
-  public void setBlockingJobId(Long jobId) {
-    this.blockingJobId = jobId;
-  }
-
-  @Override
-  public void removeBlockingJobId() {
-    this.blockingJobId = null;
-  }
-
-  @Override
   public boolean equals(Object o) {
     if (this == o)
       return true;
@@ -371,8 +332,7 @@ public class JobImpl implements Job {
             .append(dateStarted, job.dateStarted).append(dateCompleted, job.dateCompleted)
             .append(queueTime, job.queueTime).append(runTime, job.runTime).append(payload, job.payload)
             .append(parentJobId, job.parentJobId).append(rootJobId, job.rootJobId)
-            .append(uri, job.uri).append(load, job.load).append(blockedJobIds, job.blockedJobIds)
-            .append(blockingJobId, job.blockingJobId).isEquals();
+            .append(uri, job.uri).append(load, job.load).isEquals();
   }
 
   @Override
@@ -381,7 +341,7 @@ public class JobImpl implements Job {
             .append(operation).append(arguments).append(status).append(failureReason).append(createdHost)
             .append(processingHost).append(dateCreated).append(dateStarted).append(dateCompleted).append(queueTime)
             .append(runTime).append(payload).append(parentJobId).append(rootJobId).append(dispatchable).append(uri)
-            .append(load).append(blockedJobIds).append(blockingJobId).toHashCode();
+            .append(load).toHashCode();
   }
 
   @Override
