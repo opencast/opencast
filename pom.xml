@@ -1477,7 +1477,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-
+    <developer>
+        <id>turro</id>
+        <name>Carlos Turró</name>
+        <email>turro@cc.upv.es</email>
+        <organization>Universitat Politecnica de Valencia</organization>
+        <organizationUrl>http://www.upv.es/</organizationUrl>
+        <roles>
+          <role>developer</role>
+         </roles>
+        <timezone>Europe/Madrid</timezone>
+     </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>
