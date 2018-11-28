@@ -17,7 +17,7 @@
     <operation
       id="comment"
       fail-on-error="false"
-      description="Mark the recording for cutting">
+      description="Mark the recording for review because of a failure">
       <configurations>
         <configuration key="description">Processing failed</configuration>
         <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.PROCESSING_FAILURE</configuration>
