@@ -425,6 +425,55 @@ public class JobEndpoint {
   }
 
   /**
+   * Returns the list of tasks matching the given query as JSON Object
+   *
+   * @param query
+   *          The worklfow query
+   * @return The list of matching tasks as JSON Object
+   * @throws JobEndpointException
+   * @throws NotFoundException
+   */
+  public JObject getTasksAsJSON(String mediapackageId) throws JobEndpointException, NotFoundException {
+    // Get results
+    WorkflowSet workflowInstances = null;
+    long totalWithoutFilters = 0;
+    List<JValue> jsonList = new ArrayList<>();
+
+    try {
+      workflowInstances = workflowService.getWorkflowInstances(mediapackageId);
+      totalWithoutFilters = workflowService.countWorkflowInstances();
+    } catch (WorkflowDatabaseException e) {
+      throw new JobEndpointException(String.format("Not able to get the list of job from the database: %s", e),
+              e.getCause());
+    }
+
+    WorkflowInstance[] items = workflowInstances.getItems();
+
+    for (WorkflowInstance instance : items) {
+      long instanceId = instance.getId();
+      String series = instance.getMediaPackage().getSeriesTitle();
+
+      // Retrieve submission date with the workflow instance main job
+      Date created;
+      try {
+        created = serviceRegistry.getJob(instanceId).getDateCreated();
+      } catch (ServiceRegistryException e) {
+        throw new JobEndpointException(String.format("Error when retrieving job %s from the service registry: %s",
+                instanceId, e), e.getCause());
+      }
+
+      jsonList.add(obj(f("id", v(instanceId)), f("title", v(nul(instance.getMediaPackage().getTitle()).getOr(""))),
+              f("series", v(series, Jsons.BLANK)), f("workflow", v(instance.getTitle(), Jsons.BLANK)),
+              f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
+              f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : ""))));
+    }
+
+    JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),
+            f("offset", v(0)), f("limit", v(jsonList.size())), f("total", v(totalWithoutFilters)));
+    return json;
+  }
+
+  /**
    * Returns the single task with the given Id as JSON Object
    *
    * @param id

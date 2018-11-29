@@ -533,6 +533,20 @@ public class ServiceRegistryEndpoint {
   }
 
   @GET
+  @Path("job/mediapackage/{event_identifier}.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "jobforevent", description = "Returns a job as JSON.", returnDescription = "The job as JSON", pathParameters = { @RestParameter(name = "event_identifier", isRequired = true, type = Type.STRING, description = "The job identifier") }, reponses = {
+          @RestResponse(responseCode = SC_OK, description = "Job found."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No job with that identifier exists.") })
+  public JaxbJobList getJobsForMediapackage(@PathParam("event_identifier") String eventId) throws NotFoundException {
+    try {
+      return new JaxbJobList(serviceRegistry.getJobsForMediapackage(eventId));
+    } catch (ServiceRegistryException e) {
+      throw new WebApplicationException(e);
+    }
+  }
+
+  @GET
   @Path("job/{id}/children.xml")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "childrenjobsasxml", description = "Returns all children from a job as XML.", returnDescription = "A list of children jobs as XML", pathParameters = { @RestParameter(name = "id", isRequired = true, type = Type.STRING, description = "The parent job identifier") }, reponses = { @RestResponse(responseCode = SC_OK, description = "Jobs found.") })

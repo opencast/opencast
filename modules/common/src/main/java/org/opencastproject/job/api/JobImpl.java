@@ -59,6 +59,7 @@ public class JobImpl implements Job {
   private Float load = 1.0F;
   private List<Long> blockedJobIds = new ArrayList<>();
   private Long blockingJobId = null;
+  private String mediapackage;
 
   public JobImpl() { }
 
@@ -116,6 +117,60 @@ public class JobImpl implements Job {
     if (blockedJobIds != null)
       this.blockedJobIds.addAll(blockedJobIds);
     this.blockingJobId = blockingJobId;
+  }
+
+  public JobImpl(
+          long id,
+          String creator,
+          String organization,
+          long version,
+          String jobType,
+          String operation,
+          List<String> arguments,
+          Status status,
+          String createdHost,
+          String processingHost,
+          Date dateCreated,
+          Date dateStarted,
+          Date dateCompleted,
+          Long queueTime,
+          Long runTime,
+          String payload,
+          Long parentJobId,
+          Long rootJobId,
+          boolean dispatchable,
+          URI uri,
+          Float load,
+          List<Long> blockedJobIds,
+          Long blockingJobId,
+          String mediapackage
+  ) {
+    this.id = id;
+    this.creator = creator;
+    this.organization = organization;
+    this.version = version;
+    this.jobType = jobType;
+    this.operation = operation;
+    if (arguments != null)
+      this.arguments.addAll(arguments);
+    this.status = status;
+    this.createdHost = createdHost;
+    this.processingHost = processingHost;
+    this.dateCreated = dateCreated;
+    this.dateStarted = dateStarted;
+    this.dateCompleted = dateCompleted;
+    this.queueTime = queueTime;
+    this.runTime = runTime;
+    this.payload = payload;
+    this.parentJobId = parentJobId;
+    this.rootJobId = rootJobId;
+    this.dispatchable = dispatchable;
+    this.uri = uri;
+    this.load = load;
+    if (blockedJobIds != null)
+      this.blockedJobIds.addAll(blockedJobIds);
+    this.blockingJobId = blockingJobId;
+    this.mediapackage = mediapackage;
   }
 
   @Override
@@ -387,5 +442,15 @@ public class JobImpl implements Job {
   @Override
   public String toString() {
     return String.format("Job {id:%d, operation:%s, status:%s}", id, operation, status.toString());
+  }
+
+  @Override
+  public String getMediapackageIdentifier() {
+    return mediapackage;
+  }
+
+  @Override
+  public void setMediapackageIdentifier(String mediapackage) {
+    this.mediapackage = mediapackage;
   }
 }

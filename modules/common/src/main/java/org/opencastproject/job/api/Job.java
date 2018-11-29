@@ -298,4 +298,9 @@ public interface Job {
    * Clears the reference to the job which this job is blocking, if any
    */
   void removeBlockingJobId();
+
+  String getMediapackageIdentifier();
+
+  void setMediapackageIdentifier(String mediapackage);
+
 }

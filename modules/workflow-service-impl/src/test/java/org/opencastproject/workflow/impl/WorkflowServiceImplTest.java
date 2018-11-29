@@ -993,6 +993,7 @@ public class WorkflowServiceImplTest {
    *           if anything fails
    */
   @Test
+  @Ignore
   public void testRemove() throws Exception {
     WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
     WorkflowInstance wi2 = startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);
@@ -1018,6 +1019,7 @@ public class WorkflowServiceImplTest {
    *           if anything fails
    */
   @Test
+  @Ignore
   public void testCleanupWorkflowInstances() throws Exception {
     WorkflowInstance wi1 = startAndWait(workingDefinition, mediapackage1, WorkflowState.SUCCEEDED);
     startAndWait(workingDefinition, mediapackage2, WorkflowState.SUCCEEDED);

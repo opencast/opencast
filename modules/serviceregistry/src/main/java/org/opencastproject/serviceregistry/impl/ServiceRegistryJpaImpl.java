@@ -504,13 +504,24 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           Job parentJob, Float jobLoad) throws ServiceRegistryException {
     return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, jobLoad);
   }
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+   *      java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job, Float)
+   */
+  @Override
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean dispatchable,
+          Job parentJob, Float jobLoad, String mediapackageId) throws ServiceRegistryException {
+    return createJob(this.hostName, type, operation, arguments, payload, dispatchable, parentJob, jobLoad, mediapackageId);
+  }
 
   /**
    * Creates a job on a remote host with a jobLoad of 1.0.
    */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob) throws ServiceRegistryException {
-    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD);
+    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, DEFAULT_JOB_LOAD, null);
   }
 
   /**
@@ -518,6 +529,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
           boolean dispatchable, Job parentJob, float jobLoad) throws ServiceRegistryException {
+    return createJob(host, serviceType, operation, arguments, payload, dispatchable, parentJob, jobLoad, null);
+  }
+
+  public Job createJob(String host, String serviceType, String operation, List<String> arguments, String payload,
+          boolean dispatchable, Job parentJob, float jobLoad, String mediapackageId) throws ServiceRegistryException {
     if (StringUtils.isBlank(host)) {
       throw new IllegalArgumentException("Host can't be null");
     }
@@ -547,8 +563,16 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       User currentUser = securityService.getUser();
       Organization currentOrganization = securityService.getOrganization();
 
-      JpaJob jpaJob = new JpaJob(currentUser, currentOrganization, creatingService, operation, arguments, payload,
+      JpaJob jpaJob;
+
+      if (mediapackageId != null) {
+        jpaJob = new JpaJob(currentUser, currentOrganization, creatingService, operation, arguments, payload,
+              dispatchable, jobLoad, mediapackageId);
+      }
+      else {
+        jpaJob = new JpaJob(currentUser, currentOrganization, creatingService, operation, arguments, payload,
               dispatchable, jobLoad);
+      }
 
       // Bind the given parent job to the new job
       if (parentJob != null) {
@@ -1776,6 +1800,35 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobsForMediaPackage(java.lang.String)
+   */
+  public List<Job> getJobsForMediapackage(String mediapackage) throws ServiceRegistryException {
+    TypedQuery<JpaJob> query = null;
+    EntityManager em = null;
+    if (mediapackage == null) {
+      throw new ServiceRegistryException("provide a mediapackage id");
+    }
+    try {
+      em = emf.createEntityManager();
+      query = em.createNamedQuery("Job.mediaPackage", JpaJob.class);
+      query.setParameter("mediapackage", mediapackage);
+      List<JpaJob> jobs = query.getResultList();
+      for (JpaJob job : jobs) {
+        setJobUri(job);
+      }
+
+      return $(jobs).map(fnToJob()).toList();
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
   @Override
   public List<String> getJobPayloads(String operation) throws ServiceRegistryException {
     EntityManager em = emf.createEntityManager();
@@ -1955,6 +2008,29 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         query.setParameter("status", status.ordinal());
         query.setParameter("serviceType", serviceType);
       }
+      Number countResult = (Number) query.getSingleResult();
+      return countResult.longValue();
+    } catch (Exception e) {
+      throw new ServiceRegistryException(e);
+    } finally {
+      if (em != null)
+        em.close();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#countByHost(java.lang.String, java.lang.String,
+   *      Status)
+   */
+  @Override
+  public long countWorkflows() throws ServiceRegistryException {
+    EntityManager em = null;
+    try {
+      em = emf.createEntityManager();
+      Query query = em.createNamedQuery("Job.count.workflows");
+      query.setParameter("operation", "START_WORKFLOW");
       Number countResult = (Number) query.getSingleResult();
       return countResult.longValue();
     } catch (Exception e) {

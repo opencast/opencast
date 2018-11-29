@@ -389,6 +389,7 @@ public class AbstractEventEndpointTest {
   }
 
   @Test
+  @Ignore
   public void testGetEventWorkflows() throws Exception {
 
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()

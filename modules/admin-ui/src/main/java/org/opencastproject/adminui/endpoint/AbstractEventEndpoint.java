@@ -1486,6 +1486,43 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventWorkflows(@PathParam("eventId") String id)
           throws UnauthorizedException, SearchIndexException, JobEndpointException {
+    logger.info("Looking for workflows for {} via the DB", id);
+    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isNone())
+      return notFound("Cannot find an event with id '%s'.", id);
+
+    try {
+      if (!optEvent.get().hasRecordingStarted()) {
+        List<Field> fields = new ArrayList<Field>();
+        Map<String, String> workflowConfig = getSchedulerService().getWorkflowConfig(id);
+        for (Entry<String, String> entry : workflowConfig.entrySet()) {
+          fields.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+        }
+
+        Map<String, String> agentConfiguration = getSchedulerService().getCaptureAgentConfiguration(id);
+        return okJson(obj(f("workflowId", v(agentConfiguration.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION), Jsons.BLANK)),
+                f("configuration", obj(fields))));
+      } else {
+        return okJson(getJobService().getTasksAsJSON(id));
+      }
+    } catch (NotFoundException e) {
+      return notFound("Cannot find workflows for event %s", id);
+    } catch (SchedulerException e) {
+      logger.error("Unable to get workflow data for event with id {}", id);
+      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @GET
+  @Path("{eventId}/solr/workflows.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "geteventworkflows", description = "Returns all the data related to the workflows tab in the event details modal as JSON", returnDescription = "All the data related to the event workflows tab as JSON", pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, reponses = {
+                  @RestResponse(description = "Returns all the data related to the event workflows tab as JSON", responseCode = HttpServletResponse.SC_OK),
+                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  public Response getEventWorkflowsFromDB(@PathParam("eventId") String id)
+          throws UnauthorizedException, SearchIndexException, JobEndpointException {
+    logger.info("Looking for workflows for {} via the Solr", id);
     Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
     if (optEvent.isNone())
       return notFound("Cannot find an event with id '%s'.", id);

@@ -1643,10 +1643,11 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public Opt<WorkflowInstance> getCurrentWorkflowInstance(String mpId) throws IndexServiceException {
-    WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
+//    WorkflowQuery query = new WorkflowQuery().withMediaPackage(mpId);
     WorkflowSet workflowInstances;
     try {
-      workflowInstances = workflowService.getWorkflowInstances(query);
+//      workflowInstances = workflowService.getWorkflowInstances(query);
+      workflowInstances = workflowService.getWorkflowInstances(mpId);
       if (workflowInstances.size() == 0) {
         logger.info("No workflow instance found for mediapackage {}.", mpId);
         return Opt.none();

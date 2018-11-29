@@ -99,11 +99,13 @@ import javax.persistence.Version;
         @NamedQuery(name = "Job.children", query = "SELECT j FROM Job j WHERE j.parentJob.id = :id ORDER BY j.dateCreated"),
         @NamedQuery(name = "Job.withoutParent", query = "SELECT j FROM Job j WHERE j.parentJob IS NULL"),
         @NamedQuery(name = "Job.avgOperation", query = "SELECT j.operation, AVG(j.runTime), AVG(j.queueTime) FROM Job j GROUP BY j.operation"),
+        @NamedQuery(name = "Job.mediaPackage", query = "SELECT j FROM Job j where j.mediapackage = :mediapackage"),
 
         // Job count queries
         @NamedQuery(name = "Job.count", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.status = :status and j.creatorServiceRegistration.serviceType = :serviceType"),
         @NamedQuery(name = "Job.count.all", query = "SELECT COUNT(j) FROM Job j"),
+        @NamedQuery(name = "Job.count.workflows", query = "SELECT COUNT(j) FROM Job j where j.operation = :operation"),
         @NamedQuery(name = "Job.count.nullType", query = "SELECT COUNT(j) FROM Job j " + "where j.status = :status"),
         @NamedQuery(name = "Job.count.nullStatus", query = "SELECT COUNT(j) FROM Job j "
                 + "where j.creatorServiceRegistration.serviceType = :serviceType"),
@@ -152,6 +154,9 @@ public class JpaJob {
 
   @Column(name = "status")
   private int status;
+
+  @Column(name = "mediapackage")
+  private String mediapackage;
 
   @Lob
   @Column(name = "operation", length = 65535)
@@ -276,6 +281,21 @@ public class JpaJob {
     this.dispatchable = dispatchable;
     this.jobLoad = load;
     this.status = Status.INSTANTIATED.ordinal();
+  }
+
+  public JpaJob(User currentUser, Organization organization, ServiceRegistrationJpaImpl creatingService,
+          String operation, List<String> arguments, String payload, boolean dispatchable, float load, String mediapackage) {
+    this.creator = currentUser.getUsername();
+    this.organization = organization.getId();
+    this.creatorServiceRegistration = creatingService;
+    this.jobType = creatingService.getServiceType();
+    this.operation = operation;
+    this.arguments = arguments;
+    this.payload = payload;
+    this.dispatchable = dispatchable;
+    this.jobLoad = load;
+    this.status = Status.INSTANTIATED.ordinal();
+    this.mediapackage = mediapackage;
   }
 
   public static JpaJob from(Job job) {
@@ -417,6 +437,10 @@ public class JpaJob {
     this.failureReason = failureReason;
   }
 
+  public void setMediapackageIdentifier(String mediapackage) {
+    this.mediapackage = mediapackage;
+  }
+
   public void setUri(URI uri) {
     this.uri = uri;
   }
@@ -488,6 +512,10 @@ public class JpaJob {
 
   public String getOrganization() {
     return organization;
+  }
+
+  public String getMediapackageIdentifier() {
+    return mediapackage;
   }
 
   @Override

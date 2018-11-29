@@ -101,6 +101,7 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowQuery;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSet;
+import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStatistics;
 import org.opencastproject.workflow.impl.jmx.WorkflowsStatistics;
@@ -602,18 +603,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } catch (UnauthorizedException e) {
           throw new IllegalArgumentException("Parent workflow " + parentWorkflowId + " not visible to this user");
         }
-      } else {
-        WorkflowQuery wfq = new WorkflowQuery().withMediaPackage(sourceMediaPackage.getIdentifier().compact());
-        WorkflowSet mpWorkflowInstances = getWorkflowInstances(wfq);
-        if (mpWorkflowInstances.size() > 0) {
-          for (WorkflowInstance wfInstance : mpWorkflowInstances.getItems()) {
-            if (wfInstance.isActive())
-              throw new IllegalStateException(String.format(
-                      "Can't start workflow '%s' for media package '%s' because another workflow is currently active.",
-                      workflowDefinition.getTitle(),
-                      sourceMediaPackage.getIdentifier().compact()));
-          }
-        }
       }
 
       // Get the current user
@@ -649,7 +638,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         }
 
         Job job = serviceRegistry.createJob(JOB_TYPE, Operation.START_WORKFLOW.toString(), arguments,
-                workflowInstanceXml, false, null, WORKFLOW_JOB_LOAD);
+                workflowInstanceXml, false, null, WORKFLOW_JOB_LOAD, mediaPackageId);
 
         // Have the workflow take on the job's identity
         workflowInstance.setId(job.getId());
@@ -1034,11 +1023,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     final Lock lock = this.lock.get(workflowInstanceId);
     lock.lock();
     try {
-      WorkflowQuery query = new WorkflowQuery();
-      query.withId(Long.toString(workflowInstanceId));
-      WorkflowSet workflows = index.getWorkflowInstances(query, Permissions.Action.READ.toString(), false);
-      if (workflows.size() == 1) {
-        WorkflowInstance instance = workflows.getItems()[0];
+      Job job = serviceRegistry.getJob(workflowInstanceId);
+      if (Status.DELETED.equals(job.getStatus())) {
+        throw new NotFoundException("Workflow '" + workflowInstanceId + "' has been deleted");
+      }
+      if (!Operation.START_WORKFLOW.toString().equals(job.getOperation())) {
+        throw new NotFoundException("Job '" + workflowInstanceId + "' is an operation, not a workflow instance and thus cannot be deleted");
+      }
+      WorkflowInstance instance = WorkflowParser.parseWorkflowInstance(job.getPayload());
 
         WorkflowInstance.WorkflowState state = instance.getState();
         if (state != WorkflowState.SUCCEEDED && state != WorkflowState.FAILED && state != WorkflowState.STOPPED)
@@ -1091,20 +1083,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           logger.info("No workflow instance job '%d' found in the service registry", workflowInstanceId);
         }
 
-        // At last, remove workflow instance from the index
-        try {
-          index.remove(workflowInstanceId);
-        } catch (NotFoundException e) {
-          // This should never happen, because we got workflow instance by querying the index...
-          logger.warn("Workflow instance could not be removed from index", e);
-        }
-      } else if (workflows.size() == 0) {
-        throw new NotFoundException("Workflow instance with id '" + Long.toString(workflowInstanceId)
-                                              + "' could not be found");
-      } else {
-        throw new WorkflowDatabaseException("More than one workflow found with id: "
-                                                    + Long.toString(workflowInstanceId));
-      }
+        logger.info("got this far, skipping trying to remove this from the workflow solr index");
+    } catch (ServiceRegistryException e) {
+      throw new WorkflowDatabaseException(e);
     } finally {
       lock.unlock();
     }
@@ -1272,6 +1253,23 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
+  protected Boolean isPermitted(WorkflowInstance workflow) {
+    return isPermitted(workflow, Permissions.Action.READ.toString());
+  }
+
+  protected Boolean isPermitted(WorkflowInstance workflow, String action) {
+    try {
+      assertPermission(workflow, action);
+    } catch (UnauthorizedException e) {
+      return false;
+    } catch (MediaPackageException e) {
+      logger.error("Error in sourcing mediapackage for permission assertion", e);
+      return false;
+    }
+
+    return true;
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -1390,7 +1388,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           messageSender.sendObjectMessage(WorkflowItem.WORKFLOW_QUEUE, MessageSender.DestinationType.Queue,
                   WorkflowItem.updateInstance(workflowInstance, dcXml, accessControlList));
         }
-        index(workflowInstance);
+//        index(workflowInstance);
       } catch (ServiceRegistryException e) {
         logger.error(
                 "Update of workflow job %s in the service registry failed, service registry and workflow index may be out of sync",
@@ -1442,7 +1440,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    */
   @Override
   public long countWorkflowInstances() throws WorkflowDatabaseException {
-    return index.countWorkflowInstances(null, null);
+    try {
+      return serviceRegistry.countWorkflows();
+    } catch (ServiceRegistryException e) {
+      throw new WorkflowDatabaseException(e);
+    }
   }
 
   /**
@@ -1474,6 +1476,40 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   @Override
   public WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException {
     return index.getWorkflowInstances(query, Permissions.Action.READ.toString(), true);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.workflow.api.WorkflowService#getWorkflowInstances(String)
+   */
+  @Override
+  public WorkflowSet getWorkflowInstances(String mediaPackageId) throws WorkflowDatabaseException {
+    if (mediaPackageId == null) {
+      throw new WorkflowDatabaseException("provide a mediapackage id");
+    }
+
+    WorkflowSetImpl set;
+    try {
+      set = new WorkflowSetImpl();
+      serviceRegistry.getJobsForMediapackage(mediaPackageId).stream()
+              .filter(job -> Operation.START_WORKFLOW.toString().equals(job.getOperation()))
+              .map(this::parseWorkflowInstance)
+              .filter(instance -> instance != null)
+              .filter(this::isPermitted)
+              .forEach(instance -> set.addItem(instance));
+      return set;
+    } catch (ServiceRegistryException e) {
+      throw new WorkflowDatabaseException(e);
+    }
+  }
+
+  private WorkflowInstance parseWorkflowInstance(Job job) {
+    try {
+      return WorkflowParser.parseWorkflowInstance(job.getPayload());
+    } catch (WorkflowParsingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

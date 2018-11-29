@@ -424,6 +424,9 @@ public interface ServiceRegistry {
                 Float jobLoad)
           throws ServiceRegistryException;
 
+  Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable, Job parentJob,
+                Float jobLoad, String mediapackageId)
+          throws ServiceRegistryException;
   /**
    * Update the job in the database
    *
@@ -491,6 +494,17 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   List<Job> getJobs(String serviceType, Status status) throws ServiceRegistryException;
+
+  /**
+   * Gets the list of jobs assocated to a given mediapackage.
+   *
+   * @param mediapackage
+   *          The associated mediapackage
+   * @return the jobs associated to the given mediapackage
+   * @throws ServiceRegistryException
+   *           if there is a problem accessing the service registry
+   */
+  List<Job> getJobsForMediapackage(String mediapackage) throws ServiceRegistryException;
 
   /**
    * Return the payload of all jobs for a specified operation type.
@@ -630,6 +644,7 @@ public interface ServiceRegistry {
    */
   long count(String serviceType, Status status) throws ServiceRegistryException;
 
+  long countWorkflows() throws ServiceRegistryException;
   /**
    * Count the number of jobs running the given operation in this {@link Status}.
    *

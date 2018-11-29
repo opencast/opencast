@@ -438,6 +438,17 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
           Job parentJob, Float jobLoad) throws ServiceRegistryException {
+    return createJob(type, operation, arguments, payload, queueable, parentJob, 1.0f, null);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#createJob(java.lang.String, java.lang.String,
+          java.util.List, java.lang.String, boolean, org.opencastproject.job.api.Job, Float)
+   */
+  public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
+          Job parentJob, Float jobLoad, String mediapackageId) throws ServiceRegistryException {
     if (getServiceRegistrationsByType(type).size() == 0)
       logger.warn("Service " + type + " not available");
 
@@ -746,6 +757,32 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     return result;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.serviceregistry.api.ServiceRegistry#getJobsForMediaPackage(java.lang.String)
+   */
+  public List<Job> getJobsForMediapackage(String mediapackage) throws ServiceRegistryException {
+    List<Job> result = new ArrayList<Job>();
+    if (mediapackage == null) {
+      throw new ServiceRegistryException("provide a mediapackage id");
+    }
+    synchronized (jobs) {
+      for (String serializedJob : jobs.values()) {
+        Job job = null;
+        try {
+          job = JobParser.parseJob(serializedJob);
+        } catch (IOException e) {
+          throw new IllegalStateException("Error unmarshaling job", e);
+        }
+        if (job.getMediapackageIdentifier().equals(mediapackage))
+          result.add(job);
+      }
+    }
+    return result;
+  }
+
+
   @Override
   public Incidents incident() {
     return incidents;
@@ -854,6 +891,11 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public long count(String serviceType, Status status) throws ServiceRegistryException {
     return count(serviceType, null, null, status);
+  }
+
+  @Override
+  public long countWorkflows() throws ServiceRegistryException {
+    return count(null, null, "START_WORKFLOW", null);
   }
 
   /**

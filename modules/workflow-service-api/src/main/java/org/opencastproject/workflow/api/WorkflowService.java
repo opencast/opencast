@@ -119,6 +119,17 @@ public interface WorkflowService {
   WorkflowSet getWorkflowInstances(WorkflowQuery query) throws WorkflowDatabaseException;
 
   /**
+   * Finds workflow instances associated with a given mediapackage.
+   *
+   * @param mediaPackageId
+   *          The id of the mediapackage in question
+   * @return The {@link WorkflowSet} containing the workflow instances associated with the given mediapackage
+   * @throws WorkflowDatabaseException
+   *           if there is a problem accessing the workflow instances from persistence
+   */
+  WorkflowSet getWorkflowInstances(String mediaPackageId) throws WorkflowDatabaseException;
+
+  /**
    * Finds workflow instances based on the specified query for administrative access.
    *
    * @param q
