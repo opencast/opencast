@@ -21,9 +21,10 @@
 
 package org.opencastproject.index.service.resources.list.impl;
 
-import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.DEFAULT_ORG;
+import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.ALL_ORGANIZATIONS;
+import static org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl.ResourceTuple;
 
-import org.opencastproject.index.service.exception.ListProviderException;
+import org.opencastproject.index.service.exception.ListProviderNotFoundException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
@@ -60,7 +61,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersScanner.class);
   /** The Map to go from file locations of properties files to list names. **/
-  private Map<String, String> fileToListNames = new HashMap<String, String>();
+  private Map<String, ListProvidersServiceImpl.ResourceTuple> fileToListNames = new HashMap<>();
   /** The list providers service to add the list provider to. **/
   private ListProvidersService listProvidersService;
 
@@ -97,21 +98,6 @@ public class ListProvidersScanner implements ArtifactInstaller {
     private boolean translatable;
     private String defaultKey;
 
-    /**
-     * Default constructor.
-     *
-     * @param listName
-     *          The name of the new list to add.
-     * @param list
-     *          The list of properties to expose.
-     */
-    SingleResourceListProviderImpl(String listName, Map<String, String> list, boolean translatable) {
-      this.listName = listName;
-      this.list = list;
-      this.orgId = DEFAULT_ORG;
-      this.translatable = translatable;
-    }
-
     SingleResourceListProviderImpl(String listName, Map<String, String> list, String organizationId, boolean translatable) {
       this.listName = listName;
       this.list = list;
@@ -128,16 +114,12 @@ public class ListProvidersScanner implements ArtifactInstaller {
       return new String[] { listName };
     }
 
-    public void setOrg(String orgName) {
-      this.orgId = orgName;
-    }
-
     @Override
     public Map<String, String> getList(String listName, ResourceListQuery query)
-            throws ListProviderException {
+            throws ListProviderNotFoundException {
       logger.debug("Getting list " + listName + " query " + query + " org " + orgId);
-
-      return this.listName.equals(listName) ? Collections.unmodifiableMap(list) : null;
+      if (this.listName.equals(listName)) return Collections.unmodifiableMap(list);
+      else throw new ListProviderNotFoundException("Unable to read list data from file");
     }
 
     @Override
@@ -156,33 +138,23 @@ public class ListProvidersScanner implements ArtifactInstaller {
   }
 
   /**
-   * Add a list provider based upon a configuration file.
+   * Adds a resource list provider to the provider service
    *
-   * @param artifact
-   *          The File representing the configuration file for the list.
+   * @param path the path to the property file
+   * @param properties the properties from the property file
    */
-  private void addResourceListProvider(File artifact) throws IOException {
-    logger.debug("Adding {}", artifact.getAbsolutePath());
-
-    // Format name
-    Properties properties = new Properties();
-
-    try (InputStreamReader reader = new InputStreamReader(new FileInputStream(artifact), "UTF-8")) {
-      properties.load(reader);
-    }
-
-    String listName =  properties.getProperty(LIST_NAME_KEY);
-    logger.debug("Found list with name '{}'", listName);
+  private void addResourceListProvider(String path, Properties properties) {
+    String listName = properties.getProperty(LIST_NAME_KEY);
     if (StringUtils.isBlank(listName)) {
       logger.error("Unable to add {} as a list provider because the {} entry was empty. "
-              + "Please add it to get this list provider to work.", artifact.getAbsolutePath(), LIST_NAME_KEY);
+              + "Please add it to get this list provider to work.", path, LIST_NAME_KEY);
       return;
     }
-
     String defaultKey = properties.getProperty(LIST_DEFAULT_KEY);
+    boolean translatable = BooleanUtils.toBoolean(properties.getProperty(LIST_TRANSLATABLE_KEY));
+    String orgId = properties.getProperty(LIST_ORG_KEY) != null ? properties.getProperty(LIST_ORG_KEY) : ALL_ORGANIZATIONS;
 
-    Boolean translatable = BooleanUtils.toBoolean(properties.getProperty(LIST_TRANSLATABLE_KEY));
-    String orgId = properties.getProperty(LIST_ORG_KEY);
+    logger.info("Adding {} for {}", listName, orgId);
 
     HashMap<String, String> list = new HashMap<>();
     for (Map.Entry<Object, Object> entry: properties.entrySet()) {
@@ -196,24 +168,22 @@ public class ListProvidersScanner implements ArtifactInstaller {
         default:
           list.put(entry.getKey().toString(), entry.getValue().toString());
           logger.debug("Found entry: {}", entry);
-        }
       }
+    }
 
-      SingleResourceListProviderImpl listProvider;
+    SingleResourceListProviderImpl listProvider = new SingleResourceListProviderImpl(listName, list, orgId, translatable);
+    if (StringUtils.isNotBlank(defaultKey)) {
+      listProvider.setDefault(defaultKey);
+    }
+    fileToListNames.put(path, new ResourceTuple(listName, orgId));
+    listProvidersService.addProvider(listName, listProvider, orgId);
+  }
 
-      if (StringUtils.isNotBlank(orgId)) {
-        listProvider = new SingleResourceListProviderImpl(listName, list, orgId, translatable);
-        listProvidersService.addProvider(listProvider.getListName(), listProvider, orgId);
-      } else {
-        listProvider = new SingleResourceListProviderImpl(listName, list, translatable);
-        listProvidersService.addProvider(listProvider.getListName(), listProvider, DEFAULT_ORG);
-      }
-
-      if (StringUtils.isNotBlank(defaultKey)) {
-        listProvider.setDefault(defaultKey);
-      }
-
-      fileToListNames.put(artifact.getAbsolutePath(), listProvider.getListName());
+  private static Properties readProperties(File file) throws IOException {
+    Properties properties = new Properties();
+    InputStreamReader reader = new InputStreamReader(new FileInputStream(file), "UTF-8");
+    properties.load(reader);
+    return properties;
   }
 
   /**
@@ -222,28 +192,52 @@ public class ListProvidersScanner implements ArtifactInstaller {
    * @param artifact
    *          The File representing the configuration file for the list.
    */
-  public void removeResourceListProvider(File artifact) {
-    String listName = fileToListNames.remove(artifact.getAbsoluteFile());
-    if (listName != null) {
-      listProvidersService.removeProvider(listName);
+  private void removeResourceListProvider(File artifact) {
+    ResourceTuple resource = fileToListNames.remove(artifact.getAbsolutePath());
+    if (resource != null) {
+      logger.info("Removing {} for {}", resource.getResourceName(), resource.getOrganizationId());
+      listProvidersService.removeProvider(resource.getResourceName(), resource.getOrganizationId());
     }
   }
 
   @Override
-  public void install(File artifact) throws Exception {
-    logger.info("Installing list provider {}", artifact.getAbsolutePath());
-    addResourceListProvider(artifact);
+  public void install(File artifact) {
+    String filePath = artifact.getAbsolutePath();
+    logger.info("Installing list provider {}", filePath);
+
+    Properties properties;
+    try {
+      properties = readProperties(artifact);
+    } catch (IOException e) {
+      logger.error("Unable to read file " + filePath);
+      return;
+    }
+    addResourceListProvider(filePath, properties);
   }
 
   @Override
-  public void update(File artifact) throws Exception {
-    logger.info("Updating list provider {}", artifact.getAbsolutePath());
-    removeResourceListProvider(artifact);
-    addResourceListProvider(artifact);
+  public void update(File artifact) {
+    String filePath = artifact.getAbsolutePath();
+    logger.info("Updating list provider {}", filePath);
+    // get the previous affiliation
+    ResourceTuple resource = fileToListNames.get(filePath);
+
+    Properties properties;
+    try {
+      properties = readProperties(artifact);
+    } catch (IOException e) {
+      logger.error("Unable to read file " + filePath);
+      return;
+    }
+    String orgId = properties.getProperty(LIST_ORG_KEY) != null ? properties.getProperty(LIST_ORG_KEY) : ALL_ORGANIZATIONS;
+    if (resource != null && !orgId.equals(resource.getOrganizationId())) { // the org ID was changed
+      removeResourceListProvider(artifact);
+    }
+    addResourceListProvider(filePath, properties);
   }
 
   @Override
-  public void uninstall(File artifact) throws Exception {
+  public void uninstall(File artifact) {
     logger.info("Removing list provider {}", artifact.getAbsolutePath());
     removeResourceListProvider(artifact);
   }

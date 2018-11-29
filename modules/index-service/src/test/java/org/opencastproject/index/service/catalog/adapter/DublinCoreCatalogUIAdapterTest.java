@@ -42,7 +42,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
@@ -140,7 +139,7 @@ public class DublinCoreCatalogUIAdapterTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
-                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
+                    EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 
     Properties props = new Properties();

@@ -27,6 +27,7 @@ import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.impl.ListProvidersServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.ServersListProvider;
 import org.opencastproject.index.service.util.ListProviderUtil;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
 import org.easymock.EasyMock;
@@ -47,10 +48,16 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
 
   private ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
   private SecurityService securityService;
+  private Organization organization;
 
   public TestListProvidersEndpoint() {
     this.securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(null);
+    organization = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(organization.getId()).andReturn("mh_default_org").anyTimes();
+    EasyMock.replay(organization);
+    EasyMock.replay(securityService);
+    listProvidersService.setSecurityService(securityService);
 
     for (int i = 0; i < PROVIDER_VALUES.length; i++) {
       baseMap.put(Integer.toString(i), PROVIDER_VALUES[i]);

@@ -124,7 +124,7 @@ public class ListProvidersEndpoint {
     addRequestFiltersToQuery(filter, query);
     Map<String, String> autocompleteList;
     try {
-      autocompleteList = listProvidersService.getList(source, query, securityService.getOrganization(), false);
+      autocompleteList = listProvidersService.getList(source, query, false);
     } catch (ListProviderNotFoundException e) {
       logger.error("No list found for {}: {}", source, e);
       return NOT_FOUND;
@@ -160,8 +160,7 @@ public class ListProvidersEndpoint {
       if (listProvidersService.hasProvider(source)) {
         JSONObject subList;
         try {
-          subList = generateJSONObject(listProvidersService.getList(source, query, securityService.getOrganization(),
-                  true));
+          subList = generateJSONObject(listProvidersService.getList(source, query, true));
           list.put(source, subList);
         } catch (JsonCreationException e) {
           logger.error("Not able to generate resources list JSON from source {}: {}", source, e);

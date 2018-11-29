@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.resources.list.api;
 
 import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.security.api.Organization;
 
 import java.util.List;
 import java.util.Map;
@@ -39,12 +38,10 @@ public interface ListProvidersService {
    *          The name of the source
    * @param query
    *          The query for the list
-   * @param organization
-   *          The organization context
    * @return a list of tuple id - value from the given source
    */
-  Map<String, String> getList(String providerName, ResourceListQuery query, Organization organization,
-                              boolean inverseValueKey) throws ListProviderException;
+  Map<String, String> getList(String providerName, ResourceListQuery query, boolean inverseValueKey)
+          throws ListProviderException;
 
   /**
    * Defines if keys and values of the given list should be translated in the administrative user interface.
@@ -56,7 +53,6 @@ public interface ListProvidersService {
    *              if no list provider found for the given list name
    */
   boolean isTranslatable(String listName) throws ListProviderException;
-  boolean isTranslatable(String listName, String organizationId) throws ListProviderException;
 
   /**
    * Defines the key of a default value in the given list.
@@ -68,7 +64,6 @@ public interface ListProvidersService {
    *              if no list provider found for the given list name
    */
   String getDefault(String listName) throws ListProviderException;
-  String getDefault(String listName, String organizationId) throws ListProviderException;
 
   /**
    * Adds an source to the service
