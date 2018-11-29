@@ -96,11 +96,13 @@ public class AdminUIConfiguration implements ManagedService {
   public static final String OPT_THUMBNAIL_SOURCE_FLAVOR_SUBTYPE = "thumbnail.source.flavor.subtype";
   public static final String OPT_THUMBNAIL_DEFAULT_POSITION = "thumbnail.default.position";
   public static final String OPT_THUMBNAIL_DISTRIBUTION_AUTO = "thumbnail.distribution.auto";
-  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL = "thumbnail.distribution.oaipmh.channel";
-  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR = "thumbnail.distribution.oaipmh.flavor";
-  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS = "thumbnail.distribution.oaipmh.tags";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_CHANNEL =
+    "thumbnail.distribution.configurable.channel";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_FLAVOR =
+    "thumbnail.distribution.configurable.flavor";
+  public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_TAGS = "thumbnail.distribution.configurable.tags";
   public static final String OPT_THUMBNAIL_DISTRIBUTION_CONFIGURABLE_PROFILES =
-      "thumbnail.distribution.oaipmh.profiles";
+      "thumbnail.distribution.configurable.profiles";
   public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_CHANNEL = "thumbnail.distribution.oaipmh.channel";
   public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_FLAVOR = "thumbnail.distribution.oaipmh.flavor";
   public static final String OPT_THUMBNAIL_DISTRIBUTION_OAIPMH_TAGS = "thumbnail.distribution.oaipmh.tags";
