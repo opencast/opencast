@@ -824,7 +824,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
     if (StringUtils.isBlank(smilAsXml) || StringUtils.isBlank(profileIds))
       return Response.status(Response.Status.BAD_REQUEST).entity("smil and profileId must not be null").build();
 
-    // Deserialize the data     String[] profiles = StringUtils.split(profileIds, ",");
+    // Deserialize the data
+    String[] profiles = StringUtils.split(profileIds, ",");
+    Smil smil;
     try {
       smil = smilService.fromXml(smilAsXml).getSmil();
     } catch (Exception e) {
