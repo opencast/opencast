@@ -139,7 +139,6 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
                             ng-model="scheduling[wd].start.hour"
                             ng-change="onTemporalValueChange(wd, 'start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
@@ -148,7 +147,6 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
                             ng-model="scheduling[wd].start.minute"
                             ng-change="onTemporalValueChange(wd, 'start');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
@@ -162,7 +160,6 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
                             ng-model="scheduling[wd].end.hour"
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
@@ -171,7 +168,6 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
                             ng-model="scheduling[wd].end.minute"
                             ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
@@ -189,7 +185,6 @@
                             ng-disabled="checkingConflicts"
                             data-width="'200px'"
                             ng-change="roomChanged();"
-                            data-disable-search-threshold="8"
                             ng-model="scheduling[wd].location"
                             ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
