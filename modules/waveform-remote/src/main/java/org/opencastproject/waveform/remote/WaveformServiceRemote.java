@@ -55,16 +55,25 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
    * Takes the given track and returns the job that will create an waveform image using a remote service.
    *
    * @param sourceTrack the track to create waveform image from
+   * @param pixelsPerMinute the width of the waveform image in pixels per minute
+   * @param minWidth the minimum width of the waveform image
+   * @param maxWidth the maximum width of the waveform image
+   * @param height the height of the waveform image
    * @return a job that will create a waveform image
    * @throws MediaPackageException if the serialization of the given track fails
    * @throws WaveformServiceException if the job can't be created for any reason
    */
   @Override
-  public Job createWaveformImage(Track sourceTrack) throws MediaPackageException, WaveformServiceException {
+  public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height)
+    throws MediaPackageException, WaveformServiceException {
     HttpPost post = new HttpPost("/create");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
+      params.add(new BasicNameValuePair("pixelsPerMinute", Integer.toString(pixelsPerMinute)));
+      params.add(new BasicNameValuePair("minWidth", Integer.toString(minWidth)));
+      params.add(new BasicNameValuePair("maxWidth", Integer.toString(maxWidth)));
+      params.add(new BasicNameValuePair("height", Integer.toString(height)));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new WaveformServiceException(e);

@@ -96,10 +96,6 @@ public class WaveformServiceImplTest {
   @Test
   public void testUpdated() throws Exception {
     Dictionary<String, String> properties = new Hashtable<>();
-    properties.put(WaveformServiceImpl.WAVEFORM_IMAGE_WIDTH_MIN_CONFIG_KEY, "1000");
-    properties.put(WaveformServiceImpl.WAVEFORM_IMAGE_WIDTH_MAX_CONFIG_KEY, "2000");
-    properties.put(WaveformServiceImpl.WAVEFORM_IMAGE_WIDTH_PPM_CONFIG_KEY, "100");
-    properties.put(WaveformServiceImpl.WAVEFORM_IMAGE_HEIGHT_CONFIG_KEY, "480");
     properties.put(WaveformServiceImpl.WAVEFORM_COLOR_CONFIG_KEY, "blue green 0x2A2A2A 323232CC");
     properties.put(WaveformServiceImpl.WAVEFORM_SPLIT_CHANNELS_CONFIG_KEY, "false");
     properties.put(WaveformServiceImpl.WAVEFORM_SCALE_CONFIG_KEY, "lin");
@@ -134,7 +130,7 @@ public class WaveformServiceImplTest {
 
     WaveformServiceImpl instance = new WaveformServiceImpl();
     instance.setServiceRegistry(serviceRegistry);
-    Job job = instance.createWaveformImage(dummyTrack);
+    Job job = instance.createWaveformImage(dummyTrack, 200, 5000, 20000, 500);
     assertEquals(expectedJob, job);
   }
 
@@ -159,7 +155,7 @@ public class WaveformServiceImplTest {
     Job job = new JobImpl(1);
     job.setJobType(WaveformServiceImpl.JOB_TYPE);
     job.setOperation(WaveformServiceImpl.Operation.Waveform.toString());
-    job.setArguments(Arrays.asList(audioTrackXml));
+    job.setArguments(Arrays.asList(audioTrackXml, "200", "5000", "20000", "500"));
     String result = instance.process(job);
     assertNotNull(result);
 

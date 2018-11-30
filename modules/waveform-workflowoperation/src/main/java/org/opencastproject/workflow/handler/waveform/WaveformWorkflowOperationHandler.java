@@ -39,6 +39,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +68,30 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   /** Target tags configuration property name. */
   private static final String TARGET_TAGS_PROPERTY = "target-tags";
 
+  /** Default value of pixel per minute configuration. */
+  private static final int DEFAULT_PIXELS_PER_MINUTE = 200;
+
+  /** Default value of minimum width configuration. */
+  private static final int DEFAULT_MIN_WIDTH = 5000;
+
+  /** Default value of maximum width configuration. */
+  private static final int DEFAULT_MAX_WIDTH = 20000;
+
+  /** Default value of height configuration. */
+  private static final int DEFAULT_HEIGHT = 500;
+
+  /** Pixel per minute of waveform image width configuration property name. */
+  private static final String PIXELS_PER_MINUTE_PROPERTY = "pixels-per-minute";
+
+  /** Minimun width of waveform image configuration property name. */
+  private static final String MIN_WIDTH_PROPERTY = "min-width";
+
+  /** Maximum width of waveform image configuration property name. */
+  private static final String MAX_WIDTH_PROPERTY = "max-width";
+
+  /** Height of waveform image configuration property name. */
+  private static final String HEIGHT_PROPERTY = "height";
+
   /** The waveform service. */
   private WaveformService waveformService = null;
 
@@ -92,22 +117,41 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start waveform workflow operation for mediapackage {}", mediaPackage);
 
+    String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
+    String sourceTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
+    if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
+      throw new WorkflowOperationException(
+              String.format("Required property %s or %s not set", SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
+    }
+
+    String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
+    if (targetFlavorProperty == null) {
+      throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
+    }
+
+    String targetTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
+
+    int pixelsPerMinute = NumberUtils.toInt(
+      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(PIXELS_PER_MINUTE_PROPERTY)),
+      DEFAULT_PIXELS_PER_MINUTE
+    );
+
+    int minWidth = NumberUtils.toInt(
+      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MIN_WIDTH_PROPERTY)),
+      DEFAULT_MIN_WIDTH
+    );
+
+    int maxWidth = NumberUtils.toInt(
+      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(MAX_WIDTH_PROPERTY)),
+      DEFAULT_MAX_WIDTH
+    );
+
+    int height = NumberUtils.toInt(
+      StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(HEIGHT_PROPERTY)),
+      DEFAULT_HEIGHT
+    );
+
     try {
-
-      String sourceFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_FLAVOR_PROPERTY));
-      String sourceTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(SOURCE_TAGS_PROPERTY));
-      if (StringUtils.isEmpty(sourceFlavorProperty) && StringUtils.isEmpty(sourceTagsProperty)) {
-        throw new WorkflowOperationException(
-                String.format("Required property %s or %s not set", SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
-      }
-
-      String targetFlavorProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_FLAVOR_PROPERTY));
-      if (targetFlavorProperty == null) {
-        throw new WorkflowOperationException(String.format("Required property %s not set", TARGET_FLAVOR_PROPERTY));
-      }
-
-      String targetTagsProperty = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(TARGET_TAGS_PROPERTY));
-
       TrackSelector trackSelector = new TrackSelector();
       for (String flavor : asList(sourceFlavorProperty)) {
         trackSelector.addFlavor(flavor);
@@ -133,7 +177,8 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           // generate waveform
           logger.info("Creating waveform extraction job for track '{}' in mediapackage '{}'", sourceTrack.getIdentifier(), mediaPackage);
 
-          Job waveformJob = waveformService.createWaveformImage(sourceTrack);
+          Job waveformJob = waveformService.createWaveformImage(sourceTrack, pixelsPerMinute, minWidth, maxWidth,
+            height);
           waveformJobs.add(waveformJob);
         } catch (MediaPackageException | WaveformServiceException e) {
           logger.error("Creating waveform extraction job for track '{}' in media package '{}' failed", sourceTrack.getIdentifier(), mediaPackage, e);
