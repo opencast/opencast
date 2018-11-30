@@ -35,6 +35,8 @@
  * which maps values to their labels.
  * The "save" attribute is a reference to a save function used to persist
  * the value.
+ * The "delimiter" attribute specifies at what character the input string
+ * is to be split into multiple individual values.
  *
  * @example
    <doc:example>
@@ -86,13 +88,51 @@ angular.module('adminNg.directives')
         scope.editMode = false;
       };
 
+      scope.removeValue = function (index) {
+        scope.removedValue = true;
+        scope.params.value.splice(index, 1);
+        scope.submit();
+      };
+
+      scope.addValue = function () {
+        var value = scope.data.value || '';
+        var newValues = scope.params.delimiter
+          ? value.split(scope.params.delimiter)
+          : [value];
+
+        var previousValue = scope.params.value.slice();
+        var failed = false;
+
+        angular.forEach(newValues, function (newValue) {
+          if (failed) {
+            return;
+          }
+
+          var parseResult = scope.parseValue(newValue);
+          if (!parseResult.value) {
+            return;
+          }
+          if (scope.mixed || parseResult.found) {
+            if (parseResult.value && scope.params.value.indexOf(parseResult.value) < 0) {
+              scope.params.value.push(parseResult.value);
+            }
+          } else {
+            failed = true;
+          }
+        });
+
+        if (failed) {
+          scope.params.value = previousValue;
+        } else {
+          scope.submit();
+          scope.data.value = '';
+        }
+      };
+
       scope.keyUp = function (event) {
         if (event.keyCode === 13) {
           // ENTER
-          if (angular.isDefined(scope.data.value)) {
-            scope.addValue(scope.params.value, scope.data.value);
-          }
-          scope.data.value = '';
+          scope.addValue();
         } else if (event.keyCode === 27) {
           // ESC
           scope.leaveEditMode();
@@ -100,27 +140,7 @@ angular.module('adminNg.directives')
         event.stopPropagation();
       };
 
-      scope.addValue = function (model, value) {
-        value = value.trim();
-
-        if (scope.mixed || scope.collection[value]) {
-          value = angular.isDefined(scope.collection[value]) ? scope.collection[value] : value;
-
-          if (value && model.indexOf(value) === -1) {
-            model.push(value);
-          }
-          scope.submit();
-        }
-      };
-
-      scope.removeValue = function (model, value) {
-        scope.removedValue = true;
-        model.splice(model.indexOf(value), 1);
-        scope.submit();
-      };
-
       scope.submit = function () {
-        scope.parseValues();
         if (angular.isDefined(scope.save)) {
           scope.save(scope.params.id);
         }
@@ -131,25 +151,33 @@ angular.module('adminNg.directives')
        * collection.
        */
       scope.parseValues = function () {
-        angular.forEach(scope.params.value, function(value) {
-          scope.params.value[scope.params.value.indexOf(value)] =
-            scope.params.value[scope.params.value.indexOf(value)].trim();
+        angular.forEach(scope.params.value, function (value, index) {
+          scope.params.value[index] = scope.parseValue(value).value;
         });
+      };
 
-        angular.forEach(scope.params.value, function(value) {
-          if (angular.isDefined(scope.collection[value])) {
-            scope.params.value[scope.params.value.indexOf(value)] = scope.collection[value];
-          }
-        });
+      scope.parseValue = function (value) {
+        value = value.trim();
+        return scope.getText(value);
       };
 
       scope.getText = function (value) {
-        if (angular.isDefined(scope.collection[value])) {
-          return scope.collection[value];
+        var collectionValue = scope.collection[value];
+        if (angular.isDefined(collectionValue)) {
+          return {
+            found: true,
+            value: collectionValue
+          };
         } else {
-          return value;
+          return {
+            found: false,
+            value: value
+          };
         }
       };
+
+      scope.parseValues();
+      scope.$watchCollection('collection', scope.parseValues);
     }
   };
 }]);

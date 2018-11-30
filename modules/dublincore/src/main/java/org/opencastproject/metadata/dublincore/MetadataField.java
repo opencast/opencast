@@ -69,6 +69,7 @@ public class MetadataField<A> {
   /** Keys for the different values in the configuration file */
   public static final String CONFIG_COLLECTION_ID_KEY = "collectionID";
   public static final String CONFIG_PATTERN_KEY = "pattern";
+  public static final String CONFIG_DELIMITER_KEY = "delimiter";
   public static final String CONFIG_END_DATE_OUTPUT_KEY = "endDateOutputID";
   public static final String CONFIG_END_TIME_OUTPUT_KEY = "endTimeOutputID";
   public static final String CONFIG_INPUT_ID_KEY = "inputID";
@@ -93,6 +94,7 @@ public class MetadataField<A> {
   protected static final String JSON_KEY_VALUE = "value";
   protected static final String JSON_KEY_COLLECTION = "collection";
   protected static final String JSON_KEY_TRANSLATABLE = "translatable";
+  protected static final String JSON_KEY_DELIMITER = "delimiter";
 
   /** Labels for the temporal date fields */
   private static final String LABEL_METADATA_PREFIX = "EVENTS.EVENTS.DETAILS.METADATA.";
@@ -118,6 +120,8 @@ public class MetadataField<A> {
   private Opt<String> collectionID = Opt.none();
   /** The format to use for temporal date properties. */
   private Opt<String> pattern = Opt.none();
+  /** The delimiter used to display and parse list values. */
+  private Opt<String> delimiter = Opt.none();
   /** The id of the field used to identify it in the dublin core. */
   private String inputID;
   /** The i18n id for the label to show the property. */
@@ -246,6 +250,8 @@ public class MetadataField<A> {
       values.put(JSON_KEY_COLLECTION, f(JSON_KEY_COLLECTION, v(collectionID.get())));
     if (translatable.isSome())
       values.put(JSON_KEY_TRANSLATABLE, f(JSON_KEY_TRANSLATABLE, v(translatable.get())));
+    if (delimiter.isSome())
+      values.put(JSON_KEY_DELIMITER, f(JSON_KEY_DELIMITER, v(delimiter.get())));
     return obj(values);
   }
 
@@ -375,7 +381,7 @@ public class MetadataField<A> {
         MetadataField<Iterable<String>> iterableTextField = MetadataField.createIterableStringMetadataField(
                 oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
                 oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
-                oldField.getOrder(), oldField.getNamespace());
+                oldField.getDelimiter(), oldField.getOrder(), oldField.getNamespace());
         iterableTextField.fromJSON(value);
         return iterableTextField;
       case LONG:
@@ -389,7 +395,7 @@ public class MetadataField<A> {
         MetadataField<Iterable<String>> mixedField = MetadataField.createMixedIterableStringMetadataField(
                 oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
                 oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
-                oldField.getOrder(), oldField.getNamespace());
+                oldField.getDelimiter(), oldField.getOrder(), oldField.getNamespace());
         mixedField.fromJSON(value);
         return mixedField;
       case START_DATE:
@@ -564,7 +570,8 @@ public class MetadataField<A> {
    */
   public static MetadataField<Iterable<String>> createMixedIterableStringMetadataField(String inputID,
           Opt<String> outputID, String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
-          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<String> delimiter, Opt<Integer> order,
+          Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
@@ -618,9 +625,11 @@ public class MetadataField<A> {
 
     };
 
-    return new MetadataField<>(inputID, outputID, label, readOnly, required, new ArrayList<String>(), isTranslatable,
-            Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
-            namespace);
+     MetadataField<Iterable<String>> mixedField = new MetadataField<>(inputID, outputID, label, readOnly, required,
+             new ArrayList<String>(), isTranslatable, Type.MIXED_TEXT, JsonType.MIXED_TEXT, collection, collectionId,
+             iterableToJSON, jsonToIterable, order, namespace);
+     mixedField.setDelimiter(delimiter);
+     return mixedField;
   }
 
   /**
@@ -645,7 +654,8 @@ public class MetadataField<A> {
    */
   public static MetadataField<Iterable<String>> createIterableStringMetadataField(String inputID, Opt<String> outputID,
           String label, boolean readOnly, boolean required, Opt<Boolean> isTranslatable,
-          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
+          Opt<Map<String, String>> collection, Opt<String> collectionId, Opt<String> delimiter, Opt<Integer> order,
+          Opt<String> namespace) {
 
     Fn<Opt<Iterable<String>>, JValue> iterableToJSON = new Fn<Opt<Iterable<String>>, JValue>() {
       @Override
@@ -687,9 +697,11 @@ public class MetadataField<A> {
 
     };
 
-    return new MetadataField<>(inputID, outputID, label, readOnly, required, new ArrayList<String>(), isTranslatable,
-            Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId, iterableToJSON, jsonToIterable, order,
-            namespace);
+    MetadataField<Iterable<String>> iterableField = new MetadataField<>(inputID, outputID, label, readOnly, required,
+            new ArrayList<String>(), isTranslatable, Type.ITERABLE_TEXT, JsonType.TEXT, collection, collectionId,
+            iterableToJSON, jsonToIterable, order, namespace);
+    iterableField.setDelimiter(delimiter);
+    return iterableField;
   }
 
   public static MetadataField<Long> createLongMetadataField(String inputID, Opt<String> outputID, String label,
@@ -1045,6 +1057,9 @@ public class MetadataField<A> {
       case CONFIG_PATTERN_KEY:
         this.pattern = Opt.some(value);
         break;
+      case CONFIG_DELIMITER_KEY:
+        this.delimiter = Opt.some(value);
+        break;
       case CONFIG_INPUT_ID_KEY:
         this.inputID = value;
         break;
@@ -1152,6 +1167,14 @@ public class MetadataField<A> {
 
   public void setPattern(Opt<String> pattern) {
     this.pattern = pattern;
+  }
+
+  public Opt<String> getDelimiter() {
+    return delimiter;
+  }
+
+  public void setDelimiter(Opt<String> delimiter) {
+    this.delimiter = delimiter;
   }
 
   public void setReadOnly(boolean readOnly) {
