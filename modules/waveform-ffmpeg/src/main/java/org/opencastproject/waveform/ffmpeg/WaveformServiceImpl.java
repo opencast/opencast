@@ -387,9 +387,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * Create an ffmpeg waveform filter with parameters based on input track and service configuration.
    *
    * @param track source audio/video track with at least one audio channel
-   * @param pixelsPerMinute width of waveform image in pixels per minute
-   * @param minWidth minimum width of waveform image
-   * @param maxWidth maximum width of waveform image
+   * @param width width of waveform image
    * @param height height of waveform image
    * @return ffmpeg filter parameter
    */
