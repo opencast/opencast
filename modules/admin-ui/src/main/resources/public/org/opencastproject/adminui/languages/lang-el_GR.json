@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Πρόσθετες ενέργειες",
                   "ACTION": "Ενέργειες",
                   "NEW": "Νέα πολιτική",
-                  "DETAILS": "Λεπτομέρειες"
+                  "DETAILS": "Λεπτομέρειες",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Επιλέξτε ένα ρόλο",

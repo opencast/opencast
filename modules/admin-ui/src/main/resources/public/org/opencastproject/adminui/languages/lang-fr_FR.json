@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Actions supplémentaires",
                   "ACTION": "Actions",
                   "NEW": "Add row",
-                  "DETAILS": "Détails"
+                  "DETAILS": "Détails",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Sélectionner un rôle",

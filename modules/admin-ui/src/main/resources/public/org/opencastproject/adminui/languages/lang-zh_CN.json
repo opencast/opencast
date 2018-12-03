@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "其他操作",
                   "ACTION": "操作",
                   "NEW": "新建策略",
-                  "DETAILS": "详情"
+                  "DETAILS": "详情",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "选择一个角色",

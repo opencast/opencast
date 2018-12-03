@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Bijkomende opties",
                   "ACTION": "Acties",
                   "NEW": "Nieuwe policy",
-                  "DETAILS": "Details"
+                  "DETAILS": "Details",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Selecteer een rol",

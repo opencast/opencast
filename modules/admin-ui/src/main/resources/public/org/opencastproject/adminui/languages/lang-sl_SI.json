@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Dodatna dejanja",
                   "ACTION": "Dejanja",
                   "NEW": "Nov pravilnik",
-                  "DETAILS": "Podrobnosti"
+                  "DETAILS": "Podrobnosti",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Izberite vlogo",

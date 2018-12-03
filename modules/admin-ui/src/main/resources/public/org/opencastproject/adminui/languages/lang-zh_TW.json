@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "更多選項",
                   "ACTION": "操作",
                   "NEW": "新政策",
-                  "DETAILS": "詳細信息"
+                  "DETAILS": "詳細信息",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "選擇一個角色",

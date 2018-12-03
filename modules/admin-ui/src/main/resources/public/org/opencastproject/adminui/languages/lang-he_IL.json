@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "פעולות נוספות",
                   "ACTION": "פעולות",
                   "NEW": "מדיניות חדשה",
-                  "DETAILS": "פרטים"
+                  "DETAILS": "פרטים",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "בחר תפקיד",

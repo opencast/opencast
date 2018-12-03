@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Karagdagang mga Aksyon",
                   "ACTION": "Mga aksyon",
                   "NEW": "Bagong patakaran",
-                  "DETAILS": "Mga detalye"
+                  "DETAILS": "Mga detalye",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Pumili ng papel",

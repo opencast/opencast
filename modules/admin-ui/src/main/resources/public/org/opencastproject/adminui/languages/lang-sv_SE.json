@@ -449,7 +449,7 @@
                   "REPEATS": "Upprepningar",
                   "REPEAT_ON": "Upprepa på",
                   "WEEKDAYS": "Vardagar",
-                  "WEEKDAY": "Weekday"
+                  "WEEKDAY": "Veckodag"
                },
                "NO_SOURCE_AVAILABLE": "Ingen capture agent tillgänglig för schemaläggning"
             },
@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Ytterliga aktioner",
                   "ACTION": "Åtgärder",
                   "NEW": "Ny policy",
-                  "DETAILS": "Detaljer"
+                  "DETAILS": "Detaljer",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Välj en roll",

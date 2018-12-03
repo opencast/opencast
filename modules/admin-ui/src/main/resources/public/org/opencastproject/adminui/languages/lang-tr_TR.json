@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Ek eylemler",
                   "ACTION": "Eylemler",
                   "NEW": "Yeni sözleşme",
-                  "DETAILS": "Ayrıntılar"
+                  "DETAILS": "Ayrıntılar",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",

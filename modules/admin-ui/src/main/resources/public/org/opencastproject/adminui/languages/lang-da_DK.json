@@ -1074,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Yderligere handlinger",
                   "ACTION": "Handlinger",
                   "NEW": "Ny politik",
-                  "DETAILS": "Oplysninger"
+                  "DETAILS": "Oplysninger",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Vælg en rolle",
