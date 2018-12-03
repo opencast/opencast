@@ -881,8 +881,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
    *
    * @param sourceImageXml
    *          The source image
-   * @param profileId
-   *          The profile to use in image conversion
+   * @param profileIds
+   *          The encoding profiles to use in image conversion
    * @return A {@link Response} with the resulting image in the response body
    * @throws Exception
    */
