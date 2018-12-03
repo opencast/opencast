@@ -66,11 +66,11 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
   // common fields
 
   private final String mediaPackageId;
-  private final Date date;
+  private final long date;
 
   private AssetManagerItem(String mediaPackageId, Date date) {
     this.mediaPackageId = RequireUtil.notNull(mediaPackageId, "mediaPackageId");
-    this.date = RequireUtil.notNull(date, "date");
+    this.date = RequireUtil.notNull(date, "date").getTime();
   }
 
   public abstract Type getType();
@@ -79,7 +79,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
           Fn<? super DeleteSnapshot, ? extends A> deleteSnapshot, Fn<? super DeleteEpisode, ? extends A> deleteEpisode);
 
   public final Date getDate() {
-    return date;
+    return new Date(date);
   }
 
   @Override
