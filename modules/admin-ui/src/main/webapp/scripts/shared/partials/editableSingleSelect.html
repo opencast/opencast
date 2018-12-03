@@ -1,7 +1,7 @@
-<div ng-form="innerForm" ng-click="enterEditMode()">
-  &nbsp;<span ng-show="!editMode" ng-click="enterEditMode()" translate="{{((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value))}}"></span>
+<div ng-form="innerForm" ng-click="toggleEditMode()">
+  &nbsp;<span ng-show="!editMode" translate="{{((params.value === '' || params.value === null || angular.isUndefined(params.value)) ? 'SELECT_NO_OPTIONS' : getLabel(params.value))}}"></span>
 
-  <i class="edit fa fa-pencil-square" ng-show="!editMode" ng-click="enterEditMode()" ng-focus="enterEditMode()" tabindex="{{ params.tabindex }}"></i>
+  <i class="edit fa fa-pencil-square" ng-show="!editMode" tabindex="{{ params.tabindex }}"></i>
   <i class="saved fa fa-check" ng-show="!editMode" ng-class="{ active: params.saved }"></i>
 
   <div class="editable-select" ng-show="editMode">
@@ -10,7 +10,6 @@
             ng-model="params.value"
             name="{{ params.name }}"
             ng-change="submit()"
-            ng-blur="leaveEditMode()"
             ng-required="params.required"
             tabindex="{{ params.tabindex }}"
             data-width="'250px'"
@@ -19,4 +18,3 @@
     </select>
   </div>
 </div>
-
