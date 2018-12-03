@@ -450,7 +450,7 @@
                "NO_SOURCE_AVAILABLE": "Kein Capture-Agent zur Planung einer Aufzeichnung verfügbar"
             },
             "PROCESSING": {
-               "CAPTION": "In Verarbeitung",
+               "CAPTION": "Verarbeitung",
                "SELECT_WORKFLOW": "Workflow wählen",
                "SELECT_WORKFLOW_EMPTY": "Keinen Workflow gefunden",
                "WORKFLOW": "Workflow"
