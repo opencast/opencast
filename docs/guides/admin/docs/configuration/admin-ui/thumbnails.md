@@ -48,7 +48,7 @@ following encoding profile:
     # Default: editor.thumbnail.preview
     #thumbnail.preview.profile=editor.thumbnail.preview
 
-In case that automatic distribution is enabled, a master thumbnail image is extracted. The thumbnail preview 
+In case that automatic distribution is enabled, a master thumbnail image is extracted. The thumbnail preview
 image is then created by downscaling this master thumbnail image using the following encoding profile:
 
     # Default: editor.thumbnail.preview.downscale
