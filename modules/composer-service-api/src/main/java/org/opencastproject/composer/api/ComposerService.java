@@ -249,7 +249,7 @@ public interface ComposerService {
 
   /**
    * Synchronously converts the given image to different image formats using the specified encoding profiles. Please
-   * note that synchronously doing this means, that the workload cannot be distributed amongst all nodes.
+   * note that synchronously doing this means that the workload cannot be distributed amongst all nodes.
    *
    * @param image
    *          the image

@@ -261,7 +261,7 @@ public final class ThumbnailImpl {
       final Tuple<URI, List<MediaPackageElement>> internalPublicationResult = updateInternalPublication(mp, true);
       deletionUris.add(internalPublicationResult.getA());
       if (distributionConfigurable.getEnabled()) {
-        deletionUris.add(updateExternalPublication(mp, trackFlavor));
+        deletionUris.add(updateConfigurablePublication(mp, trackFlavor));
       }
       if (distributionOaiPmh.getEnabled()) {
         deletionUris.add(updateOaiPmh(mp, trackFlavor));
@@ -336,10 +336,10 @@ public final class ThumbnailImpl {
         this.distributionOaiPmh.getChannelId());
     }
 
-    // We have to update the external publication to contain the new thumbnail as an attachment
-    final Optional<Publication> externalPublicationOpt = getPublication(mp, distributionConfigurable.getChannelId());
+    // We have to update the configurable publication to contain the new thumbnail as an attachment
+    final Optional<Publication> configurablePublicationOpt = getPublication(mp, distributionConfigurable.getChannelId());
     final Set<Publication> publicationsToUpdate = new HashSet<>();
-    externalPublicationOpt.ifPresent(publicationsToUpdate::add);
+    configurablePublicationOpt.ifPresent(publicationsToUpdate::add);
 
     final String publishThumbnailId = UUID.randomUUID().toString();
     final InputStream inputStream = tempInputStream();
@@ -422,7 +422,7 @@ public final class ThumbnailImpl {
     return downscaled.stream().map(a -> cloneAttachment(attachment, a.getURI())).collect(Collectors.toList());
   }
 
-  private URI updateExternalPublication(final MediaPackage mp, final MediaPackageElementFlavor trackFlavor)
+  private URI updateConfigurablePublication(final MediaPackage mp, final MediaPackageElementFlavor trackFlavor)
     throws IOException, NotFoundException, MediaPackageException, PublicationException,
       EncoderException, DistributionException {
     final Predicate<Attachment> flavorFilter = a -> a.getFlavor().matches(distributionConfigurable.getFlavor());
@@ -488,7 +488,7 @@ public final class ThumbnailImpl {
       deletionUris.add(internalPublicationResult.getA());
 
       if (distributionConfigurable.getEnabled()) {
-        deletionUris.add(updateExternalPublication(mp, track.getFlavor()));
+        deletionUris.add(updateConfigurablePublication(mp, track.getFlavor()));
       }
       if (distributionOaiPmh.getEnabled()) {
         deletionUris.add(updateOaiPmh(mp, track.getFlavor()));
