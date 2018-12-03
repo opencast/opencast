@@ -44,7 +44,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,11 +133,11 @@ public class TimelinePreviewsServiceImplTest {
   public void testProcess() throws Exception {
     File file = new File(track.getURI());
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject()))
+    EasyMock.expect(workspace.get(EasyMock.anyObject()))
             .andReturn(file);
-    Capture filenameCapture = new Capture();
+    Capture<String> filenameCapture = Capture.newInstance();
     EasyMock.expect(workspace.putInCollection(
-            EasyMock.anyString(), (String) EasyMock.capture(filenameCapture), (InputStream) EasyMock.anyObject()))
+            EasyMock.anyString(), EasyMock.capture(filenameCapture), EasyMock.anyObject()))
             .andReturn(new URI("timelinepreviews.png"));
     EasyMock.replay(workspace);
 

@@ -3,7 +3,7 @@
 
   <feature name="query-dsl" version="${project.version}">
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
-    <bundle>mvn:joda-time/joda-time/2.10</bundle>
+    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-core/3.6.5</bundle>
     <bundle>mvn:com.mysema.querydsl/querydsl-sql/3.6.5</bundle>
@@ -50,13 +50,13 @@
     <bundle>mvn:commons-io/commons-io/2.6</bundle>
     <!-- FIXME: commons-lang 2.6 only needed for the ical library in the commons bundle -->
     <bundle>mvn:commons-lang/commons-lang/2.6</bundle>
-    <bundle>mvn:joda-time/joda-time/2.9.9</bundle>
+    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
     <bundle>mvn:org.aopalliance/com.springsource.org.aopalliance/1.0.0</bundle>
     <bundle>mvn:org.apache.commons/commons-collections4/${commons-collections.version}</bundle>
     <bundle>mvn:org.apache.commons/commons-compress/${commons-compress.version}</bundle>
-    <bundle>mvn:org.apache.commons/commons-csv/1.5</bundle>
-    <bundle>mvn:org.apache.commons/commons-lang3/3.7</bundle>
-    <bundle>mvn:org.apache.commons/commons-text/1.2</bundle>
+    <bundle>mvn:org.apache.commons/commons-csv/${commons-csv.version}</bundle>
+    <bundle>mvn:org.apache.commons/commons-lang3/${commons-lang3.version}</bundle>
+    <bundle>mvn:org.apache.commons/commons-text/${commons-text.version}</bundle>
     <bundle>mvn:org.apache.neethi/neethi/3.0.1</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.bcel/5.2_3</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.batik/1.7_3</bundle>
