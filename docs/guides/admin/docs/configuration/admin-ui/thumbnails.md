@@ -144,8 +144,12 @@ To avoid the situation that a user needs to start a workflow just to update the 
 Opencast supports automatic distribution of thumbnail images for publication channels that support incremental
 publication.
 
-Currently, this is supported for configurable publication channels (created by WOH publish-configure) as used by the
-External API and OAI-PMH publication channels (created by WOH publish-oaipmh).
+This is currently supported by the following kinds of publication channels:
+
+- Configurable publication channels (used by the External API)
+- OAI-PMH publication channels
+
+Note that this mechanism is currently limited to at most one publication channel per kind.
 
 The automatic distribution of thumbnail images can be enabled in the configuration:
 
