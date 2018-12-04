@@ -284,7 +284,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     this.indexVersion = version;
 
     // Configure and start Elasticsearch
-    synchronized (this) {
+    synchronized (AbstractElasticsearchIndex.class) {
       if (elasticSearch == null) {
         logger.info("Starting local Elasticsearch node");
 
@@ -298,12 +298,12 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         elasticSearch.start();
         logger.info("Elasticsearch node is up and running");
       }
-    }
 
-    // Create the client
-    synchronized (elasticSearch) {
-      nodeClient = elasticSearch.client();
-      elasticSearchClients.add(nodeClient);
+      // Create the client
+      if (nodeClient == null) {
+        nodeClient = elasticSearch.client();
+        elasticSearchClients.add(nodeClient);
+      }
     }
 
     // Create the index
@@ -320,12 +320,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     try {
       if (nodeClient != null) {
         nodeClient.close();
-        synchronized (elasticSearch) {
+        synchronized (AbstractElasticsearchIndex.class) {
           elasticSearchClients.remove(nodeClient);
-        }
-
-        synchronized (this) {
-          if (elasticSearchClients.isEmpty()) {
+          if (elasticSearchClients.isEmpty() && elasticSearch != null) {
             logger.info("Stopping local Elasticsearch node");
             elasticSearch.stop();
             elasticSearch.close();
