@@ -419,8 +419,8 @@ public class JobEndpoint {
 
       jsonList.add(obj(f("id", v(instanceId)), f("title", v(instance.getTitle(), Jsons.BLANK)),
               f("status", v(WORKFLOW_STATUS_TRANSLATION_PREFIX + instance.getState().toString())),
-              f("submittedAt", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
-              f("submittedBy", v(creatorName, Jsons.BLANK))));
+              f("submitted", v(created != null ? DateTimeSupport.toUTC(created.getTime()) : "", Jsons.BLANK)),
+              f("submitter", v(creatorName, Jsons.BLANK))));
     }
 
     JObject json = obj(f("results", arr(jsonList)), f("count", v(workflowInstances.getTotalCount())),

@@ -409,12 +409,13 @@
                 <table class="main-tbl">
                   <thead>
                     <tr>
+                      <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></th>
                       <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.TITLE"><!-- Title --></th>
-                      <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED_BY">
-                        <!-- Submitted By -->
+                      <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER">
+                        <!-- Submitter -->
                       </th>
-                      <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED_AT">
-                        <!-- Submitted At -->
+                      <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED">
+                        <!-- Submitted -->
                       </th>
                       <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATUS"><!-- Status --></th>
                       <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" class="fit"><!-- Actions --></th>
@@ -422,9 +423,10 @@
                   </thead>
                   <tbody>
                     <tr ng-repeat="item in workflows.entries|orderBy:'submitted':true track by $index">
+                      <td>{{ item.id }}</td>
                       <td>{{ item.title }}</td>
-                      <td>{{ item.submittedBy }}</td>
-                      <td>{{ item.submittedAt | localizeDate : 'dateTime' : 'medium' }}</td>
+                      <td>{{ item.submitter }}</td>
+                      <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                       <td>{{ item.status | translate }}</td>
                       <td>
                         <a class="more" title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.DETAILS' | translate }}"
@@ -1480,14 +1482,14 @@
                   <td>{{ subNavData.description }}</td>
                 </tr>
                 <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED_BY"><!-- Submitted by --></td>
+                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTER"><!-- Submitter--></td>
                   <td>
                     {{ subNavData.creator.name }}
                     <span ng-if="subNavData.creator.email">{{'<' + subNavData.creator.email + '>' }}</span>
                   </td>
                 </tr>
                 <tr>
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED_AT"><!-- Submitted at --></td>
+                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.SUBMITTED"><!-- Submitted --></td>
                   <td>{{ subNavData.submittedAt | localizeDate : 'dateTime' : 'medium' }}</td>
                 </tr>
                 <tr>
@@ -1495,15 +1497,15 @@
                   <td>{{ subNavData.status | translate }}</td>
                 </tr>
                 <tr ng-if="subNavData.status !== 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING'">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME"><!-- Duration --></td>
+                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.EXECUTION_TIME"><!-- Execution time --></td>
                   <td>{{ subNavData.executionTime | humanDuration }}</td>
                 </tr>
                 <tr with-role="ROLE_ADMIN">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- WIID --></td>
+                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ID"><!-- ID --></td>
                   <td>{{ subNavData.wiid }}</td>
                 </tr>
                 <tr with-role="ROLE_ADMIN">
-                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID"><!-- WDID --></td>
+                  <td translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.WDID"><!-- Workflow definition --></td>
                   <td>{{ subNavData.wdid }}</td>
                 </tr>
               </table>

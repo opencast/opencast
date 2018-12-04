@@ -6,22 +6,22 @@
         {
             "id": 1,
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
-            "submittedAt": "",
-            "submittedBy": "",
+            "submitted": "",
+            "submitter": "",
             "title": "Full"
         },
         {
             "id": 2,
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
-            "submittedAt": "",
-            "submittedBy": "",
+            "submitted": "",
+            "submitter": "",
             "title": "Full"
         },
         {
             "id": 3,
             "status": "EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.INSTANTIATED",
-            "submittedAt": "",
-            "submittedBy": "",
+            "submitted": "",
+            "submitter": "",
             "title": "Full"
         }
     ],
