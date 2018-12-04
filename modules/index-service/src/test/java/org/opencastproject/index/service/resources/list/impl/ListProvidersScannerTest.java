@@ -26,7 +26,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.index.service.exception.ListProviderException;
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.security.api.Organization;
@@ -47,7 +46,7 @@ public class ListProvidersScannerTest {
   private Organization defaultOrg;
   private Organization specificOrg;
   private ListProvidersScanner listProvidersScanner;
-  private ListProvidersService listProvidersService;
+  private ListProvidersServiceImpl listProvidersService;
   private SecurityService securityService;
 
   private static File getResourceFile(String resourcePath) throws Exception {
@@ -62,7 +61,7 @@ public class ListProvidersScannerTest {
     listProvidersService = new ListProvidersServiceImpl();
     listProvidersScanner = new ListProvidersScanner();
     securityService = EasyMock.createNiceMock(SecurityService.class);
-    ((ListProvidersServiceImpl) listProvidersService).setSecurityService(securityService);
+    listProvidersService.setSecurityService(securityService);
     listProvidersScanner.setListProvidersService(listProvidersService);
   }
 
@@ -225,9 +224,6 @@ public class ListProvidersScannerTest {
     assertEquals("org1", org1.getId());
     assertTrue("Provider is not registered", listProvidersService.hasProvider(listName, org1.getId()));
     Map<String, String> dictionary = listProvidersService.getList(listName, query, false);
-    for (String key : dictionary.keySet()) {
-      logger.info("Key: {}, Value {}.", key, dictionary.get(key));
-    }
 
     assertEquals(3, dictionary.size());
 

@@ -68,10 +68,9 @@ public class ListProvidersServiceImpl implements ListProvidersService {
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      ResourceTuple that = (ResourceTuple) o;
-      return Objects.equals(resourceName, that.resourceName)
-              && Objects.equals(organizationId, that.organizationId);
+      return o instanceof ResourceTuple
+              && Objects.equals(resourceName, ((ResourceTuple) o).resourceName)
+              && Objects.equals(organizationId, ((ResourceTuple) o).organizationId);
     }
 
     @Override
@@ -178,8 +177,8 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   @Override
   public List<String> getAvailableProviders() {
     List<String> sources = new ArrayList<>();
-    for (Map.Entry<ResourceTuple, ResourceListProvider> entry : providers.entrySet()) {
-      sources.add(entry.getKey().getResourceName());
+    for (ResourceTuple key : providers.keySet()) {
+      sources.add(key.getResourceName());
     }
     return sources;
   }

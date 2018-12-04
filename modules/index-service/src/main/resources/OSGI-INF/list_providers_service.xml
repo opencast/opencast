@@ -10,7 +10,7 @@
              cardinality="0..n" policy="dynamic" bind="addProvider" unbind="removeProvider"/>
 
   <reference name="security-service" interface="org.opencastproject.security.api.SecurityService"
-           cardinality="1..1" policy="static" bind="setSecurityService"/>
+             bind="setSecurityService"/>
 
   <service>
     <provide interface="org.opencastproject.index.service.resources.list.api.ListProvidersService"/>

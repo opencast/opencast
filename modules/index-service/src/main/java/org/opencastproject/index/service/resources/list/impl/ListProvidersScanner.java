@@ -43,6 +43,7 @@ import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 public class ListProvidersScanner implements ArtifactInstaller {
@@ -117,7 +118,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
     @Override
     public Map<String, String> getList(String listName, ResourceListQuery query)
             throws ListProviderNotFoundException {
-      logger.debug("Getting list " + listName + " query " + query + " org " + orgId);
+      logger.debug("Getting list {} with query {} for org {}", listName, query, orgId);
       if (this.listName.equals(listName)) return Collections.unmodifiableMap(list);
       else throw new ListProviderNotFoundException("Unable to read list data from file");
     }
@@ -152,7 +153,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
     }
     String defaultKey = properties.getProperty(LIST_DEFAULT_KEY);
     boolean translatable = BooleanUtils.toBoolean(properties.getProperty(LIST_TRANSLATABLE_KEY));
-    String orgId = properties.getProperty(LIST_ORG_KEY) != null ? properties.getProperty(LIST_ORG_KEY) : ALL_ORGANIZATIONS;
+    String orgId = Objects.toString(properties.getProperty(LIST_ORG_KEY), ALL_ORGANIZATIONS);
 
     logger.info("Adding {} for {}", listName, orgId);
 
@@ -229,7 +230,7 @@ public class ListProvidersScanner implements ArtifactInstaller {
       logger.error("Unable to read file " + filePath);
       return;
     }
-    String orgId = properties.getProperty(LIST_ORG_KEY) != null ? properties.getProperty(LIST_ORG_KEY) : ALL_ORGANIZATIONS;
+    String orgId = Objects.toString(properties.getProperty(LIST_ORG_KEY), ALL_ORGANIZATIONS);
     if (resource != null && !orgId.equals(resource.getOrganizationId())) { // the org ID was changed
       removeResourceListProvider(artifact);
     }

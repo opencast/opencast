@@ -26,22 +26,22 @@ package org.opencastproject.index.service.exception;
  */
 public class ListProviderNotFoundException extends ListProviderException {
 
-    /**
-     * Constructs an exception with a simple message.
-     *
-     * @param message the simple message
-     */
-    public ListProviderNotFoundException(String message) {
-        super(message);
-    }
+  /**
+   * Constructs an exception with a simple message.
+   *
+   * @param message the simple message
+   */
+  public ListProviderNotFoundException(String message) {
+    super(message);
+  }
 
-    /**
-     * Constructs an exception with its cause and a simple message.
-     *
-     * @param message the simple message
-     * @param cause the cause
-     */
-    public ListProviderNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  /**
+   * Constructs an exception with its cause and a simple message.
+   *
+   * @param message the simple message
+   * @param cause the cause
+   */
+  public ListProviderNotFoundException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

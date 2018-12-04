@@ -126,10 +126,10 @@ public class ListProvidersEndpoint {
     try {
       autocompleteList = listProvidersService.getList(source, query, false);
     } catch (ListProviderNotFoundException e) {
-      logger.error("No list found for {}: {}", source, e);
+      logger.debug("No list found for {}", source, e);
       return NOT_FOUND;
     } catch (ListProviderException e) {
-      logger.error("Server error when getting list from provider {}: {}", source, e);
+      logger.error("Server error when getting list from provider {}", source, e);
       return SERVER_ERROR;
     }
 
@@ -137,7 +137,7 @@ public class ListProvidersEndpoint {
     try {
       jsonList = generateJSONObject(autocompleteList);
     } catch (JsonCreationException e) {
-      logger.error("Not able to generate resources list JSON from source {}: {}", source, e);
+      logger.error("Not able to generate resources list JSON from source {}", source, e);
       return SERVER_ERROR;
     }
 

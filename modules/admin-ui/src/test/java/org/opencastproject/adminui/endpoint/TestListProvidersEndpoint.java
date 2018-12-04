@@ -55,8 +55,7 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
     organization = EasyMock.createNiceMock(Organization.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
     EasyMock.expect(organization.getId()).andReturn("mh_default_org").anyTimes();
-    EasyMock.replay(organization);
-    EasyMock.replay(securityService);
+    EasyMock.replay(organization, securityService);
     listProvidersService.setSecurityService(securityService);
 
     for (int i = 0; i < PROVIDER_VALUES.length; i++) {
