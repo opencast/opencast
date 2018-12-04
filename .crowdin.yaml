@@ -25,4 +25,4 @@ files:
 
   -
     source: '/modules/lti/src/i18n/en-US.json'
-    translation: '/modules/lti/src/i18n//%locale%.json'
+    translation: '/modules/lti/src/i18n/%locale%.json'
