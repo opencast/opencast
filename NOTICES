@@ -625,7 +625,7 @@ admin-ui
   com.jayway.restassured                 rest-assured                                     Apache 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.codehaus.groovy                    groovy-all                                       The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1094,7 +1094,7 @@ scheduler-impl
   commons-logging                        commons-logging                                  The Apache Software License, Version 2.0
   javax.ws.rs                            jsr311-api                                       -
   javax.xml.bind                         jaxb-api                                         CDDL 1.1-GPL2 w/ CPE
-  net.fortuna.ical4j                     ical4j                                           -
+  org.mnode.ical4j                       ical4j                                           BSD 3-Clause License
   org.eclipse.persistence                javax.persistence                                Eclipse Public License v1.0-Eclipse Distribution License v. 1.0
   org.slf4j                              slf4j-api                                        MIT License
 
