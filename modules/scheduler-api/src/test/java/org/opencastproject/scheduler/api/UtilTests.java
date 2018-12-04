@@ -43,6 +43,7 @@ public class UtilTests {
   private final TimeZone jst = TimeZone.getTimeZone("Asia/Tokyo"); // Japan Standard Time (UTC +9)
   private final TimeZone pst = TimeZone.getTimeZone("America/Anchorage"); // Alaska Standard Time (UTC -8)
   private final TimeZone cet = TimeZone.getTimeZone("Europe/Zurich"); // European time (UTC +2)
+  private final TimeZone nonDstTz = TimeZone.getTimeZone("America/Phoenix"); // Like UTC, it has no DaySavings Boundry
 
   @Before
   public void setUp() {
@@ -101,6 +102,23 @@ public class UtilTests {
     periods = generatePeriods(cet, start, end, days, durationMillis);
     logger.trace("Expecting 5 got {}", periods.size());
     assertEquals(5, periods.size());
+
+    // A Non-Daylight Saving observing TimeZone
+    // reference https://github.com/ical4j/ical4j/issues/232
+    start = Calendar.getInstance(nonDstTz);
+    start.set(2016, 2, 10, 0, 5);
+    start.set(Calendar.SECOND, 0);
+    assertEquals(0, start.get(Calendar.SECOND));
+    end = Calendar.getInstance(nonDstTz);
+    end.set(2016, 2, 17, start.get(Calendar.HOUR_OF_DAY), 10);
+    end.set(Calendar.SECOND, 50);
+    durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
+    days = "MO,TU,FR,SA,SU";
+    logger.debug("expecting days {} tz {}", days, start.getTimeZone().getID());
+    periods = generatePeriods(nonDstTz, start, end, days, durationMillis);
+    logger.debug("Expecting 5 got {}", periods.size());
+    assertEquals(5, periods.size());
+
   }
 
   @Test
@@ -157,21 +175,19 @@ public class UtilTests {
     String days;
 
     // CET->CEST test (March 25 is CET->CEST)
-    TimeZone cetCest = TimeZone.getTimeZone("Europe/Berlin");
-
     // On Sunday, March 27, 2:00 am CET->CEST
     int scheduledHour = 12; // the hour of the day that the events should occur
     int expectedCount = 17; // the amount of events that should be scheduled
-    start = Calendar.getInstance(cetCest);
+    start = Calendar.getInstance(cet);
     start.set(2016, 2, 20, scheduledHour, 5);
     start.set(Calendar.SECOND, 0);
-    end = Calendar.getInstance(cetCest);
+    end = Calendar.getInstance(cet);
     end.set(2016, 3, 11, start.get(Calendar.HOUR_OF_DAY), 10);
     end.set(Calendar.SECOND, 50);
     durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
     days = "MO,TH,FR,SA,SU";
     logger.trace("expecting hour {} days {} tz {}", scheduledHour, days, start.getTimeZone().getID());
-    doDSTChangeOverTest(cetCest, start, end, days, durationMillis, scheduledHour, expectedCount);
+    doDSTChangeOverTest(cet, start, end, days, durationMillis, scheduledHour, expectedCount);
   }
 
   @Test
@@ -183,23 +199,46 @@ public class UtilTests {
 
     // CET->CEST Sunday March 25 2am
     // CET->CEST Sunday, October 30, 3am
-    TimeZone cetCest = TimeZone.getTimeZone("Europe/Berlin");
 
-    int scheduledHour = 1; // the hour of the day that the events should occur
+    int scheduledHour = 5; // the hour of the day that the events should occur
     int expectedCount = 535; // the amount of events that should be scheduled
     int minutesOfEvent = 3 * 60; // 3 hours
-    start = Calendar.getInstance(cetCest);
+    start = Calendar.getInstance(cet);
     start.set(2015, 9, 15, scheduledHour, 5);
     // The seconds are NOT guaranteed to be 0 unless explicitly set
     start.set(Calendar.SECOND, 0);
-    end = Calendar.getInstance(cetCest);
+    end = Calendar.getInstance(cet);
     end.set(2017, 9, 30, start.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE) % minutesOfEvent);
     // The seconds are NOT guaranteed to be 0 unless explicitly set
     end.set(Calendar.SECOND, 50);
     durationMillis = minutesOfEvent * 60 * 1000;
     days = "MO,TH,FR,SA,SU";
     logger.trace("expecting hour {} days {} tz {}", scheduledHour, days, start.getTimeZone().getID());
-    doDSTChangeOverTest(cetCest, start, end, days, durationMillis, scheduledHour, expectedCount);
+    doDSTChangeOverTest(cet, start, end, days, durationMillis, scheduledHour, expectedCount);
+  }
+
+  @Test
+  // reference https://github.com/ical4j/ical4j/issues/232
+  public void calculateNonDstTimeZoneInOneVeryLongRecurrence() throws ParseException {
+    Calendar start;
+    Calendar end;
+    long durationMillis;
+    String days;
+    int scheduledHour = 5; // the hour of the day that the events should occur
+    int expectedCount = 535; // the amount of events that should be scheduled
+    int minutesOfEvent = 3 * 60; // 3 hours
+    start = Calendar.getInstance(nonDstTz);
+    start.set(2015, 9, 15, scheduledHour, 5);
+    // The seconds are NOT guaranteed to be 0 unless explicitly set
+    start.set(Calendar.SECOND, 0);
+    end = Calendar.getInstance(nonDstTz);
+    end.set(2017, 9, 30, start.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE) % minutesOfEvent);
+    // The seconds are NOT guaranteed to be 0 unless explicitly set
+    end.set(Calendar.SECOND, 50);
+    durationMillis = minutesOfEvent * 60 * 1000;
+    days = "MO,TH,FR,SA,SU";
+    logger.trace("expecting hour {} days {} tz {}", scheduledHour, days, start.getTimeZone().getID());
+    doDSTChangeOverTest(nonDstTz, start, end, days, durationMillis, scheduledHour, expectedCount);
   }
 
   /**
@@ -217,7 +256,7 @@ public class UtilTests {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
     logger.debug("= start ======================================================");
-    List<Period> periods = generatePeriods(cet, start, end, days, durationMillis);
+    List<Period> periods = generatePeriods(tz, start, end, days, durationMillis);
     logger.debug("Expecting {} got {}", expectedCount, periods.size());
     assertEquals(expectedCount, periods.size());
     for (Period d : periods) {

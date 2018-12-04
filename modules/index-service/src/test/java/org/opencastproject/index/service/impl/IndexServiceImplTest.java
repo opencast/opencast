@@ -136,6 +136,7 @@ public class IndexServiceImplTest {
   private final TimeZone jst = TimeZone.getTimeZone("Asia/Tokyo"); // Japan Standard Time (UTC +9)
   private final TimeZone pst = TimeZone.getTimeZone("America/Anchorage"); // Alaska Standard Time (UTC -8)
   private final TimeZone cet = TimeZone.getTimeZone("Europe/Zurich"); // European time (UTC +2)
+  private final TimeZone nonDstTz = TimeZone.getTimeZone("America/Phoenix"); // No Daylight Savings //
 
   private JpaOrganization organization = new JpaOrganization("org-id", "Organization", null, null, null, null, null);
 
@@ -944,6 +945,30 @@ public class IndexServiceImplTest {
     //period Sat Mar 26 00:05:52 CET 2016 to Sat Mar 26 00:10:52 CET 2016
     //period Sun Mar 27 00:05:52 CET 2016 to Sun Mar 27 00:10:52 CET 2016
     //period Mon Mar 28 00:05:52 CEST 2016 to Mon Mar 28 00:10:52 CEST 2016
+    assertEquals(4, periods.size());
+
+    // Non-DST TZ
+    // MST change over for Daily Savings observant areas is Sunday, March 13, 2:00 am
+    start = Calendar.getInstance(nonDstTz);
+    start.set(2016, 2, 11, 0, 5);
+    end = Calendar.getInstance(nonDstTz);
+    end.set(2016, 2, 15, start.get(Calendar.HOUR_OF_DAY), 10); // 15th is a Tues, non schedule day
+    durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
+    days = "MO,TH,FR,SA,SU"; // --> A day before when switch to UCT (0-2)
+
+    periods = generatePeriods(nonDstTz, start, end, days, durationMillis);
+    simpleDateFormat.setTimeZone(nonDstTz);
+    iter = periods.iterator();
+    while (iter.hasNext()) {
+      Period p = iter.next();
+      logger.trace("Got period {} to {}", simpleDateFormat.format(p.getRangeStart()),
+              simpleDateFormat.format(p.getRangeEnd()));
+    }
+    // Expecting 4 days to be scheduled:
+    // Got period Fri Mar 11 00:05:40 MST 2016 to Fri Mar 11 00:10:40 MST 2016
+    // Got period Sat Mar 12 00:05:40 MST 2016 to Sat Mar 12 00:10:40 MST 2016
+    // Got period Sun Mar 13 00:05:40 MST 2016 to Sun Mar 13 00:10:40 MST 2016 <- still standard time, not MDT
+    // Got period Mon Mar 14 00:05:40 MST 2016 to Mon Mar 14 00:10:40 MST 2016 <- still standard time, not MDT
     assertEquals(4, periods.size());
   }
 
