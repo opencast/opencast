@@ -23,16 +23,11 @@ package org.opencastproject.adminui.userdirectory;
 
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.Role.Type;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
-
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
 
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
@@ -70,14 +65,10 @@ public class UIRolesRoleProvider implements RoleProvider {
   }
 
   protected void activate(ComponentContext cc) {
-    InputStream in = null;
-    try {
-      in = getClass().getResourceAsStream("/roles.txt");
-      roles = new TreeSet<String>(IOUtils.readLines(in, "UTF-8"));
+    try (InputStream in = getClass().getResourceAsStream("/roles.txt")) {
+      roles = new TreeSet<>(IOUtils.readLines(in, "UTF-8"));
     } catch (IOException e) {
       logger.error("Unable to read available roles", e);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
     logger.info("Activated Admin UI roles role provider");
   }
@@ -87,8 +78,8 @@ public class UIRolesRoleProvider implements RoleProvider {
    */
   @Override
   public Iterator<Role> getRoles() {
-    Organization organization = securityService.getOrganization();
-    return Stream.$(roles).map(toRole._2(organization)).iterator();
+    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
+    return roles.stream().map((role) -> toRole(role, organization)).iterator();
   }
 
   /**
@@ -120,10 +111,13 @@ public class UIRolesRoleProvider implements RoleProvider {
       return Collections.emptyIterator();
     }
 
-    Organization organization = securityService.getOrganization();
-    return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
-            .apply(limit > 0 ? StreamOp.<String> id().take(limit) : StreamOp.<String> id()).map(toRole._2(organization))
-            .iterator();
+    JaxbOrganization organization = JaxbOrganization.fromOrganization(securityService.getOrganization());
+    return roles.stream()
+      .filter((role) -> like(role, query))
+      .skip(offset)
+      .limit(limit > 0 ? limit : roles.size())
+      .map((role) -> toRole(role, organization))
+      .iterator();
   }
 
   private static boolean like(String string, final String query) {
@@ -132,17 +126,8 @@ public class UIRolesRoleProvider implements RoleProvider {
     return p.matcher(string).matches();
   }
 
-  private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
-    @Override
-    public Role apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "AdminNG UI Role", Type.INTERNAL);
-    }
-  };
+  private Role toRole(final String role, final JaxbOrganization organization) {
+    return new JaxbRole(role, organization, "AdminNG UI Role", Type.INTERNAL);
+  }
 
-  private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
-    @Override
-    public Boolean apply(String role, String query) {
-      return like(role, query);
-    }
-  };
 }
