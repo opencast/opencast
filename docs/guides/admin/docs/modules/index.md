@@ -13,7 +13,9 @@ Documentation for modules included in Opencast.
 * Player
     * [Configuration](player.configuration.md)
     * [URL Parameter](player.url.parameter.md)
-* [Search Index](searchindex.md)
+* [Search Indexes](searchindex/index.md)
+    * [Solr](searchindex/solr.md)
+    * [Elasticsearch](searchindex/elasticsearch.md)
 * [Stream Security](stream-security.md)
 * [Text Extraction](textextraction.md)
 * Videoeditor

@@ -69,7 +69,7 @@ public class TestSearchIndex extends AbstractSearchIndex {
   }
 
   @Override
-  public String[] getDocumenTypes() {
+  public String[] getDocumentTypes() {
     return null;
   }
 

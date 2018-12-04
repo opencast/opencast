@@ -82,7 +82,10 @@ nav:
       - URL Parameters: 'modules/player.url.parameter.md'
       - Matomo Tracking: 'modules/player.matomo.tracking.md'
    - Paella player: 'modules/paella.player.md'
-   - Search Index: 'modules/searchindex.md'
+   - Search Index:
+      - Overview: 'modules/searchindex/index.md'
+      - Solr: 'modules/searchindex/solr.md'
+      - Elasticsearch: 'modules/searchindex/elasticsearch.md'
    - Stream Security: 'modules/stream-security.md'
    - Text Extraction: 'modules/textextraction.md'
    - Timeline Previews: 'modules/timelinepreviews.md'

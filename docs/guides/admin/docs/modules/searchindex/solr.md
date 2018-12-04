@@ -1,4 +1,4 @@
-# Search Index Configuration
+# Solr Configuration
 
 *Opencast has Solr included by default. This guide is only needed, if you want to run Solr on a separate server.*
 
@@ -63,13 +63,13 @@ work.*
 
 You should see that the solr server is running on http://localhost:8080/solr
 
-![SOLR welcome page](searchindex1.png)
+![SOLR welcome page](solr1.png)
 
 You can use the admin screen to monitor the server or make ad-hoc queries:
 
-![SOLR admin](searchindex2.png)
+![SOLR admin](solr2.png)
 
-![SOLR XML](searchindex3.png)
+![SOLR XML](solr3.png)
 
 ## Secure the solr server
 
