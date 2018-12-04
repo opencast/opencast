@@ -99,7 +99,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
   private static final String ALLOW_SYSTEM_ADMINISTRATOR_KEY = "lti.allow_system_administrator";
 
   /** The key to look up whether the digest user should be able to authenticate via LTI **/
-  private static final String ALLOW_DIGIST_USER_KEY = "lti.allow_digest_user";
+  private static final String ALLOW_DIGEST_USER_KEY = "lti.allow_digest_user";
 
   /** The user details service */
   private UserDetailsService userDetailsService;
@@ -154,7 +154,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
         usernameBlacklist.add(adminUsername);
       }
     }
-    if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_DIGIST_USER_KEY)))) {
+    if (!BooleanUtils.toBoolean(StringUtils.trimToNull((String) properties.get(ALLOW_DIGEST_USER_KEY)))) {
       usernameBlacklist.add(SecurityUtil.getSystemUserName(componentContext));
     }
 
