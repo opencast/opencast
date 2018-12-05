@@ -201,7 +201,6 @@ public final class AclServiceImpl implements AclService {
       // not found
       return false;
     } catch (Exception e) {
-      logger.error("Error applying episode ACL", e);
       throw new AclServiceException(e);
     }
   }
