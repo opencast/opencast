@@ -48,7 +48,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final String acl;
   private final String propertyName;
   private final String propertyValue;
-  private final Boolean optOut;
+  private final String optOut;
   private final String element;
   private final String elementType;
 
@@ -186,7 +186,7 @@ public final class SeriesItem implements MessageItem, Serializable {
     this.acl = acl;
     this.propertyName = propertyName;
     this.propertyValue = propertyValue;
-    this.optOut = optOut;
+    this.optOut = optOut == null ? null : Boolean.toString(optOut);
     this.elementType = elementType;
     this.element = element;
   }
@@ -225,7 +225,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   }
 
   public Boolean getOptOut() {
-    return optOut;
+    return optOut == null ? null : Boolean.valueOf(optOut);
   }
 
   public String getPropertyName() {

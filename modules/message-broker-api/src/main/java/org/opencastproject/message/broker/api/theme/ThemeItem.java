@@ -36,7 +36,7 @@ public class ThemeItem implements MessageItem, Serializable {
 
   public static final String THEME_QUEUE = THEME_QUEUE_PREFIX + "QUEUE";
 
-  private final Long id;
+  private final long id;
   private final SerializableTheme theme;
 
   /** The type of the message being sent. */
