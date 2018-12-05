@@ -728,8 +728,10 @@ public abstract class AbstractEventEndpoint {
         return ok();
       }
     } catch (AclServiceException e) {
-      logger.error("Error applying acl '{}' to event '{}' because: {}",
-              accessControlList, eventId, ExceptionUtils.getStackTrace(e));
+      if (e.getCause() instanceof UnauthorizedException) {
+        return forbidden();
+      }
+      logger.error("Error applying acl '{}' to event '{}'", accessControlList, eventId, e);
       return serverError();
     } catch (SchedulerException e) {
       logger.error("Error applying ACL to scheduled event {} because {}", eventId, ExceptionUtils.getStackTrace(e));
