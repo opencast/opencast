@@ -65,25 +65,25 @@ public class SchedulerMigrationService {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.migration";
 
   /** Configuration keys */
-  private static final String JOB_TYPE = "org.opencastproject.scheduler";
-  private static final String SNAPSHOT_OWNER = JOB_TYPE;
-  private static final String WORKFLOW_NAMESPACE = JOB_TYPE + ".workflow.configuration";
-  private static final String CA_NAMESPACE = JOB_TYPE + ".ca.configuration";
-  private static final String RECORDING_LAST_HEARD_CONFIG = "recording_last_heard";
-  private static final String RECORDING_STATE_CONFIG = "recording_state";
-  private static final String REVIEW_DATE_CONFIG = "review_date";
-  private static final String REVIEW_STATUS_CONFIG = "review_status";
-  private static final String SOURCE_CONFIG = "source";
-  private static final String PRESENTERS_CONFIG = "presenters";
-  private static final String AGENT_CONFIG = "agent";
-  private static final String START_DATE_CONFIG = "start";
-  private static final String END_DATE_CONFIG = "end";
-  private static final String OPTOUT_CONFIG = "optout";
-  private static final String VERSION = "version";
-  private static final String LAST_MODIFIED_ORIGIN = "last_modified_origin";
-  private static final String LAST_MODIFIED_DATE = "last_modified_date";
-  private static final String LAST_CONFLICT = "last_conflict";
-  private static final String CHECKSUM = "checksum";
+  static final String SCHEDULER_NAMESPACE = "org.opencastproject.scheduler";
+  static final String SNAPSHOT_OWNER = SCHEDULER_NAMESPACE;
+  static final String WORKFLOW_NAMESPACE = SCHEDULER_NAMESPACE + ".workflow.configuration";
+  static final String CA_NAMESPACE = SCHEDULER_NAMESPACE + ".ca.configuration";
+  static final String RECORDING_LAST_HEARD_CONFIG = "recording_last_heard";
+  static final String RECORDING_STATE_CONFIG = "recording_state";
+  static final String REVIEW_DATE_CONFIG = "review_date";
+  static final String REVIEW_STATUS_CONFIG = "review_status";
+  static final String SOURCE_CONFIG = "source";
+  static final String PRESENTERS_CONFIG = "presenters";
+  static final String AGENT_CONFIG = "agent";
+  static final String START_DATE_CONFIG = "start";
+  static final String END_DATE_CONFIG = "end";
+  static final String OPTOUT_CONFIG = "optout";
+  static final String VERSION = "version";
+  static final String LAST_MODIFIED_ORIGIN = "last_modified_origin";
+  static final String LAST_MODIFIED_DATE = "last_modified_date";
+  static final String LAST_CONFLICT = "last_conflict";
+  static final String CHECKSUM = "checksum";
 
   /** The security service */
   private SecurityService securityService;
@@ -161,7 +161,7 @@ public class SchedulerMigrationService {
     final Predicate predicate = withOrganization(query).and(withVersion(query)).and(withOwner(query))
         .and(withProperties(query));
     // select necessary properties when assembling query
-    return query.select(query.propertiesOf(JOB_TYPE, WORKFLOW_NAMESPACE, CA_NAMESPACE))
+    return query.select(query.propertiesOf(SCHEDULER_NAMESPACE, WORKFLOW_NAMESPACE, CA_NAMESPACE))
         .where(predicate).run().getRecords();
   }
 
@@ -178,7 +178,7 @@ public class SchedulerMigrationService {
   }
 
   private Predicate withProperties(AQueryBuilder query) {
-    return query.hasPropertiesOf(JOB_TYPE);
+    return query.hasPropertiesOf(SCHEDULER_NAMESPACE);
   }
 
   private Opt<ExtendedEventDto> getExtendedEventDto(String id, String orgId, EntityManager em) {
@@ -267,7 +267,7 @@ public class SchedulerMigrationService {
       try {
         // Remove obsolete asset manager properties
         final AQueryBuilder query = assetManager.createQuery();
-        final long deleted = query.delete(SNAPSHOT_OWNER, query.propertiesOf(JOB_TYPE, CA_NAMESPACE, WORKFLOW_NAMESPACE))
+        final long deleted = query.delete(SNAPSHOT_OWNER, query.propertiesOf(SCHEDULER_NAMESPACE, CA_NAMESPACE, WORKFLOW_NAMESPACE))
             .where(query.mediaPackageId(event.getMediaPackageId()).and(withOrganization(query))).run();
         logger.debug("Deleted {} migrated properties", deleted);
       } catch (Exception e) {
