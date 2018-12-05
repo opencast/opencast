@@ -47,6 +47,7 @@ import java.util.Date;
  * <li>language</li>
  * <li>reviewStatus</li>
  * <li>startDate</li>
+ * <li>endDate</li>
  * <li>status</li>
  * </ul>
  */
@@ -76,6 +77,9 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_STARTDATE_NAME = "startDate";
   private static final String FILTER_STARTDATE_LABEL = "FILTERS.EVENTS.START_DATE.LABEL";
 
+  public static final String FILTER_ENDDATE_NAME = "endDate";
+  private static final String FILTER_ENDDATE_LABEL = "FILTERS.EVENTS.END_DATE.LABEL";
+
   public static final String FILTER_STATUS_NAME = "status";
   private static final String FILTER_STATUS_LABEL = "FILTERS.EVENTS.STATUS.LABEL";
 
@@ -102,6 +106,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createLocationFilter(Option.<String> none()));
     this.availableFilters.add(createAgentFilter(Option.<String> none()));
     this.availableFilters.add(createStartDateFilter(Option.<Tuple<Date, Date>> none()));
+    this.availableFilters.add(createEndDateFilter(Option.<Tuple<Date, Date>> none()));
     this.availableFilters.add(createStatusFilter(Option.<String> none()));
     this.availableFilters.add(createCommentsFilter(Option.<String> none()));
     this.availableFilters.add(createPublisherFilter(Option.<String> none()));
@@ -319,6 +324,25 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Add a {@link ResourceListFilter} filter to the query with the given end date period
+   *
+   * @param endDate
+   *          the end date period as {@link Tuple} with two {@link Date}.
+   */
+  public void withEndDate(Tuple<Date, Date> endDate) {
+    this.addFilter(createEndDateFilter(Option.option(endDate)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the end date period used to filter if set
+   *
+   * @return an {@link Option} containing the end date period or none.
+   */
+  public Option<Tuple<Date, Date>> getEndDate() {
+    return this.getFilterValue(FILTER_ENDDATE_NAME);
+  }
+
+  /**
    * Add a {@link ResourceListFilter} filter to the query with the given comments
    *
    * @param comments
@@ -453,6 +477,18 @@ public class EventListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Create a new {@link ResourceListFilter} based on end date period
+   *
+   * @param period
+   *          the period to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for the given period
+   */
+  public static ResourceListFilter<Tuple<Date, Date>> createEndDateFilter(Option<Tuple<Date, Date>> period) {
+    return FiltersUtils.generateFilter(period, FILTER_ENDDATE_NAME, FILTER_ENDDATE_LABEL, SourceType.PERIOD,
+            Option.some(EventsListProvider.END_DATE));
+  }
+
+  /**
    * Create a new {@link ResourceListFilter} based on stats
    *
    * @param status
@@ -475,6 +511,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     return FiltersUtils.generateFilter(comments, FILTER_COMMENTS_NAME, FILTER_COMMENTS_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.COMMENTS));
   }
+
 
   /**
    * Create a new {@link ResourceListFilter} based on publishers

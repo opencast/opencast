@@ -2341,6 +2341,15 @@ public abstract class AbstractEventEndpoint {
           return RestUtil.R.badRequest(e.getMessage());
         }
       }
+      if (EventListQuery.FILTER_ENDDATE_NAME.equals(name)) {
+        try {
+          Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
+          query.withTechnicalEndFrom(fromAndToCreationRange.getA());
+          query.withTechnicalEndTo(fromAndToCreationRange.getB());
+        } catch (IllegalArgumentException e) {
+          return RestUtil.R.badRequest(e.getMessage());
+        }
+      }
     }
 
     if (optSort.isSome()) {

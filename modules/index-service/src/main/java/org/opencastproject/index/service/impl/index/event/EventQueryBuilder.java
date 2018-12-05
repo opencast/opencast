@@ -298,6 +298,11 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.TECHNICAL_START, query.getTechnicalStartTime(), true);
     }
 
+    // Technical end date period
+    if (query.getTechnicalEndFrom() != null && query.getTechnicalEndTo() != null) {
+      and(EventIndexSchema.TECHNICAL_END, query.getTechnicalEndFrom(), query.getTechnicalEndTo());
+    }
+
     // Technical end date
     if (query.getTechnicalEndTime() != null) {
       and(EventIndexSchema.TECHNICAL_END, query.getTechnicalEndTime(), true);

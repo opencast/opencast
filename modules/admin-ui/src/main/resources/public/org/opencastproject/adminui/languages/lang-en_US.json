@@ -1901,6 +1901,9 @@
        "CREATOR": {
          "LABEL": "Creator"
        },
+       "END_DATE": {
+        "LABEL": "End date"
+       },
        "PUBLISHER": {
          "LABEL": "Publisher"
        },

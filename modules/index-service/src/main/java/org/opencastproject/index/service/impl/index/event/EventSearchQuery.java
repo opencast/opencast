@@ -58,6 +58,8 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Date startTo = null;
   private Date technicalStartFrom = null;
   private Date technicalStartTo = null;
+  private Date technicalEndFrom = null;
+  private Date technicalEndTo = null;
   private String creator = null;
   private String publisher = null;
   private String license = null;
@@ -512,6 +514,44 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public Date getTechnicalStartTo() {
     return technicalStartTo;
+  }
+
+  /**
+  * The technical end date to start looking for events.
+  *
+  * @param endFrom
+  *          The technical end date to start looking for events
+  * @return the enhanced search query
+  */
+  public EventSearchQuery withTechnicalEndFrom(Date endFrom) {
+    this.technicalEndFrom = endFrom;
+    return this;
+  }
+
+  /**
+  * @return The technical date after which all events returned should have been ended
+  */
+  public Date getTechnicalEndFrom() {
+    return technicalEndFrom;
+  }
+
+  /**
+  * The technical end date to stop looking for events.
+  *
+  * @param endTo
+  *          The technical end date to stop looking for events
+  * @return the enhanced search query
+  */
+  public EventSearchQuery withTechnicalEndTo(Date endTo) {
+  this.technicalEndTo = endTo;
+    return this;
+  }
+
+  /**
+  * @return The technical date before which all events returned should have been ended
+  */
+  public Date getTechnicalEndTo() {
+    return technicalEndTo;
   }
 
   /**

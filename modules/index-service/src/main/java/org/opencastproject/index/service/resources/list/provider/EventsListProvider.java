@@ -46,6 +46,7 @@ public class EventsListProvider implements ResourceListProvider {
   public static final String SUBJECT = PROVIDER_PREFIX + ".SUBJECT";
   public static final String LOCATION = PROVIDER_PREFIX + ".LOCATION";
   public static final String START_DATE = PROVIDER_PREFIX + ".START_DATE";
+  public static final String END_DATE = PROVIDER_PREFIX + ".END_DATE";
   public static final String PROGRESS = PROVIDER_PREFIX + ".PROGRESS";
   public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
   public static final String REVIEW_STATUS = PROVIDER_PREFIX + ".REVIEW_STATUS";
