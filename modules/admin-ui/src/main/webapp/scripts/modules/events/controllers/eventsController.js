@@ -124,9 +124,9 @@ angular.module('adminNg.controllers')
     $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' });
 
     $scope.table.dateToFilterValue = function(dateString) {
-
-      var from = RelativeDatesService.relativeToAbsoluteDate(0, 'days', true);
-      var to = RelativeDatesService.relativeToAbsoluteDate(0, 'days', false);
+      var date = new Date(dateString),
+          from = new Date(date.setHours(0, 0, 0, 0)),
+          to = new Date(date.setHours(23, 59, 59, 999));
       return from.toISOString() + '/' + to.toISOString();
     };
 
