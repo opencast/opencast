@@ -811,8 +811,8 @@ public class EncoderEngine implements AutoCloseable {
         int fileindx = vclip.getSrc(); // get source file by index
         double inpt = vclip.getStart(); // get in points
         double duration = vclip.getDuration();
-        double vend = duration - vfade;
-        double aend = duration - afade;
+        double vend = Math.max(duration - vfade, 0);
+        double aend = Math.max(duration - afade, 0);
         if (hasVideo) {
           String vvclip;
           vvclip = "[" + fileindx + ":v]trim=" + f.format(inpt) + ":duration=" + f.format(duration)
@@ -843,8 +843,8 @@ public class EncoderEngine implements AutoCloseable {
       int fileindx = vclip.getSrc(); // get source file by index
       double inpt = vclip.getStart(); // get in points
       double duration = vclip.getDuration();
-      double vend = duration - vfade;
-      double aend = duration - afade;
+      double vend = Math.max(duration - vfade, 0);
+      double aend = Math.max(duration - afade, 0);
 
       if (hasVideo) {
         String vvclip;
