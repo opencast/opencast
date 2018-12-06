@@ -41,4 +41,5 @@ migrations. For that, the following steps might help.
 8. Rebuild the Elasticsearch indices using the REST endpoint listed in the docs:
    https://admin.opencast.example.com/docs.html?path=/admin-ng/index
 
-Note: If the solr index does not repopulate by itself please check if your nodes are still in maintenance mode and reactiveate them.
+Note: If the solr index does not repopulate by itself please check if your nodes are still in maintenance mode and
+reactiveate them.
