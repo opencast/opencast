@@ -23,9 +23,9 @@ package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.util.data.Function2;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public final class IncidentUtil {
@@ -35,7 +35,7 @@ public final class IncidentUtil {
   /** Concat a tree of incidents into a list. */
   public static List<Incident> concat(IncidentTree tree) {
     return mlist(tree.getDescendants()).foldl(
-            Mutables.list(tree.getIncidents()),
+            new LinkedList<>(tree.getIncidents()),
             new Function2<List<Incident>, IncidentTree, List<Incident>>() {
               @Override public List<Incident> apply(List<Incident> sum, IncidentTree tree) {
                 sum.addAll(concat(tree));

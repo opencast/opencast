@@ -25,7 +25,6 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 import static org.opencastproject.util.data.Option.option;
 
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentImpl;
 import org.opencastproject.job.api.IncidentTree;
@@ -39,7 +38,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.functions.Functions;
@@ -56,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -279,15 +278,14 @@ public abstract class AbstractIncidentService implements IncidentService {
    * "org.opencastproject.composer.1.title"]
    */
   public static List<String> genDbKeys(List<String> locale, String base) {
-    final List<String> keys = mlist(locale).foldl(Mutables.list(base),
-            new Function2<List<String>, String, List<String>>() {
-              @Override
-              public List<String> apply(List<String> sum, String s) {
-                sum.add(sum.get(sum.size() - 1) + "." + s);
-                return sum;
-              }
-            });
-    return mlist(keys).reverse().value();
+    List<String> result = new LinkedList<>();
+    StringBuilder key = new StringBuilder(base);
+    result.add(base);
+    for (String s: locale) {
+      key.append('.').append(s);
+      result.add(0, key.toString());
+    }
+    return result;
   }
 
   /** Convert a locale into a list of strings, [language, country, variant] */

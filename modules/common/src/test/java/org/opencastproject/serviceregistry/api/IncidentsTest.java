@@ -24,7 +24,6 @@ package org.opencastproject.serviceregistry.api;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentImpl;
@@ -33,48 +32,44 @@ import org.opencastproject.job.api.IncidentTreeImpl;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 public class IncidentsTest {
   @Test
   public void testFindFailure1() {
     final IncidentTree r = new IncidentTreeImpl(
-            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
-            Immutables.<IncidentTree>list(
-                    new IncidentTreeImpl(
-                            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
-                            Immutables.<IncidentTree>list(
-                                    new IncidentTreeImpl(
-                                            Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.FAILURE)),
-                                            Immutables.<IncidentTree>nil())))));
+            Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
+            Collections.singletonList(new IncidentTreeImpl(
+                    Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
+                    Collections.singletonList(new IncidentTreeImpl(
+                            Arrays.asList(mkIncident(Severity.WARNING), mkIncident(Severity.FAILURE)),
+                            Collections.emptyList())))));
     assertTrue(Incidents.findFailure(r));
   }
 
   @Test
   public void testFindFailure2() {
     final IncidentTree r = new IncidentTreeImpl(
-            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
-            Immutables.<IncidentTree>list(
-                    new IncidentTreeImpl(
-                            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
-                            Immutables.<IncidentTree>list(
-                                    new IncidentTreeImpl(
-                                            Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
-                                            Immutables.<IncidentTree>nil())))));
+            Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
+            Collections.singletonList(new IncidentTreeImpl(
+                    Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
+                    Collections.singletonList(new IncidentTreeImpl(
+                            Arrays.asList(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
+                            Collections.emptyList())))));
     assertFalse(Incidents.findFailure(r));
   }
 
   @Test
   public void testFindFailure3() {
     final IncidentTree r = new IncidentTreeImpl(
-            Immutables.list(mkIncident(Severity.FAILURE), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
-            Immutables.<IncidentTree>list(
-                    new IncidentTreeImpl(
-                            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
-                            Immutables.<IncidentTree>list(
-                                    new IncidentTreeImpl(
-                                            Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
-                                            Immutables.<IncidentTree>nil())))));
+            Arrays.asList(mkIncident(Severity.FAILURE), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
+            Collections.singletonList(new IncidentTreeImpl(
+                    Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
+                    Collections.singletonList(new IncidentTreeImpl(
+                            Arrays.asList(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
+                            Collections.emptyList())))));
     assertTrue(Incidents.findFailure(r));
   }
 

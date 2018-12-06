@@ -24,9 +24,7 @@ package org.opencastproject.util.persistencefn;
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
-import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.data.Collections;
 
 import com.entwinemedia.fn.Fn;
@@ -118,10 +116,9 @@ public final class PersistenceUtil {
     pooledDataSource.setPassword(pwd);
 
     // Set up the persistence properties
-    final Map<String, Object> props = Immutables.<String, Object>map(
-            persistenceProps,
-            tuple("javax.persistence.nonJtaDataSource", pooledDataSource),
-            tuple("eclipselink.target-database", vendor));
+    final Map<String, Object> props = new HashMap<>(persistenceProps);
+    props.put("javax.persistence.nonJtaDataSource", pooledDataSource);
+    props.put("eclipselink.target-database", vendor);
 
     final EntityManagerFactory emf = pp.createEntityManagerFactory(emName, props);
     if (emf == null) {

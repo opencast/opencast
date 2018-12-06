@@ -24,8 +24,7 @@ package org.opencastproject.job.api;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import org.opencastproject.fun.juc.Immutables;
-
+import java.util.Collections;
 import java.util.List;
 
 public final class IncidentTreeImpl implements IncidentTree {
@@ -34,11 +33,11 @@ public final class IncidentTreeImpl implements IncidentTree {
   private final List<IncidentTree> descendants;
 
   public IncidentTreeImpl(List<Incident> incidents, List<IncidentTree> descendants) {
-    this.incidents = Immutables.mk(incidents);
+    this.incidents = Collections.unmodifiableList(incidents);
     if (descendants != null) {
-      this.descendants = Immutables.mk(descendants);
+      this.descendants = Collections.unmodifiableList(descendants);
     } else {
-      this.descendants = Immutables.nil();
+      this.descendants = Collections.emptyList();
     }
   }
 

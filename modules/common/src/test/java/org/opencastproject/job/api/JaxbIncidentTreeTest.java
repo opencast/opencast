@@ -25,11 +25,12 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -37,10 +38,10 @@ public class JaxbIncidentTreeTest {
   /** This test ensures full mapping of all IncidentTree properties to its accompanying JAXB DTO. */
   @Test
   public void testEquivalence() throws Exception {
-    final List<Incident> incidents = Immutables.list(mkIncident(1), mkIncident(2));
-    final List<IncidentTree> subTrees = Immutables.<IncidentTree>list(new IncidentTreeImpl(
-            Immutables.list(mkIncident(3), mkIncident(4)),
-            Immutables.<IncidentTree>nil()));
+    final List<Incident> incidents = Arrays.asList(mkIncident(1), mkIncident(2));
+    final List<IncidentTree> subTrees = Collections.singletonList(new IncidentTreeImpl(
+            Arrays.asList(mkIncident(3), mkIncident(4)),
+            Collections.emptyList()));
     final JaxbIncidentTree dto = new JaxbIncidentTree(new IncidentTreeImpl(incidents, subTrees));
     final IncidentTree tree = dto.toIncidentTree();
     run(IncidentTree.class, new IncidentTree() {
@@ -61,7 +62,7 @@ public class JaxbIncidentTreeTest {
             id, id, "service-" + id, "host-" + id, new Date(id),
             Severity.FAILURE,
             "code-" + id,
-            Immutables.list(tuple("detail-" + id, "value-" + id)),
-            Immutables.map(tuple("key-" + id, "value-" + id)));
+            Collections.singletonList(tuple("detail-" + id, "value-" + id)),
+            Collections.singletonMap("key-" + id, "value-" + id));
   }
 }
