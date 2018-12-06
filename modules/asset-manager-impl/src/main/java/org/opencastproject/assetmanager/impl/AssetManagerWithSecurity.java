@@ -237,10 +237,17 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   }
 
   private void storeAclAsProperties(Snapshot snapshot, AccessControlList acl) {
+    final String mediaPackageId =  snapshot.getMediaPackage().getIdentifier().toString();
+    // Drop old ACL rules
+    final AQueryBuilder queryBuilder = createQuery();
+    queryBuilder.delete(snapshot.getOwner(), queryBuilder.propertiesOf(SECURITY_NAMESPACE))
+            .where(queryBuilder.mediaPackageId(mediaPackageId))
+            .run();
+    // Set new ACL rules
     for (final AccessControlEntry ace : acl.getEntries()) {
       super.setProperty(Property.mk(
           PropertyId.mk(
-              snapshot.getMediaPackage().getIdentifier().toString(),
+              mediaPackageId,
               SECURITY_NAMESPACE,
               mkPropertyName(ace)),
           Value.mk(ace.isAllow())));
