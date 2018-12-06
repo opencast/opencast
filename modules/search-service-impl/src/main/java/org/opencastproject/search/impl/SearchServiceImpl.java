@@ -43,7 +43,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -359,12 +358,6 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
    */
   public void addSynchronously(MediaPackage mediaPackage) throws SearchException, MediaPackageException,
           IllegalArgumentException, UnauthorizedException {
-    User currentUser = securityService.getUser();
-    String orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!currentUser.hasRole(orgAdminRole) && !currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            && !authorizationService.hasPermission(mediaPackage, Permissions.Action.WRITE.toString())) {
-      throw new UnauthorizedException(currentUser, Permissions.Action.WRITE.toString());
-    }
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Unable to add a null mediapackage");
     }
