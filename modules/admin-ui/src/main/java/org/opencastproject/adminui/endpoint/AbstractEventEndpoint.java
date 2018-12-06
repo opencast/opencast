@@ -865,6 +865,9 @@ public abstract class AbstractEventEndpoint {
         return ok();
       }
     } catch (AclServiceException | MediaPackageException e) {
+      if (e.getCause() instanceof UnauthorizedException) {
+        return forbidden();
+      }
       logger.error("Error applying acl '{}' to event '{}'", accessControlList, eventId, e);
       return serverError();
     } catch (SchedulerException e) {
