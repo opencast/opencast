@@ -90,15 +90,18 @@ public interface ComposerService {
    *          The encoding profile to use
    * @param background
    *          The background color
+   * @param sourceAudioName
+   *          Use audio from only lower or upper track, use both when available if omitted
    * @return The receipt for this composite job
    * @throws EncoderException
    *           if encoding fails
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack, LaidOutElement<Track> lowerTrack,
-          Option<LaidOutElement<Attachment>> watermark, String profileId, String background) throws EncoderException,
-          MediaPackageException;
+
+  Job composite(Dimension outputDimension, Option<LaidOutElement<Track>> option,
+        LaidOutElement<Track> lowerLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
+        String identifier, String outputBackground, String sourceAudioName) throws EncoderException, MediaPackageException;
 
   /**
    * Concat multiple tracks to a single track.
