@@ -42,6 +42,11 @@ public class ApiMediaTypeTest {
     assertEquals(ApiVersion.VERSION_1_1_0, type.getVersion());
     assertEquals(ApiFormat.JSON, type.getFormat());
     assertEquals("application/v1.1.0+json", type.toExternalForm());
+
+    type = ApiMediaType.parse(null);
+    assertEquals(ApiVersion.VERSION_1_1_0, type.getVersion());
+    assertEquals(ApiFormat.JSON, type.getFormat());
+    assertEquals("application/v1.1.0+json", type.toExternalForm());
   }
 
   @Test
