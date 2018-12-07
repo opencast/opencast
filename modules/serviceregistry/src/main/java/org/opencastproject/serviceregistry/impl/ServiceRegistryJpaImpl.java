@@ -2477,6 +2477,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           if (currentService.equals(relatedService))
             continue;
 
+          // De-escalate the state of related services as the issue is most likely with the job not the service
           // Reset the WARNING job to NORMAL
           if (relatedService.getServiceState() == WARNING) {
             logger.info("State reset to NORMAL for related service {} on host {}", relatedService.getServiceType(),
@@ -2527,17 +2528,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 currentService.getHost());
         currentService.setServiceState(NORMAL);
         updateServiceState(em, currentService);
-      }
-
-      // Services in WARNING state triggered by current job
-      List<ServiceRegistrationJpaImpl> relatedWarningServices = getRelatedWarningServices(job);
-
-      // Sets all related services to error state
-      for (ServiceRegistrationJpaImpl relatedService : relatedWarningServices) {
-        logger.info("State set to ERROR for related service {} on host {}", currentService.getServiceType(),
-                currentService.getHost());
-        relatedService.setServiceState(ERROR, job.toJob().getSignature());
-        updateServiceState(em, relatedService);
       }
 
     }
