@@ -129,9 +129,10 @@ public class CaptureAgentsEndpoint {
           @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "false", description = "Define if the inputs should or not returned with the capture agent.", isRequired = false, name = "inputs", type = RestParameter.Type.BOOLEAN),
+          @RestParameter(defaultValue = "false", description = "Define if the details should or not returned with the capture agent.", isRequired = false, name = "details", type = RestParameter.Type.BOOLEAN),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING) }, reponses = { @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getAgents(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
-          @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
+          @QueryParam("inputs") boolean inputs, @QueryParam("details") boolean details, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
     Option<String> filterName = Option.none();
     Option<String> filterStatus = Option.none();
     Option<Long> filterLastUpdated = Option.none();
@@ -208,7 +209,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JValue> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, false));
+      agentsJSON.add(generateJsonAgent(agent, /* Option.option(room), blacklist, */ inputs, details));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
