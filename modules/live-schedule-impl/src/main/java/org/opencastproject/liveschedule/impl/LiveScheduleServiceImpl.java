@@ -229,9 +229,24 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   public boolean createOrUpdateLiveEvent(String mpId, DublinCoreCatalog episodeDC) throws LiveScheduleException {
     MediaPackage mp = getMediaPackageFromSearch(mpId);
     if (mp == null) {
+      // Check if capture not over. We have to check because we may get a notification for past events if
+      // the admin ui index is rebuilt
+      DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(episodeDC.getFirst(DublinCore.PROPERTY_TEMPORAL));
+      if (period.getEnd().getTime() <= System.currentTimeMillis()) {
+        logger.info("Live media package {} not created in search index because event is already past (end date: {})",
+                mpId, period.getEnd());
+        return false;
+      }
       return createLiveEvent(mpId, episodeDC);
-    } else
+    } else {
+      // Check if the media package found in the search index is live. We have to check because we may get a
+      // notification for past events if the admin ui index is rebuilt
+      if (!isLive(mp)) {
+        logger.info("Media package {} is in search index but not live so not updating it.", mpId);
+        return false;
+      }
       return updateLiveEvent(mp, episodeDC);
+    }
   }
 
   @Override
@@ -240,14 +255,23 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     if (mp == null) {
       logger.debug("Live media package {} not found in search index", mpId);
       return false;
-    } else
+    } else {
+      if (!isLive(mp)) {
+        logger.info("Media package {} is not live. Not retracting.", mpId);
+        return false;
+      }
       return retractLiveEvent(mp);
+    }
   }
 
   @Override
   public boolean updateLiveEventAcl(String mpId, AccessControlList acl) throws LiveScheduleException {
     MediaPackage previousMp = getMediaPackageFromSearch(mpId);
     if (previousMp != null) {
+      if (!isLive(previousMp)) {
+        logger.info("Media package {} is not live. Not updating acl.", mpId);
+        return false;
+      }
       // Replace and distribute acl, this creates new mp
       MediaPackage newMp = replaceAndDistributeAcl(previousMp, acl);
       // Publish mp to engage search index
@@ -334,10 +358,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   boolean retractLiveEvent(MediaPackage mp) throws LiveScheduleException {
-    if (!isLive(mp)) {
-      logger.debug("Media package {} is not live. Not retracting.", mp.getIdentifier().compact());
-      return false;
-    }
     retract(mp);
 
     // Get latest mp from the asset manager if there to remove the publication
