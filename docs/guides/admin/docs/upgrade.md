@@ -1,100 +1,62 @@
-Upgrading Opencast from 4.x to 5
+Upgrading Opencast from 5.x to 6
 ================================
 
-> Note about 5.2 release:
-> Opencast 5.2 introduces several security fixes. One of them requires a configuration update.  The [configuration
-> changes](#configuration-changes-since-opencast-52) section has been updated to track the new changes.
-
-This guide describes how to upgrade Opencast 4.x to 5.0. In case you need information about how to upgrade older
+This guide describes how to upgrade Opencast 5.x to 6.0. In case you need information about how to upgrade older
 versions of Opencast, please refer to the [old release notes](https://docs.opencast.org).
 
 How to Upgrade
 --------------
 
 1. Stop your current Opencast instance
-2. Replace Opencast 4.x with 5.0
+2. Replace Opencast 5.x with 6.x
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-5. [Upgrade the ActiveMQ configuration](#activemq-migration)
+5. [Rebuild Elasticsearch index](#rebuild-elasticsearch-index)
 6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 
 
 Database Migration
 ------------------
 
-As part of removing mentions of the old name Matterhorn, all database table names have been changed and are now prefixed
-with `oc_`.  This requires an database schema update. As with all database migrations, we recommend to make a database
-backup before attempting the upgrade.
+The new asset manager extensions require a database migration. The migration should be very fast and uncritical but as
+with all database migrations, we recommend to make a database backup before attempting the upgrade regardless.
 
-You can find the database upgrade script in `docs/upgrade/4_to_5/`. There are two scripts which are essentially doing
-the same thing with the MariaDB one running a few more checks on the database for safety which cannot be run like this
-on MySQL.  More information about the differences can be found in the readme next to the scripts.
-
-ActiveMQ Migration
-------------------
-
-Opencast 5.0 needs a new ActiveMQ message broker configuration. Please follow the steps of the [message broker
-configuration guide](../configuration/message-broker/) to deploy a new configuration. No data migration is required for
-this since the message broker contains only temporary data.
+You can find the database upgrade script in `docs/upgrade/5_to_6/`.
 
 
-Configuration Changes
----------------------
+Rebuild ElasticSearch Index
+---------------------------
 
-HTTP Basic authentication is enabled by default (see `etc/security/mh_default_org.xml`). Make sure you've enabled
-HTTPS before using it.
+The update requires an ElasticSearch index rebuild. For that, stop Opencast, delete the index directory at `data/index`,
+start Opencast and use one of the following methods to recreate the index:
 
-Paella Player has been included in Opencast 5.0. So you can choose between the Theodul and Paella player.
-This can be done by setting the `prop.player` property in the tennant's configuration file (for example
-`etc/org.opencastproject.organization-mh_default_org.cfg`).  Additionally, the path to the Paella player configuration
-folder is added in `etc/custom.properties` as `org.opencastproject.engage.paella.config.folder` with the default value
-of `${karaf.etc}/paella`. There you will find the default configuration. The Paella URL pattern was also added to the
-default security configuration `etc/security/mh_default_org.xml`.
+- Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
+- Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+  symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
+  `/recreateIndex`.
 
-Workflow definition IDs have been changed and are no longer prefixed with `ng-` anymore. If you are using the default
-workflows or include them as part of your custom workflow, please adapt the changes. You can find the workflow
-definitions in `etc/workflows/*.xml`. You may also want to adapt the workflow ID changes in the following configuration
-files:
+In both cases, the resulting page is empty but should return a HTTP status 200.
 
-Configuration file name | Property name
-------------------------|-------------------
-custom.properties                                 | org.opencastproject.workflow.default.definition
-org.opencastproject.ingest.scanner.InboxScannerService-inbox.cfg              | workflow.definition
-org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService.cfg | workflow
+If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
 
-The workflow control functionality includes some new REST endpoints.  Therefore the new URL patterns has been added to
-the tenant's security configuration (e.g. `etc/security/mh_default_org.xml`.)
+- Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
+- Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
+  symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
+  `/recreateIndex`.
 
-As Piwik has been renamed to Matomo, Opencast changed the name for the plugin and configuration keys too.
-So if you already configured a Piwik server please adapt the following keys in
-`etc/org.opencastproject.organization-mh_default_org.cfg`:
+Security Configuration Changes
+------------------------------
 
-* `prop.player.piwik.server` → `prop.player.matomo.server`
-* `prop.player.piwik.site_id` → `prop.player.matomo.site_id`
-* `prop.player.piwik.heartbeat` → `prop.player.matomo.heartbeat`
-* `prop.player.piwik.track_events` → `prop.player.matomo.track_events`
-
-The publication channel's listprovider configurations `etc/listproviders/publication.channel.labels.properties` and
-`etc/listproviders/publication.channel.icons.properties` have been merged into
-`etc/listproviders/publication.channels.properties`.
-
-Several service job load values were updated. You can find these configuration files by running the command
-`grep job.load etc/org.opencastproject.*` on the command line or by searching for `job.load` string in Opencast's
-service configuration files.
-
-### Configuration changes since Opencast 5.2
-
-The tenant security configuration (e.g. `etc/security/mh_default_org.xml`) has been changed in between Opencast 5.1 and
-5.2 ([[MH-13082](https://opencast.jira.com/browse/MH-13082)][[#449](https://github.com/opencast/opencast/pull/449)]).
-The LTI OAuth configuration part was moved to separate configuration files.
-
-> **NOTE:** All Opencast nodes must adapt the configuration changes, regardless of whether the LTI is used or not
+The tenant security configuration (e.g. `etc/security/mh_default_org.xml`) has been changed and
+([[MH-13082](https://opencast.jira.com/browse/MH-13082)][[#449](https://github.com/opencast/opencast/pull/449)]).  The
+LTI OAuth configuration part was moved to separate configuration files, but all Opencast nodes must adapt the
+configuration changes, regardless of whether the LTI is used or not.
 
 The configuration file `etc/org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler.cfg` introduces the LTI
-authentication configurations.  It is now possible to define multiple trusted OAuth consumer keys.
-Some other security related configurations are also added. Please consult the [LTI configuration
-guide](../modules/ltimodule/#configure-lti-optional) for the complete documentation.
+authentication configurations.  It is now possible to define multiple trusted OAuth consumer keys.  Some other security
+related configurations are also added. Please consult the [LTI configuration guide
+](../modules/ltimodule/#configure-lti-optional) for the complete documentation.
 
 In the configuration file `etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` one or more OAuth
-consumer keys and their secrets can be defined.  Please consult the [LTI configuration
-guide](../modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
+consumer keys and their secrets can be defined.  Please consult the [LTI configuration guide
+](../modules/ltimodule/#configure-oauth-authentication) for the complete documentation.
