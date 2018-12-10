@@ -391,7 +391,7 @@ public class ServiceRegistrationTest {
     updatedService3 = getUpdatedService(regType1Remotehost2);
     Assert.assertEquals(ServiceState.NORMAL, updatedService1.getServiceState());
     Assert.assertEquals(ServiceState.NORMAL, updatedService2.getServiceState());
-    Assert.assertEquals(ServiceState.ERROR, updatedService3.getServiceState());
+    Assert.assertEquals(ServiceState.WARNING, updatedService3.getServiceState());
   }
 
   /**

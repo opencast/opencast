@@ -750,6 +750,31 @@ public class LiveScheduleServiceImplTest {
   }
 
   @Test
+  public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
+    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/search-result-empty.xml").toURI();
+    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
+    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    replayServices();
+
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
+    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
+  }
+
+  @Test
+  public void testCreateOuUpdateLiveEventAlreadyPublished() throws Exception {
+    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
+    DublinCoreCatalog episodeDC = DublinCores.read(catalogURI.toURL().openStream());
+
+    URI searchResultURI = LiveScheduleServiceImplTest.class.getResource("/no-live-search-result.xml").toURI();
+    SearchResult searchResult = SearchResultImpl.valueOf(searchResultURI.toURL().openStream());
+    EasyMock.expect(searchService.getByQuery((SearchQuery) EasyMock.anyObject())).andReturn(searchResult);
+    replayServices();
+
+    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
+  }
+
+  @Test
   public void testUpdateLiveEvent() throws Exception {
     URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-with-live.xml").toURI();
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()

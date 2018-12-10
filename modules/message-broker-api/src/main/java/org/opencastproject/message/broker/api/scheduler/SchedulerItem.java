@@ -28,6 +28,8 @@ import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -45,6 +47,8 @@ import java.util.Set;
 public class SchedulerItem implements MessageItem, Serializable {
   private static final long serialVersionUID = 6061069989788904237L;
 
+  private static final Gson gson = new Gson();
+
   public static final String SCHEDULER_QUEUE_PREFIX = "SCHEDULER.";
 
   public static final String SCHEDULER_QUEUE = SCHEDULER_QUEUE_PREFIX + "QUEUE";
@@ -55,9 +59,9 @@ public class SchedulerItem implements MessageItem, Serializable {
   private final String acl;
   private final String agentId;
   private final long end;
-  private final Boolean optOut;
-  private final Set<String> presenters;
-  private final Boolean blacklisted;
+  private final String optOut;
+  private final String presenters;
+  private final String blacklisted;
   private final String reviewStatus;
   private final long reviewDate;
   private final String recordingState;
@@ -336,7 +340,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.agentId = null;
     this.blacklisted = null;
     this.end = -1;
-    this.optOut = optOut;
+    this.optOut = gson.toJson(optOut);
     this.presenters = null;
     this.reviewStatus = null;
     this.reviewDate = -1;
@@ -360,7 +364,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = blacklisted;
+    this.blacklisted = gson.toJson(blacklisted);
     this.end = -1;
     this.optOut = null;
     this.presenters = null;
@@ -473,7 +477,7 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.end = -1;
     this.lastHeardFrom = null;
     this.optOut = null;
-    this.presenters = presenters;
+    this.presenters = gson.toJson(presenters);
     this.properties = null;
     this.recordingState = null;
     this.reviewDate = -1;
@@ -519,7 +523,7 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Boolean getBlacklisted() {
-    return blacklisted;
+    return gson.fromJson(blacklisted, Boolean.class);
   }
 
   public Date getEnd() {
@@ -531,11 +535,12 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Boolean getOptOut() {
-    return optOut;
+    return gson.fromJson(optOut, Boolean.class);
   }
 
+  @SuppressWarnings("unchecked")
   public Set<String> getPresenters() {
-    return presenters;
+    return gson.fromJson(presenters, Set.class);
   }
 
   public ReviewStatus getReviewStatus() {

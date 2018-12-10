@@ -55,7 +55,6 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.Opt;
@@ -246,19 +245,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       return dc;
     } catch (Exception e) {
-      throw rethrow(e);
-    }
-  }
-
-  private static Error rethrow(Exception e) throws SeriesException, UnauthorizedException {
-    if (e instanceof FunctionException) {
-      final Throwable cause = e.getCause();
-      if (cause instanceof UnauthorizedException) {
-        throw ((UnauthorizedException) cause);
-      } else {
-        throw new SeriesException(e);
-      }
-    } else {
       throw new SeriesException(e);
     }
   }
