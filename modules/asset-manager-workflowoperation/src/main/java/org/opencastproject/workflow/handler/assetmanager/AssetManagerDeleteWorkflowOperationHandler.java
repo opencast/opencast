@@ -30,9 +30,11 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
+import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +51,9 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
 
   /** The archive */
   private AssetManager assetManager;
+
+  /** Configuration if last snapshot should not be deleted
+  public static final String OPT_LAST_SNAPSHOT = "keep-last-snapshot";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -73,9 +78,22 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     final String mpId = mediaPackage.getIdentifier().toString();
 
+    WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
+    boolean keepLastSnapshot = BooleanUtils.toBoolean(currentOperation.getConfiguration(OPT_LAST_SNAPSHOT));
+
     try {
       final AQueryBuilder q = assetManager.createQuery();
-      final long deleted = q.delete(DEFAULT_OWNER, q.snapshot()).where(q.mediaPackageId(mpId)).run();
+      final long deleted;
+
+      if (keepLastSnapshot) {
+        deleted = q.delete(DEFAULT_OWNER, q.snapshot())
+                .where(q.mediaPackageId(mpId).and(q.version().isLatest().not())).run();
+        logger.info("Deleting all but latest Snapshot %s", mpId);
+      } else {
+        deleted = q.delete(DEFAULT_OWNER, q.snapshot())
+                .where(q.mediaPackageId(mpId)).run();
+      }
+
       if (deleted == 0) {
         logger.info(format("The asset manager does not contain episode %s", mpId));
       } else {
