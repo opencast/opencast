@@ -232,7 +232,7 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       // Check if capture not over. We have to check because we may get a notification for past events if
       // the admin ui index is rebuilt
       DCMIPeriod period = EncodingSchemeUtils.decodeMandatoryPeriod(episodeDC.getFirst(DublinCore.PROPERTY_TEMPORAL));
-      if (period.getEnd().getTime() < System.currentTimeMillis()) {
+      if (period.getEnd().getTime() <= System.currentTimeMillis()) {
         logger.info("Live media package {} not created in search index because event is already past (end date: {})",
                 mpId, period.getEnd());
         return false;
