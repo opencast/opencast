@@ -12,7 +12,7 @@ How to Upgrade
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
 5. [Rebuild Elasticsearch index](#rebuild-elasticsearch-index)
-6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
+6. Review the [configuration](#configuration-changes) and [security configuration changes](#security-configuration-changes) and adjust your configuration accordingly
 
 
 Database Migration
@@ -43,6 +43,12 @@ If you are going to use the External API, then the corresponding ElasticSearch i
 - Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
   symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
   `/recreateIndex`.
+
+Configuration Changes
+---------------------
+
+The Paella Player configuration has been updated for version 6.0.x.
+
 
 Security Configuration Changes
 ------------------------------
