@@ -1,4 +1,4 @@
 {
-  "RESULTS": "Results {{{range.begin}}}-{{{range.end}}} of {{{total}}}",
-  "CREATOR": "by {{{creator}}}"
+  "RESULTS": "תוצאות {{{range.begin}}}-{{{range.end}}} מתוך {{{total}}}",
+  "CREATOR": "על ידי {{{creator}}}"
 }
