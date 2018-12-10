@@ -82,28 +82,27 @@ public interface ComposerService {
 
   /**
    * Compose two videos into one with an optional watermark.
-   *
-   * @param compositeTrackSize
-   *          The composite track dimension
-   * @param upperTrack
-   *          an optional upper track of the composition
-   * @param lowerTrack
-   *          lower track of the composition
-   * @param watermark
-   *          The optional watermark attachment
-   * @param profileId
-   *          The encoding profile to use
-   * @param background
-   *          The background color
+   * 
+   * @param outputDimension
+   *       The composite track dimension
+   * @param option
+   *        upper track element from mediapackage (optional)
+   * @param lowerLaidOutElement  
+   *        lower track element from mediapackage
+   * @param watermarkOption
+   *        watermark element (optional)
+   * @param identifier
+   *        Encoding profile name
+   * @param outputBackground
+   *        The background color
    * @param sourceAudioName
-   *          Use audio from only lower or upper track or both, use both when available if omitted
+   *        Use audio from only lower or upper track or both, use both when available if omitted
    * @return The receipt for this composite job
    * @throws EncoderException
-   *           if encoding fails
+   *    if encoding fails
    * @throws MediaPackageException
-   *           if the mediapackage is invalid
+   *     if the mediapackage is invalid
    */
-
   Job composite(Dimension outputDimension, Option<LaidOutElement<Track>> option,
         LaidOutElement<Track> lowerLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
         String identifier, String outputBackground, String sourceAudioName) throws EncoderException, MediaPackageException;
