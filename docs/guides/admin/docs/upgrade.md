@@ -12,7 +12,8 @@ How to Upgrade
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
 5. [Rebuild Elasticsearch index](#rebuild-elasticsearch-index)
-6. Review the [configuration](#configuration-changes) and [security configuration changes](#security-configuration-changes) and adjust your configuration accordingly
+6. Review the [configuration](#configuration-changes) and [security configuration
+   changes](#security-configuration-changes) and adjust your configuration accordingly
 
 
 Database Migration
