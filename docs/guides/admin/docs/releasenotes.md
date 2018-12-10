@@ -61,11 +61,11 @@ A non-comprehensive list of improvements:
 - Ability to send HTML emails
 - Ability for blacklisting languages from the admin UI
 - Update LTI Series Tool
-- Fill creator metadata field with actual user when new event
-- Video editor
+- Pre-fill creator metadata field with actual user when creating a new event
+- Video editor improvements
 - Intuitive Merging of Video Segments
 - Add new modal to edit multiple scheduled events at once
-- As an unprivileged user, I only want to see series and events that I have write access to.
+- Add ability to hide read-only series and events for unprivileged users
 - Lossless Concat Operation
 - Update Paella Player to 6.0.x
 
