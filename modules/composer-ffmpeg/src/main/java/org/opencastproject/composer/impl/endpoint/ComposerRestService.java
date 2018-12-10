@@ -543,7 +543,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
           @RestParameter(description = "The watermark source attachment containing watermark image", isRequired = false, name = "watermarkTrack", type = Type.TEXT),
           @RestParameter(description = "The watermark layout containing the JSON definition of the layout", isRequired = false, name = "watermarkLayout", type = Type.TEXT),
           @RestParameter(description = "The background color", isRequired = false, name = "background", type = Type.TEXT, defaultValue = "black"),
-          @RestParameter(description = "The name of the audio source (lower or upper)", isRequired = false, name = "audioSourceName", type = Type.TEXT),
+          @RestParameter(description = "The name of the audio source (lower or upper or both)", isRequired = false, name = "audioSourceName", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING) }, reponses = {
           @RestResponse(description = "Results in an xml document containing the compound video track", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if the source elements aren't from the right type", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")

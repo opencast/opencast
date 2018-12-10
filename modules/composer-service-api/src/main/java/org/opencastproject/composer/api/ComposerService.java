@@ -43,6 +43,11 @@ public interface ComposerService {
   String AUDIO_ONLY = "a";
   String VIDEO_ONLY = "v";
 
+  /** sourceAudioName options for composite - use one or both, if null is passed, both will be used */
+  String UPPER = "upper";
+  String LOWER = "lower";
+  String BOTH = "both";
+
   /**
    * Encode one track, using that track's audio and video streams.
    *
@@ -91,7 +96,7 @@ public interface ComposerService {
    * @param background
    *          The background color
    * @param sourceAudioName
-   *          Use audio from only lower or upper track, use both when available if omitted
+   *          Use audio from only lower or upper track or both, use both when available if omitted
    * @return The receipt for this composite job
    * @throws EncoderException
    *           if encoding fails

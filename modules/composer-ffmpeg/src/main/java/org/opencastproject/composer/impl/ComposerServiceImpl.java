@@ -1670,12 +1670,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     if (upperLaidOutElement.isSome()) {
       // handle audio
-      // if both videos contain audio mix it into a single audio stream
       boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
       boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
       if (audioSourceName != null) {
-           lowerAudio  = lowerAudio  && "lower".equalsIgnoreCase(audioSourceName);
-           upperAudio  = upperAudio  && "upper".equalsIgnoreCase(audioSourceName);
+           if (! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
+             lowerAudio  = lowerAudio  && ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
+             upperAudio  = upperAudio  && ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
+           }
       }
       if (lowerAudio && upperAudio) {
         cmd.append(";[0:a][1:a]amix=inputs=2[aout] -map [out] -map [aout]");

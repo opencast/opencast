@@ -78,6 +78,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 
@@ -116,9 +117,13 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
 
+  /** The legal options for SOURCE_AUDIO_NAME */
+  private static final Pattern sourceAudioOption = Pattern.compile(
+          ComposerService.LOWER + "|" + ComposerService.UPPER + "|" + ComposerService.BOTH, Pattern.CASE_INSENSITIVE);
+
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_AUDIO_NAME, "Only \"upper\" or \"lower\" track to be used as source audio");
+    CONFIG_OPTIONS.put(SOURCE_AUDIO_NAME, "Only \"upper\" or \"lower\" or \"both\" track to be used as source audio");
     CONFIG_OPTIONS.put(SOURCE_TAGS_UPPER, "The \"tag\" of the upper track to use as a source input");
     CONFIG_OPTIONS.put(SOURCE_FLAVOR_UPPER, "The \"flavor\" of the upper track to use as a source input");
     CONFIG_OPTIONS.put(SOURCE_TAGS_LOWER, "The \"tag\" of the lower track to use as a source input");
@@ -393,9 +398,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         watermarkLayout = singleLayouts.getB();
       }
 
-      // #DCE OPC-226 preview video echo
       // Check that source audio is upper, lower or use a combination of both
-      if (sourceAudioName != null && !("upper".equalsIgnoreCase(sourceAudioName) || "lower".equalsIgnoreCase(sourceAudioName)))
+      if (sourceAudioName != null && !sourceAudioOption.matcher(sourceAudioName).matches())
         throw new WorkflowOperationException("sourceAudioName if used, must be either upper or lower!");
 
       // Find the encoding profile
