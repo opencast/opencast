@@ -62,6 +62,7 @@ import com.google.common.cache.CacheBuilder;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
+import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
@@ -100,6 +101,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -1030,31 +1032,38 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Produces(MediaType.TEXT_HTML)
-  @Path("ingest")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files", restParameters = {
-          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
-          @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, reponses = {
-          @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response ingest(MultivaluedMap<String, String> formData) {
-    logger.trace("ingest media package");
-    return ingest(formData, null);
-  }
-
-  @POST
-  @Produces(MediaType.TEXT_HTML)
   @Path("ingest/{wdID}")
-  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The ID of the given media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, reponses = {
-          @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
-  public Response ingest(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
+  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files, and starting a specified workflow",
+    pathParameters = {
+      @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
+    restParameters = {
+      @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
+    reponses = {
+      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
+    returnDescription = "")
+  public Response ingest(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("ingest media package with workflow definition id: {}", wdID);
     if (StringUtils.isBlank(wdID)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
+    return ingest(wdID, request);
+  }
 
-    return ingest(formData, wdID);
+  @POST
+  @Produces(MediaType.TEXT_HTML)
+  @Path("ingest")
+  @RestQuery(name = "ingest", description = "Ingest the completed media package into the system, retrieving all URL-referenced files",
+    restParameters = {
+      @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
+      @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
+      @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
+    reponses = {
+      @RestResponse(description = "Returns the media package", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
+    returnDescription = "")
+  public Response ingest(@Context HttpServletRequest request) {
+    return ingest(null, request);
   }
 
   private Map<String, String> getWorkflowConfig(MultivaluedMap<String, String> formData) {
@@ -1067,11 +1076,27 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     return wfConfig;
   }
 
-  private Response ingest(MultivaluedMap<String, String> formData, String wdID) {
-    /**
-     * Note: We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters. This is required to
-     * enable things like holding for trim or distributing to YouTube.
-     */
+  private Response ingest(final String wdID, final HttpServletRequest request) {
+    /* Note: We use a MultivaluedMap here to ensure that we can get any arbitrary form parameters. This is required to
+     * enable things like holding for trim or distributing to YouTube. */
+    final MultivaluedMap<String, String> formData = new MultivaluedHashMap<>();
+    if (ServletFileUpload.isMultipartContent(request)) {
+      // parse form fields
+      try {
+        for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+          FileItemStream item = iter.next();
+          if (item.isFormField()) {
+            final String value = Streams.asString(item.openStream(), "UTF-8");
+            formData.putSingle(item.getFieldName(), value);
+          }
+        }
+      } catch (FileUploadException | IOException e) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+    } else {
+      request.getParameterMap().forEach((key, value) -> formData.put(key, Arrays.asList(value)));
+    }
+
     final Map<String, String> wfConfig = getWorkflowConfig(formData);
     if (StringUtils.isNotBlank(wdID))
       wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);

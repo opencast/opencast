@@ -44,19 +44,19 @@ analysis.
 
 For example, if you want OCR for German content, you want to run something like this:
 
-    tesseract in.tif out.txt -l deu -psm 3
+    tesseract in.tif out.txt -l deu --psm 3
 
 * The arguments `in.tif` and `out.txt` are automatically set by Opencast.
 * The argument `-l` specifies the language files used by Tesseract. `deu` specifies the German language. Multiple
   languages may be specified, separated by plus characters. Please make sure that you have installed the language packs
   you want to use on every worker (E.g. `yum install tesseract-langpack-deu`).
-* Finally `-psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
+* Finally `--psm 3` specifies the layout analysis for Tesseract. The value `3` means *Fully automatic page segmentation,
   but no orientation and script detection* which is actually the default. Hence in this case, the argument could simply
   be omitted. If you know more about your input videos, you might want to use different options here (not likely).
 
 In Opencast, you can modify this options in the `custom.properties` file by setting the following option:
 
-    org.opencastproject.textanalyzer.tesseract.options=-l deu -psm 3
+    org.opencastproject.textanalyzer.tesseract.options=-l deu --psm 3
 
 It is highly recommended to configure Tesseract to use your local language. It will improve the recognition a lot and
 only this will enable the recognition of special characters specific to your local language.

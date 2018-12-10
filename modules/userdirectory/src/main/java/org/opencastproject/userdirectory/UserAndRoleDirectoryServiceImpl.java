@@ -178,7 +178,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
    */
   protected synchronized void removeUserProvider(UserProvider userProvider) {
     logger.debug("Removing {} from the list of user providers", userProvider);
-    roleProviders.remove(userProvider);
+    userProviders.remove(userProvider);
   }
 
   /**
