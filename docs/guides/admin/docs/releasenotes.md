@@ -4,6 +4,10 @@ Opencast 6: Release Notes
 New Features
 ------------
 
+- **Asset Manager Storage Layers** - The Asset Manager now supports multiple storage layers natively.  This allows
+  users to move data from local storage to remote storage within Opencast.  These moves can be triggered manually, or
+  via a built-in timer.  Currently we support local file storage, and AWS S3 storage.
+
 - **Video Editor - Thumbnails** - When displaying lists of videos, thumbnails are usually used to make such lists more
   appealing. The video editor allows the user to choose between the default thumbnail (automatically created), a
   snapshot thumbnail (extract at current position from video stream) or an uploaded thumbnail.  This allows the user to
@@ -13,13 +17,8 @@ New Features
   choose which tracks should be processed. In case of a dual track lecture recording, the presenter track could be
   exluded from publication in case the recorded person would want this.
 
-- **Cheatsheet** - A per page keyboard shortcut list is available so that users can at any time and page see what
-  keyboard shortcuts are currenlty available.
-
-- **Capture Agent Access Management** - The Admin UI now supports access management for capture agents. This features
-  addresses the need to allow unprivileged users to access the Admin UI to manage their own content and cut videos
-  without allowing them to schedule events or change the scheduling as this task is usually in the responsibility of a
-  dedicated team.  It is also possible to permit users access to specific subsets of the available capture agents.
+- **Keyboard Shortcuts** - A per page keyboard shortcut list is available so that users can at any time and page see
+  what keyboard shortcuts are currenlty available.
 
 - **External API 1.1.0** - For the first time, Opencast takes advantage of its state-of-the-art versioned API by
   introducing the External API 1.1.0.  The new version extends the API to support scheduling of events and access to
@@ -31,6 +30,11 @@ New Features
   the Admin UI to not just provide processing settings as input when starting workflows, but also to display processing
   settings on event basis.
 
+- **Capture Agent Access Management** - The Admin UI now supports access management for capture agents. This features
+  addresses the need to allow unprivileged users to access the Admin UI to manage their own content and cut videos
+  without allowing them to schedule events or change the scheduling as this task is usually in the responsibility of a
+  dedicated team.  It is also possible to permit users access to specific subsets of the available capture agents.
+
 - **New Workflow Operation Handler**
     - **demux** can be used to demux multiple streams from a container into seperate containers
     - **image-convert** can convert multiple source images into multiple target images with different encoding
@@ -40,10 +44,6 @@ New Features
     - **process-smil** edits media files based on descriptions from a SMIL file
     - **select-tracks** can filter source tracks based on workflow properties
     - **start-workflow** allows a workflow to start another workflow
-
-- **Asset Manager Storage Layers** - The Asset Manager now supports multiple storage layers natively.  This allows
-  users to move data from local storage to remote storage within Opencast.  These moves can be triggered manually, or
-  via a built-in timer.  Currently we support local file storage, and AWS S3 storage.
 
 Improvements
 ------------
@@ -67,8 +67,6 @@ A non-comprehensive list of improvements:
 - Add new modal to edit multiple scheduled events at once
 - As an unprivileged user, I only want to see series and events that I have write access to.
 - Lossless Concat Operation
-- **Capture Agent User** - Opencast 6.0 introduces per-tenant restricted access capture agent users to avoid the
-  global system account to be used to connect external devices.
 - Update Paella Player to 6.0.x
 
 Configuration changes
