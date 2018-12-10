@@ -149,11 +149,16 @@ angular.module('adminNg.controllers')
                         if (el.length > 0) {
                             if (el.is('[type=checkbox]') || el.is('[type=radio]')) {
                                 if (value === 'true' || value === true) {
-                                    el.attr('checked','checked');
+                                    el.attr('checked', 'checked');
+                                } else {
+                                    el.removeAttr('checked');
                                 }
                             } else {
                                 el.val(value);
                             }
+
+                            // trigger any UI changes
+                            el.trigger('updateConfigUI');
                         }
 
                     });
@@ -234,7 +239,7 @@ angular.module('adminNg.controllers')
                         publication.label = publication.name;
                         publication.order = 999 + index;
                         var now = new Date();
-                        if (publication.id == "engage-live" && 
+                        if (publication.id == "engage-live" &&
                         	(now < new Date(general["start-date"]) || now > new Date(general["end-date"])))
                         	publication.enabled = false;
                         else publication.enabled = true;
