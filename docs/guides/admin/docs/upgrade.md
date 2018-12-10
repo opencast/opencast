@@ -11,8 +11,9 @@ How to Upgrade
 2. Replace Opencast 6.x with 7.x
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-5. [Upgrade the ActiveMQ configuration](#activemq-migration)
-6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
+5. [Rebuild Elasticsearch index](#rebuild-elasticsearch-index)
+6. Review the [configuration](#configuration-changes) and [security configuration
+   changes](#security-configuration-changes) and adjust your configuration accordingly
 
 
 Database Migration
@@ -54,7 +55,6 @@ select * from oc_search where mediapackage_xml like '%"security/xacml"%';
 -- Check asset manager:
 select * from oc_assets_snapshot where mediapackage_xml like '%"security/xacml"%';
 ```
-
 
 
 Configuration Changes
