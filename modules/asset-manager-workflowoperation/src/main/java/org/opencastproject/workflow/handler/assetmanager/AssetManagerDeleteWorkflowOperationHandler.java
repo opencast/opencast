@@ -52,8 +52,8 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
   /** The archive */
   private AssetManager assetManager;
 
-  /** Configuration if last snapshot should not be deleted
-  public static final String OPT_LAST_SNAPSHOT = "keep-last-snapshot";
+  /** Configuration if last snapshot should not be deleted */
+  private static final String OPT_LAST_SNAPSHOT = "keep-last-snapshot";
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
