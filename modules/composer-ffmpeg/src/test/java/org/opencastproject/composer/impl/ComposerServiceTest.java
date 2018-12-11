@@ -353,7 +353,7 @@ public class ComposerServiceTest {
             .get(1));
 
     Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
-            watermarkOption, "composite.work", "black", null); // null or "both" means that both tracks are checked for audio and both audio tracks are mixed into the final composite if they exist
+            watermarkOption, "composite.work", "black", "both"); // null or "both" means that both tracks are checked for audio and both audio tracks are mixed into the final composite if they exist
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
     Assert.assertNotNull(compositeTrack);
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());

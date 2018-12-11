@@ -26,7 +26,7 @@ Tags and flavors can be used in combination.
 
 |configuration keys|value type (EBNF)|example|description|default value|
 |------------------|-----------------|-------|-----------|-------------|
-|source-audio-name|"lower", "upper" or "both" |upper|The "name" of track to use as a source audio.|EMPTY|
+|source-audio-name|"lower", "upper" or "both" |upper|The "name" of track to use as a source audio.|both|
 |source-tags-upper|String , { "," , String }    |comp,rss|The "tag" of the upper track to use as a source input.|EMPTY|
 |source-flavor-upper|MediaPackageElementFlavor    |presenter/trimmed|The "flavor" of the upper track to use as a source input.|EMPTY|
 |source-tags-lower|String , { "," , String }    |comp,rss|The "tag" of the lower track to use as a source input.|EMPTY|

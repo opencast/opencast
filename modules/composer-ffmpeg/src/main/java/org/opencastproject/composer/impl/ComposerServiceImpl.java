@@ -1674,8 +1674,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
       if (audioSourceName != null) {
            if (! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
-             lowerAudio  = lowerAudio  && ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
-             upperAudio  = upperAudio  && ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
+             lowerAudio = lowerAudio && ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
+             upperAudio = upperAudio && ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
            }
       }
       if (lowerAudio && upperAudio) {

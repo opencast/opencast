@@ -400,7 +400,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
       // Check that source audio is upper, lower or use a combination of both
       if (sourceAudioName != null && !sourceAudioOption.matcher(sourceAudioName).matches())
-        throw new WorkflowOperationException("sourceAudioName if used, must be either upper or lower!");
+        throw new WorkflowOperationException("sourceAudioName if used, must be either upper, lower or both!");
 
       // Find the encoding profile
       if (encodingProfile == null)
