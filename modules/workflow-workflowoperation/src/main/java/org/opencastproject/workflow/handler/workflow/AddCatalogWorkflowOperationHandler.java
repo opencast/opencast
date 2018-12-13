@@ -66,7 +66,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory
-    .getLogger(ProbeResolutionWorkflowOperationHandler.class);
+    .getLogger(AddCatalogWorkflowOperationHandler.class);
 
   /** config key for the catalog name */
   private static final String CFG_KEY_CATALOG_NAME   = "catalog-name";
@@ -215,17 +215,13 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    */
   private CatalogTypeCollisionBehavior parseCollisionBehavior(String rawBehavior)
       throws WorkflowOperationException {
-    switch (rawBehavior) {
-      case "skip":
-        return CatalogTypeCollisionBehavior.SKIP;
-      case "keep":
-        return CatalogTypeCollisionBehavior.KEEP;
-      case "fail":
-        return CatalogTypeCollisionBehavior.FAIL;
-      default:
-        throw new WorkflowOperationException("Workflowoperation configured incorrectly, the configuration '"
-                                             + CFG_KEY_CATALOG_TYPE_COLLISION_BEHAVIOR
-                                             + "' only accepts 'skip', 'keep', 'fail'");
+    try {
+      return CatalogTypeCollisionBehavior.valueOf(rawBehavior.toUpperCase());
+    }
+    catch (IllegalArgumentException e) {
+      throw new WorkflowOperationException("Workflowoperation configured incorrectly, the configuration '"
+                                           + CFG_KEY_CATALOG_TYPE_COLLISION_BEHAVIOR
+                                           + "' only accepts 'skip', 'keep', 'fail'");
     }
   }
 }
