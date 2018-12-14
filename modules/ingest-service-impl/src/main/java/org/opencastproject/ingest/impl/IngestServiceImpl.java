@@ -1514,7 +1514,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
 
-        if (uri.getHost().contains(this.downloadSource)) {
+        if (uri.getHost().matches(this.downloadSource)) {
           httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
         }
         response = httpClientStandAlone.execute(get);
