@@ -23,7 +23,6 @@ package org.opencastproject.job.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.job.api.Job.FailureReason.NONE;
 import static org.opencastproject.job.api.Job.Status.DISPATCHING;
 
@@ -31,18 +30,19 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 public class JobImplTest {
 
-  private final List<String> arguments = list("arg-1", "arg-2");
+  private final List<String> arguments = Arrays.asList("arg-1", "arg-2");
   private final Date created = new Date(1455008400000L); // Tue Feb 09 2016 09:00:00
   private final Date started = new Date(1455008700000L); // Tue Feb 09 2016 09:05:00
   private final Date completed = new Date(1455009315000L); // Tue Feb 09 2016 09:15:15
   private final URI uri;
 
-  private final List<Long> blockedJobs = list(5L, 6L);
+  private final List<Long> blockedJobs = Arrays.asList(5L, 6L);
 
   private JobImpl job;
 

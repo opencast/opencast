@@ -23,9 +23,6 @@ package org.opencastproject.util;
 
 import static java.lang.String.format;
 
-import org.opencastproject.fun.juc.Immutables;
-import org.opencastproject.fun.juc.Iterables;
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.util.data.Prelude;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
@@ -58,7 +56,9 @@ public final class Log {
   /** Hold the context stack. */
   private static final ThreadLocal<Stack<String>> ctx = new ThreadLocal<Stack<String>>() {
     @Override protected Stack<String> initialValue() {
-      return Mutables.stack(JVM_SESSION);
+      Stack<String> stack = new Stack<>();
+      stack.add(JVM_SESSION);
+      return stack;
     }
   };
 
@@ -92,7 +92,7 @@ public final class Log {
   }
 
   private static String ctxAsString() {
-    return Iterables.mkString(ctx.get(), "_", "[>", "] ");
+    return "[>" + String.join("_", ctx.get()) + "] ";
   }
 
   private static String randomString() {
@@ -115,7 +115,9 @@ public final class Log {
 
   /** Continue a log context. */
   public void continueContext(Collection<String> init) {
-    ctx.set(Mutables.stack(init));
+    Stack<String> stack = new Stack<>();
+    stack.addAll(init);
+    ctx.set(stack);
     updateCurrent();
   }
 
@@ -152,7 +154,7 @@ public final class Log {
 
   /** Return the current log context. */
   public List<String> getContext() {
-    return Immutables.mk(ctx.get());
+    return Collections.unmodifiableList(ctx.get());
   }
 
   public void debug(String msg) {

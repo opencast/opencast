@@ -24,13 +24,13 @@ package org.opencastproject.job.api;
 import static org.opencastproject.util.data.Collections.nullToNil;
 import static org.opencastproject.util.data.Monadics.mlist;
 
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.jaxb.UtcTimestampAdapter;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -106,7 +106,7 @@ public final class JaxbIncident {
   public Incident toIncident() {
     return new IncidentImpl(id, jobId, serviceType, processingHost, timestamp, severity, code,
             mlist(nullToNil(details)).map(JaxbIncidentDetail.toDetailFn).value(), mlist(
-                    nullToNil(descriptionParameters)).foldl(Mutables.<String, String> hashMap(),
+                    nullToNil(descriptionParameters)).foldl(new HashMap<>(),
                     new Function2<Map<String, String>, Param, Map<String, String>>() {
                       @Override
                       public Map<String, String> apply(Map<String, String> sum, Param param) {

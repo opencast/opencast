@@ -24,8 +24,6 @@ package org.opencastproject.serviceregistry.api;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fun.juc.Immutables;
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentTree;
@@ -37,6 +35,9 @@ import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,8 @@ public final class Incidents {
   private static final String SYSTEM_JOB_CREATION_EXCEPTION = "org.opencastproject.system.job-creation-exception";
   private static final String SYSTEM_MIGRATED_ERROR = "org.opencastproject.system.migrated-error";
 
-  public static final Map<String, String> NO_PARAMS = Immutables.emtpyMap();
-  public static final List<Tuple<String, String>> NO_DETAILS = Immutables.nil();
+  public static final Map<String, String> NO_PARAMS = Collections.emptyMap();
+  public static final List<Tuple<String, String>> NO_DETAILS = Collections.emptyList();
 
   private final IncidentService is;
   private final ServiceRegistry sr;
@@ -160,14 +161,14 @@ public final class Incidents {
    */
   public void recordFailure(Job job, int code, Throwable t, Map<String, String> params,
           List<Tuple<String, String>> details) {
-    List<Tuple<String, String>> detailList = Mutables.list(details);
+    List<Tuple<String, String>> detailList = new ArrayList<>(details);
     detailList.add(tuple("stack-trace", ExceptionUtils.getStackTrace(t)));
     record(job, Severity.FAILURE, code, params, detailList);
   }
 
   public void recordMigrationIncident(Job job, String error) {
     try {
-      is.storeIncident(job, new Date(), SYSTEM_MIGRATED_ERROR, Severity.FAILURE, Immutables.map(tuple("error", error)),
+      is.storeIncident(job, new Date(), SYSTEM_MIGRATED_ERROR, Severity.FAILURE, Collections.singletonMap("error", error),
               NO_DETAILS);
     } catch (IncidentServiceException e) {
       logException(e);
@@ -213,8 +214,8 @@ public final class Incidents {
                 new Date(),
                 code,
                 severity,
-                Immutables.map(tuple("exception", ExceptionUtils.getMessage(t))),
-                Immutables.list(tuple("job-type", job.getJobType()), tuple("job-operation", job.getOperation()),
+                Collections.singletonMap("exception", ExceptionUtils.getMessage(t)),
+                Arrays.asList(tuple("job-type", job.getJobType()), tuple("job-operation", job.getOperation()),
                         tuple("stack-trace", ExceptionUtils.getStackTrace(t))));
       } catch (IncidentServiceException e) {
         logException(e);
