@@ -106,9 +106,6 @@ public class RestPublisher implements RestConstants {
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
 
-  /** The 404 Error page */
-  protected String fourOhFour = null;
-
   protected List<Object> providers = null;
 
   static {
@@ -164,25 +161,34 @@ public class RestPublisher implements RestConstants {
     logger.debug("activate()");
     baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
-    fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
     servletRegistrationMap = new ConcurrentHashMap<>();
     providers = new ArrayList<>();
 
     JSONProvider jsonProvider = new OpencastJSONProvider();
     jsonProvider.setIgnoreNamespaces(true);
     jsonProvider.setNamespaceMap(NAMESPACE_MAP);
-
     providers.add(jsonProvider);
-    providers.add((ExceptionMapper<NotFoundException>) e -> Response
-            .status(404)
-            .entity(fourOhFour)
-            .type(MediaType.TEXT_PLAIN)
-            .build());
-    providers.add((ExceptionMapper<UnauthorizedException>) e -> Response
-            .status(HttpStatus.SC_UNAUTHORIZED)
-            .entity("unauthorized")
-            .type(MediaType.TEXT_PLAIN)
-            .build());
+
+    providers.add(new ExceptionMapper<NotFoundException>() {
+      @Override
+      public Response toResponse(NotFoundException e) {
+        return Response
+                .status(HttpStatus.SC_NOT_FOUND)
+                .entity("The resource you requested does not exist.")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
+      }
+    });
+    providers.add(new ExceptionMapper<UnauthorizedException>() {
+      @Override
+      public Response toResponse(UnauthorizedException e) {
+        return Response
+                .status(HttpStatus.SC_UNAUTHORIZED)
+                .entity("unauthorized")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
+      }
+    });
 
     try {
       jaxRsTracker = new JaxRsServiceTracker();

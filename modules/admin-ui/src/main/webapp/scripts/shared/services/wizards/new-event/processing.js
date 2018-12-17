@@ -141,7 +141,8 @@ angular.module('adminNg.services')
     // Most of the stuff we do here with input elements doesn't distinguish between
     // input type="text" and input type="number", so we need this getter a few times.
     function elementIsTextual(angularElement) {
-      return angularElement.is('[type=text]') || angularElement.is('[type=number]');
+      return angularElement.is('[type=text]') || angularElement.is('[type=number]') ||
+             angularElement.is('[type=hidden]');
     }
 
     // Gather all input elements used in the workflow configuration HTML into a dictionary:
