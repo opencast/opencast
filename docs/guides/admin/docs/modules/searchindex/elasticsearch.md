@@ -19,14 +19,27 @@ When running Elasticsearch, it is recommended to deploy the same version Opencas
 otherwise not match the server. To check the version, take a look at [the maven dependency declaration for the
 elasticsearch bundle in the search module](https://github.com/opencast/opencast/blob/develop/modules/search/pom.xml).
 
-For example, to quickly spin up an external Elasticsearch matching the current version using Docker, run:
+For example, to quickly spin up an external Elasticsearch matching the current version using Docker, create a simple
+Elasticsearch configuration file called `elasticsearch.yml`:
 
-```sh
-% docker run -p 9200:9200 -p 9300:9300 -e discovery.type=single-node  elasticsearch:1.7.6
+```yml
+cluster.name: opencast
+node.name: opencast-elasticsearch-single-node
+index.max_result_window: 2147483647
+network.host: 0.0.0.0
 ```
 
-This will already give you a running cluster with the name `elasticsearch`. Note that the cluster name is important and
-you will need it later for the configuration.
+…and run
+
+```sh
+% docker run -p 9200:9200 -p 9300:9300 \
+    -e "discovery.type=single-node" \
+    -v "$(pwd)/elasticsearch.yml":/usr/share/elasticsearch/config/elasticsearch.yml \
+    elasticsearch:2.4.6
+```
+
+This will already give you a running cluster with the cluster name `opencast`. Note that the cluster name is important
+and you will need this to match Opencast's configuration.
 
 
 Configuring External Nodes
