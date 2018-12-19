@@ -70,8 +70,6 @@ public class MetadataField<A> {
   public static final String CONFIG_COLLECTION_ID_KEY = "collectionID";
   public static final String CONFIG_PATTERN_KEY = "pattern";
   public static final String CONFIG_DELIMITER_KEY = "delimiter";
-  public static final String CONFIG_END_DATE_OUTPUT_KEY = "endDateOutputID";
-  public static final String CONFIG_END_TIME_OUTPUT_KEY = "endTimeOutputID";
   public static final String CONFIG_INPUT_ID_KEY = "inputID";
   public static final String CONFIG_LABEL_KEY = "label";
   public static final String CONFIG_LIST_PROVIDER_KEY = "listprovider";
@@ -81,8 +79,6 @@ public class MetadataField<A> {
   public static final String CONFIG_PROPERTY_PREFIX = "property";
   public static final String CONFIG_READ_ONLY_KEY = "readOnly";
   public static final String CONFIG_REQUIRED_KEY = "required";
-  public static final String CONFIG_START_DATE_OUTPUT_KEY = "startDateOutputID";
-  public static final String CONFIG_START_TIME_OUTPUT_KEY = "startTimeOutputID";
   public static final String CONFIG_TYPE_KEY = "type";
 
   /* Keys for the different properties of the metadata JSON Object */
@@ -98,11 +94,6 @@ public class MetadataField<A> {
 
   /** Labels for the temporal date fields */
   private static final String LABEL_METADATA_PREFIX = "EVENTS.EVENTS.DETAILS.METADATA.";
-  private static final String LABEL_METADATA_END_DATE = LABEL_METADATA_PREFIX + "END_DATE";
-  private static final String LABEL_METADATA_END_TIME = LABEL_METADATA_PREFIX + "END_TIME";
-  private static final String LABEL_METADATA_DURATION = LABEL_METADATA_PREFIX + "DURATION";
-  private static final String LABEL_METADATA_START_DATE = LABEL_METADATA_PREFIX + "START_DATE";
-  private static final String LABEL_METADATA_START_TIME = LABEL_METADATA_PREFIX + "START_TIME";
 
   /**
    * Possible types for the metadata field. The types are used in the frontend and backend to know how the metadata
@@ -152,7 +143,6 @@ public class MetadataField<A> {
   private Opt<Map<String, String>> collection = Opt.none();
   private Fn<Opt<A>, JValue> valueToJSON;
   private Fn<Object, A> jsonToValue;
-  private Opt<String> durationOutputID = Opt.none();
 
   public MetadataField() {
   }
@@ -734,14 +724,6 @@ public class MetadataField<A> {
             collection, collectionId, longToJSON, jsonToLong, order, namespace);
   }
 
-  protected void setDurationOutputID(Opt<String> durationOutputID) {
-    this.durationOutputID = durationOutputID;
-  }
-
-  protected Opt<String> getDurationOutputID() {
-    return durationOutputID;
-  }
-
   private static MetadataField<String> createTemporalMetadata(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, final String pattern, final Type type, final JsonType jsonType,
           Opt<Integer> order, Opt<String> namespace) {
@@ -817,71 +799,6 @@ public class MetadataField<A> {
           Opt<String> namespace) {
     return createTemporalMetadata(inputID, outputID, label, readOnly, required, pattern, Type.START_TIME,
             JsonType.TIME, order, namespace);
-  }
-
-  /**
-   * Add a temporal format {@link Date} field to the metadata
-   *
-   * @param metadataField
-   *          The form of the field
-   * @param label
-   * @param p
-   *          The data to put into the field
-   * @param outputID
-   *          The id to use for the new field.
-   * @param pattern
-   *          The {@link SimpleDateFormat} to format the {@link Date} field.
-   * @param isStart
-   *          Whether this field is a start or end value of the DCMIPeriod
-   * @param order
-   *          The ui order for the new field, 0 at the top and progressively down from there.
-   */
-  public static Opt<MetadataField<Date>> createTemporalDateMetadataField(MetadataField<?> metadataField, String label,
-          Opt<DCMIPeriod> p, Opt<String> outputID, Opt<String> pattern, boolean isStart, Opt<Integer> order) {
-    if (outputID.isNone()) {
-      logger.debug("Skipping temporal property with label {} because its output id was not defined.", label);
-      return Opt.none();
-    }
-
-    if (pattern.isNone()) {
-      logger.warn("Skipping temporal JSON property with id {} because the date or time pattern was not defined for it.",
-              outputID.get());
-      return Opt.none();
-    }
-
-    MetadataField<Date> dateField = MetadataField.createDateMetadata(metadataField.getInputID(), outputID, label,
-            metadataField.isReadOnly(), metadataField.isRequired(), pattern.get(), metadataField.getOrder(),
-            metadataField.getNamespace());
-    if (p.isSome()) {
-      Date date;
-      if (isStart) {
-        date = p.get().getStart();
-      } else {
-        date = p.get().getEnd();
-      }
-      dateField.setValue(date);
-    }
-    return Opt.some(dateField);
-
-  }
-
-  public static Opt<MetadataField<String>> createTemporalDurationMetadataField(MetadataField<?> metadataField,
-          String label, Opt<DCMIPeriod> p, Opt<String> outputID, Opt<Integer> order) {
-    if (outputID.isNone()) {
-      logger.debug("Skipping temporal property with label {} because its output id was not defined.", label);
-      return Opt.none();
-    }
-
-    MetadataField<String> durationField = MetadataField.createDurationMetadataField(metadataField.getInputID(),
-            outputID, label, metadataField.isReadOnly(), metadataField.isRequired(), metadataField.getOrder(),
-            metadataField.getNamespace());
-    Long value = p.get().getEnd().getTime() - p.get().getStart().getTime();
-    if (p.get().getEnd().before(p.get().getStart())) {
-      throw new IllegalArgumentException("The start date cannot be before the end date. Start: " + p.get().getStart()
-              + " End: " + p.get().getEnd());
-    }
-    durationField.setValue(value.toString());
-    return Opt.some(durationField);
   }
 
   /**
@@ -977,7 +894,7 @@ public class MetadataField<A> {
   /**
    * Create a metadata field of type String specifying the type for the front end.
    *
-   * @param id
+   * @param inputID
    *          The identifier of the new metadata field
    * @param label
    *          The label of the new metadata field
