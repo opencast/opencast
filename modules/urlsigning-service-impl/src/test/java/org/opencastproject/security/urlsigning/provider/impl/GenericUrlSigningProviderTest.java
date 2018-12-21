@@ -39,7 +39,8 @@ import org.osgi.service.cm.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 public class GenericUrlSigningProviderTest {
   private static final Logger logger = LoggerFactory.getLogger(GenericUrlSigningProviderTest.class);
@@ -50,6 +51,7 @@ public class GenericUrlSigningProviderTest {
   private static final String NON_MATCHING_KEY = "abcdef0123456789";
 
   private static final String KEY_ID = "theId";
+  private static final String KEY_ID_2 = "theSecondId";
   private static final String MATCHING_URI = "http://www.opencast.org";
   private static final String KEY = "0123456789abcdef";
   private static final String RESOURCE_PATH = MATCHING_URI + RESOURCE_URL;
@@ -70,7 +72,7 @@ public class GenericUrlSigningProviderTest {
   private static GenericUrlSigningProvider signerA;
   private static GenericUrlSigningProvider signerB;
 
-  private static Properties properties;
+  private static Dictionary<String, String> properties;
 
   @BeforeClass
   public static void setUpClass() throws Exception {
@@ -95,7 +97,7 @@ public class GenericUrlSigningProviderTest {
     signerB = new GenericUrlSigningProvider();
     signerB.setSecurityService(securityServiceB);
 
-    properties = new Properties();
+    properties = new Hashtable<>();
 
     /* To indicate that specific tests are not supposed to test multi-tenant capabilities, we just set an alias */
     signer = signerA;
@@ -103,7 +105,7 @@ public class GenericUrlSigningProviderTest {
 
   @Before
   public void setUp() throws Exception {
-    properties.clear();
+    properties = new Hashtable<>();
     signerA.updated(properties);
     signerB.updated(properties);
   }
@@ -115,50 +117,47 @@ public class GenericUrlSigningProviderTest {
     assertEquals(0, signer.getUris().size());
 
     // Incomplete entries
-    properties.clear();
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
+    properties = new Hashtable<>();
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
     signer.updated(properties);
     assertFalse(signer.accepts(RESOURCE_PATH));
     assertEquals(0, signer.getUris().size());
 
     // Non-Matching key
-    properties.clear();
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", NON_MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", NON_MATCHING_KEY);
+    properties = new Hashtable<>();
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), NON_MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), NON_MATCHING_KEY);
     signer.updated(properties);
     assertFalse(signer.accepts(RESOURCE_PATH));
     assertEquals(1, signer.getUris().size());
 
     // Matching Key
-    properties.clear();
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
+    properties = new Hashtable<>();
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
     signer.updated(properties);
     assertTrue(signer.accepts(RESOURCE_PATH));
     assertEquals(1, signer.getUris().size());
 
     // Matching Key and Unrelated Key
-    properties.clear();
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
+    properties = new Hashtable<>();
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
 
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".2", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".2", NON_MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".2", NON_MATCHING_KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID_2, GenericUrlSigningProvider.URL), NON_MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID_2, GenericUrlSigningProvider.SECRET), NON_MATCHING_KEY);
+
     signer.updated(properties);
     assertTrue(signer.accepts(RESOURCE_PATH));
     assertEquals(2, signer.getUris().size());
 
     // Organization set to "any" organization works
-    properties.clear();
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
-    properties.put(GenericUrlSigningProvider.ORGANIZATION_PREFIX + ".1", GenericUrlSigningProvider.ANY_ORGANIZATION);
+    properties = new Hashtable<>();
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.ORGANIZATION),
+            GenericUrlSigningProvider.ANY_ORGANIZATION);
+
     signer.updated(properties);
     assertTrue(signer.accepts(RESOURCE_PATH));
     assertEquals(1, signer.getUris().size());
@@ -166,13 +165,11 @@ public class GenericUrlSigningProviderTest {
 
   @Test
   public void testSign() throws UrlSigningException, ConfigurationException {
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
 
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".2", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".2", RTMP_MATCHER);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".2", KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID_2, GenericUrlSigningProvider.URL), RTMP_MATCHER);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID_2, GenericUrlSigningProvider.SECRET), KEY);
 
     signer.updated(properties);
 
@@ -196,15 +193,14 @@ public class GenericUrlSigningProviderTest {
     result = signer.sign(withRtmp);
     logger.info(result);
     assertEquals(
-            "rtmp://www.opencast.org/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoicnRtcDpcL1wvd3d3Lm9wZW5jYXN0Lm9yZ1wvcGF0aFwvdG9cL3Jlc291cmNlLm1wNCJ9fQ&keyId=theId&signature=0464d9672fa5cb62ed82e7a6c46db5552dcd76590cf11efa5ba5222f53f5bbaa",
+            "rtmp://www.opencast.org/path/to/resource.mp4?policy=eyJTdGF0ZW1lbnQiOnsiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6MTU4MzAyMzU3NzAwMH0sIlJlc291cmNlIjoicnRtcDpcL1wvd3d3Lm9wZW5jYXN0Lm9yZ1wvcGF0aFwvdG9cL3Jlc291cmNlLm1wNCJ9fQ&keyId=theSecondId&signature=0464d9672fa5cb62ed82e7a6c46db5552dcd76590cf11efa5ba5222f53f5bbaa",
             result);
   }
 
   @Test
   public void testSignUrlWithPort() throws Exception {
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", RTMP_MATCHER);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), RTMP_MATCHER);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
 
     signer.updated(properties);
 
@@ -216,19 +212,16 @@ public class GenericUrlSigningProviderTest {
   @Test
   public void testMultitenantSign() throws UrlSigningException, ConfigurationException {
 
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".1", KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".1", MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".1", KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.URL), MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, KEY_ID, GenericUrlSigningProvider.SECRET), KEY);
 
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".2", ORGANIZATION_A_KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".2", ORGANIZATION_A_MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".2", ORGANIZATION_A_KEY);
-    properties.put(GenericUrlSigningProvider.ORGANIZATION_PREFIX + ".2", ORGANIZATION_A_ID);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_A_KEY_ID, GenericUrlSigningProvider.URL), ORGANIZATION_A_MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_A_KEY_ID, GenericUrlSigningProvider.SECRET), ORGANIZATION_A_KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_A_KEY_ID, GenericUrlSigningProvider.ORGANIZATION), ORGANIZATION_A_ID);
 
-    properties.put(GenericUrlSigningProvider.ID_PREFIX + ".3", ORGANIZATION_B_KEY_ID);
-    properties.put(GenericUrlSigningProvider.URL_PREFIX + ".3", ORGANIZATION_B_MATCHING_URI);
-    properties.put(GenericUrlSigningProvider.KEY_PREFIX + ".3", ORGANIZATION_B_KEY);
-    properties.put(GenericUrlSigningProvider.ORGANIZATION_PREFIX + ".3", ORGANIZATION_B_ID);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_B_KEY_ID, GenericUrlSigningProvider.URL), ORGANIZATION_B_MATCHING_URI);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_B_KEY_ID, GenericUrlSigningProvider.SECRET), ORGANIZATION_B_KEY);
+    properties.put(String.join(".", AbstractUrlSigningProvider.KEY_ENTRY_PREFIX, ORGANIZATION_B_KEY_ID, GenericUrlSigningProvider.ORGANIZATION), ORGANIZATION_B_ID);
 
     signerA.updated(properties);
     signerB.updated(properties);
@@ -290,5 +283,4 @@ public class GenericUrlSigningProviderTest {
     }
     assertTrue(exceptionThrown);
   }
-
 }
