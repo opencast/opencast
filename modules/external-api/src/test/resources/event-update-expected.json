@@ -23,7 +23,7 @@
         "readOnly": false,
         "id": "description",
         "label": "EVENTS.EVENTS.DETAILS.METADATA.DESCRIPTION",
-        "type": "text",
+        "type": "text_long",
         "value": "updated desciption",
         "required": false
       },
