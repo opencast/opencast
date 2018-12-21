@@ -60,7 +60,7 @@ import java.util.TimeZone;
  * @param <A>
  *          Defines the type of the metadata value
  */
-public final class MetadataField<A> {
+public class MetadataField<A> {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataField.class);
 
@@ -143,6 +143,35 @@ public final class MetadataField<A> {
   private Opt<Map<String, String>> collection = Opt.none();
   private Fn<Opt<A>, JValue> valueToJSON;
   private Fn<Object, A> jsonToValue;
+
+  /**
+   * Copy constructor
+   *
+   * @param other
+   *          Other metadata field
+   */
+  public MetadataField(MetadataField<A> other) {
+
+    this.inputID = other.inputID;
+    this.outputID = other.outputID;
+    this.label = other.label;
+    this.readOnly = other.readOnly;
+    this.required = other.required;
+    this.value = other.value;
+    this.translatable = other.translatable;
+    this.type = other.type;
+    this.jsonType = other.jsonType;
+    this.collection = other.collection;
+    this.collectionID = other.collectionID;
+    this.valueToJSON = other.valueToJSON;
+    this.jsonToValue = other.jsonToValue;
+    this.order = other.order;
+    this.namespace = other.namespace;
+    this.updated = other.updated;
+    this.pattern = other.pattern;
+    this.delimiter = other.delimiter;
+    this.listprovider = other.listprovider;
+  }
 
   /**
    * Metadata field constructor
@@ -344,83 +373,9 @@ public final class MetadataField<A> {
    * @return A new {@link MetadataField} with the value set
    */
   public static MetadataField<?> copyMetadataFieldWithValue(MetadataField<?> oldField, String value) {
-    MetadataField<?> newField = null;
-    switch (oldField.getType()) {
-      case BOOLEAN:
-        MetadataField<Boolean> booleanField = MetadataField.createBooleanMetadata(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getOrder(), oldField.getNamespace());
-        booleanField.fromJSON(value);
-        return booleanField;
-      case DATE:
-        MetadataField<Date> dateField = MetadataField.createDateMetadata(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
-        dateField.fromJSON(value);
-        return dateField;
-      case DURATION:
-        MetadataField<String> durationField = MetadataField.createDurationMetadataField(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getOrder(), oldField.getNamespace());
-        durationField.fromJSON(value);
-        return durationField;
-      case ITERABLE_TEXT:
-        MetadataField<Iterable<String>> iterableTextField = MetadataField.createIterableStringMetadataField(
-                oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
-                oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
-                oldField.getDelimiter(), oldField.getOrder(), oldField.getNamespace());
-        iterableTextField.fromJSON(value);
-        return iterableTextField;
-      case LONG:
-        MetadataField<Long> longField = MetadataField.createLongMetadataField(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-                oldField.getNamespace());
-        longField.fromJSON(value);
-        return longField;
-      case MIXED_TEXT:
-        MetadataField<Iterable<String>> mixedField = MetadataField.createMixedIterableStringMetadataField(
-                oldField.getInputID(), Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(),
-                oldField.isRequired(), oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(),
-                oldField.getDelimiter(), oldField.getOrder(), oldField.getNamespace());
-        mixedField.fromJSON(value);
-        return mixedField;
-      case START_DATE:
-        MetadataField<String> startDateField = MetadataField.createTemporalStartDateMetadata(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
-        startDateField.fromJSON(value);
-        return startDateField;
-      case START_TIME:
-        MetadataField<String> startTimeField = MetadataField.createTemporalStartTimeMetadata(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.getPattern().get(), oldField.getOrder(), oldField.getNamespace());
-        startTimeField.fromJSON(value);
-        return startTimeField;
-      case TEXT:
-        MetadataField<String> textField = MetadataField.createTextMetadataField(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-                oldField.getNamespace());
-        textField.fromJSON(value);
-        return textField;
-      case TEXT_LONG:
-        MetadataField<String> textLongField = MetadataField.createTextLongMetadataField(oldField.getInputID(),
-                Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-                oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-                oldField.getNamespace());
-        textLongField.fromJSON(value);
-        return textLongField;
-      case ORDERED_TEXT:
-        MetadataField<String> orderedTextField = MetadataField.createOrderedTextMetadataField(oldField.getInputID(),
-            Opt.some(oldField.getOutputID()), oldField.getLabel(), oldField.isReadOnly(), oldField.isRequired(),
-            oldField.isTranslatable(), oldField.getCollection(), oldField.getCollectionID(), oldField.getOrder(),
-            oldField.getNamespace());
-        orderedTextField.fromJSON(value);
-        return orderedTextField;
-      default:
-        return newField;
-    }
+    MetadataField<?> newField = new MetadataField(oldField);
+    newField.fromJSON(value);
+    return newField;
   }
 
   /**
@@ -958,28 +913,26 @@ public final class MetadataField<A> {
   }
 
   public static MetadataField createMetadataField(Map<String,String> configuration) {
-    Opt<String> collectionID = configuration.containsKey(CONFIG_COLLECTION_ID_KEY)
-            ? Opt.some(configuration.get(CONFIG_COLLECTION_ID_KEY)) : Opt.none();
-    String pattern = configuration.containsKey(CONFIG_PATTERN_KEY)
-            ? configuration.get(CONFIG_PATTERN_KEY) : "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-    Opt<String> delimiter = configuration.containsKey(CONFIG_DELIMITER_KEY)
-            ? Opt.some(configuration.get(CONFIG_DELIMITER_KEY)) : Opt.none();
-    String inputID = configuration.containsKey(CONFIG_INPUT_ID_KEY)
-            ? configuration.get(CONFIG_INPUT_ID_KEY) : null;
-    String label = configuration.containsKey(CONFIG_LABEL_KEY)
-            ? configuration.get(CONFIG_LABEL_KEY) : null;
-    Opt<String> listprovider = configuration.containsKey(CONFIG_LIST_PROVIDER_KEY)
-            ? Opt.some(configuration.get(CONFIG_LIST_PROVIDER_KEY)) : Opt.none();
-    Opt<String> namespace = configuration.containsKey(CONFIG_NAMESPACE_KEY)
-            ? Opt.some(configuration.get(CONFIG_NAMESPACE_KEY)) : Opt.none();
+
+    String inputID = configuration.get(CONFIG_INPUT_ID_KEY);
+    String label = configuration.get(CONFIG_LABEL_KEY);
+
+    Opt<String> collectionID = Opt.nul(configuration.get(CONFIG_COLLECTION_ID_KEY));
+    Opt<String> delimiter = Opt.nul(configuration.get(CONFIG_DELIMITER_KEY));
+    Opt<String> outputID = Opt.nul(configuration.get(CONFIG_OUTPUT_ID_KEY));
+    Opt<String> listprovider = Opt.nul(configuration.get(CONFIG_LIST_PROVIDER_KEY));
+    Opt<String> namespace = Opt.nul(configuration.get(CONFIG_NAMESPACE_KEY));
+
     Type type = configuration.containsKey(CONFIG_TYPE_KEY)
             ? Type.valueOf(configuration.get(CONFIG_TYPE_KEY).toUpperCase()) : null;
     Boolean required = configuration.containsKey(CONFIG_REQUIRED_KEY)
             ? Boolean.valueOf(configuration.get(CONFIG_REQUIRED_KEY).toUpperCase()) : null;
     Boolean readOnly = configuration.containsKey(CONFIG_READ_ONLY_KEY)
             ? Boolean.valueOf(configuration.get(CONFIG_READ_ONLY_KEY).toUpperCase()) : null;
-    Opt<String> outputID = configuration.containsKey(CONFIG_OUTPUT_ID_KEY)
-            ? Opt.some(configuration.get(CONFIG_OUTPUT_ID_KEY)) : Opt.none();
+
+    String pattern = configuration.containsKey(CONFIG_PATTERN_KEY)
+            ? configuration.get(CONFIG_PATTERN_KEY) : "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
     Opt<Integer> order = Opt.none();
     if (configuration.containsKey(CONFIG_ORDER_KEY)) {
       try {

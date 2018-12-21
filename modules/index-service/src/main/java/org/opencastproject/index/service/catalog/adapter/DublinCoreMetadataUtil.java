@@ -292,14 +292,8 @@ public final class DublinCoreMetadataUtil {
         String propertyName = propertyNameOpt.get();
         String propertyKey = propertyKeyOpt.get();
 
-        Map metadataFieldProperties;
-        if (!allProperties.containsKey(propertyName)) {
-          metadataFieldProperties = new HashMap();
-          allProperties.put(propertyName, metadataFieldProperties);
-        }
-        else {
-          metadataFieldProperties = allProperties.get(propertyName);
-        }
+        Map<String,String> metadataFieldProperties = allProperties.computeIfAbsent(propertyName,
+                key -> new HashMap<>());
         metadataFieldProperties.put(propertyKey, configProperties.get(property).toString());
       }
     }

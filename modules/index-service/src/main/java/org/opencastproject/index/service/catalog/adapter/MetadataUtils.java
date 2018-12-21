@@ -98,32 +98,6 @@ public final class MetadataUtils {
   }
 
   /**
-   * Copy a {@link MetadataField} into a new field.
-   *
-   * @param other
-   *          The other {@link MetadataField} to copy the state from.
-   * @return A new {@link MetadataField} with the same settings as the passed in {@link MetadataField}
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static MetadataField copyMetadataField(MetadataField other) {
-
-    MetadataField newField = MetadataField.createMetadataField(other.getInputID(),
-            other.getOutputID() != null ? Opt.some(other.getOutputID()) : Opt.none(),
-            other.getLabel(), other.isReadOnly(), other.isRequired(), other.isTranslatable(), other.getType(),
-            other.getCollection(), other.getCollectionID(), other.getOrder(), other.getNamespace(),
-            other.getDelimiter(), other.getPattern().isSome() ? (String) other.getPattern().get() : null);
-
-    newField.setListprovider(other.getListprovider());
-    newField.setJsonType(other.getJsonType());
-    newField.setJsonToValue(other.getJsonToValue());
-    newField.setValueToJSON(other.getValueToJSON());
-    if (other.getValue().isSome()) {
-      newField.setValue(other.getValue().get());
-    }
-    return newField;
-  }
-
-  /**
    * Returns the {@link String} value of a {@link MetadataField} if updated and available.
    *
    * @param collection

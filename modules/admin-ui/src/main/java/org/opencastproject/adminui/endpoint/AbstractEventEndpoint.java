@@ -77,7 +77,6 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.MetadataList.Locked;
-import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
@@ -1159,7 +1158,7 @@ public abstract class AbstractEventEndpoint {
       mc.removeField(series);
       Map<String, String> seriesAccessEventModal = getSeriesService().getUserSeriesByAccess(true);
       Opt<Map<String, String>> map = Opt.some(seriesAccessEventModal);
-      MetadataField<String> newSeries = MetadataUtils.copyMetadataField(series);
+      MetadataField<String> newSeries = new MetadataField(series);
       newSeries.setCollection(map);
       newSeries.setValue(optEvent.get().getSeriesId());
       mc.addField(newSeries);
