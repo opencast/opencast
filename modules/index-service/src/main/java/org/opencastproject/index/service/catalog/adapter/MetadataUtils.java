@@ -106,24 +106,17 @@ public final class MetadataUtils {
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public static MetadataField copyMetadataField(MetadataField other) {
-    MetadataField newField = new MetadataField();
-    newField.setCollection(other.getCollection());
-    newField.setCollectionID(other.getCollectionID());
-    newField.setInputId(other.getInputID());
-    newField.setIsTranslatable(other.isTranslatable());
-    newField.setLabel(other.getLabel());
+
+    MetadataField newField = MetadataField.createMetadataField(other.getInputID(),
+            other.getOutputID() != null ? Opt.some(other.getOutputID()) : Opt.none(),
+            other.getLabel(), other.isReadOnly(), other.isRequired(), other.isTranslatable(), other.getType(),
+            other.getCollection(), other.getCollectionID(), other.getOrder(), other.getNamespace(),
+            other.getDelimiter(), other.getPattern().isSome() ? (String) other.getPattern().get() : null);
+
     newField.setListprovider(other.getListprovider());
-    newField.setNamespace(other.getNamespace());
-    newField.setOutputID(Opt.some(other.getOutputID()));
-    newField.setPattern(other.getPattern());
-    newField.setDelimiter(other.getDelimiter());
-    newField.setOrder(other.getOrder());
-    newField.setReadOnly(other.isReadOnly());
-    newField.setRequired(other.isRequired());
     newField.setJsonType(other.getJsonType());
     newField.setJsonToValue(other.getJsonToValue());
     newField.setValueToJSON(other.getValueToJSON());
-    newField.setType(other.getType());
     if (other.getValue().isSome()) {
       newField.setValue(other.getValue().get());
     }

@@ -60,7 +60,7 @@ import java.util.TimeZone;
  * @param <A>
  *          Defines the type of the metadata value
  */
-public class MetadataField<A> {
+public final class MetadataField<A> {
 
   private static final Logger logger = LoggerFactory.getLogger(MetadataField.class);
 
@@ -143,9 +143,6 @@ public class MetadataField<A> {
   private Opt<Map<String, String>> collection = Opt.none();
   private Fn<Opt<A>, JValue> valueToJSON;
   private Fn<Object, A> jsonToValue;
-
-  public MetadataField() {
-  }
 
   /**
    * Metadata field constructor
@@ -960,60 +957,81 @@ public class MetadataField<A> {
     return obj(fields);
   }
 
-  /**
-   * A convenience function for converting properties values into their java equivalents
-   *
-   * @param key
-   *          The key for the metadata property.
-   * @param value
-   *          The value for the metadata property.
-   */
-  public void setValue(String key, String value) {
-    switch (key) {
-      case CONFIG_COLLECTION_ID_KEY:
-        this.collectionID = Opt.some(value);
-        break;
-      case CONFIG_PATTERN_KEY:
-        this.pattern = Opt.some(value);
-        break;
-      case CONFIG_DELIMITER_KEY:
-        this.delimiter = Opt.some(value);
-        break;
-      case CONFIG_INPUT_ID_KEY:
-        this.inputID = value;
-        break;
-      case CONFIG_LABEL_KEY:
-        this.label = value;
-        break;
-      case CONFIG_LIST_PROVIDER_KEY:
-        this.listprovider = Opt.some(value);
-        break;
-      case CONFIG_NAMESPACE_KEY:
-        this.namespace = Opt.some(value);
-        break;
-      case CONFIG_ORDER_KEY:
-        try {
-          Integer orderValue = Integer.parseInt(value);
-          this.order = Opt.some(orderValue);
-        } catch (NumberFormatException e) {
-          logger.warn("Unable to parse order value {} of metadata field {}", value, this.getInputID(), e);
-          this.order = Opt.none();
-        }
-        break;
-      case CONFIG_OUTPUT_ID_KEY:
-        this.outputID = Opt.some(value);
-        break;
-      case CONFIG_READ_ONLY_KEY:
-        this.readOnly = Boolean.valueOf(value);
-        break;
-      case CONFIG_REQUIRED_KEY:
-        this.required = Boolean.valueOf(value);
-        break;
-      case CONFIG_TYPE_KEY:
-        this.type = Type.valueOf(value.toUpperCase());
-        break;
+  public static MetadataField createMetadataField(Map<String,String> configuration) {
+    Opt<String> collectionID = configuration.containsKey(CONFIG_COLLECTION_ID_KEY)
+            ? Opt.some(configuration.get(CONFIG_COLLECTION_ID_KEY)) : Opt.none();
+    String pattern = configuration.containsKey(CONFIG_PATTERN_KEY)
+            ? configuration.get(CONFIG_PATTERN_KEY) : "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    Opt<String> delimiter = configuration.containsKey(CONFIG_DELIMITER_KEY)
+            ? Opt.some(configuration.get(CONFIG_DELIMITER_KEY)) : Opt.none();
+    String inputID = configuration.containsKey(CONFIG_INPUT_ID_KEY)
+            ? configuration.get(CONFIG_INPUT_ID_KEY) : null;
+    String label = configuration.containsKey(CONFIG_LABEL_KEY)
+            ? configuration.get(CONFIG_LABEL_KEY) : null;
+    Opt<String> listprovider = configuration.containsKey(CONFIG_LIST_PROVIDER_KEY)
+            ? Opt.some(configuration.get(CONFIG_LIST_PROVIDER_KEY)) : Opt.none();
+    Opt<String> namespace = configuration.containsKey(CONFIG_NAMESPACE_KEY)
+            ? Opt.some(configuration.get(CONFIG_NAMESPACE_KEY)) : Opt.none();
+    Type type = configuration.containsKey(CONFIG_TYPE_KEY)
+            ? Type.valueOf(configuration.get(CONFIG_TYPE_KEY).toUpperCase()) : null;
+    Boolean required = configuration.containsKey(CONFIG_REQUIRED_KEY)
+            ? Boolean.valueOf(configuration.get(CONFIG_REQUIRED_KEY).toUpperCase()) : null;
+    Boolean readOnly = configuration.containsKey(CONFIG_READ_ONLY_KEY)
+            ? Boolean.valueOf(configuration.get(CONFIG_READ_ONLY_KEY).toUpperCase()) : null;
+    Opt<String> outputID = configuration.containsKey(CONFIG_OUTPUT_ID_KEY)
+            ? Opt.some(configuration.get(CONFIG_OUTPUT_ID_KEY)) : Opt.none();
+    Opt<Integer> order = Opt.none();
+    if (configuration.containsKey(CONFIG_ORDER_KEY)) {
+      try {
+        order = Opt.some(Integer.parseInt(configuration.get(CONFIG_ORDER_KEY)));
+      } catch (NumberFormatException e) {
+        logger.warn("Unable to parse order value {} of metadata field {}", configuration.get(CONFIG_ORDER_KEY),
+                inputID, e);
+      }
+    }
+
+    MetadataField metadataField = createMetadataField(inputID, outputID, label, readOnly, required, Opt.none(), type,
+            Opt.none(), collectionID, order, namespace, delimiter, pattern);
+    metadataField.setListprovider(listprovider);
+    return metadataField;
+  }
+
+  public static MetadataField createMetadataField(String inputID, Opt<String> outputID, String label, boolean readOnly,
+          boolean required, Opt<Boolean> translatable, Type type, Opt<Map<String, String>> collection,
+          Opt<String> collectionID, Opt<Integer> order, Opt<String> namespace, Opt<String> delimiter, String pattern) {
+
+    switch (type) {
+      case BOOLEAN:
+        return createBooleanMetadata(inputID, outputID, label, readOnly, required, order, namespace);
+      case DATE:
+        return createDateMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
+      case DURATION:
+        return createDurationMetadataField(inputID, outputID, label, readOnly, required, translatable,
+                collection, collectionID, order, namespace);
+      case ITERABLE_TEXT:
+        return createIterableStringMetadataField(inputID, outputID, label, readOnly, required, translatable,
+                collection, collectionID, delimiter, order, namespace);
+      case MIXED_TEXT:
+        return createMixedIterableStringMetadataField(inputID, outputID, label, readOnly, required,
+                translatable, collection, collectionID, delimiter, order, namespace);
+      case LONG:
+        return createLongMetadataField(inputID, outputID, label, readOnly, required, translatable,
+                collection, collectionID, order, namespace);
+      case TEXT:
+        return createTextMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
+                collectionID, order, namespace);
+      case TEXT_LONG:
+        return createTextLongMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
+                collectionID, order, namespace);
+      case START_DATE:
+        return createTemporalStartDateMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
+      case START_TIME:
+        return createTemporalStartTimeMetadata(inputID, outputID, label, readOnly, required, pattern, order, namespace);
+      case ORDERED_TEXT:
+        return createOrderedTextMetadataField(inputID, outputID, label, readOnly, required, translatable, collection,
+                collectionID, order, namespace);
       default:
-        throw new IllegalArgumentException("Unknown Dublin Core Property Key " + key);
+        throw new IllegalArgumentException("Unknown metadata type! " + type);
     }
   }
 

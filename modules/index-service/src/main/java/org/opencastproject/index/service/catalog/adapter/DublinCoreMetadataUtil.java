@@ -278,25 +278,39 @@ public final class DublinCoreMetadataUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, MetadataField<?>> getDublinCoreProperties(Dictionary configProperties) {
-    Map<String, MetadataField<?>> dublinCorePropertyMapByConfigurationName = new HashMap<String, MetadataField<?>>();
+
+    Map<String,Map<String, String>> allProperties = new HashMap();
+
     for (Object configObject : Collections.list(configProperties.keys())) {
       String property = configObject.toString();
-      if (getDublinCorePropertyName(property).isSome()) {
-        MetadataField<?> dublinCoreProperty = dublinCorePropertyMapByConfigurationName
-                .get(getDublinCorePropertyName(property).get());
-        if (dublinCoreProperty == null) {
-          dublinCoreProperty = new MetadataField();
+
+      Opt<String> propertyNameOpt = getDublinCorePropertyName(property);
+      Opt<String> propertyKeyOpt = getDublinCorePropertyKey(property);
+
+      if (propertyNameOpt.isSome() && propertyKeyOpt.isSome()) {
+
+        String propertyName = propertyNameOpt.get();
+        String propertyKey = propertyKeyOpt.get();
+
+        Map metadataFieldProperties;
+        if (!allProperties.containsKey(propertyName)) {
+          metadataFieldProperties = new HashMap();
+          allProperties.put(propertyName, metadataFieldProperties);
         }
-        dublinCoreProperty.setValue(getDublinCorePropertyKey(property).get(),
-                configProperties.get(property).toString());
-        dublinCorePropertyMapByConfigurationName.put(getDublinCorePropertyName(property).get(), dublinCoreProperty);
+        else {
+          metadataFieldProperties = allProperties.get(propertyName);
+        }
+        metadataFieldProperties.put(propertyKey, configProperties.get(property).toString());
       }
     }
-    Map<String, MetadataField<?>> dublinCorePropertyMap = new TreeMap<String, MetadataField<?>>();
-    for (MetadataField dublinCoreProperty : dublinCorePropertyMapByConfigurationName.values()) {
-      dublinCorePropertyMap.put(dublinCoreProperty.getOutputID(), dublinCoreProperty);
+
+    Map<String, MetadataField<?>> metadataFieldsMap = new TreeMap<String, MetadataField<?>>();
+    for (Map<String, String> metadataFieldPropertiesMap : allProperties.values()) {
+      MetadataField metadataField = MetadataField.createMetadataField(metadataFieldPropertiesMap);
+      metadataFieldsMap.put(metadataField.getOutputID(), metadataField);
     }
-    return dublinCorePropertyMap;
+
+    return metadataFieldsMap;
   }
 
   static boolean isDublinCoreProperty(String propertyKey) {
