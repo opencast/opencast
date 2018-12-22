@@ -138,7 +138,7 @@
       "USER_BLACKLIST_NOT_DELETED": "Svartlistan kunde inte tas bort",
       "LOCATION_DELETED": "Platsen har raderats",
       "LOCATION_NOT_DELETED": "Platsen kunde inte raderas",
-      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "The location could not be deleted, because you don't have the permission to do so.",
+      "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Platsen kunde inte tas bort eftersom att du inte har rättigheterna för att göra det.",
       "LOCATION_BLACKLIST_CREATED": "Svartlistan har skapats",
       "LOCATION_BLACKLIST_NOT_CREATED": "Svartlistan kunde inte skapas",
       "LOCATION_BLACKLIST_SAVED": "Svartlistan har sparats",
@@ -190,9 +190,9 @@
       "VIDEO_CUT_NOT_SAVED": "Redigeringsinformationen kunde inte sparas",
       "VIDEO_CUT_SAVED": "Redigeringsinformationen har sparats",
       "VIDEO_CUT_PROCESSING": "Videon bearbetas…",
-      "THUMBNAIL_CHANGE_FAILED": "Failed to change thumbnail.",
-      "VIDEO_SOURCE_TRACKS_INVALID": "You have selected no video tracks to process",
-      "VIDEO_TOO_MANY_AUDIOS": "You cannot have more than one audio stream on a single video stream",
+      "THUMBNAIL_CHANGE_FAILED": "Misslyckades med att byta miniatyr.",
+      "VIDEO_SOURCE_TRACKS_INVALID": "Du har inte valt att bearbeta några videospår",
+      "VIDEO_TOO_MANY_AUDIOS": "Du kan inte ha mer än en ljudström i samma videoström",
       "SERVER_UNRESPONSIVE": "Oops! Servern svarar inte. Försök igen senare.",
       "SERVICE_UNAVAILABLE": "Oops! Servern svarar inte. Försök igen senare.",
       "ACTIVE_TRANSACTION": "Den aktuella händelsen kan för närvarande inte redigeras för att den deltar i en aktiv transaktion."
@@ -257,14 +257,14 @@
          }
       },
       "EDIT_EVENTS": {
-         "CAPTION": "Edit scheduled events",
+         "CAPTION": "Redigera schemalagda händelser",
          "CONFLICT_CHECK_RUNNING": "Conflict check is running…",
          "GENERAL": {
             "CAPTION": "Allmänt",
             "CANNOTSTART": "Highlighted event(s) cannot be processed, only scheduled events are supported.",
             "NOCHANGES": "No changes to the events detected!",
             "CONFLICT_FIRST_EVENT": "Changed event",
-            "CONFLICT_SECOND_EVENT": "Event in conflict",
+            "CONFLICT_SECOND_EVENT": "Händelse i konflikt",
             "CANNOTEDITSCHEDULE": "For the highlighted events, you don't have the permission to edit scheduling information. You can continue, but you won't be able to edit scheduling information of any events at all."
          },
          "METADATA": {
@@ -272,15 +272,15 @@
          },
          "SUMMARY": {
             "CAPTION": "Summering",
-            "SINGLE_EVENT_CAPTION": "Event “{{ title }}”",
+            "SINGLE_EVENT_CAPTION": "Händelse \"{{ title }}\"",
             "TYPE": "Typ",
             "PREVIOUS": "Gammalt värde",
             "NEXT": "Nytt värde"
          },
          "EDIT": {
             "CAPTION": "Redigera",
-            "EVENT": "event",
-            "EVENTS": "events",
+            "EVENT": "händelse",
+            "EVENTS": "händelser",
             "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadata",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
@@ -876,7 +876,7 @@
                "ACTIONS": "Åtgärder",
                "DETAILS": "Detaljer",
                "DESCRIPTION": "",
-               "MORE_INFO": "More Information & Actions",
+               "MORE_INFO": "Mer information och åtgärder",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
@@ -906,7 +906,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "Instanser för arbetsflöde"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflowdetaljer",
@@ -936,7 +936,7 @@
                   "FAILED_ATTEMPTS": "Misslyckade försök",
                   "MAX_ATTEMPTS": "Max",
                   "EXCEPTION_HANDLER_WORKFLOW": "Exception Handler Workflow",
-                  "FAIL_ON_ERROR": "Fail on Error"
+                  "FAIL_ON_ERROR": "Misslyckas vid fel"
                }
             },
             "QUICKACTION_WORKFLOW_DETAILS": {
@@ -1154,7 +1154,7 @@
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "NAME": "Filtrera händelserna för den här platsen",
-               "DETAILS": "Open location details",
+               "DETAILS": "Öppna platsdetaljer",
                "DELETE": "Ta bort plats (avregistrera capture agent)"
             }
          },
@@ -1563,7 +1563,7 @@
          },
          "DETAILS": {
             "NEWCAPTION": "Skapa tema",
-            "EDITCAPTION": "Theme details - {{name}}",
+            "EDITCAPTION": "Detaljer för temat - {{name}}",
             "GENERAL": {
                "CAPTION": "Allmänt",
                "NAME": "Namn",
@@ -1665,11 +1665,11 @@
             "RUNNING": "Kör",
             "FINISHED": "Färdig",
             "FAILED": "Misslyckad",
-            "DELETED": "Deleted",
+            "DELETED": "Togs bort",
             "INSTANTIATED": "Instantiated",
             "DISPATCHING": "Dispatching",
-            "RESTART": "Restart",
-            "CANCELED": "Canceled",
+            "RESTART": "Starta om",
+            "CANCELED": "Avbröts",
             "WAITING": "Väntar"
          }
       },
@@ -1754,7 +1754,7 @@
          "REMOVE_SEGMENT": "Radera segment",
          "USE_SEGMENT": "Använd detta segment",
          "START": "Starta",
-         "END": "End"
+         "END": "Slut"
       },
       "THUMBNAIL": {
          "DESCRIPTION": "A default thumbnail used to visually represent the event is generated automatically. In case you want to use a different thumbnail, you can extract a thumbnail from the video at the current playback position or upload an image.",
@@ -1765,20 +1765,20 @@
                   "TOOLTIP": "Extract the thumbnail from the video at the current playback position"
                },
                "FROM_LEFT_VIDEO": {
-                  "LABEL": "Extract from left video",
+                  "LABEL": "Extrahera från den vänstra videon",
                   "TOOLTIP": "Extract the thumbnail from the left video at the current playback position"
                },
                "FROM_RIGHT_VIDEO": {
-                  "LABEL": "Extract from right video",
+                  "LABEL": "Extrahera från den högra videon",
                   "TOOLTIP": "Extract the thumbnail from the right video at the current playback position"
                }
             },
             "UPLOAD": {
                "LABEL": "Ladda upp bild",
-               "TOOLTIP": "Upload a thumbnail image"
+               "TOOLTIP": "Ladda upp en miniatyrbild"
             },
             "USE_DEFAULT": {
-               "LABEL": "Use default thumbnail",
+               "LABEL": "Använd standard-miniatyrbild",
                "TOOLTIP": "Use the default thumbnail that is generated automatically"
             }
          },
@@ -1803,7 +1803,7 @@
          },
          "VIDEO": {
             "HEADER": "Videospår",
-            "NOT_AVAILABLE": "No video tracks available",
+            "NOT_AVAILABLE": "Det finns inga videospår tillgängliga",
             "NO_PREVIEW_AVAILABLE": "No preview image found",
             "NO_TRACK_SELECTED": "No video track selected",
             "TOOLTIPS": {
@@ -1891,7 +1891,7 @@
          "COMMENTS": {
             "LABEL": "Kommentarer",
             "NONE": "Inga",
-            "OPEN": "Open",
+            "OPEN": "Öppna",
             "RESOLVED": "Löst"
          },
          "CONTRIBUTORS": {
@@ -2106,7 +2106,7 @@
    },
    "HOTKEYS": {
       "CHEAT_SHEET": {
-         "TITLE": "Keyboard shortcuts",
+         "TITLE": "Tangentbordsgenvägar",
          "HINT": "This page lists the currently available keyboard shortcuts. Note that these might change depending on what page you are currently visiting."
       },
       "KEYS": {
@@ -2150,16 +2150,16 @@
             "SERIES_VIEW": "Serie",
             "NEW_EVENT": "Lägg till händelse",
             "NEW_SERIES": "Lägg till serie",
-            "CHEAT_SHEET": "Keyboard shortcuts"
+            "CHEAT_SHEET": "Tangentbordsgenvägar"
          },
          "PLAYER": {
             "PLAY_PAUSE": "Spela upp/pausa",
             "PREVIOUS_FRAME": "Föregående bild",
             "NEXT_FRAME": "Nästa bild",
-            "STEP_BACKWARD": "Jump 10s back",
-            "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
+            "STEP_BACKWARD": "Hoppa tillbaka 10 sek",
+            "STEP_FORWARD": "Hoppa fram 10 sek",
+            "PREVIOUS_SEGMENT": "Föregående segment/hoppa tillbaka till början",
+            "NEXT_SEGMENT": "Nästa segment/hoppa till slutet",
             "VOLUME_UP": "Volym upp",
             "VOLUME_DOWN": "Volym ner",
             "MUTE": "Ljud av/på"
@@ -2167,8 +2167,8 @@
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dela",
             "CUT_SELECTED_SEGMENT": "Klipp ut",
-            "PLAY_CURRENT_SEGMENT": "Play current segment",
-            "CLEAR_LIST": "Clear segment",
+            "PLAY_CURRENT_SEGMENT": "Spela nuvarande segment",
+            "CLEAR_LIST": "Rensa segment",
             "PLAY_CURRENT_SEGMENT_WITH_PRE-ROLL": "Replay segment with pre-roll",
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
          }
@@ -2176,9 +2176,9 @@
    },
    "AGENTS": {
       "STATUS": {
-         "CAPTURING": "Capturing",
+         "CAPTURING": "Fångar upp",
          "ERROR": "Fel",
-         "IDLE": "Idle",
+         "IDLE": "Vilande",
          "OFFLINE": "Offline",
          "SHUTTING_DOWN": "Stänger ner",
          "UNKNOWN": "Okänd",
