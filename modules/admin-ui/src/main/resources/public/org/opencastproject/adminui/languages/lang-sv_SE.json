@@ -1049,7 +1049,7 @@
             "ACTION": "Åtgärder",
             "TOOLTIP": {
                "NAME": "Filtrera händelserna för den här platsen",
-               "DETAILS": "Open location details",
+               "DETAILS": "Öppna platsdetaljer",
                "DELETE": "Ta bort plats (avregistrera capture agent)"
             }
          },
