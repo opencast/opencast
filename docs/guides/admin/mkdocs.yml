@@ -55,6 +55,7 @@ nav:
       - Authentication and Authorization Infrastructure (AAI): 'configuration/security.aai.md'
       - Central Authentication Service (CAS): 'configuration/security.cas.md'
       - LDAP Authentication and Authorization (without CAS): 'configuration/security.ldap.md'
+      - Canvas User Provider: 'configuration/security.user.canvas.md'
       - Moodle User Provider: 'configuration/security.user.moodle.md'
       - Sakai User Provider: 'configuration/security.user.sakai.md'
    - Stream Security: 'configuration/stream-security.md'
