@@ -21,6 +21,7 @@ General Configuration
 - [Authentication, Autorization and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
+    - [Canvas User Provider](security.user.canvas.md)
     - [Moodle User Provider](security.user.moodle.md)
     - [Sakai User Provider](security.user.sakai.md)
     - [Authentication and Authorization Infrastructure (AAI)](security.aai.md)
