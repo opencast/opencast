@@ -156,7 +156,7 @@ public class CanvasUserProviderInstance implements UserProvider, RoleProvider, C
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
-    logger.debug("Creating new CanvasUserProviderInstance(pid={}, url={}, courseIdentifierProperty={}, coursePattern={}, userPattern={}, userNameProperty={}, instructorRoles=[{}], cacheSize={}, cacheExpiration={})",
+    logger.info("Creating new CanvasUserProviderInstance(pid={}, url={}, courseIdentifierProperty={}, coursePattern={}, userPattern={}, userNameProperty={}, instructorRoles=[{}], cacheSize={}, cacheExpiration={})",
       pid, canvasUrl, courseIdentifierProperty, coursePattern, userPattern, userNameProperty, String.join(", ", instructorRoles), cacheSize, cacheExpiration);
 
     // Setup the caches
