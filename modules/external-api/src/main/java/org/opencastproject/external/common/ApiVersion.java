@@ -24,10 +24,11 @@ package org.opencastproject.external.common;
 public enum ApiVersion {
 
   VERSION_1_0_0(1, 0, 0),
-  VERSION_1_1_0(1, 1, 0);
+  VERSION_1_1_0(1, 1, 0),
+  VERSION_1_2_0(1, 2, 0);
 
   /** The most recent version of the External API */
-  public static final ApiVersion CURRENT_VERSION = VERSION_1_1_0;
+  public static final ApiVersion CURRENT_VERSION = VERSION_1_2_0;
 
   private int major;
   private int minor;
