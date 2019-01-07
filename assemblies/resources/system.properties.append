@@ -5,4 +5,5 @@ org.terracotta.quartz.skipUpdateCheck=true
 
 # Configuring DocumentBuilderFactory and TransformerFactory
 javax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl
+javax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl
 javax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl
