@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+  <id>failedrecording</id>
+  <title>Recording failed</title>
+  <tags>
+  <tag>editor</tag>
+  <tag>archive</tag>
+  </tags>
+  <description/>
+  <configuration_panel/>
+
+  <operations>
+
+    <!-- Resolve the comment for cutting -->
+    <operation
+      id="comment"
+      description="Resolve the cutting flag">
+      <configurations>
+        <configuration key="description">Recording has not been cut yet.</configuration>
+        <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
+        <configuration key="action">resolve</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Untag elements for deletion -->
+    <operation
+      id="tag"
+      max-attempts="2"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Tagging media package elements for deletion">
+      <configurations>
+        <configuration key="source-flavors">*/trimmed,*/source</configuration>
+        <configuration key="target-tags">-atom,-archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Copy placeholder -failed- Video for publication -->
+    <operation
+      id="compose"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="copy failed Video">
+      <configurations>
+        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="target-flavor">presenter/delivery</configuration>
+        <configuration key="target-tags">failed,+archive,+engage-download</configuration>
+        <configuration key="encoding-profile">failed.http</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Archive the current state of the media package -->
+    <operation
+      id="snapshot"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Archiving">
+      <configurations>
+	      <configuration key="source-flavors">dublincore/*,security/*,*/delivery</configuration>
+         <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="publish-engage"
+      max-attempts="2"
+      exception-handler-workflow="partial-error"
+      description="Publishing to Opencast Media Module">
+      <configurations>
+	      <configuration key="download-source-flavors">dublincore/*,security/*,*/delivery</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
+        <configuration key="check-availability">false</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Copy last mediapackage version to workspace -->
+    <operation
+      id="ingest-download"
+      exception-handler-workflow="partial-error"
+      description="Ingesting external elements">
+      <configurations>
+        <configuration key="delete-external">true</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Delete every but the last snapshot -->
+    <operation
+      id="asset-delete"
+      fail-on-error="true"
+      exception-handler-workflow="error"
+      description="Delete every older Snapshot from AssetManager">
+      <configurations>
+        <configuration key="keep-last-snapshot">true</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+
+</definition>
