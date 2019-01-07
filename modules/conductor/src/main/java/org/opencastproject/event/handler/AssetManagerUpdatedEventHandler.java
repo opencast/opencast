@@ -169,7 +169,9 @@ public class AssetManagerUpdatedEventHandler {
 
         // Update the series XACML file
         if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
-          // Build a new XACML file for this mediapackage
+          if (seriesItem.getOverrideEpisodeAcl()) {
+            authorizationService.removeAcl(mp, AclScope.Episode);
+          }
           authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
         }
 

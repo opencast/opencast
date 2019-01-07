@@ -223,7 +223,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     try {
       EasyMock.expect(seriesService.getSeriesAccessControl((String) EasyMock.anyObject())).andReturn(acl).anyTimes();
       EasyMock.expect(seriesService.updateAccessControl((String) EasyMock.anyObject(),
-              (AccessControlList) EasyMock.anyObject())).andThrow(new NotFoundException()).andReturn(true);
+              (AccessControlList) EasyMock.anyObject(), EasyMock.anyBoolean())).andThrow(new NotFoundException())
+              .andReturn(true);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
