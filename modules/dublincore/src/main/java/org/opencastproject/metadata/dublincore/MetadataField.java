@@ -992,6 +992,8 @@ public class MetadataField<A> {
    *          be none.
    * @param order
    *          The ui order for the new field, 0 at the top and progressively down from there.
+   * @param type
+   *          The metadata field type as defined in {@link MetadataField.Type}
    * @return the new metadata field
    */
   private static MetadataField<String> createTextAnyMetadataField(String inputID, Opt<String> outputID, String label,
