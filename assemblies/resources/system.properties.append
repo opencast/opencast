@@ -3,6 +3,7 @@
 net.sf.ehcache.skipUpdateCheck=true
 org.terracotta.quartz.skipUpdateCheck=true
 
-# Configuring DocumentBuilderFactory and TransformerFactory
-javax.xml.parsers.DocumentBuilderFactory=org.apache.xerces.jaxp.DocumentBuilderFactoryImpl
-javax.xml.transform.TransformerFactory=org.apache.xalan.processor.TransformerFactoryImpl
+# Configure for native JDK Impls
+javax.xml.parsers.DocumentBuilderFactory=com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
+javax.xml.parsers.SAXParserFactory=com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl
+javax.xml.transform.TransformerFactory=com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl
