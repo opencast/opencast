@@ -140,6 +140,8 @@ index.number_of_replicas: 0
 
 #################################### Paths ####################################
 
+path.home: ${opencast.home}/
+
 # Path to directory containing configuration (this file and logging.yml):
 #
 path.conf: ${opencast.home}/etc/index

@@ -626,7 +626,7 @@ public abstract class AbstractSearchIndex extends AbstractElasticsearchIndex {
     Terms aggs = response.getAggregations().get(facetName);
 
     for (Bucket bucket : aggs.getBuckets()) {
-      terms.add(bucket.getKey());
+      terms.add(bucket.getKey().toString());
     }
 
     return terms;

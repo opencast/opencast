@@ -17,12 +17,12 @@
 
             "role": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "roles": { "index_name" : "role", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "roles": { "copy_to" : "role", "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "members": { "index_name" : "member", "type" : "string", "index" : "not_analyzed", "store" : "no" },
+            "members": { "copy_to" : "member", "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "text": { "type" : "string", "index" : "analyzed", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no" }
+            "text": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" },
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
 
         },
         "dynamic_templates" : [
@@ -30,7 +30,7 @@
              "text" : {
                  "match" : "text_*",
                  "match_mapping_type" : "string",
-                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no" }
+                 "mapping" : { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
                  }
              }
          ]

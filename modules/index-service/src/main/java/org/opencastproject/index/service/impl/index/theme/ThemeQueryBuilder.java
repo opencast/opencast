@@ -58,15 +58,15 @@ public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSe
     if (query.getOrganization() == null)
       throw new IllegalStateException("No organization set on the theme search query!");
 
-    and(ThemeIndexSchema.ORGANIZATION, query.getOrganization(), true);
+    and(ThemeIndexSchema.ORGANIZATION, query.getOrganization());
 
     // theme identifier
     if (query.getIdentifiers().length > 0) {
-      and(ThemeIndexSchema.UID, query.getIdentifiers(), true);
+      and(ThemeIndexSchema.ID, query.getIdentifiers());
     }
 
     if (query.getCreator() != null) {
-      and(ThemeIndexSchema.CREATOR, query.getCreator(), true);
+      and(ThemeIndexSchema.CREATOR, query.getCreator());
     }
 
     if (query.getCreatedFrom() != null && query.getCreatedTo() != null) {
@@ -74,73 +74,73 @@ public class ThemeQueryBuilder extends AbstractElasticsearchQueryBuilder<ThemeSe
     }
 
     if (query.getIsDefault() != null) {
-      and(ThemeIndexSchema.DEFAULT, query.getIsDefault(), true);
+      and(ThemeIndexSchema.DEFAULT, query.getIsDefault());
     }
 
     if (query.getDescription() != null) {
-      and(ThemeIndexSchema.DESCRIPTION, query.getDescription(), true);
+      and(ThemeIndexSchema.DESCRIPTION, query.getDescription());
     }
 
     if (query.getName() != null) {
-      and(ThemeIndexSchema.NAME, query.getName(), true);
+      and(ThemeIndexSchema.NAME, query.getName());
     }
 
     if (query.getBumperActive() != null) {
-      and(ThemeIndexSchema.BUMPER_ACTIVE, query.getBumperActive(), true);
+      and(ThemeIndexSchema.BUMPER_ACTIVE, query.getBumperActive());
     }
 
     if (query.getBumperFile() != null) {
-      and(ThemeIndexSchema.BUMPER_FILE, query.getBumperFile(), true);
+      and(ThemeIndexSchema.BUMPER_FILE, query.getBumperFile());
     }
 
     if (query.getLicenseSlideActive() != null) {
-      and(ThemeIndexSchema.LICENSE_SLIDE_ACTIVE, query.getLicenseSlideActive(), true);
+      and(ThemeIndexSchema.LICENSE_SLIDE_ACTIVE, query.getLicenseSlideActive());
     }
 
     if (query.getLicenseSlideBackground() != null) {
-      and(ThemeIndexSchema.LICENSE_SLIDE_BACKGROUND, query.getLicenseSlideBackground(), true);
+      and(ThemeIndexSchema.LICENSE_SLIDE_BACKGROUND, query.getLicenseSlideBackground());
     }
 
     if (query.getLicenseSlideDescription() != null) {
-      and(ThemeIndexSchema.LICENSE_SLIDE_DESCRIPTION, query.getLicenseSlideDescription(), true);
+      and(ThemeIndexSchema.LICENSE_SLIDE_DESCRIPTION, query.getLicenseSlideDescription());
     }
 
     if (query.getTrailerActive() != null) {
-      and(ThemeIndexSchema.TRAILER_ACTIVE, query.getTrailerActive(), true);
+      and(ThemeIndexSchema.TRAILER_ACTIVE, query.getTrailerActive());
     }
 
     if (query.getTrailerFile() != null) {
-      and(ThemeIndexSchema.TRAILER_FILE, query.getTrailerFile(), true);
+      and(ThemeIndexSchema.TRAILER_FILE, query.getTrailerFile());
     }
 
     if (query.getTitleSlideActive() != null) {
-      and(ThemeIndexSchema.TITLE_SLIDE_ACTIVE, query.getTitleSlideActive(), true);
+      and(ThemeIndexSchema.TITLE_SLIDE_ACTIVE, query.getTitleSlideActive());
     }
 
     if (query.getTitleSlideBackground() != null) {
-      and(ThemeIndexSchema.TITLE_SLIDE_BACKGROUND, query.getTitleSlideBackground(), true);
+      and(ThemeIndexSchema.TITLE_SLIDE_BACKGROUND, query.getTitleSlideBackground());
     }
 
     if (query.getTitleSlideMetadata() != null) {
-      and(ThemeIndexSchema.TITLE_SLIDE_METADATA, query.getTitleSlideMetadata(), true);
+      and(ThemeIndexSchema.TITLE_SLIDE_METADATA, query.getTitleSlideMetadata());
     }
 
     if (query.getWatermarkActive() != null) {
-      and(ThemeIndexSchema.WATERMARK_ACTIVE, query.getWatermarkActive(), true);
+      and(ThemeIndexSchema.WATERMARK_ACTIVE, query.getWatermarkActive());
     }
 
     if (query.getWatermarkFile() != null) {
-      and(ThemeIndexSchema.WATERMARK_FILE, query.getWatermarkFile(), true);
+      and(ThemeIndexSchema.WATERMARK_FILE, query.getWatermarkFile());
     }
 
     if (query.getWatermarkPosition() != null) {
-      and(ThemeIndexSchema.WATERMARK_POSITION, query.getWatermarkPosition(), true);
+      and(ThemeIndexSchema.WATERMARK_POSITION, query.getWatermarkPosition());
     }
 
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {
-        StringBuffer queryText = new StringBuffer();
+        StringBuilder queryText = new StringBuilder();
         for (String term : terms.getTerms()) {
           if (queryText.length() > 0)
             queryText.append(" ");
