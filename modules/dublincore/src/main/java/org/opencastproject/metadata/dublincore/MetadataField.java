@@ -907,8 +907,8 @@ public class MetadataField<A> {
   public static MetadataField<String> createTextMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
           Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
-    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection, collectionId, order,
-            JsonType.TEXT, namespace);
+    return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
+            collectionId, order, Type.TEXT, JsonType.TEXT, namespace);
   }
 
   /**
@@ -942,8 +942,8 @@ public class MetadataField<A> {
       Opt<String> collectionId,
       Opt<Integer> order,
       Opt<String> namespace) {
-    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection, collectionId, order,
-        JsonType.ORDERED_TEXT, namespace);
+    return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
+            collectionId, order, Type.ORDERED_TEXT, JsonType.ORDERED_TEXT, namespace);
   }
 
 
@@ -970,8 +970,8 @@ public class MetadataField<A> {
   public static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
           Opt<String> collectionId, Opt<Integer> order, Opt<String> namespace) {
-    return createTextLongMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
-            collectionId, order, JsonType.TEXT_LONG, namespace);
+    return createTextAnyMetadataField(inputID, outputID, label, readOnly, required, isTranslatable, collection,
+            collectionId, order, Type.TEXT_LONG, JsonType.TEXT_LONG, namespace);
   }
 
   /**
@@ -992,11 +992,13 @@ public class MetadataField<A> {
    *          be none.
    * @param order
    *          The ui order for the new field, 0 at the top and progressively down from there.
+   * @param type
+   *          The metadata field type as defined in {@link MetadataField.Type}
    * @return the new metadata field
    */
-  private static MetadataField<String> createTextLongMetadataField(String inputID, Opt<String> outputID, String label,
+  private static MetadataField<String> createTextAnyMetadataField(String inputID, Opt<String> outputID, String label,
           boolean readOnly, boolean required, Opt<Boolean> isTranslatable, Opt<Map<String, String>> collection,
-          Opt<String> collectionId, Opt<Integer> order, JsonType jsonType, Opt<String> namespace) {
+          Opt<String> collectionId, Opt<Integer> order, Type type, JsonType jsonType, Opt<String> namespace) {
 
     Fn<Opt<String>, JValue> stringToJSON = new Fn<Opt<String>, JValue>() {
       @Override
@@ -1018,7 +1020,7 @@ public class MetadataField<A> {
       }
     };
 
-    return new MetadataField<>(inputID, outputID, label, readOnly, required, "", isTranslatable, Type.TEXT, jsonType,
+    return new MetadataField<>(inputID, outputID, label, readOnly, required, "", isTranslatable, type, jsonType,
             collection, collectionId, stringToJSON, jsonToString, order, namespace);
   }
 
