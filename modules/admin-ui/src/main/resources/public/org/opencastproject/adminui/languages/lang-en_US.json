@@ -2185,5 +2185,10 @@
       "UNKNOWN": "Unknown",
       "UPLOADING": "Uploading"
     }
+  },
+  "EDITABLE": {
+    "MULTI_SELECT": {
+      "PLACEHOLDER": "To insert multiple values press Enter in between"
+    }
   }
 }
