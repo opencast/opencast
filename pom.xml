@@ -31,7 +31,7 @@
     <karaf.version>4.0.10</karaf.version>
     <pax.web.version>4.3.4</pax.web.version>
     <cxf.version>3.1.12</cxf.version>
-    <jackson.version>2.9.7</jackson.version>
+    <jackson.version>2.9.8</jackson.version>
     <functional.version>1.4.2</functional.version>
     <jdk.version>1.8</jdk.version>
     <mina.version>2.0.19</mina.version>
@@ -973,11 +973,6 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
         <version>3.1_7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
-        <version>2.9.1_3</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
