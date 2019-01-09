@@ -48,7 +48,7 @@ Before you can start you need to get an account for the repository. You will nee
 after the registration to successfully complete this manual. The placeholders `[your_username]` and `[your_password]`
 are used in this manual wherever the credentials are needed.
 
-[Please visit https://pkg.opencast.org](https://pkg.opencast.org)
+[Please visit pkg.opencast.org](https://pkg.opencast.org)
 
 
 Activate Repository
