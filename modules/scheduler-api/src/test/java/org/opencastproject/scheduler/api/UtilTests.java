@@ -21,6 +21,7 @@
 package org.opencastproject.scheduler.api;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import net.fortuna.ical4j.model.Period;
 
@@ -35,6 +36,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
+
 public class UtilTests {
   private static final Logger logger = LoggerFactory.getLogger(UtilTests.class);
   /**
@@ -42,6 +44,7 @@ public class UtilTests {
    */
   private final TimeZone jst = TimeZone.getTimeZone("Asia/Tokyo"); // Japan Standard Time (UTC +9)
   private final TimeZone pst = TimeZone.getTimeZone("America/Anchorage"); // Alaska Standard Time (UTC -8)
+  private final TimeZone pstDL = TimeZone.getTimeZone("ATDT");  // Alaska Daylight Savings Time (UTC -7)
   private final TimeZone cet = TimeZone.getTimeZone("Europe/Zurich"); // European time (UTC +2)
   private final TimeZone nonDstTz = TimeZone.getTimeZone("America/Phoenix"); // Like UTC, it has no DaySavings Boundry
 
@@ -74,23 +77,23 @@ public class UtilTests {
     assertEquals(5, periods.size());
 
     // PST
-    start = Calendar.getInstance(pst);
+    start = Calendar.getInstance(pstDL);
     start.set(2016, 2, 23, 22, 0);
     start.set(Calendar.SECOND, 0);
     assertEquals(0, start.get(Calendar.SECOND));
-    end = Calendar.getInstance(pst);
+    end = Calendar.getInstance(pstDL);
     end.set(2016, 2, 29, start.get(Calendar.HOUR_OF_DAY), 5);
     end.set(Calendar.SECOND, 50);
     durationMillis = (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE)) * 60 * 1000;
     days = "MO,TU,WE,SA,SU"; // --> A day after when switching to UTC (22+8)
     logger.debug("expecting days {} tz {}", days, start.getTimeZone().getID());
-    periods = generatePeriods(pst, start, end, days, durationMillis);
+    periods = generatePeriods(pstDL, start, end, days, durationMillis);
     logger.debug("Expecting 5 got {}", periods.size());
     assertEquals(5, periods.size());
 
     // CET
     start = Calendar.getInstance(cet);
-    start.set(2016, 2, 25, 0, 5);
+    start.set(2016, 2, 25, 15, 5);
     start.set(Calendar.SECOND, 0);
     assertEquals(0, start.get(Calendar.SECOND));
     end = Calendar.getInstance(cet);
@@ -130,7 +133,7 @@ public class UtilTests {
 
     // CET->CEST test (March 25 is CET->CEST)
     // On Sunday, March 27, 2:00 am CET->CEST
-    int scheduledHour = 0; // the hour of the day that the events should occur
+    int scheduledHour = 15; // the hour of the day that the events should occur
     int expectedCount = 20; // the amount of events that should be scheduled
     start = Calendar.getInstance(cet);
     start.set(2016, 2, 15, scheduledHour, 5);
@@ -260,8 +263,9 @@ public class UtilTests {
     logger.debug("Expecting {} got {}", expectedCount, periods.size());
     assertEquals(expectedCount, periods.size());
     for (Period d : periods) {
-      Calendar cal = Calendar.getInstance(tz);
-      cal.setTime(d.getStart());
+      //logger.debug("Retrieved period start {} end {}", d.getStart().toString(),  d.getEnd().toString());
+      Calendar cal = Calendar.getInstance(d.getStart().getTimeZone());
+      cal.setTimeInMillis(d.getStart().getTime());
       logger.debug("Date {} Instance {}, calendar hour {} (expected {}), zone {}",
               d.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), expectedHour, tz.getID());
       assertEquals(expectedHour, cal.get(Calendar.HOUR_OF_DAY));
@@ -272,14 +276,14 @@ public class UtilTests {
   private List<Period> generatePeriods(TimeZone tz, Calendar startTz, Calendar endTz, String days, Long duration)
           throws ParseException {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
+    simpleDateFormat.setTimeZone(tz);
 
-    // Verify Dates are in TZ
-    if (endTz.getTimeZone().getRawOffset() != tz.getRawOffset()) {
-      throw new ParseException("Expected end tz " + tz.getID() + " but have " + endTz.getTimeZone().getID(), endTz.getTimeZone().getRawOffset());
-    }
-    if (startTz.getTimeZone().getRawOffset() != tz.getRawOffset()) {
-      throw new ParseException("Expected start tz " + tz.getID() + " but have " + endTz.getTimeZone().getID(), endTz.getTimeZone().getRawOffset());
-    }
+    // Verify Dates are in TZ or 1 off ( DayLight TZ or Standard TZ)
+    logger.debug("Period start {} end {}, Tz {}, local TimeZone {}", simpleDateFormat.format(startTz.getTime()),
+            simpleDateFormat.format(endTz.getTime()), tz.getID(),
+            TimeZone.getDefault().getID());
+    assertTrue(Math.abs(endTz.getTimeZone().getRawOffset() - tz.getRawOffset()) < 2);
+    assertTrue(Math.abs(startTz.getTimeZone().getRawOffset() - tz.getRawOffset()) < 2);
 
     String rRuleStr = generateRule(days, startTz.get(Calendar.HOUR_OF_DAY), startTz.get(Calendar.MINUTE));
     simpleDateFormat.setTimeZone(tz);
