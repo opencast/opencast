@@ -42,11 +42,12 @@
     <!-- Offload the archived mediapackage -->
 
     <operation
-      id="move-to-remote"
+      id="move-storage"
       if="${offloadToAWSS3}"
       description="Offloading to AWS S3">
       <configurations>
         <configuration key="target-storage">aws-s3</configuration>
+        <configuration key="target-version">0</configuration>
       </configurations>
     </operation>
 

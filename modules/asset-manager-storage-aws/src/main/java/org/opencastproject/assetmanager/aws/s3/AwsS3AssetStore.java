@@ -36,6 +36,7 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.BucketVersioningConfiguration;
@@ -65,6 +66,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.assetmanager.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.assetmanager.aws.s3.region";
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.assetmanager.aws.s3.bucket";
+  public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.assetmanager.aws.s3.endpoint";
+  public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.assetmanager.aws.s3.path.style";
 
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
@@ -72,6 +75,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   /** The AWS S3 bucket name */
   private String bucketName = null;
+
+  private String endpoint = null;
+
+  private boolean pathStyle = false;
 
   private boolean bucketCreated = false;
 
@@ -108,6 +115,13 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionName);
 
+      endpoint = getAWSConfigKey(cc, AWS_S3_ENDPOINT_CONFIG);
+      logger.info("AWS endpoint is {}", endpoint);
+
+      pathStyle = Boolean.valueOf(getAWSConfigKey(cc, AWS_S3_PATH_STYLE_CONFIG));
+      logger.info("AWS path style is {}", pathStyle);
+
+
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
       Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
@@ -123,10 +137,8 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
                 new BasicAWSCredentials(accessKeyIdOpt.get(), accessKeySecretOpt.get()));
 
       // Create AWS client.
-      s3 = AmazonS3ClientBuilder.standard()
-              .withRegion(regionName)
-              .withCredentials(provider)
-              .build();
+      s3 = AmazonS3ClientBuilder.standard().withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endpoint
+              , regionName)).withPathStyleAccessEnabled(pathStyle).withCredentials(provider).build();
 
       s3TransferManager = new TransferManager(s3);
 
