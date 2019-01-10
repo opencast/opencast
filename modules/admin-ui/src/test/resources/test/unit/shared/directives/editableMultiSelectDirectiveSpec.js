@@ -91,7 +91,7 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
     describe('#leaveEditMode', function () {
 
         it('leaves edit mode', function () {
-            var scope = element.find('ul').scope();  // the div & input elements doesn't exist when editMode = false
+            var scope = element.find('ul').scope();  // the div & input elements don't exist when editMode = false
             scope.editMode = true;
             scope.data.value = 'edited';
 
@@ -99,9 +99,29 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
             expect(element.scope().params.value).not.toContain('edited')
             expect(scope.editMode).toBe(false);
-            expect(scope.data.value).toEqual('edited');
+            expect(scope.data.value).toEqual('');
         });
     });
+
+    describe('#onBlur', function () {
+
+        var scope;
+
+        beforeEach(function () {
+            scope = element.find('ul').scope();  // the div & input elements don't exist when editMode = false
+            scope.editMode = true;
+            scope.mixed = true;
+            scope.data.value = 'edited';
+        });
+
+        it('saves and leaves edit mode', function () {
+            scope.onBlur();
+
+            expect(scope.editMode).toBe(false);
+            expect(scope.data.value).toEqual('');
+            expect(scope.params.value).toContain('edited')
+        });
+    })
 
     describe('#addValue', function () {
 
@@ -120,7 +140,6 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
             event.stopPropagation = jasmine.createSpy();
             scope = element.find('ul').scope()
             scope.editMode = true;
-
         });
 
         it('does nothing by default', function () {
@@ -141,6 +160,10 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
             it('leaves edit mode', function () {
                 expect(scope.editMode).toBe(false);
+            });
+
+            it('clears value', function () {
+              expect(scope.data.value).toBe('');
             });
         });
 
