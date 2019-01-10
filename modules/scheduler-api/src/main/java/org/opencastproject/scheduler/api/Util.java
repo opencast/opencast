@@ -21,15 +21,16 @@
 
 package org.opencastproject.scheduler.api;
 
+import static net.fortuna.ical4j.model.parameter.Value.DATE_TIME;
+
 import net.fortuna.ical4j.model.DateList;
+import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.Recur;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
 import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.property.RRule;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,16 +92,16 @@ public final class Util {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
     String tzStr = tz.getID();
-    List<Period> events = new LinkedList<>();
+    List<Period> event = new LinkedList<>();
     TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
     logger.debug("Inbound start of recurrence {} to end of recurrence {}, in Tz {}",
             simpleDateFormat.format(startCalTz.getTime()),
             simpleDateFormat.format(endCalTz.getTime()), tzStr);
 
-    net.fortuna.ical4j.model.DateTime periodStart = new net.fortuna.ical4j.model.DateTime(startCalTz.getTime());
+    DateTime periodStart = new DateTime(startCalTz.getTime());
     logger.debug("ical4j timeZone for {} is {}", tzStr, registry.getTimeZone(tzStr).toZoneId());
     periodStart.setTimeZone(registry.getTimeZone(tzStr));
-    net.fortuna.ical4j.model.DateTime periodEnd = new net.fortuna.ical4j.model.DateTime(endCalTz.getTime());
+    DateTime periodEnd = new DateTime(endCalTz.getTime());
     periodEnd.setTimeZone(registry.getTimeZone(tzStr));
 
     logger.trace("is utc {}? Tz is {} ", periodStart.isUtc(), periodStart.getTimeZone().toZoneId());
@@ -109,20 +110,26 @@ public final class Util {
             simpleDateFormat.format(new Date(periodEnd.getTime())), duration, rRuleTzStr);
 
     Recur recur = new Recur(rRuleTzStr);
-    DateList dates = recur.getDates(periodStart, periodEnd,
-            net.fortuna.ical4j.model.parameter.Value.DATE_TIME);
-    logger.trace("Got dates: {}", dates.toString());
+    // Try use period start as seed to stick the local TZ
+    DateList dates = recur.getDates(periodStart, periodStart, periodEnd, DATE_TIME);
+    logger.trace("Got {} dates: {}, tz '{}'", dates.size(), dates.toString(), dates.getTimeZone().toZoneId());
 
     for (Date date : dates) {
-      Date endTZ = new DateTime(date.getTime() + duration).toDateTime(DateTimeZone.forID(tz.getID())).toDate();
-      net.fortuna.ical4j.model.DateTime startDT = new net.fortuna.ical4j.model.DateTime(date);
-      net.fortuna.ical4j.model.DateTime endDT = new net.fortuna.ical4j.model.DateTime(endTZ);
-      startDT.setTimeZone(registry.getTimeZone(tz.getID()));
-      endDT.setTimeZone(registry.getTimeZone(tz.getID()));
-      logger.debug("Saving period after start {} end {}", startDT.toString(),  endDT.toString());
+      Date endTZ = new DateTime(date.getTime() + duration);
+      DateTime startDT = new DateTime(date);
+      DateTime endDT = new DateTime(endTZ);
       Period p = new Period(startDT, endDT);
-      events.add(p);
+      // remove duplicate dates from recur results
+      if (!event.contains(p)) {
+        event.add(p);
+      }
     }
-    return events;
+    for (Period e: event) {
+      Calendar cal = Calendar.getInstance(e.getStart().getTimeZone());
+      cal.setTimeInMillis(e.getStart().getTime());
+      logger.debug("EventList start {} Instance {}, calendar hour {}, zone {}",
+              e.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), e.getStart().getTimeZone());
+    }
+    return event;
   }
 }
