@@ -161,7 +161,7 @@ First option is the default one and the configuration is as follows:
     property.publisher.label=EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER
     property.publisher.type=text
     property.publisher.readOnly=true
-    property.publisher.required=true
+    property.publisher.required=false
     property.publisher.order=16
 
 To configure the second option:
