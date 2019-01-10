@@ -101,7 +101,7 @@ angular.module('adminNg.directives')
       };
 
       scope.addCurrentValue = function () {
-        if (angular.isDefined(scope.data.value)) {
+        if (angular.isDefined(scope.data.value) && scope.data.value) {
           scope.addValue(scope.params.value, scope.data.value);
         }
       };
@@ -114,8 +114,8 @@ angular.module('adminNg.directives')
 
           if (value && model.indexOf(value) === -1) {
             model.push(value);
+            scope.submit();
           }
-          scope.submit();
         }
       };
 
