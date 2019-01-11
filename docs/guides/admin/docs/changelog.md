@@ -387,6 +387,35 @@ Opencast 6
 Opencast 5
 ----------
 
+### Opencast 5.3
+
+*Released on January 11, 2018*
+
+- [[MH-13297](https://opencast.jira.com/browse/MH-13297)][[#638](https://github.com/opencast/opencast/pull/638)] -
+  FasterXML Jackson Bugfix Update
+- [[MH-13296](https://opencast.jira.com/browse/MH-13296)][[#637](https://github.com/opencast/opencast/pull/637)] -
+  Disable buttons of start task wizard while the tasks are being submitted
+- [[MH-12290](https://opencast.jira.com/browse/MH-12290)][[#636](https://github.com/opencast/opencast/pull/636)] -
+  prevent SAXParserFactory and SAXParser class load lag in series listprovider
+- [[MH-13269](https://opencast.jira.com/browse/MH-13269)][[#608](https://github.com/opencast/opencast/pull/608)] -
+  Handle Authorization Errors
+- [[MH-13263](https://opencast.jira.com/browse/MH-13263)][[#598](https://github.com/opencast/opencast/pull/598)] -
+  Invalid Ingest Encoding
+- [[MH-13257](https://opencast.jira.com/browse/MH-13257)][[#597](https://github.com/opencast/opencast/pull/597)] -
+  Fix outdated command line argument for tesseract >= 4.0.0
+- [[MH-13258](https://opencast.jira.com/browse/MH-13258)][[#592](https://github.com/opencast/opencast/pull/592)] -
+  Broken User Provider Removal
+- [[MH-13256](https://opencast.jira.com/browse/MH-13256)][[#591](https://github.com/opencast/opencast/pull/591)] -
+  Waveform operation fails
+- [[MH-13243](https://opencast.jira.com/browse/MH-13243)][[#580](https://github.com/opencast/opencast/pull/580)] -
+  Asset Manager ACL Cache Updates
+- [Documentation: Opencast 5.2 was released in Nov
+  ](https://github.com/opencast/opencast/pull/572)
+- [Documentation: Linkfixes in OC5.x upgrade guide
+  ](https://github.com/opencast/opencast/pull/571)
+- [[MH-12332](https://opencast.jira.com/browse/MH-12332)][[#567](https://github.com/opencast/opencast/pull/567)] -
+  disable workflows whose tags don't explicitly match the source type, UPLOAD|SCHEDULE 5.x
+
 ### Opencast 5.2
 
 *Released on November 13, 2018*
