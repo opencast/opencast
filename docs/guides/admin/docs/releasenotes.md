@@ -83,6 +83,15 @@ Configuration changes
   their access permissions appropriately. For more details, take a look at the [capture agent access management
   documentation](../../user/advanced/capture-agent-access/).
 
+
+Additional Notes about 6.1
+--------------------------
+
+Opencast 6.1 contains a number of bug fixes, some of which are security relevant. The following known vulnerabilities
+within Opencast's `com.fasterxml.jackson.core:jackson-databind` dependency have been fixed by this release:
+`CVE-2018-19361`, `CVE-2018-19362`, `CVE-2018-19360`.
+
+
 Release Schedule
 ----------------
 
