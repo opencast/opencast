@@ -101,7 +101,8 @@ guide](../modules/ltimodule/#configure-oauth-authentication) for the complete do
 
 ### Configuration changes since Opencast 5.3
 
-The Tesseract arguments have been updated in `etc/custom.properties`. Please validate your configuration value for `org.opencastproject.textanalyzer.tesseract.options`, which is disabled by default.
+The Tesseract arguments have been updated in `etc/custom.properties`. Please validate your configuration value for
+`org.opencastproject.textanalyzer.tesseract.options`, which is disabled by default.
 
 The configuration section in the schedule-and-upload workflow was updated. Take a look at
 `etc/workflows/schedule-and-upload.xml`.
