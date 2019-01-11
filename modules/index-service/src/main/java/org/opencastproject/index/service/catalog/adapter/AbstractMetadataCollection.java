@@ -223,20 +223,6 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
     addField(field);
   }
 
-  @Override
-  public void updateIterableStringField(MetadataField<?> current, Iterable<String> value) {
-    if (!(current.getType().equals(MetadataField.Type.ITERABLE_TEXT))) {
-      throw new IllegalArgumentException("Unable to update a field to a different type than String with this method!");
-    }
-    removeField(current);
-    MetadataField<Iterable<String>> field = MetadataField.createIterableStringMetadataField(current.getInputID(),
-            Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
-            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getDelimiter(),
-            current.getOrder(), current.getNamespace());
-    field.setValue(value);
-    addField(field);
-  }
-
   /**
    * Get the values collection with the given name from the {@link ListProvidersService}.
    *
