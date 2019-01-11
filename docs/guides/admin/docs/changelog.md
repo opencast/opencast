@@ -4,6 +4,85 @@ Changelog
 Opencast 5
 ----------
 
+### Opencast 5.3
+
+*Released on January 11, 2018*
+
+- [[MH-13297](https://opencast.jira.com/browse/MH-13297)][[#638](https://github.com/opencast/opencast/pull/638)] -
+  FasterXML Jackson Bugfix Update
+- [[MH-13296](https://opencast.jira.com/browse/MH-13296)][[#637](https://github.com/opencast/opencast/pull/637)] -
+  Disable buttons of start task wizard while the tasks are being submitted
+- [[MH-12290](https://opencast.jira.com/browse/MH-12290)][[#636](https://github.com/opencast/opencast/pull/636)] -
+  prevent SAXParserFactory and SAXParser class load lag in series listprovider
+- [[MH-13269](https://opencast.jira.com/browse/MH-13269)][[#608](https://github.com/opencast/opencast/pull/608)] -
+  Handle Authorization Errors
+- [[MH-13263](https://opencast.jira.com/browse/MH-13263)][[#598](https://github.com/opencast/opencast/pull/598)] -
+  Invalid Ingest Encoding
+- [[MH-13257](https://opencast.jira.com/browse/MH-13257)][[#597](https://github.com/opencast/opencast/pull/597)] -
+  Fix outdated command line argument for tesseract >= 4.0.0
+- [[MH-13258](https://opencast.jira.com/browse/MH-13258)][[#592](https://github.com/opencast/opencast/pull/592)] -
+  Broken User Provider Removal
+- [[MH-13256](https://opencast.jira.com/browse/MH-13256)][[#591](https://github.com/opencast/opencast/pull/591)] -
+  Waveform operation fails
+- [[MH-13243](https://opencast.jira.com/browse/MH-13243)][[#580](https://github.com/opencast/opencast/pull/580)] -
+  Asset Manager ACL Cache Updates
+- [Documentation: Opencast 5.2 was released in Nov
+  ](https://github.com/opencast/opencast/pull/572)
+- [Documentation: Linkfixes in OC5.x upgrade guide
+  ](https://github.com/opencast/opencast/pull/571)
+- [[MH-12332](https://opencast.jira.com/browse/MH-12332)][[#567](https://github.com/opencast/opencast/pull/567)] -
+  disable workflows whose tags don't explicitly match the source type, UPLOAD|SCHEDULE 5.x
+- [[MH-13144](https://opencast.jira.com/browse/MH-13144)][[#553](https://github.com/opencast/opencast/pull/553)] -
+  only set Job startDate if no set before
+- [[MH-13216](https://opencast.jira.com/browse/MH-13216)][[#550](https://github.com/opencast/opencast/pull/550)] -
+  Fix Documentation Pages
+- [[MH-13211](https://opencast.jira.com/browse/MH-13211)][[#547](https://github.com/opencast/opencast/pull/547)] -
+  engage-ui: Fix live schedule bug: event available before schedule
+- [[MH-13190](https://opencast.jira.com/browse/MH-13190)][[#520](https://github.com/opencast/opencast/pull/520)] -
+  Factor out JpaGroupRoleProvider JaxRs REST to mitigate load cycle race
+- [[MH-13189](https://opencast.jira.com/browse/MH-13189)][[#517](https://github.com/opencast/opencast/pull/517)] -
+  Fix paella xss security isues in opencast 5.x
+- [[MH-13167](https://opencast.jira.com/browse/MH-13167)][[#490](https://github.com/opencast/opencast/pull/490)] -
+  Republishing metadata does not update all metadata
+- [[MH-13152](https://opencast.jira.com/browse/MH-13152)][[#476](https://github.com/opencast/opencast/pull/476)] -
+  Reduce Workflow Messages
+- [[MH-13138](https://opencast.jira.com/browse/MH-13138)][[#463](https://github.com/opencast/opencast/pull/463)] -
+  Fix media module language configuration
+- [[MH-13108](https://opencast.jira.com/browse/MH-13108)][[#437](https://github.com/opencast/opencast/pull/437)] -
+  Prevent permission problem in Travis cache
+- [[MH-13091](https://opencast.jira.com/browse/MH-13091)][[#421](https://github.com/opencast/opencast/pull/421)] -
+  Concat operation problem with FFMPEG 4.x
+- [[MH-13069](https://opencast.jira.com/browse/MH-13069)][[#406](https://github.com/opencast/opencast/pull/406)] -
+  Update problematic admin interface libraries
+- [[MH-13067](https://opencast.jira.com/browse/MH-13067)][[#404](https://github.com/opencast/opencast/pull/404)] -
+  Configuration panel does not work for default workflow
+- [[MH-13049](https://opencast.jira.com/browse/MH-13049)][[#400](https://github.com/opencast/opencast/pull/400)] -
+  Fix video editor zoom dropdown showing wrong value
+- [[MH-13055](https://opencast.jira.com/browse/MH-13055)][[#396](https://github.com/opencast/opencast/pull/396)] -
+  Stop making events with no ACL public on ingest
+- [[MH-13048](https://opencast.jira.com/browse/MH-13048)][[#394](https://github.com/opencast/opencast/pull/394)] -
+  Improve stability of the series index rebuild
+- [[MH-13047](https://opencast.jira.com/browse/MH-13047)][[#393](https://github.com/opencast/opencast/pull/393)] -
+  Document using Nginx for HTTPS
+- [[MH-13044](https://opencast.jira.com/browse/MH-13044)][[#390](https://github.com/opencast/opencast/pull/390)] -
+  Organization server configuration documentation
+- [[MH-12976](https://opencast.jira.com/browse/MH-12976)][[#389](https://github.com/opencast/opencast/pull/389)] -
+  custom role patterns not working
+- [[MH-12016](https://opencast.jira.com/browse/MH-12016)][[#379](https://github.com/opencast/opencast/pull/379)] -
+  Scrolling role fetch
+- [[MH-13031](https://opencast.jira.com/browse/MH-13031)][[#377](https://github.com/opencast/opencast/pull/377)] -
+  Active transaction notification on top
+- [[MH-13023](https://opencast.jira.com/browse/MH-13023)][[#370](https://github.com/opencast/opencast/pull/370)] -
+  Let default value fulfill requirement
+- [[MH-13018](https://opencast.jira.com/browse/MH-13018)][[#367](https://github.com/opencast/opencast/pull/367)] -
+  re-add recordings json to 5x (includes MH-12828 re-add conflicts.json)
+- [[MH-13003](https://opencast.jira.com/browse/MH-13003)][[#352](https://github.com/opencast/opencast/pull/352)] -
+  Implement detection of already recorded (as opposed to yet to be recorded, scheduled) events by the index service
+- [[MH-12387](https://opencast.jira.com/browse/MH-12387)][[#350](https://github.com/opencast/opencast/pull/350)] -
+  Fix CAS
+- [[MH-12988](https://opencast.jira.com/browse/MH-12988)][[#337](https://github.com/opencast/opencast/pull/337)] -
+  delete-scheduled-live Fix for scheduled live event not deleted
+
 ### Opencast 5.2
 
 *Released on November 13, 2018*
