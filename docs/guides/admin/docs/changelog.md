@@ -4,12 +4,33 @@ Changelog
 Opencast 6
 ----------
 
+### Opencast 6.1
+
+- [[MH-13305](https://opencast.jira.com/browse/MH-13305)][[#646](https://github.com/opencast/opencast/pull/646)] -
+  MacOS installation update
+- [[MH-13304](https://opencast.jira.com/browse/MH-13304)][[#645](https://github.com/opencast/opencast/pull/645)] -
+  Multi-value consistent with multi-select
+- [[MH-13302](https://opencast.jira.com/browse/MH-13302)][[#644](https://github.com/opencast/opencast/pull/644)] -
+  Don't save unnecessarily in Multi-Select
+- [[MH-13301](https://opencast.jira.com/browse/MH-13301)][[#643](https://github.com/opencast/opencast/pull/643)] -
+  Don't require event.publisher since it is a readonly field
+- [[MH-13300](https://opencast.jira.com/browse/MH-13300)][[#640](https://github.com/opencast/opencast/pull/640)] -
+  Display multi-value fields correctly on summary pages
+- [[MH-13299](https://opencast.jira.com/browse/MH-13299)][[#639](https://github.com/opencast/opencast/pull/639)] -
+  Make multi-select fields consistent again
+- [[MH-13295](https://opencast.jira.com/browse/MH-13295)][[#635](https://github.com/opencast/opencast/pull/635)] -
+  Handle null for presentable value extraction
+- [[MH-13283](https://opencast.jira.com/browse/MH-13283)][[#624](https://github.com/opencast/opencast/pull/624)] -
+  Fix Custom CXF Error Handler
+- [[MH-13248](https://opencast.jira.com/browse/MH-13248)][[#623](https://github.com/opencast/opencast/pull/623)] -
+  Allow hidden workflow parameters
+
 ### Opencast 6.0
 
 *Released on December 10, 2018*
 
-- [NOJIRA: Remove dropped translations
-  ](https://github.com/opencast/opencast/pull/620)
+- [[#620](https://github.com/opencast/opencast/pull/620)] -
+  Remove dropped translations
 - [[MH-13230](https://opencast.jira.com/browse/MH-13230)][[#616](https://github.com/opencast/opencast/pull/616)] -
   remove the need for passing an Accept header with external api requests
 - [[MH-13272](https://opencast.jira.com/browse/MH-13272)][[#611](https://github.com/opencast/opencast/pull/611)] -
@@ -62,8 +83,8 @@ Opencast 6
   Unify vertical spacing in wizards
 - [[MH-13184](https://opencast.jira.com/browse/MH-13184)][[#508](https://github.com/opencast/opencast/pull/508)] -
   Update request-digest
-- [NOJIRA: Remove documentation about unused workflow pause role
-  ](https://github.com/opencast/opencast/pull/507)
+- [[#507](https://github.com/opencast/opencast/pull/507)] -
+  Remove documentation about unused workflow pause role
 - [[MH-13162](https://opencast.jira.com/browse/MH-13162)][[#506](https://github.com/opencast/opencast/pull/506)] -
   Show all series in edit-scheduled-events
 - [[MH-13179](https://opencast.jira.com/browse/MH-13179)][[#503](https://github.com/opencast/opencast/pull/503)] -
@@ -98,8 +119,8 @@ Opencast 6
   Timed tiered storage test fails on fast systems
 - [[MH-13051](https://opencast.jira.com/browse/MH-13051)][[#471](https://github.com/opencast/opencast/pull/471)] -
   Fix dropdown placeholders
-- [Fix rest docs of GroupsEndpoint
-  ](https://github.com/opencast/opencast/pull/470)
+- [[#470](https://github.com/opencast/opencast/pull/470)] -
+  Fix rest docs of GroupsEndpoint
 - [[MH-13141](https://opencast.jira.com/browse/MH-13141)][[#469](https://github.com/opencast/opencast/pull/469)] -
   Correctly initialize stats service
 - [[MH-13142](https://opencast.jira.com/browse/MH-13142)][[#468](https://github.com/opencast/opencast/pull/468)] -
@@ -122,8 +143,8 @@ Opencast 6
   Fix REST Docs Overview Rendering
 - [[MH-13131](https://opencast.jira.com/browse/MH-13131)][[#456](https://github.com/opencast/opencast/pull/456)] -
   Fix Feed Service REST Docs
-- [Remove misleading - sign in tag woh docs
-  ](https://github.com/opencast/opencast/pull/455)
+- [[#455](https://github.com/opencast/opencast/pull/455)] -
+  Remove misleading - sign in tag woh docs
 - [[MH-13125](https://opencast.jira.com/browse/MH-13125)][[#451](https://github.com/opencast/opencast/pull/451)] -
   Remove unused configuration keys
 - [[MH-13123](https://opencast.jira.com/browse/MH-13123)][[#448](https://github.com/opencast/opencast/pull/448)] -
@@ -216,8 +237,8 @@ Opencast 6
   Clean up mockup
 - [[MH-13022](https://opencast.jira.com/browse/MH-13022)][[#378](https://github.com/opencast/opencast/pull/378)] -
   fixed LTI highly trusted keys being discarded
-- [Update and improve documentation for reviews
-  ](https://github.com/opencast/opencast/pull/376)
+- [[#376](https://github.com/opencast/opencast/pull/376)] -
+  Update and improve documentation for reviews
 - [[MH-13027](https://opencast.jira.com/browse/MH-13027)][[#374](https://github.com/opencast/opencast/pull/374)] -
   Update angular-translate to 2.18.1
 - [[MH-13026](https://opencast.jira.com/browse/MH-13026)][[#373](https://github.com/opencast/opencast/pull/373)] -
@@ -226,10 +247,10 @@ Opencast 6
   Add workflow API to external API
 - [[MH-13024](https://opencast.jira.com/browse/MH-13024)][[#371](https://github.com/opencast/opencast/pull/371)] -
   Video editor does not display information when being opened while an event is being processed
-- [Documentation: message-broker: binding localhost
-  ](https://github.com/opencast/opencast/pull/369)
-- [Documentation: Update security.https.md
-  ](https://github.com/opencast/opencast/pull/368)
+- [[#369](https://github.com/opencast/opencast/pull/369)] -
+  Documentation: message-broker: binding localhost
+- [[#368](https://github.com/opencast/opencast/pull/368)] -
+  Documentation: Update security.https.md
 - [[MH-13016](https://opencast.jira.com/browse/MH-13016)][[#362](https://github.com/opencast/opencast/pull/362)] -
   Workflow display order not working in editor screen
 - [[MH-13013](https://opencast.jira.com/browse/MH-13013)][[#359](https://github.com/opencast/opencast/pull/359)] -
@@ -262,8 +283,8 @@ Opencast 6
   Trigger conflict check in “Edit scheduled” on “Next”
 - [[MH-12989](https://opencast.jira.com/browse/MH-12989)][[#338](https://github.com/opencast/opencast/pull/338)] -
   Add missing roles for actions->edit scheduled
-- [Update version info
-  ](https://github.com/opencast/opencast/pull/336)
+- [[#336](https://github.com/opencast/opencast/pull/336)] -
+  Update version info
 - [[MH-12987](https://opencast.jira.com/browse/MH-12987)][[#335](https://github.com/opencast/opencast/pull/335)] -
   Prohibit changing a scheduled event to be in the past
 - [[MH-12985](https://opencast.jira.com/browse/MH-12985)][[#332](https://github.com/opencast/opencast/pull/332)] -
@@ -272,8 +293,8 @@ Opencast 6
   Fix for mp 'start' when event is created (affects live scheduler service)
 - [[MH-12980](https://opencast.jira.com/browse/MH-12980)][[#328](https://github.com/opencast/opencast/pull/328)] -
   Update documentation landign page
-- [[MH-12930] Fill creator metadata field with actual user when new event
-  ](https://github.com/opencast/opencast/pull/327)
+- [[MH-12930](https://github.com/opencast/opencast/pull/327)][[#327](https://github.com/opencast/opencast/pull/327)] -
+  Fill creator metadata field with actual user when new event
 - [[MH-12977](https://opencast.jira.com/browse/MH-12977)][[#322](https://github.com/opencast/opencast/pull/322)] -
   Fix data placeholders in edit scheduled events
 - [[MH-11918](https://opencast.jira.com/browse/MH-11918)][[#321](https://github.com/opencast/opencast/pull/321)] -
@@ -288,8 +309,8 @@ Opencast 6
   Drop unused getAclAttachments
 - [[MH-12969](https://opencast.jira.com/browse/MH-12969)][[#314](https://github.com/opencast/opencast/pull/314)] -
   Ensure formatting of OSGI configuration
-- [NOJIRA-live-schedule-fix-issue-in-documatation
-  ](https://github.com/opencast/opencast/pull/313)
+- [[#313](https://github.com/opencast/opencast/pull/313)] -
+  NOJIRA-live-schedule-fix-issue-in-documatation
 - [[MH-12965](https://opencast.jira.com/browse/MH-12965)][[#311](https://github.com/opencast/opencast/pull/311)] -
   Add more logging data to metadata parse WARN
 - [[MH-12961](https://opencast.jira.com/browse/MH-12961)][[#308](https://github.com/opencast/opencast/pull/308)] -
@@ -300,8 +321,8 @@ Opencast 6
   Remove unused JavaScript library visualsearch.js
 - [[MH-12956](https://opencast.jira.com/browse/MH-12956)][[#305](https://github.com/opencast/opencast/pull/305)] -
   Incorrect permission check when requesting indexed workflows
-- [ MH-12958 image-convert WOH
-  ](https://github.com/opencast/opencast/pull/301)
+- [[MH-12958](https://opencast.jira.com/browse/MH-12958)][[#301](https://github.com/opencast/opencast/pull/301)] -
+  image-convert WOH
 - [[MH-12607](https://opencast.jira.com/browse/MH-12607)][[#299](https://github.com/opencast/opencast/pull/299)] -
   Multiencode
 - [[MH-12955](https://opencast.jira.com/browse/MH-12955)][[#298](https://github.com/opencast/opencast/pull/298)] -
@@ -325,7 +346,7 @@ Opencast 6
 - [[MH-12904](https://opencast.jira.com/browse/MH-12904)][[#252](https://github.com/opencast/opencast/pull/252)] -
   Paella player 5.3 update
 - [[MH-12829](https://opencast.jira.com/browse/MH-12829)][[#237](https://github.com/opencast/opencast/pull/237)] -
-  Fix broken sub tabs of Event Details->Assets
+  Fix broken sub tabs of Event Details-\>Assets
 - [[MH-12889](https://opencast.jira.com/browse/MH-12889)][[#236](https://github.com/opencast/opencast/pull/236)] -
   Intuitive Merging of Video Segments
 - [[MH-12828](https://opencast.jira.com/browse/MH-12828)][[#233](https://github.com/opencast/opencast/pull/233)] -
@@ -348,8 +369,8 @@ Opencast 6
   Make workflow processing settings persistent
 - [[MH-12823](https://opencast.jira.com/browse/MH-12823)][[#182](https://github.com/opencast/opencast/pull/182)] -
   Log Configuration and GELF Log4J with graylog
-- [[WIP]: adapt tracking default options to respect the EU GDPR
-  ](https://github.com/opencast/opencast/pull/181)
+- [[#181](https://github.com/opencast/opencast/pull/181)] -
+  adapt tracking default options to respect the EU GDPR
 - [[MH-12822](https://opencast.jira.com/browse/MH-12822)][[#179](https://github.com/opencast/opencast/pull/179)] -
   Remove old OCv2x security context fix artifacts
 - [[MH-12607](https://opencast.jira.com/browse/MH-12607)][[#172](https://github.com/opencast/opencast/pull/172)] -
@@ -360,10 +381,10 @@ Opencast 6
   Introduce displayOrder for workflow definitions
 - [[MH-12797](https://opencast.jira.com/browse/MH-12797)][[#168](https://github.com/opencast/opencast/pull/168)] -
   Explain UI actions (added missing tooltips)
-- [[MH-12820] Mattermost-notification-workflowoperationhandler
-  ](https://github.com/opencast/opencast/pull/167)
-- [Be less quiet about errors on Travis
-  ](https://github.com/opencast/opencast/pull/165)
+- [[MH-12820](https://opencast.jira.com/browse/MH-12820)][[#167](https://github.com/opencast/opencast/pull/167)] -
+  Mattermost-notification-workflowoperationhandler
+- [[#165](https://github.com/opencast/opencast/pull/165)] -
+  Be less quiet about errors on Travis
 - [[MH-12797](https://opencast.jira.com/browse/MH-12797)][[#164](https://github.com/opencast/opencast/pull/164)] -
   Explain UI Actions
 - [[MH-12794](https://opencast.jira.com/browse/MH-12794)][[#162](https://github.com/opencast/opencast/pull/162)] -
@@ -386,6 +407,35 @@ Opencast 6
 
 Opencast 5
 ----------
+
+### Opencast 5.3
+
+*Released on January 11, 2018*
+
+- [[MH-13297](https://opencast.jira.com/browse/MH-13297)][[#638](https://github.com/opencast/opencast/pull/638)] -
+  FasterXML Jackson Bugfix Update
+- [[MH-13296](https://opencast.jira.com/browse/MH-13296)][[#637](https://github.com/opencast/opencast/pull/637)] -
+  Disable buttons of start task wizard while the tasks are being submitted
+- [[MH-12290](https://opencast.jira.com/browse/MH-12290)][[#636](https://github.com/opencast/opencast/pull/636)] -
+  prevent SAXParserFactory and SAXParser class load lag in series listprovider
+- [[MH-13269](https://opencast.jira.com/browse/MH-13269)][[#608](https://github.com/opencast/opencast/pull/608)] -
+  Handle Authorization Errors
+- [[MH-13263](https://opencast.jira.com/browse/MH-13263)][[#598](https://github.com/opencast/opencast/pull/598)] -
+  Invalid Ingest Encoding
+- [[MH-13257](https://opencast.jira.com/browse/MH-13257)][[#597](https://github.com/opencast/opencast/pull/597)] -
+  Fix outdated command line argument for tesseract >= 4.0.0
+- [[MH-13258](https://opencast.jira.com/browse/MH-13258)][[#592](https://github.com/opencast/opencast/pull/592)] -
+  Broken User Provider Removal
+- [[MH-13256](https://opencast.jira.com/browse/MH-13256)][[#591](https://github.com/opencast/opencast/pull/591)] -
+  Waveform operation fails
+- [[MH-13243](https://opencast.jira.com/browse/MH-13243)][[#580](https://github.com/opencast/opencast/pull/580)] -
+  Asset Manager ACL Cache Updates
+- [[#572](https://github.com/opencast/opencast/pull/572)] -
+  Documentation: Opencast 5.2 was released in Nov
+- [[#571](https://github.com/opencast/opencast/pull/571)] -
+  Documentation: Linkfixes in OC5.x upgrade guide
+- [[MH-12332](https://opencast.jira.com/browse/MH-12332)][[#567](https://github.com/opencast/opencast/pull/567)] -
+  disable workflows whose tags don't explicitly match the source type, UPLOAD|SCHEDULE 5.x
 
 ### Opencast 5.2
 

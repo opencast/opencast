@@ -73,8 +73,9 @@ angular.module('adminNg.directives')
         });
       };
 
-      scope.onBlur = function (event) {
+      scope.onBlur = function () {
         if (!scope.removedValue) {
+          scope.addValue();
           scope.leaveEditMode();
         } else {
           $timeout(function () {
@@ -85,6 +86,7 @@ angular.module('adminNg.directives')
       };
 
       scope.leaveEditMode = function () {
+        scope.data.value = '';
         scope.editMode = false;
       };
 
@@ -95,12 +97,18 @@ angular.module('adminNg.directives')
       };
 
       scope.addValue = function () {
-        var value = scope.data.value || '';
+        if (!scope.data.value) {
+          return;
+        }
+
+        var modelUpdated = false;
+        var value = scope.data.value;
+        var model = scope.params.value;
         var newValues = scope.params.delimiter
           ? value.split(scope.params.delimiter)
           : [value];
 
-        var previousValue = scope.params.value.slice();
+        var previousValues = model.slice();
         var failed = false;
 
         angular.forEach(newValues, function (newValue) {
@@ -113,8 +121,9 @@ angular.module('adminNg.directives')
             return;
           }
           if (scope.mixed || parseResult.found) {
-            if (parseResult.value && scope.params.value.indexOf(parseResult.value) < 0) {
-              scope.params.value.push(parseResult.value);
+            if (parseResult.value && model.indexOf(parseResult.value) < 0) {
+              model.push(parseResult.value);
+              modelUpdated = true;
             }
           } else {
             failed = true;
@@ -122,10 +131,9 @@ angular.module('adminNg.directives')
         });
 
         if (failed) {
-          scope.params.value = previousValue;
-        } else {
+          scope.params.value = previousValues;
+        } else if (modelUpdated === true) {
           scope.submit();
-          scope.data.value = '';
         }
       };
 
@@ -133,6 +141,7 @@ angular.module('adminNg.directives')
         if (event.keyCode === 13) {
           // ENTER
           scope.addValue();
+          scope.data.value = '';
         } else if (event.keyCode === 27) {
           // ESC
           scope.leaveEditMode();

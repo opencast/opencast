@@ -2,7 +2,7 @@ Install from Source (Mac OS X)
 ====================================
 
 These instructions outline how to install an all in one Opencast system on the Mac OS X operating system.
-Tested on OS X 10.13.6 High Sierra.
+Tested on OS X 10.14.1 Mojave.
 
 > *The installation on Mac OS X is not officially supported. Use this at your own risk.*
 
@@ -50,7 +50,8 @@ Required:
     maven >= 3.1
     python >= 2.6, < 3.0
 
-(If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin](https://stackoverflow.com/a/37466252).)
+(If you are using [jEnv](http://www.jenv.be/) to set up your environment, make sure to [enable the maven plugin
+](https://stackoverflow.com/a/37466252).)
 
 Required (not necessarily on the same machine):
 
@@ -88,6 +89,7 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
     brew install tesseract
     brew install hunspell
     brew install sox
+    brew install synfig
 
 #### Using pre-built binaries
 
@@ -105,7 +107,7 @@ Switch to the opencast folder. If you downloaded the tarball, this is the folder
 like `opencast-community-opencast-[…]`). If you chose to download via git, use `cd opencast`. You can proceed by
 building opencast (depending on the folder permissions, you might need to start the command with `sudo`):
 
-    mvn clean install
+    mvn clean install -Pdev
 
 > *Please be patient, as building Opencast for the first time will take quite long.*
 
@@ -119,7 +121,12 @@ distribution. For the allinone distribution, this would be
 
 As specified in the guide, make sure you replace the default ActiveMQ configuration with the one provided in
 `docs/scripts/activemq/activemq.xml`. If you installed ActiveMQ using homebrew, you can find the installation path with
-`brew info activemq`.
+`brew info activemq`. The configuration is probably located in `/usr/local/Cellar/activemq/<version>/libexec/conf/`.
+
+ffprobe is used to analyse new videos. It is installed with ffmpeg but usually not on the path to be automatically
+executed. You have to link the ffprobe to `/usr/local/bin/`. You can find the ffmpeg install directory with
+`brew info ffmpeg`. Usually you would link the file with
+`ln -s /usr/local/Cellar/ffmpeg/<version>/bin/ffprobe /usr/local/bin/ffprobe`.
 
 Running Opencast
 ----------------
