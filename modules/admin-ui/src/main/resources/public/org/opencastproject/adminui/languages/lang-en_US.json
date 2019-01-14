@@ -2187,7 +2187,7 @@
     }
   },
   "EDITABLE": {
-    "MULTI_SELECT": {
+    "MULTI": {
       "PLACEHOLDER": "To insert multiple values press Enter in between"
     }
   }
