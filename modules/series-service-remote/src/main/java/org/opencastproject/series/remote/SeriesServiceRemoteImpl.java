@@ -159,11 +159,18 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   @Override
   public boolean updateAccessControl(String seriesID, AccessControlList accessControl)
           throws NotFoundException, SeriesException, UnauthorizedException {
+    return updateAccessControl(seriesID, accessControl, false);
+  }
+
+  @Override
+  public boolean updateAccessControl(String seriesID, AccessControlList accessControl, boolean overrideEpisodeAcl)
+          throws NotFoundException, SeriesException, UnauthorizedException {
     HttpPost post = new HttpPost(seriesID + "/accesscontrol");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("seriesID", seriesID));
       params.add(new BasicNameValuePair("acl", AccessControlParser.toXml(accessControl)));
+      params.add(new BasicNameValuePair("overrideEpisodeAcl", Boolean.toString(overrideEpisodeAcl)));
       post.setEntity(new UrlEncodedFormEntity(params));
     } catch (Exception e) {
       throw new SeriesException("Unable to assemble a remote series request for updating an ACL " + accessControl, e);

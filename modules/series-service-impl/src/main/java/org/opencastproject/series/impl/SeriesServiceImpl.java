@@ -278,9 +278,16 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     }
   }
 
-  // todo method signature does not fit the three different possible return values
   @Override
   public boolean updateAccessControl(final String seriesId, final AccessControlList accessControl)
+          throws NotFoundException, SeriesException {
+    return updateAccessControl(seriesId, accessControl, false);
+  }
+
+  // todo method signature does not fit the three different possible return values
+  @Override
+  public boolean updateAccessControl(final String seriesId, final AccessControlList accessControl,
+          boolean overrideEpisodeAcl)
           throws NotFoundException, SeriesException {
     if (StringUtils.isEmpty(seriesId)) {
       throw new IllegalArgumentException("Series ID parameter must not be null or empty.");
@@ -302,7 +309,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateAcl(seriesId, accessControl));
+                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
@@ -596,7 +603,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                       try {
                           AccessControlList acl = AccessControlParser.parseAcl(aclStr);
                           messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                  SeriesItem.updateAcl(id, acl));
+                                  SeriesItem.updateAcl(id, acl, false));
                       } catch (Exception ex) {
                         logger.error("Unable to parse series {} access control list", id, ex);
                       }
