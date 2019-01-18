@@ -1,20 +1,20 @@
 Release Manager Guide
 =====================
 
-The single most important duty of release managers is to keep an eye on their release, timely notify the community about
-possible problems and encourage community members to help out if needed. While working on Opencast's code is often done
-as well during the release process, for a release manager this is secondary to the communication and management role and
-with few exceptions no requirement for this position.
+The single most important duty of release managers is to keep an eye on their release, notify the community about
+possible problems in a timely manner and encourage community members to help out if needed. While working on Opencast's
+code is often done as well during the release process, for a release manager this is secondary to the communication and
+management role and with few exceptions no requirement for this position.
 
-Expectations of the community towards releases from which problems can arise and which should be handles be release
-managers are for example that:
+The community has a number of expectations for release managers, and their handling of the problems which may arise
+during the release cycle. The core of these expectations are:
 
 - The development process should be followed or amended if required
 - The release should be on time
 - The release should not have any critical technical, usability or security issues
 
 This means that a release manager may need to force decisions around the release, help negotiate the acceptance or
-rejection of contributions and provide regular updates about the release on list, during the technical and the adopter
+rejection of contributions and provide regular updates about the release on list and during the technical and adopter
 meetings. It is important to note that, while the release manager drives the release process, the committer body is in
 charge of both the work and the decision making, meaning that votes and successful proposals from this body take
 precedence over a release manager's decision.
@@ -24,12 +24,12 @@ Responsibilities
 ----------------
 
 While a general rule is certainly just to look out for the release, work together with the community to make the release
-work properly and be pragmatic about the process, there are a few tasks a release manager has to ensure that they are
-being done.
+work properly and be pragmatic about the process, there are a few tasks which really can only be done by the release
+manager.
 
 For all of these tasks, it's generally a good idea to look at previous releases and at their solutions for the tasks.
 Often, completing the task is simply a matter of repeating or updating previous work (e.g. advance the previous release
-schedule by six month).
+schedule by six months).
 
 ### Release Notes
 
@@ -161,7 +161,7 @@ is in danger of being removed in Opencast <VERSION> if its
 status stays the same.
 
 To save the <LANGUAGE> translation from removal, it needs to
-be translated at least 90% until <DATE>.
+be translated at least 90% before <DATE>.
 
 Sincerely,
 Your Opencast <VERSION> Release Managers
@@ -200,7 +200,7 @@ For example, to merge the latest release branch into `develop`, follow these ste
         git checkout develop
         git merge <remote>/develop   # this should be a fast-forward merge
 
-3. Merge the release branch. Not that if large merge conflicts arise, you may ask for help from the people creating the
+3. Merge the release branch. Note that if large merge conflicts arise, you may ask for help from the people creating the
    problematic patches:
 
         git merge <remote>/r/6.x
@@ -213,7 +213,7 @@ For example, to merge the latest release branch into `develop`, follow these ste
 ### Updating Translations
 
 Updating the [localization translations](localization.md) is automated for existing translation files. If new files need
-to be added, it is is something that should happen early during the release process.
+to be added, it is something that should happen early during the release process.
 
 
 ### Releasing
@@ -222,7 +222,7 @@ The following steps outline the necessary steps for cutting the final release:
 
 1. Switch to and update your release branch:
 
-        git checkot r/6.x
+        git checkout r/6.x
         git pull <remote>/r/6.x
 
 2. Add the release notes, and update the changelog. The `create-changelog` [helper script
