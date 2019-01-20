@@ -68,19 +68,19 @@ Example on how to create the Opencast 7 release branch:
         git checkout -b r/7.x
         git push <remote> r/7.x
 
-5. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
+4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
         for i in `find . -name pom.xml`; do \
-          sed -i 's/<version>6-SNAPSHOT</<version>7-SNAPSHOT</' $i; done
+          sed -i 's/<version>7-SNAPSHOT</<version>8-SNAPSHOT</' $i; done
 
-6. Have a look at the changes. Make sure no library version we use has the version `6-SNAPSHOT` and was accidentally
+5. Have a look at the changes. Make sure no library version we use has the version `6-SNAPSHOT` and was accidentally
    changed. Also make sure that nothing else was modified:
 
         git diff
         git status | grep modified: | grep -v pom.xml   # this should have no output
 
-8. If everything looks fine, commit the changes and push it to the community repository:
+6. If everything looks fine, commit the changes and push it to the community repository:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
         git commit -s
@@ -95,18 +95,28 @@ To: dev@opencast.org
 Subject: Release Branch for Opencast <version> Cut
 
 Hi everyone,
-the <version> release branch (r/<version>) has been cut.
-Pull requests for bug fixes may still be made against
-this branch but, as usual, features should go into
-develop instead.
+the Opencast <version> release branch (r/<version>) has been
+cut.  Pull requests for bug fixes may still be made against
+this branch but, as usual, features should go into develop
+instead.
 
 Remember the release schedule for this release:
 
   <release_schedule>
 
 As always, we hope to have a lot of people testing this
-version, especially during the public QA phase.  Please
+version, especially during the public QA phase. Please
 report any bugs or issues you encounter.
+
+For testing, you may use https://stable.opencast.org if you
+do not want to set up a test server yourself. The server is
+reset on a daily basis and will follow the new release
+branch with its next rebuild.
+
+Additionally, look out for announcements regarding container
+and package builds for testing on list if you want to run
+your own system but do not want to build Opencast from
+source.
 ```
 
 
@@ -228,9 +238,10 @@ The following steps outline the necessary steps for cutting the final release:
 2. Add the release notes, and update the changelog. The `create-changelog` [helper script
    ](https://github.com/opencast/helper-scripts/tree/master/create-changelog) is a convenient tool for this.
 
-        vim docs/guides/admin/docs/releasenotes.md
-        vim docs/guides/admin/docs/changelog.md
-        git commit -S docs/guides/admin/docs/releasenotes.md docs/guides/admin/docs/changelog.md
+        cd docs/guides/admin/docs/
+        vim releasenotes.md
+        vim changelog.md
+        git commit -S releasenotes.md changelog.md
         git push <remote> r/6.x
 
 3. Switch to a new branch to create the release (name does not really matter):
@@ -247,7 +258,7 @@ The following steps outline the necessary steps for cutting the final release:
    changed. Also make sure that nothing else was modified:
 
         git diff
-        git status | grep modified: | grep -v pom.xml   # this should have no output
+        git status | grep modified: | grep -v pom.xml   # this should yield no output
 
 6. Commit the changes and create a release tag:
 
@@ -255,11 +266,11 @@ The following steps outline the necessary steps for cutting the final release:
         git commit -S -m 'Opencast 6.0'
         git tag -s 6.0
 
-9. Push the tag to the community repository (you can remove the branch afterwards):
+7. Push the tag to the community repository (you can remove the branch afterwards):
 
         git push <remote> 6.0:6.0
 
-10. Create a new release on Github using the [graphical user interface](https://github.com/opencast/opencast/releases)
+8. Create a new release on GitHub using the [graphical user interface](https://github.com/opencast/opencast/releases)
     to upload the distribution tarballs.
 
 Finally, send a release notice to Opencast's announcement list. Note that posting to this list is restricted to those
@@ -270,7 +281,7 @@ list, please ask to be given permission. For the message, you may use the follow
 To: announcements@opencast.org
 Subject: Opencast <VERSION> Released
 
-Hi all,
+Hi everyone,
 it is my pleasure to announce that Opencast <VERSION> has
 been released:
 
