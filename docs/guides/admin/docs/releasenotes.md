@@ -50,10 +50,15 @@ within Opencast's `com.fasterxml.jackson.core:jackson-databind` dependency have 
 Release Schedule
 ----------------
 
-*To be defined*
-
+|Date                         |Phase
+|-----------------------------|------------------------------------------
+|April 1st 2019               |Feature Freeze
+|May 6th - May 12th 2019      |Translation week
+|May 13th - May 26th 2019     |Public QA phase
+|June 13th 2019               |Release of Opencast 7.0
 
 Release Managers
 ----------------
 
-*Looking for release managers*
+- Maximiliano Lira Del Canto (University of Cologne)
+- Katrin Ihler (ELAN e.V.)
