@@ -33,9 +33,8 @@ schedule by six months).
 
 ### Release Notes
 
-It's usually a good idea to create or clean the release notes page. This allows for a place to put the release schedule
-and makes it easy to encourage people to put short descriptions of features there while these features are reviewed.
-This makes it easier to later create the final release notes.
+It's usually a good idea to create or clean the release notes page early in the release phase. This allows for a place
+to put the release schedule, short descriptions of features or noteworthy configuration changes early on.
 
 ### The  Release Schedule
 
@@ -83,7 +82,7 @@ Example on how to create the Opencast 7 release branch:
 6. If everything looks fine, commit the changes and push it to the community repository:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
-        git commit -s
+        git commit -s -m 'Bumping pom.xml Version Numbers'
         git push <remote> develop
 
 
@@ -241,7 +240,7 @@ The following steps outline the necessary steps for cutting the final release:
         cd docs/guides/admin/docs/
         vim releasenotes.md
         vim changelog.md
-        git commit -S releasenotes.md changelog.md
+        git commit -S releasenotes.md changelog.md -m 'Updated Release Notes'
         git push <remote> r/6.x
 
 3. Switch to a new branch to create the release (name does not really matter):
