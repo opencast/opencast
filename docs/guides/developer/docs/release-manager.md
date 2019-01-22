@@ -122,7 +122,7 @@ source.
 ### Status of Translations
 
 When the release branch is cut, the release manager should check if there are languages to be in- or excluded for the
-upcoming release as specified [by the criteria in the localization documentation](localization.md).  If any modification
+upcoming release as specified [by the criteria in the localization documentation](localization.md). If any modification
 criteria are met, an announcement should be published on the Opencast users list that specifies:
 
 - Translations that will be included in the upcoming release
@@ -144,16 +144,14 @@ languages meet the criteria to be included in Opencast
 - <LANGUAGE2> (<PERCENTAGE2>)
 - ....
 
-Sincerely,
-Your Opencast <VERSION> Release Managers
 
-[1] Opencast project on Crowdin
+[1] Opencast on Crowdin
     https://crowdin.com/project/opencast-community
-[2] Inclusion and Exclusion of Translations
+[2] Inclusion and exclusion of translations
     https://docs.opencast.org/develop/developer/...
 ```
 
-Example announcement for endangered languages. Please create a post for each endangered language:
+Example announcement for endangered languages:
 
 ```no-highlight
 To: users@opencast.org
@@ -177,6 +175,57 @@ Your Opencast <VERSION> Release Managers
 
 [1] Inclusion and Exclusion of Translations
     https://docs.opencast.org/
+```
+
+A specific translation week may be announced using an email
+like this:
+
+```no-highlight
+To: users@opencast.org
+Subject: Opencast <version>: Translation Week
+
+Hi everyone,
+starting on <date> the Opencast <version> translation week
+will take place, during which we particular focus on
+improving Opencast's translations.
+
+
+Can I help?
+-----------
+
+Everybody that speaks a different language or dialect and
+feels confident enough to participate can participate.
+
+
+How can I help?
+---------------
+
+We use Crowdin [1] to manage translations. Please sign up
+and request to help with a particular language.
+
+
+What is the current status?
+---------------------------
+
+Fully translated:
+
+- …
+
+Mostly translated (>80% translated):
+
+- …
+
+Endangered translations (≤80% translated):
+
+- …
+
+Note that we can add any additional languages you are
+willing to translate.
+
+If you have any additional questions, please do not hesitate
+to ask.
+
+[1] https://crowdin.com/project/opencast-community
 ```
 
 
