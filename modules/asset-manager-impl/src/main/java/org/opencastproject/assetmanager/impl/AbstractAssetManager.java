@@ -33,6 +33,7 @@ import org.opencastproject.assetmanager.api.AssetId;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Availability;
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -140,6 +141,19 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
     getDb().setAvailability(RuntimeTypes.convert(version), mpId, availability);
+  }
+
+  @Override public long removeEvent(String id, DeleteSnapshotHandler deletionHandler) {
+    AQueryBuilder q = createQuery();
+    long deletedItems = q.delete(DEFAULT_OWNER, q.propertiesOf())
+            .where(q.mediaPackageId(id))
+            .willRemoveWholeMediaPackage(true)
+            .run(deletionHandler);
+    deletedItems += q.delete(DEFAULT_OWNER, q.snapshot())
+            .where(q.mediaPackageId(id))
+            .willRemoveWholeMediaPackage(true)
+            .run(deletionHandler);
+    return deletedItems;
   }
 
   @Override public boolean setProperty(Property property) {

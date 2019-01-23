@@ -228,6 +228,17 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
             AssetManagerItem.deleteEpisode(mpId, new Date()));
   }
 
+  @Override
+  public long removeEvent(String id, DeleteSnapshotHandler deleteSnapshotHandler) {
+    return super.removeEvent(id, DeleteSnapshotHandler.compose(deleteSnapshotHandler, this));
+  }
+
+  /** Optimized version without {@link DeleteSnapshotHandler#NOP_DELETE_SNAPSHOT_HANDLER} */
+  @Override
+  public long removeEvent(String id) {
+    return super.removeEvent(id, this);
+  }
+
   /**
    * Create a {@link TakeSnapshot} message.
    * <p>

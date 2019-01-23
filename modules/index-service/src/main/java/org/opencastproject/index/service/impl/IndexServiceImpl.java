@@ -22,7 +22,6 @@
 package org.opencastproject.index.service.impl;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 
@@ -30,7 +29,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -1532,10 +1530,7 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundArchive = false;
     boolean removedArchive = true;
     try {
-      final AQueryBuilder q = assetManager.createQuery();
-      final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      q.delete(DEFAULT_OWNER, q.propertiesOf()).where(q.mediaPackageId(id)).willRemoveWholeMediaPackage(true).run();
-      q.delete(DEFAULT_OWNER, q.snapshot()).where(p).willRemoveWholeMediaPackage(true).run();
+      assetManager.removeEvent(id);
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;

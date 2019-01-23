@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -193,6 +194,11 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   @Override
   public void setAvailability(Version version, String mpId, Availability availability) {
     delegate.setAvailability(version, mpId, availability);
+  }
+
+  @Override
+  public long removeEvent(String id, DeleteSnapshotHandler deleteSnapshotHandler) {
+    return delegate.removeEvent(id, deleteSnapshotHandler);
   }
 
   @Override

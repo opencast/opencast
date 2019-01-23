@@ -86,6 +86,18 @@ public interface AssetManager {
    */
   void setAvailability(Version version, String mpId, Availability availability);
 
+  /**
+   * Remove an event completely from the asset manager.
+   * @param id the media package ID of the event to remove
+   * @return the number of items deleted
+   */
+  long removeEvent(String id, DeleteSnapshotHandler nopDeleteSnapshotHandler);
+
+  /** Call {@link #removeEvent(String, DeleteSnapshotHandler)} with a callback that does nothing. */
+  default long removeEvent(String id) {
+    return removeEvent(id, DeleteSnapshotHandler.NOP_DELETE_SNAPSHOT_HANDLER);
+  }
+
   // Properties
 
   /**

@@ -22,6 +22,7 @@ package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.Availability;
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
@@ -58,6 +59,10 @@ public class AssetManagerDecorator<A extends TieredStorageAssetManager> implemen
 
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
     delegate.setAvailability(version, mpId, availability);
+  }
+
+  @Override public long removeEvent(String id, DeleteSnapshotHandler deleteSnapshotHandler) {
+    return delegate.removeEvent(id, deleteSnapshotHandler);
   }
 
   @Override public boolean setProperty(Property property) {

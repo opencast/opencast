@@ -27,6 +27,7 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.Availability;
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -100,6 +101,15 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
       super.setAvailability(version, mpId, availability);
     } else {
       chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
+    }
+  }
+
+  @Override public long removeEvent(String id, DeleteSnapshotHandler deleteSnapshotHandler) {
+    if (isAuthorized(id, WRITE_ACTION)) {
+      return super.removeEvent(id, deleteSnapshotHandler);
+    } else {
+      // TODO Is this right?
+      return chuck(new UnauthorizedException("Not allowed to delete episode " + id));
     }
   }
 
