@@ -45,8 +45,8 @@ import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +55,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -88,8 +89,17 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
     OVERRIDE, ROLES, ACTIONS
   }
 
+  public void activate(ComponentContext cc) {
+    updated(cc.getProperties());
+  }
+
+  public void modified(Map<String, Object> config) {
+    // this prevents the service from restarting on configuration updated.
+    // updated() will handle the configuration update.
+  }
+
   @Override
-  public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  public synchronized void updated(Dictionary<String, ?> properties) {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
