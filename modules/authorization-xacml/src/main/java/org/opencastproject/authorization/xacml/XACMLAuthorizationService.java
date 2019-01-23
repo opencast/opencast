@@ -82,16 +82,17 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
   private static final String CONFIG_MERGE_MODE = "merge.mode";
 
   /** Definition of how merging of series and episode ACLs work */
-  private MergeMode mergeMode = MergeMode.OVERRIDE;
+  private static MergeMode mergeMode = MergeMode.OVERRIDE;
 
   enum MergeMode {
     OVERRIDE, ROLES, ACTIONS
   }
 
   @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  public synchronized void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
+      logger.debug("Merge mode set to {}", mergeMode);
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
@@ -102,6 +103,7 @@ public class XACMLAuthorizationService implements AuthorizationService, ManagedS
       logger.warn("Invalid value set for ACL merge mode, defaulting to {}", MergeMode.OVERRIDE);
       mergeMode = MergeMode.OVERRIDE;
     }
+    logger.debug("Merge mode set to {}", mergeMode);
   }
 
   @Override
