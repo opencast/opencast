@@ -122,25 +122,11 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   @Override public AQueryBuilder createQuery() {
     return new AQueryBuilderDecorator(super.createQuery()) {
       @Override public ASelectQuery select(Target... target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.select(target);
-          case ORGANIZATION:
-            return super.select(target).where(restrictToUsersOrganization());
-          default:
-            return super.select(target).where(mkAuthPredicate(READ_ACTION));
-        }
+        return super.select(target).where(mkAuthPredicate(READ_ACTION));
       }
 
       @Override public ADeleteQuery delete(String owner, Target target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.delete(owner, target);
-          case ORGANIZATION:
-            return super.delete(owner, target).where(restrictToUsersOrganization());
-          default:
-            return super.delete(owner, target).where(mkAuthPredicate(WRITE_ACTION));
-        }
+        return super.delete(owner, target).where(mkAuthPredicate(WRITE_ACTION));
       }
     };
   }
@@ -154,21 +140,29 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
 
   /**
    * Create an authorization predicate to be used with {@link #isAuthorized},
-   * restricting access to the user's organization and the given action.
+   * restricting access to the user's organization and the given action
+   * in accordance with their admin status.
    *
    * @param action
    *     the action to restrict access to
    */
   private Predicate mkAuthPredicate(final String action) {
     final AQueryBuilder q = q();
-    return $(secSvc.getUser().getRoles())
-        .foldl(q.always().not(),
-               new Fn2<Predicate, Role, Predicate>() {
-                 @Override public Predicate apply(Predicate predicate, Role role) {
-                   return predicate.or(mkSecurityProperty(q, role.getName(), action).eq(true));
-                 }
-               })
-        .and(restrictToUsersOrganization());
+    switch (isAdmin()) {
+      case GLOBAL:
+        return q.always();
+      case ORGANIZATION:
+        return restrictToUsersOrganization();
+      default:
+        return $(secSvc.getUser().getRoles())
+                .foldl(q.always().not(),
+                        new Fn2<Predicate, Role, Predicate>() {
+                          @Override public Predicate apply(Predicate predicate, Role role) {
+                            return predicate.or(mkSecurityProperty(q, role.getName(), action).eq(true));
+                          }
+                        })
+                .and(restrictToUsersOrganization());
+    }
   }
 
   private Predicate mkAuthPredicate(final String mpId, final String action) {
@@ -182,15 +176,12 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
 
   /** Check authorization for the given action on the given media package. */
   private boolean isAuthorized(String mpId, String action) {
-    switch (isAdmin()) {
-      case GLOBAL:
-        return true;
-      case ORGANIZATION:
-        return true;
-      default:
-        final AQueryBuilder q = delegate.createQuery();
-        return !q.select().where(mkAuthPredicate(mpId, action)).run().getRecords().isEmpty();
-    }
+    return !delegate.createQuery()
+            .select()
+            .where(mkAuthPredicate(mpId, action))
+            .run()
+            .getRecords()
+            .isEmpty();
   }
 
   private AdminRole isAdmin() {
