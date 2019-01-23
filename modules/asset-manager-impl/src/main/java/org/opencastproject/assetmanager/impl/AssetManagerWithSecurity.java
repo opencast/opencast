@@ -86,7 +86,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     // Allow this if:
     //  - no previous snapshot exists
     //  - the user has write access to the previous snapshot
-    if (r.getSize() < 1 || isAuthorized(mkAuthPredicate(mediaPackageId, WRITE_ACTION))) {
+    if (r.getSize() < 1 || isAuthorized(mediaPackageId, WRITE_ACTION)) {
       final Snapshot snapshot = super.takeSnapshot(owner, mp);
       final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
       storeAclAsProperties(snapshot, acl);
@@ -96,7 +96,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   }
 
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
-    if (isAuthorized(mkAuthPredicate(mpId, WRITE_ACTION))) {
+    if (isAuthorized(mpId, WRITE_ACTION)) {
       super.setAvailability(version, mpId, availability);
     } else {
       chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
@@ -105,7 +105,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
 
   @Override public boolean setProperty(Property property) {
     final String mpId = property.getId().getMediaPackageId();
-    if (isAuthorized(mkAuthPredicate(mpId, WRITE_ACTION))) {
+    if (isAuthorized(mpId, WRITE_ACTION)) {
       return super.setProperty(property);
     } else {
       return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
@@ -113,7 +113,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   }
 
   @Override public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
-    if (isAuthorized(mkAuthPredicate(mpId, READ_ACTION))) {
+    if (isAuthorized(mpId, READ_ACTION)) {
       return super.getAsset(version, mpId, mpElementId);
     }
     return chuck(new UnauthorizedException(format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)));
@@ -153,7 +153,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   }
 
   /**
-   * Create an authorization predicate to be used with {@link #isAuthorized(Predicate)},
+   * Create an authorization predicate to be used with {@link #isAuthorized},
    * restricting access to the user's organization and the given action.
    *
    * @param action
@@ -180,8 +180,8 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     return q().organizationId().eq(secSvc.getUser().getOrganization().getId());
   }
 
-  /** Check authorization based on the given predicate. */
-  private boolean isAuthorized(Predicate p) {
+  /** Check authorization for the given action on the given media package. */
+  private boolean isAuthorized(String mpId, String action) {
     switch (isAdmin()) {
       case GLOBAL:
         return true;
@@ -189,7 +189,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
         return true;
       default:
         final AQueryBuilder q = delegate.createQuery();
-        return !q.select().where(p).run().getRecords().isEmpty();
+        return !q.select().where(mkAuthPredicate(mpId, action)).run().getRecords().isEmpty();
     }
   }
 
