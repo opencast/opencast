@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 
@@ -43,8 +44,8 @@ public class ADeleteQueryDecorator implements ADeleteQuery {
     return mkDecorator(delegate.willRemoveWholeMediaPackage(willRemoveWholeMediaPackage));
   }
 
-  @Override public long run() {
-    return delegate.run();
+  @Override public long run(DeleteSnapshotHandler deleteSnapshotHandler) {
+    return delegate.run(deleteSnapshotHandler);
   }
 
   protected ADeleteQueryDecorator mkDecorator(ADeleteQuery delegate) {

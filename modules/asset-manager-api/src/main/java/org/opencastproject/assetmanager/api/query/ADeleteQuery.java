@@ -20,6 +20,8 @@
  */
 package org.opencastproject.assetmanager.api.query;
 
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
+
 public interface ADeleteQuery {
   ADeleteQuery where(Predicate predicate);
 
@@ -38,7 +40,13 @@ public interface ADeleteQuery {
   /**
    * Delete the selected items.
    *
+   * @param deleteSnapshotHandler callback to learn about deleted snapshots and episodes
    * @return the number of affected items
    */
-  long run();
+  long run(DeleteSnapshotHandler deleteSnapshotHandler);
+
+  /** Call {@link #run()} with a deletion handler that does nothing. */
+  default long run() {
+    return run(DeleteSnapshotHandler.NOP_DELETE_SNAPSHOT_HANDLER);
+  };
 }

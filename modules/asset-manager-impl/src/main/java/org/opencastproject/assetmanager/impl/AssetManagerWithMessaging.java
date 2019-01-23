@@ -24,13 +24,13 @@ import static java.lang.String.format;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery.DeleteSnapshotHandler;
 import org.opencastproject.index.IndexProducer;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.message.broker.api.MessageReceiver;
@@ -215,10 +215,10 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
   }
 
   @Override
-  public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
+  public void notifyDeleteSnapshot(String mpId, long version) {
     logger.info(format("Send delete message for snapshot %s, %s to ActiveMQ", mpId, version));
     messageSender.sendObjectMessage(AssetManagerItem.ASSETMANAGER_QUEUE, DestinationType.Queue,
-            AssetManagerItem.deleteSnapshot(mpId, version.value(), new Date()));
+            AssetManagerItem.deleteSnapshot(mpId, version, new Date()));
   }
 
   @Override
@@ -279,8 +279,14 @@ public class AssetManagerWithMessaging extends AssetManagerDecorator<TieredStora
     }
 
     @Override
+    public long run(DeleteSnapshotHandler deleteSnapshotHandler) {
+      return delegate.run(DeleteSnapshotHandler.compose(deleteSnapshotHandler, AssetManagerWithMessaging.this));
+    }
+
+    /** Optimized version without {@link DeleteSnapshotHandler#NOP_DELETE_SNAPSHOT_HANDLER} */
+    @Override
     public long run() {
-      return RuntimeTypes.convert(delegate).run(AssetManagerWithMessaging.this);
+      return delegate.run(AssetManagerWithMessaging.this);
     }
 
     @Override

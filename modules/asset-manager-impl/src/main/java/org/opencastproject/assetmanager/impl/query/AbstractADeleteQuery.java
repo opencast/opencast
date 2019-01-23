@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl.query;
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 
+import org.opencastproject.assetmanager.api.DeleteSnapshotHandler;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.impl.AbstractAssetManager;
@@ -103,6 +104,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
     };
   }
 
+  @Override
   public long run(DeleteSnapshotHandler deleteSnapshotHandler) {
     // run query and map the result to records
     final long startTime = System.nanoTime();
@@ -122,7 +124,7 @@ public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryC
       final String mpId = t.get(Q_SNAPSHOT.mediaPackageId);
       final VersionImpl version = Conversions.toVersion(t.get(Q_SNAPSHOT.version));
       am.getLocalAssetStore().delete(DeletionSelector.delete(orgId, mpId, version));
-      deleteSnapshotHandler.notifyDeleteSnapshot(mpId, version);
+      deleteSnapshotHandler.notifyDeleteSnapshot(mpId, version.value());
     }
     for (String mpId : deletion.deletedEpisodes) {
       deleteSnapshotHandler.notifyDeleteEpisode(mpId);
@@ -266,10 +268,6 @@ HAVING v = (SELECT count(*)
     }
   }
 
-  @Override public long run() {
-    return run(NOP_DELETE_SNAPSHOT_HANDLER);
-  }
-
   /**
    * Delete all orphaned properties. Orphaned properties refer to a non-existing media package.
    */
@@ -304,23 +302,6 @@ HAVING v = (SELECT count(*)
   private static String formatQueryName(String name, String subQueryName) {
     return format("[%s] [%s]", name, subQueryName);
   }
-
-  /**
-   * Call {@link #run(DeleteSnapshotHandler)} with a deletion handler to get notified about deletions.
-   */
-  public interface DeleteSnapshotHandler {
-    void notifyDeleteSnapshot(String mpId, VersionImpl version);
-
-    void notifyDeleteEpisode(String mpId);
-  }
-
-  public static final DeleteSnapshotHandler NOP_DELETE_SNAPSHOT_HANDLER = new DeleteSnapshotHandler() {
-    @Override public void notifyDeleteSnapshot(String mpId, VersionImpl version) {
-    }
-
-    @Override public void notifyDeleteEpisode(String mpId) {
-    }
-  };
 
   public final class DeletionResult {
     // CHECKSTYLE:OFF
