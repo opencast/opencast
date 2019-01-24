@@ -6,7 +6,7 @@ Opencast 5
 
 ### Opencast 5.4
 
-*Released on January 24, 2018*
+*Released on January 24, 2019*
 
 - [[MH-13311](https://opencast.jira.com/browse/MH-13311)][[#652](https://github.com/opencast/opencast/pull/652)] -
   WOH cover-image is broken
@@ -18,7 +18,7 @@ Opencast 5
 
 ### Opencast 5.3
 
-*Released on January 11, 2018*
+*Released on January 11, 2019*
 
 - [[MH-13297](https://opencast.jira.com/browse/MH-13297)][[#638](https://github.com/opencast/opencast/pull/638)] -
   FasterXML Jackson Bugfix Update
