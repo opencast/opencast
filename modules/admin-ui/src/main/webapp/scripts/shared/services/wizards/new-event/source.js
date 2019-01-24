@@ -90,7 +90,7 @@ angular.module('adminNg.services')
       this.clearConflicts = function () {
         self.conflicts.splice(0);
         self.hasConflicts = false;
-      }
+      };
 
       this.removeAllNotifications = function () {
         self.notification = undefined;
