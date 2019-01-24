@@ -4,6 +4,18 @@ Changelog
 Opencast 5
 ----------
 
+### Opencast 5.4
+
+*Released on January 24, 2018*
+
+- [[MH-13311](https://opencast.jira.com/browse/MH-13311)][[#652](https://github.com/opencast/opencast/pull/652)] -
+  WOH cover-image is broken
+- [SUREFIRE-1588: Resolving compilation issue on Debian and related distros
+  ](https://github.com/opencast/opencast/pull/651)
+- [[MH-13244](https://opencast.jira.com/browse/MH-13244)][[#581](https://github.com/opencast/opencast/pull/581)] -
+  Improve concurrency of OAIPMH republication
+
+
 ### Opencast 5.3
 
 *Released on January 11, 2018*
