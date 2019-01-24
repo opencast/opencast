@@ -84,6 +84,7 @@ import java.util.List;
 public class ComposerServiceTest {
   /** The sources file to test with */
   private File sourceVideoOnly = null;
+  private File[] sourceVideosUnique = new File[10];
   private File sourceAudioOnly = null;
   private File sourceImage = null;
 
@@ -167,6 +168,14 @@ public class ComposerServiceTest {
 
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.eq(false))).andReturn(sourceVideoOnly).anyTimes();
+
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.eq(true))).andAnswer(() -> {
+      File f1 = getFile("/video.mp4");
+      File uniqueSourceVideo = File.createTempFile(FilenameUtils.getBaseName(f1.getName()), ".mp4", testDir);
+      FileUtils.copyFile(f1, uniqueSourceVideo);
+      return uniqueSourceVideo;
+    }).anyTimes();
 
     profileScanner = new EncodingProfileScanner();
     File encodingProfile = getFile("/encodingprofiles.properties");
@@ -240,7 +249,7 @@ public class ComposerServiceTest {
 
     // Need different media files
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(sourceVideoOnly).anyTimes();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(sourceVideoOnly.toURI()).anyTimes();
     composerService.setWorkspace(workspace);
@@ -256,7 +265,7 @@ public class ComposerServiceTest {
 
     // Need different media files
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(sourceVideoOnly).anyTimes();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(sourceVideoOnly.toURI()).anyTimes();
     composerService.setWorkspace(workspace);
@@ -273,7 +282,7 @@ public class ComposerServiceTest {
 
     // Need different media files
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(sourceVideoOnly).anyTimes();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(sourceVideoOnly.toURI()).anyTimes();
     composerService.setWorkspace(workspace);
@@ -290,8 +299,8 @@ public class ComposerServiceTest {
 
     // Need different media files
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceVideoOnly).once();
-    EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(sourceAudioOnly).once();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(sourceVideoOnly).once();
+    EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean())).andReturn(sourceAudioOnly).once();
     EasyMock.expect(workspace.putInCollection(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(sourceVideoOnly.toURI()).anyTimes();
     composerService.setWorkspace(workspace);
