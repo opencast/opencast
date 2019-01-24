@@ -3,7 +3,7 @@ Release Manager Guide
 
 The single most important duty of release managers is to keep an eye on their release, notify the community about
 possible problems in a timely manner and encourage community members to help out if needed. While working on Opencast's
-code is often done as well during the release process, for a release manager this is secondary to the communication and
+code is often done as well during the release process, for release managers this is secondary to the communication and
 management role and with few exceptions no requirement for this position.
 
 The community has a number of expectations for release managers, and their handling of the problems which may arise
@@ -13,19 +13,19 @@ during the release cycle. The core of these expectations are:
 - The release should be on time
 - The release should not have any critical technical, usability or security issues
 
-This means that a release manager may need to force decisions around the release, help negotiate the acceptance or
+This means that release managers may need to force decisions around the release, help negotiate the acceptance or
 rejection of contributions and provide regular updates about the release on list and during the technical and adopter
-meetings. It is important to note that, while the release manager drives the release process, the committer body is in
+meetings. It is important to note that, while release managers drive the release process, the committer body is in
 charge of both the work and the decision making, meaning that votes and successful proposals from this body take
-precedence over a release manager's decision.
+precedence over release manager decisions.
 
 
 Responsibilities
 ----------------
 
 While a general rule is certainly just to look out for the release, work together with the community to make the release
-work properly and be pragmatic about the process, there are a few tasks which really can only be done by the release
-manager.
+work properly and be pragmatic about the process, there are a few tasks which really can only be done by release
+managers.
 
 For all of these tasks, it's generally a good idea to look at previous releases and at their solutions for the tasks.
 Often, completing the task is simply a matter of repeating or updating previous work (e.g. advance the previous release
@@ -33,7 +33,7 @@ schedule by six months).
 
 ### Release Notes
 
-It's usually a good idea to create or clean the release notes page early in the release phase. This allows for a place
+It's usually a good idea to create or clean the release notes page early in the release cycle. This allows for a place
 to put the release schedule, short descriptions of features or noteworthy configuration changes early on.
 
 ### The  Release Schedule
@@ -45,7 +45,7 @@ list and publish it on the release notes page.
 ### Release Branch
 
 According to the set release schedule, at one point a release branch should be cut, effectively marking a feature freeze
-for a given release.  This branch is split of `develop` and should be named `r/N.x` (e.g. `r/6.x` for the Opencast 6
+for a given release.  This branch is split off `develop` and should be named `r/N.x` (e.g. `r/6.x` for the Opencast 6
 release branch).
 
 Example on how to create the Opencast 7 release branch:
@@ -121,12 +121,9 @@ source.
 
 ### Status of Translations
 
-When the release branch is cut, the release manager should check if there are languages to be in- or excluded for the
-upcoming release as specified [by the criteria in the localization documentation](localization.md). If any modification
-criteria are met, an announcement should be published on the Opencast users list that specifies:
-
-- Translations that will be included in the upcoming release
-- Endangered translations
+After the release branch is cut, the release managers should check if there are languages to be in- or excluded for the
+upcoming release as specified by the [criteria in the localization documentation](localization.md) and notify the
+community about the status of Opencast's translations if necessary.
 
 Example announcement for included languages:
 
@@ -148,7 +145,7 @@ languages meet the criteria to be included in Opencast
 [1] Opencast on Crowdin
     https://crowdin.com/project/opencast-community
 [2] Inclusion and exclusion of translations
-    https://docs.opencast.org/develop/developer/...
+    https://docs.opencast.org/develop/developer/localization/#inclusion-and-exclusion-of-translations
 ```
 
 Example announcement for endangered languages:
@@ -174,7 +171,7 @@ Sincerely,
 Your Opencast <VERSION> Release Managers
 
 [1] Inclusion and Exclusion of Translations
-    https://docs.opencast.org/
+    https://docs.opencast.org/develop/developer/localization/#inclusion-and-exclusion-of-translations
 ```
 
 A specific translation week may be announced using an email
@@ -238,9 +235,9 @@ developer list or wherever appropriate.
 
 ### Merging Release Branches
 
-To not have to merge bug fixes into several branches and create several pull requests, release branch should be merged
-down on a regular basis. Assuming, for example, that `r/6.x` is the latest release branch, merges should happen like
-this:
+To not have to merge bug fixes into several branches and create several pull requests, the release branch should be
+merged down on a regular basis. Assuming, for example, that `r/6.x` is the latest release branch, merges should happen
+like this:
 
     r/5.x → r/6.x → develop
 
@@ -271,17 +268,20 @@ For example, to merge the latest release branch into `develop`, follow these ste
 ### Updating Translations
 
 Updating the [localization translations](localization.md) is automated for existing translation files. If new files need
-to be added, it is something that should happen early during the release process.
+to be added, it is something that should happen early during the release process. If files need to be removed, this
+needs to be done manually.
 
 
 ### Releasing
 
 The following steps outline the necessary steps for cutting the final release:
 
-1. Switch to and update your release branch:
+1. Switch to and update your release branch and ensure the latest state of the previous release branch is merged:
 
         git checkout r/6.x
-        git pull <remote>/r/6.x
+        git fetch <remote>
+        git merge <remote>/r/6.x
+        git merge <remote>/r/5.x
 
 2. Add the release notes, and update the changelog. The `create-changelog` [helper script
    ](https://github.com/opencast/helper-scripts/tree/master/create-changelog) is a convenient tool for this.
@@ -358,7 +358,7 @@ For that, this email template may be used:
 
 ```no-highlight
 To: dev@opencast.org
-Subject: Opencast <NEXT_RELEASE> release manager wanted
+Subject: Opencast <NEXT_RELEASE> release managers wanted
 
 Hi everyone,
 the Opencast community is looking for release managers for
@@ -367,9 +367,9 @@ release around <DATE>).
 
 Note that the release manager's job contains very little
 technical work. Instead, they mostly focus on motivation and
-coordination of the community during the release phase.  The
-role of the release manager is described in more detail in
-the Opencast development documentation:
+coordination of the community during the release phase. The
+role of release managers is described in more detail in the
+Opencast development documentation:
 
   https://docs.opencast.org/develop/developer/release-manager/
 
