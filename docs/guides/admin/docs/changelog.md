@@ -4,6 +4,13 @@ Changelog
 Opencast 6
 ----------
 
+### Opencast 6.2
+
+*Released on January 24, 2019*
+
+- [[MH-13309](https://opencast.jira.com/browse/MH-13309)][[#649](https://github.com/opencast/opencast/pull/649)] -
+  return empty list when finding findUsersByUserName when the name param is empty.
+
 ### Opencast 6.1
 
 *Released on January 12, 2019*
