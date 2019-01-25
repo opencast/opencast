@@ -28,7 +28,7 @@ import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
 import org.opencastproject.capture.CaptureParameters;
-import org.opencastproject.external.impl.index.ExternalIndex;
+import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;

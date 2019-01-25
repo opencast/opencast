@@ -37,7 +37,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.impl.index.ExternalIndex;
+import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RestUtils;
