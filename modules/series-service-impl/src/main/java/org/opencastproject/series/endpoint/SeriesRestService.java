@@ -86,6 +86,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -318,13 +319,16 @@ public class SeriesRestService {
   @Path("/")
   @RestQuery(name = "updateSeries", description = "Updates a series", returnDescription = "No content.", restParameters = {
           @RestParameter(name = "series", isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE, description = "The series document", type = TEXT),
-          @RestParameter(name = "acl", isRequired = false, defaultValue = SAMPLE_ACCESS_CONTROL_LIST, description = "The access control list "
-                  + "for the series", type = TEXT) }, reponses = {
+          @RestParameter(name = "acl", isRequired = false, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+                         description = "The access control list for the series", type = TEXT),
+          @RestParameter(name = "override", isRequired = false, defaultValue = "false",
+                         description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, reponses = {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
           @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created.") })
-  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl)
+  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl,
+          @DefaultValue("false") @FormParam("override") boolean override)
           throws UnauthorizedException {
     if (series == null) {
       logger.warn("series that should be added is null");
@@ -350,7 +354,7 @@ public class SeriesRestService {
           logger.warn("Could not parse ACL: {}", e.getMessage());
           return Response.status(BAD_REQUEST).build();
         }
-        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl);
+        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
       }
       if (newSeries == null) {
         logger.debug("Updated series {} ", dc.getFirst(PROPERTY_IDENTIFIER));
@@ -373,7 +377,10 @@ public class SeriesRestService {
   @RestQuery(name = "updateAcl", description = "Updates the access control list for a series",
           returnDescription = "No content.",
     restParameters = {
-      @RestParameter(name = "acl", isRequired = true, defaultValue = SAMPLE_ACCESS_CONTROL_LIST, description = "The access control list for the series", type = TEXT)
+      @RestParameter(name = "acl", isRequired = true, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+                     description = "The access control list for the series", type = TEXT),
+      @RestParameter(name = "override", isRequired = false, defaultValue = "false",
+                     description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)
     }, pathParameters = {
       @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
   }, reponses = {
@@ -382,7 +389,8 @@ public class SeriesRestService {
       @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
       @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
       @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
-  public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl)
+  public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl,
+          @DefaultValue("false") @FormParam("override") boolean override)
           throws UnauthorizedException {
     if (accessControl == null) {
       logger.warn("Access control parameter is null.");
@@ -396,7 +404,7 @@ public class SeriesRestService {
       return Response.status(BAD_REQUEST).build();
     }
     try {
-      boolean updated = seriesService.updateAccessControl(seriesID, acl);
+      boolean updated = seriesService.updateAccessControl(seriesID, acl, override);
       if (updated) {
         return Response.status(NO_CONTENT).build();
       }

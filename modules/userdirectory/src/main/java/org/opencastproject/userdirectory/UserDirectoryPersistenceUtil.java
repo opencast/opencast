@@ -29,6 +29,7 @@ import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -298,6 +299,9 @@ public final class UserDirectoryPersistenceUtil {
    * @return the list of users that was found
    */
   public static List<JpaUser> findUsersByUserName(Collection<String> userNames, String organizationId, EntityManagerFactory emf) {
+    if (userNames.isEmpty()) {
+      return Collections.<JpaUser>emptyList();
+    }
     EntityManager em = null;
     try {
       em = emf.createEntityManager();
