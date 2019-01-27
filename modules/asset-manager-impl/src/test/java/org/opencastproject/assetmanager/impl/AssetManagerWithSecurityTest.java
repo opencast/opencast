@@ -98,7 +98,7 @@ public class AssetManagerWithSecurityTest extends AbstractTieredStorageAssetMana
     EasyMock.expect(secSvc.getOrganization()).andAnswer(() -> currentUser.getOrganization()).anyTimes();
     EasyMock.replay(secSvc);
     //
-    return new AssetManagerWithSecurity(mkTieredStorageAM(), authSvc, secSvc);
+    return new AssetManagerWithSecurity(mkTieredStorageAM(), authSvc, secSvc, false);
   }
 
   @Override public AbstractAssetManager getAbstractAssetManager() {

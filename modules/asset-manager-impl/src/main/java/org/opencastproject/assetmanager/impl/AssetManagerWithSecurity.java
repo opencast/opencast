@@ -64,13 +64,17 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private final AuthorizationService authSvc;
   private final SecurityService secSvc;
 
+  private final boolean includeUIRoles;
+
   public AssetManagerWithSecurity(
       TieredStorageAssetManager delegate,
       AuthorizationService authSvc,
-      SecurityService secSvc) {
+      SecurityService secSvc,
+      boolean includeUIRoles) {
     super(delegate);
     this.authSvc = authSvc;
     this.secSvc = secSvc;
+    this.includeUIRoles = includeUIRoles;
   }
 
   @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
@@ -160,6 +164,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private Predicate mkAuthPredicate(final String action) {
     final AQueryBuilder q = q();
     return secSvc.getUser().getRoles().stream()
+            .filter((role) -> includeUIRoles || !role.getName().startsWith("ROLE_UI_"))
             .map((role) -> mkSecurityProperty(q, role.getName(), action).eq(true))
             .reduce(Predicate::or)
             .orElseGet(() -> q.always().not())
