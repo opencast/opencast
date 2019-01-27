@@ -2,13 +2,13 @@
   "name": "paella-opencast",
   "private": true,
   "scripts": {
-    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/paella-opencast/",
+    "eslint": "eslint --config ../../docs/checkstyle/eslintrc.js src/main/paella-opencast/ gulpfile.js",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "devDependencies": {
-    "eslint": "^5.6.0",
+    "eslint": "^5.12.1",
     "eslint-plugin-header": "^2.0.0",
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.0",
     "merge-stream": "^1.0.1",
     "paellaplayer": "github:polimediaupv/paella#6.0.4"
   }
