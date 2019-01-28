@@ -80,7 +80,6 @@ public class SchedulerMigrationService {
   static final String END_DATE_CONFIG = "end";
   static final String OPTOUT_CONFIG = "optout";
   static final String VERSION = "version";
-  static final String LAST_MODIFIED_ORIGIN = "last_modified_origin";
   static final String LAST_MODIFIED_DATE = "last_modified_date";
   static final String LAST_CONFLICT = "last_conflict";
   static final String CHECKSUM = "checksum";
@@ -217,10 +216,6 @@ public class SchedulerMigrationService {
       final Opt<Date> lastModifiedDate = event.getProperties().apply(Properties.getDateOpt(LAST_MODIFIED_DATE));
       if (lastModifiedDate.isSome()) {
         entity.setLastModifiedDate(lastModifiedDate.get());
-      }
-      final Opt<String> lastMofifiedOrigin = event.getProperties().apply(Properties.getStringOpt(LAST_MODIFIED_ORIGIN));
-      if (lastMofifiedOrigin.isSome()) {
-        entity.setLastModifiedOrigin(lastMofifiedOrigin.get());
       }
       final Opt<Boolean> optout = event.getProperties().apply(Properties.getValueOpt(Value.BOOLEAN, OPTOUT_CONFIG));
       if (optout.isSome()) {

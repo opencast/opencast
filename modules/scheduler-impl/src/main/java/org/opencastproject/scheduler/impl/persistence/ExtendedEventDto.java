@@ -103,10 +103,6 @@ public class ExtendedEventDto {
   @Column(name = "optout")
   private Boolean optOut;
 
-  /** last modified origin */
-  @Column(name = "last_modified_origin")
-  private String lastModifiedOrigin;
-
   /** last modified date */
   @Column(name = "last_modified_date")
   @Temporal(TemporalType.TIMESTAMP)
@@ -223,14 +219,6 @@ public class ExtendedEventDto {
 
   public void setOptOut(Boolean optOut) {
     this.optOut = optOut;
-  }
-
-  public String getLastModifiedOrigin() {
-    return lastModifiedOrigin;
-  }
-
-  public void setLastModifiedOrigin(String lastModifiedOrigin) {
-    this.lastModifiedOrigin = lastModifiedOrigin;
   }
 
   public Date getLastModifiedDate() {

@@ -409,15 +409,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOutStatus, Opt<String> schedulingSource, String modificationOrigin)
+          Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
                   throws UnauthorizedException, SchedulerException {
     addEventInternal(startDateTime, endDateTime, captureAgentId, userIds, mediaPackage, wfProperties, caMetadata,
-            modificationOrigin, optOutStatus, schedulingSource);
+            optOutStatus, schedulingSource);
   }
 
   private void addEventInternal(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          String modificationOrigin, Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
+          Opt<Boolean> optOutStatus, Opt<String> schedulingSource)
                   throws SchedulerException {
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
@@ -426,7 +426,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(mediaPackage, "mediaPackage");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
-    notEmpty(modificationOrigin, "modificationOrigin");
     notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
     if (endDateTime.before(startDateTime))
@@ -472,7 +471,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
                                           captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut,
                                           acl);
-      persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
+      persistEvent(mediaPackageId, checksum, Opt.some(startDateTime), Opt.some(endDateTime),
               Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
               Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
 
@@ -494,17 +493,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
+          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     List<Period> periods = calculatePeriods(rRule, start, end, duration, tz);
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
-            modificationOrigin, optOut, schedulingSource);
+            optOut, schedulingSource);
   }
 
 
   private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
           Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, String modificationOrigin, Opt<Boolean> optOutStatus,
+          Map<String, String> caMetadata, Opt<Boolean> optOutStatus,
           Opt<String> schedulingSource) throws SchedulerException {
     notNull(periods, "periods");
     requireTrue(periods.size() > 0, "periods");
@@ -513,7 +512,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(templateMp, "mediaPackages");
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
-    notEmpty(modificationOrigin, "modificationOrigin");
     notNull(optOutStatus, "optOutStatus");
     notNull(schedulingSource, "schedulingSource");
 
@@ -617,7 +615,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         String checksum = calculateChecksum(workspace, getEventCatalogUIAdapterFlavors(), startDateTime, endDateTime,
                 captureAgentId, userIds, mediaPackage, dublinCore, wfProperties, finalCaProperties, optOut, acl);
         try {
-          persistEvent(mediaPackageId, modificationOrigin, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
+          persistEvent(mediaPackageId, checksum, Opt.some(startDateTime), Opt.some(endDateTime), Opt.some(captureAgentId), Opt.some(userIds), Opt.some(mediaPackage), Opt.some(wfProperties),
                 Opt.some(finalCaProperties), Opt.some(optOut), schedulingSource);
         } catch (Exception e) {
           Misc.chuck(e);
@@ -652,18 +650,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updateEvent(final String mpId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption, String modificationOrigin)
+          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption)
                   throws NotFoundException, UnauthorizedException, SchedulerException {
-    updateEventInternal(mpId, modificationOrigin, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
+    updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
             wfProperties, caMetadata, optOutOption);
   }
 
-  private void updateEventInternal(final String mpId, String modificationOrigin, Opt<Date> startDateTime,
+  private void updateEventInternal(final String mpId, Opt<Date> startDateTime,
           Opt<Date> endDateTime, Opt<String> captureAgentId, Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage,
           Opt<Map<String, String>> wfProperties, Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOutOption
   ) throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
-    notEmpty(modificationOrigin, "modificationOrigin");
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
     notNull(captureAgentId, "captureAgentId");
@@ -802,7 +799,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
 
       // Update asset
-      persistEvent(mpId, modificationOrigin, checksum, startDateTime, endDateTime, captureAgentId, userIds,
+      persistEvent(mpId, checksum, startDateTime, endDateTime, captureAgentId, userIds,
               mediaPackage, wfProperties, finalCaProperties, optOut, Opt.<String> none());
 
       // Send updates
@@ -1287,7 +1284,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          Opt.none(),
           Opt.none()
       );
 
@@ -1415,7 +1411,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Opt.none(),
           Opt.none(),
           Opt.none(),
-          Opt.none(),
           Opt.none()
       );
       return true;
@@ -1473,7 +1468,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     }
   }
 
-  private synchronized void persistEvent(final String mpId, final String modificationOrigin, final String checksum,
+  private synchronized void persistEvent(final String mpId, final String checksum,
           final Opt<Date> startDateTime, final Opt<Date> endDateTime, final Opt<String> captureAgentId,
           final Opt<Set<String>> userIds, final Opt<MediaPackage> mediaPackage,
           final Opt<Map<String, String>> wfProperties, final Opt<Map<String, String>> caProperties,
@@ -1497,7 +1492,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         Opt.none(),
         userIds.isSome() ? Opt.some(String.join(",", userIds.get())) : Opt.none(),
         optOut,
-        Opt.some(modificationOrigin),
         Opt.some(new Date()),
         Opt.some(checksum),
         wfProperties,

@@ -244,7 +244,6 @@ CREATE TABLE oc_scheduled_extended_event (
   review_date DATETIME,
   presenters TEXT(65535),
   optout TINYINT(1),
-  last_modified_origin VARCHAR(255),
   last_modified_date DATETIME,
   checksum VARCHAR(64),
   capture_agent_properties MEDIUMTEXT,

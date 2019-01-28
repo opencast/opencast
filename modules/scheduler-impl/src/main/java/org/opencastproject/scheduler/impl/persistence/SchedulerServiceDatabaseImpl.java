@@ -159,8 +159,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   public void storeEvent(String mediapackageId, String organizationId, Opt<String> captureAgentId, Opt<Date> start,
           Opt<Date> end, Opt<String> source, Opt<String> recordingState, Opt<Long> recordingLastHeard,
           Opt<String> reviewStatus, Opt<Date> reviewDate, Opt<String> presenters, Opt<Boolean> optOut,
-          Opt<String> lastModifiedOrigin, Opt<Date> lastModifiedDate, Opt<String> checksum,
-          Opt<Map<String, String>> workflowProperties, Opt<Map<String, String>> caProperties
+          Opt<Date> lastModifiedDate, Opt<String> checksum, Opt<Map<String, String>> workflowProperties,
+          Opt<Map<String, String>> caProperties
   ) throws SchedulerServiceDatabaseException {
     EntityManager em = null;
     EntityTransaction tx = null;
@@ -201,9 +201,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       }
       if (optOut.isSome()) {
         entity.setOptOut(optOut.get());
-      }
-      if (lastModifiedOrigin.isSome()) {
-        entity.setLastModifiedOrigin(lastModifiedOrigin.get());
       }
       if (lastModifiedDate.isSome()) {
         entity.setLastModifiedDate(lastModifiedDate.get());

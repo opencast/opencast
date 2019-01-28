@@ -50,9 +50,6 @@ public interface SchedulerService {
    */
   String JOB_TYPE = "org.opencastproject.scheduler";
 
-  /** The origin constant for internally modifications of scheduled events */
-  String ORIGIN = "org.opencastproject";
-
   enum ReviewStatus {
     UNSENT, UNCONFIRMED, CONFIRMED
   }
@@ -87,8 +84,6 @@ public interface SchedulerService {
    *          the optional opt out status
    * @param schedulingSource
    *          the optional scheduling source from which the event comes from
-   * @param modificationOrigin
-   *          the origin of the modifier which adds the event
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
    * @throws SchedulerConflictException
@@ -98,7 +93,7 @@ public interface SchedulerService {
    */
   void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin) throws UnauthorizedException,
+          Opt<Boolean> optOut, Opt<String> schedulingSource) throws UnauthorizedException,
                   SchedulerConflictException, SchedulerException;
 
   /**
@@ -136,8 +131,6 @@ public interface SchedulerService {
    *          the optional opt out status
    * @param schedulingSource
    *          the optional scheduling source from which the event comes from
-   * @param modificationOrigin
-   *          the origin of the modifier which adds the event
    * @return A {@link Map} of mediapackage ID and {@link Period} where the event occurs
    * @throws UnauthorizedException
    *           if the caller is not authorized to take this action
@@ -148,8 +141,8 @@ public interface SchedulerService {
    */
   Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String,
-          String> wfProperties, Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource,
-          String modificationOrigin) throws UnauthorizedException, SchedulerConflictException, SchedulerException;
+          String> wfProperties, Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource)
+          throws UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Updates event with specified ID.
@@ -179,8 +172,6 @@ public interface SchedulerService {
    *          the optional capture configuration to update
    * @param optOut
    *          the optional opt out status to update
-   * @param modificationOrigin
-   *          the origin of the modifier which updates the event
    * @throws NotFoundException
    *           if event with specified ID cannot be found
    * @throws UnauthorizedException
@@ -192,7 +183,7 @@ public interface SchedulerService {
    */
   void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut, String modificationOrigin)
+          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**

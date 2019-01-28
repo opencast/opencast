@@ -184,8 +184,7 @@ public class EventsLoader {
     Date endDate = new DateTime(event.getRecordingDate().getTime()).plusMinutes(event.getDuration()).toDate();
     schedulerService.addEvent(event.getRecordingDate(), endDate, event.getCaptureAgent(),
             Collections.<String> emptySet(), mediaPackage, Collections.<String, String> emptyMap(),
-            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.some("org.opencastproject.dataloader"),
-            SchedulerService.ORIGIN);
+            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.some("org.opencastproject.dataloader"));
     cleanUpMediaPackage(mediaPackage);
   }
 

@@ -697,7 +697,6 @@ public class SchedulerRestService {
           @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
           @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event"),
           @RestParameter(name = "source", isRequired = false, type = Type.STRING, description = "The scheduling source of the event"),
-          @RestParameter(name = "origin", isRequired = false, type = Type.STRING, description = "The origin")
           }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, conflicting events found (ConflicsFound)"),
@@ -708,11 +707,8 @@ public class SchedulerRestService {
           @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("mediaPackage") String mediaPackageXml, @FormParam("wfproperties") String workflowProperties,
           @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut,
-          @FormParam("source") String schedulingSource, @FormParam("origin") String origin)
+          @FormParam("source") String schedulingSource)
                   throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
     if (endTime <= startTime || startTime < 0) {
       logger.debug("Cannot add event without proper start and end time");
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
@@ -769,7 +765,7 @@ public class SchedulerRestService {
 
     try {
       service.addEvent(startDate.toDate(), endDate.toDate(), agentId, userIds, mediaPackage, wfProperties, caProperties,
-              Opt.nul(optOut), Opt.nul(schedulingSource), origin);
+              Opt.nul(optOut), Opt.nul(schedulingSource));
       return Response.status(Status.CREATED)
               .header("Location", serverUrl + serviceUrl + '/' + eventId + "/mediapackage.xml").build();
     } catch (UnauthorizedException e) {
@@ -804,7 +800,6 @@ public class SchedulerRestService {
                   @RestParameter(name = "agentparameters", isRequired = false, type = Type.TEXT, description = "The capture agent properties for the event"),
                   @RestParameter(name = "optOut", isRequired = false, type = Type.BOOLEAN, description = "The opt out status of the event"),
                   @RestParameter(name = "source", isRequired = false, type = Type.STRING, description = "The scheduling source of the event"),
-                  @RestParameter(name = "origin", isRequired = false, type = Type.STRING, description = "The origin")
           }, reponses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event is successfully created"),
           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to create event, conflicting events found (ConflicsFound)"),
@@ -816,11 +811,8 @@ public class SchedulerRestService {
           @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("templateMp") MediaPackage templateMp, @FormParam("wfproperties") String workflowProperties,
           @FormParam("agentparameters") String agentParameters, @FormParam("optOut") Boolean optOut,
-          @FormParam("source") String schedulingSource, @FormParam("origin") String origin)
+          @FormParam("source") String schedulingSource)
           throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
     if (endTime <= startTime || startTime < 0) {
       logger.debug("Cannot add event without proper start and end time");
       return RestUtil.R.badRequest("Cannot add event without proper start and end time");
@@ -881,7 +873,7 @@ public class SchedulerRestService {
 
     try {
       service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
-              Opt.nul(optOut), Opt.nul(schedulingSource), origin);
+              Opt.nul(optOut), Opt.nul(schedulingSource));
       return Response.status(Status.CREATED).build();
     } catch (UnauthorizedException e) {
       throw e;
@@ -905,8 +897,7 @@ public class SchedulerRestService {
                   @RestParameter(name = "wfproperties", isRequired = false, description = "Workflow configuration properties", type = Type.TEXT),
                   @RestParameter(name = "agentparameters", isRequired = false, description = "Updated Capture Agent properties", type = Type.TEXT),
                   @RestParameter(name = "updateOptOut", isRequired = true, defaultValue = "false", description = "Whether to update the opt out status", type = Type.BOOLEAN),
-                  @RestParameter(name = "optOut", isRequired = false, description = "Update opt out status", type = Type.BOOLEAN),
-                  @RestParameter(name = "origin", isRequired = false, description = "The origin", type = Type.STRING) }, reponses = {
+                  @RestParameter(name = "optOut", isRequired = false, description = "Update opt out status", type = Type.BOOLEAN) }, reponses = {
                           @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Event was successfully updated"),
                           @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "Event with specified ID does not exist"),
                           @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "Unable to update event, conflicting events found (ConflicsFound)"),
@@ -918,10 +909,7 @@ public class SchedulerRestService {
           @FormParam("end") Long endTime, @FormParam("agent") String agentId, @FormParam("users") String users,
           @FormParam("mediaPackage") String mediaPackageXml, @FormParam("wfproperties") String workflowProperties,
           @FormParam("agentparameters") String agentParameters, @FormParam("updateOptOut") boolean updateOptOut,
-          @FormParam("optOut") Boolean optOutBoolean, @FormParam("origin") String origin) throws UnauthorizedException {
-    if (StringUtils.isBlank(origin))
-      origin = SchedulerService.ORIGIN;
-
+          @FormParam("optOut") Boolean optOutBoolean) throws UnauthorizedException {
     if (startTime != null) {
       if (startTime < 0) {
         logger.debug("Cannot add event with negative start time ({} < 0)", startTime);
@@ -991,7 +979,7 @@ public class SchedulerRestService {
     }
     try {
       service.updateEvent(eventID, Opt.nul(startDate), Opt.nul(endDate), Opt.nul(StringUtils.trimToNull(agentId)),
-              Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties), optOut, origin);
+              Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties), optOut);
       return Response.ok().build();
     } catch (SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
@@ -1431,7 +1419,7 @@ public class SchedulerRestService {
 
         prolongingService.schedule(agentId);
         service.addEvent(now, temporaryEndDate, agentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
-                caProperties, Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+                caProperties, Opt.<Boolean> none(), Opt.<String> none());
         return Response.status(Status.CREATED)
                 .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().compact() + ".xml")
                 .build();
@@ -1520,7 +1508,7 @@ public class SchedulerRestService {
 
         service.updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), Opt.some(mp), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
         prolongingService.stop(agentId);
         return Response.ok().build();
       } catch (UnauthorizedException e) {

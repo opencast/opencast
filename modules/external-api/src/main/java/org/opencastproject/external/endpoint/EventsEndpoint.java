@@ -1763,8 +1763,7 @@ public class EventsEndpoint implements ManagedService {
           Opt.none(),
           Opt.none(),
           caConfig,
-          Opt.none(),
-          SchedulerService.ORIGIN);
+          Opt.none());
     } catch (SchedulerConflictException e) {
       final List<MediaPackage> conflictingEvents = getConflictingEvents(
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);

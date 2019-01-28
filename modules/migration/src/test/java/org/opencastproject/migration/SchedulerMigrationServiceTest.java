@@ -133,7 +133,6 @@ public class SchedulerMigrationServiceTest {
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.START_DATE_CONFIG), Value.mk(new Date(102))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.END_DATE_CONFIG), Value.mk(new Date(103))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.OPTOUT_CONFIG), Value.mk(true)));
-    assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.LAST_MODIFIED_ORIGIN), Value.mk("origin of mp1")));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.LAST_MODIFIED_DATE), Value.mk(new Date(104))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.CHECKSUM), Value.mk("checksum of mp1")));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp1", SchedulerMigrationService.WORKFLOW_NAMESPACE, "workflow testproperty"), Value.mk("wf prop 1")));
@@ -150,7 +149,6 @@ public class SchedulerMigrationServiceTest {
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.START_DATE_CONFIG), Value.mk(new Date(202))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.END_DATE_CONFIG), Value.mk(new Date(203))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.OPTOUT_CONFIG), Value.mk(false)));
-    assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.LAST_MODIFIED_ORIGIN), Value.mk("origin of mp2")));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.LAST_MODIFIED_DATE), Value.mk(new Date(204))));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.SCHEDULER_NAMESPACE, SchedulerMigrationService.CHECKSUM), Value.mk("checksum of mp2")));
     assetManager.setProperty(Property.mk(PropertyId.mk("mp2", SchedulerMigrationService.WORKFLOW_NAMESPACE, "workflow testproperty"), Value.mk("wf prop 2")));
@@ -198,7 +196,6 @@ public class SchedulerMigrationServiceTest {
     assertEquals(new Date(102), entity.getStartDate());
     assertEquals(new Date(103), entity.getEndDate());
     assertTrue(entity.getOptOut());
-    assertEquals("origin of mp1", entity.getLastModifiedOrigin());
     assertEquals(new Date(104), entity.getLastModifiedDate());
     assertEquals("checksum of mp1", entity.getChecksum());
     map = gson.fromJson(entity.getCaptureAgentProperties(), HashMap.class);
@@ -219,7 +216,6 @@ public class SchedulerMigrationServiceTest {
     assertEquals(new Date(202), entity.getStartDate());
     assertEquals(new Date(203), entity.getEndDate());
     assertFalse(entity.getOptOut());
-    assertEquals("origin of mp2", entity.getLastModifiedOrigin());
     assertEquals(new Date(204), entity.getLastModifiedDate());
     assertEquals("checksum of mp2", entity.getChecksum());
     map = gson.fromJson(entity.getCaptureAgentProperties(), HashMap.class);

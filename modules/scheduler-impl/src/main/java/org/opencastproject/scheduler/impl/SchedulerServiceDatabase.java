@@ -95,8 +95,6 @@ public interface SchedulerServiceDatabase {
    *          the presenters
    * @param optOut
    *          the opt out
-   * @param lastModifiedOrigin
-   *          the last modified origin
    * @param lastModifiedDate
    *          the last modified date
    * @param checksum
@@ -120,7 +118,6 @@ public interface SchedulerServiceDatabase {
       Opt<Date> reviewDate,
       Opt<String> presenters,
       Opt<Boolean> optOut,
-      Opt<String> lastModifiedOrigin,
       Opt<Date> lastModifiedDate,
       Opt<String> checksum,
       Opt<Map<String,String>> workflowProperties,

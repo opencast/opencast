@@ -103,8 +103,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
           MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<Boolean> optOut, Opt<String> schedulingSource, String origin) throws UnauthorizedException,
-          SchedulerConflictException, SchedulerException {
+          Opt<Boolean> optOut, Opt<String> schedulingSource) throws UnauthorizedException, SchedulerConflictException,
+          SchedulerException {
     HttpPost post = new HttpPost("/");
     String eventId = mediaPackage.getIdentifier().compact();
     logger.debug("Start adding a new event {} through remote Schedule Service", eventId);
@@ -121,7 +121,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
     if (schedulingSource.isSome())
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
-    params.add(new BasicNameValuePair("origin", origin));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
@@ -160,7 +159,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
-          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
+          Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource)
           throws UnauthorizedException, SchedulerConflictException, SchedulerException {
     HttpPost post = new HttpPost("/");
     logger.debug("Start adding a new events through remote Schedule Service");
@@ -180,7 +179,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       params.add(new BasicNameValuePair("optOut", Boolean.toString(optOut.get())));
     if (schedulingSource.isSome())
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
-    params.add(new BasicNameValuePair("origin", modificationOrigin));
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     String eventId = templateMp.getIdentifier().compact();
@@ -221,7 +219,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   @Override
   public void updateEvent(String eventId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
           Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut, String origin)
+          Opt<Map<String, String>> caMetadata, Opt<Opt<Boolean>> optOut)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
     logger.debug("Start updating event {}.", eventId);
     HttpPut put = new HttpPut("/" + eventId);
@@ -248,7 +246,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } else {
       params.add(new BasicNameValuePair("updateOptOut", Boolean.toString(false)));
     }
-    params.add(new BasicNameValuePair("origin", origin));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(put, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_FORBIDDEN, SC_CONFLICT);

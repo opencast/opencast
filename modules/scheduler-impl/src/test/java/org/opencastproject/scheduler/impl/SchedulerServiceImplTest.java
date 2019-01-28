@@ -475,12 +475,12 @@ public class SchedulerServiceImplTest {
 
     // Store event
     schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
     try {
       MediaPackage mp2 = (MediaPackage) mp.clone();
       mp2.setIdentifier(new UUIDIdBuilderImpl().createNew());
       schedSvc.addEvent(start, end, captureDeviceID, userIds, mp2, wfProperties, caProperties, Opt.<Boolean> none(),
-              Opt.<String> none(), SchedulerService.ORIGIN);
+              Opt.<String> none());
       Assert.fail();
     } catch (SchedulerConflictException e) {
       Assert.assertNotNull(e);
@@ -514,8 +514,7 @@ public class SchedulerServiceImplTest {
 
     // Update event
     schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-            Opt.some(userIds), Opt.some(mp), Opt.some(wfProperties), Opt.some(caProperties), Opt.some(Opt.some(true)),
-            SchedulerService.ORIGIN);
+            Opt.some(userIds), Opt.some(mp), Opt.some(wfProperties), Opt.some(caProperties), Opt.some(Opt.some(true)));
 
     mediaPackage = schedSvc.getMediaPackage(mp.getIdentifier().compact());
     assertEquals("series2", mediaPackage.getSeries());
@@ -559,7 +558,7 @@ public class SchedulerServiceImplTest {
     try {
       // Store event
       schedSvc.addEvent(end, start, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<Boolean> none(),
-              Opt.<String> none(), SchedulerService.ORIGIN);
+              Opt.<String> none());
       fail("Unable to detect end date being before start date during creation of event");
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
@@ -567,13 +566,13 @@ public class SchedulerServiceImplTest {
 
     // Store
     schedSvc.addEvent(start, end, captureDeviceID, userIds, mp, wfProperties, caProperties, Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     try {
       // Update end date before start date
       schedSvc.updateEvent(mp.getIdentifier().compact(), Opt.some(end), Opt.some(start), Opt.<String> none(),
               Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-              Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+              Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
       fail("Unable to detect end date being before start date during update of event");
     } catch (SchedulerException e) {
       assertNotNull(e);
@@ -591,7 +590,7 @@ public class SchedulerServiceImplTest {
 
     // Store event
     schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     assertTrue(AccessControlUtil.equals(acl, schedSvc.getAccessControlList(mp.getIdentifier().compact())));
   }
@@ -608,7 +607,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mp = generateEvent(Opt.some(mediapackageId));
     schedSvc.addEvent(new Date(), new Date(System.currentTimeMillis() + 60000), "demo", Collections.<String> emptySet(),
             mp, Collections.<String, String> emptyMap(), Collections.<String, String> emptyMap(), Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     schedSvc.updateReviewStatus(mediapackageId, ReviewStatus.UNCONFIRMED);
     Assert.assertEquals(ReviewStatus.UNCONFIRMED, schedSvc.getReviewStatus(mediapackageId));
@@ -629,7 +628,7 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "agent",
             Collections.<String> emptySet(), mp, wfPropertiesUpdated, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     try {
       schedSvc.getRecordingState(mpId);
@@ -673,7 +672,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Opt.some(id));
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     schedSvc.updateRecordingState(id, UPLOAD_FINISHED);
     assertEquals(1, schedSvc.getKnownRecordings().size());
@@ -704,7 +703,7 @@ public class SchedulerServiceImplTest {
     addDublinCore(Opt.<String> none(), mediaPackage, dublinCore);
     schedSvc.addEvent(new Date(), new Date(System.currentTimeMillis() + 60000), device, Collections.<String> emptySet(),
             mediaPackage, Collections.<String, String> emptyMap(), Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     // Request the calendar without specifying an etag. We should get a 200 with the iCalendar in the response body
     Response response = restService.getCalendar(device, null, null, request);
@@ -729,7 +728,7 @@ public class SchedulerServiceImplTest {
     // Update the event and clear to cache to make sure it's reloaded
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.some(wfPropertiesUpdated),
-            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
 
     // Try using the same old etag. We should get a 200, since the event has changed
     response = restService.getCalendar(device, null, null, request);
@@ -752,7 +751,7 @@ public class SchedulerServiceImplTest {
     // do opt out update
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)));
     Assert.assertTrue(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
 
     // Try using the same old etag. We should get a 200, since the event has changed
@@ -778,7 +777,7 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Opt.some(false),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     final Map<String, String> initalCaProps = schedSvc
             .getCaptureAgentConfiguration(mediaPackage.getIdentifier().compact());
@@ -789,7 +788,7 @@ public class SchedulerServiceImplTest {
     // do opt out update
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)));
     Assert.assertTrue(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
   }
 
@@ -812,20 +811,20 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     Assert.assertTrue(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
 
     // do opt out update
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)));
     Assert.assertFalse(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
 
     // do opt out update
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.some(Opt.some(true)));
     Assert.assertTrue(schedSvc.isOptOut(mediaPackage.getIdentifier().compact()));
   }
 
@@ -837,11 +836,11 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + (60 * 60 * 1000)), "Device A",
             Collections.<String> emptySet(), mediaPackageA, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + (20 * 24 * 60 * 60 * 1000)),
             new Date(currentTime + (20 * 25 * 60 * 60 * 1000)), "Device A", Collections.<String> emptySet(),
             mediaPackageB, wfProperties, Collections.<String, String> emptyMap(), Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     Date start = new Date(currentTime);
     Date end = new Date(currentTime + 60 * 60 * 1000);
@@ -863,8 +862,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Opt.<String> none());
     String captureAgentId = "Device A";
     schedSvc.addEvent(startDate, endDate, captureAgentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
-            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.<String> none(),
-            SchedulerService.ORIGIN);
+            Collections.<String, String> emptyMap(), Opt.<Boolean> none(), Opt.<String> none());
 
     Date start = new Date(currentTime);
     Date end = new Date(currentTime + 60 * 60 * 1000);
@@ -881,10 +879,10 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackageB = generateEvent(Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + (60 * 60 * 1000)), "Device A",
             Collections.<String> emptySet(), mediaPackageA, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + (60 * 60 * 1000)), "Device B",
             Collections.<String> emptySet(), mediaPackageB, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     List<MediaPackage> events = schedSvc.search(Opt.some("Device"), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<Date> none(), Opt.<Date> none());
@@ -922,7 +920,7 @@ public class SchedulerServiceImplTest {
             tuple("org.opencastproject.workflow.definition", "full"));
 
     schedSvc.addEvent(startDateTime, endTime, "Device A", Collections.<String> emptySet(), mediaPackage, wfProperties,
-            caMetadata, Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            caMetadata, Opt.<Boolean> none(), Opt.<String> none());
 
     MediaPackage mp = schedSvc.getMediaPackage(mediaPackage.getIdentifier().compact());
     Assert.assertEquals(mediaPackage, mp);
@@ -934,7 +932,7 @@ public class SchedulerServiceImplTest {
     addDublinCore(Opt.some(catalogId), mediaPackage, updatedEvent1);
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated),
-            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
     Assert.fail("Schedule should not update a recording that has ended (single)");
   }
 
@@ -945,11 +943,11 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + (60 * 60 * 1000)), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + (20 * 24 * 60 * 60 * 1000)),
             new Date(currentTime + (20 * 25 * 60 * 60 * 1000)), "Device A", Collections.<String> emptySet(),
             mediaPackage, wfProperties, Collections.<String, String> emptyMap(), Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
   }
 
   @Test
@@ -971,7 +969,6 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Opt<Boolean> optOut = Opt.none();
     final Opt<String> schedulingSource = Opt.none();
-    final String modificationOrigin = SchedulerService.ORIGIN;
     EasyMock.reset(seriesService);
     EasyMock.expect(seriesService.isOptOut(EasyMock.anyString())).andReturn(false).anyTimes();
     EasyMock.replay(seriesService);
@@ -988,8 +985,7 @@ public class SchedulerServiceImplTest {
         wfProperties,
         caProperties,
         optOut,
-        schedulingSource,
-        modificationOrigin
+        schedulingSource
     );
 
     final int expectedEventCount = rrule.getRecur().getDates(
@@ -1037,7 +1033,6 @@ public class SchedulerServiceImplTest {
       final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
       final Opt<Boolean> optOut = Opt.none();
       final Opt<String> schedulingSource = Opt.none();
-      final String modificationOrigin = SchedulerService.ORIGIN;
       final Map<String, Period> scheduled = schedSvc.addMultipleEvents(
           rrule,
           start,
@@ -1050,8 +1045,7 @@ public class SchedulerServiceImplTest {
           wfProperties,
           caProperties,
           optOut,
-          schedulingSource,
-          modificationOrigin
+          schedulingSource
       );
     }
   }
@@ -1150,7 +1144,7 @@ public class SchedulerServiceImplTest {
     try {
       schedSvc.updateEvent(mediaPackageId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
               Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-              Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+              Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
       fail();
     } catch (NotFoundException e) {
       Assert.assertNotNull(e);
@@ -1164,7 +1158,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackage = generateEvent(Opt.some(id));
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.updateRecordingState(id, CAPTURING);
     assertEquals(1, schedSvc.getKnownRecordings().size());
 
@@ -1172,7 +1166,7 @@ public class SchedulerServiceImplTest {
     MediaPackage mediaPackageB = generateEvent(Opt.some(id2));
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device B",
             Collections.<String> emptySet(), mediaPackageB, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.updateRecordingState(id2, UPLOADING);
     assertEquals(2, schedSvc.getKnownRecordings().size());
 
@@ -1208,16 +1202,16 @@ public class SchedulerServiceImplTest {
     //
     schedSvc.addEvent(new Date(currentTime + seconds(10)), new Date(currentTime + hours(1) + seconds(10)), "Device A",
             Collections.<String> emptySet(), mediaPackageA, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + hours(24)), new Date(currentTime + hours(25)), "Device A",
             Collections.<String> emptySet(), mediaPackageB, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.some(true), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.some(true), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime - hours(1)), new Date(currentTime - minutes(10)), "Device C",
             Collections.<String> emptySet(), mediaPackageC, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + seconds(10)), new Date(currentTime + hours(1) + seconds(10)), "Device D",
             Collections.<String> emptySet(), mediaPackageD, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     {
       List<MediaPackage> allEvents = schedSvc.search(Opt.<String> none(), Opt.<Date> none(), Opt.<Date> none(),
               Opt.<Date> none(), Opt.<Date> none());
@@ -1288,10 +1282,10 @@ public class SchedulerServiceImplTest {
     //
     schedSvc.addEvent(new Date(currentTime), new Date(currentTime + hours(1) + seconds(10)), "Device A",
             Collections.<String> emptySet(), mediaPackageA, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + hours(2)), new Date(currentTime + hours(25)), "Device A",
             Collections.<String> emptySet(), mediaPackageB, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.some(true), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.some(true), Opt.<String> none());
     {
       List<MediaPackage> allEvents = schedSvc.search(Opt.<String> none(), Opt.<Date> none(), Opt.<Date> none(),
               Opt.<Date> none(), Opt.<Date> none());
@@ -1301,14 +1295,13 @@ public class SchedulerServiceImplTest {
     // Update opted out event to a conflicting time
     schedSvc.updateEvent(mediaPackageB.getIdentifier().compact(), Opt.some(new Date(currentTime)), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
 
     // Update opted out status
     try {
       schedSvc.updateEvent(mediaPackageB.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
               Opt.<String> none(), Opt.<Set<String>> none(), Opt.<MediaPackage> none(),
-              Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)),
-              SchedulerService.ORIGIN);
+              Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(), Opt.some(Opt.some(false)));
       fail("Conflict not detected!");
     } catch (SchedulerConflictException e) {
       Assert.assertNotNull(e);
@@ -1325,16 +1318,16 @@ public class SchedulerServiceImplTest {
     //
     schedSvc.addEvent(new Date(currentTime + seconds(10)), new Date(currentTime + hours(1) + seconds(10)), "Device A",
             Collections.<String> emptySet(), mediaPackageA, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + hours(24)), new Date(currentTime + hours(25)), "Device A",
             Collections.<String> emptySet(), mediaPackageB, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime - hours(1)), new Date(currentTime - minutes(10)), "Device C",
             Collections.<String> emptySet(), mediaPackageC, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.addEvent(new Date(currentTime + seconds(10)), new Date(currentTime + hours(1) + seconds(10)), "Device D",
             Collections.<String> emptySet(), mediaPackageD, wfProperties, Collections.<String, String> emptyMap(),
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     {
       List<MediaPackage> allEvents = schedSvc.search(Opt.<String> none(), Opt.<Date> none(), Opt.<Date> none(),
               Opt.<Date> none(), Opt.<Date> none());
@@ -1356,7 +1349,7 @@ public class SchedulerServiceImplTest {
     Map<String, String> caProperties = map(tuple("org.opencastproject.workflow.definition", "full"));
     schedSvc.addEvent(new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000), "Device A",
             Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties, Opt.<Boolean> none(),
-            Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<String> none());
 
     Map<String, String> initalCaProps = schedSvc.getCaptureAgentConfiguration(mediaPackage.getIdentifier().compact());
     checkEvent(mediaPackage.getIdentifier().compact(), initalCaProps, initialTitle);
@@ -1369,7 +1362,7 @@ public class SchedulerServiceImplTest {
 
     schedSvc.updateEvent(mediaPackage.getIdentifier().compact(), Opt.<Date> none(), Opt.<Date> none(),
             Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated),
-            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+            Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
 
     final Map<String, String> updatedCaProps = new HashMap<>(initalCaProps);
     updatedCaProps.put("event.title", updatedTitle1);
@@ -1397,7 +1390,7 @@ public class SchedulerServiceImplTest {
 
     schedSvc.addEvent(new Date(System.currentTimeMillis() - 2000), new Date(System.currentTimeMillis() + 60000),
             "testdevice", Collections.<String> emptySet(), mediaPackage, wfProperties, caProperties,
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
 
     // test iCalender export
     CalendarBuilder calBuilder = new CalendarBuilder();
@@ -1450,7 +1443,7 @@ public class SchedulerServiceImplTest {
             Opt.some(new Date(System.currentTimeMillis() + 180000)),
             Opt.some(new Date(System.currentTimeMillis() + 600000)), Opt.<String> none(), Opt.<Set<String>> none(),
             Opt.some(mediaPackage), Opt.some(wfPropertiesUpdated), Opt.<Map<String, String>> none(),
-            Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+            Opt.<Opt<Boolean>> none());
 
     // test for upcoming events (now it should be there)
     upcoming = schedSvc.search(Opt.<String> none(), Opt.some(new Date(System.currentTimeMillis())), Opt.<Date> none(),
@@ -1516,7 +1509,7 @@ public class SchedulerServiceImplTest {
 
     // Store event
     schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     schedSvc.removeScheduledRecordingsBeforeBuffer(0);
 
     try {
@@ -1548,7 +1541,7 @@ public class SchedulerServiceImplTest {
     assertEquals("The asset manager should not contain any episodes", 0, q.select(q.snapshot()).run().getSize());
     // store event
     schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
-            Opt.<Boolean> none(), Opt.<String> none(), SchedulerService.ORIGIN);
+            Opt.<Boolean> none(), Opt.<String> none());
     {
       final RichAResult r = enrich(q.select(q.snapshot()).run());
       assertEquals("The asset manager should contain one episode", 1, r.getSize());
@@ -1573,7 +1566,6 @@ public class SchedulerServiceImplTest {
         final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
         final Opt<Boolean> optOut = Opt.none();
         final Opt<String> schedulingSource = Opt.none();
-        final String modificationOrigin = SchedulerService.ORIGIN;
         final String id = "Recording";
 
         // We add 3 recordings here. One is in the past, one is current, one is in the future.
@@ -1596,8 +1588,7 @@ public class SchedulerServiceImplTest {
               wfProperties,
               caProperties,
               optOut,
-              schedulingSource,
-              modificationOrigin
+              schedulingSource
           );
         }
 
@@ -1620,7 +1611,6 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Opt<Boolean> optOut = Opt.none();
     final Opt<String> schedulingSource = Opt.none();
-    final String modificationOrigin = SchedulerService.ORIGIN;
     final String id = "Recording";
 
     // We add 2 recordings here. One is in the past, one is in the future.
@@ -1645,8 +1635,7 @@ public class SchedulerServiceImplTest {
           wfProperties,
           caProperties,
           optOut,
-          schedulingSource,
-          modificationOrigin
+          schedulingSource
       );
     }
 
@@ -1665,7 +1654,6 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Opt<Boolean> optOut = Opt.none();
     final Opt<String> schedulingSource = Opt.none();
-    final String modificationOrigin = SchedulerService.ORIGIN;
     final String id = "Recording";
 
     // We add 3 recordings here. One is in the past, one is current, one is in the future.
@@ -1688,8 +1676,7 @@ public class SchedulerServiceImplTest {
           wfProperties,
           caProperties,
           optOut,
-          schedulingSource,
-          modificationOrigin
+          schedulingSource
       );
     }
 
@@ -1712,7 +1699,6 @@ public class SchedulerServiceImplTest {
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
     final Opt<Boolean> optOut = Opt.none();
     final Opt<String> schedulingSource = Opt.none();
-    final String modificationOrigin = SchedulerService.ORIGIN;
     final String id = "Recording";
 
     // We add 2 recordings here. One is in the past, one is current, none is in the future.
@@ -1734,8 +1720,7 @@ public class SchedulerServiceImplTest {
           wfProperties,
           caProperties,
           optOut,
-          schedulingSource,
-          modificationOrigin
+          schedulingSource
       );
     }
 
@@ -1889,7 +1874,7 @@ public class SchedulerServiceImplTest {
               startDateTime, endDateTime);
       addDublinCore(Opt.<String> none(), mp, event);
       schedulerService.addEvent(startDateTime, endDateTime, agent, Collections.<String> emptySet(), mp, wfProperties,
-              Collections.<String, String> emptyMap(), Opt.nul(optedout), Opt.<String> none(), SchedulerService.ORIGIN);
+              Collections.<String, String> emptyMap(), Opt.nul(optedout), Opt.<String> none());
       events.add(mp.getIdentifier().compact());
     }
     return events;
