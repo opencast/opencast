@@ -26,6 +26,7 @@ import static org.opencastproject.adminui.endpoint.EndpointUtil.generateJSONObje
 
 import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.exception.ListProviderException;
+import org.opencastproject.index.service.exception.ListProviderNotFoundException;
 import org.opencastproject.index.service.resources.list.api.ListProvidersService;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.AclsListQuery;
@@ -116,31 +117,31 @@ public class ListProvidersEndpoint {
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
           @Context HttpHeaders headers) {
-    if (listProvidersService.hasProvider(source)) {
-      ResourceListQueryImpl query = new ResourceListQueryImpl();
-      query.setLimit(limit);
-      query.setOffset(offset);
-      addRequestFiltersToQuery(filter, query);
-      Map<String, String> autocompleteList;
-      try {
-        autocompleteList = listProvidersService.getList(source, query, securityService.getOrganization(), false);
-      } catch (ListProviderException e) {
-        logger.error("Not able to get list from provider {}: {}", source, e);
-        return SERVER_ERROR;
-      }
 
-      JSONObject jsonList;
-      try {
-        jsonList = generateJSONObject(autocompleteList);
-      } catch (JsonCreationException e) {
-        logger.error("Not able to generate resources list JSON from source {}: {}", source, e);
-        return SERVER_ERROR;
-      }
-
-      return Response.ok(jsonList.toString()).build();
+    ResourceListQueryImpl query = new ResourceListQueryImpl();
+    query.setLimit(limit);
+    query.setOffset(offset);
+    addRequestFiltersToQuery(filter, query);
+    Map<String, String> autocompleteList;
+    try {
+      autocompleteList = listProvidersService.getList(source, query, false);
+    } catch (ListProviderNotFoundException e) {
+      logger.debug("No list found for {}", source, e);
+      return NOT_FOUND;
+    } catch (ListProviderException e) {
+      logger.error("Server error when getting list from provider {}", source, e);
+      return SERVER_ERROR;
     }
 
-    return NOT_FOUND;
+    JSONObject jsonList;
+    try {
+      jsonList = generateJSONObject(autocompleteList);
+    } catch (JsonCreationException e) {
+      logger.error("Not able to generate resources list JSON from source {}", source, e);
+      return SERVER_ERROR;
+    }
+
+    return Response.ok(jsonList.toString()).build();
   }
 
   @GET
@@ -159,8 +160,7 @@ public class ListProvidersEndpoint {
       if (listProvidersService.hasProvider(source)) {
         JSONObject subList;
         try {
-          subList = generateJSONObject(listProvidersService.getList(source, query, securityService.getOrganization(),
-                  true));
+          subList = generateJSONObject(listProvidersService.getList(source, query, true));
           list.put(source, subList);
         } catch (JsonCreationException e) {
           logger.error("Not able to generate resources list JSON from source {}: {}", source, e);

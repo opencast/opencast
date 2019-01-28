@@ -100,7 +100,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
@@ -449,7 +448,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-            EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(licences).anyTimes();
+      EasyMock.anyBoolean())).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
 
     final IncidentTree r = new IncidentTreeImpl(

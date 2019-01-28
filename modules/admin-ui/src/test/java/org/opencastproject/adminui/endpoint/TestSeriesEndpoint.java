@@ -64,7 +64,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
@@ -126,7 +125,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
         return new HashMap<>();
       }
 

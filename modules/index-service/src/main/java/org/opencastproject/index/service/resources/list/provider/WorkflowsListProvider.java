@@ -24,7 +24,6 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowQuery;
@@ -59,7 +58,7 @@ public class WorkflowsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> workflowsList = new HashMap<String, String>();
 

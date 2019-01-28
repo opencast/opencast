@@ -67,14 +67,14 @@ public class ServicesListProviderTest {
 
   @Test
   public void testListNames() throws ListProviderException {
-    assertEquals(3, servicesListProvider.getList("", servicesQuery, null).size());
-    assertEquals(3, servicesListProvider.getList(ServicesListProvider.LIST_NAME, servicesQuery, null).size());
-    assertEquals(3, servicesListProvider.getList(ServicesListProvider.LIST_STATUS, servicesQuery, null).size());
+    assertEquals(3, servicesListProvider.getList("", servicesQuery).size());
+    assertEquals(3, servicesListProvider.getList(ServicesListProvider.LIST_NAME, servicesQuery).size());
+    assertEquals(3, servicesListProvider.getList(ServicesListProvider.LIST_STATUS, servicesQuery).size());
   }
 
   @Test
   public void testNameList() throws ListProviderException {
-    Map<String, String> list = servicesListProvider.getList(ServicesListProvider.LIST_NAME, servicesQuery, null);
+    Map<String, String> list = servicesListProvider.getList(ServicesListProvider.LIST_NAME, servicesQuery);
     assertEquals(SERVICE_TYPE_1, list.get(SERVICE_TYPE_1));
     assertEquals(SERVICE_TYPE_2, list.get(SERVICE_TYPE_2));
     assertEquals(SERVICE_TYPE_3, list.get(SERVICE_TYPE_3));
@@ -82,7 +82,7 @@ public class ServicesListProviderTest {
 
   @Test
   public void testStatusList() throws ListProviderException {
-    Map<String, String> list = servicesListProvider.getList(ServicesListProvider.LIST_STATUS, servicesQuery, null);
+    Map<String, String> list = servicesListProvider.getList(ServicesListProvider.LIST_STATUS, servicesQuery);
     for (ServiceState state : ServiceState.values()) {
       assertEquals(ServicesListProvider.SERVICE_STATUS_FILTER_PREFIX + state.toString(), list.get(state.toString()));
     }

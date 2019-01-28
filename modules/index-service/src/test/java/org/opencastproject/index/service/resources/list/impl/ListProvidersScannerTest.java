@@ -23,17 +23,16 @@ package org.opencastproject.index.service.resources.list.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.index.service.resources.list.api.ListProvidersService;
-import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
+import org.opencastproject.index.service.exception.ListProviderException;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 
-import org.easymock.Capture;
 import org.easymock.EasyMock;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +42,28 @@ import java.util.Map;
 
 public class ListProvidersScannerTest {
   private static final Logger logger = LoggerFactory.getLogger(ListProvidersScannerTest.class);
+  private String listName;
+  private Organization defaultOrg;
+  private Organization specificOrg;
+  private ListProvidersScanner listProvidersScanner;
+  private ListProvidersServiceImpl listProvidersService;
+  private SecurityService securityService;
+
+  private static File getResourceFile(String resourcePath) throws Exception {
+    return new File(ListProvidersScannerTest.class.getResource(resourcePath).toURI());
+  }
+
+  @Before
+  public void setUp() {
+    listName = "BLACKLISTS.USERS.REASONS";
+    defaultOrg = EasyMock.createNiceMock(Organization.class);
+    specificOrg = EasyMock.createNiceMock(Organization.class);
+    listProvidersService = new ListProvidersServiceImpl();
+    listProvidersScanner = new ListProvidersScanner();
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    listProvidersService.setSecurityService(securityService);
+    listProvidersScanner.setListProvidersService(listProvidersService);
+  }
 
   @Test
   public void testCanHandle() {
@@ -61,95 +82,123 @@ public class ListProvidersScannerTest {
   }
 
   @Test
-  public void testInstall() throws Exception {
-    String listName = "BLACKLISTS.USERS.REASONS";
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-GoodProperties.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
-    Capture<String> captureListName = Capture.newInstance();
-    ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
-    listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
-    EasyMock.expectLastCall();
-    EasyMock.replay(listProvidersService);
+  public void testDefaultInstall() throws Exception {
+    EasyMock.expect(securityService.getOrganization()).andReturn(defaultOrg).anyTimes();
+    EasyMock.expect(defaultOrg.getId()).andReturn("mh_default_org").anyTimes();
 
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+    File file = getResourceFile("/ListProvidersScannerTest-GoodProperties.properties");
     listProvidersScanner.install(file);
 
-    assertEquals(1, resourceListProvider.getValues().size());
-    assertEquals(listName, resourceListProvider.getValue().getListNames()[0]);
-    assertEquals("Sick Leave",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.SICK_LEAVE"));
-    assertEquals("Leave",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.LEAVE"));
-    assertEquals("Family Emergency",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.FAMILY_EMERGENCY"));
-    assertNull(resourceListProvider.getValue().getList("Wrong List Name", null, null));
+    EasyMock.replay(securityService, defaultOrg);
+
+    assertTrue("Provider has not been registered", listProvidersService.hasProvider(listName));
+    assertEquals(1, listProvidersService.getAvailableProviders().size());
+    assertEquals(3, listProvidersService
+            .getList(listName, null, false).size()
+    );
+    assertEquals(listName, listProvidersService.getAvailableProviders().get(0));
+    assertEquals("Sick Leave", listProvidersService
+            .getList(listName, null, false)
+            .get("PM.BLACKLIST.REASONS.SICK_LEAVE")
+    );
   }
 
   @Test
-  public void testUpdate() throws Exception {
-    String listName = "BLACKLISTS.USERS.REASONS";
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-GoodProperties.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
-    Capture<String> captureListName = Capture.newInstance();
-    ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
-    listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
-    EasyMock.expectLastCall();
-    EasyMock.replay(listProvidersService);
-
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+  public void testDefaultUpdate() throws Exception {
+    File file = getResourceFile("/ListProvidersScannerTest-GoodProperties.properties");
     listProvidersScanner.update(file);
+    Map<String, String> dictionary = listProvidersService.getList(listName, null, false);
 
-    assertEquals(1, resourceListProvider.getValues().size());
-    assertEquals(listName, resourceListProvider.getValue().getListNames()[0]);
-    assertEquals("Sick Leave",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.SICK_LEAVE"));
-    assertEquals("Leave",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.LEAVE"));
-    assertEquals("Family Emergency",
-            resourceListProvider.getValue().getList(listName, null, null).get("PM.BLACKLIST.REASONS.FAMILY_EMERGENCY"));
+    assertEquals("Sick Leave", dictionary.get("PM.BLACKLIST.REASONS.SICK_LEAVE"));
+    assertEquals("Leave", dictionary.get("PM.BLACKLIST.REASONS.LEAVE"));
+    assertEquals("Family Emergency", dictionary.get("PM.BLACKLIST.REASONS.FAMILY_EMERGENCY"));
   }
 
   @Test
-  public void testUninstall() throws Exception {
-    String listName = "BLACKLISTS.USERS.REASONS";
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-GoodProperties.properties").toURI());
-    ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
-    listProvidersService.removeProvider(listName);
-    EasyMock.expectLastCall();
-    EasyMock.replay(listProvidersService);
-
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+  public void testDefaultUninstall() throws Exception {
+    File file = getResourceFile("/ListProvidersScannerTest-GoodProperties.properties");
     listProvidersScanner.uninstall(file);
+    assertTrue("Provider was not removed", !listProvidersService.hasProvider(listName));
+  }
+
+  @Test
+  public void testSpecificOrgInstall() throws Exception {
+    EasyMock.expect(securityService.getOrganization()).andReturn(specificOrg).anyTimes();
+    EasyMock.expect(specificOrg.getId()).andReturn("ch-switch").anyTimes();
+
+    listName = "DEBUG";
+    File file = getResourceFile("/ListProvidersScannerTest-AllProperties.properties");
+    listProvidersScanner.install(file);
+
+    EasyMock.replay();
+
+    assertTrue("Provider has not been registered", listProvidersService.hasProvider(listName, "ch-switch"));
+  }
+
+  @Test
+  public void testSpecificOrgUninstall() throws Exception {
+    EasyMock.expect(securityService.getOrganization()).andReturn(specificOrg).anyTimes();
+    EasyMock.expect(specificOrg.getId()).andReturn("ch-switch").anyTimes();
+    listName = "DEBUG";
+    File file = getResourceFile("/ListProvidersScannerTest-AllProperties.properties");
+    listProvidersScanner.uninstall(file);
+
+    EasyMock.replay();
+
+    assertTrue("Provider was not removed", !listProvidersService.hasProvider(listName, "ch-switch"));
+  }
+
+  @Test
+  public void testIsTranslatable() throws Exception {
+    EasyMock.expect(securityService.getOrganization()).andReturn(specificOrg).anyTimes();
+    EasyMock.expect(specificOrg.getId()).andReturn("ch-switch").anyTimes();
+    listName = "DEBUG";
+    File file = getResourceFile("/ListProvidersScannerTest-AllProperties.properties");
+    listProvidersScanner.install(file);
+
+    EasyMock.replay(securityService, specificOrg);
+
+    assertTrue("Translatable property not read correctly", listProvidersService.isTranslatable(listName));
+  }
+
+  @Test
+  public void testGetDefault() throws Exception {
+    EasyMock.expect(securityService.getOrganization()).andReturn(specificOrg).anyTimes();
+    EasyMock.expect(specificOrg.getId()).andReturn("ch-switch").anyTimes();
+    listName = "DEBUG";
+    File fileWithDefault = getResourceFile("/ListProvidersScannerTest-AllProperties.properties");
+    listProvidersScanner.install(fileWithDefault);
+
+    EasyMock.replay(securityService, specificOrg);
+
+    assertEquals("dokay", listProvidersService.getDefault(listName));
+  }
+
+  @Test
+  public void testThrowsExceptions() throws Exception {
+    File file = getResourceFile("/ListProvidersScannerTest-WithOrg.properties");
+    listProvidersScanner.install(file);
+    try {
+      String defaultValue = listProvidersService.getDefault(listName);
+    } catch (ListProviderException e) {
+      assertEquals("No provider found for organisation <*> with the name " + listName, e.getMessage());
+    }
   }
 
   @Test
   public void testInstallInputMissingListNameInPropertiesFileExpectsNotAddedToService() throws Exception {
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-MissingListName.properties").toURI());
-    ListProvidersService listProvidersService = EasyMock.createMock(ListProvidersService.class);
-    EasyMock.replay(listProvidersService);
-
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+    File file = getResourceFile("/ListProvidersScannerTest-MissingListName.properties");
     listProvidersScanner.install(file);
+
+    assertFalse("Provider should not be added without a name", listProvidersService.hasProvider(listName));
   }
 
   @Test
   public void testInstallInputEmptyListNameInPropertiesFileExpectsNotAddedToService() throws Exception {
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-EmptyListName.properties").toURI());
-    ListProvidersService listProvidersService = EasyMock.createMock(ListProvidersService.class);
-    EasyMock.replay(listProvidersService);
-
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+    File file = getResourceFile("/ListProvidersScannerTest-EmptyListName.properties");
     listProvidersScanner.install(file);
+
+    assertFalse("Provider should not be added without a name", listProvidersService.hasProvider(listName));
   }
 
   @Test
@@ -162,36 +211,24 @@ public class ListProvidersScannerTest {
     EasyMock.expect(org2.getId()).andReturn("org2").anyTimes();
     EasyMock.replay(org2);
 
-    String listName = "BLACKLISTS.USERS.REASONS";
-    File file = new File(
-            ListProvidersScannerTest.class.getResource("/ListProvidersScannerTest-WithOrg.properties").toURI());
-    Capture<ResourceListProvider> resourceListProvider = Capture.newInstance();
-    Capture<String> captureListName = Capture.newInstance();
-    ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
-    listProvidersService.addProvider(EasyMock.capture(captureListName), EasyMock.capture(resourceListProvider));
-    EasyMock.expectLastCall();
-    EasyMock.replay(listProvidersService);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org1).anyTimes();
+    EasyMock.replay(securityService);
 
-    ListProvidersScanner listProvidersScanner = new ListProvidersScanner();
-    listProvidersScanner.setListProvidersService(listProvidersService);
+    File file = getResourceFile("/ListProvidersScannerTest-WithOrg.properties");
     listProvidersScanner.install(file);
 
     ResourceListQuery query = new ResourceListQueryImpl();
 
-    assertEquals(1, resourceListProvider.getValues().size());
-    assertEquals(listName, resourceListProvider.getValue().getListNames()[0]);
-    Map<String, String> stuff = resourceListProvider.getValue().getList(listName, query, org1);
-    for (String key : stuff.keySet()) {
-      logger.info("Key: {}, Value {}.", key, stuff.get(key));
-    }
-    assertEquals(3, resourceListProvider.getValue().getList(listName, query, org1).size());
-    assertNull(resourceListProvider.getValue().getList(listName, query, org2));
-    assertNull(resourceListProvider.getValue().getList(listName, query, null));
-    assertEquals("Sick Leave",
-            resourceListProvider.getValue().getList(listName, null, org1).get("PM.BLACKLIST.REASONS.SICK_LEAVE"));
-    assertEquals("Leave",
-            resourceListProvider.getValue().getList(listName, null, org1).get("PM.BLACKLIST.REASONS.LEAVE"));
-    assertEquals("Family Emergency",
-            resourceListProvider.getValue().getList(listName, null, org1).get("PM.BLACKLIST.REASONS.FAMILY_EMERGENCY"));
+    assertEquals(1, listProvidersService.getAvailableProviders().size());
+    assertEquals(listName, listProvidersService.getAvailableProviders().get(0));
+    assertEquals("org1", org1.getId());
+    assertTrue("Provider is not registered", listProvidersService.hasProvider(listName, org1.getId()));
+    Map<String, String> dictionary = listProvidersService.getList(listName, query, false);
+
+    assertEquals(3, dictionary.size());
+
+    assertEquals("Sick Leave", dictionary.get("PM.BLACKLIST.REASONS.SICK_LEAVE"));
+    assertEquals("Leave", dictionary.get("PM.BLACKLIST.REASONS.LEAVE"));
+    assertEquals("Family Emergency", dictionary.get("PM.BLACKLIST.REASONS.FAMILY_EMERGENCY"));
   }
 }

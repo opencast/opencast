@@ -48,10 +48,15 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
 
   private ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
   private SecurityService securityService;
+  private Organization organization;
 
   public TestListProvidersEndpoint() {
     this.securityService = EasyMock.createNiceMock(SecurityService.class);
-    EasyMock.expect(securityService.getOrganization()).andReturn(null);
+    organization = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(organization.getId()).andReturn("mh_default_org").anyTimes();
+    EasyMock.replay(organization, securityService);
+    listProvidersService.setSecurityService(securityService);
 
     for (int i = 0; i < PROVIDER_VALUES.length; i++) {
       baseMap.put(Integer.toString(i), PROVIDER_VALUES[i]);
@@ -64,7 +69,7 @@ public class TestListProvidersEndpoint extends ListProvidersEndpoint {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+      public Map<String, String> getList(String listName, ResourceListQuery query) {
         return ListProviderUtil.filterMap(baseMap, query);
       }
 

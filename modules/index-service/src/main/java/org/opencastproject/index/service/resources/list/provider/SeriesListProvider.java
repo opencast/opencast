@@ -28,7 +28,6 @@ import org.opencastproject.index.service.resources.list.query.StringListFilter;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesQuery;
@@ -83,7 +82,7 @@ public class SeriesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
 
     Map<String, String> series = new HashMap<String, String>();

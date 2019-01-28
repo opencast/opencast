@@ -257,7 +257,7 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
 
     Opt<Map<String, String>> list;
     try {
-      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null, true));
+      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), true));
     } catch (ListProviderException e) {
       logger.warn("Not able to find a value list with the name {}", name);
       list = Opt.none();

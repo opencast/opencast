@@ -26,7 +26,7 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.ListProviderUtil;
-import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -47,6 +47,7 @@ public class AclListProvider implements ResourceListProvider {
   private static final Logger logger = LoggerFactory.getLogger(AclListProvider.class);
 
   private AclServiceFactory aclServiceFactory;
+  private SecurityService securityService;
 
   protected void activate(BundleContext bundleContext) {
     logger.info("ACL list provider activated!");
@@ -57,16 +58,25 @@ public class AclListProvider implements ResourceListProvider {
     this.aclServiceFactory = aclServiceFactory;
   }
 
+  /**
+   * OSGI callback to get the security service
+   *
+   * @param securityService the security service
+   */
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
   @Override
   public String[] getListNames() {
     return NAMES;
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> aclsList = new HashMap<String, String>();
 
-    List<ManagedAcl> acls = aclServiceFactory.serviceFor(organization).getAcls();
+    List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
     for (ManagedAcl a : acls) {
       if (ID.equals(listName)) {
         aclsList.put(a.getId().toString(), a.getId().toString());

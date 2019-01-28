@@ -72,16 +72,16 @@ public class ServersListProviderTest {
   public void testListNames() throws ListProviderException {
     ResourceListQuery query = new ServersListQuery();
 
-    assertEquals(4, serverListProvider.getList("non-existing-name", query, null).size());
-    assertEquals(4, serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query, null).size());
-    assertEquals(3, serverListProvider.getList(ServersListProvider.LIST_STATUS, query, null).size());
+    assertEquals(4, serverListProvider.getList("non-existing-name", query).size());
+    assertEquals(4, serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query).size());
+    assertEquals(3, serverListProvider.getList(ServersListProvider.LIST_STATUS, query).size());
   }
 
   @Test
   public void testHostnameList() throws ListProviderException {
     ResourceListQuery query = new ServersListQuery();
 
-    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query, null);
+    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_HOSTNAME, query);
     assertEquals(HOST1, list.get(HOST1));
     assertEquals(HOST2, list.get(HOST2));
     assertEquals(HOST3, list.get(HOST3));
@@ -92,7 +92,7 @@ public class ServersListProviderTest {
   public void testStatusList() throws ListProviderException {
     ResourceListQuery query = new ServersListQuery();
 
-    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_STATUS, query, null);
+    Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_STATUS, query);
     assertEquals(ServersListProvider.SERVER_STATUS_LABEL_ONLINE, list.get(ServersListProvider.SERVER_STATUS_ONLINE));
     assertEquals(ServersListProvider.SERVER_STATUS_LABEL_OFFLINE, list.get(ServersListProvider.SERVER_STATUS_OFFLINE));
     assertEquals(ServersListProvider.SERVER_STATUS_LABEL_MAINTENANCE, list.get(ServersListProvider.SERVER_STATUS_MAINTENANCE));
