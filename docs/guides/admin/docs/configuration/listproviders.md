@@ -41,11 +41,11 @@ in the filename.
       list.name=MYLIST
       key=value
 
-    /etc/listproviders/myList-org-b.properties
+    /etc/listproviders/mylist-org-b.properties
       list.name=MYLIST
       list.org=org-b
       key-org-b=value-org-b
 
-On *org_b*, the key-value pair for the list *MYLIST* is *["key-org-b", "value-org-b"]*. On *org_a*, the key-value pair for the
-list *MYLIST* is *["key", "value"]*.
+On *org_b*, the key-value pair for the list *MYLIST* is *["key-org-b", "value-org-b"]*. On *org_a*, the key-value pair
+for the list *MYLIST* is *["key", "value"]*.
 
