@@ -138,17 +138,18 @@ public class EventsLoader {
    * Callback on component activation.
    */
   protected void activate(ComponentContext cc) throws Exception {
-    boolean loadTestData = BooleanUtils
-            .toBoolean(cc.getBundleContext().getProperty("org.opencastproject.dataloader.testdata"));
 
     String csvPath = StringUtils.trimToNull(cc.getBundleContext().getProperty("org.opencastproject.dataloader.csv"));
+    if (StringUtils.isBlank(csvPath)) {
+      return; // no file is set
+    }
 
     systemUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
 
     File csv = new File(csvPath);
 
     // Load the demo users, if necessary
-    if (loadTestData && csv.exists() && serviceRegistry.count(null, null) == 0) {
+    if (csv.exists() && serviceRegistry.count(null, null) == 0) {
       // Load events by CSV file
       new Loader(csv).start();
     }
