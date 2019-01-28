@@ -1027,7 +1027,7 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the current recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the current recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1050,7 +1050,7 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the upcoming recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the upcoming recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1066,7 +1066,7 @@ public class SchedulerRestService {
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the event count: {}", e);
+      logger.error("Unable to get the event count", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }

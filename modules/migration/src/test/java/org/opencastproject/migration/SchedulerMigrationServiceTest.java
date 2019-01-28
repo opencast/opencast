@@ -50,7 +50,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
@@ -62,7 +61,10 @@ import com.google.gson.Gson;
 
 import org.easymock.EasyMock;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Version;
@@ -83,12 +85,20 @@ import javax.persistence.EntityManagerFactory;
 
 public class SchedulerMigrationServiceTest {
 
-  private static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
+  @ClassRule
+  public static final TemporaryFolder testFolder = new TemporaryFolder();
+
+  private static File baseDir;
   private SchedulerMigrationService schedulerMigrationService = new SchedulerMigrationService();
   private AssetManager assetManager;
   private Organization currentOrg = new DefaultOrganization();
   private final EntityManagerFactory emf = mkMigrationEntityManagerFactory();
   private final Gson gson = new Gson();
+
+  @BeforeClass
+  public static void setupClass() throws Exception {
+    baseDir = testFolder.newFolder();
+  }
 
   @Before
   public void setUp() throws Exception {
@@ -173,7 +183,7 @@ public class SchedulerMigrationServiceTest {
     EntityManager em = emf.createEntityManager();
     Opt<ExtendedEventDto> entityOpt;
     ExtendedEventDto entity;
-    Map<String, String> map;
+    Map map;
 
     entityOpt = Opt.nul(em.find(ExtendedEventDto.class, new EventIdPK("mp1", currentOrg.toString())));
     assertTrue(entityOpt.isSome());
@@ -191,9 +201,9 @@ public class SchedulerMigrationServiceTest {
     assertEquals("origin of mp1", entity.getLastModifiedOrigin());
     assertEquals(new Date(104), entity.getLastModifiedDate());
     assertEquals("checksum of mp1", entity.getChecksum());
-    map = gson.fromJson(entity.getCaptureAgentProperties(), new HashMap<String, String>().getClass());
+    map = gson.fromJson(entity.getCaptureAgentProperties(), HashMap.class);
     assertEquals("ca prop 1", map.get("agent testproperty"));
-    map = gson.fromJson(entity.getWorkflowProperties(), new HashMap<String, String>().getClass());
+    map = gson.fromJson(entity.getWorkflowProperties(), HashMap.class);
     assertEquals("wf prop 1", map.get("workflow testproperty"));
 
     entityOpt = Opt.nul(em.find(ExtendedEventDto.class, new EventIdPK("mp2", currentOrg.toString())));
@@ -212,9 +222,9 @@ public class SchedulerMigrationServiceTest {
     assertEquals("origin of mp2", entity.getLastModifiedOrigin());
     assertEquals(new Date(204), entity.getLastModifiedDate());
     assertEquals("checksum of mp2", entity.getChecksum());
-    map = gson.fromJson(entity.getCaptureAgentProperties(), new HashMap<String, String>().getClass());
+    map = gson.fromJson(entity.getCaptureAgentProperties(), HashMap.class);
     assertEquals("ca prop 2", map.get("agent testproperty"));
-    map = gson.fromJson(entity.getWorkflowProperties(), new HashMap<String, String>().getClass());
+    map = gson.fromJson(entity.getWorkflowProperties(), HashMap.class);
     assertEquals("wf prop 2", map.get("workflow testproperty"));
   }
 

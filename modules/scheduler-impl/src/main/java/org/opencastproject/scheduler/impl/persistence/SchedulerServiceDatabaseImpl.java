@@ -21,8 +21,6 @@
 
 package org.opencastproject.scheduler.impl.persistence;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import org.opencastproject.scheduler.impl.SchedulerServiceDatabase;
 import org.opencastproject.scheduler.impl.SchedulerServiceDatabaseException;
 import org.opencastproject.security.api.SecurityService;
@@ -62,6 +60,8 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /** The security service */
   private SecurityService securityService;
+
+  private static final Gson gson = new Gson();
 
   /** OSGi DI */
   public void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -107,7 +107,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
-      logger.error("Could not update last modified date of agent {} status: {}", agentId, getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -128,7 +127,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve last modified date for agent with id '{}': {}", agentId, getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -150,7 +148,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       }
       return dates;
     } catch (Exception e) {
-      logger.error("Could not retrieve last modified dates: {}", getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -214,7 +211,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       if (checksum.isSome()) {
         entity.setChecksum(checksum.get());
       }
-      Gson gson = new Gson();
       if (workflowProperties.isSome()) {
         entity.setWorkflowProperties(gson.toJson(workflowProperties.get()));
       }
@@ -229,7 +225,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       }
       tx.commit();
     } catch (Exception e) {
-      logger.error("Could not store extended event: {}", getStackTrace(e));
       if (tx.isActive())
         tx.rollback();
       throw new SchedulerServiceDatabaseException(e);
@@ -253,7 +248,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     try {
       return query.getResultList();
     } catch (Exception e) {
-      logger.error("Could not get events.", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       em.close();
@@ -301,7 +295,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       }
       return query.getResultList();
     } catch (Exception e) {
-      logger.error("Could not get events.", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       em.close();
@@ -316,7 +309,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     try {
       return query.getResultList();
     } catch (Exception e) {
-      logger.error("Could not get events.", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       em.close();
@@ -343,7 +335,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
-      logger.error("Could not delete extended event: {}", getStackTrace(e));
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -358,7 +349,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       em = emf.createEntityManager();
       return getExtendedEventDto(mediapackageId, orgId, em);
     } catch (Exception e) {
-      logger.error("Could not search for event {} of organization {}:  {}", mediapackageId, orgId, e.getStackTrace());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -375,7 +365,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (SchedulerServiceDatabaseException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not search for event {}: {}", mediapackageId, e.getStackTrace());
       throw new SchedulerServiceDatabaseException(e);
     }
   }
@@ -402,7 +391,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
     } catch (Exception e) {
       if (tx.isActive())
         tx.rollback();
-      logger.error("Could not reset recording state for event: {}  {}", mediapackageId, e.getStackTrace());
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       if (em != null)
@@ -418,7 +406,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
       Number total = (Number) query.getSingleResult();
       return total.intValue();
     } catch (Exception e) {
-      logger.error("Could not find the number of events.", e);
       throw new SchedulerServiceDatabaseException(e);
     } finally {
       em.close();

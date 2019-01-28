@@ -87,7 +87,7 @@ public class ExtendedEventDto {
   private Long recordingLastHeard;
 
   /** review status */
-  @Column(name = "review_status")
+  @Column(name = "review_status", length = 128)
   private String reviewStatus;
 
   /** review date */
@@ -120,6 +120,7 @@ public class ExtendedEventDto {
   @Column(name = "workflow_properties")
   private String workflowProperties;
 
+  @Column(name = "checksum", length = 64)
   private String checksum;
 
   /**

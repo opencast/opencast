@@ -151,7 +151,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -212,7 +212,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to add event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -288,7 +288,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (SchedulerConflictException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service: " + e);
+      throw new SchedulerException("Unable to update event " + eventId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -317,7 +317,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service: " + e);
+      throw new SchedulerException("Unable to remove event " + eventId + " from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -347,7 +347,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event media package from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event media package from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -377,7 +377,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event dublincore from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event dublincore from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -443,7 +443,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse the technical metadata from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse the technical metadata from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -477,7 +477,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event access control list from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event access control list from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -509,7 +509,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to parse event workflow configuration from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to parse event workflow configuration from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -543,7 +543,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
-              "Unable to parse event capture agent configuration from remote scheduler service: " + e);
+              "Unable to parse event capture agent configuration from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -580,7 +580,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event opt out status from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event opt out status from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -619,7 +619,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
-              "Unable to update event with mediapackage id " + mediapackageId + " to the scheduler service: " + e);
+              "Unable to update event with mediapackage id " + mediapackageId + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -660,7 +660,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event review status from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event review status from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -686,7 +686,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get event count from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get event count from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -706,7 +706,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get agent last modified hash from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get agent last modified hash from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -749,7 +749,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get recordings from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get recordings from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -775,7 +775,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get current recording from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get current recording from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -800,7 +800,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get upcoming recording from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get upcoming recording from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -832,7 +832,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get conflicts from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get conflicts from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -868,7 +868,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get conflicts from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get conflicts from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -900,7 +900,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get calendar from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get calendar from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -928,7 +928,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to remove old schedules from the scheduler service: " + e);
+      throw new SchedulerException("Unable to remove old schedules from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -966,7 +966,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException("Unable to update recording state of event with mediapackage id " + mediapackageId
-              + " to the scheduler service: " + e);
+              + " to the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -995,7 +995,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get calendar from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get calendar from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1019,7 +1019,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       throw e;
     } catch (Exception e) {
       throw new SchedulerException(
-              "Unable to remove recording status of event " + eventId + " from the scheduler service: " + e);
+              "Unable to remove recording status of event " + eventId + " from the scheduler service", e);
     } finally {
       closeConnection(response);
     }
@@ -1048,7 +1048,7 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         }
       }
     } catch (Exception e) {
-      throw new SchedulerException("Unable to get recording states from remote scheduler service: " + e);
+      throw new SchedulerException("Unable to get recording states from remote scheduler service", e);
     } finally {
       closeConnection(response);
     }
