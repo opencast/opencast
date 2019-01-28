@@ -45,6 +45,7 @@ nav:
    - Metadata: 'configuration/metadata.md'
    - Encoding: 'configuration/encoding.md'
    - Inbox: 'configuration/inbox.md'
+   - List Providers: 'configuration/listproviders.md'
    - Load: 'configuration/load.md'
    - Log: 'configuration/log.md'
    - User Statistics and Privacy Configuration: 'configuration/user-statistics.and.privacy.md'
