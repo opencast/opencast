@@ -86,28 +86,25 @@ angular.module('adminNg.services')
     };
 
     this.save = function (scope) {
-      //FIXME: This should be nicer, rather propagate the id and values
-      //instead of looking for them in the parent scope.
-      var params = scope.$parent.params,
-          target = scope.$parent.target,
-          fieldId = params.id,
-          value = params.value;
+      //FIXME: This should be nicer, rather propagate the id and values instead of looking for them in the parent scope.
+      var field = scope.$parent.params,
+          target = scope.$parent.target;
 
-      if (params.collection) {
-        if (angular.isArray(value)) {
-          params.presentableValue = value;
+      if (field.collection) {
+        if (angular.isArray(field.value)) {
+          field.presentableValue = field.value;
         } else {
-          params.presentableValue = params.collection[value];
+          field.presentableValue = field.collection[field.value];
         }
       } else {
-        params.presentableValue = value;
+        field.presentableValue = field.value;
       }
 
-      me.ud[target].fields[fieldId] = params;
-
-      if (angular.isDefined(me.requiredMetadata[fieldId])) {
-        me.updateRequiredMetadata(fieldId, value);
+      if (angular.isDefined(me.requiredMetadata[field.id])) {
+        me.updateRequiredMetadata(field.id, field.value);
       }
+
+      me.ud[target].fields[field.tabindex - 1] = field;
     };
 
     this.getFiledCatalogs = function () {
