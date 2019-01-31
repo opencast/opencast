@@ -18,7 +18,7 @@
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
 
     <!-- library version specifications -->
-    <aws.version>1.11.49_1</aws.version>
+    <aws.version>1.11.469_1</aws.version>
     <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-collections.version>4.2</commons-collections.version>
     <commons-compress.version>1.18</commons-compress.version>
