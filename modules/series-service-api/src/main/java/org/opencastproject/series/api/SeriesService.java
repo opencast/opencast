@@ -55,6 +55,7 @@ public interface SeriesService {
    */
   DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException;
 
+
   /**
    * Updates access control rules for specified series. Not specifying series ID or trying to update series with null
    * value will throw IllegalArgumentException.
@@ -73,6 +74,28 @@ public interface SeriesService {
    */
   boolean updateAccessControl(String seriesID, AccessControlList accessControl) throws NotFoundException,
           SeriesException, UnauthorizedException;
+
+  /**
+   * Updates access control rules for specified series. Allows to set the override parameter that controls whether the
+   * episode ACLs of the contained media packages will be removed on update. Not specifying series ID or trying to update series with null
+   * value will throw IllegalArgumentException.
+   *
+   * @param seriesID
+   *          series to be updated
+   * @param accessControl
+   *          {@link AccessControlList} defining access control rules
+   * @param overrideEpisodeAcl
+   *          Whether the new series acl should override the episode acl
+   * @return true if ACL was updated and false it if was created
+   * @throws NotFoundException
+   *           if series with given ID cannot be found
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to perform this action
+   * @throws SeriesException
+   *           if exception occurred
+   */
+  boolean updateAccessControl(String seriesID, AccessControlList accessControl, boolean overrideEpisodeAcl)
+          throws NotFoundException, SeriesException, UnauthorizedException;
 
   /**
    * Removes series

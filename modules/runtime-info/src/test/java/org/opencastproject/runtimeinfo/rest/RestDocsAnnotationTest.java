@@ -37,7 +37,6 @@ import org.junit.Test;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
@@ -192,11 +191,11 @@ public class RestDocsAnnotationTest {
         }
 
         RestEndpointData endpoint = new RestEndpointData(testMethod.getReturnType(),
-                restDocData.processMacro(restQueryAnnotation.name()), httpMethodString, "/" + pathAnnotation.value(),
-                restDocData.processMacro(restQueryAnnotation.description()));
+                restQueryAnnotation.name(), httpMethodString, "/" + pathAnnotation.value(),
+                restQueryAnnotation.description());
         if (!restQueryAnnotation.returnDescription().isEmpty()) {
           endpoint.addNote("Return value description: "
-                  + restDocData.processMacro(restQueryAnnotation.returnDescription()));
+                  + restQueryAnnotation.returnDescription());
         }
 
         // name, description and return description
@@ -220,7 +219,7 @@ public class RestDocsAnnotationTest {
 
         // responses
         for (RestResponse restResp : restQueryAnnotation.reponses()) {
-          endpoint.addStatus(restResp, restDocData);
+          endpoint.addStatus(restResp);
         }
         assertEquals(3, endpoint.getStatuses().size());
 
@@ -235,7 +234,7 @@ public class RestDocsAnnotationTest {
 
         // body parameter
         if (restQueryAnnotation.bodyParameter().type() != RestParameter.Type.NO_PARAMETER) {
-          endpoint.addBodyParam(restQueryAnnotation.bodyParameter(), restDocData);
+          endpoint.addBodyParam(restQueryAnnotation.bodyParameter());
         }
         assertEquals("BODY", endpoint.getBodyParam().getName());
         assertEquals("The media track file", endpoint.getBodyParam().getDescription());
@@ -245,7 +244,7 @@ public class RestDocsAnnotationTest {
 
         // path parameter
         for (RestParameter restParam : restQueryAnnotation.pathParameters()) {
-          endpoint.addPathParam(new RestParamData(restParam, restDocData));
+          endpoint.addPathParam(new RestParamData(restParam));
         }
         assertEquals(1, endpoint.getPathParams().size());
         assertEquals("wdID", endpoint.getPathParams().get(0).getName());
@@ -258,9 +257,9 @@ public class RestDocsAnnotationTest {
         // query parameters
         for (RestParameter restParam : restQueryAnnotation.restParameters()) {
           if (restParam.isRequired()) {
-            endpoint.addRequiredParam(new RestParamData(restParam, restDocData));
+            endpoint.addRequiredParam(new RestParamData(restParam));
           } else {
-            endpoint.addOptionalParam(new RestParamData(restParam, restDocData));
+            endpoint.addOptionalParam(new RestParamData(restParam));
           }
         }
         // #1
@@ -280,39 +279,14 @@ public class RestDocsAnnotationTest {
         assertTrue("TEXT".equalsIgnoreCase(endpoint.getOptionalParams().get(0).getType()));
 
       }
-    } catch (SecurityException e) {
-      fail();
-    } catch (NoSuchMethodException e) {
+    } catch (SecurityException | NoSuchMethodException e) {
       fail();
     }
   }
 
   @Test
-  public void testRestQueryDocsMacros() {
-    Method testMethod = null;
-    Map<String, String> map = new HashMap<String, String>();
-    map.put("somethingElse", "the value of something else");
-    map.put("anotherthing", "the value of another thing");
-    try {
-      testMethod = TestServletSample.class.getMethod("methodB");
-      if (testMethod != null) {
-        RestQuery restQueryAnnotation = (RestQuery) testMethod.getAnnotation(RestQuery.class);
-        RestDocData restDocData = new RestDocData("NAME", "TITLE", "URL", null, new TestServletSample(), map);
-
-        assertEquals(restDocData.processMacro(restQueryAnnotation.restParameters()[1].defaultValue()),
-                "ADCD THIS IS SCHEMA XUHZSUFH the value of something else UGGUH the value of another thing AIHID");
-      }
-    } catch (SecurityException e) {
-      fail();
-    } catch (NoSuchMethodException e) {
-      e.printStackTrace();
-      fail();
-    }
-  }
-
-  @Test
-  public void testPathPatternMatching() throws Exception {
-    assertTrue("/{seriesID:.+}".matches(RestDocData.PATH_VALIDATION_REGEX));
+  public void testPathPatternMatching() {
+    assertTrue(RestDocData.isValidPath("/{seriesID:.+}"));
   }
 
   /**

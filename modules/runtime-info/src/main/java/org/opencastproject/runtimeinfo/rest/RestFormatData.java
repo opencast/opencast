@@ -45,11 +45,6 @@ public final class RestFormatData {
   private String name;
 
   /**
-   * Description of the format. Currently no format has default description yet.
-   */
-  private String description;
-
-  /**
    * URL to a page providing more information of the format. Currently only JSON and XML have a default URL.
    */
   private String url;
@@ -96,15 +91,6 @@ public final class RestFormatData {
    */
   public String getName() {
     return name;
-  }
-
-  /**
-   * Return the default description of this format.
-   *
-   * @return the default description of this format.
-   */
-  public String getDescription() {
-    return description;
   }
 
   /**

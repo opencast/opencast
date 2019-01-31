@@ -33,9 +33,8 @@ import org.opencastproject.index.service.resources.list.provider.ContributorsLis
 import org.opencastproject.index.service.resources.list.query.ResourceListQueryImpl;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.resources.list.query.StringListFilter;
-import org.opencastproject.security.api.DefaultOrganization;
-import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.json.JValue;
@@ -122,9 +121,17 @@ public class JSONUtilsTest {
   public void testFiltersToJSON() throws Exception {
     String expectedJSON = IOUtils.toString(getClass().getResource("/filters.json"));
 
-    JaxbOrganization defaultOrganization = new DefaultOrganization();
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    Organization organization = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(organization.getId()).andReturn("mh_default_org").anyTimes();
+    EasyMock.replay(organization);
+    EasyMock.replay(securityService);
+
     ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
     SimpleSerializer serializer = new SimpleSerializer();
+
+    listProvidersService.setSecurityService(securityService);
 
     final Map<String, String> license = new HashMap<String, String>();
     license.put("contributor1", "My first contributor");
@@ -132,7 +139,7 @@ public class JSONUtilsTest {
     license.put("contributor3", "My third contributor");
 
     // Create test list provider
-    listProvidersService.addProvider(new ResourceListProvider() {
+    listProvidersService.addProvider(ContributorsListProvider.DEFAULT, new ResourceListProvider() {
 
       @Override
       public String[] getListNames() {
@@ -140,7 +147,7 @@ public class JSONUtilsTest {
       }
 
       @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+      public Map<String, String> getList(String listName, ResourceListQuery query)
               throws ListProviderException {
         return ListProviderUtil.filterMap(license, query);
       }
@@ -154,7 +161,7 @@ public class JSONUtilsTest {
       public String getDefault() {
         return null;
       }
-    });
+    }, organization.getId());
 
     // Prepare mock query
     List<ResourceListFilter<?>> filters = new ArrayList<ResourceListFilter<?>>();
@@ -167,7 +174,7 @@ public class JSONUtilsTest {
     EasyMock.expect(query.getOffset()).andReturn(Option.<Integer> none()).anyTimes();
     EasyMock.replay(query);
 
-    JValue result = JSONUtils.filtersToJSON(query, listProvidersService, defaultOrganization);
+    JValue result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
 
     StreamingOutput stream = RestUtils.stream(serializer.fn.toJson(result));
     ByteArrayOutputStream resultStream = new ByteArrayOutputStream();

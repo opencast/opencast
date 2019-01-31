@@ -33,6 +33,8 @@
  * `required` and `value`.
  * The "save" attribute is a reference to a save function used to persist the
  * values.
+ * The "delimiter" attribute specifies at what character the input string
+ * is to be split into multiple individual values.
  *
  * @example
    <doc:example>
@@ -52,51 +54,81 @@ angular.module('adminNg.directives')
       save:       '='
     },
     link: function (scope, element) {
+      scope.data = {};
+
       scope.enterEditMode = function () {
         scope.editMode = true;
-        scope.focusTimer = $timeout(function () {
+        $timeout(function () {
           element.find('input').focus();
         });
       };
 
-      scope.leaveEditMode = function () {
-        scope.addValue(scope.params.value, scope.value);
-        scope.editMode = false;
-        scope.value = '';
-      };
-
-      scope.addValue = function (model, value) {
-        if (value && model.indexOf(value) === -1) {
-          model.push(value);
-          scope.editMode = false;
+      scope.onBlur = function () {
+        if (!scope.removedValue) {
+          scope.addValue();
+          scope.leaveEditMode();
+        } else {
+          $timeout(function () {
+            element.find('input').focus();
+          });
         }
-        scope.submit();
+        delete scope.removedValue;
       };
 
-      scope.removeValue = function (model, value) {
-        model.splice(model.indexOf(value), 1);
-        scope.submit();
+      scope.leaveEditMode = function () {
+        scope.data.value = '';
+        scope.editMode = false;
       };
 
       scope.keyUp = function (event) {
         if (event.keyCode === 13) {
           // ENTER
-          scope.addValue(scope.params.value, scope.value);
+          scope.addValue();
+          scope.data.value = '';
         } else if (event.keyCode === 27) {
           // ESC
-          scope.editMode = false;
+          scope.leaveEditMode();
         }
         event.stopPropagation();
       };
 
-      scope.submit = function () {
-        scope.save(scope.params.id);
-        scope.editMode = false;
+      scope.addValue = function () {
+
+        if (!scope.data.value) {
+          return;
+        }
+
+        var modelUpdated = false;
+        var value = scope.data.value;
+        var model = scope.params.value;
+        var newValues = scope.params.delimiter
+          ? value.split(scope.params.delimiter)
+          : [value];
+
+        angular.forEach(newValues, function (newValue) {
+          newValue = newValue.trim();
+          if (newValue && model.indexOf(newValue) === -1) {
+            model.push(newValue);
+            modelUpdated = true;
+          }
+        });
+
+        if (modelUpdated === true) {
+          scope.submit();
+        }
       };
 
-      scope.$on('$destroy', function () {
-        $timeout.cancel(scope.focusTimer);
-      });
+      scope.removeValue = function (index) {
+        scope.removedValue = true;
+        scope.params.value.splice(index, 1);
+        scope.submit();
+      };
+
+      scope.submit = function () {
+        if (angular.isDefined(scope.save)) {
+          scope.save(scope.params.id);
+        }
+      };
     }
   };
 }]);

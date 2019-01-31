@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "Modificar",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadatos",
-            "SCHEDULING": "Programación"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "Programar múltiples eventos",
                   "REPEATS": "Repetir",
                   "REPEAT_ON": "Repetir",
-                  "WEEKDAYS": "Entre semana"
+                  "WEEKDAYS": "Entre semana",
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "No hay agentes de captura disponibles"
             },
@@ -1070,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Acciones Adicionales",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "DETAILS": "Detalles"
+                  "DETAILS": "Detalles",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Seleccione un rol",

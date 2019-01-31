@@ -3,40 +3,46 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>6-SNAPSHOT</version>
+  <version>7-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
-  <url>http://opencast.org</url>
+  <url>https://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
     <checkstyle.skip>false</checkstyle.skip>
-    <jmeter.home>${project.build.directory}/jakarta-jmeter-${jmeter.version}</jmeter.home>
-    <json-simple.version>1.1.1</json-simple.version>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <opencast.nexus.url>https://mvncache.opencast.org</opencast.nexus.url>
     <opencast.nexus-backup.url>https://nexus.opencast.org</opencast.nexus-backup.url>
-    <eclipselink.version>2.6.4</eclipselink.version>
+
+    <!-- library version specifications -->
+    <aws.version>1.11.469_1</aws.version>
+    <commons-beanutils.version>1.9.3</commons-beanutils.version>
     <commons-collections.version>4.2</commons-collections.version>
     <commons-compress.version>1.18</commons-compress.version>
-    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
-    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
-    <aws.version>1.11.438_1</aws.version>
-    <jmeter.version>2.4</jmeter.version>
-    <osgi.compendium.version>5.0.0</osgi.compendium.version>
-    <osgi.core.version>5.0.0</osgi.core.version>
-    <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <karaf.version>4.0.10</karaf.version>
-    <pax.web.version>4.3.4</pax.web.version>
-    <cxf.version>3.1.12</cxf.version>
-    <jackson.version>2.9.7</jackson.version>
+    <commons-csv.version>1.6</commons-csv.version>
+    <commons-lang3.version>3.8.1</commons-lang3.version>
+    <commons-text.version>1.6</commons-text.version>
+    <cxf.version>3.2.6</cxf.version>
+    <eclipselink.version>2.7.1</eclipselink.version>
     <functional.version>1.4.2</functional.version>
+    <guava.version>23.0</guava.version>
+    <httpcomponents-httpclient.version>4.5.6</httpcomponents-httpclient.version>
+    <httpcomponents-httpcore.version>4.4.10</httpcomponents-httpcore.version>
+    <jackson.version>2.9.8</jackson.version>
     <jdk.version>1.8</jdk.version>
+    <joda-time.version>2.10.1</joda-time.version>
+    <json-simple.version>1.1.1</json-simple.version>
+    <karaf.version>4.2.0</karaf.version>
     <mina.version>2.0.19</mina.version>
     <node.version>v8.12.0</node.version>
     <npm.version>6.4.1</npm.version>
+    <osgi.compendium.version>5.0.0</osgi.compendium.version>
+    <osgi.core.version>5.0.0</osgi.core.version>
+    <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
+    <pax.web.version>7.0.0</pax.web.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>
@@ -112,6 +118,7 @@
     <module>modules/execute-remote</module>
     <module>modules/execute-workflowoperation</module>
     <module>modules/external-api</module>
+    <module>modules/external-api-index</module>
     <module>modules/fileupload</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
@@ -150,6 +157,7 @@
     <module>modules/publication-service-oaipmh-remote</module>
     <module>modules/publication-service-youtube-remote</module>
     <module>modules/publication-service-youtube-v3</module>
+    <module>modules/rest-test-environment</module>
     <module>modules/runtime-info</module>
     <module>modules/runtime-info-ui</module>
     <module>modules/runtime-info-ui-ng</module>
@@ -336,7 +344,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>8.12</version>
+            <version>8.14</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -506,7 +514,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.20</version>
+          <version>3.0.0-M3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -517,11 +525,6 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.8</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.0.2</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -650,9 +653,25 @@
           <version>2.5.2</version>
         </plugin>
         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>1.6.0</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>1.6.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>3.1.1</version>
+          <executions>
+            <execution>
+              <id>analyze</id>
+              <goals>
+                <goal>analyze-only</goal>
+              </goals>
+              <configuration>
+                <failOnWarning>true</failOnWarning>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -666,8 +685,13 @@
       </dependency>
       <dependency>
         <groupId>org.apache.activemq</groupId>
-        <artifactId>activemq-all</artifactId>
-        <version>5.3.1</version>
+        <artifactId>activemq-client</artifactId>
+        <version>5.15.7</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.activemq</groupId>
+        <artifactId>activeio-core</artifactId>
+        <version>3.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.geronimo.specs</groupId>
@@ -695,21 +719,6 @@
         <version>${mina.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-bundle</artifactId>
-        <version>1.18</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-core</artifactId>
-        <version>1.18</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.tika</groupId>
-        <artifactId>tika-parsers</artifactId>
-        <version>1.18</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-core</artifactId>
         <exclusions>
@@ -728,7 +737,7 @@
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>18.0</version>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>net.fortuna.ical4j</groupId>
@@ -795,6 +804,11 @@
         <groupId>javax.ws.rs</groupId>
         <artifactId>jsr311-api</artifactId>
         <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-bundle</artifactId>
+        <version>1.19.4</version>
       </dependency>
       <!-- JPA -->
       <dependency>
@@ -998,12 +1012,18 @@
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
         <scope>test</scope>
-        <version>3.6</version>
+        <version>4.0.1</version>
       </dependency>
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymockclassextension</artifactId>
         <version>3.2</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>xmlunit</groupId>
+        <artifactId>xmlunit</artifactId>
+        <version>1.6</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1067,27 +1087,17 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.7</version>
+        <version>${commons-lang3.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.2</version>
+        <version>${commons-text.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-csv</artifactId>
-        <version>1.5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>com.springsource.org.apache.commons.beanutils</artifactId>
-        <version>1.8.3</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils-core</artifactId>
-        <version>1.8.3</version>
+        <version>${commons-csv.version}</version>
       </dependency>
       <!-- Querydsl -->
       <dependency>
@@ -1104,24 +1114,24 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10</version>
+        <version>${joda-time.version}</version>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>json-path</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>xml-path</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>io.rest-assured</groupId>
         <artifactId>rest-assured</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1495,7 +1505,17 @@
       </roles>
       <timezone>+1</timezone>
     </developer>
-
+    <developer>
+        <id>turro</id>
+        <name>Carlos Turró</name>
+        <email>turro@cc.upv.es</email>
+        <organization>Universitat Politecnica de Valencia</organization>
+        <organizationUrl>http://www.upv.es/</organizationUrl>
+        <roles>
+          <role>developer</role>
+         </roles>
+        <timezone>Europe/Madrid</timezone>
+     </developer>
   </developers>
   <!-- People having significantly contributed to Opencast in the past -->
   <contributors>

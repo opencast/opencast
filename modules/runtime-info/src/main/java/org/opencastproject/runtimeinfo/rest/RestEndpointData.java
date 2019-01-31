@@ -124,7 +124,8 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
       throw new IllegalArgumentException("Method must not be null and must not be empty.");
     }
     if (!RestDocData.isValidPath(path)) {
-      throw new IllegalArgumentException("Path must not be null and must look something like /a/b/{c}.");
+      throw new IllegalArgumentException(String.format("Path '%s' must not be null and must look something like "
+              + "/a/b/{c}.", path));
     }
     this.returnTypeSchema = JaxbXmlSchemaGenerator.getXmlSchema(returnType);
     this.name = name;
@@ -152,10 +153,10 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    *
    * @return the new RestParamData object in case you want to set attributes
    */
-  public RestParamData addBodyParam(RestParameter restParam, RestDocData restDocData) {
+  public RestParamData addBodyParam(RestParameter restParam) {
     RestParamData.Type type = RestParamData.Type.valueOf(restParam.type().name());
-    RestParamData param = new RestParamData("BODY", type, restDocData.processMacro(restParam.defaultValue()),
-            restDocData.processMacro(restParam.description()), null);
+    RestParamData param = new RestParamData("BODY", type, restParam.defaultValue(),
+            restParam.description(), null);
     param.setRequired(true);
     bodyParam = param;
     return param;
@@ -236,11 +237,11 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    * @param restResponse
    *          a RestResponse object containing the HTTP response code and description
    */
-  public void addStatus(RestResponse restResponse, RestDocData restDocData) {
+  public void addStatus(RestResponse restResponse) {
     if (statuses == null) {
       statuses = new Vector<StatusData>(3);
     }
-    statuses.add(new StatusData(restResponse, restDocData));
+    statuses.add(new StatusData(restResponse));
   }
 
   /**
@@ -423,7 +424,7 @@ public class RestEndpointData implements Comparable<RestEndpointData> {
    */
   public List<String> getNotes() {
     if (notes == null) {
-      notes = new ArrayList<String>(0);
+      notes = new ArrayList<>(0);
     }
     return notes;
   }

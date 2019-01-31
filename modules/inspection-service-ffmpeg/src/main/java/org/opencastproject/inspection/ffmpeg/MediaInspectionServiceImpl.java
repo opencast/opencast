@@ -37,7 +37,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.tika.parser.Parser;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -83,18 +82,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   private SecurityService securityService = null;
   private UserDirectoryService userDirectoryService = null;
   private OrganizationDirectoryService organizationDirectoryService = null;
-  private Parser tikaParser;
 
   private volatile MediaInspector inspector;
-
-  /**
-   * Sets the Apache Tika parser.
-   *
-   * @param tikaParser
-   */
-  public void setTikaParser(Parser tikaParser) {
-    this.tikaParser = tikaParser;
-  }
 
   /** Creates a new media inspection service instance. */
   public MediaInspectionServiceImpl() {
@@ -114,7 +103,7 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
       logger.debug("FFprobe config binary: {}", path);
       ffprobeBinary = path;
     }
-    inspector = new MediaInspector(workspace, tikaParser, ffprobeBinary);
+    inspector = new MediaInspector(workspace, ffprobeBinary);
   }
 
   @Override

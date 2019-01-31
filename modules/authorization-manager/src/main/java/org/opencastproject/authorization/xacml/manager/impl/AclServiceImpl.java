@@ -39,6 +39,7 @@ import org.opencastproject.authorization.xacml.manager.api.SeriesACLTransition;
 import org.opencastproject.authorization.xacml.manager.api.TransitionQuery;
 import org.opencastproject.authorization.xacml.manager.api.TransitionResult;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.MessageSender;
 import org.opencastproject.message.broker.api.acl.AclItem;
@@ -59,7 +60,6 @@ import com.entwinemedia.fn.data.Opt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -178,9 +178,13 @@ public final class AclServiceImpl implements AclService {
           @Override
           public void esome(final AccessControlList acl) {
             // update in episode service
-            MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
-            if (assetManager != null)
-              assetManager.takeSnapshot(mp);
+            try {
+              MediaPackage mp = authorizationService.setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+              if (assetManager != null)
+                assetManager.takeSnapshot(mp);
+            } catch (MediaPackageException e) {
+              logger.error("Error getting ACL from media package", e);
+            }
           }
 
           // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
@@ -201,7 +205,6 @@ public final class AclServiceImpl implements AclService {
       // not found
       return false;
     } catch (Exception e) {
-      logger.error("Error applying episode ACL", e);
       throw new AclServiceException(e);
     }
   }
@@ -230,32 +233,11 @@ public final class AclServiceImpl implements AclService {
   public boolean applyAclToSeries(String seriesId, AccessControlList acl, boolean override,
           Option<ConfiguredWorkflowRef> workflow) throws AclServiceException {
     try {
-      if (override) {
-        // delete acls before calling seriesService.updateAccessControl to avoid
-        // possible interference since a call to this method triggers update event handlers
-        // which run on a separate thread. This must be considered a design smell since it
-        // requires knowledge of the services implementation.
-        //
-        // delete in episode service
-        List<MediaPackage> mediaPackages = new ArrayList<>();
-        if (assetManager != null)
-          mediaPackages = getFromAssetManagerBySeriesId(seriesId);
-
-        for (MediaPackage mp : mediaPackages) {
-          // remove episode xacml and update in archive service
-          try {
-            if (assetManager != null)
-              assetManager.takeSnapshot(authorizationService.removeAcl(mp, AclScope.Episode));
-          } catch (Exception e) {
-            logger.error("Error applying series ACL to mediapackage {}", e);
-          }
-        }
-      }
       // update in series service
       // this will in turn update the search service by the SeriesUpdatedEventHandler
       // and the episode service by the EpisodesPermissionsUpdatedEventHandler
       try {
-        seriesService.updateAccessControl(seriesId, acl);
+        seriesService.updateAccessControl(seriesId, acl, override);
       } catch (NotFoundException e) {
         return false;
       }

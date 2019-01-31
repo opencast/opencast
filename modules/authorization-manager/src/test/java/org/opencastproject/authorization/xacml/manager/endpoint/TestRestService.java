@@ -22,7 +22,7 @@
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
 import static org.opencastproject.util.persistence.PersistenceEnvs.persistenceEnvironment;
 import static org.opencastproject.util.persistence.PersistenceUtil.newTestEntityManagerFactory;
 
@@ -165,8 +165,15 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     EasyMock.expect(authorizationService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
-    EasyMock.expect(authorizationService.setAcl((MediaPackage) EasyMock.anyObject(), (AclScope) EasyMock.anyObject(),
-            (AccessControlList) EasyMock.anyObject())).andReturn(Tuple.tuple(mediapackage, attachment));
+    try {
+      EasyMock.expect(authorizationService.setAcl(
+                EasyMock.anyObject(MediaPackage.class),
+                EasyMock.anyObject(AclScope.class),
+                EasyMock.anyObject(AccessControlList.class)))
+              .andReturn(Tuple.tuple(mediapackage, attachment));
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
     EasyMock.replay(authorizationService);
 
     return authorizationService;
@@ -223,7 +230,8 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     try {
       EasyMock.expect(seriesService.getSeriesAccessControl((String) EasyMock.anyObject())).andReturn(acl).anyTimes();
       EasyMock.expect(seriesService.updateAccessControl((String) EasyMock.anyObject(),
-              (AccessControlList) EasyMock.anyObject())).andThrow(new NotFoundException()).andReturn(true);
+              (AccessControlList) EasyMock.anyObject(), EasyMock.anyBoolean())).andThrow(new NotFoundException())
+              .andReturn(true);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }

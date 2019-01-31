@@ -52,7 +52,6 @@ import com.entwinemedia.fn.Fn2;
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.CharUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -226,7 +225,7 @@ public final class SchedulerUtil {
       try {
         dublinCore = DublinCoreUtil.loadDublinCore(workspace, c);
       } catch (Exception e) {
-        logger.error("Unable to read event dublincore: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Unable to read event dublincore", e);
         continue;
       }
 

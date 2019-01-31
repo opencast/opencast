@@ -48,41 +48,48 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'title',
-        label: 'EVENTS.EVENTS.TABLE.TITLE'
+        label: 'EVENTS.EVENTS.TABLE.TITLE',
+        sortable: true
       }, {
-        name:  'presenter',
-        label: 'EVENTS.EVENTS.TABLE.PRESENTERS'
+        template: 'modules/events/partials/eventsPresentersCell.html',
+        name:  'presenters',
+        label: 'EVENTS.EVENTS.TABLE.PRESENTERS',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsSeriesCell.html',
         name:  'series_name',
-        label: 'EVENTS.EVENTS.TABLE.SERIES'
+        label: 'EVENTS.EVENTS.TABLE.SERIES',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsTechnicalDateCell.html',
         name:  'technical_date',
-        label: 'EVENTS.EVENTS.TABLE.DATE'
+        label: 'EVENTS.EVENTS.TABLE.DATE',
+        sortable: true
       }, {
         name:  'technical_start',
-        label: 'EVENTS.EVENTS.TABLE.START'
+        label: 'EVENTS.EVENTS.TABLE.START',
+        sortable: true
       }, {
         name:  'technical_end',
-        label: 'EVENTS.EVENTS.TABLE.STOP'
+        label: 'EVENTS.EVENTS.TABLE.STOP',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventsLocationCell.html',
         name:  'location',
-        label: 'EVENTS.EVENTS.TABLE.LOCATION'
+        label: 'EVENTS.EVENTS.TABLE.LOCATION',
+        sortable: true
       }, {
         name:  'published',
         label: 'EVENTS.EVENTS.TABLE.PUBLISHED',
-        template: 'modules/events/partials/publishedCell.html',
-        dontSort: true
+        template: 'modules/events/partials/publishedCell.html'
       }, {
         template: 'modules/events/partials/eventsStatusCell.html',
         name:  'event_status',
-        label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS'
+        label: 'EVENTS.EVENTS.TABLE.SCHEDULING_STATUS',
+        sortable: true
       }, {
         template: 'modules/events/partials/eventActionsCell.html',
-        label:    'EVENTS.EVENTS.TABLE.ACTION',
-        dontSort: true
+        label:    'EVENTS.EVENTS.TABLE.ACTION'
       }],
       caption:    'EVENTS.EVENTS.TABLE.CAPTION',
       resource:   'events',
@@ -124,9 +131,9 @@ angular.module('adminNg.controllers')
     $scope.publicationChannels = ResourcesListResource.get({ resource: 'PUBLICATION.CHANNELS' });
 
     $scope.table.dateToFilterValue = function(dateString) {
-
-      var from = RelativeDatesService.relativeToAbsoluteDate(0, 'days', true);
-      var to = RelativeDatesService.relativeToAbsoluteDate(0, 'days', false);
+      var date = new Date(dateString),
+          from = new Date(date.setHours(0, 0, 0, 0)),
+          to = new Date(date.setHours(23, 59, 59, 999));
       return from.toISOString() + '/' + to.toISOString();
     };
 

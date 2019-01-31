@@ -34,7 +34,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.RequireUtil;
-import org.opencastproject.util.data.Effect0;
 
 import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.Products;
@@ -185,35 +184,31 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     public void update(final Organization org, final Iterable<P1<? extends Serializable>> messages) {
       if (updatesCurrent < updatesTotal) {
         final User user = SecurityUtil.createSystemUser(getSystemUserName(), org);
-        SecurityUtil.runAs(getSecurityService(), org, user, new Effect0() {
-          @Override protected void run() {
-            for (final P1<? extends Serializable> m : $(messages).filter(Booleans.<P1<? extends Serializable>>ne(IDENTITY_MSG))) {
-              getMessageSender().sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, m.get1());
-            }
-            updatesCurrent = updatesCurrent + 1;
-            if (((updatesCurrent % responseInterval) == 0) || (updatesCurrent == updatesTotal)) {
+        SecurityUtil.runAs(getSecurityService(), org, user, () -> {
+          for (final P1<? extends Serializable> m : $(messages).filter(Booleans.<P1<? extends Serializable>>ne(IDENTITY_MSG))) {
+            getMessageSender().sendObjectMessage(destinationId, MessageSender.DestinationType.Queue, m.get1());
+          }
+          updatesCurrent = updatesCurrent + 1;
+          if (((updatesCurrent % responseInterval) == 0) || (updatesCurrent == updatesTotal)) {
+            getMessageSender().sendObjectMessage(
+                  IndexProducer.RESPONSE_QUEUE,
+                  MessageSender.DestinationType.Queue,
+                  IndexRecreateObject.update(
+                          indexName,
+                          getService(),
+                          updatesTotal,
+                          updatesCurrent));
+          }
+          if (updatesCurrent >= updatesTotal) {
+            // send end-of-batch message
+            final Organization emo = endMessageOrg.getOr(org);
+            final User emu = SecurityUtil.createSystemUser(getSystemUserName(), emo);
+            SecurityUtil.runAs(getSecurityService(), emo, emu, () -> {
               getMessageSender().sendObjectMessage(
-                    IndexProducer.RESPONSE_QUEUE,
-                    MessageSender.DestinationType.Queue,
-                    IndexRecreateObject.update(
-                            indexName,
-                            getService(),
-                            updatesTotal,
-                            updatesCurrent));
-            }
-            if (updatesCurrent >= updatesTotal) {
-              // send end-of-batch message
-              final Organization emo = endMessageOrg.getOr(org);
-              final User emu = SecurityUtil.createSystemUser(getSystemUserName(), emo);
-              SecurityUtil.runAs(getSecurityService(), emo, emu, new Effect0() {
-                @Override protected void run() {
-                  getMessageSender().sendObjectMessage(
-                          destinationId,
-                          MessageSender.DestinationType.Queue,
-                          IndexRecreateObject.end(indexName, getService()));
-                }
-              });
-            }
+                      destinationId,
+                      MessageSender.DestinationType.Queue,
+                      IndexRecreateObject.end(indexName, getService()));
+            });
           }
         });
       } else {

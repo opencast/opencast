@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -28,20 +28,16 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-metadata-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
     <!-- 3rd party dependencies -->
     <dependency>
       <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-all</artifactId>
+      <artifactId>activemq-client</artifactId>
+      <version>5.15.7</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.geronimo.specs</groupId>
-      <artifactId>geronimo-jms_1.1_spec</artifactId>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activeio-core</artifactId>
+      <version>3.1.4</version>
     </dependency>
     <dependency>
       <groupId>javax.ws.rs</groupId>
@@ -52,26 +48,25 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpcore-osgi</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jms_1.1_spec</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
       <scope>test</scope>
     </dependency>
     <!-- Testing -->
@@ -108,8 +103,18 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
-              !com.thoughtworks.xstream.*,
+              !bsh,
+              !com.barchart.*,
+              !com.fasterxml.*,
+              !com.google.protobuf*,
+              !com.jcraft*;
+              !com.ibm.*,
+              !com.ning.*,
+              !com.sun.jdmk.comm,
+              !com.sun.net.httpserver,
+              !com.thoughtworks.*,
               !javax.ejb.*,
+              !javax.jmdns,
               !junit.framework,
               !org.apache.activeio.*,
               !org.apache.axis.*,
@@ -124,6 +129,7 @@
               !org.codehaus.jam.*,
               !org.josql,
               !org.mortbay.jetty.*,
+              !org.objectweb.*,
               !org.springframework.jms.connection,
               !org.springframework.oxm,
               !org.springframework.xml.transform,
@@ -143,7 +149,8 @@
               *
             </Import-Package>
             <Embed-Dependency>
-              activemq-all;inline=true
+              activemq-client;inline=true,
+              activeio-core;inline=true
             </Embed-Dependency>
             <Private-Package>
               org.opencastproject.message.broker.endpoint
@@ -152,7 +159,6 @@
               org.opencastproject.message.broker.impl;version=${project.version}
             </Export-Package>
             <_exportcontents>
-              javax.jms,
               javax.transaction,
               javax.transaction.xa
             </_exportcontents>

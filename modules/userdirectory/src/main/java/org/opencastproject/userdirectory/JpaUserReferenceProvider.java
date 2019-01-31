@@ -401,6 +401,9 @@ public class JpaUserReferenceProvider implements UserReferenceProvider, UserProv
    * @return the user references list
    */
   private List<JpaUserReference> findUsersByUserName(String orgId, Collection<String> names, EntityManagerFactory emf) {
+    if (names.isEmpty()) {
+      return Collections.<JpaUserReference>emptyList();
+    }
     EntityManager em = null;
     try {
       em = emf.createEntityManager();

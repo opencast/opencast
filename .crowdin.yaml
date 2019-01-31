@@ -22,3 +22,7 @@ files:
   -
     source: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/en-US.json'
     translation: '/modules/engage-paella-player/src/main/paella-opencast/plugins/**/localization/%locale%.json'
+
+  -
+    source: '/modules/lti/src/i18n/en-US.json'
+    translation: '/modules/lti/src/i18n/%locale%.json'

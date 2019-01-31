@@ -98,6 +98,7 @@ import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
@@ -113,6 +114,7 @@ import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
+import org.opencastproject.scheduler.api.Util;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -131,6 +133,7 @@ import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -158,7 +161,6 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -423,10 +425,10 @@ public abstract class AbstractEventEndpoint {
     try {
       eventIdsJsonArray = (JSONArray) parser.parse(eventIdsContent);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.error("Unable to parse '{}' because: {}", eventIdsContent, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to parse '{}'", eventIdsContent, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.error("Unable to cast '{}' because: {}", eventIdsContent, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to cast '{}'", eventIdsContent, e);
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
@@ -541,14 +543,14 @@ public abstract class AbstractEventEndpoint {
         fields.add(technicalMetadataToJson.apply(getSchedulerService().getTechnicalMetadata(eventId)));
       } catch (final NotFoundException e) {
         if (!ignoreNonScheduled) {
-          logger.warn("Unable to find id {}", eventId, ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to find id {}", eventId, e);
           return notFound("Cannot find an event with id '%s'.", eventId);
         }
       } catch (final UnauthorizedException e) {
-        logger.warn("Unauthorized access to event ID {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.warn("Unauthorized access to event ID {}", eventId, e);
         return Response.status(Status.BAD_REQUEST).build();
       } catch (final SchedulerException e) {
-        logger.warn("Scheduler exception accessing event ID {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.warn("Scheduler exception accessing event ID {}", eventId, e);
         return Response.status(Status.BAD_REQUEST).build();
       }
     }
@@ -578,8 +580,7 @@ public abstract class AbstractEventEndpoint {
     } catch (ParseException e) {
       return RestUtil.R.badRequest("The UTC dates in the scheduling object is not valid");
     } catch (SchedulerException e) {
-      logger.error("Unable to update scheduling technical metadata of event {}: {}", eventId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update scheduling technical metadata of event {}", eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (IllegalStateException e) {
       return RestUtil.R.badRequest(e.getMessage());
@@ -708,7 +709,7 @@ public abstract class AbstractEventEndpoint {
       return Response.ok(org.opencastproject.util.Jsons.arr(commentArr).toJson(), MediaType.APPLICATION_JSON_TYPE)
               .build();
     } catch (EventCommentException e) {
-      logger.error("Unable to get comments from event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get comments from event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -756,7 +757,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not retrieve comment {}: {}", commentId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not retrieve comment {}", commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -807,7 +808,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to update the comments catalog on event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to update the comments catalog on event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -863,12 +864,14 @@ public abstract class AbstractEventEndpoint {
                 Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
         return ok();
       }
-    } catch (AclServiceException e) {
-      logger.error("Error applying acl '{}' to event '{}' because: {}",
-              accessControlList, eventId, ExceptionUtils.getStackTrace(e));
+    } catch (AclServiceException | MediaPackageException e) {
+      if (e.getCause() instanceof UnauthorizedException) {
+        return forbidden();
+      }
+      logger.error("Error applying acl '{}' to event '{}'", accessControlList, eventId, e);
       return serverError();
     } catch (SchedulerException e) {
-      logger.error("Error applying ACL to scheduled event {} because {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error applying ACL to scheduled event {}", eventId, e);
       return serverError();
     }
   }
@@ -903,7 +906,7 @@ public abstract class AbstractEventEndpoint {
       return Response.created(getCommentUrl(eventId, createdComment.getId().get()))
               .entity(createdComment.toJson().toJson()).build();
     } catch (Exception e) {
-      logger.error("Unable to create a comment on the event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to create a comment on the event {}", eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -934,7 +937,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Could not resolve comment {}: {}", commentId, ExceptionUtils.getStackTrace(e));
+      logger.error("Could not resolve comment {}", commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -961,8 +964,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to delete comment {} on event {}: {}",
-              commentId, eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to delete comment {} on event {}", commentId, eventId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1004,8 +1006,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not remove event comment reply {} from comment {}: {}",
-              replyId, commentId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not remove event comment reply {} from comment {}", replyId, commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1055,8 +1056,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not update event comment reply {} from comment {}: {}",
-              replyId, commentId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not update event comment reply {} from comment {}", replyId, commentId, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1103,7 +1103,7 @@ public abstract class AbstractEventEndpoint {
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
       return Response.ok(updatedComment.toJson().toJson()).build();
     } catch (Exception e) {
-      logger.warn("Could not create event comment reply on comment {}: {}", comment, ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not create event comment reply on comment {}", comment, e);
       throw new WebApplicationException(e);
     }
   }
@@ -1176,10 +1176,10 @@ public abstract class AbstractEventEndpoint {
   @PUT
   @Path("bulk/update")
   @RestQuery(name = "bulkupdate", description = "Update all of the given events at once", restParameters = {
-    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of events and fields to update.")}, reponses = {
+    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of groups with events and fields to update.")}, reponses = {
     @RestResponse(description = "All events have been updated successfully.", responseCode = HttpServletResponse.SC_OK),
     @RestResponse(description = "Could not parse update instructions.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-    @RestResponse(description = "Faield updating metadata or scheduling information. Some events may have been updated. Details are available in the response body.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
+    @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been updated. Details are available in the response body.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
     @RestResponse(description = "The events in the response body were not found. No events were updated.", responseCode = HttpServletResponse.SC_NOT_FOUND)},
     returnDescription = "In case of success, no content is returned. In case of errors while updating the metadata or scheduling information, the errors are returned. In case events were not found, their ids are returned")
   public Response bulkUpdate(@FormParam("update") String updateJson) {
@@ -1191,50 +1191,49 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Cannot parse bulk update instructions");
     }
 
-    // Get all the events to edit
-    final Map<String, Optional<Event>> events = instructions.getEventIds().stream()
-      .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
-
-    // Check for invalid (non-existing) event ids
-    final Set<String> notFoundIds = events.entrySet().stream()
-      .filter(e -> !e.getValue().isPresent())
-      .map(Entry::getKey)
-      .collect(Collectors.toSet());
-    if (!notFoundIds.isEmpty()) {
-      return notFoundJson(JSONUtils.setToJSON(notFoundIds));
-    }
-
     final Map<String, String> metadataUpdateFailures = new HashMap<>();
     final Map<String, String> schedulingUpdateFailures = new HashMap<>();
 
-    events.values().forEach(e -> e.ifPresent(event -> {
+    for (final BulkUpdateUtil.BulkUpdateInstructionGroup groupInstructions : instructions.getGroups()) {
+      // Get all the events to edit
+      final Map<String, Optional<Event>> events = groupInstructions.getEventIds().stream()
+        .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
 
-      JSONObject metadata = null;
-
-      // Update the scheduling information
-      try {
-        if (instructions.getScheduling() != null) {
-          // Since we only have the start/end time, we have to add the correct date(s) for this event.
-          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, instructions.getScheduling());
-          updateEventScheduling(scheduling.toJSONString(), event);
-          // We have to update the non-technical metadata as well to keep them in sync with the technical ones.
-          metadata = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
-        }
-      } catch (Exception exception) {
-        schedulingUpdateFailures.put(event.getIdentifier(), exception.getMessage());
+      // Check for invalid (non-existing) event ids
+      final Set<String> notFoundIds = events.entrySet().stream().filter(e -> !e.getValue().isPresent()).map(Entry::getKey).collect(Collectors.toSet());
+      if (!notFoundIds.isEmpty()) {
+        return notFoundJson(JSONUtils.setToJSON(notFoundIds));
       }
 
-      // Update the event metadata
-      try {
-        if (instructions.getMetadata() != null || metadata != null) {
-          metadata = BulkUpdateUtil.mergeMetadataFields(metadata, instructions.getMetadata());
-          getIndexService().updateAllEventMetadata(event.getIdentifier(),
-            JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+
+      events.values().forEach(e -> e.ifPresent(event -> {
+
+        JSONObject metadata = null;
+
+        // Update the scheduling information
+        try {
+          if (groupInstructions.getScheduling() != null) {
+            // Since we only have the start/end time, we have to add the correct date(s) for this event.
+            final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupInstructions.getScheduling());
+            updateEventScheduling(scheduling.toJSONString(), event);
+            // We have to update the non-technical metadata as well to keep them in sync with the technical ones.
+            metadata = BulkUpdateUtil.toNonTechnicalMetadataJson(scheduling);
+          }
+        } catch (Exception exception) {
+          schedulingUpdateFailures.put(event.getIdentifier(), exception.getMessage());
         }
-      } catch (Exception exception) {
-        metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
-      }
-    }));
+
+        // Update the event metadata
+        try {
+          if (groupInstructions.getMetadata() != null || metadata != null) {
+            metadata = BulkUpdateUtil.mergeMetadataFields(metadata, groupInstructions.getMetadata());
+            getIndexService().updateAllEventMetadata(event.getIdentifier(), JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+          }
+        } catch (Exception exception) {
+          metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
+        }
+      }));
+    }
 
     // Check if there were any errors updating the metadata or scheduling information
     if (!metadataUpdateFailures.isEmpty() || !schedulingUpdateFailures.isEmpty()) {
@@ -1262,25 +1261,28 @@ public abstract class AbstractEventEndpoint {
       return badRequest("Cannot parse bulk update instructions");
     }
 
-    // Get all the events to check
-    final Map<String, Optional<Event>> events = instructions.getEventIds().stream()
-      .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
-
+    final Map<String, List<JValue>> conflicts = new HashMap<>();
+    final List<Tuple3<String, Optional<Event>, JSONObject>> eventsWithSchedulingOpt = instructions.getGroups().stream()
+      .flatMap(group -> group.getEventIds().stream().map(eventId -> Tuple3
+        .tuple3(eventId, BulkUpdateUtil.getEvent(getIndexService(), getIndex(), eventId), group.getScheduling())))
+      .collect(Collectors.toList());
     // Check for invalid (non-existing) event ids
-    final Set<String> notFoundIds = events.entrySet().stream()
-      .filter(e -> !e.getValue().isPresent())
-      .map(Entry::getKey)
-      .collect(Collectors.toSet());
+    final Set<String> notFoundIds = eventsWithSchedulingOpt.stream().filter(e -> !e.getB().isPresent())
+      .map(Tuple3::getA).collect(Collectors.toSet());
     if (!notFoundIds.isEmpty()) {
       return notFoundJson(JSONUtils.setToJSON(notFoundIds));
     }
-
-    final Map<String, List<JValue>> conflicts = new HashMap<>();
-    events.values().forEach(e -> e.ifPresent(event -> {
+    final List<Tuple<Event, JSONObject>> eventsWithScheduling = eventsWithSchedulingOpt.stream()
+      .map(e -> Tuple.tuple(e.getB().get(), e.getC())).collect(Collectors.toList());
+    final Set<String> changedIds = eventsWithScheduling.stream().map(e -> e.getA().getIdentifier())
+      .collect(Collectors.toSet());
+    for (final Tuple<Event, JSONObject> eventWithGroup : eventsWithScheduling) {
+      final Event event = eventWithGroup.getA();
+      final JSONObject groupScheduling = eventWithGroup.getB();
       try {
-        if (instructions.getScheduling() != null) {
+        if (groupScheduling != null) {
           // Since we only have the start/end time, we have to add the correct date(s) for this event.
-          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, instructions.getScheduling());
+          final JSONObject scheduling = BulkUpdateUtil.addSchedulingDates(event, groupScheduling);
           final Date start = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_START_KEY)));
           final Date end = Date.from(Instant.parse((String) scheduling.get(SCHEDULING_END_KEY)));
           final String agentId = Optional.ofNullable((String) scheduling.get(SCHEDULING_AGENT_ID_KEY))
@@ -1289,41 +1291,39 @@ public abstract class AbstractEventEndpoint {
           final List<JValue> currentConflicts = new ArrayList<>();
 
           // Check for conflicts between the events themselves
-          events.values().forEach(oe -> oe.ifPresent(otherEvent -> {
-            if (otherEvent.getIdentifier().equals(event.getIdentifier())) {
-              // don't check event against itself
-              return;
-            }
-            final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent, instructions.getScheduling());
+          eventsWithScheduling.stream()
+            .filter(otherEvent -> !otherEvent.getA().getIdentifier().equals(event.getIdentifier()))
+            .forEach(otherEvent -> {
+            final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(), otherEvent.getB());
             final Date otherStart = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_START_KEY)));
             final Date otherEnd = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_END_KEY)));
             final String otherAgentId = Optional.ofNullable((String) otherScheduling.get(SCHEDULING_AGENT_ID_KEY))
-              .orElse(otherEvent.getAgentId());
+              .orElse(otherEvent.getA().getAgentId());
             if (!otherAgentId.equals(agentId)) {
               // different agent -> no conflict
               return;
             }
-            if (start.before(otherEnd) && end.after(otherStart)) {
+            if (Util.schedulingIntervalsOverlap(start, end, otherStart, otherEnd)) {
               // conflict
               currentConflicts.add(convertEventToConflictingObject(DateTimeSupport.toUTC(otherStart.getTime()),
-                DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getTitle()));
+                DateTimeSupport.toUTC(otherEnd.getTime()), otherEvent.getA().getTitle()));
             }
-          }));
+          });
 
           // Check for conflicts with other events from the database
           final List<MediaPackage> conflicting = getSchedulerService().findConflictingEvents(agentId, start, end)
             .stream()
-            .filter(mp -> !events.keySet().contains(mp.getIdentifier().toString()))
+            .filter(mp -> !changedIds.contains(mp.getIdentifier().toString()))
             .collect(Collectors.toList());
-          if (conflicting != null && !conflicting.isEmpty()) {
+          if (!conflicting.isEmpty()) {
             currentConflicts.addAll(convertToConflictObjects(event.getIdentifier(), conflicting));
           }
           conflicts.put(event.getIdentifier(), currentConflicts);
         }
-      } catch (SchedulerException | UnauthorizedException | SearchIndexException exception) {
+      } catch (final SchedulerException | UnauthorizedException | SearchIndexException exception) {
         throw new RuntimeException(exception);
       }
-    }));
+    }
 
     if (!conflicts.isEmpty()) {
       final List<JValue> responseJson = new ArrayList<>();
@@ -1799,9 +1799,8 @@ public abstract class AbstractEventEndpoint {
         transitionsJson.add(AccessInformationUtil.serializeEpisodeACLTransition(trans));
       }
     } catch (AclServiceException e) {
-      logger.error(
-              "There was an error while trying to get the ACL transitions for series '{}' from the ACL service: {}",
-              eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("There was an error while trying to get the ACL transitions for series '{}' from the ACL service",
+        eventId, e);
       return RestUtil.R.serverError();
     }
 
@@ -1810,7 +1809,7 @@ public abstract class AbstractEventEndpoint {
       if (optEvent.get().getAccessPolicy() != null)
         activeAcl = AccessControlParser.parseAcl(optEvent.get().getAccessPolicy());
     } catch (Exception e) {
-      logger.error("Unable to parse access policy because: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to parse access policy", e);
     }
     Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAcls(acls, activeAcl);
 
@@ -1915,15 +1914,11 @@ public abstract class AbstractEventEndpoint {
       return Response.noContent().build();
     } catch (JSONException e) {
       return RestUtil.R.badRequest("The transition object is not valid");
-    } catch (IllegalStateException e) {
+    } catch (IllegalStateException | ParseException e) {
       // That should never happen
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     } catch (AclServiceException e) {
-      logger.error("Unable to update transtion {} of event {}: {}",
-              transitionId, eventId, ExceptionUtils.getStackTrace(e));
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    } catch (ParseException e) {
-      // That should never happen
+      logger.error("Unable to update transition {} of event {}", transitionId, eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -1994,14 +1989,13 @@ public abstract class AbstractEventEndpoint {
     try {
       eventIdsArray = (JSONArray) parser.parse(eventIds);
     } catch (org.json.simple.parser.ParseException e) {
-      logger.warn("Unable to parse event ids {} : {}", eventIds, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse event ids {} ", eventIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (NullPointerException e) {
       logger.warn("Unable to parse event ids because it was null {}", eventIds);
       return Response.status(Status.BAD_REQUEST).build();
     } catch (ClassCastException e) {
-      logger.warn("Unable to parse event ids because it was the wrong class {} : {}", eventIds,
-              ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to parse event ids because it was the wrong class {}", eventIds, e);
       return Response.status(Status.BAD_REQUEST).build();
     }
 
@@ -2016,7 +2010,7 @@ public abstract class AbstractEventEndpoint {
       } catch (NotFoundException e) {
         result.addNotFound(eventId);
       } catch (Exception e) {
-        logger.error("Could not update opt out status of event {}: {}", eventId, ExceptionUtils.getStackTrace(e));
+        logger.error("Could not update opt out status of event {}", eventId, e);
         result.addServerError(eventId);
       }
     }
@@ -2040,8 +2034,7 @@ public abstract class AbstractEventEndpoint {
       getAclService().deleteEpisodeTransition(transitionId);
       return Response.noContent().build();
     } catch (AclServiceException e) {
-      logger.error("Error while trying to delete transition '{}' from event '{}': {}",
-              transitionId, eventId, ExceptionUtils.getStackTrace(e));
+      logger.error("Error while trying to delete transition '{}' from event '{}'", transitionId, eventId, e);
       throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
     }
   }
@@ -2115,7 +2108,7 @@ public abstract class AbstractEventEndpoint {
         }
       }
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get available workflow definitions: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to get available workflow definitions", e);
       return RestUtil.R.serverError();
     }
 
@@ -2226,8 +2219,8 @@ public abstract class AbstractEventEndpoint {
       }
       return Response.noContent().build();
     } catch (Exception e) {
-      logger.error("Unable to find conflicting events for {}, {}, {}: {}",
-              device, startDate, endDate, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find conflicting events for {}, {}, {}",
+              device, startDate, endDate, e);
       return RestUtil.R.serverError();
     }
   }
@@ -2598,7 +2591,7 @@ public abstract class AbstractEventEndpoint {
         }
         return URI.create(getUrlSigningService().sign(url.toString(), getUrlSigningExpireDuration(), null, clientIP));
       } catch (UrlSigningException e) {
-        logger.warn("Unable to sign url '{}': {}", url, ExceptionUtils.getStackTrace(e));
+        logger.warn("Unable to sign url '{}'", url, e);
       }
     }
     return url;

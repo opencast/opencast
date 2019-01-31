@@ -29,14 +29,20 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 
-import java.util.Date;
+import org.eclipse.persistence.annotations.CascadeOnDelete;
 
+import java.util.Date;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
@@ -85,6 +91,10 @@ public class SnapshotDto {
   @Lob
   @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXml;
+
+  @CascadeOnDelete
+  @OneToMany(targetEntity = AssetDto.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "snapshot")
+  private Set<AssetDto> assets;
 
   public static SnapshotDto mk(
           MediaPackage mediaPackage,
@@ -147,6 +157,14 @@ public class SnapshotDto {
 
   void setStorageId(String id) {
     this.storageId = id;
+  }
+
+  public boolean addAsset(AssetDto asset) {
+    return this.assets.add(asset);
+  }
+
+  public boolean removeAsset(AssetDto asset) {
+    return this.assets.remove(asset);
   }
 
   public Snapshot toSnapshot() {

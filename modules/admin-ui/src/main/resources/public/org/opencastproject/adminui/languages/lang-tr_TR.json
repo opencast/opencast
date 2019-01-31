@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "Düzenle",
+            "EVENT": "event",
+            "EVENTS": "events",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Üstveri",
-            "SCHEDULING": "Zamanlanıyor"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "Çoklu etkinlik zamanla",
                   "REPEATS": "Tekrarlar",
                   "REPEAT_ON": "Tekrarlama açık",
-                  "WEEKDAYS": "Hafta içi"
+                  "WEEKDAYS": "Hafta içi",
+                  "WEEKDAY": "Weekday"
                },
                "NO_SOURCE_AVAILABLE": "Zamanlama için kullanılabilecek yakalama aracı yok"
             },
@@ -1070,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Ek eylemler",
                   "ACTION": "Eylemler",
                   "NEW": "Yeni sözleşme",
-                  "DETAILS": "Ayrıntılar"
+                  "DETAILS": "Ayrıntılar",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Bir rol seç",

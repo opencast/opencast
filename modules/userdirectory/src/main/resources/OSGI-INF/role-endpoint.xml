@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               name="org.opencastproject.userdirectory.RoleEndpoint"
+               immediate="true">
+  <implementation class="org.opencastproject.userdirectory.RoleEndpoint"/>
+  <property name="service.description" value="Role listing REST endpoint"/>
+  <property name="opencast.service.type" value="org.opencastproject.userdirectory.roles"/>
+  <property name="opencast.service.path" value="/roles"/>
+  <property name="opencast.service.jobproducer" value="false"/>
+  <service>
+    <provide interface="org.opencastproject.userdirectory.RoleEndpoint"/>
+  </service>
+  <reference name="roleDirectoryService" interface="org.opencastproject.security.api.RoleDirectoryService"
+             bind="setRoleDirectoryService"/>
+  <reference name="orgDirectory" interface="org.opencastproject.security.api.OrganizationDirectoryService"
+             bind="setOrganizationDirectoryService"/>
+</scr:component>

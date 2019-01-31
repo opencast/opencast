@@ -24,7 +24,6 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.security.api.JaxbGroup;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import org.osgi.framework.BundleContext;
@@ -63,7 +62,7 @@ public class GroupsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> groupsList = new HashMap<String, String>();
     List<JaxbGroup> groups = null;
     int limit = 0;

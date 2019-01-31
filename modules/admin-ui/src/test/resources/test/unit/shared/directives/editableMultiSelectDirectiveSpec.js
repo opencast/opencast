@@ -40,28 +40,31 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
         expect(element.find('div').length).toBe(1);
     });
 
-    it('saves when adding values', function () {
-        expect(element.scope().params.value).not.toContain('item2');
-
+    function enterValue(value) {
         element.click();
-        element.find('input').val('item2').trigger('change');
+        element.find('input').val(value).trigger('change');
 
         var enter = $.Event('keyup');
         enter.keyCode = 13;
         element.find('input').trigger(enter);
+    }
+
+    it('saves when adding values', function () {
+        expect(element.scope().params.value).not.toContain('Item 2');
+
+        enterValue('item2');
 
         expect($rootScope.save).toHaveBeenCalled();
         expect(element.scope().params.value).toContain('Item 2');
     });
 
     it('saves when removing values', function () {
-        expect(element.scope().params.value).toContain('item1');
+        expect(element.scope().params.value).toContain('Item 1');
 
-        element.click();
         element.find('span.ng-multi-value:first a').mousedown();
 
         expect($rootScope.save).toHaveBeenCalled();
-        expect(element.scope().params.value).not.toContain('item1');
+        expect(element.scope().params.value).not.toContain('Item 1');
     });
 
     xit('autocompletes after entering three characters', function () {
@@ -88,20 +91,69 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
         });
     });
 
+    it('allows entering multiple values at once separated by a given delimiter', function () {
+        element.scope().params.value = ['item1'];
+        element.scope().params.delimiter = ';';
+
+        enterValue('item2;item3');
+
+        expect(element.scope().params.value).toContain('Item 2');
+        expect(element.scope().params.value).toContain('Item 3');
+        expect(element.scope().params.value).not.toContain('item2;item3');
+    });
+
+    it('ignores duplicate values', function () {
+        function count() {
+            var count = 0;
+            angular.forEach(element.scope().params.value, function (value) {
+                if (value == 'Item 2') {
+                    ++count;
+                }
+            });
+            return count;
+        }
+        expect(count()).toBe(0);
+
+        enterValue('item2');
+        enterValue('item2');
+
+        expect(count()).toBe(1);
+    });
+
     describe('#leaveEditMode', function () {
 
         it('leaves edit mode', function () {
-            var scope = element.find('ul').scope();  // the div & input elements doesn't exist when editMode = false
+            var scope = element.find('ul').scope();  // the div & input elements don't exist when editMode = false
             scope.editMode = true;
             scope.data.value = 'edited';
 
             scope.leaveEditMode();
 
-            expect(element.scope().params.value).not.toContain('edited')
+            expect(element.scope().params.value).not.toContain('edited');
             expect(scope.editMode).toBe(false);
-            expect(scope.data.value).toEqual('edited');
+            expect(scope.data.value).toEqual('');
         });
     });
+
+    describe('#onBlur', function () {
+
+        var scope;
+
+        beforeEach(function () {
+            scope = element.find('ul').scope();  // the div & input elements don't exist when editMode = false
+            scope.editMode = true;
+            scope.mixed = true;
+            scope.data.value = 'edited';
+        });
+
+        it('saves and leaves edit mode', function () {
+            scope.onBlur();
+
+            expect(scope.editMode).toBe(false);
+            expect(scope.data.value).toEqual('');
+            expect(scope.params.value).toContain('edited')
+        });
+    })
 
     describe('#addValue', function () {
 
@@ -118,9 +170,8 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
         beforeEach(function () {
             event.stopPropagation = jasmine.createSpy();
-            scope = element.find('ul').scope()
+            scope = element.find('ul').scope();
             scope.editMode = true;
-
         });
 
         it('does nothing by default', function () {
@@ -141,6 +192,10 @@ describe('adminNg.directives.adminNgEditableMultiSelect', function () {
 
             it('leaves edit mode', function () {
                 expect(scope.editMode).toBe(false);
+            });
+
+            it('clears value', function () {
+              expect(scope.data.value).toBe('');
             });
         });
 

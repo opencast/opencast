@@ -31,7 +31,6 @@ import static org.opencastproject.util.data.functions.Booleans.not;
 import static org.opencastproject.util.data.functions.Options.sequenceOpt;
 import static org.opencastproject.util.data.functions.Options.toOption;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
@@ -47,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /** Utility class used for media package handling. */
@@ -306,7 +307,7 @@ public final class MediaPackageSupport {
         @Override
         public List<MediaPackageElement> apply(MediaPackageElement mpe) {
           // match is commutative
-          return flavor.matches(mpe.getFlavor()) ? list(mpe) : Immutables.<MediaPackageElement> nil();
+          return flavor.matches(mpe.getFlavor()) ? Collections.singletonList(mpe) : Collections.emptyList();
         }
       };
     }
@@ -315,7 +316,7 @@ public final class MediaPackageSupport {
       return new Function<MediaPackageElement, List<MediaPackageElement>>() {
         @Override
         public List<MediaPackageElement> apply(MediaPackageElement mpe) {
-          return mpe.containsTag(tags) ? list(mpe) : Immutables.<MediaPackageElement> nil();
+          return mpe.containsTag(tags) ? Collections.singletonList(mpe) : Collections.emptyList();
         }
       };
     }
@@ -422,25 +423,6 @@ public final class MediaPackageSupport {
       };
     }
 
-    /**
-     * Return true if the element has a flavor that matches any of the <code>flavors</code>.
-     *
-     * @see MediaPackageElementFlavor#matches(MediaPackageElementFlavor)
-     */
-    public static Function<MediaPackageElement, Boolean> matchesFlavorAny(final List<MediaPackageElementFlavor> flavors) {
-      return new Function<MediaPackageElement, Boolean>() {
-        @Override
-        public Boolean apply(MediaPackageElement mpe) {
-          for (MediaPackageElementFlavor f : flavors) {
-            if (f.matches(mpe.getFlavor())) {
-              return true;
-            }
-          }
-          return false;
-        }
-      };
-    }
-
     public static final Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>> matchesFlavor = new Function<MediaPackageElementFlavor, Function<MediaPackageElement, Boolean>>() {
       @Override
       public Function<MediaPackageElement, Boolean> apply(final MediaPackageElementFlavor flavor) {
@@ -457,10 +439,6 @@ public final class MediaPackageSupport {
         }
       };
     }
-
-    public static final Function<MediaPackageElement, Boolean> isXACML = MediaPackageSupport.Filters
-            .matchesFlavorAny(list(MediaPackageElements.XACML_POLICY, MediaPackageElements.XACML_POLICY_EPISODE,
-                    MediaPackageElements.XACML_POLICY_SERIES));
 
     public static final Function<MediaPackageElement, Boolean> isEpisodeAcl = new Function<MediaPackageElement, Boolean>() {
       @Override
@@ -562,21 +540,21 @@ public final class MediaPackageSupport {
     public static final Function<MediaPackage, List<MediaPackageElement>> getElements = new Function<MediaPackage, List<MediaPackageElement>>() {
       @Override
       public List<MediaPackageElement> apply(MediaPackage a) {
-        return Immutables.list(a.getElements());
+        return Arrays.asList(a.getElements());
       }
     };
 
     public static final Function<MediaPackage, List<Track>> getTracks = new Function<MediaPackage, List<Track>>() {
       @Override
       public List<Track> apply(MediaPackage a) {
-        return Immutables.list(a.getTracks());
+        return Arrays.asList(a.getTracks());
       }
     };
 
     public static final Function<MediaPackage, List<Publication>> getPublications = new Function<MediaPackage, List<Publication>>() {
       @Override
       public List<Publication> apply(MediaPackage a) {
-        return Immutables.list(a.getPublications());
+        return Arrays.asList(a.getPublications());
       }
     };
   }

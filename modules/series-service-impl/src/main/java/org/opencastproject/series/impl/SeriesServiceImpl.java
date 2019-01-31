@@ -55,26 +55,26 @@ import org.opencastproject.series.api.SeriesQuery;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.FunctionException;
 import org.opencastproject.util.data.Option;
 
 import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.ServiceException;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Implements {@link SeriesService}. Uses {@link SeriesServiceDatabase} for permanent storage and
@@ -245,19 +245,6 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       return dc;
     } catch (Exception e) {
-      throw rethrow(e);
-    }
-  }
-
-  private static Error rethrow(Exception e) throws SeriesException, UnauthorizedException {
-    if (e instanceof FunctionException) {
-      final Throwable cause = e.getCause();
-      if (cause instanceof UnauthorizedException) {
-        throw ((UnauthorizedException) cause);
-      } else {
-        throw new SeriesException(e);
-      }
-    } else {
       throw new SeriesException(e);
     }
   }
@@ -278,9 +265,16 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     }
   }
 
-  // todo method signature does not fit the three different possible return values
   @Override
   public boolean updateAccessControl(final String seriesId, final AccessControlList accessControl)
+          throws NotFoundException, SeriesException {
+    return updateAccessControl(seriesId, accessControl, false);
+  }
+
+  // todo method signature does not fit the three different possible return values
+  @Override
+  public boolean updateAccessControl(final String seriesId, final AccessControlList accessControl,
+          boolean overrideEpisodeAcl)
           throws NotFoundException, SeriesException {
     if (StringUtils.isEmpty(seriesId)) {
       throw new IllegalArgumentException("Series ID parameter must not be null or empty.");
@@ -302,7 +296,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       try {
         updated = persistence.storeSeriesAccessControl(seriesId, accessControl);
         messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
-                SeriesItem.updateAcl(seriesId, accessControl));
+                SeriesItem.updateAcl(seriesId, accessControl, overrideEpisodeAcl));
       } catch (SeriesServiceDatabaseException e) {
         logger.error("Could not update series {} with access control rules: {}", seriesId, e.getMessage());
         throw new SeriesException(e);
@@ -405,8 +399,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return index.isOptOut(seriesId);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Exception occured while getting opt out status of series '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Exception occurred while getting opt out status of series '{}'", seriesId, e);
       throw new SeriesException(e);
     }
   }
@@ -419,8 +412,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.updateOptOut(seriesId, optOut));
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to update opt out status of series with id '{}': {}", seriesId,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to update opt out status of series with id '{}'", seriesId, e);
       throw new SeriesException(e);
     }
   }
@@ -431,8 +423,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperties(seriesID);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series properties for series with id '{}': {}", seriesID,
-              ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to get series properties for series with id '{}'", seriesID, e);
       throw new SeriesException(e);
     }
   }
@@ -443,8 +434,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       return persistence.getSeriesProperty(seriesID, propertyName);
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to get series property for series with series id '{}' and property name '{}': {}", seriesID,
-              propertyName, ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to get series property for series with series id '{}' and property name '{}'", seriesID,
+              propertyName, e);
       throw new SeriesException(e);
     }
   }
@@ -458,8 +449,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
               SeriesItem.updateProperty(seriesID, propertyName, propertyValue));
     } catch (SeriesServiceDatabaseException e) {
       logger.error(
-              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}': {}",
-              seriesID, propertyName, propertyValue, ExceptionUtils.getStackTrace(e));
+              "Failed to get series property for series with series id '{}' and property name '{}' and value '{}'",
+              seriesID, propertyName, propertyValue, e);
       throw new SeriesException(e);
     }
   }
@@ -472,8 +463,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       messageSender.sendObjectMessage(SeriesItem.SERIES_QUEUE, MessageSender.DestinationType.Queue,
               SeriesItem.updateProperty(seriesID, propertyName, null));
     } catch (SeriesServiceDatabaseException e) {
-      logger.error("Failed to delete series property for series with series id '{}' and property name '{}': {}",
-              seriesID, propertyName, ExceptionUtils.getStackTrace(e));
+      logger.error("Failed to delete series property for series with series id '{}' and property name '{}'",
+              seriesID, propertyName, e);
       throw new SeriesException(e);
     }
   }
@@ -582,32 +573,38 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       for (SeriesEntity series: databaseSeries) {
         Organization organization = orgDirectory.getOrganization(series.getOrganization());
         SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-                new Function0.X<Void>() {
-                  @Override
-                  public Void xapply() throws Exception {
-                    String id = series.getSeriesId();
-                    logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
-                    DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateCatalog(catalog));
+                () -> {
+                  String id = series.getSeriesId();
+                  logger.trace("Adding series '{}' for org '{}'", id, series.getOrganization());
+                  DublinCoreCatalog catalog;
+                  try {
+                    catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
+                  } catch (IOException | ParserConfigurationException | SAXException e) {
+                    logger.error("Could not read dublincore XML", e);
+                    return;
+                  }
+                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                          SeriesItem.updateCatalog(catalog));
 
-                    String aclStr = series.getAccessControl();
-                    if (StringUtils.isNotBlank(aclStr)) {
-                      try {
-                          AccessControlList acl = AccessControlParser.parseAcl(aclStr);
-                          messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                                  SeriesItem.updateAcl(id, acl));
-                      } catch (Exception ex) {
-                        logger.error("Unable to parse series {} access control list", id, ex);
-                      }
+                  String aclStr = series.getAccessControl();
+                  if (StringUtils.isNotBlank(aclStr)) {
+                    try {
+                        AccessControlList acl = AccessControlParser.parseAcl(aclStr);
+                        messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                                SeriesItem.updateAcl(id, acl, false));
+                    } catch (Exception ex) {
+                      logger.error("Unable to parse series {} access control list", id, ex);
                     }
-                    messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
-                            SeriesItem.updateOptOut(id, series.isOptOut()));
+                  }
+                  messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
+                          SeriesItem.updateOptOut(id, series.isOptOut()));
+                  try {
                     for (Entry<String, String> property : persistence.getSeriesProperties(id).entrySet()) {
                       messageSender.sendObjectMessage(destinationId, MessageSender.DestinationType.Queue,
                               SeriesItem.updateProperty(id, property.getKey(), property.getValue()));
                     }
-                    return null;
+                  } catch (NotFoundException | SeriesServiceDatabaseException e) {
+                    logger.error("Error requesting series properties", e);
                   }
                 });
         if ((current % responseInterval == 0) || (current == total)) {
@@ -622,15 +619,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       throw new ServiceException(e.getMessage());
     }
 
-    Organization organization = new DefaultOrganization();
-    SecurityUtil.runAs(securityService, organization, SecurityUtil.createSystemUser(systemUserName, organization),
-            new Effect0() {
-              @Override
-              protected void run() {
-                messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
-                        IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
-              }
-            });
+    Organization org = new DefaultOrganization();
+    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(systemUserName, org), () -> {
+      messageSender.sendObjectMessage(IndexProducer.RESPONSE_QUEUE, MessageSender.DestinationType.Queue,
+              IndexRecreateObject.end(indexName, IndexRecreateObject.Service.Series));
+    });
   }
 
   @Override

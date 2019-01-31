@@ -28,7 +28,8 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'name',
-        label: 'USERS.ACLS.TABLE.NAME'
+        label: 'USERS.ACLS.TABLE.NAME',
+        sortable: true
         //}, {
         //    name:  'created',
         //    label: 'USERS.ACLS.TABLE.CREATED'
@@ -40,8 +41,7 @@ angular.module('adminNg.controllers')
         //    label: 'USERS.ACLS.TABLE.IN_USE'
       }, {
         template: 'modules/users/partials/aclActionsCell.html',
-        label:    'USERS.ACLS.TABLE.ACTION',
-        dontSort: true
+        label:    'USERS.ACLS.TABLE.ACTION'
       }],
       caption:    'USERS.ACLS.TABLE.CAPTION',
       resource:   'acls',

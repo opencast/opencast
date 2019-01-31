@@ -26,8 +26,7 @@ import static java.lang.String.format;
 import org.opencastproject.util.data.Function;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -39,6 +38,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlJavaTypeAdapter(MediaPackageElementFlavor.FlavorAdapter.class)
 public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPackageElementFlavor>, Serializable {
+
+  /**
+   * Wildcard character used in type and subtype
+   */
   public static final String WILDCARD = "*";
 
   /**
@@ -61,30 +64,21 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   private String subtype = null;
 
-  /**
-   * Alternate representations for type/subtype
-   */
-  private List<ElementTypeEquivalent> equivalents = new ArrayList<ElementTypeEquivalent>();
+
+  private MediaPackageElementFlavor() {
+  }
 
   /**
-   * Main description
-   */
-  private String description = null;
-
-  /**
-   * Creates a new element type with the given type, subtype and a description.
+   * Creates a new flavor with the given type and subtype.
    *
    * @param type
-   *          the major type
+   *          the type of the flavor
    * @param subtype
-   *          minor type
-   * @param description
-   *          an optional description
+   *          the subtype of the flavor
    */
-  public MediaPackageElementFlavor(String type, String subtype, String description) {
+  public MediaPackageElementFlavor(String type, String subtype) {
     this.type = checkPartSyntax(type);
     this.subtype = checkPartSyntax(subtype);
-    this.description = description;
   }
 
   /**
@@ -114,83 +108,35 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     return adaptedPart;
   }
 
-  public MediaPackageElementFlavor() {
-  }
-
-  /**
-   * Creates a new element type with the given type and subtype.
-   *
-   * @param type
-   *          the major type
-   * @param subtype
-   *          minor type
-   */
-  public MediaPackageElementFlavor(String type, String subtype) {
-    this(type, subtype, null);
-  }
-
   /** Constructor function for {@link #MediaPackageElementFlavor(String, String)}. */
   public static MediaPackageElementFlavor flavor(String type, String subtype) {
     return new MediaPackageElementFlavor(type, subtype);
   }
 
   /**
-   * Returns the major type of this element type. Major types are more of a technical description.
+   * Returns the type of this flavor.
+   * The type is never <code>null</code>.
    * <p>
-   * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
-   * this method will return <code>track</code>.
+   * For example, if the type is a presentation movie which is represented as <code>presentation/source</code>,
+   * this method will return <code>presentation</code>.
    *
-   * @return the type
+   * @return the type of this flavor
    */
   public String getType() {
     return type;
   }
 
   /**
-   * Returns the minor type of this element type. Minor types define the meaning.
+   * Returns the subtype of this flavor.
+   * The subtype is never <code>null</code>.
    * <p>
-   * For example, if the element type is a presentation movie which is represented as <code>presentation/source</code>,
-   * this method will return <code>presentation</code>.
+   * For example, if the subtype is a presentation movie which is represented as <code>presentation/source</code>,
+   * this method will return <code>source</code>.
    *
    * @return the subtype
    */
   public String getSubtype() {
     return subtype;
-  }
-
-  /**
-   * Returns the element type description.
-   *
-   * @return the description
-   */
-  public String getDescription() {
-    return description;
-  }
-
-  /**
-   * Sets the element type description.
-   */
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  /**
-   * Adds an equivalent type / subtype definition for this element type.
-   *
-   * @param type
-   *          major type
-   * @param subtype
-   *          minor type
-   * @throws IllegalArgumentException
-   *           if any of the arguments is <code>null</code>
-   */
-  public void addEquivalent(String type, String subtype) throws IllegalArgumentException {
-    if (type == null)
-      throw new IllegalArgumentException("Type must not be null!");
-    if (subtype == null)
-      throw new IllegalArgumentException("Subtype must not be null!");
-
-    equivalents.add(new ElementTypeEquivalent(type, subtype));
   }
 
   /**
@@ -203,15 +149,15 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    * @return The resulting flavor.
    */
   public MediaPackageElementFlavor applyTo(MediaPackageElementFlavor target) {
-    String subtype = this.subtype;
     String type = this.type;
-    if ("*".equals(this.subtype)) {
-      subtype = target.getSubtype();
-    }
-    if ("*".equals(this.type)) {
+    String subtype = this.subtype;
+    if (WILDCARD.equals(this.type)) {
       type = target.getType();
     }
-    return MediaPackageElementFlavor.flavor(type, subtype);
+    if (WILDCARD.equals(this.subtype)) {
+      subtype = target.getSubtype();
+    }
+    return new MediaPackageElementFlavor(type, subtype);
   }
 
   /**
@@ -222,29 +168,7 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     MediaPackageElementFlavor m = (MediaPackageElementFlavor) super.clone();
     m.type = this.type;
     m.subtype = this.subtype;
-    m.description = this.description;
-    m.equivalents.addAll(equivalents);
     return m;
-  }
-
-  /**
-   * Returns <code>true</code> if this element type is an equivalent for the specified type and subtype.
-   * <p>
-   * For example, a gzipped file may have both of these element types defined, <code>application/x-compressed</code> or
-   * <code>application/x-gzip</code>.
-   *
-   * @return <code>true</code> if this mime type is an equivalent
-   */
-  public boolean isEquivalentTo(String type, String subtype) {
-    if (this.type.equalsIgnoreCase(type) && this.subtype.equalsIgnoreCase(subtype))
-      return true;
-    if (equivalents != null) {
-      for (ElementTypeEquivalent equivalent : equivalents) {
-        if (equivalent.matches(type, subtype))
-          return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -298,79 +222,6 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     }
   };
 
-  /** Check if <code>type</code> is a {@link #WILDCARD wildcard}. */
-  public static boolean isWildcard(String type) {
-    return WILDCARD.equals(type);
-  }
-
-  /** Check if type or subtype of <code>flavor</code> is a wildcard. */
-  public static boolean hasWildcard(MediaPackageElementFlavor flavor) {
-    return isWildcard(flavor.getType()) || isWildcard(flavor.getSubtype());
-  }
-
-  /**
-   * Helper class to store type/subtype equivalents for a given element type.
-   */
-  private class ElementTypeEquivalent implements Serializable {
-
-    /**
-     * Serial version uid
-     */
-    private static final long serialVersionUID = 1L;
-
-    private String innerType;
-
-    private String innerSubtype;
-
-    ElementTypeEquivalent(String type, String subtype) {
-      innerType = type.trim().toLowerCase();
-      innerSubtype = subtype.trim().toLowerCase();
-    }
-
-    boolean matches(String type, String subtype) {
-      return innerType.equalsIgnoreCase(type) && innerSubtype.equalsIgnoreCase(subtype);
-    }
-
-    @Override
-    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + getOuterType().hashCode();
-      result = prime * result + ((innerSubtype == null) ? 0 : innerSubtype.hashCode());
-      result = prime * result + ((innerType == null) ? 0 : innerType.hashCode());
-      return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (this == obj)
-        return true;
-      if (obj == null)
-        return false;
-      if (!(obj instanceof ElementTypeEquivalent))
-        return false;
-      ElementTypeEquivalent other = (ElementTypeEquivalent) obj;
-      if (!getOuterType().equals(other.getOuterType()))
-        return false;
-      if (innerSubtype == null) {
-        if (other.innerSubtype != null)
-          return false;
-      } else if (!innerSubtype.equals(other.innerSubtype))
-        return false;
-      if (innerType == null) {
-        if (other.innerType != null)
-          return false;
-      } else if (!innerType.equals(other.innerType))
-        return false;
-      return true;
-    }
-
-    private MediaPackageElementFlavor getOuterType() {
-      return MediaPackageElementFlavor.this;
-    }
-
-  }
-
   /**
    * JAXB adapter implementation.
    */
@@ -379,65 +230,48 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
     public String marshal(MediaPackageElementFlavor flavor) throws Exception {
       if (flavor == null) {
         return null;
-      } else {
-        return flavor.toString();
       }
+      return flavor.toString();
     }
 
     @Override
     public MediaPackageElementFlavor unmarshal(String str) throws Exception {
-      MediaPackageElementFlavor f = parseFlavor(str);
-      return f;
+      return parseFlavor(str);
     }
   }
 
+  /**
+   * Check if types match.
+   * Two types match if they are equal or if one of them is a {@link #WILDCARD wildcard}.
+   **/
+  private static boolean typeMatches(String a, String b) {
+    return a.equals(b) || WILDCARD.equals(a) || WILDCARD.equals(b);
+  }
+
+  /**
+   * Check if two flavors match.
+   * Two flavors match if both their type and subtype matches.
+   *
+   * @param other
+   *          Flavor to compare against
+   * @return  If the flavors match
+   */
   public boolean matches(MediaPackageElementFlavor other) {
-    if (other == null)
-      return false;
-    if (this == other)
-      return true;
-    if (subtype == null) {
-      if (other.subtype != null && !isWildcard(other.subtype))
-        return false;
-    } else if (!subtype.equals(other.subtype) && (!isWildcard(subtype) && !isWildcard(other.subtype)))
-      return false;
-    if (type == null) {
-      if (other.type != null && !isWildcard(other.type))
-        return false;
-    } else if (!type.equals(other.type) && (!isWildcard(type) && !isWildcard(other.type)))
-      return false;
-    return true;
+    return other != null
+      && typeMatches(type, other.type)
+      && typeMatches(subtype, other.subtype);
   }
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((subtype == null) ? 0 : subtype.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    return result;
+    return Objects.hash(type, subtype);
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (obj == null)
-      return false;
-    if (!(obj instanceof MediaPackageElementFlavor))
-      return false;
-    MediaPackageElementFlavor other = (MediaPackageElementFlavor) obj;
-    if (subtype == null) {
-      if (other.subtype != null)
-        return false;
-    } else if (!subtype.equals(other.subtype))
-      return false;
-    if (type == null) {
-      if (other.type != null)
-        return false;
-    } else if (!type.equals(other.type))
-      return false;
-    return true;
+  public boolean equals(Object other) {
+    return (other instanceof MediaPackageElementFlavor)
+      && type.equals(((MediaPackageElementFlavor) other).type)
+      && subtype.equals(((MediaPackageElementFlavor) other).subtype);
   }
 
 }

@@ -18,8 +18,8 @@ Configure Opencast
 
 ### Configure OAuth authentication
 
-LTI uses OAuth to authenticate users. To enable OAuth in Opencast, edit `OPENCAST/etc/security/mh_default_org.xml` and
-uncomment the oAuthProtectedResourceFilter in the Authentication Filters section:
+LTI uses OAuth to authenticate users. To enable OAuth in Opencast, edit `etc/security/mh_default_org.xml` and uncomment
+the oauthProtectedResourceFilter in the Authentication Filters section:
 
 ```xml
     <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
@@ -28,8 +28,8 @@ uncomment the oAuthProtectedResourceFilter in the Authentication Filters section
 ```
 
 To configure OAuth consumers (e.g. a LMS), edit
-`OPENCAST/etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` and replace CONSUMERNAME,
-CONSUMERKEY, and CONSUMERSECRET with the values you will use in your LMS:
+`etc/org.opencastproject.kernel.security.OAuthConsumerDetailsService.cfg` and replace CONSUMERNAME, CONSUMERKEY, and
+CONSUMERSECRET with the values you will use in your LMS:
 
 ```properties
 oauth.consumer.name.1=CONSUMERNAME

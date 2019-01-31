@@ -26,8 +26,6 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.fun.juc.Immutables;
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.serviceregistry.api.Incidents;
@@ -43,6 +41,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -57,7 +58,7 @@ public class OsgiIncidentServiceTest {
 
   private AbstractIncidentService incidentService;
   private PersistenceEnv penv;
-  private Map<Long, Job> jobs = Mutables.map();
+  private Map<Long, Job> jobs = new HashMap<>();
   private Incidents incidents;
 
   /** @throws java.lang.Exception */
@@ -133,7 +134,7 @@ public class OsgiIncidentServiceTest {
     jobs.put(job.getId(), job);
     incidents.record(job, Incident.Severity.FAILURE, 1511);
     // retrieve the job incident
-    final List<Incident> incidents = incidentService.getIncidentsOfJob(Immutables.list(job.getId()));
+    final List<Incident> incidents = incidentService.getIncidentsOfJob(Collections.singletonList(job.getId()));
     assertEquals(1, incidents.size());
     assertEquals(Incident.Severity.FAILURE, incidents.get(0).getSeverity());
     assertEquals("localhost", incidents.get(0).getProcessingHost());
@@ -144,11 +145,11 @@ public class OsgiIncidentServiceTest {
 
   @Test
   public void testGenDbKeys() {
-    assertEquals(Immutables.list("org.opencastproject.composer.1.title.de.DE",
-            "org.opencastproject.composer.1.title.de", "org.opencastproject.composer.1.title"),
+    assertEquals(Arrays.asList("org.opencastproject.composer.1.title.de.DE", "org.opencastproject.composer.1.title.de",
+            "org.opencastproject.composer.1.title"),
             OsgiIncidentService.genDbKeys(OsgiIncidentService.localeToList(Locale.GERMANY),
                     "org.opencastproject.composer.1.title"));
-    assertEquals(Immutables.list("org.opencastproject.composer.1.title"),
-            OsgiIncidentService.genDbKeys(Immutables.<String> nil(), "org.opencastproject.composer.1.title"));
+    assertEquals(Collections.singletonList("org.opencastproject.composer.1.title"),
+            OsgiIncidentService.genDbKeys(Collections.emptyList(), "org.opencastproject.composer.1.title"));
   }
 }

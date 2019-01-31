@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -500,8 +499,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   /**
    * Get a prefix from {@link #bindings} but throw a {@link NamespaceBindingException} if none found.
    */
-  @Nonnull
-  protected String getPrefix(@Nonnull String namespaceURI) {
+  protected String getPrefix(String namespaceURI) {
     final String prefix = bindings.getPrefix(namespaceURI);
     if (prefix != null) {
       return prefix;
@@ -528,7 +526,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @throws NamespaceBindingException
    *           if the namespace name is not bound to a prefix
    */
-  @Nonnull
   protected String toQName(EName eName) {
     if (eName.hasNamespace()) {
       return toQName(getPrefix(eName.getNamespaceURI()), eName.getLocalName());
@@ -549,7 +546,6 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @throws NamespaceBindingException
    *           if the namespace name is not bound to a prefix
    */
-  @Nonnull
   protected EName toEName(String prefix, String localName) {
     return new EName(bindings.getNamespaceURI(prefix), localName);
   }
@@ -763,7 +759,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      * - attribute comparison (e_name -&gt; value)
      */
     @Override
-    public int compareTo(@Nonnull CatalogEntry o) {
+    public int compareTo(CatalogEntry o) {
       int c;
       c = getEName().compareTo(o.getEName());
       if (c != 0) {

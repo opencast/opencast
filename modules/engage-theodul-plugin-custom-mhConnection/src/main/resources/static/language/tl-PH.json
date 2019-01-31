@@ -1,8 +1,0 @@
-{
-    "value_locale": "en",
-    "error_mediaPackageInformationNotLoaded": "Mayroong dalawang posibleng mga dahilan para sa error na ito:",
-    "error_mediaPackageInformationNotLoaded_reason1": "Ang media ay hindi na magagamit pang muli",
-    "error_mediaPackageInformationNotLoaded_reason2": "Ang media ay protektado at kailangan mong mag-log in",
-    "error_noMediaInformationAvailable": "Walang impormasyon ng media na magagamit.",
-    "error_endpointNotAvailable": "Ang serbisyo sa paghahanap ay kasalukuyang hindi magagamit."
-}

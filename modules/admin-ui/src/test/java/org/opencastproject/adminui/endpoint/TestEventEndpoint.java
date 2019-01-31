@@ -50,7 +50,6 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
@@ -101,7 +100,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
@@ -150,6 +148,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -449,16 +448,16 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
     EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-            EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(licences).anyTimes();
+      EasyMock.anyBoolean())).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
 
     final IncidentTree r = new IncidentTreeImpl(
-            Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
-            Immutables.<IncidentTree> list(
-                    new IncidentTreeImpl(Immutables.list(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
-                            Immutables.<IncidentTree> list(new IncidentTreeImpl(
-                                    Immutables.list(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)), Immutables
-                                            .<IncidentTree> nil())))));
+            Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
+            Collections.singletonList(new IncidentTreeImpl(
+              Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.WARNING)),
+              Collections.singletonList(new IncidentTreeImpl(
+                Arrays.asList(mkIncident(Severity.WARNING), mkIncident(Severity.INFO)),
+                Collections.emptyList())))));
 
     IncidentService incidentService = EasyMock.createNiceMock(IncidentService.class);
     EasyMock.expect(incidentService.getIncident(EasyMock.anyLong())).andReturn(mkIncident(Severity.INFO)).anyTimes();

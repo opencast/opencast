@@ -588,9 +588,13 @@ public class IndexServiceImplTest {
     // Setup Authorization Service
     Tuple<MediaPackage, Attachment> returnValue = new Tuple<>(mediapackage, null);
     AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
-    EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class))).andReturn(returnValue)
-            .anyTimes();
+    try {
+      EasyMock.expect(authorizationService.setAcl(EasyMock.anyObject(MediaPackage.class),
+              EasyMock.anyObject(AclScope.class), EasyMock.anyObject(AccessControlList.class)))
+              .andReturn(returnValue).anyTimes();
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
     EasyMock.replay(authorizationService);
     return authorizationService;
   }
@@ -849,7 +853,7 @@ public class IndexServiceImplTest {
     // Using scheduler as the source of the media package here.
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
     EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andReturn(mp);
-    Capture<Opt<MediaPackage>> mpCapture = new Capture<>();
+    Capture<Opt<MediaPackage>> mpCapture = Capture.newInstance();
     schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class),
             EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
             EasyMock.capture(mpCapture),
@@ -1068,8 +1072,8 @@ public class IndexServiceImplTest {
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(multiUserUpdatedPresenter);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("There should be three presenters", updatedPresenters.getA().size() == 3);
-    assertTrue("There should be three technical presenters", updatedPresenters.getB().size() == 3);
+    assertEquals("There should be three presenters", 3, updatedPresenters.getA().size());
+    assertEquals("There should be three technical presenters", 3, updatedPresenters.getB().size());
     assertTrue("The list of technical presenters should contain all of the user names",
             updatedPresenters.getB().containsAll(multiUserList));
 
@@ -1077,8 +1081,8 @@ public class IndexServiceImplTest {
     metadata.removeField(metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName()));
     metadata.addField(mixedPresenters);
     updatedPresenters = indexServiceImpl.getTechnicalPresenters(metadata);
-    assertTrue("There should be six presenters", updatedPresenters.getA().size() == 6);
-    assertTrue("There should be three technical presenters", updatedPresenters.getB().size() == 3);
+    assertEquals("There should be six presenters", 6, updatedPresenters.getA().size());
+    assertEquals("There should be three technical presenters", 3, updatedPresenters.getB().size());
     assertTrue("The list of presenters should contain all of the non-user names",
             updatedPresenters.getA().containsAll(multiNonUserList));
     assertTrue("The list of presenters should contain all of the user full names",

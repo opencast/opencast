@@ -30,21 +30,24 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'resourceName',
-        label: 'USERS.BLACKLISTS.TABLE.NAME'
+        label: 'USERS.BLACKLISTS.TABLE.NAME',
+        sortable: true
       }, {
         name:  'date_from',
-        label: 'USERS.BLACKLISTS.TABLE.DATE_FROM'
+        label: 'USERS.BLACKLISTS.TABLE.DATE_FROM',
+        sortable: true
       }, {
         name:  'date_to',
-        label: 'USERS.BLACKLISTS.TABLE.DATE_TO'
+        label: 'USERS.BLACKLISTS.TABLE.DATE_TO',
+        sortable: true
       }, {
         name:  'reason',
         label: 'USERS.BLACKLISTS.TABLE.REASON',
-        translate: true
+        translate: true,
+        sortable: true
       }, {
         template: 'modules/recordings/partials/locationblacklistActionsCell.html',
-        label:    'USERS.BLACKLISTS.TABLE.ACTION',
-        dontSort: true
+        label:    'USERS.BLACKLISTS.TABLE.ACTION'
       }],
       caption:    'RECORDINGS.BLACKLISTS.TABLE.CAPTION',
       resource:   'locationblacklists',

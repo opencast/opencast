@@ -29,16 +29,20 @@ angular.module('adminNg.controllers')
     $scope.table.configure({
       columns: [{
         name:  'name',
-        label: 'CONFIGURATION.THEMES.TABLE.NAME'
+        label: 'CONFIGURATION.THEMES.TABLE.NAME',
+        sortable: true
       }, {
         name:  'description',
-        label: 'CONFIGURATION.THEMES.TABLE.DESCRIPTION'
+        label: 'CONFIGURATION.THEMES.TABLE.DESCRIPTION',
+        sortable: true
       },  {
         name:  'creator',
-        label: 'CONFIGURATION.THEMES.TABLE.CREATOR'
+        label: 'CONFIGURATION.THEMES.TABLE.CREATOR',
+        sortable: true
       }, {
         name:  'creation_date',
-        label: 'CONFIGURATION.THEMES.TABLE.CREATED'
+        label: 'CONFIGURATION.THEMES.TABLE.CREATED',
+        sortable: true
       },
       /*
              * Temporarily disabled
@@ -50,8 +54,7 @@ angular.module('adminNg.controllers')
              */
       {
         template: 'modules/configuration/partials/themesActionsCell.html',
-        label:    'CONFIGURATION.THEMES.TABLE.ACTION',
-        dontSort: true
+        label:    'CONFIGURATION.THEMES.TABLE.ACTION'
       }],
       caption:    'CONFIGURATION.THEMES.TABLE.CAPTION',
       resource:   'themes',

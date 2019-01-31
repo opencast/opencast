@@ -23,14 +23,11 @@ package org.opencastproject.job.api;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.fun.juc.Immutables.list;
-import static org.opencastproject.fun.juc.Immutables.map;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.xmlmatchers.XmlMatchers.similarTo;
 import static org.xmlmatchers.transform.XmlConverters.the;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 
 import org.apache.commons.io.IOUtils;
@@ -38,6 +35,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 public class IncidentParserTest {
@@ -47,8 +46,8 @@ public class IncidentParserTest {
   @Test
   public void testSerializationOfJaxbIncident() throws Exception {
     final Incident incident = new IncidentImpl(1, 2, "service", "localhost", new Date(0), Severity.FAILURE, "code",
-            list(tuple("title", "content"), tuple("Another title", "...and even more content")), map(tuple("key",
-                    "value")));
+            Arrays.asList(tuple("title", "content"), tuple("Another title", "...and even more content")),
+            Collections.singletonMap("key", "value"));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncident(incident));
     logger.info(marshaled);
     assertThat(the(marshaled),
@@ -59,10 +58,13 @@ public class IncidentParserTest {
 
   @Test
   public void testSerializationOfJaxbIncidentTree() throws Exception {
-    final IncidentTree tree = new IncidentTreeImpl(list(incident(1), incident(2)),
-            Immutables.<IncidentTree> list(new IncidentTreeImpl(list(incident(3)), Immutables
-                    .<IncidentTree> list(new IncidentTreeImpl(list(incident(4), incident(5)), Immutables
-                            .<IncidentTree> nil())))));
+    final IncidentTree tree = new IncidentTreeImpl(
+            Arrays.asList(incident(1), incident(2)),
+            Collections.singletonList(new IncidentTreeImpl(
+                    Collections.singletonList(incident(3)),
+                    Collections.singletonList(new IncidentTreeImpl(
+                            Arrays.asList(incident(4), incident(5)),
+                            Collections.emptyList())))));
     final String marshaled = IncidentParser.I.toXml(new JaxbIncidentTree(tree));
     logger.info(marshaled);
     assertThat(the(marshaled),
@@ -74,7 +76,7 @@ public class IncidentParserTest {
   }
 
   public Incident incident(long id) {
-    return new IncidentImpl(id, 2, "service", "localhost", new Date(id), Severity.FAILURE, "code", list(tuple("title",
-            "content")), map(tuple("key", "value")));
+    return new IncidentImpl(id, 2, "service", "localhost", new Date(id), Severity.FAILURE, "code",
+            Collections.singletonList(tuple("title", "content")), Collections.singletonMap("key", "value"));
   }
 }

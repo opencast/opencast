@@ -69,10 +69,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   protected Long duration = null;
 
   @XmlElement(name = "audio")
-  protected List<AudioStream> audio = new ArrayList<AudioStream>();
+  protected List<AudioStream> audio = new ArrayList<>();
 
   @XmlElement(name = "video")
-  protected List<VideoStream> video = new ArrayList<VideoStream>();
+  protected List<VideoStream> video = new ArrayList<>();
 
   @XmlAttribute(name = "transport")
   protected StreamingProtocol transport = null;
@@ -144,12 +144,10 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
 
   @Override
   public Stream[] getStreams() {
-    List<Stream> streams = new ArrayList<Stream>(audio.size() + video.size());
-    for (Stream s : audio)
-      streams.add(s);
-    for (Stream s : video)
-      streams.add(s);
-    return streams.toArray(new Stream[streams.size()]);
+    List<Stream> streams = new ArrayList<>(audio.size() + video.size());
+    streams.addAll(audio);
+    streams.addAll(video);
+    return streams.toArray(new Stream[0]);
   }
 
   /**

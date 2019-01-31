@@ -26,8 +26,6 @@ import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 
-import org.apache.commons.beanutils.BeanUtils;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -45,11 +43,6 @@ import javax.ws.rs.Produces;
 public class RestDocData extends DocData {
 
   /**
-   * The REGEX pattern used to find the macros in the REST documentation.
-   */
-  private static final String REST_DOC_MACRO_PATTERN = "\\$\\{(.+?)\\}";
-
-  /**
    * The name to identify the endpoint holder for read endpoints (get/head).
    */
   private static final String READ_ENDPOINT_HOLDER_NAME = "READ";
@@ -65,17 +58,6 @@ public class RestDocData extends DocData {
   public static final String PATH_PARAM_COUNTING_REGEX = "\\{(.+?)\\}";
 
   /**
-   * Regular expression used to validate a path.
-   */
-  // FIXME: This regex doesn't match all valid paths that can occur in rest endpoint @Path;
-  public static final String PATH_VALIDATION_REGEX = "^[\\w\\/{}|\\:\\.\\*\\+|\\[\\w-\\w\\]\\+]+$";
-
-  /**
-   * A slash character.
-   */
-  public static final String SLASH = "/";
-
-  /**
    * List of RestEndpointHolderData which each stores a group of endpoints. Currently there are 2 groups, READ group and
    * WRITE group.
    */
@@ -84,7 +66,7 @@ public class RestDocData extends DocData {
   /**
    * The service object which this RestDocData is about.
    */
-  private Object serviceObject = null;
+  private Object serviceObject;
 
   /**
    * A map of macro values for REST documentation.
@@ -244,58 +226,7 @@ public class RestDocData extends DocData {
    * @return true if this path is valid, false otherwise
    */
   public static boolean isValidPath(String path) {
-    boolean valid = true;
-    if (isBlank(path)) {
-      valid = false;
-    } else {
-      if (SLASH.equals(path)) {
-        valid = true;
-      } else if (path.endsWith(SLASH) || !path.startsWith(SLASH)) {
-        valid = false;
-      } else {
-        valid = path.matches(PATH_VALIDATION_REGEX);
-      }
-    }
-    return valid;
-  }
-
-  /**
-   * Takes a string and replaces any REST doc macros in it with the corresponding values.
-   *
-   * @param value
-   *          the string to check
-   * @return a string where all the macros are replaced by the corresponding values
-   */
-  public String processMacro(String value) {
-    Pattern pattern = Pattern.compile(REST_DOC_MACRO_PATTERN);
-    Matcher matcher = pattern.matcher(value);
-
-    StringBuilder sb = new StringBuilder();
-    int begin = 0;
-    while (matcher.find()) {
-      sb.append(value.substring(begin, matcher.start()));
-      String macro = matcher.group(1);
-      // All macros that start with "this." is a "local" macro.
-      if (macro.startsWith("this.")) {
-        try {
-          sb.append(BeanUtils.getProperty(serviceObject, macro.substring(5)));
-        } catch (Exception e) {
-          // If there is any problem (e.g. the property cannot be found), the macro would be displayed directly.
-          sb.append(matcher.group());
-        }
-      } else {
-        if (macros.containsKey(matcher.group(1))) {
-          sb.append(macros.get(matcher.group(1)));
-        } else {
-          // If the macro cannot be found in the list of global macro, it would be displayed directly.
-          sb.append(matcher.group());
-        }
-      }
-      begin = matcher.end();
-    }
-    sb.append(value.substring(begin, value.length()));
-
-    return sb.toString();
+    return path != null && path.matches("^/$|^/[\\w/{}|:.*+]*[\\w}.]$");
   }
 
   /**
@@ -320,11 +251,11 @@ public class RestDocData extends DocData {
   public void addEndpoint(RestQuery restQuery, Class<?> returnType, Produces produces, String httpMethodString,
           Path path) {
     String pathValue = path.value().startsWith("/") ? path.value() : "/" + path.value();
-    RestEndpointData endpoint = new RestEndpointData(returnType, this.processMacro(restQuery.name()), httpMethodString,
-            pathValue, processMacro(restQuery.description()));
+    RestEndpointData endpoint = new RestEndpointData(returnType, restQuery.name(), httpMethodString, pathValue,
+            restQuery.description());
     // Add return description if needed
     if (!restQuery.returnDescription().isEmpty()) {
-      endpoint.addNote("Return value description: " + processMacro(restQuery.returnDescription()));
+      endpoint.addNote("Return value description: " + restQuery.returnDescription());
     }
 
     // Add formats
@@ -336,25 +267,25 @@ public class RestDocData extends DocData {
 
     // Add responses
     for (RestResponse restResp : restQuery.reponses()) {
-      endpoint.addStatus(restResp, this);
+      endpoint.addStatus(restResp);
     }
 
     // Add body parameter
     if (restQuery.bodyParameter().type() != RestParameter.Type.NO_PARAMETER) {
-      endpoint.addBodyParam(restQuery.bodyParameter(), this);
+      endpoint.addBodyParam(restQuery.bodyParameter());
     }
 
     // Add path parameter
     for (RestParameter pathParam : restQuery.pathParameters()) {
-      endpoint.addPathParam(new RestParamData(pathParam, this));
+      endpoint.addPathParam(new RestParamData(pathParam));
     }
 
     // Add query parameter (required and optional)
     for (RestParameter restParam : restQuery.restParameters()) {
       if (restParam.isRequired()) {
-        endpoint.addRequiredParam(new RestParamData(restParam, this));
+        endpoint.addRequiredParam(new RestParamData(restParam));
       } else {
-        endpoint.addOptionalParam(new RestParamData(restParam, this));
+        endpoint.addOptionalParam(new RestParamData(restParam));
       }
     }
 

@@ -23,8 +23,8 @@
 package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
-import static org.opencastproject.util.data.Collections.find;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -33,21 +33,14 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.MetadataValues;
 import org.opencastproject.metadata.api.StaticMetadata;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Predicate;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
-import org.easymock.IAnswer;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-
-import junit.framework.Assert;
 
 public final class StaticMetadataServiceDublinCoreImplTest {
 
@@ -57,17 +50,8 @@ public final class StaticMetadataServiceDublinCoreImplTest {
     StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
     StaticMetadata md = ms.getMetadata(mp);
     assertEquals("Land and Vegetation: Key players on the Climate Scene",
-                 find(md.getTitles(), new Predicate<MetadataValue<String>>() {
-                   @Override
-                   public Boolean apply(MetadataValue<String> v) {
-                     return v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED);
-                   }
-                 }).map(new Function<MetadataValue<String>, String>() {
-                   @Override
-                   public String apply(MetadataValue<String> v) {
-                     return v.getValue();
-                   }
-                 }).getOrElse(""));
+            md.getTitles().stream().filter(v -> v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED))
+                    .findFirst().map(MetadataValue::getValue).orElse(""));
     assertEquals(createDate(2007, 12, 5, 0, 0, 0), md.getCreated().get());
   }
 
@@ -90,14 +74,10 @@ public final class StaticMetadataServiceDublinCoreImplTest {
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     final File dcFile = new File(getClass().getResource("/dublincore.xml").toURI());
     final File dcFileDefect = new File(getClass().getResource("/dublincore-defect.xml").toURI());
-    Assert.assertNotNull(dcFile);
+    assertNotNull(dcFile);
     // set expectations
-    EasyMock.expect(workspace.get((URI) EasyMock.anyObject())).andAnswer(new IAnswer<File>() {
-      @Override
-      public File answer() throws Throwable {
-        return EasyMock.getCurrentArguments()[0].toString().contains("-defect") ? dcFileDefect : dcFile;
-      }
-    }).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(
+            () -> EasyMock.getCurrentArguments()[0].toString().contains("-defect") ? dcFileDefect : dcFile).anyTimes();
     // put into replay mode
     EasyMock.replay(workspace);
     return workspace;
@@ -108,12 +88,8 @@ public final class StaticMetadataServiceDublinCoreImplTest {
     MediaPackageBuilder mediaPackageBuilder = builderFactory.newMediaPackageBuilder();
     URL rootUrl = getClass().getResource("/");
     mediaPackageBuilder.setSerializer(new DefaultMediaPackageSerializerImpl(rootUrl));
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream(manifest);
+    try (InputStream is = getClass().getResourceAsStream(manifest)) {
       return mediaPackageBuilder.loadFromXml(is);
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 }

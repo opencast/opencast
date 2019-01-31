@@ -26,7 +26,6 @@ import org.opencastproject.capture.admin.api.AgentState;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.index.service.resources.list.api.ResourceListProvider;
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
-import org.opencastproject.security.api.Organization;
 
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
@@ -62,7 +61,7 @@ public class AgentsListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization) {
+  public Map<String, String> getList(String listName, ResourceListQuery query) {
     Map<String, String> result = new TreeMap<String, String>();
 
     if (STATUS.equals(listName)) {

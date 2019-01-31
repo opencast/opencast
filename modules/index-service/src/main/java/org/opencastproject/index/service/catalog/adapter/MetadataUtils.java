@@ -116,6 +116,7 @@ public final class MetadataUtils {
     newField.setNamespace(other.getNamespace());
     newField.setOutputID(Opt.some(other.getOutputID()));
     newField.setPattern(other.getPattern());
+    newField.setDelimiter(other.getDelimiter());
     newField.setOrder(other.getOrder());
     newField.setReadOnly(other.isReadOnly());
     newField.setRequired(other.isRequired());

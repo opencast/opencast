@@ -21,6 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CREATED;
@@ -31,10 +32,10 @@ import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
-import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
+import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
-import org.opencastproject.rest.RestServiceTestEnv;
+import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONArray;
@@ -125,7 +126,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testCreateSeriesJson() throws Exception {
-    String metadataJson = IOUtils.toString(getClass().getResource("/series/create-series-metadata.json"));
+    String metadataJson = IOUtils.toString(getClass().getResource("/series/create-series-metadata.json"), UTF_8);
     given().formParam("metadata", metadataJson).formParam("acl", "[]").formParam("theme", "1234")
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_CREATED).when().post(env.host("/"));
   }
@@ -156,7 +157,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testGetSeriesMetadataJson() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata.json"));
+    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata.json"), UTF_8);
     final String response = given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when().get(env.host("/{seriesId}/metadata"))
             .asString();
@@ -179,7 +180,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testGetSeriesMetadataByTypeJson() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata-dublincore.json"));
+    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata-dublincore.json"), UTF_8);
     final String response = given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")
             .queryParam("type", "dublincore/series").accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK)
             .when().get(env.host("/{seriesId}/metadata")).asString();
@@ -203,7 +204,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testMissingSeriesUpdateSeriesMetadataJson() throws Exception {
-    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"));
+    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"), UTF_8);
     given().pathParam("seriesId", "unknown-series-id").pathParam("type", "dublincore").formParam("metadata", metadata)
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_NOT_FOUND).when()
             .put(env.host("/{seriesId}/metadata/{type}"));
@@ -211,7 +212,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testMissingCatalogUpdateSeriesMetadataJson() throws Exception {
-    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"));
+    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"), UTF_8);
     given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f").pathParam("type", "missing")
             .formParam("metadata", metadata).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_NOT_FOUND)
             .when().put(env.host("/{seriesId}/metadata/{type}"));
@@ -219,7 +220,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testUpdateSeriesMetadataJson() throws Exception {
-    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"));
+    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"), UTF_8);
     given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f").queryParam("type", "dublincore/series")
             .formParam("metadata", metadata).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when()
             .put(env.host("/{seriesId}/metadata"));
@@ -248,7 +249,7 @@ public class SeriesEndpointTest {
 
   @Test
   public void testDeleteOtherSeriesMetadataJson() throws Exception {
-    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"));
+    String metadata = IOUtils.toString(getClass().getResource("/series/metadata/put-metadata.json"), UTF_8);
     given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f").queryParam("type", "othercatalog/episode")
             .formParam("metadata", metadata).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_NO_CONTENT)
             .when().delete(env.host("/{seriesId}/metadata"));

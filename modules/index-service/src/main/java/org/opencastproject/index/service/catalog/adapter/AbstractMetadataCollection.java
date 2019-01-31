@@ -231,8 +231,8 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
     removeField(current);
     MetadataField<Iterable<String>> field = MetadataField.createIterableStringMetadataField(current.getInputID(),
             Opt.some(current.getOutputID()), current.getLabel(), current.isReadOnly(), current.isRequired(),
-            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getOrder(),
-            current.getNamespace());
+            current.isTranslatable(), current.getCollection(), current.getCollectionID(), current.getDelimiter(),
+            current.getOrder(), current.getNamespace());
     field.setValue(value);
     addField(field);
   }
@@ -257,7 +257,7 @@ public abstract class AbstractMetadataCollection implements MetadataCollection {
 
     Opt<Map<String, String>> list;
     try {
-      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), null, true));
+      list = Opt.some(listProviderService.getList(name, new ResourceListQueryImpl(), true));
     } catch (ListProviderException e) {
       logger.warn("Not able to find a value list with the name {}", name);
       list = Opt.none();

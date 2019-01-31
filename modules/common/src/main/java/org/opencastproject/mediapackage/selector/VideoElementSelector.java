@@ -24,10 +24,7 @@ package org.opencastproject.mediapackage.selector;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.TrackSupport;
-import org.opencastproject.mediapackage.VideoStream;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -112,18 +109,15 @@ public class VideoElementSelector extends AbstractMediaPackageElementSelector<Tr
   public Collection<Track> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
     // instead of relying on the broken superclass, we'll inspect every track
     // Collection<Track> candidates = super.select(mediaPackage);
-    Collection<Track> candidates = Arrays.asList(mediaPackage.getTracks());
     Set<Track> result = new HashSet<Track>();
 
     boolean foundVideo = false;
 
     // Look for a track containing video
-    for (Track t : candidates) {
-      if (TrackSupport.byType(t.getStreams(), VideoStream.class).length > 0) {
-        if (!foundVideo && (videoFlavor == null || videoFlavor.equals(t.getFlavor()))) {
-          result.add(t);
-          foundVideo = true;
-        }
+    for (Track t : mediaPackage.getTracks()) {
+      if (t.hasVideo() && !foundVideo && (videoFlavor == null || videoFlavor.equals(t.getFlavor()))) {
+        result.add(t);
+        foundVideo = true;
       }
     }
     return result;

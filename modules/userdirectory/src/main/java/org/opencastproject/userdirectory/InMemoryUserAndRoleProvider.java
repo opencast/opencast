@@ -275,7 +275,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
     return getOrganizationUsers().stream()
             .filter(user -> like(user.getUsername(), query))
             .sorted(Comparator.comparing(User::getUsername))
-            .skip(offset).limit(limit < 0 ? Long.MAX_VALUE : limit)
+            .skip(offset).limit(limit <= 0 ? Long.MAX_VALUE : limit)
             .iterator();
   }
 
@@ -291,7 +291,7 @@ public class InMemoryUserAndRoleProvider implements UserProvider, RoleProvider {
             .filter(role -> (like(role.getName(), query) || like(role.getDescription(), query))
                     && !(target == Role.Target.ACL && GLOBAL_SUDO_ROLE.equals(role.getName())))
             .sorted(Comparator.comparing(Role::getName))
-            .skip(offset).limit(limit < 0 ? Long.MAX_VALUE : limit)
+            .skip(offset).limit(limit <= 0 ? Long.MAX_VALUE : limit)
             .iterator();
   }
 

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -76,10 +76,6 @@
       <artifactId>guava</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>jsr305</artifactId>
-    </dependency>
-    <dependency>
       <groupId>net.fortuna.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>
@@ -109,7 +105,7 @@
     <dependency>
       <groupId>de.schlichtherle</groupId>
       <artifactId>truezip</artifactId>
-      <version>6.8</version>
+      <version>6.8.4</version>
       <exclusions>
         <exclusion>
           <groupId>bouncycastle</groupId>
@@ -133,21 +129,6 @@
       <groupId>io.rest-assured</groupId>
       <artifactId>xml-path</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-bundle</artifactId>
-      <version>1.19</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-server</artifactId>
-      <version>9.2.19.v20160908</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jetty</groupId>
-      <artifactId>jetty-servlet</artifactId>
-      <version>9.2.19.v20160908</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -215,7 +196,6 @@
     <dependency>
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
-      <version>1.5</version>
       <scope>test</scope>
     </dependency>
     <!-- for xml matchers (org.w3c.dom.ElementTraversal) -->

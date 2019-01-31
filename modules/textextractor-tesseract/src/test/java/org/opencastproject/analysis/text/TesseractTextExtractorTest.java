@@ -61,7 +61,7 @@ public class TesseractTextExtractorTest {
   protected String text = "Land and Vegetation Key players on the";
 
   /** Additional options for tesseract */
-  protected String addopts = "-psm 3";
+  protected String addopts = "--psm 3";
 
   /** True to run the tests */
   private static boolean tesseractInstalled = true;

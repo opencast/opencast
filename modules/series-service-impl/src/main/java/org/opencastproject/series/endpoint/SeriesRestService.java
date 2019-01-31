@@ -86,6 +86,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -136,6 +137,47 @@ public class SeriesRestService {
 
   /** Suffix to mark descending ordering of results */
   public static final String DESCENDING_SUFFIX = "_DESC";
+
+  private static final String SAMPLE_DUBLIN_CORE = "<?xml version=\"1.0\"?>\n"
+          + "<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" "
+          + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+          + "    xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" "
+          + "    xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n"
+          + "    xmlns:dcterms=\"http://purl.org/dc/terms/\" "
+          + "    xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n"
+          + "  <dcterms:title xml:lang=\"en\">\n"
+          + "    Land and Vegetation: Key players on the Climate Scene\n"
+          + "  </dcterms:title>\n"
+          + "  <dcterms:subject>"
+          + "    climate, land, vegetation\n"
+          + "  </dcterms:subject>\n"
+          + "  <dcterms:description xml:lang=\"en\">\n"
+          + "    Introduction lecture from the Institute for\n"
+          + "    Atmospheric and Climate Science.\n"
+          + "  </dcterms:description>\n"
+          + "  <dcterms:publisher>\n"
+          + "    ETH Zurich, Switzerland\n"
+          + "  </dcterms:publisher>\n"
+          + "  <dcterms:identifier>\n"
+          + "    10.0000/5819\n"
+          + "  </dcterms:identifier>\n"
+          + "  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n"
+          + "    2007-12-05\n"
+          + "  </dcterms:modified>\n"
+          + "  <dcterms:format xsi:type=\"dcterms:IMT\">\n"
+          + "    video/x-dv\n"
+          + "  </dcterms:format>\n"
+          + "</dublincore>";
+
+  private static final String SAMPLE_ACCESS_CONTROL_LIST =
+          "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                  + "<acl xmlns=\"http://org.opencastproject.security\">\n"
+                  + "  <ace>\n"
+                  + "    <role>admin</role>\n"
+                  + "    <action>delete</action>\n"
+                  + "    <allow>true</allow>\n"
+                  + "  </ace>\n"
+                  + "</acl>";
 
   /**
    * OSGi callback for setting series service.
@@ -276,13 +318,17 @@ public class SeriesRestService {
   @POST
   @Path("/")
   @RestQuery(name = "updateSeries", description = "Updates a series", returnDescription = "No content.", restParameters = {
-          @RestParameter(name = "series", isRequired = true, defaultValue = "${this.sampleDublinCore}", description = "The series document", type = TEXT),
-          @RestParameter(name = "acl", isRequired = false, defaultValue = "${this.sampleAccessControlList}", description = "The access control list for the series", type = TEXT) }, reponses = {
+          @RestParameter(name = "series", isRequired = true, defaultValue = SAMPLE_DUBLIN_CORE, description = "The series document", type = TEXT),
+          @RestParameter(name = "acl", isRequired = false, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+                         description = "The access control list for the series", type = TEXT),
+          @RestParameter(name = "override", isRequired = false, defaultValue = "false",
+                         description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, reponses = {
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
           @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
           @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created.") })
-  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl)
+  public Response addOrUpdateSeries(@FormParam("series") String series, @FormParam("acl") String accessControl,
+          @DefaultValue("false") @FormParam("override") boolean override)
           throws UnauthorizedException {
     if (series == null) {
       logger.warn("series that should be added is null");
@@ -308,7 +354,7 @@ public class SeriesRestService {
           logger.warn("Could not parse ACL: {}", e.getMessage());
           return Response.status(BAD_REQUEST).build();
         }
-        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl);
+        seriesService.updateAccessControl(dc.getFirst(PROPERTY_IDENTIFIER), acl, override);
       }
       if (newSeries == null) {
         logger.debug("Updated series {} ", dc.getFirst(PROPERTY_IDENTIFIER));
@@ -328,13 +374,23 @@ public class SeriesRestService {
 
   @POST
   @Path("/{seriesID:.+}/accesscontrol")
-  @RestQuery(name = "updateAcl", description = "Updates the access control list for a series", returnDescription = "No content.", restParameters = { @RestParameter(name = "acl", isRequired = true, defaultValue = "${this.sampleAccessControlList}", description = "The access control list for the series", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING) }, reponses = {
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
-          @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-          @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
-  public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl)
+  @RestQuery(name = "updateAcl", description = "Updates the access control list for a series",
+          returnDescription = "No content.",
+    restParameters = {
+      @RestParameter(name = "acl", isRequired = true, defaultValue = SAMPLE_ACCESS_CONTROL_LIST,
+                     description = "The access control list for the series", type = TEXT),
+      @RestParameter(name = "override", isRequired = false, defaultValue = "false",
+                     description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)
+    }, pathParameters = {
+      @RestParameter(name = "seriesID", isRequired = true, description = "The series identifier", type = STRING)
+  }, reponses = {
+      @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
+      @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
+      @RestResponse(responseCode = SC_CREATED, description = "The access control list has been created."),
+      @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
+      @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
+  public Response updateAccessControl(@PathParam("seriesID") String seriesID, @FormParam("acl") String accessControl,
+          @DefaultValue("false") @FormParam("override") boolean override)
           throws UnauthorizedException {
     if (accessControl == null) {
       logger.warn("Access control parameter is null.");
@@ -348,7 +404,7 @@ public class SeriesRestService {
       return Response.status(BAD_REQUEST).build();
     }
     try {
-      boolean updated = seriesService.updateAccessControl(seriesID, acl);
+      boolean updated = seriesService.updateAccessControl(seriesID, acl, override);
       if (updated) {
         return Response.status(NO_CONTENT).build();
       }
@@ -374,7 +430,7 @@ public class SeriesRestService {
       logger.warn("Series with id '{}' does not exist.", seriesId);
       return Response.status(Status.NOT_FOUND).build();
     } catch (Exception e) {
-      logger.warn("Unable to get series opt out status with id '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to get series opt out status with id '{}'", seriesId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -567,7 +623,7 @@ public class SeriesRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.warn("Could not perform search query: {}", ExceptionUtils.getStackTrace(e));
+      logger.warn("Could not perform search query", e);
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
@@ -793,7 +849,7 @@ public class SeriesRestService {
         return R.notFound();
       }
     } catch (SeriesException e) {
-      logger.warn("Error while retrieving elements for sieres '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while retrieving elements for sieres '{}'", seriesId, e);
       return R.serverError();
     }
   }
@@ -850,10 +906,10 @@ public class SeriesRestService {
         }
       }
     } catch (IOException e) {
-      logger.error("Error while trying to read from request: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error while trying to read from request", e);
       return R.serverError();
     } catch (SeriesException e) {
-      logger.warn("Error while adding element to series '{}': {}", seriesId, ExceptionUtils.getStackTrace(e));
+      logger.warn("Error while adding element to series '{}'", seriesId, e);
       return R.serverError();
     } finally {
       IOUtils.closeQuietly(is);
@@ -880,24 +936,6 @@ public class SeriesRestService {
     } catch (SeriesException e) {
       return R.serverError();
     }
-  }
-
-  /**
-   * Generates sample Dublin core.
-   *
-   * @return sample Dublin core
-   */
-  public String getSampleDublinCore() {
-    return "<?xml version=\"1.0\"?>\n<dublincore xmlns=\"http://www.opencastproject.org/xsd/1.0/dublincore/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n  xsi:schemaLocation=\"http://www.opencastproject.org http://www.opencastproject.org/schema.xsd\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n  xmlns:dcterms=\"http://purl.org/dc/terms/\" xmlns:oc=\"http://www.opencastproject.org/matterhorn/\">\n\n  <dcterms:title xml:lang=\"en\">\n    Land and Vegetation: Key players on the Climate Scene\n    </dcterms:title>\n  <dcterms:subject>\n    climate, land, vegetation\n    </dcterms:subject>\n  <dcterms:description xml:lang=\"en\">\n    Introduction lecture from the Institute for\n    Atmospheric and Climate Science.\n    </dcterms:description>\n  <dcterms:publisher>\n    ETH Zurich, Switzerland\n    </dcterms:publisher>\n  <dcterms:identifier>\n    10.0000/5819\n    </dcterms:identifier>\n  <dcterms:modified xsi:type=\"dcterms:W3CDTF\">\n    2007-12-05\n    </dcterms:modified>\n  <dcterms:format xsi:type=\"dcterms:IMT\">\n    video/x-dv\n    </dcterms:format>\n  <oc:promoted>\n    true\n  </oc:promoted>\n</dublincore>";
-  }
-
-  /**
-   * Generates sample access control list.
-   *
-   * @return sample ACL
-   */
-  public String getSampleAccessControlList() {
-    return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><acl xmlns=\"http://org.opencastproject.security\"><ace><role>admin</role><action>delete</action><allow>true</allow></ace></acl>";
   }
 
 }

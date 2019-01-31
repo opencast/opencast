@@ -52,7 +52,7 @@ public final class RestParamData {
    * parameter. "size" is used to control the size of text box for other types of parameter. Please look at the template
    * to see how this is used.
    */
-  private Map<String, String> attributes = new HashMap<String, String>();
+  private Map<String, String> attributes = new HashMap<>();
 
   /**
    * Convenient constructor: take a RestParameter annotation and create a RestParamData from it.
@@ -60,9 +60,11 @@ public final class RestParamData {
    * @param restParam
    *          the RestParameter annotation type that is to be transformed to RestParamData
    */
-  public RestParamData(RestParameter restParam, RestDocData restDocData) {
-    this(restDocData.processMacro(restParam.name()), Type.valueOf(restParam.type().name()), restDocData
-            .processMacro(restParam.defaultValue()), restDocData.processMacro(restParam.description()),
+  public RestParamData(RestParameter restParam) {
+    this(restParam.name(),
+            Type.valueOf(restParam.type().name()),
+            restParam.defaultValue(),
+            restParam.description(),
             JaxbXmlSchemaGenerator.getXmlSchema(restParam.jaxbClass()));
   }
 

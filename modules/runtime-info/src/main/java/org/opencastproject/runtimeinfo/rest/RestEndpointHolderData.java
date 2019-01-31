@@ -75,7 +75,7 @@ public class RestEndpointHolderData {
   public void addEndPoint(RestEndpointData endpoint) {
     if (endpoint != null) {
       if (endpoints == null) {
-        endpoints = new Vector<RestEndpointData>();
+        endpoints = new Vector<>();
       }
       endpoints.add(endpoint);
       Collections.sort(endpoints);
@@ -106,10 +106,9 @@ public class RestEndpointHolderData {
    *
    * @return a copy of this RestEndpointHolderData object
    *
-   * @throws CloneNotSupportedException
    */
   @Override
-  protected Object clone() throws CloneNotSupportedException {
+  protected Object clone() {
     return duplicate();
   }
 
@@ -138,7 +137,7 @@ public class RestEndpointHolderData {
    */
   public List<RestEndpointData> getEndpoints() {
     if (endpoints == null) {
-      endpoints = new Vector<RestEndpointData>(0);
+      endpoints = new Vector<>(0);
     }
     return endpoints;
   }

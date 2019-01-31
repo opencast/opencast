@@ -94,7 +94,7 @@ describe('Events API Resource', function () {
             $httpBackend.flush();
             expect(data.rows.length).toBe(2);
             expect(data.rows[0].title).toBe(sampleJSON.results[0].title);
-            expect(data.rows[0].presenter).toEqual(sampleJSON.results[0].presenters.join(', '));
+            expect(data.rows[0].presenters).toEqual(sampleJSON.results[0].presenters);
             expect(data.rows[0].date).toBe(sampleJSON.results[0].start_date);
             expect(data.rows[0].start_date).toBe('2012-12-02T10:00:00Z');
             expect(data.rows[0].end_date).toBe('2012-12-02T11:15:00Z');

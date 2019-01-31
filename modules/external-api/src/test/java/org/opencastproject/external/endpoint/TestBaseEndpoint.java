@@ -27,7 +27,7 @@ import static org.opencastproject.systems.OpencastConstants.ADMIN_DOC_URL_ORG_PR
 import static org.opencastproject.systems.OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY;
 import static org.opencastproject.systems.OpencastConstants.FEED_URL_ORG_PROPERTY;
 
-import org.opencastproject.external.impl.index.ExternalIndex;
+import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;

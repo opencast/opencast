@@ -28,9 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-import static org.elasticsearch.common.lang3.StringUtils.isNoneBlank;
+import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -39,7 +37,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.external.common.ApiVersion;
-import org.opencastproject.external.impl.index.ExternalIndex;
+import org.opencastproject.external.index.ExternalIndex;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RestUtils;
@@ -244,7 +242,7 @@ public class WorkflowsEndpoint {
 
     // Apply sort
     // TODO: this only uses the last sorting criteria
-    if (StringUtils.isNoneBlank(sort)) {
+    if (isNoneBlank(sort)) {
       Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
       for (SortCriterion criterion : sortCriteria) {
         boolean isASC = criterion.getOrder() != SearchQuery.Order.Descending;
@@ -305,8 +303,8 @@ public class WorkflowsEndpoint {
     try {
       workflowInstances = workflowService.getWorkflowInstances(query);
     } catch (Exception e) {
-      logger.error("The workflow service was not able to get the workflow instances: {}", getStackTrace(e));
-      return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", getMessage(e));
+      logger.error("The workflow service was not able to get the workflow instances", e);
+      return ApiResponses.serverError("Could not retrieve workflow instances, reason: '%s'", e.getMessage());
     }
 
     List<JValue> json = Arrays.stream(workflowInstances.getItems())
@@ -373,10 +371,10 @@ public class WorkflowsEndpoint {
               workflowInstanceToJSON(wi, withOperations, withConfiguration));
     } catch (IllegalStateException e) {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponses.Json.conflict(requestedVersion, obj(f("message", v(getMessage(e), BLANK))));
+      return ApiResponses.Json.conflict(requestedVersion, obj(f("message", v(e.getMessage(), BLANK))));
     } catch (Exception e) {
-      logger.error("Could not create workflow instances: {}", getStackTrace(e));
-      return ApiResponses.serverError("Could not create workflow instances, reason: '%s'", getMessage(e));
+      logger.error("Could not create workflow instances", e);
+      return ApiResponses.serverError("Could not create workflow instances, reason: '%s'", e.getMessage());
     }
   }
 
@@ -400,8 +398,8 @@ public class WorkflowsEndpoint {
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
-      logger.error("The workflow service was not able to get the workflow instance: {}", getStackTrace(e));
-      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", getMessage(e));
+      logger.error("The workflow service was not able to get the workflow instance", e);
+      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
     }
 
     return ApiResponses.Json.ok(acceptHeader, workflowInstanceToJSON(wi, withOperations, withConfiguration));
@@ -502,8 +500,8 @@ public class WorkflowsEndpoint {
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
-      logger.error("The workflow service was not able to get the workflow instance: {}", getStackTrace(e));
-      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", getMessage(e));
+      logger.error("The workflow service was not able to get the workflow instance", e);
+      return ApiResponses.serverError("Could not retrieve workflow instance, reason: '%s'", e.getMessage());
     }
   }
 
@@ -526,8 +524,8 @@ public class WorkflowsEndpoint {
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (Exception e) {
-      logger.error("Could not delete workflow instances: {}", getStackTrace(e));
-      return ApiResponses.serverError("Could not delete workflow instances, reason: '%s'", getMessage(e));
+      logger.error("Could not delete workflow instances", e);
+      return ApiResponses.serverError("Could not delete workflow instances, reason: '%s'", e.getMessage());
     }
 
     return Response.noContent().build();

@@ -31,6 +31,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
@@ -50,8 +52,9 @@ public class AssetDto {
   private Long id;
 
   // foreign key referencing SnapshotDto.id
-  @Column(name = "snapshot_id", nullable = false)
-  private Long snapshotId;
+  @ManyToOne(targetEntity = SnapshotDto.class)
+  @JoinColumn(name = "snapshot_id", referencedColumnName = "id", nullable = false)
+  private SnapshotDto snapshot;
 
   @Column(name = "mediapackage_element_id", nullable = false, length = 128)
   private String mediaPackageElementId;
@@ -71,9 +74,9 @@ public class AssetDto {
   /**
    * Create a new DTO.
    */
-  public static AssetDto mk(String mediaPackageElementId, long snapshotId, String checksum, Opt<MimeType> mimeType, String storeageId, long size) {
+  public static AssetDto mk(String mediaPackageElementId, SnapshotDto snapshot, String checksum, Opt<MimeType> mimeType, String storeageId, long size) {
     final AssetDto dto = new AssetDto();
-    dto.snapshotId = snapshotId;
+    dto.snapshot = snapshot;
     dto.mediaPackageElementId = mediaPackageElementId;
     dto.checksum = checksum;
     dto.mimeType = mimeType.isSome() ? mimeType.get().toString() : null;
@@ -104,6 +107,14 @@ public class AssetDto {
 
   void setStorageId(String storage) {
     this.storageId = storage;
+  }
+
+  public SnapshotDto getSnapshot() {
+    return snapshot;
+  }
+
+  public void setSnapshot(SnapshotDto snapshot) {
+    this.snapshot = snapshot;
   }
 }
 

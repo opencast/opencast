@@ -93,8 +93,64 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(ComposerRestService.class);
 
-  /** The rest documentation */
-  protected String docs;
+  private static final String VIDEO_TRACK_DEFAULT = "<track id=\"track-1\" type=\"presentation/source\">\n"
+          + "  <mimetype>video/quicktime</mimetype>\n"
+          + "  <url>http://localhost:8080/workflow/samples/camera.mpg</url>\n"
+          + "  <checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum>\n"
+          + "  <duration>14546</duration>\n" + "  <video>\n"
+          + "    <device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />\n"
+          + "    <encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" />\n"
+          + "    <resolution>640x480</resolution>\n"
+          + "    <scanType type=\"progressive\" />\n"
+          + "    <bitrate>540520</bitrate>\n"
+          + "    <frameRate>2</frameRate>\n"
+          + "  </video>\n"
+          + "</track>";
+
+  private static final String AUDIO_TRACK_DEFAULT = "<track id=\"track-2\" type=\"presentation/source\">\n"
+          + "  <mimetype>audio/mp3</mimetype>\n"
+          + "  <url>serverUrl/workflow/samples/audio.mp3</url>\n"
+          + "  <checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum>\n"
+          + "  <duration>10472</duration>\n"
+          + "  <audio>\n"
+          + "    <channels>2</channels>\n"
+          + "    <bitdepth>0</bitdepth>\n"
+          + "    <bitrate>128004.0</bitrate>\n"
+          + "    <samplingrate>44100</samplingrate>\n"
+          + "  </audio>\n"
+          + "</track>";
+
+  private static final String MEDIA_TRACK_DEFAULT = "<track id=\"track-3\">\n"
+          + "  <mimetype>video/quicktime</mimetype>\n"
+          + "  <url>serverUrl/workflow/samples/slidechanges.mov</url>\n"
+          + "  <checksum type=\"md5\">4cbcc9223c0425a54c3f253823487d5f</checksum>\n"
+          + "  <duration>27626</duration>\n"
+          + "  <video>\n"
+          + "    <resolution>1024x768</resolution>"
+          + "  </video>\n"
+          + "</track>";
+
+  private static final String CAPTIONS_CATALOGS_DEFAULT = "<captions>\n"
+          + "  <catalog id=\"catalog-1\">\n"
+          + "    <mimetype>application/x-subrip</mimetype>\n"
+          + "    <url>serverUrl/workflow/samples/captions_test_eng.srt</url>\n"
+          + "    <checksum type=\"md5\">55d70b062896aa685e2efc4226b32980</checksum>\n" + "    <tags>\n"
+          + "      <tag>lang:en</tag>\n"
+          + "    </tags>\n"
+          + "  </catalog>\n"
+          + "  <catalog id=\"catalog-2\">\n"
+          + "    <mimetype>application/x-subrip</mimetype>\n"
+          + "    <url>serverUrl/workflow/samples/captions_test_fra.srt</url>\n"
+          + "    <checksum type=\"md5\">8f6cd99bbb6d591107f3b5c47ee51f2c</checksum>\n" + "    <tags>\n"
+          + "      <tag>lang:fr</tag>\n"
+          + "    </tags>\n"
+          + "  </catalog>\n"
+          + "</captions>\n";
+
+  private static final String IMAGE_ATTACHMENT_DEFAULT = "<attachment id=\"track-3\">\n"
+          + "  <mimetype>image/jpeg</mimetype>\n"
+          + "  <url>serverUrl/workflow/samples/image.jpg</url>\n"
+          + "</attachment>";
 
   /** The base server URL */
   protected String serverUrl;
@@ -160,8 +216,9 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("encode")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "encode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", restParameters = {
-          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http") }, reponses = {
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
+          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http")
+    }, reponses = {
           @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response encode(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
@@ -198,9 +255,13 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("parallelencode")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "parallelencode", description = "Starts an encoding process, based on the specified encoding profile ID and the track", pathParameters = { }, restParameters = {
-          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http") }, reponses = { @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(name = "parallelencode", description = "Starts an encoding process, based on the specified encoding profile ID and the track",
+    restParameters = {
+      @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
+      @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http")
+    }, reponses = {
+      @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK)
+    }, returnDescription = "")
   public Response parallelencode(@FormParam("sourceTrack") String sourceTrackAsXml, @FormParam("profileId") String profileId)
           throws Exception {
     // Ensure that the POST parameters are present
@@ -239,7 +300,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("trim")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "trim", description = "Starts a trimming process, based on the specified track, start time and duration in ms", restParameters = {
-          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
           @RestParameter(description = "The encoding profile to use for trimming", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "trim.work"),
           @RestParameter(description = "The start time in milisecond", isRequired = true, name = "start", type = Type.STRING, defaultValue = "0"),
           @RestParameter(description = "The duration in milisecond", isRequired = true, name = "duration", type = Type.STRING, defaultValue = "10000") }, reponses = {
@@ -298,8 +359,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("mux")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", restParameters = {
-          @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = "${this.audioTrackDefault}"),
-          @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = AUDIO_TRACK_DEFAULT),
+          @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if the source tracks aren't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -349,7 +410,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("image")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "image", description = "Starts an image extraction process, based on the specified encoding profile ID and the source track", restParameters = {
-          @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http"),
           @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = false, name = "time", type = Type.STRING),
           @RestParameter(description = "An optional set of key=value\\n properties", isRequired = false, name = "properties", type = TEXT) }, reponses = {
@@ -411,7 +472,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("imagesync")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "imagesync", description = "Synchronously extracts an image, based on the specified encoding profile ID and the source track", restParameters = {
-      @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+      @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
       @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "player-preview.http"),
       @RestParameter(description = "The number of seconds (many numbers can be specified, separated by semicolon) into the video to extract the image", isRequired = false, name = "time", type = Type.STRING)}, reponses = {
       @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
@@ -667,7 +728,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("convertimage")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "convertimage", description = "Starts an image conversion process, based on the specified encoding profile ID and the source image", restParameters = {
-          @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
+          @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = IMAGE_ATTACHMENT_DEFAULT),
           @RestParameter(description = "A comma separated list of encoding profiles to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
           @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -707,7 +768,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("demux")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "demux", description = "Starts an demux process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
-          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
+          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "demux.work") }, reponses = {
                   @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -785,11 +846,14 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("multiencode")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "multiencode", description = "Starts an encoding process that produces multiple outputs, based on the specified encoding profile ID and the track", restParameters = {
-          @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = "${this.videoTrackDefault}"),
-          @RestParameter(description = "The comma-delimited encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "mp4-medium.http,mp4-low.http") }, reponses = {
-                  @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  @RestQuery(name = "multiencode", description = "Starts an encoding process that produces multiple outputs, based on the specified encoding profile ID and the track",
+    restParameters = {
+      @RestParameter(description = "The track containing the stream", isRequired = true, name = "sourceTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
+      @RestParameter(description = "The comma-delimited encoding profiles to use", isRequired = true, name = "profileIds", type = Type.STRING, defaultValue = "mp4-medium.http,mp4-low.http")
+    }, reponses = {
+      @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If required parameters aren't set or if sourceTrack isn't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+    }, returnDescription = "")
   public Response multiEncode(@FormParam("sourceTrack") String sourceTrackAsXml,
           @FormParam("profileIds") String profileIds) throws Exception {
     // Ensure that the POST parameters are present
@@ -826,7 +890,7 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("convertimagesync")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "convertimagesync", description = "Synchronously converts an image, based on the specified encoding profile ID and the source image", restParameters = {
-      @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = "${this.imageAttachmentDefault}"),
+      @RestParameter(description = "The original image", isRequired = true, name = "sourceImage", type = Type.TEXT, defaultValue = IMAGE_ATTACHMENT_DEFAULT),
       @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "image-conversion.http") }, reponses = {
       @RestResponse(description = "Results in an xml document containing the image attachment", responseCode = HttpServletResponse.SC_OK),
       @RestResponse(description = "If required parameters aren't set or if sourceImage isn't from the type Attachment", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
@@ -919,50 +983,6 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       timeArray[i] = parsedTimeArray.get(i);
     }
     return timeArray;
-  }
-
-  protected String getVideoTrackDefault() {
-    return "<track id=\"track-1\" type=\"presentation/source\">\n" + "  <mimetype>video/quicktime</mimetype>\n"
-            + "  <url>" + serverUrl + "/workflow/samples/camera.mpg</url>\n"
-            + "  <checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum>\n"
-            + "  <duration>14546</duration>\n" + "  <video>\n"
-            + "    <device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />\n"
-            + "    <encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" />\n"
-            + "    <resolution>640x480</resolution>\n" + "    <scanType type=\"progressive\" />\n"
-            + "    <bitrate>540520</bitrate>\n" + "    <frameRate>2</frameRate>\n" + "  </video>\n" + "</track>";
-  }
-
-  protected String getAudioTrackDefault() {
-    return "<track id=\"track-2\" type=\"presentation/source\">\n" + "  <mimetype>audio/mp3</mimetype>\n"
-            + "  <url>serverUrl/workflow/samples/audio.mp3</url>\n"
-            + "  <checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum>\n"
-            + "  <duration>10472</duration>\n" + "  <audio>\n" + "    <channels>2</channels>\n"
-            + "    <bitdepth>0</bitdepth>\n" + "    <bitrate>128004.0</bitrate>\n"
-            + "    <samplingrate>44100</samplingrate>\n" + "  </audio>\n" + "</track>";
-  }
-
-  protected String getMediaTrackDefault() {
-    return "<track id=\"track-3\">\n" + "  <mimetype>video/quicktime</mimetype>\n"
-            + "  <url>serverUrl/workflow/samples/slidechanges.mov</url>\n"
-            + "  <checksum type=\"md5\">4cbcc9223c0425a54c3f253823487d5f</checksum>\n"
-            + "  <duration>27626</duration>\n" + "  <video>\n" + "    <resolution>1024x768</resolution>"
-            + "  </video>\n" + "</track>";
-  }
-
-  protected String getCaptionsCatalogsDefault() {
-    return "<captions>\n" + "  <catalog id=\"catalog-1\">\n" + "    <mimetype>application/x-subrip</mimetype>\n"
-            + "    <url>serverUrl/workflow/samples/captions_test_eng.srt</url>\n"
-            + "    <checksum type=\"md5\">55d70b062896aa685e2efc4226b32980</checksum>\n" + "    <tags>\n"
-            + "      <tag>lang:en</tag>\n" + "    </tags>\n" + "  </catalog>\n" + "  <catalog id=\"catalog-2\">\n"
-            + "    <mimetype>application/x-subrip</mimetype>\n"
-            + "    <url>serverUrl/workflow/samples/captions_test_fra.srt</url>\n"
-            + "    <checksum type=\"md5\">8f6cd99bbb6d591107f3b5c47ee51f2c</checksum>\n" + "    <tags>\n"
-            + "      <tag>lang:fr</tag>\n" + "    </tags>\n" + "  </catalog>\n" + "</captions>\n";
-  }
-
-  protected String getImageAttachmentDefault() {
-    return "<attachment id=\"track-3\">\n" + "  <mimetype>image/jpeg</mimetype>\n"
-            + "  <url>serverUrl/workflow/samples/image.jpg</url>\n" + "</attachment>";
   }
 
 }

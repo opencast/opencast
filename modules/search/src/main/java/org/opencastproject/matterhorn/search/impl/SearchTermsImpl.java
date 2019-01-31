@@ -31,23 +31,13 @@ import java.util.List;
 /**
  * Implementation of a list of search terms.
  */
-public class SearchTermsImpl<T extends Object> implements SearchTerms<T> {
+public class SearchTermsImpl<T> implements SearchTerms<T> {
 
   /** The quantifier */
-  protected Quantifier quantifier = Quantifier.Any;
+  protected Quantifier quantifier;
 
   /** The search terms */
-  protected List<T> terms = new ArrayList<T>();
-
-  /**
-   * Creates a list of search terms, to be queried using the given quantifier.
-   * 
-   * @param quantifier
-   *          the quantifier
-   */
-  public SearchTermsImpl(Quantifier quantifier) {
-    this.quantifier = quantifier;
-  }
+  protected List<T> terms = new ArrayList<>();
 
   /**
    * Creates a list of search terms, to be queried using the given quantifier.

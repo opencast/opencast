@@ -24,9 +24,9 @@ package org.opencastproject.job.api;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.util.data.Tuple;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +58,8 @@ public final class IncidentImpl implements Incident {
     this.timestamp = new Date(timestamp.getTime());
     this.severity = severity;
     this.code = code;
-    this.details = Immutables.mk(details);
-    this.parameters = Immutables.mk(parameters);
+    this.details = Collections.unmodifiableList(details);
+    this.parameters = Collections.unmodifiableMap(parameters);
   }
 
   @Override

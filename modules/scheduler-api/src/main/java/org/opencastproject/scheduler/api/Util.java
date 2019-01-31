@@ -33,6 +33,9 @@ import java.util.List;
 import java.util.TimeZone;
 
 public final class Util {
+  /** The minimum separation between one event ending and the next starting */
+  public static final int EVENT_MINIMUM_SEPARATION_MILLISECONDS = 60 * 1000;
+
   private Util() {
   }
 
@@ -97,5 +100,31 @@ public final class Util {
     }
     TimeZone.setDefault(null);
     return events;
+  }
+
+  /**
+   * Check if two intervals (for example, for two scheduled events), overlap.
+   * @param start1 start of first interval
+   * @param end1 end of first interval
+   * @param start2 start of second interval
+   * @param end2 end of second interval
+   * @return <code>true</code> if they overlap, <code>false</code> if they don't
+   */
+  public static boolean schedulingIntervalsOverlap(final Date start1, final Date end1, final Date start2, final Date end2) {
+    return (start1.after(start2) && start1.before(end2)
+            || end1.after(start2) && end1.before(end2)
+            || start1.before(start2) && end1.after(end2)
+            || eventWithinMinimumSeparation(start1, end1, start2, end2));
+  }
+
+  /**
+   * Returns true of checkStart is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates, or checkEnd
+   * is within EVENT_MINIMUM_SEPARATION_SECONDS of either the start or end dates.  False otherwise
+   */
+  private static boolean eventWithinMinimumSeparation(Date checkStart, Date checkEnd, Date start, Date end) {
+    return Math.abs(checkStart.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+            || Math.abs(checkStart.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+            || Math.abs(checkEnd.getTime() - start.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS
+            || Math.abs(checkEnd.getTime() - end.getTime()) < EVENT_MINIMUM_SEPARATION_MILLISECONDS;
   }
 }

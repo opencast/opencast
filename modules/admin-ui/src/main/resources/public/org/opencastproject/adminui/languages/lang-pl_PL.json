@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "Edycja",
+            "EVENT": "wydarzenie",
+            "EVENTS": "wydarzenia",
+            "HEADER": "This page allows you to edit scheduled events grouped by weekdays. The inputs fields are pre-filled in case all scheduled events have the same value for a specific field. Otherwise, the input fields are left blank. Leaving input fields blank means that the respective values should not be changed.",
             "METADATA": "Metadane",
-            "SCHEDULING": "Harmonogram"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} : {{ eventOrEvents }})"
          }
       }
    },
@@ -445,7 +448,8 @@
                   "CAPTION": "Zaplanuj wiele wydarzeń",
                   "REPEATS": "Powtórzenia",
                   "REPEAT_ON": "Powtórz w",
-                  "WEEKDAYS": "Dni tygodnia"
+                  "WEEKDAYS": "Dni tygodnia",
+                  "WEEKDAY": "Dzień tygodnia"
                },
                "NO_SOURCE_AVAILABLE": "Żadne urządzenie nagrywajace nie jest dostępne"
             },
@@ -1070,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Dodatkowe Działania",
                   "ACTION": "Działania",
                   "NEW": "Nowe zasada",
-                  "DETAILS": "Szczegóły"
+                  "DETAILS": "Szczegóły",
+                  "REPLACE_EVENT_ACLS": "Update event permissions",
+                  "REPLACE_EVENT_ACLS_HINT": "Ensure all events of this series have these permissions in effect"
                },
                "ROLES": {
                   "LABEL": "Wybierz rolę",

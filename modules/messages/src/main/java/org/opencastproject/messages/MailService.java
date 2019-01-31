@@ -37,11 +37,9 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,15 +96,11 @@ public class MailService {
     logger.info("Activating persistence manager for participation management");
 
     for (Organization org : organizationDirectoryService.getOrganizations()) {
-      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
-        @Override
-        protected void run() {
-          try {
-            updateSmtpConfiguration(getEmailConfiguration());
-          } catch (MailServiceException e) {
-            logger.error("Unable to initialize the SMTP configuration from the database: {}",
-                    ExceptionUtils.getStackTrace(e));
-          }
+      SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), () -> {
+        try {
+          updateSmtpConfiguration(getEmailConfiguration());
+        } catch (MailServiceException e) {
+          logger.error("Unable to initialize the SMTP configuration from the database", e);
         }
       });
     }
@@ -234,7 +228,7 @@ public class MailService {
       }
       return templates;
     } catch (Exception e) {
-      logger.error("Could not get message templates: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get message templates", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null)
@@ -257,7 +251,7 @@ public class MailService {
       }
       return templates;
     } catch (Exception e) {
-      logger.error("Could not get message templates: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get message templates", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null)
@@ -280,7 +274,7 @@ public class MailService {
       }
       return templates;
     } catch (Exception e) {
-      logger.error("Could not get message templates: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get message templates", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null)
@@ -376,7 +370,7 @@ public class MailService {
       }
       return signatures;
     } catch (Exception e) {
-      logger.error("Could not get message signatures: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get message signatures", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null) {
@@ -403,7 +397,7 @@ public class MailService {
     } catch (NoResultException e) {
       throw new NotFoundException(e);
     } catch (Exception e) {
-      logger.error("Could not get message signatures: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not get message signatures", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null)
@@ -426,7 +420,7 @@ public class MailService {
       Number countResult = (Number) q.getSingleResult();
       return countResult.intValue();
     } catch (Exception e) {
-      logger.error("Could not count message signatures: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Could not count message signatures", e);
       throw new MailServiceException(e);
     } finally {
       if (em != null)
@@ -552,13 +546,13 @@ public class MailService {
     try {
       mimeMessage = toMimeMessage(mail);
     } catch (Exception e) {
-      logger.error("Unable to create mime message: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to create mime message", e);
       throw new MailServiceException(e);
     }
     try {
       smtpService.send(mimeMessage);
     } catch (MessagingException e) {
-      logger.error("Unable to send the email: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to send the email", e);
       throw new MailServiceException(e);
     }
   }

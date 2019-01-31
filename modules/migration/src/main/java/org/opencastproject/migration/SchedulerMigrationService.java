@@ -23,7 +23,6 @@ package org.opencastproject.migration;
 import static com.entwinemedia.fn.Equality.eq;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.data.Opt.none;
-import static java.lang.String.format;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -52,7 +51,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -61,7 +59,6 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.osgi.service.cm.ConfigurationException;
@@ -167,25 +164,22 @@ public class SchedulerMigrationService {
     } catch (NotFoundException e) {
       throw new ConfigurationException(CFG_ORGANIZATION, String.format("Could not find organization '%s'", orgId), e);
     }
-    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), new Effect0() {
-      @Override
-      protected void run() {
-        // check if migration is needed
-        try {
-          int size = schedulerService.search(none(), none(), none(), none(), none()).size();
-          if (size > 0) {
-            logger.info("There are already '{}' existing scheduled events, skip scheduler migration!", size);
-            return;
-          }
-        } catch (UnauthorizedException | SchedulerException e) {
-          logger.error("Unable to read existing scheduled events, skip scheduler migration!", e);
+    SecurityUtil.runAs(securityService, org, SecurityUtil.createSystemUser(cc, org), () -> {
+      // check if migration is needed
+      try {
+        int size = schedulerService.search(none(), none(), none(), none(), none()).size();
+        if (size > 0) {
+          logger.info("There are already '{}' existing scheduled events, skip scheduler migration!", size);
+          return;
         }
+      } catch (UnauthorizedException | SchedulerException e) {
+        logger.error("Unable to read existing scheduled events, skip scheduler migration!", e);
+      }
 
-        try {
-          migrateScheduledEvents();
-        } catch (SQLException e) {
-          chuck(e);
-        }
+      try {
+        migrateScheduledEvents();
+      } catch (SQLException e) {
+        chuck(e);
       }
     });
     logger.info("Finished migrating scheduled events");
@@ -221,15 +215,13 @@ public class SchedulerMigrationService {
       }
       logger.info("Scheduler transaction | end");
     } catch (Exception e) {
-      final String stackTrace = ExceptionUtils.getStackTrace(e);
-      logger.error(format("Scheduler transaction | error\n%s", stackTrace));
+      logger.error("Scheduler transaction | error", e);
       if (tx != null) {
         logger.error("Scheduler transaction | rollback transaction");
         try {
           tx.rollback();
         } catch (Exception e2) {
-          final String stackTrace2 = ExceptionUtils.getStackTrace(e2);
-          logger.error(format("Scheduler transaction | error doing rollback\n%s", stackTrace2));
+          logger.error("Scheduler transaction | error doing rollback", e2);
         }
       }
     } finally {
@@ -254,7 +246,11 @@ public class SchedulerMigrationService {
     mp.add(dc);
     // add acl to the media package
     for (AccessControlList acl : event.accessControlList) {
-      authorizationService.setAcl(mp, AclScope.Episode, acl);
+      try {
+        authorizationService.setAcl(mp, AclScope.Episode, acl);
+      } catch (MediaPackageException e) {
+        logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
+      }
     }
     //
     // add to scheduler service

@@ -113,6 +113,15 @@
             var show = $(this).val() == 'publish';
             $('#publicationConfigurationPanel').toggle(show);
             $('#straightToPublishing').val(show);
+            // Trigger update of the schedule's workflow config
+            $('#straightToPublishing').change();
+        });
+
+        <!-- called on loading an exisiting event -->
+        $('#straightToPublishing').bind('updateConfigUI', function() {
+            var publish = $(this).val().toLowerCase() === 'true';
+            $('#publicationConfigurationPanel').toggle(publish);
+            $('#holdOrPublishToggle_' + (publish ? 'publish':'hold')).prop('checked', 'checked');
         });
 
         <!-- Remove the line below if you wish to publish to AWS S3 -->

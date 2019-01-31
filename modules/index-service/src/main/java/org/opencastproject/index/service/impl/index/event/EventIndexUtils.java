@@ -51,13 +51,13 @@ import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -510,9 +510,9 @@ public final class EventIndexUtils {
    */
   public static Event updateEvent(Event event, MediaPackage mp) {
     // Tracks
-    List<String> trackMimeTypes = new ArrayList<String>();
-    List<String> trackStreamResolutions = new ArrayList<String>();
-    List<String> trackFlavors = new ArrayList<String>();
+    List<String> trackMimeTypes = new ArrayList<>();
+    List<String> trackStreamResolutions = new ArrayList<>();
+    List<String> trackFlavors = new ArrayList<>();
     for (Track t : mp.getTracks()) {
       if (t.getMimeType() != null)
         trackMimeTypes.add(t.getMimeType().toString());
@@ -528,8 +528,8 @@ public final class EventIndexUtils {
     event.setTrackFlavors(trackFlavors);
 
     // Metadata
-    List<String> metadataFlavors = new ArrayList<String>();
-    List<String> metadataMimetypes = new ArrayList<String>();
+    List<String> metadataFlavors = new ArrayList<>();
+    List<String> metadataMimetypes = new ArrayList<>();
     for (Catalog c : mp.getCatalogs()) {
       if (c.getFlavor() != null)
         metadataFlavors.add(c.getFlavor().toString());
@@ -540,7 +540,7 @@ public final class EventIndexUtils {
     event.setMetadataMimetypes(metadataMimetypes);
 
     // Attachments
-    List<String> attachmentFlavors = new ArrayList<String>();
+    List<String> attachmentFlavors = new ArrayList<>();
     for (Attachment a : mp.getAttachments()) {
       if (a.getFlavor() != null)
         attachmentFlavors.add(a.getFlavor().toString());
@@ -548,11 +548,7 @@ public final class EventIndexUtils {
     event.setAttachmentFlavors(attachmentFlavors);
 
     // Publications
-    List<Publication> publications = new ArrayList<Publication>();
-    for (Publication p : mp.getPublications()) {
-      publications.add(p);
-    }
-    event.setPublications(publications);
+    event.setPublications(Arrays.asList(mp.getPublications()));
 
     event.setSeriesName(mp.getSeriesTitle());
 
@@ -603,14 +599,13 @@ public final class EventIndexUtils {
           event.setSeriesName(result.getItems()[0].getSource().getTitle());
           break;
         } else {
-          Integer triesLeft = new Integer(tries - i);
+          Integer triesLeft = tries - i;
           logger.debug("Not able to find the series {} in the search index for the event {}. Will try {} more times.",
                   event.getSeriesId(), event.getIdentifier(), triesLeft);
           try {
             Thread.sleep(sleep);
           } catch (InterruptedException e) {
-            logger.warn("Interupted while sleeping before checking for the series being added to the index {}",
-                    ExceptionUtils.getStackTrace(e));
+            logger.warn("Interrupted while sleeping before checking for the series being added to the index", e);
           }
         }
 
@@ -656,7 +651,7 @@ public final class EventIndexUtils {
     try {
       searchIndex.addOrUpdate(event);
     } catch (SearchIndexException e) {
-      logger.warn("Unable to update event '{}': {}", event, ExceptionUtils.getStackTrace(e));
+      logger.warn("Unable to update event '{}'", event, e);
     }
   }
 
@@ -681,8 +676,8 @@ public final class EventIndexUtils {
       result = searchIndex
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              organization, currentManagedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -692,8 +687,8 @@ public final class EventIndexUtils {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
           logger.warn(
-                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}' because {}",
-                  event, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e));
+                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
+                  event, currentManagedAcl, newManagedAcl, e);
         }
       }
     }
@@ -718,8 +713,8 @@ public final class EventIndexUtils {
       result = searchIndex
               .getByQuery(new EventSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event because {}",
-              organization, managedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
+              organization, managedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Event> eventItem : result.getItems()) {
@@ -728,8 +723,7 @@ public final class EventIndexUtils {
         try {
           searchIndex.addOrUpdate(event);
         } catch (SearchIndexException e) {
-          logger.warn("Unable to update event '{}' to remove managed acl '{}' because {}",
-                  event, managedAcl, ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to update event '{}' to remove managed acl '{}'", event, managedAcl, e);
         }
       }
     }

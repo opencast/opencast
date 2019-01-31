@@ -63,16 +63,16 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
     if (query.getOrganization() == null)
       throw new IllegalStateException("No organization set on the series search query!");
 
-    and(SeriesIndexSchema.ORGANIZATION, query.getOrganization(), true);
+    and(SeriesIndexSchema.ORGANIZATION, query.getOrganization());
 
     // Series identifier
     if (query.getIdentifier().length > 0) {
-      and(SeriesIndexSchema.UID, query.getIdentifier(), true);
+      and(SeriesIndexSchema.UID, query.getIdentifier());
     }
 
     // Title
     if (query.getTitle() != null) {
-      and(SeriesIndexSchema.TITLE, query.getTitle(), true);
+      and(SeriesIndexSchema.TITLE, query.getTitle());
     }
 
     // Action
@@ -81,34 +81,34 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
       if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
         for (Role role : user.getRoles()) {
           for (String action : query.getActions()) {
-            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName(), true);
+            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
       }
     }
 
     if (query.getDescription() != null) {
-      and(SeriesIndexSchema.DESCRIPTION, query.getDescription(), true);
+      and(SeriesIndexSchema.DESCRIPTION, query.getDescription());
     }
 
     if (query.getSubjects().length > 0) {
-      and(SeriesIndexSchema.SUBJECT, query.getSubjects(), true);
+      and(SeriesIndexSchema.SUBJECT, query.getSubjects());
     }
 
     if (query.getLanguage() != null) {
-      and(SeriesIndexSchema.LANGUAGE, query.getLanguage(), true);
+      and(SeriesIndexSchema.LANGUAGE, query.getLanguage());
     }
 
     if (query.getCreator() != null) {
-      and(SeriesIndexSchema.CREATOR, query.getCreator(), true);
+      and(SeriesIndexSchema.CREATOR, query.getCreator());
     }
 
     if (query.getLicense() != null) {
-      and(SeriesIndexSchema.LICENSE, query.getLicense(), true);
+      and(SeriesIndexSchema.LICENSE, query.getLicense());
     }
 
     if (query.getAccessPolicy() != null) {
-      and(SeriesIndexSchema.ACCESS_POLICY, query.getAccessPolicy(), true);
+      and(SeriesIndexSchema.ACCESS_POLICY, query.getAccessPolicy());
     }
 
     if (query.getCreatedFrom() != null && query.getCreatedTo() != null) {
@@ -116,31 +116,31 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
     }
 
     if (query.getOrganizers().length > 0) {
-      and(SeriesIndexSchema.ORGANIZERS, query.getOrganizers(), true);
+      and(SeriesIndexSchema.ORGANIZERS, query.getOrganizers());
     }
 
     if (query.getContributors().length > 0) {
-      and(SeriesIndexSchema.CONTRIBUTORS, query.getContributors(), true);
+      and(SeriesIndexSchema.CONTRIBUTORS, query.getContributors());
     }
 
     if (query.getPublishers().length > 0) {
-      and(SeriesIndexSchema.PUBLISHERS, query.getPublishers(), true);
+      and(SeriesIndexSchema.PUBLISHERS, query.getPublishers());
     }
 
     if (query.getManagedAcl() != null) {
-      and(SeriesIndexSchema.MANAGED_ACL, query.getManagedAcl(), true);
+      and(SeriesIndexSchema.MANAGED_ACL, query.getManagedAcl());
     }
 
     if (query.getRightsHolder() != null) {
-      and(SeriesIndexSchema.RIGHTS_HOLDER, query.getRightsHolder(), true);
+      and(SeriesIndexSchema.RIGHTS_HOLDER, query.getRightsHolder());
     }
 
     if (query.getOptedOut() != null) {
-      and(SeriesIndexSchema.OPT_OUT, query.getOptedOut(), true);
+      and(SeriesIndexSchema.OPT_OUT, query.getOptedOut());
     }
 
     if (query.getTheme() != null) {
-      and(SeriesIndexSchema.THEME, query.getTheme(), true);
+      and(SeriesIndexSchema.THEME, query.getTheme());
     }
 
     if (query.getCreatedFrom() != null && query.getCreatedTo() != null) {

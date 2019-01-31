@@ -224,10 +224,10 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
         return getSeriesService().addSeriesElement(seriesId, flavor.getType(), dcData);
       }
     } catch (IOException e) {
-      logger.error("Error while serializing the dublin core catalog to XML: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error while serializing the dublin core catalog to XML", e);
       return false;
     } catch (SeriesException e) {
-      logger.error("Error while saving the series element: {}", ExceptionUtils.getStackTrace(e));
+      logger.error("Error while saving the series element", e);
       return false;
     }
   }
@@ -241,7 +241,7 @@ public class ConfigurableSeriesDCCatalogUIAdapter implements SeriesCatalogUIAdap
       try {
         dublinCoreMetadata.addField(dublinCoreProperties.get(field), "", listProvidersService);
       } catch (Exception e) {
-        logger.error("Skipping metadata field '{}' because of error: {}", field, ExceptionUtils.getStackTrace(e));
+        logger.error("Skipping metadata field '{}' because of error", field, e);
       }
     }
   }

@@ -12,6 +12,7 @@ General Configuration
 - [Database Configuration](database.md)
 - [HTTPS Configuration](https/index.md)
 - [Encoding Profile Configuration](encoding.md)
+- [List Providers](listproviders.md)
 - [Load Configuration](load.md)
 - [Log Configuration](log.md)
 - [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)

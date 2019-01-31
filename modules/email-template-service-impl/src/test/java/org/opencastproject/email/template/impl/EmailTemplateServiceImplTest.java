@@ -20,7 +20,6 @@
  */
 package org.opencastproject.email.template.impl;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -44,6 +43,7 @@ import org.junit.Test;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,7 +125,7 @@ public class EmailTemplateServiceImplTest {
     incidents.add(incident1);
     EasyMock.expect(subtree.getIncidents()).andReturn(incidents).anyTimes();
     // This is what Entwine wrote in the IncidentTree class, so rather than null we're using Immutables.nil()
-    List<IncidentTree> subtreeDecendants = Immutables.nil();
+    List<IncidentTree> subtreeDecendants = Collections.emptyList();
     EasyMock.expect(subtree.getDescendants()).andReturn(subtreeDecendants).anyTimes();
 
     // Link the incident and the parent tree

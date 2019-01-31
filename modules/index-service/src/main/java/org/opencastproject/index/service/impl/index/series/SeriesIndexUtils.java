@@ -42,7 +42,6 @@ import org.opencastproject.util.DateTimeSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -274,8 +273,8 @@ public final class SeriesIndexUtils {
       result = searchIndex
               .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(currentManagedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
-              organization, currentManagedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", organization,
+              currentManagedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -285,8 +284,8 @@ public final class SeriesIndexUtils {
           searchIndex.addOrUpdate(series);
         } catch (SearchIndexException e) {
           logger.warn(
-                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}' because {}",
-                  series, currentManagedAcl, newManagedAcl, ExceptionUtils.getStackTrace(e));
+                  "Unable to update event '{}' from current managed acl '{}' to new managed acl name '{}'",
+                  series, currentManagedAcl, newManagedAcl, e);
         }
       }
     }
@@ -311,8 +310,8 @@ public final class SeriesIndexUtils {
       result = searchIndex
               .getByQuery(new SeriesSearchQuery(organization, user).withoutActions().withManagedAcl(managedAcl));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}' because {}",
-              organization, managedAcl, ExceptionUtils.getStackTrace(e));
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", organization,
+              managedAcl, e);
     }
     if (result != null && result.getHitCount() > 0) {
       for (SearchResultItem<Series> seriesItem : result.getItems()) {
@@ -321,8 +320,7 @@ public final class SeriesIndexUtils {
         try {
           searchIndex.addOrUpdate(series);
         } catch (SearchIndexException e) {
-          logger.warn("Unable to update series '{}' to remove managed acl '{}' because {}",
-                  series, managedAcl, ExceptionUtils.getStackTrace(e));
+          logger.warn("Unable to update series '{}' to remove managed acl '{}'", series, managedAcl, e);
         }
       }
     }

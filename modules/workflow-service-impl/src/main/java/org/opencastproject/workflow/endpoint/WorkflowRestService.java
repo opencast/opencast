@@ -78,7 +78,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.util.concurrent.Striped;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
@@ -87,8 +86,6 @@ import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -198,62 +195,6 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
         serverUrl = ccServerUrl;
       }
       serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
-    }
-  }
-
-  public String getSampleMediaPackage() {
-    String samplesUrl = serverUrl + "/workflow/samples";
-
-    return "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\">\n"
-            + "  <media>\n"
-            + "    <track id=\"track-1\" type=\"presenter/source\">\n"
-            + "      <mimetype>audio/mp3</mimetype>\n" + "      <url>"
-            + samplesUrl
-            + "/audio.mp3</url>\n"
-            + "      <checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum>\n"
-            + "      <duration>10472</duration>\n"
-            + "      <audio>\n"
-            + "        <channels>2</channels>\n"
-            + "        <bitdepth>0</bitdepth>\n"
-            + "        <bitrate>128004.0</bitrate>\n"
-            + "        <samplingrate>44100</samplingrate>\n"
-            + "      </audio>\n"
-            + "    </track>\n"
-            + "    <track id=\"track-2\" type=\"presenter/source\">\n"
-            + "      <mimetype>video/quicktime</mimetype>\n"
-            + "      <url>"
-            + samplesUrl
-            + "/camera.mpg</url>\n"
-            + "      <checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum>\n"
-            + "      <duration>14546</duration>\n"
-            + "      <video>\n"
-            + "        <device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />\n"
-            + "        <encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" />\n"
-            + "        <resolution>640x480</resolution>\n"
-            + "        <scanType type=\"progressive\" />\n"
-            + "        <bitrate>540520</bitrate>\n"
-            + "        <frameRate>2</frameRate>\n"
-            + "      </video>\n"
-            + "    </track>\n"
-            + "  </media>\n"
-            + "  <metadata>\n"
-            + "    <catalog id=\"catalog-1\" type=\"dublincore/episode\">\n"
-            + "      <mimetype>text/xml</mimetype>\n"
-            + "      <url>"
-            + samplesUrl
-            + "/dc-1.xml</url>\n"
-            + "      <checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum>\n"
-            + "    </catalog>\n"
-            + "  </metadata>\n" + "</mediapackage>";
-  }
-
-  public String getSampleWorkflowDefinition() throws IOException {
-    InputStream is = null;
-    try {
-      is = getClass().getResourceAsStream("/sample/compose-distribute-publish.xml");
-      return IOUtils.toString(is, "UTF-8");
-    } finally {
-      IOUtils.closeQuietly(is);
     }
   }
 
@@ -567,8 +508,8 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @Path("start")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, defaultValue = "${this.sampleWorkflowDefinition}", jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, defaultValue = "${this.sampleMediaPackage}", jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, jaxbClass = WorkflowDefinitionImpl.class),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, jaxbClass = MediaPackageImpl.class),
           @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
           @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, reponses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),

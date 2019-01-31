@@ -8,11 +8,11 @@ Infrastructure
 
 ### Test Servers
 
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)
----------------------------|-------------------------------|------------------|--------------------
-University of Osnabrück    | develop.opencast.org          | Lars Kiesow      | Lars Kiesow
-ETH Zürich                 | stable.opencast.org           | Lars Kiesow      | Markus Borzechowski
-Jan Koppe                  | legacy.opencast.org           | Greg Logan       | Jan Koppe
+Institution                    | Hostname                      | Admin (Software) | Admin (Hardware)
+-------------------------------|-------------------------------|------------------|------------------
+University of Osnabrück        | develop.opencast.org          | Lars Kiesow      | Lars Kiesow
+ETH Zürich                     | stable.opencast.org           | Lars Kiesow      | Waldemar Smirnow
+Technische Universität Ilmenau | legacy.opencast.org           | Lars Kiesow      | Daniel Konrad
 
 
 ### CI Servers
@@ -35,7 +35,6 @@ Nexus administration:
 
 - Greg Logan
 - Lars Kiesow
-- Michael Stypa
 
 
 ### Other Hosted Services
@@ -44,9 +43,8 @@ Institution                | Hostname                        | Admin (Software) 
 ---------------------------|---------------------------------|------------------|-------------------------
 University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
 University of Cologne      | ci.opencast.org                 | Greg Logan       | Ruth Lang
-University of Osnabrück    | build.opencast.org              | Greg Logan       | Lars Kiesow
+University of Osnabrück    | build.opencast.org              | Lars Kiesow      | Lars Kiesow
 University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
-University of Osnabrück    | opencast.org                    | Rüdiger Rolf     | UOS RZ
 University of Stuttgart    | testrailoc.tik.uni-stuttgart.de | Release managers | Per Pascal Grube
 
 
@@ -80,8 +78,8 @@ groups in multiple places when a change is necessary.  These changes are
 - Modifying the [JIRA committers group](https://opencast.jira.com/admin/groups/view?groupname=committers-matterhorn)
 - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
-- Modifying the [Crowdin commiters group](https://crowdin.com/project/opencast-community/settings#members)
-- Modifying the list of committers on the [Opencast website](http://www.opencast.org/people)
+- Modifying the [Crowdin committers group](https://crowdin.com/project/opencast-community/settings#members)
+- Modifying the list of committers on the [Opencast website](https://opencast.org/people)
 
 ### Current Administrators
 
@@ -99,7 +97,6 @@ order:
     - [Conference rooms](http://opencast.blindsidenetworks.net/opencast/)
         - Password: welcome
     - [Recordings](http://opencast.blindsidenetworks.net/opencast/recordings-5720cd14621.jsp)
-    - Flash based
 
 ### Other Services
 

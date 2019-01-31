@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -16,10 +16,6 @@
   </properties>
   <dependencies>
     <!-- osgi support -->
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-    </dependency>
     <dependency>
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.compendium</artifactId>
@@ -79,6 +75,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <!-- we use this for the transitive dependency to elasticsearch -->
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-search-api</artifactId>
       <version>${project.version}</version>
@@ -99,12 +96,25 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-external-api-index</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+    </dependency>
+    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -138,11 +148,6 @@
       <groupId>com.entwinemedia.common</groupId>
       <artifactId>functional</artifactId>
     </dependency>
-    <!-- Logging -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>
@@ -171,6 +176,12 @@
       <artifactId>easymock</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-rest-test-environment</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -183,6 +194,7 @@
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
+              org.opencastproject.external.index,
               org.opencastproject.matterhorn.search.impl;version=${project.version},
               org.opencastproject.rest;version=${project.version},
               org.opencastproject.index.service.message,
@@ -210,8 +222,6 @@
               org.opencastproject.external.api,
               org.opencastproject.external.common,
               org.opencastproject.external.endpoint,
-              org.opencastproject.external.impl,
-              org.opencastproject.external.impl.index,
               org.opencastproject.external.userdirectory
             </Export-Package>
             <Service-Component>
@@ -221,19 +231,10 @@
               OSGI-INF/external-group-loader.xml,
               OSGI-INF/external-role-provider.xml,
               OSGI-INF/external-groups-endpoint.xml,
-              OSGI-INF/external-index.xml,
               OSGI-INF/external-security-endpoint.xml,
               OSGI-INF/external-series-endpoint.xml,
               OSGI-INF/external-workflow-definitions-endpoint.xml,
-              OSGI-INF/external-workflows-endpoint.xml,
-              OSGI-INF/message-receiver-acl.xml,
-              OSGI-INF/message-receiver-assetmanager.xml,
-              OSGI-INF/message-receiver-comment.xml,
-              OSGI-INF/message-receiver-group.xml,
-              OSGI-INF/message-receiver-scheduler.xml,
-              OSGI-INF/message-receiver-series.xml,
-              OSGI-INF/message-receiver-theme.xml,
-              OSGI-INF/message-receiver-workflow.xml
+              OSGI-INF/external-workflows-endpoint.xml
             </Service-Component>
           </instructions>
         </configuration>

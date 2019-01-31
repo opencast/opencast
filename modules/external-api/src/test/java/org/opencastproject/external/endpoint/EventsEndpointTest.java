@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static io.restassured.RestAssured.given;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -29,11 +30,12 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opencastproject.rest.RestServiceTestEnv.localhostRandomPort;
-import static org.opencastproject.rest.RestServiceTestEnv.testEnvForClasses;
+import static org.opencastproject.test.rest.RestServiceTestEnv.localhostRandomPort;
+import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.external.common.ApiFormat;
@@ -47,12 +49,12 @@ import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.PublicationImpl;
-import org.opencastproject.rest.RestServiceTestEnv;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
@@ -71,7 +73,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,7 +111,7 @@ public class EventsEndpointTest {
   @Ignore
   @Test
   public void testGetEventsJsonResponse() throws Exception {
-    String eventJson = IOUtils.toString(getClass().getResource("/events.json"));
+    String eventJson = IOUtils.toString(getClass().getResource("/events.json"), UTF_8);
     String acceptHeader = "application/" + ApiVersion.CURRENT_VERSION.toExternalForm() + "+" + ApiFormat.JSON;
     List<IndexObject> events = new ArrayList<IndexObject>();
     List<String> contributors = new ArrayList<String>();
@@ -158,7 +159,7 @@ public class EventsEndpointTest {
 
     EventsEndpoint endpoint = new EventsEndpoint();
     Response result = endpoint.getJsonEvents(acceptHeader, events, false, false, false,false, false, ApiVersion.VERSION_1_0_0);
-    assertTrue(result.getMetadata().get("Content-Type") != null);
+    assertNotNull(result.getMetadata().get("Content-Type"));
     assertEquals("application/v1.0.0+json", result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(eventJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
   }
@@ -166,7 +167,7 @@ public class EventsEndpointTest {
   @Ignore
   @Test
   public void testGetEventJsonResponse() throws Exception {
-    String eventJson = IOUtils.toString(getClass().getResource("/event-single.json"));
+    String eventJson = IOUtils.toString(getClass().getResource("/event-single.json"), UTF_8);
     List<String> contributors = new ArrayList<String>();
     contributors.add("Physics Department");
 
@@ -193,7 +194,7 @@ public class EventsEndpointTest {
     EventsEndpoint endpoint = new EventsEndpoint();
     Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0,
             endpoint.eventToJSON(event, false, false, false,false, false, ApiVersion.VERSION_1_0_0));
-    assertTrue(result.getMetadata().get("Content-Type") != null);
+    assertNotNull(result.getMetadata().get("Content-Type"));
     assertEquals("application/v1.0.0+json", result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(eventJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
   }
@@ -201,38 +202,38 @@ public class EventsEndpointTest {
   @Ignore
   @Test
   public void testSerializationOfAcl() throws IOException {
-    String emptyAclJson = IOUtils.toString(getClass().getResource("/acl-empty.json"));
+    String emptyAclJson = IOUtils.toString(getClass().getResource("/acl-empty.json"), UTF_8);
     // Test empty acl
     AccessControlList acl = new AccessControlList();
     Event event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
     Response result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
-    assertTrue(result.getMetadata().get("Content-Type") != null);
+    assertNotNull(result.getMetadata().get("Content-Type"));
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(emptyAclJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
 
     // Test acl with one entry
-    String oneAclJson = IOUtils.toString(getClass().getResource("/acl-one.json"));
+    String oneAclJson = IOUtils.toString(getClass().getResource("/acl-one.json"), UTF_8);
     AccessControlEntry ace = new AccessControlEntry("ROLE_ADMIN", "write", true);
     acl = new AccessControlList(ace);
     event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
     result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
-    assertTrue(result.getMetadata().get("Content-Type") != null);
+    assertNotNull(result.getMetadata().get("Content-Type"));
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(oneAclJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
 
     // Test acl with many entries
-    String manyAclJson = IOUtils.toString(getClass().getResource("/acl-many.json"));
+    String manyAclJson = IOUtils.toString(getClass().getResource("/acl-many.json"), UTF_8);
     AccessControlEntry ace1 = new AccessControlEntry("ROLE_ADMIN", "write", true);
     AccessControlEntry ace2 = new AccessControlEntry("ROLE_USER", "read", true);
     acl = new AccessControlList(ace1, ace2);
     event = new Event();
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
     result = ApiResponses.Json.ok(ApiVersion.VERSION_1_0_0, arr(AclUtils.serializeAclToJson(acl)));
-    assertTrue(result.getMetadata().get("Content-Type") != null);
+    assertNotNull(result.getMetadata().get("Content-Type"));
     assertEquals("application/" + ApiVersion.CURRENT_VERSION + "+json",
             result.getMetadata().get("Content-Type").get(0).toString().toLowerCase());
     assertThat(manyAclJson, SameJSONAs.sameJSONAs(result.getEntity().toString()).allowingAnyArrayOrdering());
@@ -240,34 +241,34 @@ public class EventsEndpointTest {
 
   @Test
   public void testDeserializationOfAcl() throws IOException, ParseException {
-    String emptyAclJson = IOUtils.toString(getClass().getResource("/acl-empty.json"));
+    String emptyAclJson = IOUtils.toString(getClass().getResource("/acl-empty.json"), UTF_8);
     AccessControlList acl = AclUtils.deserializeJsonToAcl(emptyAclJson, false);
     assertEquals(acl.getEntries().size(), 0);
 
     // Test acl with one entry
-    String oneAclJson = IOUtils.toString(getClass().getResource("/acl-one.json"));
+    String oneAclJson = IOUtils.toString(getClass().getResource("/acl-one.json"), UTF_8);
     acl = AclUtils.deserializeJsonToAcl(oneAclJson, false);
     assertEquals(acl.getEntries().size(), 1);
     assertEquals(acl.getEntries().get(0).getAction(), "write");
-    assertEquals(acl.getEntries().get(0).isAllow(), true);
+    assertTrue(acl.getEntries().get(0).isAllow());
     assertEquals(acl.getEntries().get(0).getRole(), "ROLE_ADMIN");
 
     // Test acl with many entries
-    String manyAclJson = IOUtils.toString(getClass().getResource("/acl-many.json"));
+    String manyAclJson = IOUtils.toString(getClass().getResource("/acl-many.json"), UTF_8);
     acl = AclUtils.deserializeJsonToAcl(manyAclJson, false);
     assertEquals(acl.getEntries().size(), 2);
     assertEquals(acl.getEntries().get(0).getAction(), "write");
-    assertEquals(acl.getEntries().get(0).isAllow(), true);
+    assertTrue(acl.getEntries().get(0).isAllow());
     assertEquals(acl.getEntries().get(0).getRole(), "ROLE_ADMIN");
 
     assertEquals(acl.getEntries().get(1).getAction(), "read");
-    assertEquals(acl.getEntries().get(1).isAllow(), true);
+    assertTrue(acl.getEntries().get(1).isAllow());
     assertEquals(acl.getEntries().get(1).getRole(), "ROLE_USER");
   }
 
   @Test
   public void testDeserializeMetadataFields() throws IOException, ParseException {
-    String manyAclJson = IOUtils.toString(getClass().getResource("/event-metadata.json"));
+    String manyAclJson = IOUtils.toString(getClass().getResource("/event-metadata.json"), UTF_8);
     Map<String, String> fields = RequestUtils.getKeyValueMap(manyAclJson);
     assertEquals(3, fields.size());
 
@@ -275,19 +276,20 @@ public class EventsEndpointTest {
     assertEquals("What this is about - edited", fields.get("subject"));
     assertEquals("A great description - edited", fields.get("description"));
 
-    String updateMetadataJson = IOUtils.toString(getClass().getResource("/event-metadata-update.json"));
+    String updateMetadataJson = IOUtils.toString(getClass().getResource("/event-metadata-update.json"), UTF_8);
     fields = RequestUtils.getKeyValueMap(updateMetadataJson);
     assertEquals(5, fields.size());
     assertEquals("Captivating title - edited", fields.get("title"));
     assertEquals("What this is about - edited", fields.get("subject"));
     assertEquals("", fields.get("description"));
 
-    String updateInvalidMetadataJson = IOUtils.toString(getClass().getResource("/event-metadata-update-invalid.json"));
+    String updateInvalidMetadataJson = IOUtils.toString(getClass().getResource("/event-metadata-update-invalid.json")
+            , UTF_8);
     try {
       fields = RequestUtils.getKeyValueMap(updateInvalidMetadataJson);
       fail();
     } catch (IllegalArgumentException e) {
-      assertTrue(e != null);
+      assertNotNull(e);
     }
   }
 
@@ -361,13 +363,13 @@ public class EventsEndpointTest {
     given().log().all().expect().statusCode(SC_NOT_FOUND).when().get(env.host(missingEvent)).asString();
 
     String noPublications = "/" + TestEventsEndpoint.NO_PUBLICATIONS_EVENT + "/publications";
-    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-none.json"));
+    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-none.json"), UTF_8);
     result = given().log().all().expect().statusCode(SC_OK).when().get(env.host(noPublications)).asString();
 
     assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
 
     String twoPublications = "/" + TestEventsEndpoint.TWO_PUBLICATIONS + "/publications";
-    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-two.json"));
+    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-two.json"), UTF_8);
     result = given().log().all().expect().statusCode(SC_OK).when().get(env.host(twoPublications)).asString();
 
     assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
@@ -383,27 +385,27 @@ public class EventsEndpointTest {
     given().log().all().expect().statusCode(SC_NOT_FOUND).when().get(env.host(missingEvent)).asString();
 
     String noPublications = "/" + TestEventsEndpoint.NO_PUBLICATIONS_EVENT + "/publications/missing";
-    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-none.json"));
+    expected = IOUtils.toString(getClass().getResource("/events/publications/publications-none.json"), UTF_8);
     given().log().all().expect().statusCode(SC_NOT_FOUND).when().get(env.host(noPublications)).asString();
 
     String engagePublication = "/" + TestEventsEndpoint.TWO_PUBLICATIONS + "/publications/"
             + TestEventsEndpoint.ENGAGE_PUBLICATION_ID;
-    expected = IOUtils.toString(getClass().getResource("/events/publications/publication-engage.json"));
+    expected = IOUtils.toString(getClass().getResource("/events/publications/publication-engage.json"), UTF_8);
     result = given().log().all().expect().statusCode(SC_OK).when().get(env.host(engagePublication)).asString();
 
     assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
 
     String oaipmhPublication = "/" + TestEventsEndpoint.TWO_PUBLICATIONS + "/publications/"
             + TestEventsEndpoint.OAIPMH_PUBLICATION_ID;
-    expected = IOUtils.toString(getClass().getResource("/events/publications/publication-oaipmh.json"));
+    expected = IOUtils.toString(getClass().getResource("/events/publications/publication-oaipmh.json"), UTF_8);
     result = given().log().all().expect().statusCode(SC_OK).when().get(env.host(oaipmhPublication)).asString();
     assertThat(expected, SameJSONAs.sameJSONAs(result).allowingAnyArrayOrdering());
   }
 
   @Test
   public void testUpdateEventMetadata() throws IOException {
-    String jsonString = IOUtils.toString(getClass().getResource("/event-update.json"));
-    String expectedJson = IOUtils.toString(getClass().getResource("/event-update-expected.json"));
+    String jsonString = IOUtils.toString(getClass().getResource("/event-update.json"), UTF_8);
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-update-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.UPDATE_EVENT;
     given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
             .when().post(env.host("{event_id}"));
@@ -413,7 +415,7 @@ public class EventsEndpointTest {
 
   @Test
   public void testGetAllEventMetadata() throws IOException {
-    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-expected.json"));
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.METADATA_GET_EVENT;
     String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when().get(env.host("{event_id}/metadata")).asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -421,8 +423,8 @@ public class EventsEndpointTest {
 
   @Test
   public void testUpdateEventMetadataByType() throws IOException {
-    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update.json"));
-    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-update-expected.json"));
+    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update.json"), UTF_8);
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-update-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.METADATA_UPDATE_EVENT;
     given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
@@ -436,8 +438,7 @@ public class EventsEndpointTest {
    */
   @Test
   public void testGetEventScheduling() throws IOException {
-    String expectedJson = IOUtils.toString(getClass().getResource("/event-scheduling-expected.json"),
-        Charset.forName("UTF-8"));
+    String expectedJson = IOUtils.toString(getClass().getResource("/event-scheduling-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.SCHEDULING_GET_EVENT;
     String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when()
         .get(env.host("{event_id}/scheduling")).asString();
@@ -449,8 +450,7 @@ public class EventsEndpointTest {
    */
   @Test
   public void testUpdateEventScheduling() throws IOException {
-    String jsonString = IOUtils.toString(getClass().getResource("/event-scheduling-update.json"),
-        Charset.forName("UTF-8"));
+    String jsonString = IOUtils.toString(getClass().getResource("/event-scheduling-update.json"), UTF_8);
     String eventId = TestEventsEndpoint.SCHEDULING_UPDATE_EVENT;
     given().formParam("scheduling", jsonString).pathParam("event_id", eventId)
         .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/scheduling"));

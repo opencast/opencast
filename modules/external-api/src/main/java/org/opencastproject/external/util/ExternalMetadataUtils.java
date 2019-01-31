@@ -47,7 +47,8 @@ public final class ExternalMetadataUtils {
     MetadataField<Iterable<String>> newSubjects; // = //MetadataUtils.copyMetadataField(subject);
     newSubjects = MetadataField.createIterableStringMetadataField(subject.getInputID(), Opt.some("subjects"),
             subject.getLabel(), subject.isReadOnly(), subject.isRequired(), subject.isTranslatable(),
-            subject.getCollection(), subject.getCollectionID(), subject.getOrder(), subject.getNamespace());
+            subject.getCollection(), subject.getCollectionID(), subject.getDelimiter(), subject.getOrder(),
+            subject.getNamespace());
     List<String> subjectNames = new ArrayList<String>();
     if (subject.getValue().isSome()) {
       subjectNames = com.entwinemedia.fn.Stream.$(subject.getValue().get().toString().split(",")).toList();

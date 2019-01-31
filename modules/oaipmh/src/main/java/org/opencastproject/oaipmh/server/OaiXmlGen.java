@@ -20,7 +20,6 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static org.opencastproject.fun.juc.Immutables.list;
 import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION;
 import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_XML_NS;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
@@ -44,6 +43,7 @@ import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -68,12 +68,12 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create the OAI-PMH tag.
    */
   Element oai(Node... nodes) {
-    final List<Node> combined = list(
-            list(schemaLocation(OAI_2_0_SCHEMA_LOCATION),
-                 $eTxt("responseDate", OAI_2_0_XML_NS, toUtcSecond(new Date()))),
-            nodes);
+    final List<Node> combined = new ArrayList<>();
+    combined.add(schemaLocation(OAI_2_0_SCHEMA_LOCATION));
+    combined.add($eTxt("responseDate", OAI_2_0_XML_NS, toUtcSecond(new Date())));
+    Collections.addAll(combined, nodes);
     return $e("OAI-PMH",
-              list(ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
+              Collections.singletonList(ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
               combined);
   }
 
@@ -82,9 +82,9 @@ public abstract class OaiXmlGen extends XmlGen {
    */
   Element dc(Node... nodes) {
     List<Node> combined = new ArrayList<Node>(Arrays.asList(nodes));
-    combined.addAll(list(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION)));
+    combined.add(schemaLocation(OaiPmhConstants.OAI_DC_SCHEMA_LOCATION));
     return $e("oai_dc:dc", OaiPmhConstants.OAI_DC_XML_NS,
-              list(ns("dc", "http://purl.org/dc/elements/1.1/"),
+              Arrays.asList(ns("dc", "http://purl.org/dc/elements/1.1/"),
                    ns("xsi", XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI)),
               combined);
   }

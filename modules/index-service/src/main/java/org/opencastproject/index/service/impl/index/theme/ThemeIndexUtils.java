@@ -76,7 +76,7 @@ public final class ThemeIndexUtils {
     SearchMetadataCollection metadata = new SearchMetadataCollection(Long.toString(theme.getIdentifier()).concat(
             theme.getOrganization()), Theme.DOCUMENT_TYPE);
     // Mandatory fields
-    metadata.addField(ThemeIndexSchema.UID, theme.getIdentifier(), true);
+    metadata.addField(ThemeIndexSchema.ID, theme.getIdentifier(), true);
     metadata.addField(ThemeIndexSchema.ORGANIZATION, theme.getOrganization(), false);
     metadata.addField(ThemeIndexSchema.OBJECT, theme.toXML(), false);
 

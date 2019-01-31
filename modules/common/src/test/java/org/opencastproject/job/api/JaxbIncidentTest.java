@@ -25,13 +25,14 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.ReflectionUtil.run;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.fun.juc.Immutables;
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Tuple;
 
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +41,13 @@ public class JaxbIncidentTest {
   @Test
   public void testEquivalence() throws Exception {
     final Date now = new Date();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("param", "value");
+    parameters.put("param-2", "value-2");
     final JaxbIncident dto = new JaxbIncident(new IncidentImpl(
             1, 2, "service", "localhost", now, Severity.FAILURE, "code",
-            Immutables.list(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
-            Immutables.map(tuple("param", "value"), tuple("param-2", "value-2"))));
+            Arrays.asList(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
+            parameters));
     final Incident incident = dto.toIncident();
     run(Incident.class, new Incident() {
       @Override public long getId() {
@@ -83,14 +87,17 @@ public class JaxbIncidentTest {
 
       @Override public List<Tuple<String, String>> getDetails() {
         assertEquals("details transferred",
-                     Immutables.list(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
+                     Arrays.asList(tuple("detail-1", "value-1"), tuple("detail-2", "detail-2")),
                      incident.getDetails());
         return null;
       }
 
       @Override public Map<String, String> getDescriptionParameters() {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("param", "value");
+        parameters.put("param-2", "value-2");
         assertEquals("decriptionParameters transferred",
-                     Immutables.map(tuple("param", "value"), tuple("param-2", "value-2")),
+                     parameters,
                      incident.getDescriptionParameters());
         return null;
       }

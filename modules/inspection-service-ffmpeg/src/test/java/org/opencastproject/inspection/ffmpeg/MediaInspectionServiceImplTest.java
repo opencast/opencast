@@ -44,7 +44,6 @@ import org.opencastproject.util.StreamHelper;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.tika.parser.audio.AudioParser;
 import org.easymock.EasyMock;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -101,7 +100,7 @@ public class MediaInspectionServiceImplTest {
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.expect(workspace.get(resource)).andReturn(f);
       EasyMock.replay(workspace);
-      return some(new MediaInspector(workspace, new AudioParser(), binary));
+      return some(new MediaInspector(workspace, binary));
     }
     return none();
   }
@@ -154,9 +153,9 @@ public class MediaInspectionServiceImplTest {
       Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
-      assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
+      assertTrue(videoStreams[0].getFrameCount() > 0);
       AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
-      assertTrue(audioStreams[0].getFrameCount().longValue() > 0);
+      assertTrue(audioStreams[0].getFrameCount() > 0);
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNotNull(newTrack.getDuration());
@@ -179,9 +178,9 @@ public class MediaInspectionServiceImplTest {
       Track newTrack = (Track) mi.enrich(track, false, Options.NO_OPTION);
 
       VideoStream[] videoStreams = TrackSupport.byType(newTrack.getStreams(), VideoStream.class);
-      assertTrue(videoStreams[0].getFrameCount().longValue() > 0);
+      assertTrue(videoStreams[0].getFrameCount() > 0);
       AudioStream[] audioStreams = TrackSupport.byType(newTrack.getStreams(), AudioStream.class);
-      assertTrue(audioStreams[0].getFrameCount().longValue() > 0);
+      assertTrue(audioStreams[0].getFrameCount() > 0);
       assertEquals(newTrack.getChecksum(), cs);
       assertEquals(newTrack.getMimeType(), mt);
       assertNotNull(newTrack.getDuration());

@@ -92,10 +92,10 @@ public class AdminUISearchIndex extends AbstractSearchIndex implements EventInde
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumenTypes()
+   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
-  public String[] getDocumenTypes() {
+  public String[] getDocumentTypes() {
     return DOCUMENT_TYPES;
   }
 

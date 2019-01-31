@@ -90,6 +90,7 @@ output id to make it easy to find.
 |property.{field-id}.label |"EVENTS.EVENTS.DETAILS.METADATA.TITLE" or "Event Title" |The label to show for this property in the UI. If there is a i18n support for a label that should be the value used so that it will be translated, if you don't mind it being locked to one translation just put that single value in.|
 |property.{field-id}.type |text |The type of the metadata field. |
 |property.{field-id}.pattern |yyyy-MM-dd |Applies to date and time types for now. It is used to format their values using the java DateTimeFormatter values\**|
+|property.{field-id}.delimiter |;|For mixed_text and iterable_text type fields, a string at which inputs into the corresponding fields are split into individual values for easier bulk entry of lists. The default is no delimiter, in which case no splitting takes place.|
 |property.{field-id}.readOnly |false |If the property can be edited in the UI or if it should only be displayed. |
 |property.{field-id}.required |true |If the property has to have a value before the metadata can be saved (the UI's save button will be disabled until all of the required fields are entered)|
 |property.{field-id}.collectionID |USERS |The id of the list provider that will be used to validate the input in the backend. So for example entering a username that doesn't exist will throw an error in this case.|
@@ -161,7 +162,7 @@ First option is the default one and the configuration is as follows:
     property.publisher.label=EVENTS.EVENTS.DETAILS.METADATA.PUBLISHER
     property.publisher.type=text
     property.publisher.readOnly=true
-    property.publisher.required=true
+    property.publisher.required=false
     property.publisher.order=16
 
 To configure the second option:

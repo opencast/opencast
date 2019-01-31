@@ -105,6 +105,18 @@ describe('Processing Step in New Event Wizard', function () {
                     .toEqual({ testID: 'testvalueA' });
             });
         });
+
+        describe('with a hidden field', function () {
+            beforeEach(function () {
+                $('#new-event-workflow-configuration')
+                    .append('<input type="hidden" class="configField" id="testID" value="testvalueA">');
+            });
+
+            it('returns the field value', function () {
+                expect(NewEventProcessing.getWorkflowConfig())
+                    .toEqual({ testID: 'testvalueA' });
+            });
+        });
     });
 
     describe('#getUserEntries', function () {

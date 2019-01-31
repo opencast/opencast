@@ -31,10 +31,8 @@ import org.opencastproject.matterhorn.search.SearchIndexException;
 import org.opencastproject.matterhorn.search.SearchQuery;
 import org.opencastproject.matterhorn.search.SearchResult;
 import org.opencastproject.matterhorn.search.SearchResultItem;
-import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +74,7 @@ public class ThemesListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> list = new HashMap<String, String>();
 
@@ -91,7 +89,7 @@ public class ThemesListProvider implements ResourceListProvider {
       try {
         results = searchIndex.getByQuery(themeQuery);
       } catch (SearchIndexException e) {
-        logger.error("The admin UI Search Index was not able to get the themes: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("The admin UI Search Index was not able to get the themes", e);
         throw new ListProviderException("No themes list for list name " + listName + " found!");
       }
 
@@ -111,7 +109,7 @@ public class ThemesListProvider implements ResourceListProvider {
       try {
         results = searchIndex.getByQuery(themeQuery);
       } catch (SearchIndexException e) {
-        logger.error("The admin UI Search Index was not able to get the themes: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("The admin UI Search Index was not able to get the themes", e);
         throw new ListProviderException("No themes list for list name " + listName + " found!");
       }
 

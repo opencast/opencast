@@ -140,6 +140,8 @@ index.number_of_replicas: 0
 
 #################################### Paths ####################################
 
+path.home: ${karaf.home}/
+
 # Path to directory containing configuration (this file and logging.yml):
 #
 path.conf: ${karaf.etc}/index/adminui
@@ -166,6 +168,7 @@ path.logs: ${karaf.data}/log/elasticsearch.log
 #
 #path.plugins: /path/to/plugins
 
+index.max_result_window: 2147483647
 
 #################################### Plugin ###################################
 

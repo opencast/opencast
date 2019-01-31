@@ -30,9 +30,9 @@ import org.opencastproject.util.UrlSupport;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.parser.AutoDetectParser;
 import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,8 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.ws.rs.core.Response;
-
-import junit.framework.Assert;
 
 public class WorkingFileRepositoryRestEndpointTest {
 
@@ -69,7 +67,6 @@ public class WorkingFileRepositoryRestEndpointTest {
     FileUtils.forceMkdir(new File(endpoint.rootDirectory));
     endpoint.serverUrl = UrlSupport.DEFAULT_BASE_URL;
     endpoint.servicePath = WorkingFileRepositoryImpl.URI_PREFIX;
-    endpoint.setTikaParser(new AutoDetectParser());
   }
 
   @After
@@ -133,30 +130,22 @@ public class WorkingFileRepositoryRestEndpointTest {
   public void testExtractXmlContentType() throws Exception {
     String mediaPackageId = "mp";
     String dc = "element1";
-    InputStream in = null;
-    InputStream responseIn = null;
-    try {
-      in = getClass().getResourceAsStream("/dublincore.xml");
+    try (InputStream in = getClass().getResourceAsStream("/dublincore.xml")) {
       endpoint.put(mediaPackageId, dc, "dublincore.xml", in);
-    } finally {
-      IOUtils.closeQuietly(in);
     }
 
     // execute gets, and ensure that the content types are correct
     Response response = endpoint.restGet(mediaPackageId, dc, null);
 
-    Assert.assertEquals("Gif content type", "application/xml", response.getMetadata().getFirst("Content-Type"));
+    Assert.assertEquals("DC content type", "text/xml", response.getMetadata().getFirst("Content-Type"));
 
     // Make sure the image byte stream was not modified by the content type detection
-    try {
-      in = getClass().getResourceAsStream("/dublincore.xml");
+    try (InputStream in = getClass().getResourceAsStream("/dublincore.xml")) {
       byte[] imageBytesFromClasspath = IOUtils.toByteArray(in);
-      responseIn = (InputStream) response.getEntity();
-      byte[] imageBytesFromRepo = IOUtils.toByteArray(responseIn);
-      Assert.assertTrue(Arrays.equals(imageBytesFromClasspath, imageBytesFromRepo));
-    } finally {
-      IOUtils.closeQuietly(in);
-      IOUtils.closeQuietly(responseIn);
+      try (InputStream responseIn = (InputStream) response.getEntity()) {
+        byte[] imageBytesFromRepo = IOUtils.toByteArray(responseIn);
+        Assert.assertTrue(Arrays.equals(imageBytesFromClasspath, imageBytesFromRepo));
+      }
     }
   }
 

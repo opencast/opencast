@@ -29,7 +29,6 @@ import org.opencastproject.message.broker.api.group.GroupItem;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +70,7 @@ public class GroupMessageReceiverImpl extends BaseMessageReceiverImpl<GroupItem>
           group.setRoles(roles);
           getSearchIndex().addOrUpdate(group);
         } catch (SearchIndexException e) {
-          logger.error("Error storing the group {} to the search index: {}", jaxbGroup.getGroupId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error storing the group {} to the search index", jaxbGroup.getGroupId(), e);
           return;
         }
         break;
@@ -84,8 +82,7 @@ public class GroupMessageReceiverImpl extends BaseMessageReceiverImpl<GroupItem>
           getSearchIndex().delete(Group.DOCUMENT_TYPE, groupItem.getGroupId().concat(organization));
           logger.debug("Group {} removed from external search index", groupItem.getGroupId());
         } catch (SearchIndexException e) {
-          logger.error("Error deleting the group {} from the search index: {}", groupItem.getGroupId(),
-                  ExceptionUtils.getStackTrace(e));
+          logger.error("Error deleting the group {} from the search index", groupItem.getGroupId(), e);
           return;
         }
         return;

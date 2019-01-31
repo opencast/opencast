@@ -33,10 +33,10 @@ describe('adminNg.directives.adminNgEditableMultiValue', function () {
     });
 
     it('becomes editable when clicked', function () {
-        expect(element.find('div')).toHaveClass('ng-hide');
+        expect(element.find('div').length).toBe(0);
         element.click();
         $timeout.flush();
-        expect(element.find('div')).not.toHaveClass('ng-hide');
+        expect(element.find('div').length).toBe(1);
     });
 
     it('saves when adding values', function () {
@@ -64,78 +64,118 @@ describe('adminNg.directives.adminNgEditableMultiValue', function () {
         expect(element.scope().params.value).not.toContain('Value 1');
     });
 
+    it('allows entering multiple values at once separated by a given delimiter', function () {
+        element.scope().params.delimiter = ';';
+
+        element.click();
+        element.find('input').val('a;b;c').trigger('change');
+
+        var enter = $.Event('keyup');
+        enter.keyCode = 13;
+        element.find('input').trigger(enter);
+
+        expect(element.scope().params.value).toContain('a');
+        expect(element.scope().params.value).toContain('b');
+        expect(element.scope().params.value).toContain('c');
+        expect(element.scope().params.value).not.toContain('a;b;c');
+    });
+
     describe('#leaveEditMode', function () {
 
         it('leaves edit mode', function () {
-            var scope = element.find('div').scope();
+            var scope = element.find('ul').scope(); // the div & input elements don't exist when editMode = false
             scope.editMode = true;
-            scope.value = 'edited';
+            scope.data.value = 'edited';
 
             scope.leaveEditMode();
 
+            expect(element.scope().params.value).not.toContain('edited')
             expect(scope.editMode).toBe(false);
-            expect(scope.value).toEqual('');
+            expect(scope.data.value).toEqual('');
         });
     });
+
+    describe('#onBlur', function () {
+
+        var scope;
+
+        beforeEach(function () {
+            scope = element.find('ul').scope();
+            scope.editMode = true;
+            scope.mixed = true;
+            scope.data.value = 'edited';
+        });
+
+        it('saves and leaves edit mode', function () {
+            scope.onBlur();
+
+            expect(scope.editMode).toBe(false);
+            expect(scope.data.value).toEqual('');
+            expect(scope.params.value).toContain('edited')
+        });
+    })
 
     describe('#addValue', function () {
 
         it('does not save duplicate values', function () {
             var model = ['unique'];
-            element.find('input').scope().addValue(model, 'unique');
+            element.find('ul').scope().addValue(model, 'unique');
             expect(model).toEqual(['unique']);
         });
     });
 
     describe('#keyUp', function () {
         var event = { target: { value: 'a' } };
+        var scope;
 
         beforeEach(function () {
             event.stopPropagation = jasmine.createSpy();
-            element.find('input').scope().editMode = true;
+            scope = element.find('ul').scope();
+            scope.editMode = true;
+
         });
 
         it('does nothing by default', function () {
-            element.find('input').scope().keyUp(event);
-            expect(element.find('input').scope().editMode).toBe(true);
+            scope.keyUp(event);
+            expect(scope.editMode).toBe(true);
         });
 
         it('stops propagation', function () {
-            element.find('input').scope().keyUp(event);
+            scope.keyUp(event);
             expect(event.stopPropagation).toHaveBeenCalled();
         });
 
         describe('when pressing ESC', function () {
             beforeEach(function () {
                 event.keyCode = 27;
-                element.find('input').scope().keyUp(event);
+                scope.keyUp(event);
             });
 
             it('leaves edit mode', function () {
-                expect(element.find('input').scope().editMode).toBe(false);
+                expect(scope.editMode).toBe(false);
+            });
+
+            it('clears value', function () {
+              expect(scope.data.value).toBe('');
             });
         });
 
         describe('when pressing ENTER', function () {
             beforeEach(function () {
                 event.keyCode = 13;
-                element.find('input').scope().keyUp(event);
+                scope.keyUp(event);
             });
 
-            it('leaves edit mode', function () {
-                expect(element.find('input').scope().editMode).toBe(false);
+            it('does not leave edit mode', function () {
+                expect(scope.editMode).toBe(true);
             });
         });
     });
 
     describe('#submit', function () {
-        var callbackContext = {};
-        beforeEach(function () {
-            callbackContext.scope = element.find('input').scope();
-        });
 
         it('saves the value', function () {
-            element.find('input').scope().submit();
+            element.find('ul').scope().submit();
             expect($rootScope.save).toHaveBeenCalled();
         });
     });

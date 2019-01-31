@@ -111,7 +111,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
-import org.opencastproject.util.data.Effect0;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -1352,23 +1351,26 @@ public class IndexServiceImpl implements IndexService {
         // Not updating the acl as the workflow might have already passed the point of distribution.
         throw new IllegalArgumentException("Unable to update the ACL of this event as it is currently processing.");
       case ARCHIVE:
-        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+        try {
+          mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+        } catch (MediaPackageException e) {
+          throw new IndexServiceException("Unable to update  acl", e);
+        }
         assetManager.takeSnapshot(mediaPackage);
         return acl;
       case SCHEDULE:
-        mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
         try {
-          schedulerService.updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                  Opt.<Set<String>> none(), Opt.some(mediaPackage), Opt.<Map<String, String>> none(),
-                  Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
-        } catch (SchedulerException e) {
+          mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
+          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.some(mediaPackage),
+                  Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+        } catch (SchedulerException | MediaPackageException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
         return acl;
       default:
         logger.error("Unknown event source '{}' unable to update ACL!", getEventSource(event));
         throw new IndexServiceException(
-                String.format("Unable to update the ACL as '{}' is an unknown event source.", getEventSource(event)));
+                String.format("Unable to update the ACL as '%s' is an unknown event source.", getEventSource(event)));
     }
   }
 
@@ -1532,9 +1534,8 @@ public class IndexServiceImpl implements IndexService {
     try {
       final AQueryBuilder q = assetManager.createQuery();
       final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      final AResult r = q.select(q.nothing()).where(p).run();
-      if (r.getSize() > 0)
-        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+      q.delete(DEFAULT_OWNER, q.propertiesOf()).where(q.mediaPackageId(id)).willRemoveWholeMediaPackage(true).run();
+      q.delete(DEFAULT_OWNER, q.snapshot()).where(p).willRemoveWholeMediaPackage(true).run();
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;
@@ -1767,7 +1768,7 @@ public class IndexServiceImpl implements IndexService {
               }
             }
           }
-        } catch (SeriesException e) {
+        } catch (SeriesException | MediaPackageException e) {
           throw new IllegalStateException("Unable to retrieve series ACL for series " + oldSeriesId, e);
         } catch (NotFoundException e) {
           logger.debug("There is no ACL set for the series {}", mp.getSeries());
@@ -1969,48 +1970,38 @@ public class IndexServiceImpl implements IndexService {
   public void updateCommentCatalog(final Event event, final List<EventComment> comments) throws Exception {
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
-    executorService.execute(new Runnable() {
-      @Override
-      public void run() {
-        securityContext.runInContext(new Effect0() {
-          @Override
-          protected void run() {
-            try {
-              MediaPackage mediaPackage = getEventMediapackage(event);
-              updateMediaPackageCommentCatalog(mediaPackage, comments);
-              switch (getEventSource(event)) {
-                case WORKFLOW:
-                  logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
-                  if (workflowInstance.isNone()) {
-                    logger.error("No workflow instance for event {} found!", event.getIdentifier());
-                    throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
-                  }
-                  WorkflowInstance instance = workflowInstance.get();
-                  instance.setMediaPackage(mediaPackage);
-                  updateWorkflowInstance(instance);
-                  break;
-                case ARCHIVE:
-                  logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  assetManager.takeSnapshot(mediaPackage);
-                  break;
-                case SCHEDULE:
-                  logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
-                  schedulerService.updateEvent(event.getIdentifier(), Opt.<Date> none(), Opt.<Date> none(),
-                          Opt.<String> none(), Opt.<Set<String>> none(), Opt.some(mediaPackage),
-                          Opt.<Map<String, String>> none(), Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(),
-                          SchedulerService.ORIGIN);
-                  break;
-                default:
-                  logger.error("Unkown event source {}!", event.getSource().toString());
-              }
-            } catch (Exception e) {
-              logger.error("Unable to update event {} comment catalog: {}", event.getIdentifier(), getStackTrace(e));
+    executorService.execute(() -> securityContext.runInContext(() -> {
+      try {
+        MediaPackage mediaPackage = getEventMediapackage(event);
+        updateMediaPackageCommentCatalog(mediaPackage, comments);
+        switch (getEventSource(event)) {
+          case WORKFLOW:
+            logger.info("Update workflow mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            Opt<WorkflowInstance> workflowInstance = getCurrentWorkflowInstance(event.getIdentifier());
+            if (workflowInstance.isNone()) {
+              logger.error("No workflow instance for event {} found!", event.getIdentifier());
+              throw new IndexServiceException("No workflow instance found for event " + event.getIdentifier());
             }
-          }
-        });
+            WorkflowInstance instance = workflowInstance.get();
+            instance.setMediaPackage(mediaPackage);
+            updateWorkflowInstance(instance);
+            break;
+          case ARCHIVE:
+            logger.info("Update archive mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            assetManager.takeSnapshot(mediaPackage);
+            break;
+          case SCHEDULE:
+            logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
+            schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
+                    Opt.some(mediaPackage), Opt.none(), Opt.none(), Opt.none(), SchedulerService.ORIGIN);
+            break;
+          default:
+            logger.error("Unkown event source {}!", event.getSource());
+        }
+      } catch (Exception e) {
+        logger.error("Unable to update event {} comment catalog", event.getIdentifier(), e);
       }
-    });
+    }));
   }
 
   private void updateMediaPackageCommentCatalog(MediaPackage mediaPackage, List<EventComment> comments)

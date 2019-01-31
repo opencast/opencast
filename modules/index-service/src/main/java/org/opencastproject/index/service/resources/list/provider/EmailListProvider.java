@@ -28,9 +28,7 @@ import org.opencastproject.index.service.util.ListProviderUtil;
 import org.opencastproject.messages.MailService;
 import org.opencastproject.messages.MailServiceException;
 import org.opencastproject.messages.MessageTemplate;
-import org.opencastproject.security.api.Organization;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.osgi.framework.BundleContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +82,7 @@ public class EmailListProvider implements ResourceListProvider {
   }
 
   @Override
-  public Map<String, String> getList(String listName, ResourceListQuery query, Organization organization)
+  public Map<String, String> getList(String listName, ResourceListQuery query)
           throws ListProviderException {
     Map<String, String> result = new HashMap<String, String>();
     if (getListNameFromFilter(EmailFilterList.TEMPLATE_NAMES).equals(listName)) {
@@ -111,7 +109,7 @@ public class EmailListProvider implements ResourceListProvider {
           messageTemplateList = mailService.getMessageTemplates();
         }
       } catch (MailServiceException e) {
-        logger.error("Error retreiving message templates from mail service: {}", ExceptionUtils.getStackTrace(e));
+        logger.error("Error retreiving message templates from mail service", e);
         throw new ListProviderException("Error retreiving message templates from mail service", e);
       }
 

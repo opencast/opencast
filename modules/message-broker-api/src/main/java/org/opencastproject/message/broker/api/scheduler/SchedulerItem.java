@@ -28,6 +28,8 @@ import org.opencastproject.scheduler.api.SchedulerService.ReviewStatus;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -45,6 +47,8 @@ import java.util.Set;
 public class SchedulerItem implements MessageItem, Serializable {
   private static final long serialVersionUID = 6061069989788904237L;
 
+  private static final Gson gson = new Gson();
+
   public static final String SCHEDULER_QUEUE_PREFIX = "SCHEDULER.";
 
   public static final String SCHEDULER_QUEUE = SCHEDULER_QUEUE_PREFIX + "QUEUE";
@@ -54,14 +58,14 @@ public class SchedulerItem implements MessageItem, Serializable {
   private final String properties;
   private final String acl;
   private final String agentId;
-  private final Date end;
-  private final Boolean optOut;
-  private final Set<String> presenters;
-  private final Boolean blacklisted;
+  private final long end;
+  private final String optOut;
+  private final String presenters;
+  private final String blacklisted;
   private final String reviewStatus;
-  private final Date reviewDate;
+  private final long reviewDate;
   private final String recordingState;
-  private final Date start;
+  private final long start;
   private final Long lastHeardFrom;
   private final Type type;
 
@@ -229,13 +233,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateCatalog;
   }
@@ -255,13 +259,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateProperties;
   }
@@ -279,13 +283,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = type;
   }
@@ -309,13 +313,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     }
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateAcl;
   }
@@ -335,13 +339,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
-    this.optOut = optOut;
+    this.end = -1;
+    this.optOut = gson.toJson(optOut);
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateOptOut;
   }
@@ -360,14 +364,14 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.properties = null;
     this.acl = null;
     this.agentId = null;
-    this.blacklisted = blacklisted;
-    this.end = null;
+    this.blacklisted = gson.toJson(blacklisted);
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateBlacklist;
   }
@@ -389,13 +393,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = reviewStatus.toString();
-    this.reviewDate = reviewDate;
+    this.reviewDate = reviewDate == null ? -1 : reviewDate.getTime();
     this.recordingState = null;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = null;
     this.type = Type.UpdateReviewStatus;
   }
@@ -417,13 +421,13 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.optOut = null;
     this.presenters = null;
     this.reviewStatus = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.recordingState = state;
-    this.start = null;
+    this.start = -1;
     this.lastHeardFrom = lastHeardFrom;
     this.type = Type.UpdateRecordingStatus;
   }
@@ -434,15 +438,15 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = end;
+    this.end = end == null ? -1 : end.getTime();
     this.lastHeardFrom = null;
     this.optOut = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.reviewStatus = null;
-    this.start = start;
+    this.start = start == null ? -1 : start.getTime();
     this.type = type;
   }
 
@@ -452,15 +456,15 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = agentId;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.lastHeardFrom = null;
     this.optOut = null;
     this.presenters = null;
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.reviewStatus = null;
-    this.start = null;
+    this.start = -1;
     this.type = Type.UpdateAgentId;
   }
 
@@ -470,15 +474,15 @@ public class SchedulerItem implements MessageItem, Serializable {
     this.acl = null;
     this.agentId = null;
     this.blacklisted = null;
-    this.end = null;
+    this.end = -1;
     this.lastHeardFrom = null;
     this.optOut = null;
-    this.presenters = presenters;
+    this.presenters = gson.toJson(presenters);
     this.properties = null;
     this.recordingState = null;
-    this.reviewDate = null;
+    this.reviewDate = -1;
     this.reviewStatus = null;
-    this.start = null;
+    this.start = -1;
     this.type = Type.UpdatePresenters;
   }
 
@@ -519,11 +523,11 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Boolean getBlacklisted() {
-    return blacklisted;
+    return gson.fromJson(blacklisted, Boolean.class);
   }
 
   public Date getEnd() {
-    return end;
+    return end < 0 ? null : new Date(end);
   }
 
   public Long getLastHeardFrom() {
@@ -531,11 +535,12 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Boolean getOptOut() {
-    return optOut;
+    return gson.fromJson(optOut, Boolean.class);
   }
 
+  @SuppressWarnings("unchecked")
   public Set<String> getPresenters() {
-    return presenters;
+    return gson.fromJson(presenters, Set.class);
   }
 
   public ReviewStatus getReviewStatus() {
@@ -543,7 +548,7 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Date getReviewDate() {
-    return reviewDate;
+    return reviewDate < 0 ? null : new Date(reviewDate);
   }
 
   public String getRecordingState() {
@@ -551,7 +556,7 @@ public class SchedulerItem implements MessageItem, Serializable {
   }
 
   public Date getStart() {
-    return start;
+    return start < 0 ? null : new Date(start);
   }
 
   public Type getType() {

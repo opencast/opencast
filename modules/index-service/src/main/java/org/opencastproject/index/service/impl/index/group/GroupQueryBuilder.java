@@ -63,11 +63,11 @@ public class GroupQueryBuilder extends AbstractElasticsearchQueryBuilder<GroupSe
     if (query.getOrganization() == null)
       throw new IllegalStateException("No organization set on the group search query!");
 
-    and(GroupIndexSchema.ORGANIZATION, query.getOrganization(), true);
+    and(GroupIndexSchema.ORGANIZATION, query.getOrganization());
 
     // group identifier
     if (query.getIdentifier().length > 0) {
-      and(GroupIndexSchema.UID, query.getIdentifier(), true);
+      and(GroupIndexSchema.UID, query.getIdentifier());
     }
 
     // Action
@@ -76,30 +76,30 @@ public class GroupQueryBuilder extends AbstractElasticsearchQueryBuilder<GroupSe
       if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(user.getOrganization().getAdminRole())) {
         for (Role role : user.getRoles()) {
           for (String action : query.getActions()) {
-            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName(), true);
+            and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
       }
     }
 
     if (query.getRole() != null) {
-      and(GroupIndexSchema.ROLE, query.getRole(), true);
+      and(GroupIndexSchema.ROLE, query.getRole());
     }
 
     if (query.getName() != null) {
-      and(GroupIndexSchema.NAME, query.getName(), true);
+      and(GroupIndexSchema.NAME, query.getName());
     }
 
     if (query.getDescription() != null) {
-      and(GroupIndexSchema.DESCRIPTION, query.getDescription(), true);
+      and(GroupIndexSchema.DESCRIPTION, query.getDescription());
     }
 
     if (query.getRoles().length > 0) {
-      and(GroupIndexSchema.ROLES, query.getRoles(), true);
+      and(GroupIndexSchema.ROLES, query.getRoles());
     }
 
     if (query.getMembers().length > 0) {
-      and(GroupIndexSchema.MEMBERS, query.getMembers(), true);
+      and(GroupIndexSchema.MEMBERS, query.getMembers());
     }
 
     // Text

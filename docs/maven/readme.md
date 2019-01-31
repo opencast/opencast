@@ -1,10 +1,10 @@
-Special Maven Settings
-======================
+Custom Maven Settings
+=====================
 
 The Maven settings file in this repository shows how to configure an
 alternative primary and secondary repository for Opencast. This example just
 switches the primary repository from the one hosted by Harvard DCE to the
-repository hosted the University of Osnabrück.
+repository hosted by Osnabrück University.
 
 To use this setting file either use the maven command line options:
 

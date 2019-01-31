@@ -279,8 +279,11 @@
          },
          "EDIT": {
             "CAPTION": "Bearbeiten",
+            "EVENT": "Aufzeichnung",
+            "EVENTS": "Aufzeichnungen",
+            "HEADER": "Hierkönnen Sie geplante Aufzeichnungen nach Wochentagen gruppiert bearbeiten. Die Eingabefelder sind vorausgefüllt, wenn alle Aufzeichnungen den gleichen Wert haben. Andernfalls sind die Felder leer. Werden Felder leer gelassen, werden diese Felder bei den Aufzeichnungen nicht geändert.",
             "METADATA": "Metadaten",
-            "SCHEDULING": "Planung"
+            "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
       }
    },
@@ -445,12 +448,13 @@
                   "CAPTION": "Mehrere Aufzeichnungen planen",
                   "REPEATS": "Wiederholt sich",
                   "REPEAT_ON": "Wiederholen am",
-                  "WEEKDAYS": "Wochentage"
+                  "WEEKDAYS": "Wochentage",
+                  "WEEKDAY": "Wochentag"
                },
                "NO_SOURCE_AVAILABLE": "Kein Capture-Agent zur Planung einer Aufzeichnung verfügbar"
             },
             "PROCESSING": {
-               "CAPTION": "In Verarbeitung",
+               "CAPTION": "Verarbeitung",
                "SELECT_WORKFLOW": "Workflow wählen",
                "SELECT_WORKFLOW_EMPTY": "Keinen Workflow gefunden",
                "WORKFLOW": "Workflow"
@@ -1070,7 +1074,9 @@
                   "ADDITIONAL_ACTIONS": "Weitere Aktionen",
                   "ACTION": "Aktionen",
                   "NEW": "Neue Richtlinie",
-                  "DETAILS": "Details"
+                  "DETAILS": "Details",
+                  "REPLACE_EVENT_ACLS": "Zugriffsrechte der Einzelaufzeichnungen aktualisieren",
+                  "REPLACE_EVENT_ACLS_HINT": "Sicherstellen, dass alle Aufzeichnungen dieser Series genau diese Zugriffsrechte haben"
                },
                "ROLES": {
                   "LABEL": "Rolle auswählen",
@@ -1747,7 +1753,7 @@
       "SEGMENTS": {
          "REMOVE_SEGMENT": "Segment löschen",
          "USE_SEGMENT": "Dieses Segment nutzen",
-         "START": "Zur Startseite",
+         "START": "Start",
          "END": "Ende"
       },
       "THUMBNAIL": {

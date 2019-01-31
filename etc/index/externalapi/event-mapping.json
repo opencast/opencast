@@ -37,7 +37,7 @@
 
             "agent_id": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
-            "agent_configuration": { "type" : "object", "index" : "not_analyzed", "store" : "no"},
+            "agent_configuration": { "type" : "object" },
 
             "language": { "type" : "string", "index" : "not_analyzed", "store" : "no" },
 
@@ -105,7 +105,6 @@
 
             "publication": {
                 "type" : "nested",
-                "index" : "not_analyzed",
                 "properties": {
                     "channel": { "type": "string"},
                     "mimetype": { "type": "string"},
@@ -181,7 +180,7 @@
             },
 
             "text": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" },
-            "text_fuzzy": { "type" : "string", "index" : "analyzed", "analyzer": "lowercasespaceanalyzer", "store" : "no" }
+            "text_fuzzy": { "type" : "string", "index" : "analyzed", "store" : "no", "analyzer": "lowercasespaceanalyzer" }
 
         },
         "dynamic_templates" : [

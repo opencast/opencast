@@ -66,10 +66,10 @@ public class SearchIndexImplStub extends AbstractElasticsearchIndex {
   }
 
   /**
-   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumenTypes()
+   * @see org.opencastproject.matterhorn.search.impl.AbstractElasticsearchIndex#getDocumentTypes()
    */
   @Override
-  public String[] getDocumenTypes() {
+  public String[] getDocumentTypes() {
     return new String[] { "content", "version" };
   }
 

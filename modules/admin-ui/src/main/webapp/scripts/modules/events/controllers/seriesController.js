@@ -30,20 +30,25 @@ angular.module('adminNg.controllers')
       columns: [{
         template: 'modules/events/partials/seriesTitleCell.html',
         name:  'title',
-        label: 'EVENTS.SERIES.TABLE.TITLE'
+        label: 'EVENTS.SERIES.TABLE.TITLE',
+        sortable: true
       }, {
-        name:  'creator',
-        label: 'EVENTS.SERIES.TABLE.CREATORS'
+        template: 'modules/events/partials/seriesCreatorsCell.html',
+        name:  'creators',
+        label: 'EVENTS.SERIES.TABLE.CREATORS',
+        sortable: true
       }, {
+        template: 'modules/events/partials/seriesContributorsCell.html',
         name:  'contributors',
-        label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS'
+        label: 'EVENTS.SERIES.TABLE.CONTRIBUTORS',
+        sortable: true
       }, {
         name:  'createdDateTime',
-        label: 'EVENTS.SERIES.TABLE.CREATED'
+        label: 'EVENTS.SERIES.TABLE.CREATED',
+        sortable: true
       }, {
         template: 'modules/events/partials/seriesActionsCell.html',
-        label:    'EVENTS.SERIES.TABLE.ACTION',
-        dontSort: true
+        label:    'EVENTS.SERIES.TABLE.ACTION'
       }],
       caption:    'EVENTS.SERIES.TABLE.CAPTION',
       resource: 'series',

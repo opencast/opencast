@@ -174,7 +174,7 @@ public class XACMLSecurityTest {
     currentRoles.add(new JaxbRole("admin", organization));
 
     mediapackage = authzService.setAcl(mediapackage, AclScope.Episode, aclEpisode).getA();
-    Assert.assertEquals(AclScope.Episode, authzService.getActiveAcl(mediapackage).getB());
+    Assert.assertEquals(AclScope.Merged, authzService.getActiveAcl(mediapackage).getB());
     Assert.assertFalse(authzService.hasPermission(mediapackage, "delete"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "read"));
     Assert.assertFalse(authzService.hasPermission(mediapackage, "comment"));

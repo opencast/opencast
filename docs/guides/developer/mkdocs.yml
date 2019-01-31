@@ -1,5 +1,6 @@
 site_name: Opencast - Developer Guide
-repo_url: https://github.com/opencast/opencast/tree/develop/docs/guides/developer/docs
+repo_url: https://github.com/opencast/opencast
+edit_uri: edit/develop/docs/guides/developer/docs/
 
 # Default theme used is readthedocs
 theme: readthedocs
@@ -19,6 +20,7 @@ extra_css:
 nav:
 - Home: 'index.md'
 - Development Process:
+   - Installation: 'installation/source-linux.md'
    - Development: 'development-process.md'
    - Reviewing, Merging and Declining Pull Requests: 'reviewing-and-merging.md'
    - Release Manager: 'release-manager.md'
@@ -60,7 +62,9 @@ nav:
         - Dropdowns: 'modules/admin-ui/style/dropdowns.md'
         - Alerts and Indicators: 'modules/admin-ui/style/alerts-indicators.md'
         - References: 'modules/admin-ui/style/references.md'
-   - Capture Agent: 'modules/capture-agent.md'
+   - Capture Agent:
+     - Capture Agent: 'modules/capture-agent/capture-agent.md'
+     - Test Cases: 'modules/capture-agent/testcases.md'
    - Player:
       - Architecture: 'modules/player/architecture.md'
       - Core Reference: 'modules/player/core.reference.md'

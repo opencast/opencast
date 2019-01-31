@@ -36,7 +36,6 @@ import org.opencastproject.composer.api.VideoClip;
 import org.opencastproject.composer.layout.Dimension;
 import org.opencastproject.composer.layout.Layout;
 import org.opencastproject.composer.layout.Serializer;
-import org.opencastproject.fun.juc.Mutables;
 import org.opencastproject.inspection.api.MediaInspectionException;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -1797,7 +1796,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   }
 
   private static List<Tuple<String, String>> detailsFor(EncoderException ex, EncoderEngine engine) {
-    final List<Tuple<String, String>> d = Mutables.arrayList();
+    final List<Tuple<String, String>> d = new ArrayList<>();
     d.add(tuple("encoder-engine-class", engine.getClass().getName()));
     if (ex instanceof CmdlineEncoderException) {
       d.add(tuple("encoder-commandline", ((CmdlineEncoderException) ex).getCommandLine()));

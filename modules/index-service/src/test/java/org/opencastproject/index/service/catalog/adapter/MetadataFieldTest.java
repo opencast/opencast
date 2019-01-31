@@ -32,7 +32,6 @@ import org.opencastproject.index.service.resources.list.api.ListProvidersService
 import org.opencastproject.index.service.resources.list.api.ResourceListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.metadata.dublincore.MetadataField;
-import org.opencastproject.security.api.Organization;
 
 import com.entwinemedia.fn.data.Opt;
 
@@ -81,7 +80,7 @@ public class MetadataFieldTest {
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
             listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
-                    EasyMock.anyObject(Organization.class), EasyMock.anyBoolean())).andReturn(collection).anyTimes();
+                    EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.expect(
             listProvidersService.isTranslatable(EasyMock.anyString())).andReturn(isTranslatable).anyTimes();
     EasyMock.replay(listProvidersService);

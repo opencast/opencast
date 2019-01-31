@@ -135,7 +135,7 @@ public class ContributorsListProviderTest {
 
   @Test
   public void testUsernamesList() {
-    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, null, null);
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, null);
 
     Assert.assertTrue(list.containsKey(user1.getUsername()));
     Assert.assertTrue(list.containsKey(user2.getUsername()));
@@ -153,7 +153,7 @@ public class ContributorsListProviderTest {
 
   @Test
   public void testListSimple() throws ListProviderException {
-    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null, null);
+    Map<String, String> list = contributorsListProvider.getList(ContributorsListProvider.DEFAULT, null);
 
     Assert.assertTrue(list.containsKey(user1.getName()));
     Assert.assertTrue(list.containsKey(user2.getName()));
@@ -172,11 +172,11 @@ public class ContributorsListProviderTest {
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(0);
     query.setOffset(0);
-    Assert.assertEquals(5, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
+    Assert.assertEquals(5, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
     query.setOffset(3);
-    Assert.assertEquals(2, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
+    Assert.assertEquals(2, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
     query.setOffset(0);
     query.setLimit(1);
-    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query, null).size());
+    Assert.assertEquals(1, contributorsListProvider.getList(ContributorsListProvider.NAMES_TO_USERNAMES, query).size());
   }
 }

@@ -4,9 +4,8 @@ Basic Configuration
 This guide will help you to change the basic configuration settings which are required or at least strongly recommended
 for each Opencast installation. This is basically what you should do, right after installing Opencast on your machine.
 
-All settings are made to files, residing in the Opencast configuration directory. In most cases, that should be either
-`/etc/opencast/custom.properties` or `/opt/opencast/etc/custom.properties`. Edit the files, using the editor of your
-choice, e.g.:
+All settings are made to files residing in the Opencast configuration directory. In most cases, that should be either
+`/etc/opencast/` or `/opt/opencast/etc/`. Edit the files using the editor of your choice, e.g.:
 
     vim /etc/opencast/custom.properties
 
@@ -26,8 +25,8 @@ your own domain name:
 processed media. At least not without an extra amount of work involving modifications to the database. That is why you
 should think about this setting carefully.
 
-Second, adjust the binding address in `org.ops4j.pax.web.cfg`. The binding address can be set to `0.0.0.0` for general
-network access. The property to modify is:
+Second, adjust the binding address in your `org.ops4j.pax.web.cfg` configuration file. The binding address can be set to
+`0.0.0.0` for general network access. The property to modify is:
 
     org.ops4j.pax.web.listening.addresses=127.0.0.1
 

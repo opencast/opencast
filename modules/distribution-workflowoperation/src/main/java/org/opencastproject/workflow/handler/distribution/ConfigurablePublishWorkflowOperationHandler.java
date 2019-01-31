@@ -20,8 +20,6 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getStackTrace;
-
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -48,7 +46,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -292,8 +289,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
         Job job = distributionService.distribute(channelId, mediapackage, bulkElementIds, checkAvailability);
         jobs.add(job);
       } catch (DistributionException | MediaPackageException e) {
-        logger.error("Creating the distribution job for {} elements of media package '{}' failed: {}",
-                bulkElementIds.size(), mediapackage, getStackTrace(e));
+        logger.error("Creating the distribution job for {} elements of media package '{}' failed",
+                bulkElementIds.size(), mediapackage, e);
         throw new WorkflowOperationException(e);
       }
     }
@@ -305,8 +302,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           Job job = distributionService.distribute(channelId, mediapackage, elementId, checkAvailability);
           jobs.add(job);
         } catch (DistributionException | MediaPackageException e) {
-          logger.error("Creating the distribution job for element '{}' of media package '{}' failed: {}", elementId,
-                  mediapackage, getStackTrace(e));
+          logger.error("Creating the distribution job for element '{}' of media package '{}' failed", elementId,
+                  mediapackage, e);
           throw new WorkflowOperationException(e);
         }
       }
@@ -321,8 +318,8 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
           List<? extends MediaPackageElement> elems = MediaPackageElementParser.getArrayFromXml(job.getPayload());
           result.addAll(elems);
         } catch (MediaPackageException e) {
-          logger.error("Job '{}' returned payload ({}) that could not be parsed to media package elements: {}", job,
-                  job.getPayload(), ExceptionUtils.getStackTrace(e));
+          logger.error("Job '{}' returned payload ({}) that could not be parsed to media package elements", job,
+                  job.getPayload(), e);
           throw new WorkflowOperationException(e);
         }
       }

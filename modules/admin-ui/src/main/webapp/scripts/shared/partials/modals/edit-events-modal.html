@@ -92,6 +92,10 @@
             </table>
           </div>
 
+          <div class="obj edit-scheduled-header">
+            <span translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.HEADER"></span>
+          </div>
+
           <div class="obj tbl-details">
             <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.METADATA"><!-- Edit Metadata --></header>
             <div class="obj-container">
@@ -114,8 +118,14 @@
 
           </div><!--list-obj -->
 
-          <div class="obj tbl-details" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
-            <header translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"><!-- Edit scheduling --></header>
+          <div class="obj tbl-details"
+               ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"
+               ng-repeat="wd in validWeekdays()">
+            <header
+              translate="BULK_ACTIONS.EDIT_EVENTS.EDIT.SCHEDULING"
+              translate-values="{ weekday: '{{ translateWeekdayLong(wd) }}', noEvents: '{{numberOfEventsForWeekday(wd)}}', eventOrEvents: '{{ eventOrEvents(wd) }}' }">
+              <!-- Edit scheduling -->
+            </header>
             <div class="obj-container">
 
               <table class="main-tbl">
@@ -129,21 +139,19 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
-                            ng-model="scheduling.start.hour"
-                            ng-change="onTemporalValueChange('start');"
+                            ng-model="scheduling[wd].start.hour"
+                            ng-change="onTemporalValueChange(wd, 'start')"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                            />
-                      <select chosen
-                              ng-disabled="checkingConflicts"
-                              data-width="'100px'"
-                              data-disable-search-threshold="8"
-                              ng-model="scheduling.start.minute"
-                              ng-change="onTemporalValueChange('start');"
-                              placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
-                              ng-options="m.index as m.value for m in minutes"
-                              />
+                    />
+                    <select chosen
+                            ng-disabled="checkingConflicts"
+                            data-width="'100px'"
+                            ng-model="scheduling[wd].start.minute"
+                            ng-change="onTemporalValueChange(wd, 'start');"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
+                            ng-options="m.index as m.value for m in minutes"
+                    />
                   </td>
                 </tr>
                 <tr>
@@ -152,38 +160,35 @@
                     <select chosen
                             ng-disabled="checkingConflicts"
                             data-width="'100px'"
-                            data-disable-search-threshold="8"
-                            ng-model="scheduling.end.hour"
-                            ng-change="onTemporalValueChange('end');"
+                            ng-model="scheduling[wd].end.hour"
+                            ng-change="onTemporalValueChange(wd, 'end');"
                             placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.HOUR' | translate}}'"
                             ng-options="h.index as h.value for h in hours"
-                            />
-                      <select chosen
-                              ng-disabled="checkingConflicts"
-                              data-width="'100px'"
-                              data-disable-search-threshold="8"
-                              ng-model="scheduling.end.minute"
-                              ng-change="onTemporalValueChange('end');"
-                              placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
-                              ng-options="m.index as m.value for m in minutes"
-                              />
-                        <span ng-bind="scheduling.end.date"
-                              ng-show="scheduling.end.date !== scheduling.start.date"
-                              />
+                    />
+                    <select chosen
+                            ng-disabled="checkingConflicts"
+                            data-width="'100px'"
+                            ng-model="scheduling[wd].end.minute"
+                            ng-change="onTemporalValueChange(wd, 'end');"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.MINUTE' | translate}}'"
+                            ng-options="m.index as m.value for m in minutes"
+                    />
+                    <span ng-bind="scheduling.end.date"
+                          ng-show="scheduling.end.date !== scheduling.start.date"
+                    />
                   </td>
                 </tr>
                 <tr>
                   <td>{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}</td>
                   <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                     <select chosen pre-select-from="captureAgents"
-                                   ng-disabled="checkingConflicts"
-                                   data-width="'200px'"
-                                   ng-change="roomChanged();"
-                                   data-disable-search-threshold="8"
-                                   ng-model="scheduling.location"
-                                   ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
-                                   placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
-                                   />
+                            ng-disabled="checkingConflicts"
+                            data-width="'200px'"
+                            ng-change="roomChanged();"
+                            ng-model="scheduling[wd].location"
+                            ng-options="value.name for (id, value) in captureAgents | filter:hasAgentAccess"
+                            placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.SOURCE.PLACEHOLDER.LOCATION' | translate }}'"
+                            />
                   </td>
                   <td ng-if="!$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')">
                     {{ source.device.name }}
@@ -201,12 +206,12 @@
                   </td>
                 </tr>
                 <tr>
-                  <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAYS' | translate }}</td>
+                  <td>{{ 'EVENTS.EVENTS.NEW.SOURCE.SCHEDULE_MULTIPLE.WEEKDAY' | translate }}</td>
                   <td class="weekdays">
                     <label ng-repeat="weekday in weekdays">
                       <input type="radio"
-                             ng-model="scheduling.weekday"
-                             name="weekdays"
+                             ng-model="scheduling[wd].weekday"
+                             name="weekdays_{{wd}}"
                              value="{{weekday.key}}"
                              ng-disabled="checkingConflicts || !$root.userIs('ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')"> {{ weekday.translation | translate }}
                     </label>
@@ -226,7 +231,7 @@
       <a
         class="submit"
         ng-click="checkConflicts()"
-        ng-class="{active: !checkingConflicts, disabled: checkingConflicts}">
+        ng-class="{active: !checkingConflicts, disabled: checkingConflicts || hasInvalidDates()}">
         {{ nextButtonText() | translate }}
       </a>
       <a wz-previous translate="WIZARD.BACK" class="cancel">

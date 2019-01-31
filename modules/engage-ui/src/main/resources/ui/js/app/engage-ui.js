@@ -99,7 +99,6 @@ function($, bootbox, _, alertify) {
               case "el": return "el-GR";
               case "en": return "en-US";
               case "es": return "es-ES";
-              case "fil": return "fil-PH";
               case "fr": return "fr-FR";
               case "gl": return "gl-ES";
               case "he": return "he-IL";
@@ -107,9 +106,7 @@ function($, bootbox, _, alertify) {
               case "pl": return "pl-PL";
               case "sl": return "sl-SI";
               case "sv": return "sv-SE";
-              case "tl": return "tl-PH";
               case "tr": return "tr-TR";
-              case "zh": return "zh-CN";
               default: return null;
             }
         }

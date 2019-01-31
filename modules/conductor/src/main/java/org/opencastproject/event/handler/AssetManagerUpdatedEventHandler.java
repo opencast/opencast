@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.message.broker.api.series.SeriesItem;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -170,7 +171,14 @@ public class AssetManagerUpdatedEventHandler {
         // Update the series XACML file
         if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
           // Build a new XACML file for this mediapackage
-          authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
+          try {
+            if (seriesItem.getOverrideEpisodeAcl()) {
+              authorizationService.removeAcl(mp, AclScope.Episode);
+            }
+            authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
+          } catch (MediaPackageException e) {
+            logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
+          }
         }
 
         // Update the series dublin core or extended metadata
