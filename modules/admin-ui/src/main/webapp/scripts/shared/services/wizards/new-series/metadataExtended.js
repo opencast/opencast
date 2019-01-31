@@ -54,6 +54,8 @@ angular.module('adminNg.services')
       // we go for the extended metadata here
       if (fields.length > 0) {
         for (i = 0; i < fields.length; i++) {
+          // just hooking the tab index up here, as this is already running through all elements
+          fields[i].tabindex = i + 1;
           if (fields[i].required) {
             me.updateRequiredMetadata(fields[i].id, fields[i].value);
             if (fields[i].type === 'boolean') {
