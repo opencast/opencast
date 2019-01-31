@@ -194,20 +194,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** The source to download from  */
+  public static final String DOWNLOAD_SOURCE = "org.opencastproject.download.source";
+
+  /** The user for download from external sources */
+  public static final String DOWNLOAD_USER = "org.opencastproject.download.user";
+
+  /** The password for download from external sources */
+  public static final String DOWNLOAD_PASSWORD = "org.opencastproject.download.password";
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
   /** The approximate load placed on the system by ingesting a zip file */
   private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
 
-  /** The User for Download from external sources */
-  private static String downloadUser = "opencast_system_account";
+  /** The user for download from external sources */
+  private static String downloadUser = DOWNLOAD_USER;
 
-  /** The Password for Download from external sources */
-  private static String downloadPassword = "CHANGE_ME";
+  /** The password for download from external sources */
+  private static String downloadPassword = DOWNLOAD_PASSWORD;
 
   /** The external source dns name */
-  private static String downloadSource = "localhost";
+  private static String downloadSource = DOWNLOAD_SOURCE;
 
   /** The JMX business object for ingest statistics */
   private IngestStatistics ingestStatistics = new IngestStatistics();
@@ -308,9 +317,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return;
     }
 
-    downloadPassword = StringUtils.trimToNull((String) properties.get("download.password"));
-    downloadUser = StringUtils.trimToNull(((String) properties.get("download.user")));
-    downloadSource = StringUtils.trimToNull(((String) properties.get("download.source")));
+    downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
+    downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
+    downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
 
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
             serviceRegistry);
