@@ -146,7 +146,7 @@ public class CaptureAgentAdminRoleProviderImpl implements RoleProvider, CaptureA
               .map(role -> (JpaRole)role)
               .collect(Collectors.toSet());
       try {
-        this.userAndRoleProvider.updateUser(new JpaUser(user.getUsername(), user.getPassword(),
+        this.userAndRoleProvider.updateUser(new JpaUser(user.getUsername(), "",
             (JpaOrganization) user.getOrganization(), user.getName(), user.getEmail(), user.getProvider(),
             user.isManageable(), newRoles));
       } catch (final NotFoundException | UnauthorizedException e) {
