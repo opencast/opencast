@@ -75,6 +75,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 /**
@@ -154,13 +155,22 @@ public abstract class AbstractAssetManager implements AssetManager {
     // try to fetch the asset
     for (final AssetDtos.Medium asset : getDb().getAsset(RuntimeTypes.convert(version), mpId, mpeId)) {
       for (final InputStream assetStream : getLocalAssetStore().get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+
+        Checksum checksum = null;
+        try {
+          checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
+        } catch (NoSuchAlgorithmException e) {
+          logger.warn("Invalid checksum for asset {} of media package {}", mpeId, mpId, e);
+        }
+
         final Asset a = new AssetImpl(
                 AssetId.mk(version, mpId, mpeId),
                 assetStream,
                 asset.getAssetDto().getMimeType(),
                 asset.getAssetDto().getSize(),
                 asset.getStorageId(),
-                asset.getAvailability());
+                asset.getAvailability(),
+                checksum);
         return Opt.some(a);
       }
     }

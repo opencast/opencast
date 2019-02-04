@@ -139,6 +139,28 @@ public final class Checksum implements Serializable {
   }
 
   /**
+   * Creates a checksum from a string in the form "value (type)".
+   *
+   * @param checksum
+   *         the checksum in string form
+   * @return the checksum
+   * @throws NoSuchAlgorithmException
+   *           if the checksum of the specified type cannot be created
+   */
+  public static Checksum fromString(String checksum) throws NoSuchAlgorithmException {
+    String[] checksumParts = checksum.split(" ");
+
+    if (checksumParts.length != 2) {
+      throw new IllegalArgumentException("Invalid string for checksum!");
+    }
+
+    String value = checksumParts[0];
+    String type = checksumParts[1].replace("(","").replace(")", "");
+
+    return create(type, value);
+  }
+
+  /**
    * Creates a checksum of type <code>type</code> and value <code>value</code>.
    *
    * @param type

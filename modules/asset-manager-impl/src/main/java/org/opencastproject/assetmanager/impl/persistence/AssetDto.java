@@ -93,6 +93,10 @@ public class AssetDto {
     return mediaPackageElementId;
   }
 
+  public String getChecksum() {
+    return checksum;
+  }
+
   public Opt<MimeType> getMimeType() {
     return Conversions.toMimeType(mimeType);
   }

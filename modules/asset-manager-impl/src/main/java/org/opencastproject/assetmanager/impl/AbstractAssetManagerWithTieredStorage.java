@@ -39,6 +39,7 @@ import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
 import org.opencastproject.assetmanager.impl.storage.Source;
 import org.opencastproject.assetmanager.impl.storage.StoragePath;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
@@ -326,13 +328,22 @@ public abstract class AbstractAssetManagerWithTieredStorage extends AbstractAsse
       for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
         for (final AssetStore store : getAssetStore(storageId)) {
           for (final InputStream assetStream : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpeId))) {
+
+            Checksum checksum = null;
+            try {
+              checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
+            } catch (NoSuchAlgorithmException e) {
+              logger.warn("Invalid checksum for asset {} of media package {}", mpeId, mpId, e);
+            }
+
             final Asset a = new AssetImpl(
                     AssetId.mk(version, mpId, mpeId),
                     assetStream,
                     asset.getAssetDto().getMimeType(),
                     asset.getAssetDto().getSize(),
                     asset.getStorageId(),
-                    asset.getAvailability());
+                    asset.getAvailability(),
+                    checksum);
             return Opt.some(a);
           }
         }
