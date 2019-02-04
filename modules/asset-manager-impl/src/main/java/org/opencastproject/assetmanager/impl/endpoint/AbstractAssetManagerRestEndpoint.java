@@ -25,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
@@ -51,6 +52,8 @@ import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.util.Checksum;
+import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypeUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -72,6 +75,7 @@ import java.util.Map;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -271,6 +275,9 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_NOT_FOUND,
               description = "Not found"),
           @RestResponse(
+              responseCode = SC_NOT_MODIFIED,
+              description = "If file not modified"),
+          @RestResponse(
               description = "Not allowed to read assets of this snapshot.",
               responseCode = SC_FORBIDDEN),
           @RestResponse(
@@ -278,13 +285,31 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
               responseCode = SC_INTERNAL_SERVER_ERROR)})
   public Response getAsset(@PathParam("mediaPackageID") final String mediaPackageID,
                            @PathParam("mediaPackageElementID") final String mediaPackageElementID,
-                           @PathParam("version") final String version) {
+                           @PathParam("version") final String version,
+                           @HeaderParam("If-None-Match") String ifNoneMatch) {
+
     try {
       for (final Version v : getAssetManager().toVersion(version)) {
         for (Asset asset : getAssetManager().getAsset(v, mediaPackageID, mediaPackageElementID)) {
+
+          if (StringUtils.isNotBlank(ifNoneMatch)) {
+            Checksum checksum = asset.getChecksum();
+
+            if (checksum == null || !checksum.getType().equals((ChecksumType.DEFAULT_TYPE))) {
+              checksum = Checksum.create(ChecksumType.DEFAULT_TYPE, asset.getInputStream());
+            }
+
+            String md5 = checksum.getValue();
+
+            if (md5.equals(ifNoneMatch)) {
+              return Response.notModified(md5).build();
+            }
+          }
+
           final String fileName = mediaPackageElementID
                   .concat(".")
                   .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+
           asset.getMimeType().map(MimeTypeUtil.Fns.toString);
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
@@ -302,6 +327,14 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
       return handleException(e);
     }
   }
+
+//
+//  String md5 = null;
+//    try {
+//    md5 = getMediaPackageElementDigest(mediaPackageID, mediaPackageElementID);
+
+
+
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
