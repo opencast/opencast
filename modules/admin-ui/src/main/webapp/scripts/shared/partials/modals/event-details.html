@@ -419,6 +419,7 @@
                       </th>
                       <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.STATUS"><!-- Status --></th>
                       <th translate="EVENTS.EVENTS.DETAILS.WORKFLOWS.ACTIONS" ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" class="fit"><!-- Actions --></th>
+                      <th class="medium"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -428,25 +429,18 @@
                       <td>{{ item.submitter }}</td>
                       <td>{{ item.submitted | localizeDate : 'dateTime' : 'medium' }}</td>
                       <td>{{ item.status | translate }}</td>
-                      <td>
-                        <a class="more" title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.DETAILS' | translate }}"
-                           ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)">
-                          <!-- Workflow details -->
-                        </a>
+                      <td ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')">
                         <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.RUNNING'" ng-click="workflowAction(item.id, 'STOP')"
-                           ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
                            class="stop fa-fw"
                            title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.STOP' | translate }}">
                           <!-- STOP -->
                         </a>
                         <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.PAUSED'" ng-click="workflowAction(item.id, 'NONE')"
-                           ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
                            class="fa fa-hand-stop-o fa-fw" style="color:red"
                            title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.ABORT' | translate }}">
                           <!-- Abort -->
                         </a>
                         <a ng-show="item.status == 'EVENTS.EVENTS.DETAILS.WORKFLOWS.OPERATION_STATUS.PAUSED'" ng-click="workflowAction(item.id, 'RETRY')"
-                           ng-if="$root.userIs('ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')"
                            class="fa fa-refresh fa-fw"
                            title="{{ 'EVENTS.EVENTS.DETAILS.WORKFLOWS.TOOLTIP.RETRY' | translate }}">
                           <!-- Retry -->
@@ -462,6 +456,12 @@
                           <!-- DELETE -->
                         </a>
 
+                      </td>
+                      <td>
+                        <a class="details-link" ng-click="openSubTab('workflow-details', 'EventWorkflowDetailsResource', item.id)"
+                           translate="EVENTS.EVENTS.DETAILS.MEDIA.DETAILS">
+                          <!-- Details -->
+                        </a>
                       </td>
                     </tr>
                   </tbody>
