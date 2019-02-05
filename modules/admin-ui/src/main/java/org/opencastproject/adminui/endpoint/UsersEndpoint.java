@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.lang.String.CASE_INSENSITIVE_ORDER;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
@@ -72,6 +73,9 @@ import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -82,6 +86,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -127,6 +132,10 @@ public class UsersEndpoint {
 
   /** Base url of this endpoint */
   private String endpointBaseUrl;
+
+  /** For JSON serialization */
+  private static final Type listType = new TypeToken<ArrayList<Map<String, String>>>() { }.getType();
+  private static final Gson gson = new Gson();
 
   /**
    * Sets the user directory service
@@ -363,17 +372,23 @@ public class UsersEndpoint {
     JpaOrganization organization = (JpaOrganization) securityService.getOrganization();
     Set<JpaRole> rolesSet = new HashSet<>();
 
-    Option<JSONArray> rolesArray = Option.none();
-    if (StringUtils.isNotBlank(roles)) {
-      rolesArray = Option.some((JSONArray) JSONValue.parse(roles));
+    List<Map<String, String>> rolesList;
+    try {
+      rolesList = gson.fromJson(roles, listType);
+    } catch (JsonSyntaxException e) {
+      return Response.status(SC_BAD_REQUEST).build();
     }
-    if (rolesArray.isSome()) {
+
+    if (rolesList != null) {
       // Add the roles given
-      for (Object roleObj : rolesArray.get()) {
-        JSONObject role = (JSONObject) roleObj;
-        String rolename = (String) role.get("id");
-        Role.Type roletype = Role.Type.valueOf((String) role.get("type"));
-        rolesSet.add(new JpaRole(rolename, organization, null, roletype));
+      for (Map<String, String> role: rolesList) {
+        try {
+          final String roleName = role.get("id");
+          final Role.Type roleType = Role.Type.valueOf(role.get("type"));
+          rolesSet.add(new JpaRole(roleName, organization, null, roleType));
+        } catch (IllegalArgumentException | NullPointerException e) {
+          return Response.status(SC_BAD_REQUEST).build();
+        }
       }
     } else {
       // Or the use the one from the user if no one is given
