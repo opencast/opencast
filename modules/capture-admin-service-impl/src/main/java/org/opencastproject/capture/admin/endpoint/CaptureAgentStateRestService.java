@@ -30,7 +30,6 @@ import static org.opencastproject.capture.admin.api.AgentState.KNOWN_STATES;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentStateUpdate;
-import org.opencastproject.capture.admin.api.CaptureAgentAdminRoleProvider;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.capture.admin.impl.RecordingStateUpdate;
 import org.opencastproject.scheduler.api.Recording;
@@ -94,7 +93,6 @@ public class CaptureAgentStateRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(CaptureAgentStateRestService.class);
   private CaptureAgentStateService service;
-  private CaptureAgentAdminRoleProvider roleProvider;
   private SchedulerService schedulerService;
 
   /**
@@ -116,10 +114,6 @@ public class CaptureAgentStateRestService {
 
   public void setSchedulerService(SchedulerService schedulerService) {
     this.schedulerService = schedulerService;
-  }
-
-  public void setRoleProvider(CaptureAgentAdminRoleProvider roleProvider) {
-    this.roleProvider = roleProvider;
   }
 
   public CaptureAgentStateRestService() {
@@ -219,9 +213,6 @@ public class CaptureAgentStateRestService {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
 
     service.removeAgent(agentName);
-
-    // Remove the corresponding capture agent roles
-    this.roleProvider.removeRole(agentName);
 
     logger.debug("The agent {} was successfully removed", agentName);
     return Response.ok(agentName + " removed").build();
