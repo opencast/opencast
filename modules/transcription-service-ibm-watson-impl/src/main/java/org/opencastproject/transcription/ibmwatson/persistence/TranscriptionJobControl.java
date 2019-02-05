@@ -24,7 +24,7 @@ import java.util.Date;
 
 public final class TranscriptionJobControl {
   public enum Status {
-    Progress, Canceled, Error, TranscriptionComplete, Closed
+    Progress, Canceled, Error, TranscriptionComplete, Closed, Retry
   }
 
   // Media package id

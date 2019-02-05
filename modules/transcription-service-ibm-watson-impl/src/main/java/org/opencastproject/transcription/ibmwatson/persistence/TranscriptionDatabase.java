@@ -97,4 +97,15 @@ public class TranscriptionDatabase {
     return resultList;
   }
 
+  public List<TranscriptionJobControl> findByMediaPackageTrackAndStatus(String mpId, String trackId, String... status)
+          throws TranscriptionDatabaseException {
+    List<TranscriptionJobControlDto> list = TranscriptionJobControlDto
+            .findByMediaPackageTrackAndStatus(emf.createEntityManager(), mpId, trackId, status);
+    List<TranscriptionJobControl> resultList = new ArrayList<TranscriptionJobControl>();
+    for (TranscriptionJobControlDto dto : list) {
+      resultList.add(dto.toTranscriptionJobControl());
+    }
+    return resultList;
+  }
+
 }
