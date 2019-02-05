@@ -25,25 +25,41 @@ with all database migrations, we recommend to make a database backup before atte
 You can find the database upgrade script in `docs/upgrade/5_to_6/`.
 
 
-Rebuild ElasticSearch Index
+Rebuild Elasticsearch Index
 ---------------------------
 
-The update requires an ElasticSearch index rebuild. For that, stop Opencast, delete the index directory at `data/index`,
-start Opencast and use one of the following methods to recreate the index:
+### Admin Interface
 
-- Make an HTTP POST request to `/admin-ng/index/recreateIndex` using your browser or an alternative HTTP client.
-- Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
-  symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
-  `/recreateIndex`.
+The update requires an Elasticsearch index rebuild. For that, stop Opencast, delete the index directory at `data/index`,
+restart Opencast and make an HTTP POST request to `/admin-ng/index/recreateIndex`.
 
-In both cases, the resulting page is empty but should return a HTTP status 200.
+Example (using cURL):
 
-If you are going to use the External API, then the corresponding ElasticSearch index must also be recreated:
+    curl -i --digest -u <digest_user>:<digest_password> -H "X-Requested-Auth: Digest" -s -X POST \
+      https://example.opencast.org/admin-ng/index/recreateIndex
 
-- Make an HTTP POST request to `/api/recreateIndex` using your browser or an alternative HTTP client.
-- Open the REST documentation, which can be found under the “Help” section in the Admin UI (by clicking on the “?”
-  symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
-  `/recreateIndex`.
+You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
+“?” symbol at the top right corner). Then go to the “Admin UI - Index Endpoint” section and use the testing form on
+`/recreateIndex` to issue a POST request.
+
+In both cases you should get a 200 HTTP status.
+
+
+### External API
+
+If you are using the External API, then also trigger a rebuilt of its index by sending an HTTP POST request to
+`/api/recreateIndex`.
+
+Example (using cURL):
+
+    curl -i --digest -u <digest_user>:<digest_password> -H "X-Requested-Auth: Digest" -s -X POST \
+      https://example.opencast.org/api/recreateIndex
+
+You can also just open the REST documentation, which can be found under the “Help” section in the admin interface (the
+“?” symbol at the top right corner). Then go to the “External API - Base Endpoint” section and use the testing form on
+`/recreateIndex`.
+
+In both cases you should again get a 200 HTTP status.
 
 Configuration Changes
 ---------------------
