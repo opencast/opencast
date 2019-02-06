@@ -29,19 +29,22 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -67,6 +70,9 @@ public class LanguageServiceEndpoint implements ManagedService {
   /** Reference to the {@link LanguageService} instance. */
   private LanguageService languageSrv;
 
+  /** For Serialization */
+  private static final Gson gson = new Gson();
+
   /** OSGi callback to bind a {@link LanguageService} instance. */
   void setLanguageService(LanguageService languageSrv) {
     this.languageSrv = languageSrv;
@@ -74,7 +80,7 @@ public class LanguageServiceEndpoint implements ManagedService {
 
   private static Set<String> excludedLocales;
 
-  public static final String EXCLUDE_CONFIG_KEY = "org.opencastproject.adminui.languages.exclude";
+  private static final String EXCLUDE_CONFIG_KEY = "org.opencastproject.adminui.languages.exclude";
 
   /** OSGi callback if properties file is present */
   @Override
@@ -93,73 +99,63 @@ public class LanguageServiceEndpoint implements ManagedService {
   @Path("languages.json")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "languages", description = "Information about the user locale and the available languages", reponses = { @RestResponse(description = "Returns information about the current user's locale and the available translations", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
-  @SuppressWarnings("unchecked")
   public String getLanguagesInfo(@Context HttpHeaders headers) {
 
-    final List<Locale> clientsAcceptableLanguages = headers.getAcceptableLanguages();
-    final List<Language> serversAvailableLanguages = languageSrv.getAvailableLanguages();
+    final Map<String, Object> json = new HashMap<>();
+    json.put("availableLanguages",
+      languageSrv.getAvailableLanguages()
+        .parallelStream()
+        .filter(l -> !excludedLocales.contains(l.getCode()))
+        .map(this::languageToJson)
+        .collect(Collectors.toList()));
 
-    logger.debug("Get languages for the following locale(s): '{}'.", clientsAcceptableLanguages.toArray());
+    final List<Locale> acceptableLanguages = headers.getAcceptableLanguages();
+    json.put("bestLanguage", languageToJson(languageSrv.getBestLanguage(acceptableLanguages)));
+    json.put("fallbackLanguage", languageToJson(languageSrv.getFallbackLanguage(acceptableLanguages)));
 
-    JSONObject json = new JSONObject();
-    JSONArray availableLanguages = new JSONArray();
-    for (Language serverLang : serversAvailableLanguages) {
-      if (!excludedLocales.contains(serverLang.getCode())) {
-        availableLanguages.add(languageToJson(serverLang));
-      } else {
-        logger.debug("Filtering out " + serverLang.getCode() + " because it is excluded");
-      }
-    }
-    json.put("availableLanguages", availableLanguages);
+    logger.debug("Language data: {}", json);
 
-    logger.debug("Available languages: '{}'.", availableLanguages);
-
-    Language bestLanguage = languageSrv.getBestLanguage(clientsAcceptableLanguages);
-    json.put("bestLanguage", languageToJson(bestLanguage));
-    Language fallbackLanguage = languageSrv.getFallbackLanguage(clientsAcceptableLanguages);
-    json.put("fallbackLanguage", languageToJson(fallbackLanguage));
-
-    logger.debug("Returns the following languages for the locale(s) '{}': '{}'.", clientsAcceptableLanguages.toArray(),
-            availableLanguages);
-
-    return json.toJSONString();
+    return gson.toJson(json);
   }
 
-  private JSONObject languageToJson(Language language) {
-    JSONObject json = new JSONObject();
-    if (language != null) {
-      json.put("code", language.getCode());
-      json.put("displayLanguage", language.getDisplayName());
-      addDateTimeFormatsTo(json, language);
+  /**
+   * Prepares a language for JSON serialization.
+   *
+   * @param language
+   *          Language to prepare
+   * @return Map with prepared data
+   */
+  private Map<String, Object> languageToJson(Language language) {
+    if (language == null) {
+      return null;
     }
-    return json;
-  }
+    Map<String, Object> jsonData = new HashMap<>();
+    jsonData.put("code", language.getCode());
+    jsonData.put("displayLanguage", language.getDisplayName());
 
-  @SuppressWarnings("unchecked")
-  private void addDateTimeFormatsTo(JSONObject json, Language language) {
+    final LocaleFormattingStringProvider formattingProvider = new LocaleFormattingStringProvider(language.getLocale());
 
-    LocaleFormattingStringProvider localeFormattingStringProvider = new LocaleFormattingStringProvider(
-            language.getLocale());
-
-    final JSONObject dateFormatsJson = new JSONObject();
-    final JSONObject dateTimeFormat = new JSONObject();
-    final JSONObject timeFormat = new JSONObject();
-    final JSONObject dateFormat = new JSONObject();
+    final Map<String, Object> dateFormatsJson = new HashMap<>();
+    final Map<String, String> dateTimeFormat = new HashMap<>();
+    final Map<String, String> timeFormat = new HashMap<>();
+    final Map<String, String> dateFormat = new HashMap<>();
 
     for (int i = 0; i < LanguageService.DATEPATTERN_STYLES.length; i++) {
       dateTimeFormat.put(LanguageService.DATEPATTERN_STYLENAMES[i],
-              localeFormattingStringProvider.getDateTimeFormat(LanguageService.DATEPATTERN_STYLES[i]));
+              formattingProvider.getDateTimeFormat(LanguageService.DATEPATTERN_STYLES[i]));
 
       timeFormat.put(LanguageService.DATEPATTERN_STYLENAMES[i],
-              localeFormattingStringProvider.getTimeFormat(LanguageService.DATEPATTERN_STYLES[i]));
+              formattingProvider.getTimeFormat(LanguageService.DATEPATTERN_STYLES[i]));
 
       dateFormat.put(LanguageService.DATEPATTERN_STYLENAMES[i],
-              localeFormattingStringProvider.getDateFormat(LanguageService.DATEPATTERN_STYLES[i]));
+              formattingProvider.getDateFormat(LanguageService.DATEPATTERN_STYLES[i]));
     }
     dateFormatsJson.put("dateTime", dateTimeFormat);
     dateFormatsJson.put("time", timeFormat);
     dateFormatsJson.put("date", dateFormat);
-    json.put("dateFormats", dateFormatsJson);
+    jsonData.put("dateFormats", dateFormatsJson);
+
+    return jsonData;
   }
 
 }
