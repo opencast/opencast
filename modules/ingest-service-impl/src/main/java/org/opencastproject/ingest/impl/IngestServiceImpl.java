@@ -64,6 +64,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.util.StandAloneTrustedHttpClientImpl;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
@@ -192,11 +193,29 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The key to look for in the service configuration file to override the {@link DEFAULT_INGEST_ZIP_JOB_LOAD} */
   public static final String ZIP_JOB_LOAD_KEY = "job.load.ingest.zip";
 
+  /** The source to download from  */
+  public static final String DOWNLOAD_SOURCE = "org.opencastproject.download.source";
+
+  /** The user for download from external sources */
+  public static final String DOWNLOAD_USER = "org.opencastproject.download.user";
+
+  /** The password for download from external sources */
+  public static final String DOWNLOAD_PASSWORD = "org.opencastproject.download.password";
+
   /** The approximate load placed on the system by ingesting a file */
   private float ingestFileJobLoad = DEFAULT_INGEST_FILE_JOB_LOAD;
 
   /** The approximate load placed on the system by ingesting a zip file */
   private float ingestZipJobLoad = DEFAULT_INGEST_ZIP_JOB_LOAD;
+
+  /** The user for download from external sources */
+  private static String downloadUser = DOWNLOAD_USER;
+
+  /** The password for download from external sources */
+  private static String downloadPassword = DOWNLOAD_PASSWORD;
+
+  /** The external source dns name */
+  private static String downloadSource = DOWNLOAD_SOURCE;
 
   /** The JMX business object for ingest statistics */
   private IngestStatistics ingestStatistics = new IngestStatistics();
@@ -296,6 +315,10 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       logger.info("No configuration available, using defaults");
       return;
     }
+
+    downloadPassword = StringUtils.trimToEmpty((String)properties.get(DOWNLOAD_PASSWORD));
+    downloadUser = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_USER)));
+    downloadSource = StringUtils.trimToEmpty(((String) properties.get(DOWNLOAD_SOURCE)));
 
     ingestFileJobLoad = LoadUtil.getConfiguredLoadValue(properties, FILE_JOB_LOAD_KEY, DEFAULT_INGEST_FILE_JOB_LOAD,
             serviceRegistry);
@@ -1478,13 +1501,30 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     logger.info("Sucessful discarded mediapackage {}", mp);
   }
 
+  /**
+   * Creates a StandAloneTrustedHttpClientImpl
+   *
+   * @param user
+   * @param password
+   * @return
+   */
+  protected TrustedHttpClient createStandaloneHttpClient(String user, String password) {
+    return new StandAloneTrustedHttpClientImpl(this.downloadUser, this.downloadPassword, none(), none(), none());
+  }
+
   protected URI addContentToRepo(MediaPackage mp, String elementId, URI uri) throws IOException {
     InputStream in = null;
     HttpResponse response = null;
+    TrustedHttpClient httpClientStandAlone = httpClient;
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        response = httpClient.execute(get);
+
+        if (uri.getHost().matches(this.downloadSource)) {
+          httpClientStandAlone = this.createStandaloneHttpClient(downloadUser,downloadPassword);
+        }
+        response = httpClientStandAlone.execute(get);
+
         int httpStatusCode = response.getStatusLine().getStatusCode();
         if (httpStatusCode != 200) {
           throw new IOException(uri + " returns http " + httpStatusCode);
@@ -1502,7 +1542,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       return addContentToRepo(mp, elementId, fileName, in);
     } finally {
       IOUtils.closeQuietly(in);
-      httpClient.close(response);
+      httpClientStandAlone.close(response);
     }
   }
 
