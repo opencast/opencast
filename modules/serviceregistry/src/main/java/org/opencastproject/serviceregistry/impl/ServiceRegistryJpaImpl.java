@@ -1037,10 +1037,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.error("JPA processor service mismatch: " + originalJob.getProcessorServiceRegistration().getId() + " vs " + fromDb.getProcessorServiceRegistration().getId());
       if (!originalJob.getDateStarted().equals(fromDb.getDateStarted()))
         logger.error("JPA date started mismatch: " + originalJob.getDateStarted() + " vs " + fromDb.getDateStarted());
-      if (!originalJob.getBlockedJobIds().equals(fromDb.getBlockedJobIds()))
-        logger.error("JPA blocked job ids mismatch: " + originalJob.getBlockedJobIds() + " vs " + fromDb.getBlockedJobIds());
-      if (!originalJob.getBlockingJobId().equals(fromDb.getBlockingJobId()))
-        logger.error("JPA blocking job id mismatch: " + originalJob.getBlockingJobId() + " vs " + fromDb.getBlockingJobId());
       if (!originalJob.getChildJobsString().equals(fromDb.getChildJobsString()))
         logger.error("JPA child job id mismatch: " + originalJob.getChildJobsString() + " vs " + fromDb.getChildJobsString());
     } catch (Exception e) {
@@ -1106,8 +1102,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     fromDb.setVersion(job.getVersion());
     fromDb.setOperation(job.getOperation());
     fromDb.setArguments(job.getArguments());
-    fromDb.setBlockedJobIds(job.getBlockedJobIds());
-    fromDb.setBlockingJobId(job.getBlockingJobId());
 
     if (job.getDateCreated() == null) {
       jpaJob.setDateCreated(now);

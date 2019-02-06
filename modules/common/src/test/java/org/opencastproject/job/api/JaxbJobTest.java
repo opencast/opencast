@@ -44,7 +44,7 @@ public class JaxbJobTest {
 
     final JaxbJob jaxb = new JaxbJob(
             new JobImpl(3L, "test", "test_org", 0L, "simple", "do", arguments, DISPATCHING, "localhost", "remotehost",
-                    now, now, now, 100L, 200L, "result", 1L, 3L, true, uri, 1.5F, blockedJobs, 4L));
+                    now, now, now, 100L, 200L, "result", 1L, 3L, true, uri, 1.5F));
     final Job job = jaxb.toJob();
 
     assertEquals(3L, job.getId());
@@ -68,8 +68,6 @@ public class JaxbJobTest {
     assertTrue(job.isDispatchable());
     assertEquals(uri, job.getUri());
     assertEquals((Float) 1.5F, job.getJobLoad());
-    assertEquals(blockedJobs, job.getBlockedJobIds());
-    assertEquals((Long) 4L, job.getBlockingJobId());
   }
 
 }
