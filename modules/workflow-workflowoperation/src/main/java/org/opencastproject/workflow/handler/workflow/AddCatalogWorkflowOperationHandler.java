@@ -180,7 +180,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
       throws WorkflowOperationException {
     String value = inst.getCurrentOperation().getConfiguration(cfgKey);
 
-    if (!isOptional && value == null) {
+    if (!isOptional && (value == null || value.isEmpty())) {
       throw new WorkflowOperationException("'" + cfgKey + "' not set");
     }
 
