@@ -897,7 +897,9 @@
                   "PAUSED": "Začasno ustavljeno",
                   "SUCCEEDED": "Uspelo",
                   "FAILED": "Ni uspelo",
+                  "FAILING": "Failing",
                   "SKIPPED": "Izpuščen",
+                  "STOPPED": "Stopped",
                   "RETRY": "Ponovi"
                }
             },

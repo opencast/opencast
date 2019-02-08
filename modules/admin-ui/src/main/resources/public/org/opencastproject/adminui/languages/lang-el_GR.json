@@ -897,7 +897,9 @@
                   "PAUSED": "Σε παύση",
                   "SUCCEEDED": "Ολοκληρώθηκε με επιτυχία",
                   "FAILED": "Απέτυχε",
+                  "FAILING": "Failing",
                   "SKIPPED": "Παραλείφθηκε",
+                  "STOPPED": "Stopped",
                   "RETRY": "Επανάληψη"
                }
             },

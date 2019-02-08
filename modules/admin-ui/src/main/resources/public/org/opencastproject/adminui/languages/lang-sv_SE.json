@@ -897,7 +897,9 @@
                   "PAUSED": "Pausad",
                   "SUCCEEDED": "Lyckade",
                   "FAILED": "Misslyckad",
+                  "FAILING": "Failing",
                   "SKIPPED": "Hoppades över",
+                  "STOPPED": "Stopped",
                   "RETRY": "Försök igen"
                }
             },

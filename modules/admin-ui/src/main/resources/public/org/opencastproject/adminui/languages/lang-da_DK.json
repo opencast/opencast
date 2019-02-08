@@ -897,7 +897,9 @@
                   "PAUSED": "På pause",
                   "SUCCEEDED": "Gennemført",
                   "FAILED": "Mislykkedes",
+                  "FAILING": "Failing",
                   "SKIPPED": "Oversprunget",
+                  "STOPPED": "Stopped",
                   "RETRY": "Prøv igen"
                }
             },
