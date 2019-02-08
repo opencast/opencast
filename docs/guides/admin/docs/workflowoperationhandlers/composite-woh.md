@@ -12,7 +12,8 @@ The internal ffmpeg command is using the following filters: scale for scaling th
 dimension including the background color, movie for adding additional videos and images and overlay for aligning the
 videos and images to the output dimension. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
 
-If both upper and lower tracks have audio, "source-audio-name" can be set to "upper", "lower" or "both" to choose only the audio from one track or both tracks for the composite video.
+If both upper and lower tracks have audio, "source-audio-name" can be set to "upper", "lower" or "both"
+to choose only the audio from one track or both tracks for the composite video.
 
 ### Sample complex composite filter command
 
