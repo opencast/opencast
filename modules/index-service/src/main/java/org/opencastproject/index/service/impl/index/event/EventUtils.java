@@ -159,7 +159,8 @@ public final class EventUtils {
       }
     }
 
-    if (event.getDuration() != null) {
+    // The duration event details metadata is an optional display field
+    if (metadata.getOutputFields().containsKey("duration")  && event.getDuration() != null) {
       MetadataField<?> duration = metadata.getOutputFields().get("duration");
       metadata.removeField(duration);
       MetadataField<String> newDuration = MetadataUtils.copyMetadataField(duration);
