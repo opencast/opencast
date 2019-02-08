@@ -124,8 +124,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static final int PROFILE_ID_INDEX = 0;
   private static final int UPPER_TRACK_INDEX = 3;
   private static final int UPPER_TRACK_LAYOUT_INDEX = 4;
-  private static final int WATERMARK_INDEX = 7;
-  private static final int WATERMARK_LAYOUT_INDEX = 8;
+  private static final int WATERMARK_INDEX = 8;
+  private static final int WATERMARK_LAYOUT_INDEX = 9;
+  private static final int AUDIO_SOURCE_INDEX = 7;
   /**
    * Error codes
    */
@@ -612,8 +613,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Override
   public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
           LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
-          String background) throws EncoderException, MediaPackageException {
-    List<String> arguments = new ArrayList<>(9);
+          String background, String sourceAudioName) throws EncoderException, MediaPackageException {
+    List<String> arguments = new ArrayList<>(10);
     arguments.add(PROFILE_ID_INDEX, profileId);
     arguments.add(LOWER_TRACK_INDEX, MediaPackageElementParser.getAsXml(lowerTrack.getElement()));
     arguments.add(LOWER_TRACK_LAYOUT_INDEX, Serializer.json(lowerTrack.getLayout()).toJson());
@@ -631,6 +632,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       arguments.add(WATERMARK_INDEX, MediaPackageElementParser.getAsXml(watermarkLaidOutElement.getElement()));
       arguments.add(WATERMARK_LAYOUT_INDEX, Serializer.json(watermarkLaidOutElement.getLayout()).toJson());
     }
+    arguments.add(AUDIO_SOURCE_INDEX, sourceAudioName);
     try {
       final EncodingProfile profile = profileScanner.getProfile(profileId);
       return serviceRegistry.createJob(JOB_TYPE, Operation.Composite.toString(), arguments, profile.getJobLoad());
@@ -641,7 +643,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
   private Option<Track> composite(Job job, Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
           Option<LaidOutElement<Track>> upperLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
-          String profileId, String backgroundColor) throws EncoderException, MediaPackageException {
+          String profileId, String backgroundColor, String audioSourceName) throws EncoderException, MediaPackageException {
 
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
@@ -701,7 +703,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       // Creating video filter command
       final String compositeCommand = buildCompositeCommand(compositeTrackSize, lowerLaidOutElement,
-              upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor);
+              upperLaidOutElement, upperVideoFile, watermarkOption, watermarkFile, backgroundColor, audioSourceName);
 
       Map<String, String> properties = new HashMap<>();
       properties.put(EncoderEngine.CMD_SUFFIX + ".compositeCommand", compositeCommand);
@@ -1421,6 +1423,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           Dimension compositeTrackSize = Serializer
                   .dimension(JsonObj.jsonObj(arguments.get(COMPOSITE_TRACK_SIZE_INDEX)));
           String backgroundColor = arguments.get(BACKGROUND_COLOR_INDEX);
+          String audioSourceName = arguments.get(AUDIO_SOURCE_INDEX);
 
           Option<LaidOutElement<Attachment>> watermarkOption = Option.none();
           if (arguments.size() == 9) {
@@ -1429,7 +1432,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
             watermarkOption = Option.some(new LaidOutElement<>(watermarkAttachment, watermarkLayout));
           }
           serialized = composite(job, compositeTrackSize, lowerLaidOutElement, upperLaidOutElement, watermarkOption,
-                  encodingProfile, backgroundColor).map(MediaPackageElementParser.getAsXml()).getOrElse("");
+                  encodingProfile, backgroundColor, audioSourceName).map(MediaPackageElementParser.getAsXml()).getOrElse("");
           break;
         case Concat:
           String dimensionString = arguments.get(1);
@@ -1620,7 +1623,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   private static String buildCompositeCommand(Dimension compositeTrackSize, LaidOutElement<Track> lowerLaidOutElement,
           Option<LaidOutElement<Track>> upperLaidOutElement, Option<File> upperFile,
-          Option<LaidOutElement<Attachment>> watermarkOption, File watermarkFile, String backgroundColor) {
+          Option<LaidOutElement<Attachment>> watermarkOption, File watermarkFile, String backgroundColor, String audioSourceName) {
     final StringBuilder cmd = new StringBuilder();
     final String videoId = watermarkOption.isNone() ? "[out]" : "[video]";
     if (upperLaidOutElement.isNone()) {
@@ -1666,9 +1669,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     if (upperLaidOutElement.isSome()) {
       // handle audio
-      // if both videos contain audio mix it into a single audio stream
-      final boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
-      final boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
+      boolean lowerAudio = lowerLaidOutElement.getElement().hasAudio();
+      boolean upperAudio = upperLaidOutElement.get().getElement().hasAudio();
+      // if not specfied or "both", use both videos
+      if (audioSourceName != null && ! ComposerService.BOTH.equalsIgnoreCase(audioSourceName)) {
+        lowerAudio = lowerAudio & ComposerService.LOWER.equalsIgnoreCase(audioSourceName);
+        upperAudio = upperAudio & ComposerService.UPPER.equalsIgnoreCase(audioSourceName);
+      }
       if (lowerAudio && upperAudio) {
         cmd.append(";[0:a][1:a]amix=inputs=2[aout] -map [out] -map [aout]");
       } else if (lowerAudio) {
