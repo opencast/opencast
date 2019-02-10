@@ -99,7 +99,17 @@ public final class WorkflowPropertiesUtil {
    */
   public static void storeProperties(final AssetManager assetManager, final MediaPackage mediaPackage,
           final Map<String, String> properties) {
-    assetManager.takeSnapshot(DEFAULT_OWNER,mediaPackage);
+
+    // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
+    final AQueryBuilder q = assetManager.createQuery();
+    final AResult r = q.select(q.snapshot())
+            .where(q.mediaPackageId(mediaPackage.getIdentifier().toString()).and(q.version().isLatest()))
+            .run();
+    if (r.getSize() < 1) {
+      assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
+    }
+
+    // Store all properties
     for (final Map.Entry<String, String> entry : properties.entrySet()) {
       final PropertyId propertyId = PropertyId
               .mk(mediaPackage.getIdentifier().compact(), WORKFLOW_PROPERTIES_NAMESPACE, entry.getKey());
