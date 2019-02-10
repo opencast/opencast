@@ -20,8 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl.persistence;
 
-import static java.lang.String.format;
-
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
@@ -119,11 +117,11 @@ public class Database implements EntityPaths {
   }
 
   public void logQuery(JPAQuery q) {
-    logger.debug(format("\n---\nQUERY\n%s\n---", q.toString()));
+    logger.debug("\n---\nQUERY\n{}\n---", q);
   }
 
   public void logDelete(String queryName, JPADeleteClause q) {
-    logger.debug(format("\n---\nDELETE %s\n%s\n---", queryName, q.toString()));
+    logger.debug("\n---\nDELETE {}\n{}\n---", queryName, q);
   }
 
   /**
