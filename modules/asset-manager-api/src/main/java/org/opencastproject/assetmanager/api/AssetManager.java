@@ -114,6 +114,15 @@ public interface AssetManager {
    */
   void deleteProperties(String mediaPackageId, String namespace);
 
+  /**
+   * Check if any snapshot with the given media package identifier exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @return If a snapshot exists for the given media package
+   */
+  boolean snapshotExists(String mediaPackageId);
+
   /** Create a new query builder. */
   AQueryBuilder createQuery();
 

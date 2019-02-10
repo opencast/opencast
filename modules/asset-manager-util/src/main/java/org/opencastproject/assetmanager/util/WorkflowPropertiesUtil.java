@@ -101,11 +101,7 @@ public final class WorkflowPropertiesUtil {
           final Map<String, String> properties) {
 
     // Properties can only be created if a snapshot exists. Hence, we create a snapshot if there is none right now.
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult r = q.select(q.snapshot())
-            .where(q.mediaPackageId(mediaPackage.getIdentifier().toString()).and(q.version().isLatest()))
-            .run();
-    if (r.getSize() < 1) {
+    if (!assetManager.snapshotExists(mediaPackage.getIdentifier().toString())) {
       assetManager.takeSnapshot(DEFAULT_OWNER, mediaPackage);
     }
 

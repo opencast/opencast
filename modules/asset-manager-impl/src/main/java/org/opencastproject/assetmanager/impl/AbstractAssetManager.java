@@ -156,6 +156,11 @@ public abstract class AbstractAssetManager implements AssetManager {
     getDb().deleteProperties(mediaPackageId, namespace);
   }
 
+  @Override
+  public boolean snapshotExists(final String mediaPackageId) {
+    return getDb().snapshotExists(mediaPackageId);
+  }
+
   @Override public AQueryBuilder createQuery() {
     return new AQueryBuilderImpl(this);
   }

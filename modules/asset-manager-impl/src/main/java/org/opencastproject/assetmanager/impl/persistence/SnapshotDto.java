@@ -29,29 +29,41 @@ import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.TypedQuery;
 import javax.persistence.UniqueConstraint;
 
 /** JPA DTO. */
 @Entity(name = "Snapshot")
 @Table(name = "oc_assets_snapshot",
         uniqueConstraints = {@UniqueConstraint(columnNames = {"mediapackage_id", "version"})})
+@NamedQueries({
+        @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
+                + "where s.mediaPackageId = :mediaPackageId")})
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
 @TableGenerator(name = "seq_oc_assets_snapshot", initialValue = 0, allocationSize = 50)
 public class SnapshotDto {
+  private static final Logger logger = LoggerFactory.getLogger(SnapshotDto.class);
+
   @Id
   @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_oc_assets_snapshot")
@@ -159,5 +171,21 @@ public class SnapshotDto {
             storageId,
             owner,
             Conversions.toMediaPackage(mediaPackageXml));
+  }
+
+  /**
+   * Check if any snapshot with the given media package exists.
+   *
+   * @param em
+   *          An entity manager to sue
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @return If a snapshot exists for the given media package
+   */
+  public static boolean exists(EntityManager em, final String mediaPackageId) {
+    TypedQuery<Long> query = em.createNamedQuery("Snapshot.countByMediaPackage", Long.class)
+            .setParameter("mediaPackageId", mediaPackageId);
+    logger.debug("Executing query {}", query);
+    return query.getSingleResult() > 0;
   }
 }
