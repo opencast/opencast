@@ -48,7 +48,7 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     assertTotals(mpCount, mpCount, 3);
     assertStoreSize(6);
     assertEquals(3, q.delete(OWNER, q.snapshot()).run());
-    assertTotals(0, 0, 0);
+    assertTotals(0, 0, 3);
     assertStoreSize(0);
   }
 
@@ -67,16 +67,9 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     am.setProperty(p.agent.mk(mp[2], "agent-2"));
     assertTotals(mpCount * versionCount, mpCount * versionCount, 3);
     assertStoreSize(mpCount * versionCount * 2);
-    if (RUN_RAW_QUERIES) {
-      delete(Q_PROPERTY, Q_PROPERTY.mediaPackageId.eq(mp[0]));
-      delete(Q_ASSET, Q_ASSET.snapshotId.in(new JPASubQuery().from(Q_SNAPSHOT).where(Q_SNAPSHOT.mediaPackageId.eq(mp[0])).list(Q_SNAPSHOT.id)));
-      delete(Q_SNAPSHOT, Q_SNAPSHOT.mediaPackageId.eq(mp[0]));
-    } else {
-      assertEquals(versionCount, q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0])).run());
-    }
-    assertTotals((mpCount - 1) * versionCount, (mpCount - 1) * versionCount, 2);
+    assertEquals(versionCount, q.delete(OWNER, q.snapshot()).where(q.mediaPackageId(mp[0])).run());
+    assertTotals((mpCount - 1) * versionCount, (mpCount - 1) * versionCount, 3);
     assertStoreSize((mpCount - 1) * versionCount * 2);
-    assertPropertiesOfMediaPackage(0, mp[0]);
   }
 
   /**
@@ -131,51 +124,9 @@ public class AbstractAssetManagerDeleteSnapshotTest extends AbstractAssetManager
     am.setProperty(p.agent.mk(mp[1], "agent-2"));
     assertTotals(3, 3, 3);
     assertStoreSize(3 * 2);
-    if (RUN_RAW_QUERIES) {
-      /*
-        DELETE FROM oc_assets_asset
-        WHERE oc_assets_asset.snapshot_id IN (
-          SELECT e.id
-          FROM oc_assets_snapshot e
-            LEFT JOIN oc_assets_properties p ON p.mediapackage_id = e.mediapackage_id
-          WHERE p.namespace = 'org.opencastproject.service' AND p.property_name = 'agent' AND p.val_string = 'agent-2'
-        );
-
-        Query: DeleteAllQuery(referenceClass=AssetDto jpql="delete from Asset assetDto
-        where assetDto.snapshotId in (select episodeDto.id
-        from Snapshot snapshotDto
-          left join Property propertyDto on snapshotDto.mediaPackageId = propertyDto.mediaPackageId
-        where propertyDto.namespace = ?1 and propertyDto.propertyName = ?2 and propertyDto.stringValue = ?3)")
-      */
-      assertEquals(2, delete(
-              Q_ASSET,
-              Q_ASSET.snapshotId.in(
-                      new JPASubQuery()
-                              .from(Q_SNAPSHOT, Q_PROPERTY)
-                              .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId)
-                                             .and(Q_PROPERTY.namespace.eq(p.agent.name().getNamespace()))
-                                             .and(Q_PROPERTY.propertyName.eq(p.agent.name().getName()))
-                                             .and(Q_PROPERTY.stringValue.eq("agent-1")))
-                              .list(Q_SNAPSHOT.id))));
-      assertEquals(2, delete(
-              Q_SNAPSHOT,
-              Q_SNAPSHOT.mediaPackageId.in(
-                      new JPASubQuery()
-                              .from(Q_PROPERTY)
-                              .where(Q_PROPERTY.mediaPackageId.eq(Q_SNAPSHOT.mediaPackageId)
-                                             .and(Q_PROPERTY.namespace.eq(p.agent.name().getNamespace()))
-                                             .and(Q_PROPERTY.propertyName.eq(p.agent.name().getName()))
-                                             .and(Q_PROPERTY.stringValue.eq("agent-1")))
-                              .list(Q_PROPERTY.mediaPackageId))));
-      assertEquals(2, delete(
-              Q_PROPERTY,
-              Q_PROPERTY.namespace.eq(p.agent.name().getNamespace())
-                      .and(Q_PROPERTY.propertyName.eq(p.agent.name().getName()))
-                      .and(Q_PROPERTY.stringValue.eq("agent-1"))));
-    } else {
-      assertEquals("Two snapshots should be deleted", 2, q.delete(OWNER, q.snapshot()).where(p.agent.eq("agent-1")).run());
-    }
-    assertTotals(1, 1, 1);
+    assertEquals("Two snapshots should be deleted", 2,
+            q.delete(OWNER, q.snapshot()).where(p.agent.eq("agent-1")).run());
+    assertTotals(1, 1, 3);
     assertStoreSize(2);
   }
 

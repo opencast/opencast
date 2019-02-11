@@ -29,15 +29,12 @@ import org.opencastproject.assetmanager.impl.AbstractAssetManager;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Conversions;
-import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import org.opencastproject.assetmanager.impl.storage.DeletionSelector;
-import org.opencastproject.util.persistencefn.Queries;
 
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Unit;
 import com.entwinemedia.fn.data.SetB;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.JPASubQuery;
@@ -53,8 +50,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.persistence.EntityManager;
 
 public abstract class AbstractADeleteQuery implements ADeleteQuery, DeleteQueryContributor, EntityPaths {
   private static final Logger logger = LoggerFactory.getLogger(AbstractADeleteQuery.class);
@@ -191,8 +186,6 @@ HAVING v = (SELECT count(*)
       final JPADeleteClause qMain = jpa.delete(Q_SNAPSHOT).where(where);
       am.getDb().logDelete(formatQueryName(c.name, "main"), qMain);
       final long deletedItems = qMain.execute();
-      // delete orphaned properties
-      deleteOrphanedProperties();
       // <BLOCK>
       // TODO Bad solution. Yields all media package IDs which can easily be thousands
       // TODO The above SQL solution does not work with H2 so I suspect the query is not 100% clean
@@ -263,37 +256,6 @@ HAVING v = (SELECT count(*)
 
   @Override public long run() {
     return run(NOP_DELETE_SNAPSHOT_HANDLER);
-  }
-
-  /**
-   * Delete all orphaned properties. Orphaned properties refer to a non-existing media package.
-   */
-  private void deleteOrphanedProperties() {
-    logger.debug("\n---\nDELETE [orphaned properties]\n---");
-    am.getDb().runSql(new Database.Sql<Unit>() {
-      @Override public Unit h2(EntityManager em) {
-        Queries.sql.update(em, "DELETE FROM oc_assets_properties\n"
-                + "WHERE id in (\n"
-                + "  SELECT p.id\n"
-                + "  FROM oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
-                + "  WHERE e.id IS NULL);");
-        return Unit.unit;
-      }
-
-      @Override public Unit mysql(EntityManager em) {
-        Queries.sql.update(em, "DELETE p FROM\n"
-                + "oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
-                + "WHERE e.id IS NULL;");
-        return Unit.unit;
-      }
-
-      @Override public Unit postgres(EntityManager em) {
-        Queries.sql.update(em, "DELETE p FROM\n"
-                + "oc_assets_properties p LEFT JOIN oc_assets_snapshot e ON p.mediapackage_id = e.mediapackage_id\n"
-                + "WHERE e.id IS NULL;");
-        return Unit.unit;
-      }
-    });
   }
 
   private static String formatQueryName(String name, String subQueryName) {
