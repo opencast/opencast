@@ -504,6 +504,12 @@ input.disabled, select.disabled {
 }
 
 table.main-tbl {
+  &.vertical-headers {
+    tr > td:first-of-type {
+      white-space: nowrap;
+    }
+  }
+
   /* we don't want to let the angular animation show up*/
   .ng-hide-add, .ng-hide-remove {
     display: none !important;
