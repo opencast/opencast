@@ -280,7 +280,7 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
         return null;
       }
     });
-    final Database db = new Database(penv);
+    final Database db = new Database(null, penv);
     //
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))

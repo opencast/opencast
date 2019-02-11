@@ -146,6 +146,16 @@ public abstract class AbstractAssetManager implements AssetManager {
     return getDb().saveProperty(property);
   }
 
+  @Override
+  public void deleteProperties(final String mediaPackageId) {
+    getDb().deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId, final String namespace) {
+    getDb().deleteProperties(mediaPackageId, namespace);
+  }
+
   @Override public AQueryBuilder createQuery() {
     return new AQueryBuilderImpl(this);
   }
