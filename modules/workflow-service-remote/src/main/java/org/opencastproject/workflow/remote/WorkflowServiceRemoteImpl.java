@@ -319,7 +319,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
         params.add(new BasicNameValuePair("parent", parentWorkflowId.toString()));
       if (properties != null)
         params.add(new BasicNameValuePair("properties", mapToString(properties)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new IllegalStateException("Unable to assemble a remote workflow request", e);
     }
@@ -422,7 +422,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
     try {
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     }
@@ -457,7 +457,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
     try {
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     }
@@ -545,7 +545,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("workflow", WorkflowParser.toXml(workflowInstance)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     } catch (Exception e) {
@@ -624,7 +624,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("workflowDefinition", WorkflowParser.toXml(workflow)));
-      put.setEntity(new UrlEncodedFormEntity(params));
+      put.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     } catch (Exception e) {
@@ -704,7 +704,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     if (state != null)
       params.add(new BasicNameValuePair("state", state.toString()));
     try {
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
       throw new IllegalStateException("Unable to assemble a remote workflow service request", e);
     }

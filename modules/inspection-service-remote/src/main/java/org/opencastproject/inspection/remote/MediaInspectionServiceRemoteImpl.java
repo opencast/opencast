@@ -127,7 +127,7 @@ public class MediaInspectionServiceRemoteImpl extends RemoteBase implements Medi
     HttpResponse response = null;
     try {
       HttpPost post = new HttpPost("/enrich");
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
       response = getResponse(post);
       if (response != null) {
         Job receipt = JobParser.parseJob(response.getEntity().getContent());
