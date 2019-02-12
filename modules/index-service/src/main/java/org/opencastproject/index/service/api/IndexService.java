@@ -41,6 +41,7 @@ import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.userdirectory.ConflictException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -55,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Response;
 
 public interface IndexService {
   enum Source {
@@ -67,7 +67,7 @@ public interface IndexService {
   }
 
   SearchResult<Group> getGroups(String filter, Opt<Integer> limit, Opt<Integer> offset, Opt<String> sort,
-          AbstractSearchIndex index) throws SearchIndexException;
+          AbstractSearchIndex index) throws SearchIndexException, IllegalArgumentException;
 
   /**
    * Get a single group
@@ -82,12 +82,25 @@ public interface IndexService {
    */
   Opt<Group> getGroup(String id, AbstractSearchIndex index) throws SearchIndexException;
 
-  Response removeGroup(String id) throws NotFoundException;
+  /**
+   * Remove a group by id
+   *
+   * @param groupId
+   *          the id of the group to remove
+   * @throws NotFoundException
+   *           the group was not found
+   * @throws UnauthorizedException
+   *           user is not authorized to remove this group
+   * @throws Exception
+   *           unexpected error occurred
+   *
+   */
+  void removeGroup(String groupId) throws NotFoundException, UnauthorizedException, Exception;
 
   /**
    * Update a {@link Group} with new data
    *
-   * @param id
+   * @param groupId
    *          The unique id for the group.
    * @param name
    *          The name to use for the group.
@@ -97,12 +110,13 @@ public interface IndexService {
    *          A comma separated list of roles to add to this group.
    * @param members
    *          A comma separated list of roles to add to this group.
-   * @return The Response from the update
    * @throws NotFoundException
    *           Thrown if the group was not found
+   * @throws UnauthorizedException
+   *           Thrown if the user does not have rights to update the group
    */
-  Response updateGroup(String id, String name, String description, String roles, String members)
-          throws NotFoundException;
+  void updateGroup(String groupId, String name, String description, String roles, String members)
+          throws NotFoundException, UnauthorizedException;
 
   /**
    * Create a new {@link Group}
@@ -115,10 +129,13 @@ public interface IndexService {
    *          A comma separated list of roles to add to this group.
    * @param members
    *          A comma separated list of members to add to this group.
-   * @return The Response from the update
+   * @throws UnauthorizedException
+   *           if user does not have rights to create group
+   * @throws ConflictException
+   *           if group already exists
    */
-  Response createGroup(String name, String description, String roles, String members);
-
+   void createGroup(String name, String description, String roles, String members)
+          throws IllegalArgumentException, UnauthorizedException, ConflictException;
   /**
    * Get a single event
    *

@@ -897,7 +897,9 @@
                   "PAUSED": "暫停",
                   "SUCCEEDED": "Succeeded",
                   "FAILED": "失敗",
+                  "FAILING": "Failing",
                   "SKIPPED": "Skipped",
+                  "STOPPED": "Stopped",
                   "RETRY": "Retry"
                }
             },

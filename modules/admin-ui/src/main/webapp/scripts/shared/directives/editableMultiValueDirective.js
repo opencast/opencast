@@ -52,51 +52,72 @@ angular.module('adminNg.directives')
       save:       '='
     },
     link: function (scope, element) {
+      scope.data = {};
+
       scope.enterEditMode = function () {
         scope.editMode = true;
-        scope.focusTimer = $timeout(function () {
+        $timeout(function () {
           element.find('input').focus();
         });
       };
 
-      scope.leaveEditMode = function () {
-        scope.addValue(scope.params.value, scope.value);
-        scope.editMode = false;
-        scope.value = '';
-      };
-
-      scope.addValue = function (model, value) {
-        if (value && model.indexOf(value) === -1) {
-          model.push(value);
-          scope.editMode = false;
+      scope.onBlur = function () {
+        if (!scope.removedValue) {
+          scope.addCurrentValue();
+          scope.leaveEditMode();
+        } else {
+          $timeout(function () {
+            element.find('input').focus();
+          });
         }
-        scope.submit();
+        delete scope.removedValue;
       };
 
-      scope.removeValue = function (model, value) {
-        model.splice(model.indexOf(value), 1);
-        scope.submit();
+      scope.leaveEditMode = function () {
+        scope.data.value = '';
+        scope.editMode = false;
       };
 
       scope.keyUp = function (event) {
         if (event.keyCode === 13) {
           // ENTER
-          scope.addValue(scope.params.value, scope.value);
+          scope.addCurrentValue();
+          scope.data.value = '';
         } else if (event.keyCode === 27) {
           // ESC
-          scope.editMode = false;
+          scope.leaveEditMode();
         }
         event.stopPropagation();
       };
 
-      scope.submit = function () {
-        scope.save(scope.params.id);
-        scope.editMode = false;
+      scope.addCurrentValue = function () {
+        if (angular.isDefined(scope.data.value) && scope.data.value) {
+          scope.addValue(scope.params.value, scope.data.value);
+        }
       };
 
-      scope.$on('$destroy', function () {
-        $timeout.cancel(scope.focusTimer);
-      });
+      scope.addValue = function (model, value) {
+        value = value.trim();
+
+        if (value && model.indexOf(value) === -1) {
+          model.push(value);
+          scope.submit();
+        }
+      };
+
+      scope.removeValue = function (model, value) {
+        scope.removedValue = true;
+        model.splice(model.indexOf(value), 1);
+        scope.submit();
+      };
+
+
+
+      scope.submit = function () {
+        if (angular.isDefined(scope.save)) {
+          scope.save(scope.params.id);
+        }
+      };
     }
   };
 }]);

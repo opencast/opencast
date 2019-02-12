@@ -254,16 +254,10 @@ public abstract class AbstractAssetManager implements AssetManager {
     }
   }
 
-  /** Check if element <code>e</code> is already part of the history and in the local store. */
+  /** Check if element <code>e</code> is already part of the history. */
   private Opt<StoragePath> findAssetInVersions(final String checksum) throws Exception {
-    return getDb().findAssetByChecksum(checksum).filter(new Fn<AssetDtos.Full, Boolean>() {
-      @Override public Boolean apply(AssetDtos.Full dto) {
-        if (getLocalAssetStore().getStoreType().equals(dto.getStorageId())) {
-          return true;
-        }
-        return false;
-      }
-    }).map(new Fn<AssetDtos.Full, StoragePath>() {
+    return getDb().findAssetByChecksumAndStore(checksum, getLocalAssetStore().getStoreType())
+            .map(new Fn<AssetDtos.Full, StoragePath>() {
       @Override public StoragePath apply(AssetDtos.Full dto) {
         return StoragePath.mk(dto.getOrganizationId(), dto.getMediaPackageId(), dto.getVersion(), dto.getAssetDto().getMediaPackageElementId());
       }
@@ -275,9 +269,10 @@ public abstract class AbstractAssetManager implements AssetManager {
     final String orgId = getCurrentOrgId();
     // store the manifest.xml
     // TODO make use of checksums
-    logger.debug(format("Archiving manifest of media package %s", mpId));
+    logger.debug("Archiving manifest of media package {} version {}", mpId, version);
     // temporarily save the manifest XML into the workspace to
-    final String manifestFileName = format("manifest_%s.xml", pmp.getMediaPackage().getIdentifier().toString());
+    // Fix file not found exception when several snapshots are taken at the same time
+    final String manifestFileName = format("manifest_%s_%s.xml", pmp.getMediaPackage().getIdentifier(), version);
     final URI manifestTmpUri = getWorkspace().putInCollection(
             "archive",
             manifestFileName,

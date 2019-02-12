@@ -72,9 +72,24 @@ jobs:
         - (! grep -rn ' $' modules assemblies pom.xml --include=pom.xml)
         - (! grep -rn '	' etc)
         - (! grep -rn ' $' etc)
-        - (cd docs/guides/admin && mkdocs build)
-        - (cd docs/guides/developer && mkdocs build)
-        - (cd docs/guides/user && mkdocs build)
+        - >
+          ( cd docs/guides/admin &&
+            mkdocs build > mkdocs.log 2>&1 &&
+            ! grep 'WARNING.*Documentation file' mkdocs.log &&
+            ! grep 'pages exist in the docs directory' mkdocs.log &&
+            cat mkdocs.log )
+        - >
+          ( cd docs/guides/user &&
+            mkdocs build > mkdocs.log 2>&1 &&
+            ! grep 'WARNING.*Documentation file' mkdocs.log &&
+            ! grep 'pages exist in the docs directory' mkdocs.log &&
+            cat mkdocs.log )
+        - >
+          ( cd docs/guides/developer &&
+            mkdocs build > mkdocs.log 2>&1 &&
+            ! grep 'WARNING.*Documentation file' mkdocs.log &&
+            ! grep 'pages exist in the docs directory' mkdocs.log &&
+            cat mkdocs.log )
         - (cd docs/guides && grunt)
 
     # Test database scripts with MariaDB 10.x

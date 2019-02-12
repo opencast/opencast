@@ -79,31 +79,25 @@ angular.module('adminNg.services')
     };
 
     this.extractPresentableValue = function (field) {
-      var actualValue = field.value;
       var presentableValue = '';
-      if (field.collection) {
-        if (angular.isArray(actualValue)) {
-          angular.forEach(actualValue, function (item, index) {
-            presentableValue += item;
-            if ((index + 1) < actualValue.length) {
-              presentableValue += ', ';
-            }
-          });
-          field.presentableValue = presentableValue;
-        } else {
-          if (field.collection.hasOwnProperty(actualValue)) {
-            presentableValue = field.collection[actualValue];
+      if (field.value !== undefined && field.value !== '' && field.value !== null) {
+        if (angular.isArray(field.value)) {
+          presentableValue = field.value.join(', ');
+        } else if (field.collection) {
+          // We need to lookup the presentable value in the collection
+          if (field.collection.hasOwnProperty(field.value)) {
+            presentableValue = field.collection[field.value];
           } else {
-            // this should work in older browsers, albeit looking clumsy
+            // This should work in older browsers, albeit looking clumsy
             var matchingKey = Object.keys(field.collection)
-              .filter(function(key) {return field.collection[key] === actualValue;})[0];
+              .filter(function(key) {return field.collection[key] === field.value;})[0];
             presentableValue = field.type === 'ordered_text'
               ? JSON.parse(matchingKey)['label']
               : matchingKey;
           }
+        } else {
+          presentableValue = field.value;
         }
-      } else {
-        presentableValue = actualValue;
       }
       return presentableValue;
     };

@@ -36,6 +36,6 @@
   "login_success": "Zalogowano.",
   "login_failed": "Błąd logowania.",
   "not_logged_in": "Nie zalogowano.",
-  "live_in_progress": "Live (in progress)",
-  "live_not_in_progress": "Live (not in progress)"
+  "live_in_progress": "Na żywo (w toku)",
+  "live_not_in_progress": "Na żywo (zatrzymane)"
 }

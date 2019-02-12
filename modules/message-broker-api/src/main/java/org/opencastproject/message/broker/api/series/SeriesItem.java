@@ -51,6 +51,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final Boolean optOut;
   private final String element;
   private final String elementType;
+  private final Boolean overrideEpisodeAcl;
 
   public enum Type {
     UpdateCatalog, UpdateElement, UpdateAcl, UpdateOptOut, UpdateProperty, Delete
@@ -62,7 +63,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series.
    */
   public static SeriesItem updateCatalog(DublinCoreCatalog series) {
-    return new SeriesItem(Type.UpdateCatalog, null, series, null, null, null, null, null, null);
+    return new SeriesItem(Type.UpdateCatalog, null, series, null, null, null, null, null, null, null);
   }
 
   /**
@@ -75,7 +76,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating series element.
    */
   public static SeriesItem updateElement(String seriesId, String type, String data) {
-    return new SeriesItem(Type.UpdateElement, seriesId, null, null, null, null, null, type, data);
+    return new SeriesItem(Type.UpdateElement, seriesId, null, null, null, null, null, type, data, null);
   }
 
   /**
@@ -83,11 +84,13 @@ public final class SeriesItem implements MessageItem, Serializable {
    *          The unique id for the series to update.
    * @param acl
    *          The new access control list to update to.
+   * @param overrideEpisodeAcl
+   *          Whether to override the episode ACL.
    * @return Builds {@link SeriesItem} for updating the access control list of a series.
    */
-  public static SeriesItem updateAcl(String seriesId, AccessControlList acl) {
-    return new SeriesItem(Type.UpdateAcl, seriesId, null, AccessControlParser.toJsonSilent(acl),
-            null, null, null, null, null);
+  public static SeriesItem updateAcl(String seriesId, AccessControlList acl, boolean overrideEpisodeAcl) {
+    return new SeriesItem(Type.UpdateAcl, seriesId, null, AccessControlParser.toJsonSilent(acl), null, null, null,
+            null, null, overrideEpisodeAcl);
   }
 
   /**
@@ -98,7 +101,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating the opt out status.
    */
   public static SeriesItem updateOptOut(String seriesId, boolean optOut) {
-    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optOut, null, null);
+    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optOut, null, null, null);
   }
 
   /**
@@ -111,7 +114,8 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating a series property.
    */
   public static SeriesItem updateProperty(String seriesId, String propertyName, String propertyValue) {
-    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null);
+    return new SeriesItem(Type.UpdateProperty, seriesId, null, null, propertyName, propertyValue, null, null, null,
+            null);
   }
 
   /**
@@ -122,7 +126,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for updating the opt out status of a series.
    */
   public static SeriesItem delete(String seriesId, boolean optedOut) {
-    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optedOut, null, null);
+    return new SeriesItem(Type.UpdateOptOut, seriesId, null, null, null, null, optedOut, null, null, null);
   }
 
   /**
@@ -131,7 +135,7 @@ public final class SeriesItem implements MessageItem, Serializable {
    * @return Builds {@link SeriesItem} for deleting a series.
    */
   public static SeriesItem delete(String seriesId) {
-    return new SeriesItem(Type.Delete, seriesId, null, null, null, null, null, null, null);
+    return new SeriesItem(Type.Delete, seriesId, null, null, null, null, null, null, null, null);
   }
 
   /**
@@ -163,7 +167,8 @@ public final class SeriesItem implements MessageItem, Serializable {
    *          {@link DublinCore.PROPERTY_IDENTIFIER} in the series catalog does not match.
    */
   private SeriesItem(Type type, String seriesId, DublinCoreCatalog series, String acl,
-          String propertyName, String propertyValue, Boolean optOut, String elementType, String element) {
+          String propertyName, String propertyValue, Boolean optOut, String elementType, String element,
+          Boolean overrideEpisodeAcl) {
     if (seriesId != null && series != null && !seriesId.equals(series.getFirst(DublinCore.PROPERTY_IDENTIFIER)))
       throw new IllegalStateException("Provided series ID and dublincore series ID does not match");
 
@@ -189,6 +194,7 @@ public final class SeriesItem implements MessageItem, Serializable {
     this.optOut = optOut;
     this.elementType = elementType;
     this.element = element;
+    this.overrideEpisodeAcl = overrideEpisodeAcl;
   }
 
   @Override
@@ -243,5 +249,9 @@ public final class SeriesItem implements MessageItem, Serializable {
 
   public String getElementType() {
     return elementType;
+  }
+
+  public Boolean getOverrideEpisodeAcl() {
+    return overrideEpisodeAcl;
   }
 }

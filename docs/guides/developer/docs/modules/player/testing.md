@@ -235,4 +235,4 @@ following command:
 
 In a browser you should see an output like it is shown on the next screenshot.
 
-![Jasmin screen](modules/testing.png)
+![Jasmin screen](testing.png)

@@ -1,8 +1,8 @@
 {
-	"Error loading video! No video tracks found": "Error loading video! No video tracks found",
-	"Error loading video {0}": "Error loading video {0}",
-	"CAPTIONS_undefined": "Unknown language",
-	"CAPTIONS_es": "Spanish",
-	"CAPTIONS_en": "English",
-	"CAPTIONS_de": "German"
+	"Error loading video! No video tracks found": "Video yüklenirken hata oluştu! Hiçbir video parçası bulunamadı",
+	"Error loading video {0}": "Video yüklenirken hata oluştu {0}",
+	"CAPTIONS_undefined": "Bilinmeyen dil",
+	"CAPTIONS_es": "İspanyolca",
+	"CAPTIONS_en": "İngilizce",
+	"CAPTIONS_de": "Almanca"
 }

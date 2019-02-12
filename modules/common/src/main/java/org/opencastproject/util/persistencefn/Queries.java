@@ -193,12 +193,12 @@ public final class Queries {
     for (int i = 0; i < params.length; i++) {
       final Object value = params[i];
       if (value instanceof Date) {
-        q.setParameter(i, (Date) value, TemporalType.TIMESTAMP);
+        q.setParameter(i + 1, (Date) value, TemporalType.TIMESTAMP);
       }
       if (value instanceof AbstractInstant) {
-        q.setParameter(i, ((AbstractInstant) value).toDate(), TemporalType.TIMESTAMP);
+        q.setParameter(i + 1, ((AbstractInstant) value).toDate(), TemporalType.TIMESTAMP);
       } else {
-        q.setParameter(i, value);
+        q.setParameter(i + 1, value);
       }
     }
     return q;

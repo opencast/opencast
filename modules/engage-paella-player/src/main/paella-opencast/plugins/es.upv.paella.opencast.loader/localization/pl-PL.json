@@ -1,8 +1,8 @@
 {
-	"Error loading video! No video tracks found": "Error loading video! No video tracks found",
-	"Error loading video {0}": "Error loading video {0}",
-	"CAPTIONS_undefined": "Unknown language",
-	"CAPTIONS_es": "Spanish",
-	"CAPTIONS_en": "English",
-	"CAPTIONS_de": "German"
+	"Error loading video! No video tracks found": "Błąd ładowania wideo! Nie znaleziono żandej ścieżki",
+	"Error loading video {0}": "Błąd ładowania wideo {0}",
+	"CAPTIONS_undefined": "Nieznany język",
+	"CAPTIONS_es": "Hiszpański",
+	"CAPTIONS_en": "Angielski",
+	"CAPTIONS_de": "Niemiecki"
 }

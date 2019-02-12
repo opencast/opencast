@@ -106,9 +106,6 @@ public class RestPublisher implements RestConstants {
   /** A map that sets default xml namespaces in {@link XMLStreamWriter}s */
   protected static final ConcurrentHashMap<String, String> NAMESPACE_MAP;
 
-  /** The 404 Error page */
-  protected String fourOhFour = null;
-
   protected List<Object> providers = null;
 
   static {
@@ -137,7 +134,7 @@ public class RestPublisher implements RestConstants {
   private Server server;
 
   /** The map of JAX-RS resource providers */
-  private Map<ServiceReference<?>, ResourceProvider> resourceProviders = new HashMap<>();
+  private Map<ServiceReference<?>, ResourceProvider> resourceProviders = new ConcurrentHashMap<>();
 
   /** A token to store in the miss cache */
   private Object nullToken = new Object();
@@ -164,26 +161,33 @@ public class RestPublisher implements RestConstants {
     logger.debug("activate()");
     baseServerUri = componentContext.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
     this.componentContext = componentContext;
-    fourOhFour = "The resource you requested does not exist."; // TODO: Replace this with something a little nicer
     servletRegistrationMap = new ConcurrentHashMap<>();
     providers = new ArrayList<>();
 
     JSONProvider jsonProvider = new OpencastJSONProvider();
     jsonProvider.setIgnoreNamespaces(true);
     jsonProvider.setNamespaceMap(NAMESPACE_MAP);
-
     providers.add(jsonProvider);
+
     providers.add(new ExceptionMapper<NotFoundException>() {
       @Override
       public Response toResponse(NotFoundException e) {
-        return Response.status(404).entity(fourOhFour).type(MediaType.TEXT_PLAIN).build();
+        return Response
+                .status(HttpStatus.SC_NOT_FOUND)
+                .entity("The resource you requested does not exist.")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
       }
     });
     providers.add(new ExceptionMapper<UnauthorizedException>() {
       @Override
       public Response toResponse(UnauthorizedException e) {
-        return Response.status(HttpStatus.SC_UNAUTHORIZED).entity("unauthorized").type(MediaType.TEXT_PLAIN).build();
-      };
+        return Response
+                .status(HttpStatus.SC_UNAUTHORIZED)
+                .entity("unauthorized")
+                .type(MediaType.TEXT_PLAIN)
+                .build();
+      }
     });
 
     try {
@@ -452,6 +456,8 @@ public class RestPublisher implements RestConstants {
    */
   class StaticResourceBundleTracker extends BundleTracker<Object> {
 
+    private HashMap<Bundle, ServiceRegistration> servlets = new HashMap<>();
+
     /**
      * Creates a new StaticResourceBundleTracker.
      *
@@ -485,10 +491,28 @@ public class RestPublisher implements RestConstants {
         // We use the newly added bundle's context to register this service, so when that bundle shuts down, it brings
         // down this servlet with it
         logger.debug("Registering servlet with alias {}", alias);
-        componentContext.getBundleContext().registerService(Servlet.class.getName(), servlet, props);
+
+        ServiceRegistration serviceRegistration = componentContext.getBundleContext()
+                .registerService(Servlet.class.getName(), servlet, props);
+        servlets.put(bundle, serviceRegistration);
       }
 
       return super.addingBundle(bundle, event);
+    }
+
+    @Override
+    public void removedBundle(Bundle bundle, BundleEvent event, Object object) {
+      String classpath = bundle.getHeaders().get(RestConstants.HTTP_CLASSPATH);
+      String alias = bundle.getHeaders().get(RestConstants.HTTP_ALIAS);
+      if (classpath != null && alias != null) {
+        ServiceRegistration serviceRegistration = servlets.get(bundle);
+        if (serviceRegistration != null) {
+          serviceRegistration.unregister();
+          servlets.remove(bundle);
+        }
+      }
+
+      super.removedBundle(bundle, event, object);
     }
   }
 
