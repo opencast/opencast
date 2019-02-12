@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0"
+               immediate="true"
+               name="org.opencastproject.adminui.index.AdminUISearchIndex">
+  <implementation class="org.opencastproject.adminui.index.AdminUISearchIndex"/>
+  <property name="service.description" value="Admin Interface Search Index"/>
+  <property name="service.pid" value="ch.entwine.matterhorn.search"/>
+  <service>
+    <provide interface="org.opencastproject.matterhorn.search.SearchIndex"/>
+    <provide interface="org.opencastproject.adminui.index.AdminUISearchIndex"/>
+  </service>
+
+  <reference name="MessageSender"
+             interface="org.opencastproject.message.broker.api.MessageSender"
+             bind="setMessageSender"/>
+  <reference name="MessageReceiver"
+             interface="org.opencastproject.message.broker.api.MessageReceiver"
+             bind="setMessageReceiver"/>
+</scr:component>

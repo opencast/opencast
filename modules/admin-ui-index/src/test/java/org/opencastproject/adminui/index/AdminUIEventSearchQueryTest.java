@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adminui.impl.index;
+package org.opencastproject.adminui.index;
 
 import org.opencastproject.index.service.impl.index.event.Event;
 import org.opencastproject.index.service.impl.index.event.EventSearchQuery;

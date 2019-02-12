@@ -20,7 +20,7 @@
  */
 
 
-package org.opencastproject.adminui.impl.index;
+package org.opencastproject.adminui.index;
 
 import org.opencastproject.util.PathSupport;
 
