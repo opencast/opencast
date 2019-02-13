@@ -154,7 +154,6 @@ CREATE TABLE oc_job (
   parent BIGINT,
   root BIGINT,
   job_load FLOAT NOT NULL DEFAULT 1.0,
-  blocking_job BIGINT DEFAULT NULL,
   PRIMARY KEY (id),
   CONSTRAINT FK_oc_job_creator_service FOREIGN KEY (creator_service) REFERENCES oc_service_registration (id) ON DELETE CASCADE,
   CONSTRAINT FK_oc_job_processor_service FOREIGN KEY (processor_service) REFERENCES oc_service_registration (id) ON DELETE CASCADE,
@@ -182,13 +181,6 @@ CREATE TABLE oc_job_argument (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE INDEX IX_oc_job_argument_id ON oc_job_argument (id);
-
-CREATE TABLE oc_blocking_job (
-  id BIGINT NOT NULL,
-  blocking_job_list BIGINT,
-  job_index INTEGER,
-  CONSTRAINT FK_oc_blocking_job_id FOREIGN KEY (id) REFERENCES oc_job (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE oc_job_context (
   id BIGINT NOT NULL,
