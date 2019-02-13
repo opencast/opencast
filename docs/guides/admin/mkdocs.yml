@@ -28,6 +28,7 @@ pages:
       - Debian/Ubuntu: 'installation/debs.md'
       - Fedora: 'installation/rpm-fedora.md'
       - RHEL/CentOS: 'installation/rpm-rhel-sl-centos.md'
+      - Ansible: 'installation/ansible.md'
    - Installation with Docker:
       - Testing Locally: 'installation/docker-local.md'
 - Configuration:
