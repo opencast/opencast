@@ -1233,7 +1233,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     }
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
-              workflowProperties, agentProperties, Opt.none(), Opt.none(), "ingest-service");
+              workflowProperties, agentProperties, Opt.none(), Opt.none());
     } finally {
       for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
         try {

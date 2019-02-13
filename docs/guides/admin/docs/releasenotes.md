@@ -30,8 +30,8 @@ Improvements
 
 A non-comprehensive list of improvements:
 
-- improvement 1
-- improvement 2
+- Improvement of performance when scheduling new events or checking for conflicts. Please read the [upgrade guide] to
+  make sure you migrate your data properly.
 
 Configuration changes
 ---------------------

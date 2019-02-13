@@ -641,7 +641,7 @@ public abstract class AbstractEventEndpoint {
 
     if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone() || !optOut.isNone()) {
       getSchedulerService()
-        .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration, optOut, SchedulerService.ORIGIN);
+        .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration, optOut);
       // We want to keep the bibliographic meta data in sync
       updateBibliographicMetadata(event, agentId, start, end);
     }
@@ -860,7 +860,7 @@ public abstract class AbstractEventEndpoint {
         // We could check agent access here if we want to forbid updating ACLs for users without access.
         getSchedulerService().updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), some(mediaPackage), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                Opt.<Map<String, String>> none(), Opt.<Opt<Boolean>> none());
         return ok();
       }
     } catch (AclServiceException | MediaPackageException e) {
@@ -1596,7 +1596,7 @@ public abstract class AbstractEventEndpoint {
 
         getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
                 Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt,
-                Opt.<Opt<Boolean>> none(), SchedulerService.ORIGIN);
+                Opt.<Opt<Boolean>> none());
         return Response.noContent().build();
       } catch (NotFoundException e) {
         return notFound("Cannot find event %s in scheduler service", id);

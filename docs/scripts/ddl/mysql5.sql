@@ -234,21 +234,27 @@ CREATE INDEX IX_oc_scheduled_last_modified_last_modified ON oc_scheduled_last_mo
 CREATE TABLE oc_scheduled_extended_event (
   mediapackage_id VARCHAR(128) NOT NULL,
   organization VARCHAR(128) NOT NULL,
+  capture_agent_id VARCHAR(128) NOT NULL,
+  start_date DATETIME NOT NULL,
+  end_date DATETIME NOT NULL,
+  source VARCHAR(255),
+  recording_state VARCHAR(255),
+  recording_last_heard BIGINT,
+  review_status VARCHAR(128),
+  review_date DATETIME,
+  presenters TEXT(65535),
+  optout TINYINT(1),
+  last_modified_date DATETIME,
+  checksum VARCHAR(64),
+  capture_agent_properties MEDIUMTEXT,
+  workflow_properties MEDIUMTEXT,
   PRIMARY KEY (mediapackage_id, organization),
   CONSTRAINT FK_oc_scheduled_extended_event_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE oc_scheduled_transaction (
-  id VARCHAR(128) NOT NULL,
-  organization VARCHAR(128) NOT NULL,
-  source VARCHAR(255) NOT NULL,
-  last_modified DATETIME NOT NULL,
-  PRIMARY KEY (id, organization),
-  CONSTRAINT UNQ_oc_scheduled_transaction UNIQUE (id, organization, source),
-  CONSTRAINT FK_oc_scheduled_transaction_organization FOREIGN KEY (organization) REFERENCES oc_organization (id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-CREATE INDEX IX_oc_scheduled_transaction_source ON oc_scheduled_transaction (source);
+CREATE INDEX IX_oc_scheduled_extended_event_organization ON oc_scheduled_extended_event (organization);
+CREATE INDEX IX_oc_scheduled_extended_event_capture_agent_id ON oc_scheduled_extended_event (capture_agent_id);
+CREATE INDEX IX_oc_scheduled_extended_event_dates ON oc_scheduled_extended_event (start_date, end_date);
 
 CREATE TABLE oc_search (
   id VARCHAR(128) NOT NULL,

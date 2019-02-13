@@ -11,16 +11,16 @@ How to Upgrade
 2. Replace Opencast 6.x with 7.x
 3. Back-up Opencast files and database (optional)
 4. [Upgrade the database](#database-migration)
-5. [Rebuild Elasticsearch index](#rebuild-elasticsearch-index)
-6. Review the [configuration](#configuration-changes) and [security configuration
-   changes](#security-configuration-changes) and adjust your configuration accordingly
-
+5. [Upgrade the ActiveMQ configuration](#activemq-migration)
+6. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
+7. Migrate the scheduled events
 
 Database Migration
 ------------------
 
-As part of performance optimizations, a foreign key constraint was added to one table. This requires a database schema
-update. As with all database migrations, we recommend to create a database backup before attempting the upgrade.
+As part of performance optimizations, some tables were modified. This requires a database schema update. Also, one table
+is no longer needed and can be dropped. As with all database migrations, we strongly recommend to create a database
+backup before attempting the upgrade.
 
 You can find the database upgrade script in `docs/upgrade/6_to_7/`. This script is suitable for both, MariaDB and
 MySQL.
@@ -60,4 +60,23 @@ select * from oc_assets_snapshot where mediapackage_xml like '%"security/xacml"%
 Configuration Changes
 ---------------------
 
-- *TODO*
+- `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` no longer needs the `transaction_cleanup_offset`
+  option.
+- `etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` has a new option `maintenance` which temporarily
+  disables the scheduler if set to `true`.
+
+Scheduler Migration
+-------------------
+
+The way the Scheduler stores its data was changed in Opencast 7 to improve performance when checking for conflicts.
+
+The necessary database schema changes are part of the upgrade script in `docs/upgrade/6_to_7/`.
+
+To actually migrate the data, set the `maintenance` configuration option of
+`etc/org.opencastproject.scheduler.impl.SchedulerServiceImpl.cfg` to `true` and start opencast. The migration will start
+automatically. Wait until the migration is complete. Once complete, the opencast log will contain a line saying
+`Finished migrating scheduled events`. Check if there were any errors during the migration. If not, stop opencast and
+change `maintenance` back to `false` to put the scheduler back into its normal mode of operation.
+
+You should avoid running Opencast 7 without migrating the scheduled events first. Otherwise, your capture agents may
+fetch an empty calendar.
