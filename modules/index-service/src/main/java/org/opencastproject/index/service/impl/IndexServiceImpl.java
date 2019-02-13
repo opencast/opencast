@@ -850,7 +850,7 @@ public class IndexServiceImpl implements IndexService {
       currentStartDate = sdf.parse((String) startDate.getValue().get());
     } else if (currentStartDate != null) {
       eventMetadata.removeField(startDate);
-      MetadataField<String> newStartDate = MetadataUtils.copyMetadataField(startDate);
+      MetadataField<String> newStartDate = new MetadataField(startDate);
       newStartDate.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Fraction).getValue());
       eventMetadata.addField(newStartDate);
     }
@@ -858,7 +858,7 @@ public class IndexServiceImpl implements IndexService {
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
     if (created == null || !created.isUpdated() || created.getValue().isNone()) {
       eventMetadata.removeField(created);
-      MetadataField<String> newCreated = MetadataUtils.copyMetadataField(created);
+      MetadataField<String> newCreated = new MetadataField(created);
       if (currentStartDate != null) {
         newCreated.setValue(EncodingSchemeUtils.encodeDate(currentStartDate, Precision.Second).getValue());
       } else {
@@ -1020,8 +1020,7 @@ public class IndexServiceImpl implements IndexService {
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
       presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
-      MetadataField<Iterable<String>> newPresentersMetadataField = MetadataUtils
-              .copyMetadataField(presentersMetadataField);
+      MetadataField<Iterable<String>> newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
       return Opt.some(presenterUsernames);

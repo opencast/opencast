@@ -959,8 +959,9 @@ public class IndexServiceImplTest {
   }
 
   private MetadataField<Iterable<String>> createCreatorMetadataField(Iterable<String> value) {
-    MetadataField<Iterable<String>> creator = new MetadataField<>();
-    creator.setInputId(DublinCore.PROPERTY_CREATOR.getLocalName());
+    MetadataField<Iterable<String>> creator = MetadataField.createMetadataField(
+            DublinCore.PROPERTY_CREATOR.getLocalName(), Opt.none(), "creator", false, false, Opt.none(),
+            MetadataField.Type.TEXT, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.none(), null);
     creator.setValue(value);
     return creator;
   }

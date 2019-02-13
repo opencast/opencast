@@ -41,7 +41,6 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.MetadataList;
-import org.opencastproject.index.service.catalog.adapter.MetadataUtils;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.index.event.EventIndexSchema;
 import org.opencastproject.index.service.impl.index.series.Series;
@@ -477,55 +476,55 @@ public class SeriesEndpoint {
 
     MetadataField<?> title = metadata.getOutputFields().get(DublinCore.PROPERTY_TITLE.getLocalName());
     metadata.removeField(title);
-    MetadataField<String> newTitle = MetadataUtils.copyMetadataField(title);
+    MetadataField<String> newTitle = new MetadataField(title);
     newTitle.setValue(series.getTitle());
     metadata.addField(newTitle);
 
     MetadataField<?> subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
-    MetadataField<String> newSubject = MetadataUtils.copyMetadataField(subject);
+    MetadataField<String> newSubject = new MetadataField(subject);
     newSubject.setValue(series.getSubject());
     metadata.addField(newSubject);
 
     MetadataField<?> description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
     metadata.removeField(description);
-    MetadataField<String> newDescription = MetadataUtils.copyMetadataField(description);
+    MetadataField<String> newDescription = new MetadataField(description);
     newDescription.setValue(series.getDescription());
     metadata.addField(newDescription);
 
     MetadataField<?> language = metadata.getOutputFields().get(DublinCore.PROPERTY_LANGUAGE.getLocalName());
     metadata.removeField(language);
-    MetadataField<String> newLanguage = MetadataUtils.copyMetadataField(language);
+    MetadataField<String> newLanguage = new MetadataField(language);
     newLanguage.setValue(series.getLanguage());
     metadata.addField(newLanguage);
 
     MetadataField<?> rightsHolder = metadata.getOutputFields().get(DublinCore.PROPERTY_RIGHTS_HOLDER.getLocalName());
     metadata.removeField(rightsHolder);
-    MetadataField<String> newRightsHolder = MetadataUtils.copyMetadataField(rightsHolder);
+    MetadataField<String> newRightsHolder = new MetadataField(rightsHolder);
     newRightsHolder.setValue(series.getRightsHolder());
     metadata.addField(newRightsHolder);
 
     MetadataField<?> license = metadata.getOutputFields().get(DublinCore.PROPERTY_LICENSE.getLocalName());
     metadata.removeField(license);
-    MetadataField<String> newLicense = MetadataUtils.copyMetadataField(license);
+    MetadataField<String> newLicense = new MetadataField(license);
     newLicense.setValue(series.getLicense());
     metadata.addField(newLicense);
 
     MetadataField<?> organizers = metadata.getOutputFields().get(DublinCore.PROPERTY_CREATOR.getLocalName());
     metadata.removeField(organizers);
-    MetadataField<String> newOrganizers = MetadataUtils.copyMetadataField(organizers);
+    MetadataField<String> newOrganizers = new MetadataField(organizers);
     newOrganizers.setValue(StringUtils.join(series.getOrganizers(), ", "));
     metadata.addField(newOrganizers);
 
     MetadataField<?> contributors = metadata.getOutputFields().get(DublinCore.PROPERTY_CONTRIBUTOR.getLocalName());
     metadata.removeField(contributors);
-    MetadataField<String> newContributors = MetadataUtils.copyMetadataField(contributors);
+    MetadataField<String> newContributors = new MetadataField(contributors);
     newContributors.setValue(StringUtils.join(series.getContributors(), ", "));
     metadata.addField(newContributors);
 
     MetadataField<?> publishers = metadata.getOutputFields().get(DublinCore.PROPERTY_PUBLISHER.getLocalName());
     metadata.removeField(publishers);
-    MetadataField<String> newPublishers = MetadataUtils.copyMetadataField(publishers);
+    MetadataField<String> newPublishers = new MetadataField(publishers);
     newPublishers.setValue(StringUtils.join(series.getPublishers(), ", "));
     metadata.addField(newPublishers);
 
@@ -538,7 +537,7 @@ public class SeriesEndpoint {
 
     MetadataField<?> uid = metadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName());
     metadata.removeField(uid);
-    MetadataField<String> newUID = MetadataUtils.copyMetadataField(uid);
+    MetadataField<String> newUID = new MetadataField(uid);
     newUID.setValue(series.getIdentifier());
     metadata.addField(newUID);
 

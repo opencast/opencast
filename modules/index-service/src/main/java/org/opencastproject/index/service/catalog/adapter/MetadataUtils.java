@@ -98,39 +98,6 @@ public final class MetadataUtils {
   }
 
   /**
-   * Copy a {@link MetadataField} into a new field.
-   *
-   * @param other
-   *          The other {@link MetadataField} to copy the state from.
-   * @return A new {@link MetadataField} with the same settings as the passed in {@link MetadataField}
-   */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static MetadataField copyMetadataField(MetadataField other) {
-    MetadataField newField = new MetadataField();
-    newField.setCollection(other.getCollection());
-    newField.setCollectionID(other.getCollectionID());
-    newField.setInputId(other.getInputID());
-    newField.setIsTranslatable(other.isTranslatable());
-    newField.setLabel(other.getLabel());
-    newField.setListprovider(other.getListprovider());
-    newField.setNamespace(other.getNamespace());
-    newField.setOutputID(Opt.some(other.getOutputID()));
-    newField.setPattern(other.getPattern());
-    newField.setDelimiter(other.getDelimiter());
-    newField.setOrder(other.getOrder());
-    newField.setReadOnly(other.isReadOnly());
-    newField.setRequired(other.isRequired());
-    newField.setJsonType(other.getJsonType());
-    newField.setJsonToValue(other.getJsonToValue());
-    newField.setValueToJSON(other.getValueToJSON());
-    newField.setType(other.getType());
-    if (other.getValue().isSome()) {
-      newField.setValue(other.getValue().get());
-    }
-    return newField;
-  }
-
-  /**
    * Returns the {@link String} value of a {@link MetadataField} if updated and available.
    *
    * @param collection
