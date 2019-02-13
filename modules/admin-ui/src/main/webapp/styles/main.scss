@@ -99,10 +99,6 @@ $disable-warnings: true !default; // disables deprecation warnings
   }
 }
 
-[data-title]:hover:after {
-  white-space: nowrap;
-}
-
 // All anchors should behave clickable (even without href attributes)
 a {
   cursor: pointer;
