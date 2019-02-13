@@ -152,6 +152,7 @@ nav:
    - Publish OAI-PMH: 'workflowoperationhandlers/publish-oaipmh-woh.md'
    - Publish YouTube: 'workflowoperationhandlers/publish-youtube-woh.md'
    - Republish OAI-PMH: 'workflowoperationhandlers/republish-oaipmh-woh.md'
+   - Restore From Remote: 'workflowoperationhandlers/restore-from-remote.md'
    - Retract AWS S3 and Cloudfront: 'workflowoperationhandlers/retract-aws-woh.md'
    - Retract Engage: 'workflowoperationhandlers/retract-engage-woh.md'
    - Retract Configure: 'workflowoperationhandlers/retract-configure-woh.md'
