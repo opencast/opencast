@@ -160,6 +160,7 @@
               com.google.api.*
             </_exportcontents>
             <Import-Package>
+              !javax.annotation,
               !oracle.xml.parser.*,
               !org.jaxen.*,
               !sun.security.util,
