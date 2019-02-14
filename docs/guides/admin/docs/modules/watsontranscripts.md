@@ -32,8 +32,21 @@ Configuration
 
 ### Step 1: Get IBM Watson credentials
 
-* [Create a 30-day trial acoount in IBM Bluemix](https://www.ibm.com/cloud-computing/bluemix)
-* [Get service credentials](https://www.ibm.com/watson/developercloud/doc/common/getting-started-credentials.html)
+* [Create a 30-day trial acoount in IBM Bluemix](https://console.bluemix.net)
+* [Get service credentials](https://console.bluemix.net/docs/services/watson/getting-started-iam.html#iam)
+
+As of 10/30/2018, the service has migrated to token-based Identity and Access Management (IAM) authentication so user
+and password are not generated anymore. Details can be found
+[here](https://cloud.ibm.com/docs/services/speech-to-text/release-notes.html#October2018b).
+
+As a temporary workaround, when configuring the transcription service, enter the constant "apikey" as the user name.
+
+Example:
+
+```
+ibm.watson.user=apikey
+ibm.watson.password=API_KEY_GOTTEN_ABOVE
+```
 
 ### Step 2: Configure IBMWatsonTranscriptionService
 

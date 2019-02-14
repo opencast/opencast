@@ -251,7 +251,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     if (searchResult.size() > 0) {
       try {
         Publication p = retract(job, mediaPackage, repository);
-        if (mediaPackage.contains(p))
+        if (p != null && mediaPackage.contains(p))
           mediaPackage.remove(p);
       } catch (NotFoundException e) {
         logger.debug("No OAI-PMH publication found for media package {}.", mpId, e);

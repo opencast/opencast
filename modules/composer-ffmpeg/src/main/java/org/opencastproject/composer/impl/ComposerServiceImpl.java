@@ -284,9 +284,10 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @return File handler for track
    * @throws EncoderException Could not load file into workspace
    */
-  private File loadTrackIntoWorkspace(final Job job, final String name, final Track track) throws EncoderException {
+  private File loadTrackIntoWorkspace(final Job job, final String name, final Track track, boolean unique)
+          throws EncoderException {
     try {
-      return workspace.get(track.getURI());
+      return workspace.get(track.getURI(), unique);
     } catch (NotFoundException e) {
       incident().recordFailure(job, WORKSPACE_GET_NOT_FOUND, e,
               getWorkspaceMediapackageParams(name, track), NO_DETAILS);
@@ -348,7 +349,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     Map<String, File> files = new HashMap<>();
     // Get the tracks and make sure they exist
     for (Entry<String, Track> track: tracks.entrySet()) {
-      files.put(track.getKey(), loadTrackIntoWorkspace(job, track.getKey(), track.getValue()));
+      files.put(track.getKey(), loadTrackIntoWorkspace(job, track.getKey(), track.getValue(), false));
     }
 
     // Get the encoding profile
@@ -420,7 +421,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new EncoderException("The Job parameter must not be null");
     }
     // Get the tracks and make sure they exist
-    final File mediaFile = loadTrackIntoWorkspace(job, "source", mediaTrack);
+    final File mediaFile = loadTrackIntoWorkspace(job, "source", mediaTrack, false);
 
     // Create the engine
     final EncodingProfile profile = getProfile(profileId);
@@ -530,7 +531,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     String targetTrackId = idBuilder.createNew().toString();
 
     // Get the track and make sure it exists
-    final File trackFile = loadTrackIntoWorkspace(job, "source", sourceTrack);
+    final File trackFile = loadTrackIntoWorkspace(job, "source", sourceTrack, false);
 
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
@@ -653,11 +654,11 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     Option<File> upperVideoFile = Option.none();
     try {
       // Get the tracks and make sure they exist
-      final File lowerVideoFile = loadTrackIntoWorkspace(job, "lower video", lowerLaidOutElement.getElement());
+      final File lowerVideoFile = loadTrackIntoWorkspace(job, "lower video", lowerLaidOutElement.getElement(), false);
 
       if (upperLaidOutElement.isSome()) {
         upperVideoFile = Option.option(
-                loadTrackIntoWorkspace(job, "upper video", upperLaidOutElement.get().getElement()));
+                loadTrackIntoWorkspace(job, "upper video", upperLaidOutElement.get().getElement(), false));
       }
       File watermarkFile = null;
       if (watermarkOption.isSome()) {
@@ -831,7 +832,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         incident().recordFailure(job, NO_STREAMS, params);
         throw new EncoderException("Track has no audio or video stream available: " + track);
       }
-      trackFiles.add(i++, loadTrackIntoWorkspace(job, "concat", track));
+      trackFiles.add(i++, loadTrackIntoWorkspace(job, "concat", track, false));
     }
 
     // Create the engine
@@ -1132,7 +1133,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     final EncoderEngine encoderEngine = getEncoderEngine();
 
     // Finally get the file that needs to be encoded
-    File videoFile = loadTrackIntoWorkspace(job, "video", sourceTrack);
+    File videoFile = loadTrackIntoWorkspace(job, "video", sourceTrack, true);
 
     // Do the work
     List<File> encodingOutput;
@@ -1182,6 +1183,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     // cleanup
     cleanup(encodingOutput.toArray(new File[encodingOutput.size()]));
+    cleanup(videoFile);
 
     MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
     List<Attachment> imageAttachments = new LinkedList<Attachment>();
@@ -1957,7 +1959,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     try {
       // Get the track and make sure it exists
-      final File videoFile = (videoTrack != null) ? loadTrackIntoWorkspace(job, "source", videoTrack) : null;
+      final File videoFile = (videoTrack != null) ? loadTrackIntoWorkspace(job, "source", videoTrack, false) : null;
 
       // Get the encoding profile
       EncodingProfile profile = getProfile(job, encodingProfile);
@@ -2298,7 +2300,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       throw new IllegalArgumentException("Cannot encode without encoding profiles");
     List<File> outputs = null;
     try {
-      final File videoFile = loadTrackIntoWorkspace(job, "source", track);
+      final File videoFile = loadTrackIntoWorkspace(job, "source", track, false);
       // Get the encoding profiles
       List<EncodingProfile> profiles = new ArrayList<>();
       for (String profileId : profileIds) {

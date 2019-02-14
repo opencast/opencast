@@ -901,7 +901,9 @@
                   "PAUSED": "Duraklatıldı",
                   "SUCCEEDED": "Başarılı oldu",
                   "FAILED": "Başarısız",
+                  "FAILING": "Failing",
                   "SKIPPED": "Atlandı",
+                  "STOPPED": "Stopped",
                   "RETRY": "Yeniden Dene"
                }
             },

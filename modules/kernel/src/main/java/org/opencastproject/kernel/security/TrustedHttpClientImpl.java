@@ -114,7 +114,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   public static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
 
   /** The default time between packets that causes a connection to fail */
-  public static final int DEFAULT_SOCKET_TIMEOUT = DEFAULT_CONNECTION_TIMEOUT;
+  public static final int DEFAULT_SOCKET_TIMEOUT = 300 * 1000;
 
   /** The default number of times to attempt a request after it has failed due to a nonce expiring. */
   public static final int DEFAULT_NONCE_TIMEOUT_RETRIES = 12;
