@@ -77,6 +77,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   }
 
   @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
+
     final String mediaPackageId = mp.getIdentifier().toString();
     final AQueryBuilder q = q();
     final AResult r = q.select(q.snapshot())
@@ -208,13 +209,18 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     GLOBAL, ORGANIZATION, NONE
   }
 
+  /**
+   * Update the ACL properties. Note that this method assumes proper proper authorization.
+   *
+   * @param snapshot
+   *          Snapshot to reference the media package identifier
+   * @param acl
+   *          ACL to set
+   */
   private void storeAclAsProperties(Snapshot snapshot, AccessControlList acl) {
     final String mediaPackageId =  snapshot.getMediaPackage().getIdentifier().toString();
     // Drop old ACL rules
-    final AQueryBuilder queryBuilder = createQuery();
-    queryBuilder.delete(snapshot.getOwner(), queryBuilder.propertiesOf(SECURITY_NAMESPACE))
-            .where(queryBuilder.mediaPackageId(mediaPackageId))
-            .run();
+    super.deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
     // Set new ACL rules
     for (final AccessControlEntry ace : acl.getEntries()) {
       super.setProperty(Property.mk(

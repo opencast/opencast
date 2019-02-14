@@ -39,7 +39,6 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
@@ -86,7 +85,7 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   /** OSGi callback. */
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager");
-    final Database db = new Database(PersistenceEnvs.mk(emf));
+    final Database db = new Database(emf);
     final String systemUserName = SecurityUtil.getSystemUserName(cc);
     // create the core asset manager
     final AbstractAssetManagerWithTieredStorage core = new AbstractAssetManagerWithTieredStorage() {
@@ -198,6 +197,16 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   @Override
   public boolean setProperty(Property property) {
     return delegate.setProperty(property);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId) {
+    delegate.deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId, final String namespace) {
+    delegate.deleteProperties(mediaPackageId, namespace);
   }
 
   @Override

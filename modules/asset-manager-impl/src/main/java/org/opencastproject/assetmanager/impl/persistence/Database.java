@@ -30,6 +30,7 @@ import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Full;
 import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Medium;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
+import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.util.persistencefn.PersistenceUtil.DatabaseVendor;
 import org.opencastproject.util.persistencefn.Queries;
@@ -46,6 +47,7 @@ import com.mysema.query.jpa.impl.JPAQueryFactory;
 import com.mysema.query.jpa.impl.JPAUpdateClause;
 import com.mysema.query.types.expr.BooleanExpression;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +57,7 @@ import java.util.Date;
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.inject.Provider;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 
 /**
  * Data access object.
@@ -66,9 +69,16 @@ public class Database implements EntityPaths {
   public static final JPQLTemplates TEMPLATES = EclipseLinkTemplates.DEFAULT;
 
   private final PersistenceEnv penv;
+  private final EntityManagerFactory entityManagerFactory;
 
-  public Database(PersistenceEnv penv) {
-    this.penv = penv;
+  public Database(EntityManagerFactory emf, PersistenceEnv persistenceEnv) {
+    penv = persistenceEnv;
+    entityManagerFactory = emf;
+  }
+
+  public Database(EntityManagerFactory emf) {
+    penv = PersistenceEnvs.mk(emf);
+    entityManagerFactory = emf;
   }
 
   /**
@@ -313,6 +323,32 @@ public class Database implements EntityPaths {
         return Opt.nul(result).map(Full.fromTuple);
       }
     });
+  }
+
+  /**
+   * Delete all properties for a given media package identifier
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   */
+  public void deleteProperties(final String mediaPackageId) {
+    PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
+  }
+
+  /**
+   * Delete all properties for a given media package identifier and namespace.
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   * @param namespace
+   *          A namespace prefix to use for deletion
+   */
+  public void deleteProperties(final String mediaPackageId, final String namespace) {
+    if (StringUtils.isBlank(namespace)) {
+      PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId);
+    } else {
+      PropertyDto.delete(entityManagerFactory.createEntityManager(), mediaPackageId, namespace);
+    }
   }
 
   public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {

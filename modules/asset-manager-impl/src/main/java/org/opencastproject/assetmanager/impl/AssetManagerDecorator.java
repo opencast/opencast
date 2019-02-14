@@ -64,6 +64,16 @@ public class AssetManagerDecorator<A extends TieredStorageAssetManager> implemen
     return delegate.setProperty(property);
   }
 
+  @Override
+  public void deleteProperties(final String mediaPackageId) {
+    delegate.deleteProperties(mediaPackageId);
+  }
+
+  @Override
+  public void deleteProperties(final String mediaPackageId, final String namespace) {
+    delegate.deleteProperties(mediaPackageId, namespace);
+  }
+
   @Override public AQueryBuilder createQuery() {
     return delegate.createQuery();
   }

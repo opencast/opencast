@@ -96,6 +96,24 @@ public interface AssetManager {
    */
   boolean setProperty(Property property);
 
+  /**
+   * Delete all properties for a given media package identifier
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   */
+  void deleteProperties(String mediaPackageId);
+
+  /**
+   * Delete all properties for a given media package identifier and namespace.
+   *
+   * @param mediaPackageId
+   *          Media package identifier
+   * @param namespace
+   *          A namespace prefix to use for deletion
+   */
+  void deleteProperties(String mediaPackageId, String namespace);
+
   /** Create a new query builder. */
   AQueryBuilder createQuery();
 
