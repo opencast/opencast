@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Acties",
                "DETAILS": "Details",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Meer informatie & acties",
+               "DESCRIPTION": "Beschrijving",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
-               "STATE": "Status",
+               "STATUS": "Status",
                "STARTED": "Gestart",
                "SERIES": "Series",
                "SUBMITTED": "Ingediend",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Workflow definitie",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
                "CONFIGURATION": "Configuratie",
                "NO_CONFIGURATION": "Geen bestaande configuratie parameters voor de geselecteerde workflow definitie.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Uitvoering werkstroom instantie stoppen",
-                  "ABORT": "Uitvoering van de workflow instantie afbreken (mislukte bewerking niet opnieuw proberen)",
-                  "RETRY": "Uitvoering van de workflow instantie opnieuw proberen",
-                  "DELETE": "Werkstroom instantie verwijderen"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Geïnstantieerd",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Worfklow instanties"
+               "TITLE": "Workflows"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Workflow details",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Uitschakelen",
          "UNKNOWN": "Onbekend",
          "UPLOADING": "Uploaden"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

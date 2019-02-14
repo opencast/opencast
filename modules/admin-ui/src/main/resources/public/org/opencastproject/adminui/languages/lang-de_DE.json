@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Aktionen",
                "DETAILS": "Details",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Mehr Information",
+               "DESCRIPTION": "Beschreibung",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
-               "STATE": "Status",
+               "STATUS": "Status",
                "STARTED": "Gestartet",
                "SERIES": "Serie",
                "SUBMITTED": "Übermittelt",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Workflow-Definition",
                "MIMETYPE": "MIME-Type",
                "URL": "URL",
                "CONFIGURATION": "Konfiguration",
                "NO_CONFIGURATION": "Keine Konfigurationsparameter für die ausgewählten Workflow-Definition.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Workflowinstanz stoppen",
-                  "ABORT": "Ausführung der Workflowinstanz unterbrechen (fehlgeschlagene Operationen nicht wiederholen)",
-                  "RETRY": "Ausführung der Workflowinstanz wieder aufnehmen",
-                  "DELETE": "Workflowinstanz löschen"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanziiert",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Fährt herunter",
          "UNKNOWN": "Unbekannt",
          "UPLOADING": "Lädt hoch"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

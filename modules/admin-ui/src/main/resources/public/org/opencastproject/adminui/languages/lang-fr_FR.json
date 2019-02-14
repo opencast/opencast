@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Actions",
                "DETAILS": "Détails",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Informations supplémentaires et actions",
+               "DESCRIPTION": "Description",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titre",
-               "STATE": "Statut",
+               "STATUS": "Statut",
                "STARTED": "Démarré",
                "SERIES": "Séries",
                "SUBMITTED": "Soumis le",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Définition de workflow",
                "MIMETYPE": "Type MIME",
                "URL": "URL",
                "CONFIGURATION": "Configuration",
                "NO_CONFIGURATION": "Aucun paramètre de configuration existant pour la définition du flux de travail sélectionné.",
                "WORKFLOW": "Flux de travail",
                "TOOLTIP": {
-                  "STOP": "Arrêtez l'exécution de l'instance du flux de travail",
-                  "ABORT": "Interrompre l'exécution de l'instance du flux de travail (ne réessayez pas l'opération ayant échoué)",
-                  "RETRY": "Réessayer l'exécution de l'instance du flux de travail",
-                  "DELETE": "Supprimer l’instance du flux de travail"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instancié",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instance des flux de travail"
+               "TITLE": "Flux de travail"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Détails du workflow",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Éteindre",
          "UNKNOWN": "Inconnu",
          "UPLOADING": "Transfert"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

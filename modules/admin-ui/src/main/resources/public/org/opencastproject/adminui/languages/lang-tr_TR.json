@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Hareketler",
                "DETAILS": "Ayrıntılar",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Daha Fazla Bilgi ve Eylemler",
+               "DESCRIPTION": "Açıklama",
+               "MORE_INFO": "More Information",
                "ID": "KİMLİK",
                "TYPE": "Tür",
                "TITLE": "Başlık",
-               "STATE": "Ülke",
+               "STATUS": "Durum",
                "STARTED": "Başlatıldı",
                "SERIES": "Diziler",
                "SUBMITTED": "Gönderildi",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "İş akışı tanımı",
                "MIMETYPE": "Mime Türü",
                "URL": "Bağlantı Adresi",
                "CONFIGURATION": "Yapılandır",
                "NO_CONFIGURATION": "Seçilen iş akışı tanımı için mevcut yapılandırma parametreleri yok.",
                "WORKFLOW": "İş akışı",
                "TOOLTIP": {
-                  "STOP": "Bu yürütme iş akışını durdur",
-                  "ABORT": "Bu iş akışı yürütümünü iptal et (başarısız işlemi yeniden deneme)",
-                  "RETRY": "Bu iş akışı yürütümünü yeniden dene",
-                  "DELETE": "Bu iş akışını sil"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "İlklendirildi",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Workflow instances"
+               "TITLE": "İş Akışları"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "İş akışı detayları",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Shutting down",
          "UNKNOWN": "Unknown",
          "UPLOADING": "Yükleniyor"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Dejanja",
                "DETAILS": "Podrobnosti",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Več informacij in dejanj",
+               "DESCRIPTION": "Opis",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Vrsta",
                "TITLE": "Naslov",
-               "STATE": "Stanje",
+               "STATUS": "Stanje",
                "STARTED": "Začeto",
                "SERIES": "Serije",
                "SUBMITTED": "Poslano",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Definicija poteka dela",
                "MIMETYPE": "Mimetype",
                "URL": "URL",
                "CONFIGURATION": "Konfiguracija",
                "NO_CONFIGURATION": "Ni obstoječih konfiguracijskih parametrov za izbrano definicijo poteka dela.",
                "WORKFLOW": "Potek dela",
                "TOOLTIP": {
-                  "STOP": "Ustavi potek dela",
-                  "ABORT": "Prekliči potek dela (ne ponovi neuspešnega postopka)",
-                  "RETRY": "Ponovi potek dela",
-                  "DELETE": "Izbriši potek dela"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "V izdelavi",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Potek dela"
+               "TITLE": "Poteki dela"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Podrobnosti poteka dela",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Ustavljanje",
          "UNKNOWN": "Neznan",
          "UPLOADING": "Nalaganje"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

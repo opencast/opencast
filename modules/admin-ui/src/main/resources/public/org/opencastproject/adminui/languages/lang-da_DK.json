@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Handlinger",
                "DETAILS": "Oplysninger",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Flere oplysninger og handlinger",
+               "DESCRIPTION": "Beskriveslse",
+               "MORE_INFO": "More Information",
                "ID": "ID",
                "TYPE": "Type",
                "TITLE": "Titel",
-               "STATE": "Tilstand",
+               "STATUS": "Status",
                "STARTED": "Startet",
                "SERIES": "Serier",
                "SUBMITTED": "Indsendt",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Arbejdsgngsdefinition",
                "MIMETYPE": "Mime-type",
                "URL": "URL",
                "CONFIGURATION": "Opsætning",
                "NO_CONFIGURATION": "Ingen eksisterende opsætningsparametre til den valgte arbejdsgangsdefinition.",
                "WORKFLOW": "Arbejdsgang",
                "TOOLTIP": {
-                  "STOP": "Stop arbejdsgangseksekveringsproces",
-                  "ABORT": "Afbryd arbejdsgangseksekveringsproces (forsøg igen ikke fejlede operationer igen)",
-                  "RETRY": "Førsøg arbejdsgangseksekveringsproces igen",
-                  "DELETE": "Slet arbejdsgangsproces"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Forberedes",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Arbejdsprocesinstanser"
+               "TITLE": "Arbejdsgange"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Arbejdsgangsoplysninger",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Lukker ned",
          "UNKNOWN": "Ukendt",
          "UPLOADING": "Uploader"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }

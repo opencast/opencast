@@ -875,25 +875,29 @@
             "WORKFLOWS": {
                "ACTIONS": "Accións",
                "DETAILS": "Detalles",
-               "DESCRIPTION": "",
-               "MORE_INFO": "Máis información e Accións",
+               "DESCRIPTION": "Descrición",
+               "MORE_INFO": "More Information",
                "ID": "Id.",
                "TYPE": "Tipo",
                "TITLE": "Título",
-               "STATE": "Estado",
+               "STATUS": "Estado",
                "STARTED": "Iniciado",
                "SERIES": "Series",
                "SUBMITTED": "Enviado",
+               "SUBMITTER": "Submitter",
+               "EXECUTION_TIME": "Execution time",
+               "WDID": "Definición do fluxo de traballo",
                "MIMETYPE": "Tipo Mime",
                "URL": "URL",
                "CONFIGURATION": "Configuración",
                "NO_CONFIGURATION": "Non existen parámetros de configuración para o fluxo de traballo seleccionado.",
                "WORKFLOW": "Fluxo de traballo",
                "TOOLTIP": {
-                  "STOP": "Deter a execución da instancia de fluxo de traballo",
-                  "ABORT": "Anular a execución da instancia de fluxo de traballo (non volver tentar a operación errada)",
-                  "RETRY": "Volver tentar a execución da instancia de fluxo de traballo",
-                  "DELETE": "Borrar a instancia de fluxo do traballo"
+                  "STOP": "Stop workflow",
+                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
+                  "RETRY": "Retry execution of workflow",
+                  "DELETE": "Delete workflow",
+                  "DETAILS": "Open workflow details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanciado",
@@ -908,7 +912,7 @@
                }
             },
             "WORKFLOW_INSTANCES": {
-               "TITLE": "Instancias do fuxo de traballo"
+               "TITLE": "Fluxos de Traballo"
             },
             "WORKFLOW_DETAILS": {
                "TITLE": "Detalles do fluxo de traballo",
@@ -2185,6 +2189,11 @@
          "SHUTTING_DOWN": "Apagando",
          "UNKNOWN": "Descoñecido",
          "UPLOADING": "Subindo"
+      }
+   },
+   "EDITABLE": {
+      "MULTI": {
+         "PLACEHOLDER": "To insert multiple values press Enter in between"
       }
    }
 }
