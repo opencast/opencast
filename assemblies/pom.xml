@@ -111,7 +111,6 @@
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.stax-api-1.2/2.8.0;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan-serializer/2.7.2_1;type:=endorsed;export:=true</library>
-              <library>mvn:javax.annotation/javax.annotation-api/1.2;type:=endorsed;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activator/2.8.0;type:=default;export:=true</library>
               <library>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.locator/2.8.0;type:=default;export:=true</library>
             </libraries>
