@@ -90,6 +90,7 @@ public class AbstractTieredStorageAssetManagerTest<A extends TieredStorageAssetM
     EasyMock.expect(em.getTransaction()).andReturn(tx).anyTimes();
     EasyMock.expect(query.setParameter(EasyMock.anyString(), EasyMock.anyString())).andReturn(query).anyTimes();
     EasyMock.expect(query.executeUpdate()).andReturn(0).anyTimes();
+    EasyMock.expect(query.getSingleResult()).andReturn(0L).anyTimes();
     EasyMock.replay(emf, em, query, tx);
     final Database db = new Database(emf, penv);
     //

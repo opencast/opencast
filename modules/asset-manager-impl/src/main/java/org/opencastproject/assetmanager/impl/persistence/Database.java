@@ -351,6 +351,17 @@ public class Database implements EntityPaths {
     }
   }
 
+  /**
+   * Check if any snapshot with the given media package identifier exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @return If a snapshot exists for the given media package
+   */
+  public boolean snapshotExists(final String mediaPackageId) {
+    return SnapshotDto.exists(entityManagerFactory.createEntityManager(), mediaPackageId);
+  }
+
   public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
     return penv.tx(new Fn<EntityManager, Opt<AssetDtos.Full>>() {
       @Override

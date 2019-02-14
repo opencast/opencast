@@ -34,7 +34,6 @@ import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
@@ -79,15 +78,16 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   @Override public Snapshot takeSnapshot(String owner, MediaPackage mp) {
 
     final String mediaPackageId = mp.getIdentifier().toString();
-    final AQueryBuilder q = q();
-    final AResult r = q.select(q.snapshot())
-            .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-           .run();
+    final boolean firstSnapshot = !snapshotExists(mediaPackageId);
 
     // Allow this if:
     //  - no previous snapshot exists
     //  - the user has write access to the previous snapshot
-    if (r.getSize() < 1 || isAuthorized(mkAuthPredicate(mediaPackageId, WRITE_ACTION))) {
+    if (firstSnapshot) {
+      // if it's the first snapshot, ensure that old, leftover properties are removed
+      deleteProperties(mediaPackageId);
+    }
+    if (firstSnapshot || isAuthorized(mkAuthPredicate(mediaPackageId, WRITE_ACTION))) {
       final Snapshot snapshot = super.takeSnapshot(owner, mp);
       final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
       storeAclAsProperties(snapshot, acl);
