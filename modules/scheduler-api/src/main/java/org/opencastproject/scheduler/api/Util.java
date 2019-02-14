@@ -128,7 +128,7 @@ public final class Util {
       Calendar cal = Calendar.getInstance(e.getStart().getTimeZone());
       cal.setTimeInMillis(e.getStart().getTime());
       logger.debug("EventList start {} Instance {}, calendar hour {}, zone {}",
-              e.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), e.getStart().getTimeZone());
+              e.getStart().toString(), simpleDateFormat.format(cal.getTime()), cal.get(Calendar.HOUR_OF_DAY), e.getStart().getTimeZone().toZoneId());
     }
     return event;
   }
