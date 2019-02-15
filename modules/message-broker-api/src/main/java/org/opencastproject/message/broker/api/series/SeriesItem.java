@@ -51,7 +51,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   private final String optOut;
   private final String element;
   private final String elementType;
-  private final Boolean overrideEpisodeAcl;
+  private final String overrideEpisodeAcl;
 
   public enum Type {
     UpdateCatalog, UpdateElement, UpdateAcl, UpdateOptOut, UpdateProperty, Delete
@@ -194,7 +194,7 @@ public final class SeriesItem implements MessageItem, Serializable {
     this.optOut = optOut == null ? null : Boolean.toString(optOut);
     this.elementType = elementType;
     this.element = element;
-    this.overrideEpisodeAcl = overrideEpisodeAcl;
+    this.overrideEpisodeAcl = overrideEpisodeAcl == null ? null : overrideEpisodeAcl.toString();
   }
 
   @Override
@@ -252,6 +252,6 @@ public final class SeriesItem implements MessageItem, Serializable {
   }
 
   public Boolean getOverrideEpisodeAcl() {
-    return overrideEpisodeAcl;
+    return overrideEpisodeAcl == null ? null : Boolean.parseBoolean(overrideEpisodeAcl);
   }
 }
