@@ -253,10 +253,6 @@ public final class EventIndexUtils {
               event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), true);
     }
 
-    if (event.getAgentConfiguration() != null) {
-      metadata.addField(EventIndexSchema.AGENT_CONFIGURATION, event.getAgentConfiguration(), false);
-    }
-
     return metadata;
   }
 

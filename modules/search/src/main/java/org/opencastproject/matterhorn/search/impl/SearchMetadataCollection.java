@@ -42,7 +42,7 @@ import java.util.Map;
 public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
 
   /** The metadata */
-  protected Map<String, SearchMetadata<?>> metadata = new HashMap<String, SearchMetadata<?>>();
+  protected Map<String, SearchMetadata<?>> metadata = new HashMap<>();
 
   /** Returns the document identifier */
   protected String identifier = null;
@@ -117,6 +117,8 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
   public void addField(String fieldName, Object fieldValue, boolean addToText) {
     if (fieldName == null)
       throw new IllegalArgumentException("Field name cannot be null");
+    if (fieldName.contains("."))
+      throw new IllegalArgumentException("Field name may not contain '.'");
     if (fieldValue == null)
       return;
 
@@ -158,9 +160,7 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
    * @return the metadata items
    */
   public List<SearchMetadata<?>> getMetadata() {
-    List<SearchMetadata<?>> result = new ArrayList<SearchMetadata<?>>();
-    result.addAll(metadata.values());
-    return result;
+    return new ArrayList<>(metadata.values());
   }
 
   /**
