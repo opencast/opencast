@@ -3,7 +3,7 @@
   "private": true,
   "devDependencies": {
     "grunt": "^1.0.3",
-    "grunt-markdownlint": "^2.1.0",
+    "grunt-markdownlint": "^2.2.1",
     "load-grunt-tasks": "^4.0.0"
   }
 }

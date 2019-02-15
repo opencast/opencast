@@ -6,8 +6,8 @@
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
   "devDependencies": {
-    "eslint": "^5.12.1",
-    "eslint-plugin-header": "^2.0.0",
+    "eslint": "^5.13.0",
+    "eslint-plugin-header": "^3.0.0",
     "gulp": "^4.0.0",
     "merge-stream": "^1.0.1",
     "paellaplayer": "github:polimediaupv/paella#6.0.4"
