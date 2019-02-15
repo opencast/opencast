@@ -136,6 +136,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-ldap/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-moodle/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-userdirectory-sakai/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-user-interface-configuration/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-common/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-urlsigning-service-impl/${project.version}</bundle>
