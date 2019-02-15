@@ -57,7 +57,7 @@
       exception-handler-workflow="partial-error"
       description="Archiving">
       <configurations>
-	      <configuration key="source-flavors">dublincore/*,security/*,*/delivery</configuration>
+         <configuration key="source-flavors">dublincore/*,security/*,*/delivery</configuration>
          <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
@@ -68,7 +68,7 @@
       exception-handler-workflow="partial-error"
       description="Publishing to Opencast Media Module">
       <configurations>
-	      <configuration key="download-source-flavors">dublincore/*,security/*,*/delivery</configuration>
+        <configuration key="download-source-flavors">dublincore/*,security/*,*/delivery</configuration>
         <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>
