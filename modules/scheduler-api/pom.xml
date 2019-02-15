@@ -51,19 +51,6 @@
     </dependency>
   </dependencies>
   <build>
-    <testResources>
-      <!-- Overrule main log4j configuration file to the test resources -->
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-        <includes>
-          <include>log4j.properties</include>
-        </includes>
-      </testResource>
-      <!-- Re-add the test resources as defined by the project -->
-      <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>

@@ -34,7 +34,6 @@ import net.fortuna.ical4j.model.property.RRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -45,6 +44,7 @@ import java.util.TimeZone;
 public final class Util {
 
   private static final Logger logger = LoggerFactory.getLogger(Util.class);
+  private static final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   private Util() {
   }
@@ -60,20 +60,11 @@ public final class Util {
    * @return the calculated periods
    */
   public static List<Period> calculatePeriods(Date start, Date end, long duration, RRule rRule, TimeZone tz) {
-    List<Period> periods = null;
-    String recurStr = rRule.getValue();
     Calendar startCal = Calendar.getInstance(tz);
     Calendar endCal = Calendar.getInstance(tz);
     startCal.setTime(start);
     endCal.setTime(end);
-    try {
-      periods = Util.calculatePeriods(startCal, endCal, duration, recurStr, tz);
-    } catch (ParseException e) {
-      // Swallowing this exception because this should never happen here.
-      // The inbound RRule should have contained a valid rule string.
-      logger.warn("Unexpected parse exception from RRule's recurrcence string {}", rRule.getValue(), e);
-    }
-    return periods;
+    return Util.calculatePeriods(startCal, endCal, duration, rRule.getRecur(), tz);
   }
 
   /**
@@ -83,17 +74,15 @@ public final class Util {
    * @param startCalTz, Calendar date time of the recurrence in the timezone of the scheduled CA
    * @param endCalTz, Calendar date time of the recurrence in the timezone of the scheduled CA
    * @param duration, the length of each event
-   * @param rRuleTzStr, the recurrence rule (based on the Start time zone, including start hour and days of week)
+   * @param recur, the recurrence rule (based on the Start time zone, including start hour and days of week)
    * @param tz, the timezone of the scheduled CA
    * @return a list of event Periods that match the rule and start and end times
-   * @throws ParseException
    */
-  public static List<Period> calculatePeriods(Calendar startCalTz, Calendar endCalTz, long duration, String rRuleTzStr, TimeZone tz) throws ParseException {
+  public static List<Period> calculatePeriods(Calendar startCalTz, Calendar endCalTz, long duration, Recur recur, TimeZone tz) {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EE MMM dd HH:mm:ss zzz yyyy");
     simpleDateFormat.setTimeZone(tz);
     String tzStr = tz.getID();
     List<Period> event = new LinkedList<>();
-    TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
     logger.debug("Inbound start of recurrence {} to end of recurrence {}, in Tz {}",
             simpleDateFormat.format(startCalTz.getTime()),
             simpleDateFormat.format(endCalTz.getTime()), tzStr);
@@ -107,11 +96,9 @@ public final class Util {
     logger.trace("is utc {}? Tz is {} ", periodStart.isUtc(), periodStart.getTimeZone().toZoneId());
     logger.debug("({}) Looking at recurrences for {} to {}, duration {}, {}", periodStart.getTimeZone().toZoneId(),
             simpleDateFormat.format(new Date(periodStart.getTime())),
-            simpleDateFormat.format(new Date(periodEnd.getTime())), duration, rRuleTzStr);
+            simpleDateFormat.format(new Date(periodEnd.getTime())), duration, recur.toString());
 
-    Recur recur = new Recur(rRuleTzStr);
-    // Try use period start as seed to stick the local TZ
-    DateList dates = recur.getDates(periodStart, periodStart, periodEnd, DATE_TIME);
+    DateList dates = recur.getDates(periodStart, periodEnd, DATE_TIME);
     logger.trace("Got {} dates: {}, tz '{}'", dates.size(), dates.toString(), dates.getTimeZone().toZoneId());
 
     for (Date date : dates) {
@@ -119,10 +106,7 @@ public final class Util {
       DateTime startDT = new DateTime(date);
       DateTime endDT = new DateTime(endTZ);
       Period p = new Period(startDT, endDT);
-      // remove duplicate dates from recur results
-      if (!event.contains(p)) {
-        event.add(p);
-      }
+      event.add(p);
     }
     for (Period e: event) {
       Calendar cal = Calendar.getInstance(e.getStart().getTimeZone());

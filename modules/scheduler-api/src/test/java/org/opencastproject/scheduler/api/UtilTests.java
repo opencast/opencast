@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import net.fortuna.ical4j.model.Period;
+import net.fortuna.ical4j.model.Recur;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -291,7 +292,7 @@ public class UtilTests {
             simpleDateFormat.format(endTz.getTime()), tz.getID(),
             TimeZone.getDefault().getID());
     logger.debug(rRuleStr);
-    return Util.calculatePeriods(startTz, endTz, duration, rRuleStr, tz);
+    return Util.calculatePeriods(startTz, endTz, duration, new Recur(rRuleStr), tz);
   }
 
   private String generateRule(String days, int hour, int minute) {

@@ -258,8 +258,8 @@
               !com.sun.*,
               !javax.el.*,
               !javax.servlet.jsp.*,
-              !net.mnode.ical4j.factory,
-              !net.mnode.ical4j.timezone,
+              !net.fortuna.ical4j.factory,
+              !net.fortuna.ical4j.timezone,
               !org.apache.log.*,
               !org.apache.tools.*,
               !org.bouncycastle.crypto.*,
@@ -286,15 +286,15 @@
               freemarker.template
             </Private-Package>
             <_exportcontents>
-              net.mnode.ical4j,
-              net.mnode.ical4j.data,
-              net.mnode.ical4j.filter,
-              net.mnode.ical4j.model,
-              net.mnode.ical4j.model.component,
-              net.mnode.ical4j.model.parameter,
-              net.mnode.ical4j.model.property,
-              net.mnode.ical4j.transform,
-              net.mnode.ical4j.util
+              net.fortuna.ical4j,
+              net.fortuna.ical4j.data,
+              net.fortuna.ical4j.filter,
+              net.fortuna.ical4j.model,
+              net.fortuna.ical4j.model.component,
+              net.fortuna.ical4j.model.parameter,
+              net.fortuna.ical4j.model.property,
+              net.fortuna.ical4j.transform,
+              net.fortuna.ical4j.util
             </_exportcontents>
             <Export-Package>
               org.opencastproject.util.*;version=${project.version};-split-package:=merge-first,
