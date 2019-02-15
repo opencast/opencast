@@ -6,7 +6,7 @@
 
     <property name="service.description" value="UI Config REST Endpoint"/>
     <property name="opencast.service.type" value="org.opencastproject.uiconfig"/>
-    <property name="opencast.service.path" value="/web/config"/>
+    <property name="opencast.service.path" value="/ui/config"/>
 
     <service>
       <provide interface="org.opencastproject.uiconfig.UIConfigRest"/>
