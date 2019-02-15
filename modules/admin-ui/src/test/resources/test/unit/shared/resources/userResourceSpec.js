@@ -1,15 +1,13 @@
 describe('User API Resource', function () {
-    var $httpBackend, UserResource, CryptService;
+    var $httpBackend, UserResource;
 
     beforeEach(module('adminNg.resources'));
     beforeEach(module('adminNg.services'));
-    beforeEach(module('angular-md5'));
     beforeEach(module('ngResource'));
 
-    beforeEach(inject(function (_$httpBackend_, _UserResource_, _CryptService_) {
+    beforeEach(inject(function (_$httpBackend_, _UserResource_) {
         $httpBackend  = _$httpBackend_;
         UserResource = _UserResource_;
-        CryptService = _CryptService_;
     }));
 
     beforeEach(function () {
