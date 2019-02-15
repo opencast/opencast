@@ -36,9 +36,12 @@
     <!-- Offload the archived mediapackage -->
 
     <operation
-      id="restore-from-remote"
+      id="move-to-remote"
       if="${restoreToLocal}"
       description="Restoring to local storage">
+      <configurations>
+        <configuration key="target-storage">local-filesystem</configuration>
+      </configurations>
     </operation>
 
   </operations>
