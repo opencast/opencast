@@ -742,9 +742,9 @@
         <version>${guava.version}</version>
       </dependency>
       <dependency>
-        <groupId>net.fortuna.ical4j</groupId>
+        <groupId>org.mnode.ical4j</groupId>
         <artifactId>ical4j</artifactId>
-        <version>1.0-rc2-patched</version>
+        <version>3.0.6-patched</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

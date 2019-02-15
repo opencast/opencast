@@ -50,8 +50,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.util.persistencefn.PersistenceEnv;
-import org.opencastproject.util.persistencefn.PersistenceEnvs;
 import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -225,8 +223,7 @@ public class SchedulerMigrationServiceTest {
   }
 
   private AssetManager mkAssetManager() {
-    final PersistenceEnv penv = PersistenceEnvs.mk(mkAssetManagerEntityManagerFactory());
-    final Database db = new Database(null, penv);
+    final Database db = new Database(mkAssetManagerEntityManagerFactory());
     final AssetStore assetStore = mkAssetStore();
     return new AbstractAssetManager() {
 
