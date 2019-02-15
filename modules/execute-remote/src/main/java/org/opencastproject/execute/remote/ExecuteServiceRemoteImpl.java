@@ -107,7 +107,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       logger.info("Executing command {} using a remote execute service", exec);
 
       post = new HttpPost("/" + ExecuteService.ENDPOINT_NAME);
-      post.setEntity(new UrlEncodedFormEntity(formStringParams));
+      post.setEntity(new UrlEncodedFormEntity(formStringParams, "UTF-8"));
       response = getResponse(post);
 
       if (response != null) {
@@ -161,7 +161,7 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       logger.info("Executing command {} using a remote execute service", exec);
 
       post = new HttpPost("/" + ExecuteService.ENDPOINT_NAME);
-      post.setEntity(new UrlEncodedFormEntity(formStringParams));
+      post.setEntity(new UrlEncodedFormEntity(formStringParams, "UTF-8"));
       response = getResponse(post);
 
       if (response != null) {
