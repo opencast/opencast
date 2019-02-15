@@ -85,7 +85,7 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
       // if it's the first snapshot, ensure that old, leftover properties are removed
       deleteProperties(mediaPackageId);
     }
-    if (firstSnapshot || isAuthorized(mkAuthPredicate(mediaPackageId, WRITE_ACTION))) {
+    if (firstSnapshot || isAuthorized(mediaPackageId, WRITE_ACTION)) {
       final Snapshot snapshot = super.takeSnapshot(owner, mp);
       final AccessControlList acl = authSvc.getActiveAcl(mp).getA();
       storeAclAsProperties(snapshot, acl);
