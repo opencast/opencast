@@ -722,12 +722,11 @@ public class SeriesEndpoint {
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
       JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
 
-      if (((JSONObject) acl.get("acl")).containsKey("ace")) {
-        return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
-      } else if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
+      if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
         return ApiResponses.notFound("Cannot find acl for series with id '%s'.", id);
+      } else {
+        return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
       }
-      return ApiResponses.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
     }
 
     return ApiResponses.notFound("Cannot find an series with id '%s'.", id);
