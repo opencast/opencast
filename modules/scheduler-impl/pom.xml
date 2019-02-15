@@ -224,6 +224,7 @@
               org.opencastproject.scheduler.endpoint;version=${project.version}
             </Export-Package>
             <Import-Package>
+              net.fortuna.ical4j.*,
               org.w3c.dom;version=0,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
