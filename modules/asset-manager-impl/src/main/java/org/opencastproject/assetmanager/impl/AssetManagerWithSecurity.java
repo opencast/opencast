@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.impl;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static java.lang.String.format;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.Availability;
@@ -191,7 +192,10 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
     final User user = secSvc.getUser();
     if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
       return AdminRole.GLOBAL;
-    } else if (user.hasRole(secSvc.getOrganization().getAdminRole())) {
+    } else if (user.hasRole(secSvc.getOrganization().getAdminRole())
+            || user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
+      // In this context, we treat capture agents the same way as organization admins, allowing them access so that
+      // they can ingest new media without requiring them to be explicitly specified in the ACLs.
       return AdminRole.ORGANIZATION;
     } else {
       return AdminRole.NONE;
