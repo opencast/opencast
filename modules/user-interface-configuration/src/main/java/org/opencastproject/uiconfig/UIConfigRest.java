@@ -127,17 +127,17 @@ public class UIConfigRest {
              },
              returnDescription = "")
   public Response getConfigFile(@PathParam("component") String component, @PathParam("filename") String filename) throws IOException, NotFoundException {
-    try {
-      String orgId = securityService.getOrganization().getId();
-      String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
+    String orgId = securityService.getOrganization().getId();
 
-      File configFile = new File(PathSupport.concat(new String[] { uiConfigFolder, orgId, component, filename }));
+    File configFile = new File(PathSupport.concat(new String[] { uiConfigFolder, orgId, component, filename }));
+    try {
+      String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
       String configFileCanPath = configFile.getCanonicalPath();
 
       // is configFile a subdirectory of basePath (additional directory traversal protection), if not stop
       if (!configFileCanPath.startsWith(basePath))
       {
-        logger.warn("Directory traversal prevented");
+        logger.warn("Directory traversal prevented (trying to access '{}')", configFile.getPath());
         throw new AccessDeniedException(configFileCanPath);
       }
 
@@ -149,6 +149,7 @@ public class UIConfigRest {
     }
     catch (FileNotFoundException e)
     {
+      logger.debug("Could not find requested configuration file '{}'", configFile.getPath(), e);
       throw new NotFoundException();
     }
   }
