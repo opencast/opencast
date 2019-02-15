@@ -9,7 +9,6 @@
     "angular-resource": "1.5.11",
     "angular-animate": "1.5.11",
     "angular-messages": "1.5.11",
-    "angular-md5": "0.1.8",
     "angular-translate": "2.18.1",
     "angular-translate-loader-static-files": "2.18.1",
     "angular-local-storage": "0.7.1",

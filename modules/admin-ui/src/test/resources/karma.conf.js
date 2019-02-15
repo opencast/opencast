@@ -11,7 +11,6 @@ module.exports = function (config) {
             '../../../bower_components/angular-resource/angular-resource.js',
             '../../../bower_components/angular-animate/angular-animate.js',
             '../../../bower_components/angular-messages/angular-messages.js',
-            '../../../bower_components/angular-md5/angular-md5.js',
             '../../../bower_components/angular-translate/angular-translate.js',
             '../../../bower_components/angular-translate-loader-static-files/angular-translate-loader-static-files.js',
             '../../../bower_components/angular-local-storage/dist/angular-local-storage.js',
@@ -26,7 +25,6 @@ module.exports = function (config) {
             '../../main/webapp/scripts/lib/underscore-1.5.2.js',
             '../../main/webapp/scripts/lib/video-js/video.js',
             '../../main/webapp/scripts/lib/moment-with-locales.js',
-            '../../main/webapp/scripts/lib/javascript-md5/js/md5.min.js',
             '../../main/webapp/scripts/lib/timepicker/jquery-ui-timepicker-addon.js',
 
             '../../main/webapp/scripts/app.js',
