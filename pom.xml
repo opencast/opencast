@@ -42,7 +42,6 @@
     <osgi.compendium.version>5.0.0</osgi.compendium.version>
     <osgi.core.version>5.0.0</osgi.core.version>
     <osgi.enterprise.version>5.0.0</osgi.enterprise.version>
-    <pax.web.version>7.2.3</pax.web.version>
   </properties>
   <modules>
     <module>modules/admin-ui</module>

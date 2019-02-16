@@ -37,14 +37,6 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.ops4j.pax.web</groupId>
-      <artifactId>pax-web-features</artifactId>
-      <version>${pax.web.version}</version>
-      <classifier>features</classifier>
-      <type>xml</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.cxf.karaf</groupId>
       <artifactId>apache-cxf</artifactId>
       <version>${cxf.version}</version>
