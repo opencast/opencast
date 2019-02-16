@@ -64,7 +64,7 @@ public class SchedulerItem implements Serializable {
   private final long reviewDate;
   private final String recordingState;
   private final long start;
-  private final Long lastHeardFrom;
+  private final String lastHeardFrom;
   private final Type type;
 
   public enum Type {
@@ -365,7 +365,7 @@ public class SchedulerItem implements Serializable {
     this.reviewDate = -1;
     this.recordingState = state;
     this.start = -1;
-    this.lastHeardFrom = lastHeardFrom;
+    this.lastHeardFrom = gson.toJson(lastHeardFrom);
     this.type = Type.UpdateRecordingStatus;
   }
 
@@ -455,7 +455,7 @@ public class SchedulerItem implements Serializable {
   }
 
   public Long getLastHeardFrom() {
-    return lastHeardFrom;
+    return gson.fromJson(lastHeardFrom, Long.class);
   }
 
   public Boolean getOptOut() {
