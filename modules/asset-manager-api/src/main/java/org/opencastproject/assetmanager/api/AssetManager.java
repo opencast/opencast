@@ -25,6 +25,8 @@ import org.opencastproject.mediapackage.MediaPackage;
 
 import com.entwinemedia.fn.data.Opt;
 
+import java.util.List;
+
 /**
  * The AssetManager stores versioned {@linkplain Snapshot snapshots} of media packages.
  * <p>
@@ -122,6 +124,28 @@ public interface AssetManager {
    * @return If a snapshot exists for the given media package
    */
   boolean snapshotExists(String mediaPackageId);
+
+  /**
+   * Check if any snapshot with the given media package identifier exists.
+   *
+   * @param mediaPackageId
+   *          The media package identifier to check for
+   * @param organization
+   *          The organization to limit the search to
+   * @return If a snapshot exists for the given media package
+   */
+  boolean snapshotExists(String mediaPackageId, String organization);
+
+  /**
+   * Select all properties for a specific media package.
+   *
+   * @param mediaPackageId
+   *          Media package identifier to check for
+   * @param namespace
+   *          Namespace to limit the search to
+   * @return List of properties
+   */
+  List<Property> selectProperties(String mediaPackageId, String namespace);
 
   /** Create a new query builder. */
   AQueryBuilder createQuery();

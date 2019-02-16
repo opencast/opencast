@@ -51,6 +51,7 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.persistencefn.PersistenceEnv;
 import org.opencastproject.util.persistencefn.PersistenceEnvs;
+import org.opencastproject.util.persistencefn.PersistenceUtil;
 import org.opencastproject.util.persistencefn.Queries;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -280,7 +281,9 @@ public abstract class AssetManagerTestBase<A extends AssetManager> {
         return null;
       }
     });
-    final Database db = new Database(null, penv);
+    final Database db = new Database(
+            PersistenceUtil.mkTestEntityManagerFactoryFromSystemProperties(PERSISTENCE_UNIT),
+            penv);
     //
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))

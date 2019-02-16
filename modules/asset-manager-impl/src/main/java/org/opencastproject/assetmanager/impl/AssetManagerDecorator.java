@@ -35,6 +35,7 @@ import org.opencastproject.util.NotFoundException;
 import com.entwinemedia.fn.data.Opt;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 public class AssetManagerDecorator<A extends TieredStorageAssetManager> implements TieredStorageAssetManager {
@@ -77,6 +78,16 @@ public class AssetManagerDecorator<A extends TieredStorageAssetManager> implemen
   @Override
   public boolean snapshotExists(final String mediaPackageId) {
     return delegate.snapshotExists(mediaPackageId);
+  }
+
+  @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return delegate.snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, final String namespace) {
+    return delegate.selectProperties(mediaPackageId, namespace);
   }
 
   @Override public AQueryBuilder createQuery() {

@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -50,6 +52,8 @@ import javax.persistence.TypedQuery;
 @Entity(name = "Property")
 @Table(name = "oc_assets_properties")
 @NamedQueries({
+    @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
+            + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
     @NamedQuery(name = "Property.delete", query = "delete from Property p where p.mediaPackageId = :mediaPackageId"),
     @NamedQuery(name = "Property.deleteByNamespace", query = "delete from Property p "
             + "where p.mediaPackageId = :mediaPackageId and p.namespace = :namespace")})
@@ -175,5 +179,13 @@ public class PropertyDto {
     tx.begin();
     query.executeUpdate();
     tx.commit();
+  }
+
+  public static List<Property> select(EntityManager em, final String mediaPackageId, final String namespace) {
+    TypedQuery<PropertyDto> query = em.createNamedQuery("Property.selectByMediaPackageAndNamespace", PropertyDto.class)
+              .setParameter("mediaPackageId", mediaPackageId)
+              .setParameter("namespace", namespace);
+    logger.debug("Executing query {}", query);
+    return query.getResultList().parallelStream().map(PropertyDto::toProperty).collect(Collectors.toList());
   }
 }

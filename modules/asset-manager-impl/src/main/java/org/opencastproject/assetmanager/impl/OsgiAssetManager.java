@@ -218,6 +218,16 @@ public class OsgiAssetManager implements AssetManager, TieredStorageAssetManager
   }
 
   @Override
+  public boolean snapshotExists(final String mediaPackageId, final String organization) {
+    return delegate.snapshotExists(mediaPackageId, organization);
+  }
+
+  @Override
+  public List<Property> selectProperties(final String mediaPackageId, final String namespace) {
+    return delegate.selectProperties(mediaPackageId, namespace);
+  }
+
+  @Override
   public AQueryBuilder createQuery() {
     return delegate.createQuery();
   }

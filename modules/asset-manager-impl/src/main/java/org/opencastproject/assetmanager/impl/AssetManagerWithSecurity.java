@@ -51,6 +51,9 @@ import com.entwinemedia.fn.data.Opt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Security layer.
  */
@@ -171,10 +174,6 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
             .and(restrictToUsersOrganization());
   }
 
-  private Predicate mkAuthPredicate(final String mpId, final String action) {
-    return q().mediaPackageId(mpId).and(mkAuthPredicate(action));
-  }
-
   /** Create a predicate that restricts access to the user's organization. */
   private Predicate restrictToUsersOrganization() {
     return q().organizationId().eq(secSvc.getUser().getOrganization().getId());
@@ -184,13 +183,29 @@ public class AssetManagerWithSecurity extends AssetManagerDecorator<TieredStorag
   private boolean isAuthorized(final String mediaPackageId, final String action) {
     switch (isAdmin()) {
       case GLOBAL:
+        // grant general access
+        logger.debug("Access granted since user is global admin");
         return true;
       case ORGANIZATION:
-        return true;
+        // ensure that the requested assets belong to this organization
+        logger.debug("User is organization admin. Checking organization. Checking organization ID of asset.");
+        return snapshotExists(mediaPackageId, secSvc.getOrganization().getId());
       default:
-        return !delegate.createQuery().select()
-                .where(mkAuthPredicate(mediaPackageId, action))
-                .run().getRecords().isEmpty();
+        // check organization
+        logger.debug("Non admin user. Checking organization.");
+        final String org = secSvc.getOrganization().getId();
+        if (!snapshotExists(mediaPackageId, org)) {
+          return false;
+        }
+        // check acl rules
+        logger.debug("Non admin user. Checking ACL rules.");
+        final List<String> roles = secSvc.getUser().getRoles().parallelStream()
+                .filter((role) -> includeUIRoles || !role.getName().startsWith("ROLE_UI_"))
+                .map((role) -> mkPropertyName(role.getName(), action))
+                .collect(Collectors.toList());
+        return selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+                .map(p -> p.getId().getName())
+                .anyMatch(p -> roles.parallelStream().anyMatch(r -> r.equals(p)));
     }
   }
 
