@@ -28,3 +28,9 @@ DELETE FROM oc_assets_properties WHERE namespace = 'org.opencastproject.schedule
 
 ALTER TABLE oc_job DROP COLUMN blocking_job;
 DROP TABLE oc_blocking_job;
+
+-- Clean up orphaned asset manager properties
+delete p from oc_assets_properties p where not exists (
+  select * from oc_assets_snapshot s
+    where p.mediapackage_id = s.mediapackage_id
+);
