@@ -30,7 +30,7 @@
 
   <reference name="search-index"
              cardinality="1..1"
-             interface="org.opencastproject.external.impl.index.ExternalIndex"
+             interface="org.opencastproject.external.index.ExternalIndex"
              policy="static"
              bind="setSearchIndex"/>
 
