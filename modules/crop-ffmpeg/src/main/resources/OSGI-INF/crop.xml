@@ -24,7 +24,7 @@
     <implementation class="org.opencastproject.crop.endpoint.CropRestEndpoint" />
     <property name="service.description" value="Video Crop REST Endpoint" />
     <property name="opencast.service.type" value="org.opencastproject.crop" />
-    <property name="opencast.service.path" value="/analysis/crop" />
+    <property name="opencast.service.path" value="/crop" />
     <property name="opencast.service.jobproducer" value="true" />
     <service>
       <provide interface="org.opencastproject.crop.endpoint.CropRestEndpoint" />

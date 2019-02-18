@@ -54,7 +54,7 @@ public class CropServiceRemoteImpl extends RemoteBase implements CropService {
 
   @Override
   public Job crop(Track track) throws CropException, MediaPackageException {
-    HttpPost post = new HttpPost("/crop");
+    HttpPost post = new HttpPost("/");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(track)));
