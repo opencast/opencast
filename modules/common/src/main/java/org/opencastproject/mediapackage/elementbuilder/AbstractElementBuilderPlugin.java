@@ -112,7 +112,7 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
     if (mimeTypes != null) {
       if (mimeTypes.length > 0) {
         for (MimeType m : mimeTypes) {
-          if (m.equals(MimeTypes.fromURL(file.toURI().toURL())))
+          if (m.equals(MimeTypes.fromString(file.getPath())))
             return true;
         }
       } else {
@@ -143,15 +143,9 @@ public abstract class AbstractElementBuilderPlugin implements MediaPackageElemen
       throw new IllegalStateException("Mime types have not been initialized");
 
     // Check mimetype
-    if (mimeTypes != null) {
-      if (mimeTypes.size() > 0) {
-        for (MimeType m : mimeTypes) {
-          if (m.equals(MimeTypes.fromURL(file.toURI().toURL())))
-            return true;
-        }
-      } else {
-        return false;
-      }
+    for (MimeType m : mimeTypes) {
+      if (m.equals(MimeTypes.fromString(file.getPath())))
+        return true;
     }
 
     return false;
