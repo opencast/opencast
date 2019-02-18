@@ -684,12 +684,6 @@ public class IndexServiceImplTest {
     CaptureAgentStateService captureAgentStateService = setupCaptureAgentStateService();
 
     // Setup scheduler service
-    Capture<Date> recurrenceStart = EasyMock.newCapture();
-    Capture<Date> recurrenceEnd = EasyMock.newCapture();
-    Capture<RRule> rrule = EasyMock.newCapture();
-    Capture duration = EasyMock.newCapture();
-    Capture<TimeZone> tz = EasyMock.newCapture();
-
     Capture<Date> schedStart = EasyMock.newCapture();
     Capture<Date> schedEnd = EasyMock.newCapture();
     Capture<RRule> schedRRule = EasyMock.newCapture();
@@ -698,16 +692,6 @@ public class IndexServiceImplTest {
 
     Capture<MediaPackage> mp = EasyMock.newCapture();
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    //Look up the expected periods
-    EasyMock.expect(
-            schedulerService.calculatePeriods(EasyMock.capture(rrule), EasyMock.capture(recurrenceStart),
-                    EasyMock.capture(recurrenceEnd), EasyMock.captureLong(duration), EasyMock.capture(tz))).
-            andAnswer(new IAnswer<List<Period>>() {
-              @Override
-              public List<Period> answer() throws Throwable {
-                return calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue());
-              }
-            }).anyTimes();
     //The actual scheduling
     EasyMock.expect(
     schedulerService.addMultipleEvents(
@@ -744,7 +728,7 @@ public class IndexServiceImplTest {
     String scheduledEvents = indexServiceImpl.createEvent(metadataJson, mediapackage);
     String[] ids = StringUtils.split(scheduledEvents, ",");
     //We should have as many scheduled events as we do periods
-    Assert.assertTrue(ids.length == calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue()).size());
+    Assert.assertTrue(ids.length == calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue()).size());
 
     assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
             mediapackageIdResult.getValue());
@@ -754,25 +738,12 @@ public class IndexServiceImplTest {
     assertTrue("The mediapackage should have had its title updated", catalogResult.hasCaptured());
     assertEquals("The mediapackage title should have been updated.", expectedTitle, mediapackageTitleResult.getValue());
     assertTrue("The catalog should have been created", catalogResult.hasCaptured());
-    //Assert that the start and end recurrence dates captured, along with the duration and recurrence rule
-    //This is all used by the scheduling calculation, but not the actual scheduling call
-    assertTrue(recurrenceStart.hasCaptured());
-    assertTrue(recurrenceEnd.hasCaptured());
-    assertTrue(duration.hasCaptured());
-    assertTrue(rrule.hasCaptured());
     //Assert that the scheduling call has its necessary data
     assertTrue(schedStart.hasCaptured());
     assertTrue(schedEnd.hasCaptured());
     assertTrue(schedDuration.hasCaptured());
     assertTrue(schedRRule.hasCaptured());
     assertTrue(schedTz.hasCaptured());
-    List<Period> pCheck = calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
-    List<Period> pExpected = calculatePeriods(rrule.getValue(), recurrenceStart.getValue(), recurrenceEnd.getValue(), (Long) duration.getValue(), tz.getValue());
-
-    //Assert that the first capture time is the same as the recurrence start
-    assertEquals(pExpected.get(0).getStart(), pCheck.get(0).getStart());
-    //Assert that the end of the last capture time is the same as the recurrence end
-    assertEquals(pExpected.get(pExpected.size() - 1).getEnd(), pCheck.get(pCheck.size() - 1).getEnd());
   }
 
   /**

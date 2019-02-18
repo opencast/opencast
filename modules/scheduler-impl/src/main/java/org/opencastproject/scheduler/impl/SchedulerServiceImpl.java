@@ -647,10 +647,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String, String> wfProperties,
           Map<String, String> caMetadata, Opt<Boolean> optOut, Opt<String> schedulingSource, String modificationOrigin)
           throws UnauthorizedException, SchedulerConflictException, SchedulerTransactionLockException, SchedulerException {
-    List<Period> periods = calculatePeriods(rRule, start, end, duration, tz);
+    // input Rrule is UTC. Needs to be adjusted to tz
+    Util.adjustRrule(rRule, start, tz);
+    List<Period> periods = Util.calculatePeriods(start, end, duration, rRule, tz);
     return addMultipleEventInternal(periods, captureAgentId, userIds, templateMp, wfProperties, caMetadata,
             modificationOrigin, optOut, schedulingSource, Opt.<String> none());
   }
+
 
 
   private Map<String, Period> addMultipleEventInternal(List<Period> periods, String captureAgentId,
@@ -1561,7 +1564,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(end, "end");
     notNull(tz, "timeZone");
 
-    final List<Period> periods = calculatePeriods(rrule, start, end, duration, tz);
+    Util.adjustRrule(rrule, start, tz);
+    final List<Period> periods =  Util.calculatePeriods(start, end, duration, rrule, tz);
     return findConflictingEvents(periods, captureAgentId, tz);
   }
 
@@ -1590,11 +1594,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       logger.error("Failed to search for conflicting events: {}", getStackTrace(e));
       throw new SchedulerException(e);
     }
-  }
-
-  @Override
-  public List<Period> calculatePeriods(RRule rrule, Date start, Date end, long duration, TimeZone tz) {
-    return Util.calculatePeriods(start, end, duration, rrule, tz);
   }
 
   @Override

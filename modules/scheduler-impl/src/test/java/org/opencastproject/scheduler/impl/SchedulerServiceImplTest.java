@@ -183,6 +183,8 @@ import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1892,8 +1894,9 @@ public class SchedulerServiceImplTest {
       assertEquals(1, events.size());
     }
     {
+      ZonedDateTime startZdt = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC);
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA"), start, new Date(start.getTime() + hours(48)),
+              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour() + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
     }
