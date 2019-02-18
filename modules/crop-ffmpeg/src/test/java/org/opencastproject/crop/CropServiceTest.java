@@ -42,7 +42,7 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.tika.io.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
 import org.junit.After;
@@ -63,7 +63,7 @@ public class CropServiceTest {
   /** Video file to test. Has black bars on each side */
   protected static final String mediaResource = "/black.mp4";
 
-  /** Video file to test entire black slides. Shoudn't not be cropped */
+  /** Video file to test entire black slides. Should not be cropped */
   protected static final String mediaResource1 = "/schwarzesVideoFinal.mp4";
 
   /** Duration of whole videos */
