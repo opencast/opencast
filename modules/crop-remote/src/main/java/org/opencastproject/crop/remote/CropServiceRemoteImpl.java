@@ -48,7 +48,7 @@ public class CropServiceRemoteImpl extends RemoteBase implements CropService {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(CropServiceRemoteImpl.class);
 
-  protected CropServiceRemoteImpl() {
+  public CropServiceRemoteImpl() {
     super(JOB_TYPE);
   }
 
