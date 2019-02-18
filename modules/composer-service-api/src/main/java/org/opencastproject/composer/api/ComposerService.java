@@ -248,20 +248,21 @@ public interface ComposerService {
 
 
   /**
-   * Synchronously converts the given image to a different image format using the specified image profile. Please note that
-   * synchronously doing this means, that the workload cannot be distributed amongst all nodes.
+   * Synchronously converts the given image to different image formats using the specified encoding profiles. Please
+   * note that synchronously doing this means that the workload cannot be distributed amongst all nodes.
    *
    * @param image
    *          the image
-   * @param profileId
-   *          the profile to use for conversion
-   * @return the converted image
+   * @param profileIds
+   *          the profiles to use for conversion
+   * @return the converted images
    * @throws EncoderException
    *           if image conversion fails
    * @throws MediaPackageException
    *           if the mediapackage is invalid
    */
-  Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException;
+  List<Attachment> convertImageSync(Attachment image, String... profileIds) throws EncoderException,
+          MediaPackageException;
 
 
   /**

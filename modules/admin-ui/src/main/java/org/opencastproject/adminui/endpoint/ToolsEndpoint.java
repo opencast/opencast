@@ -661,7 +661,8 @@ public class ToolsEndpoint implements ManagedService {
         } catch (UrlSigningException | URISyntaxException e) {
           logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
           return R.serverError();
-        } catch (IOException | EncoderException | PublicationException | UnknownFileTypeException | MediaPackageException e) {
+        } catch (IOException | DistributionException | EncoderException | PublicationException
+            | UnknownFileTypeException | MediaPackageException e) {
           logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
           return R.serverError();
         }

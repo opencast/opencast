@@ -1233,24 +1233,35 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.composer.api.ComposerService#convertImageSync(
+          org.opencastproject.mediapackage.Attachment, java.lang.String...)
+   */
   @Override
-  public Attachment convertImageSync(Attachment image, String profileId) throws EncoderException, MediaPackageException {
+  public List<Attachment> convertImageSync(Attachment image, String... profileIds) throws EncoderException,
+      MediaPackageException {
     Job job = null;
     try {
-      final EncodingProfile profile = profileScanner.getProfile(profileId);
+      final float jobLoad = (float) Arrays.stream(profileIds)
+        .map(p -> profileScanner.getProfile(p))
+        .mapToDouble(EncodingProfile::getJobLoad)
+        .max()
+        .orElse(0);
       job = serviceRegistry
           .createJob(
-              JOB_TYPE, Operation.Image.toString(), null, null, false, profile.getJobLoad());
+              JOB_TYPE, Operation.Image.toString(), null, null, false, jobLoad);
       job.setStatus(Job.Status.RUNNING);
       job = serviceRegistry.updateJob(job);
-      List<Attachment> result = convertImage(job, image, profileId);
+      List<Attachment> results = convertImage(job, image, profileIds);
       job.setStatus(Job.Status.FINISHED);
-      if (result.isEmpty()) {
+      if (results.isEmpty()) {
         throw new EncoderException(format(
-                "Unable to convert image %s with encoding profile %s. The result set is empty.",
-                image.getURI().toString(), profileId));
+                "Unable to convert image %s with encoding profiles %s. The result set is empty.",
+                image.getURI().toString(), profileIds));
       }
-      return result.get(0);
+      return results;
     } catch (ServiceRegistryException | NotFoundException e) {
       throw new EncoderException("Unable to create a job", e);
     } finally {
