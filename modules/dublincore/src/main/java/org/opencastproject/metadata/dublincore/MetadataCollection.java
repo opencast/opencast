@@ -90,8 +90,6 @@ public interface MetadataCollection {
 
   void updateStringField(MetadataField<?> current, String value);
 
-  void updateIterableStringField(MetadataField<?> current, Iterable<String> value);
-
   boolean isUpdated();
 
 }
