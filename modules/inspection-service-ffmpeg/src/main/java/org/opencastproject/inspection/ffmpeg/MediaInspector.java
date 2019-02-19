@@ -350,7 +350,7 @@ public class MediaInspector {
       // Mimetype
       if (element.getMimeType() == null || override) {
         try {
-          element.setMimeType(MimeTypes.fromURI(file.toURI()));
+          element.setMimeType(MimeTypes.fromString(file.getPath()));
         } catch (UnknownFileTypeException e) {
           logger.info("unable to determine the mime type for {}", file.getName());
         }
