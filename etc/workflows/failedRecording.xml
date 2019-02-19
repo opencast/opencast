@@ -8,8 +8,8 @@
   <tag>archive</tag>
   </tags>
   <description>
-   Publish a placeholder video for corrupt videos. 
-   Delete and cleanup old snapshots, but keep the metadata.	  
+    Publish a placeholder video for corrupt videos.
+    Delete and cleanup old snapshots, but keep the metadata.
   <description/>
   <configuration_panel/>
 
