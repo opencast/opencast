@@ -141,10 +141,6 @@
                   <concat destfile="target/assembly/etc/system.properties" append="true">
                     <filelist dir="../resources" files="system.properties.append"/>
                   </concat>
-                  <!-- Additional config lines to startup.properties -->
-                  <concat destfile="target/assembly/etc/startup.properties" append="true">
-                    <filelist dir="../resources" files="startup.properties.append"/>
-                  </concat>
                   <!-- Adding extra OSGi system packages to configuration -->
                   <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>
                   <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
