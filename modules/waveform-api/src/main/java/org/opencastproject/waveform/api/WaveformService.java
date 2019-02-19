@@ -39,11 +39,12 @@ public interface WaveformService {
    * @param pixelPerMinute the width of the waveform image in pixels per minute
    * @param minWidth the minimum width of the waveform image
    * @param maxWidth the maximum width of the waveform image
-   * @param height the height of the waveform image
+   * @param height the height of the waveform image   
+   * @param color the color of the waveform image
    * @return a job that will create a waveform image
    * @throws MediaPackageException if the serialization of the given track fails
    * @throws WaveformServiceException if the job can't be created for any reason
    */
-  Job createWaveformImage(Track sourceTrack, int pixelPerMinute, int minWidth, int maxWidth, int height)
+  Job createWaveformImage(Track sourceTrack, int pixelPerMinute, int minWidth, int maxWidth, int height, String color)
     throws MediaPackageException, WaveformServiceException;
 }
