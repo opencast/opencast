@@ -226,7 +226,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * {@inheritDoc}
    *
    * @see org.opencastproject.waveform.api.WaveformService#createWaveformImage(org.opencastproject.mediapackage.Track,
-   *         int, int, int, int)
+   *         int, int, int, int, String)
    */
   @Override
   public Job createWaveformImage(Track sourceTrack, int pixelsPerMinute, int minWidth, int maxWidth, int height, String color)
@@ -280,6 +280,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param minWidth minimum width of waveform image
    * @param maxWidth maximum width of waveform image
    * @param height height of waveform image
+   * @param color color of waveform image
    * @return waveform image attachment
    * @throws WaveformServiceException if processing fails
    */
@@ -391,7 +392,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
    * @param track source audio/video track with at least one audio channel
    * @param width width of waveform image
    * @param height height of waveform image
-   * @param color colour of waveform image
+   * @param color color of waveform image
    * @return ffmpeg filter parameter
    */
   private String createWaveformFilter(Track track, int width, int height, String color) {

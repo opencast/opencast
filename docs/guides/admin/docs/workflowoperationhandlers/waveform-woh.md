@@ -25,7 +25,7 @@ pixels-per-minute |400         |Width of waveform image in pixels per minute    
 min-width         |10000       |Minimum width of waveform image in pixels                       |5000
 max-width         |30000       |Maximum width of waveform image in pixels                       |20000
 height            |60          |Height of waveform image in pixels                              |500
-color             |black       |Color of waveform image                                         |black
+color             |black       |Color of waveform image, see [ffmpeg.org/ffmpeg-all.html#Color](https://www.ffmpeg.org/ffmpeg-all.html#Color) |black
 Additional notes:
 
 - All media, that match either source-flavors or source tags will be processed.
