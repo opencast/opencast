@@ -35,6 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -47,6 +49,28 @@ public final class Util {
   private static final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
   private Util() {
+  }
+
+
+  /**
+   * Adjust the given UTC rrule to the given timezone.
+   *
+   * @param rRule The rrule to adjust.
+   * @param start The start date in UTC
+   *
+   * @param tz The target timezone.
+   */
+  public static void adjustRrule(final RRule rRule, final Date start, final TimeZone tz) {
+    final Recur recur = rRule.getRecur();
+    if (recur.getHourList().size() != 1 || recur.getMinuteList().size() != 1) {
+      throw new IllegalArgumentException("RRules with multiple hours/minutes are not supported by Opencast. " + recur.toString());
+    }
+    final ZonedDateTime adjustedDate = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC)
+            .withHour(recur.getHourList().get(0))
+            .withMinute(recur.getMinuteList().get(0))
+            .withZoneSameInstant(tz.toZoneId());
+    recur.getHourList().set(0, adjustedDate.getHour());
+    recur.getMinuteList().set(0, adjustedDate.getMinute());
   }
 
   /**
