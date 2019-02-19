@@ -7,6 +7,9 @@
   <tag>editor</tag>
   <tag>archive</tag>
   </tags>
+  <description>
+   Publish a placeholder video for corrupt videos. 
+   Delete and cleanup old snapshots, but keep the metadata.	  
   <description/>
   <configuration_panel/>
 
@@ -43,7 +46,7 @@
       exception-handler-workflow="error"
       description="copy failed Video">
       <configurations>
-        <configuration key="source-flavor">*/source</configuration>
+        <configuration key="source-flavor">presenter/source</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
         <configuration key="target-tags">failed,+archive,+engage-download</configuration>
         <configuration key="encoding-profile">failed.http</configuration>
