@@ -169,14 +169,14 @@ angular.module('adminNg.controllers')
     $scope.player = {};
     $scope.video  = ToolsResource.get({ id: $scope.id, tool: 'editor' });
 
-    $scope.activeTransaction = false;
+    $scope.activeRequest = false;
 
     $scope.submit = function () {
-      $scope.activeTransaction = true;
+      $scope.activeRequest = true;
       $scope.video.thumbnail.loading = $scope.video.thumbnail && $scope.video.thumbnail.type &&
               ($scope.video.thumbnail.type === 'DEFAULT');
       $scope.video.$save({ id: $scope.id, tool: $scope.tab }, function (response) {
-        $scope.activeTransaction = false;
+        $scope.activeRequest = false;
         if ($scope.video.workflow) {
           Notifications.add('success', 'VIDEO_CUT_PROCESSING');
           $location.url('/events/' + $scope.resource);
@@ -197,7 +197,7 @@ angular.module('adminNg.controllers')
           trackErrorMessageId = null;
         }
       }, function () {
-        $scope.activeTransaction = false;
+        $scope.activeRequest = false;
         $scope.video.thumbnail.loading = false;
         trackErrorMessageId = Notifications.add('error', 'VIDEO_CUT_NOT_SAVED', LOCAL_CONTEXT);
       });

@@ -33,7 +33,7 @@
                                                              ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
               <a ng-click="submit()"
-                 ng-class="{disabled: activeTransaction}"
+                 ng-class="{disabled: activeTransaction || sanityCheckFlags() || activeRequest}"
                  class="save-and-close-button"
                  translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                 <!-- Save and Continue -->
@@ -409,7 +409,7 @@
                                                                  ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
 
                   <a ng-click="submit()"
-                     ng-class="{disabled: activeTransaction || sanityCheckFlags()}"
+                     ng-class="{disabled: activeTransaction || sanityCheckFlags() || activeRequest}"
                      class="save-and-close-button"
                      translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
                     <!-- Save and Continue -->
