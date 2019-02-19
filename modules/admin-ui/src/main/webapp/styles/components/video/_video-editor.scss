@@ -195,6 +195,12 @@ $segment-deleted-selected: saturate(darken($segment-deleted, 25%), 5%);
                 // needed for zoom offset
                 position: relative;
 
+                // don't smooth the waveform
+                -ms-interpolation-mode: nearest-neighbor;
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: -moz-crisp-edges;
+                image-rendering: pixelated;
+
                 .segment-container {
                     float: left;
                     height: $segment-height;
