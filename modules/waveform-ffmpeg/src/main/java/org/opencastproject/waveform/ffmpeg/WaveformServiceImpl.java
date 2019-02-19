@@ -308,11 +308,11 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     // create ffmpeg command
     String[] command = new String[] {
       binary,
-      "-nostats",
+      "-nostats", "-nostdin", "-hide_banner",
       "-i", mediaFile.getAbsolutePath(),
       "-lavfi", createWaveformFilter(track, width, height),
       "-frames:v", "1",
-      "-an", "-vn", "-sn", "-y",
+      "-an", "-vn", "-sn",
       waveformFilePath
     };
     logger.debug("Start waveform ffmpeg process: {}", StringUtils.join(command, " "));
@@ -338,7 +338,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     } catch (IOException ex) {
       throw new WaveformServiceException("Start ffmpeg process failed", ex);
     } catch (InterruptedException ex) {
-      throw new WaveformServiceException("Waiting for encoder process exited was interrupted unexpectly", ex);
+      throw new WaveformServiceException("Waiting for encoder process exited was interrupted unexpectedly", ex);
     } finally {
       IoSupport.closeQuietly(ffmpegProcess);
       IoSupport.closeQuietly(errStream);
@@ -352,7 +352,8 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     }
 
     if (exitCode != 0)
-      throw new WaveformServiceException("The encoder process exited abnormally with exit code " + exitCode);
+      throw new WaveformServiceException(String.format("The encoder process exited abnormally with exit code %s "
+              + "using command\n%s", exitCode, String.join(" ", command)));
 
     // put waveform image into workspace
     FileInputStream waveformFileInputStream = null;
