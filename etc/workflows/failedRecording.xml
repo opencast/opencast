@@ -6,7 +6,7 @@
     <!-- encoding/faildRecroding.properties encoding profile               -->
     <!--                                                                   -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-	
+
   <id>failedrecording</id>
   <title>Publish failed placeholder</title>
     <tags>
