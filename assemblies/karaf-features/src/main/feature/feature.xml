@@ -211,8 +211,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-workflowoperation/${project.version}</bundle>
@@ -324,7 +324,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
@@ -449,7 +449,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-remote/${project.version}</bundle>
@@ -526,7 +526,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
@@ -619,7 +619,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-incident-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-index-service/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-api/${project.version}</bundle>
-    <bundle start-level="83">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-ingest-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-inspection-service-ffmpeg/${project.version}</bundle>

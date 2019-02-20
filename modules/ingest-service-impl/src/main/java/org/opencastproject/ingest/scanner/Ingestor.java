@@ -147,25 +147,25 @@ public class Ingestor implements Runnable {
               logger.info("Start ingest track from file {} to mediapackage {}",
                       artifact.getName(), mp.getIdentifier().compact());
 
+              DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
+              dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
+
               /* Check if we have a subdir and if its name matches an existing series */
               File dir = artifact.getParentFile();
-              String seriesID = "";
+              String seriesID;
               if (FileUtils.directoryContains(inbox, dir)) {
                 /* cut away inbox path and trailing slash from artifact path */
                 seriesID = dir.getName();
                 if (seriesService.getSeries(seriesID) != null) {
                   logger.info("Ingest from inbox into series with id {}", seriesID);
-                } else {
-                  seriesID = null;
+                  dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
                 }
               }
 
-              /* Add title */
-              DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-              dcc.add(DublinCore.PROPERTY_TITLE, artifact.getName());
-              if (StringUtils.isNotBlank(seriesID))
-                dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
-              logger.debug("episode dublincore for the inbox file {}: {}", artifact.getName(), dcc.toXml());
+              if (logger.isDebugEnabled()) {
+                logger.debug("episode dublincore for the inbox file {}: {}", artifact.getName(), dcc.toXml());
+              }
+
               try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
                 dcc.toXml(dcout, true);
                 try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {

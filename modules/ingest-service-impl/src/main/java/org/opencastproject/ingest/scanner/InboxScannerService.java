@@ -324,31 +324,12 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
     return config;
   }
 
-  /**
-   * Get a mandatory integer from a dictionary.
-   *
-   * @throws ConfigurationException
-   *           key does not exist or is not an integer
-   */
-  public static Integer getCfgAsInt(Dictionary d, String key) throws ConfigurationException {
-    try {
-      return Integer.parseInt(getCfg(d, key));
-    } catch (NumberFormatException e) {
-      throw new ConfigurationException(key, "not an integer");
-    }
-  }
-
   public static int getCfgAsIntOrDefault(Dictionary d, String key, int defaultValue) throws ConfigurationException {
     String valStr = getCfgOrDefault(d, key, null);
     if (StringUtils.isEmpty(valStr))
       return defaultValue;
-    try {
+    else
       return Integer.parseInt(valStr);
-    } catch (Exception e) {
-      logger.warn("The inbox configuration {} value {} is not an integer. Use default value of {}", key, valStr,
-              defaultValue);
-    }
-    return defaultValue;
   }
 
   public void setSeriesService(SeriesService seriesService) {
