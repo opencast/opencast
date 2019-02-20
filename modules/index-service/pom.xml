@@ -194,10 +194,6 @@
       <groupId>org.mnode.ical4j</groupId>
       <artifactId>ical4j</artifactId>
     </dependency>
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-    </dependency>
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
