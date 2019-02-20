@@ -1144,12 +1144,12 @@ public class Event implements IndexObject {
   }
 
   private void updateEventStatus() {
-    if (getWorkflowId() != null) {
+    if (getWorkflowId() != null && StringUtils.isNotBlank(getWorkflowState())) {
       eventStatus = workflowStatusMapping.get(getWorkflowState());
       return;
     }
 
-    if (getRecordingStatus() != null) {
+    if (StringUtils.isNotBlank(getRecordingStatus())) {
       eventStatus = recordingStatusMapping.get(getRecordingStatus());
       return;
     }
