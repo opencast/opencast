@@ -135,7 +135,7 @@ public class MediaInspector {
         }
 
         // Mimetype
-        MimeType mimeType = MimeTypes.fromURL(file.toURI().toURL());
+        MimeType mimeType = MimeTypes.fromString(file.getPath());
 
         // The mimetype library doesn't know about audio/video metadata, so the type might be wrong.
         if ("audio".equals(mimeType.getType()) && metadata.hasVideoStreamMetadata()) {
@@ -350,7 +350,7 @@ public class MediaInspector {
       // Mimetype
       if (element.getMimeType() == null || override) {
         try {
-          element.setMimeType(MimeTypes.fromURI(file.toURI()));
+          element.setMimeType(MimeTypes.fromString(file.getPath()));
         } catch (UnknownFileTypeException e) {
           logger.info("unable to determine the mime type for {}", file.getName());
         }
