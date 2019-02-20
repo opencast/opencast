@@ -78,8 +78,10 @@ public final class DublinCoreMetadataUtil {
         if (field.getType() == MetadataField.Type.START_DATE) {
           setStartDate(dc, field, ename);
         } else if (field.getType() == MetadataField.Type.DURATION) {
+          // WARN: the duration change assumes the catalog's start date is already up to date.
           setDuration(dc, field, ename);
         } else if (field.getType() == Type.DATE) {
+          // Skip over metadata field tagged with key "created".
           // DC created should only be modified by changing the start date, see MH-12250
           if (! DublinCore.PROPERTY_CREATED.equals(ename))
             setDate(dc, field, ename);
@@ -268,7 +270,7 @@ public final class DublinCoreMetadataUtil {
     if (duration < 1L) {
       duration = getDuration(period);
     }
-    // Get the current start date
+    // Get the current start date (WARN: this assumes any start time updates have already been performed)
     DateTime startDateTime = getCurrentStartDateTime(period);
     // Get the current end date based on new date and duration.
     DateTime endDate = new DateTime(startDateTime.toDate().getTime() + duration);

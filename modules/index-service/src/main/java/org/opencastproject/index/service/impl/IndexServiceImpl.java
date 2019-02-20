@@ -855,8 +855,13 @@ public class IndexServiceImpl implements IndexService {
       eventMetadata.addField(newStartDate);
     }
 
+    // This field is null when it is not used in the Admin UI event details metadata tab.
+    // If used, set it to the the start Date or a new date.
+    // Note, even though this field borrows the DublinCore.PROPERTY_CREATED key,
+    // the startDate is used to update the DublinCore catalog PROPERTY_CREATED field,
+    // event, and mediapackage start fields.
     MetadataField<?> created = eventMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName());
-    if (created == null || !created.isUpdated() || created.getValue().isNone()) {
+    if (created != null && (!created.isUpdated() || created.getValue().isNone())) {
       eventMetadata.removeField(created);
       MetadataField<String> newCreated = MetadataUtils.copyMetadataField(created);
       if (currentStartDate != null) {
