@@ -54,6 +54,7 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.PathSupport;
+import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -171,7 +172,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   private static final String IBM_WATSON_SERVICE_URL = "https://stream.watsonplatform.net/speech-to-text/api";
-  private static final String API_VERSION = "/v1/";
+  private static final String API_VERSION = "v1";
   private static final String REGISTER_CALLBACK = "register_callback";
   private static final String RECOGNITIONS = "recognitions";
   private static final String CALLBACK_PATH = "/transcripts/watson/results";
@@ -194,7 +195,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   /** Service configuration values */
   private boolean enabled = false; // Disabled by default
-  private String watsonServiceUrl = IBM_WATSON_SERVICE_URL + API_VERSION;
+  private String watsonServiceUrl = UrlSupport.concat(IBM_WATSON_SERVICE_URL, "/", API_VERSION, "/");
   private String user; // user name or 'apikey'
   private String psw; // password or api key
   private String model;
@@ -227,7 +228,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         // Service url (optional)
         Option<String> urlOpt = OsgiUtil.getOptCfg(cc.getProperties(), IBM_WATSON_SERVICE_URL_CONFIG);
         if (urlOpt.isSome()) {
-          watsonServiceUrl = urlOpt.get() + API_VERSION;
+          watsonServiceUrl = UrlSupport.concat(urlOpt.get(), "/", API_VERSION, "/");
         }
 
         // Api key is checked first. If not entered, user and password are mandatory (to
