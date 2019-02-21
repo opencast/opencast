@@ -56,6 +56,10 @@ public class AssetManagerDecorator<A extends TieredStorageAssetManager> implemen
     return delegate.getAsset(version, mpId, mpeId);
   }
 
+  @Override public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return delegate.getMediaPackage(mediaPackageId);
+  }
+
   @Override public void setAvailability(Version version, String mpId, Availability availability) {
     delegate.setAvailability(version, mpId, availability);
   }

@@ -22,14 +22,11 @@
 package org.opencastproject.authorization.xacml.manager.impl;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.authorization.xacml.manager.impl.Util.toAcl;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.workflow.api.ConfiguredWorkflowRef.toConfiguredWorkflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
@@ -165,13 +162,14 @@ public final class AclServiceImpl implements AclService {
   public boolean applyAclToEpisode(String episodeId, AccessControlList acl, Option<ConfiguredWorkflowRef> workflow)
           throws AclServiceException {
     try {
-      Option<MediaPackage> mediaPackage = Option.none();
+      Opt<MediaPackage> mediaPackage = Opt.none();
       if (assetManager != null)
-        mediaPackage = getFromAssetManagerByMpId(episodeId);
+        mediaPackage = assetManager.getMediaPackage(episodeId);
 
       Option<AccessControlList> aclOpt = Option.option(acl);
       // the episode service is the source of authority for the retrieval of media packages
-      for (final MediaPackage episodeSvcMp : mediaPackage) {
+      if (mediaPackage.isSome()) {
+        MediaPackage episodeSvcMp = mediaPackage.get();
         aclOpt.fold(new Option.EMatch<AccessControlList>() {
           // set the new episode ACL
           @Override
@@ -261,26 +259,6 @@ public final class AclServiceImpl implements AclService {
     } catch (NotFoundException e) {
       throw new AclServiceException(e);
     }
-  }
-
-  /**
-   * Return media package with id <code>mpId</code> from asset manager.
-   *
-   * @return single element list or empty list
-   */
-  private Option<MediaPackage> getFromAssetManagerByMpId(String mpId) {
-    final AQueryBuilder q = assetManager.createQuery();
-    final Opt<MediaPackage> mp = enrich(
-            q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run()).getSnapshots()
-                    .head().map(Snapshots.getMediaPackage);
-    return Option.fromOpt(mp);
-  }
-
-  /** Return all media packages of a series from the asset manager. */
-  private List<MediaPackage> getFromAssetManagerBySeriesId(String seriesId) {
-    final AQueryBuilder q = assetManager.createQuery();
-    return enrich(q.select(q.snapshot()).where(q.seriesId().eq(seriesId).and(q.version().isLatest())).run())
-            .getSnapshots().map(Snapshots.getMediaPackage).toList();
   }
 
   /** Apply a workflow to a list of media packages. */

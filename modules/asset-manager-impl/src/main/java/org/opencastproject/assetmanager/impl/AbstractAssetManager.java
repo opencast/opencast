@@ -106,7 +106,20 @@ public abstract class AbstractAssetManager implements AssetManager {
 
   /* ------------------------------------------------------------------------------------------------------------------ */
 
-  @Override public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
+  @Override
+  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+    final AQueryBuilder q = createQuery();
+    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
+            .run();
+
+    if (r.getSize() == 0) {
+      return Opt.none();
+    }
+    return Opt.some(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+  }
+
+  @Override
+  public Snapshot takeSnapshot(final String owner, final MediaPackage mp) {
     if (owner == null)
       return takeSnapshot(mp);
 

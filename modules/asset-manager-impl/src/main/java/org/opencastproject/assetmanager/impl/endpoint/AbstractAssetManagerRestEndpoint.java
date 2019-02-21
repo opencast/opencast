@@ -48,6 +48,7 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.impl.TieredStorageAssetManager;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageImpl;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -59,6 +60,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -223,17 +225,15 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "There has been an internal error.")
       })
   public Response getMediaPackage(@PathParam("mediaPackageID") final String mediaPackageId) {
+
     try {
-      final AQueryBuilder q = getAssetManager().createQuery();
-      final AResult r = q.select(q.snapshot())
-              .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-              .run();
-      if (r.getSize() == 1) {
-        return ok(r.getRecords().head2().getSnapshot().get().getMediaPackage());
-      } else if (r.getSize() == 0) {
+      Opt<MediaPackage> mp = getAssetManager().getMediaPackage(mediaPackageId);
+
+      if (mp.isSome()) {
+        return ok(mp);
+      } else {
         return notFound();
       }
-      return serverError();
     } catch (Exception e) {
       return handleException(e);
     }

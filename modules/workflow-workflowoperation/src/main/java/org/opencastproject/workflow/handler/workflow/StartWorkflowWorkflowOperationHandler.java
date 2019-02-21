@@ -25,8 +25,6 @@ import static java.lang.String.format;
 import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.NotFoundException;
@@ -37,6 +35,8 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowService;
+
+import com.entwinemedia.fn.data.Opt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,14 +89,11 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
     final String configuredWorkflowDefinition = trimToEmpty(operation.getConfiguration(WORKFLOW_DEFINITION));
 
     // Get media package
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult r = q.select(q.snapshot())
-                       .where(q.mediaPackageId(configuredMediaPackageID).and(q.version().isLatest()))
-                       .run();
-    if (r.getSize() != 1) {
+    Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(configuredMediaPackageID);
+    if (mpOpt.isNone()) {
       throw new WorkflowOperationException(format("Media package %s not found", configuredMediaPackageID));
     }
-    final MediaPackage mp = r.getRecords().head().get().getSnapshot().get().getMediaPackage();
+    final MediaPackage mp = mpOpt.get();
 
     // Get workflow parameter
     final Map<String, String> properties = new HashMap<>();

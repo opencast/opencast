@@ -201,6 +201,12 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(select).anyTimes();
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
+    try {
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
+            .createNew())).anyTimes();
+    } catch (MediaPackageException e) {
+      throw new RuntimeException(e);
+    }
     EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
     EasyMock.replay(assetManager, version, query, predicate, select, result, record, snapshot);
     return assetManager;
