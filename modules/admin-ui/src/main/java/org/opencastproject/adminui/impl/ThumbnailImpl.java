@@ -566,7 +566,7 @@ public final class ThumbnailImpl {
   }
 
   private String getRepositoryName(final String publicationChannelId) {
-    return publicationChannelId.replaceFirst​(OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX, "");
+    return publicationChannelId.replaceFirst(OaiPmhPublicationService.PUBLICATION_CHANNEL_PREFIX, "");
   }
 
 }
