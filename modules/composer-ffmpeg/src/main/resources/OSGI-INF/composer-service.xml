@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scr:components xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0">
   <scr:component name="org.opencastproject.composer.impl.ComposerServiceImpl" immediate="true"
-                 activate="activate" deactivate="deactivate">
+                 activate="activate" deactivate="deactivate" modified="modified">
     <implementation class="org.opencastproject.composer.impl.ComposerServiceImpl"/>
     <property name="service.description" value="Composer (Encoder) Local Service"/>
     <property name="service.pid" value="org.opencastproject.composer.impl.ComposerServiceImpl"/>
