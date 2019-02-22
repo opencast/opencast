@@ -22,6 +22,7 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static com.entwinemedia.fn.Stream.$;
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.job.api.AbstractJobProducer.ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY;
@@ -355,7 +356,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", systemLoad);
+    logger.info("Current system load: {}", format("%.1f", systemLoad));
   }
 
   @Override
@@ -931,27 +932,28 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
    */
   private synchronized void processCachedLoadChange(JpaJob job) {
     if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && jobCache.get(job.getId()) == null) {
-      logger.debug("{} Adding to load cache: Job {}, type {}, status {}", Thread.currentThread().getId(), job.getId(),
-              job.getJobType(), job.getStatus());
+      logger.debug("{} Adding to load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(), job.getId(),
+              job.getJobType(), job.getJobLoad(), job.getStatus());
       systemLoad += job.getJobLoad();
       jobCache.put(job.getId(), job.getJobLoad());
     } else if (jobCache.get(job.getId()) != null && Status.FINISHED.equals(job.getStatus())
             || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
-      logger.debug("{} Removing from load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
-              job.getId(), job.getJobType(), job.getStatus());
+      logger.debug("{} Removing from load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(),
+              job.getId(), job.getJobType(), job.getJobLoad(), job.getStatus());
       systemLoad -= job.getJobLoad();
       jobCache.remove(job.getId());
     } else {
       logger.debug("{} Ignoring for load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
               job.getId(), job.getJobType(), job.getStatus());
     }
-    logger.debug("{} Current host load: {}", Thread.currentThread().getId(), systemLoad);
+    logger.debug("{} Current host load: {}, job load cache size: {}", Thread.currentThread().getId(), format("%.1f", systemLoad), jobCache.size());
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
     if (jobCache.get(jobId) != null) {
-      logger.debug("{} Removing deleted job from load cache: Job {}", Thread.currentThread().getId(), jobId);
-      systemLoad -= jobCache.get(jobId);
+      float jobLoad = jobCache.get(jobId);
+      logger.debug("{} Removing deleted job from load cache: Job {}, load {}", Thread.currentThread().getId(), jobId, jobLoad);
+      systemLoad -= jobLoad;
       jobCache.remove(jobId);
     }
   }
