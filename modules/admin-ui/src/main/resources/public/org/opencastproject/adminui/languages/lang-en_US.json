@@ -546,7 +546,8 @@
            "EDITOR": "Open video Editor",
            "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
            "COMMENTS": "View comments",
-           "PAUSED_WORKFLOW": "View paused workflow"
+           "PAUSED_WORKFLOW": "View paused workflow",
+           "PRESENTER": "Filter for this presenter"
          }
        },
        "SCHEDULING_STATUS": {
