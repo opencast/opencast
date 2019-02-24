@@ -267,7 +267,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected Boolean acceptJobLoadsExeedingMaxLoad = true;
 
   // Current system load
-  protected float systemLoad = 0.0f;
+  protected float localSystemLoad = 0.0f;
 
   /** OSGi DI */
   void setEntityManagerFactory(EntityManagerFactory emf) {
@@ -355,13 +355,13 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
               .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
-    systemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
-    logger.info("Current system load: {}", format("%.1f", systemLoad));
+    localSystemLoad = getHostLoads(emf.createEntityManager()).get(hostName).getLoadFactor();
+    logger.info("Current system load: {}", format("%.1f", localSystemLoad));
   }
 
   @Override
   public float getOwnLoad() {
-    return systemLoad;
+    return localSystemLoad;
   }
 
   @Override
@@ -934,26 +934,27 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (JOB_STATUSES_INFLUENCING_LOAD_BALANCING.contains(job.getStatus()) && jobCache.get(job.getId()) == null) {
       logger.debug("{} Adding to load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(), job.getId(),
               job.getJobType(), job.getJobLoad(), job.getStatus());
-      systemLoad += job.getJobLoad();
+      localSystemLoad += job.getJobLoad();
       jobCache.put(job.getId(), job.getJobLoad());
     } else if (jobCache.get(job.getId()) != null && Status.FINISHED.equals(job.getStatus())
             || Status.FAILED.equals(job.getStatus()) || Status.WAITING.equals(job.getStatus())) {
       logger.debug("{} Removing from load cache: Job {}, type {}, load {}, status {}", Thread.currentThread().getId(),
               job.getId(), job.getJobType(), job.getJobLoad(), job.getStatus());
-      systemLoad -= job.getJobLoad();
+      localSystemLoad -= job.getJobLoad();
       jobCache.remove(job.getId());
     } else {
       logger.debug("{} Ignoring for load cache: Job {}, type {}, status {}", Thread.currentThread().getId(),
               job.getId(), job.getJobType(), job.getStatus());
     }
-    logger.debug("{} Current host load: {}, job load cache size: {}", Thread.currentThread().getId(), format("%.1f", systemLoad), jobCache.size());
+    logger.debug("{} Current host load: {}, job load cache size: {}",
+            Thread.currentThread().getId(), format("%.1f", localSystemLoad), jobCache.size());
   }
 
   private synchronized void removeFromLoadCache(Long jobId) {
     if (jobCache.get(jobId) != null) {
       float jobLoad = jobCache.get(jobId);
       logger.debug("{} Removing deleted job from load cache: Job {}, load {}", Thread.currentThread().getId(), jobId, jobLoad);
-      systemLoad -= jobLoad;
+      localSystemLoad -= jobLoad;
       jobCache.remove(jobId);
     }
   }
@@ -2752,7 +2753,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Is this host suited for processing?
       if (hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax) {
-        logger.debug("Adding candidate service {} for processing of jobs of type '{}'", service, jobType);
+        logger.debug("Adding candidate service {} for processing of jobs of type '{}' (host load is {} of max {})",
+           service, jobType, hostLoad, hostLoadMax);
         filteredList.add(service);
       }
 
@@ -3169,8 +3171,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         HttpResponse response = null;
         int responseStatusCode;
         try {
-          logger.debug("Trying to dispatch job {} of type '{}' to {}",
-                  new String[] { Long.toString(job.getId()), job.getJobType(), registration.getHost() });
+          logger.debug("Trying to dispatch job {} of type '{}' and load {} to {}",
+                  job.getId(), job.getJobType(), job.getJobLoad(), registration.getHost());
           if (!START_WORKFLOW.equals(job.getOperation()))
             setCurrentJob(job.toJob());
           response = client.execute(post);
