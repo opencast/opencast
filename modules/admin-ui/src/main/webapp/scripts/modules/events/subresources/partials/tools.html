@@ -24,22 +24,6 @@
             </span>
             <span class="video-details-series">{{(video.series && video.series.title) ? " - " + video.series.title : "" }}</span></h4>
         </div>
-        <div class="video-save-panel video-more-options video-editor-actions-toolbar" ng-if="tab === 'editor' && player.adapter">
-          <div class="buttons">
-            <select chosen pre-select-from="video.workflows" class="workflow"
-                                                             ng-disabled="!video.workflows || video.workflows.length === 0"
-                                                             data-width="'175px'"
-                                                             ng-model="video.workflow"
-                                                             ng-options="workflow.id as workflow.name for workflow in video.workflows | orderBy: 'displayOrder':true" />
-
-              <a ng-click="submit()"
-                 ng-class="{disabled: activeTransaction || sanityCheckFlags() || activeRequest}"
-                 class="save-and-close-button"
-                 translate="{{ video.workflow ? 'VIDEO_TOOL.BUTTONS.PROCESS' : 'VIDEO_TOOL.BUTTONS.SAVE' }}">
-                <!-- Save and Continue -->
-              </a>
-          </div>
-        </div>
       </div>
       <div data-admin-ng-notifications="" type="warning" show="submitButton" context="video-editor-event-access"></div>
 
