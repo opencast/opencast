@@ -3,7 +3,7 @@
 ## Description
 
 The CompositeWorkflowOperationHandler is used to composite two videos (upper and lower) and an optional watermark into
-one video, including encoding to different formats. The audio track is always taken from the lower video. Everything is
+one video, including encoding to different formats. The audio track is taken from both videos by default. Everything is
 done using FFmpeg. The composition can be done in various layout formats e.g. side by side or picture in picture. The
 layout has to be defined in JSON format and is described in section "Layout Definition". For some general information
 about layouts see Opencast Composer Layout Module.
@@ -11,6 +11,9 @@ about layouts see Opencast Composer Layout Module.
 The internal ffmpeg command is using the following filters: scale for scaling the videos, pad for defining the output
 dimension including the background color, movie for adding additional videos and images and overlay for aligning the
 videos and images to the output dimension. More info can be found here: https://trac.ffmpeg.org/wiki/FilteringGuide
+
+If both upper and lower tracks have audio, "source-audio-name" can be set to "upper", "lower" or "both"
+to choose only the audio from one track or both tracks for the composite video.
 
 ### Sample complex composite filter command
 
@@ -22,6 +25,7 @@ Tags and flavors can be used in combination.
 
 |configuration keys|value type (EBNF)|example|description|default value|
 |------------------|-----------------|-------|-----------|-------------|
+|source-audio-name|"lower", "upper" or "both" |upper|The "name" of track to use as a source audio.|both|
 |source-tags-upper|String , { "," , String }    |comp,rss|The "tag" of the upper track to use as a source input.|EMPTY|
 |source-flavor-upper|MediaPackageElementFlavor    |presenter/trimmed|The "flavor" of the upper track to use as a source input.|EMPTY|
 |source-tags-lower|String , { "," , String }    |comp,rss|The "tag" of the lower track to use as a source input.|EMPTY|

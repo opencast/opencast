@@ -444,7 +444,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   @Override
   public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
           LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
-          String background) throws EncoderException, MediaPackageException {
+          String background, String sourceAudioName) throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/composite");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -464,6 +464,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       }
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("background", background));
+      params.add(new BasicNameValuePair("sourceAudioName", sourceAudioName));
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);

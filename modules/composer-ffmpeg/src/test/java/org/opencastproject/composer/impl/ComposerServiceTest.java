@@ -362,7 +362,10 @@ public class ComposerServiceTest {
             .get(1));
 
     Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
-            watermarkOption, "composite.work", "black");
+            watermarkOption, "composite.work", "black", "both");
+            //  null or "both" means that both tracks are checked for audio and both audio tracks
+            // are mixed into the final composite if they exist
+
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
     Assert.assertNotNull(compositeTrack);
     inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
@@ -370,6 +373,41 @@ public class ComposerServiceTest {
     Assert.assertEquals(inspectedTrack, compositeTrack);
   }
 
+  @Test
+  public void testCompositeAudio() throws Exception {
+    if (!ffmpegInstalled)
+      return;
+
+    Dimension outputDimension = new Dimension(500, 500);
+
+    List<HorizontalCoverageLayoutSpec> layouts = new ArrayList<HorizontalCoverageLayoutSpec>();
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}}")));
+    layouts.add(Serializer.horizontalCoverageLayoutSpec(JsonObj
+            .jsonObj("{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}")));
+
+    List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<>();
+    shapes.add(0, Tuple.tuple(new Dimension(300, 300), layouts.get(0)));
+    shapes.add(1, Tuple.tuple(new Dimension(200, 200), layouts.get(1)));
+
+    MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
+
+    Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
+    LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
+            .get(0));
+    LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
+            .get(1));
+
+    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
+            watermarkOption, "composite.work", "black", "upper");
+    Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
+    Assert.assertNotNull(compositeTrack);
+    inspectedTrack.setIdentifier(compositeTrack.getIdentifier());
+    inspectedTrack.setMimeType(MimeType.mimeType("video", "mp4"));
+    Assert.assertEquals(inspectedTrack, compositeTrack);
+  }
   /**
    * Test method for {@link ComposerServiceImpl#concat(String, Dimension, Track...)}
    */
