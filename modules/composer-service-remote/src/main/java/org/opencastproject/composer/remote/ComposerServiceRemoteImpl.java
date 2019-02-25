@@ -87,7 +87,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
     }
@@ -118,7 +118,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
     }
@@ -153,7 +153,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("start", Long.toString(start)));
       params.add(new BasicNameValuePair("duration", Long.toString(duration)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request for track " + sourceTrack, e);
     }
@@ -188,7 +188,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("videoSourceTrack", MediaPackageElementParser.getAsXml(sourceVideoTrack)));
       params.add(new BasicNameValuePair("audioSourceTrack", MediaPackageElementParser.getAsXml(sourceAudioTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote composer request", e);
     }
@@ -244,7 +244,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("time", buildTimeArray(times)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -273,7 +273,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
       params.add(new BasicNameValuePair("time", buildTimeArray(times)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -310,7 +310,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("profileId", profileId));
       if (properties != null)
         params.add(new BasicNameValuePair("properties", mapToString(properties)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -344,7 +344,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
       params.add(new BasicNameValuePair("profileId", StringUtils.join(profileIds, ',')));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -371,7 +371,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceImage", MediaPackageElementParser.getAsXml(image)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
     }
@@ -562,7 +562,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote demux request for track " + sourceTrack, e);
     }
@@ -621,7 +621,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileIds", StringUtils.join(profileIds, ","))); // comma separated profiles
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException("Unable to assemble a remote demux request for track " + sourceTrack, e);
     }

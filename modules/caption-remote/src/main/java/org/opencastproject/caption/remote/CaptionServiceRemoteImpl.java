@@ -84,7 +84,7 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
       params.add(new BasicNameValuePair("output", outputFormat));
       if (StringUtils.isNotBlank(language))
         params.add(new BasicNameValuePair("language", language));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new CaptionConverterException(e);
     }
@@ -117,7 +117,7 @@ public class CaptionServiceRemoteImpl extends RemoteBase implements CaptionServi
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("captions", MediaPackageElementParser.getAsXml(input)));
       params.add(new BasicNameValuePair("input", format));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new CaptionConverterException(e);
     }

@@ -65,7 +65,7 @@ public class WaveformServiceRemote extends RemoteBase implements WaveformService
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(sourceTrack)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new WaveformServiceException(e);
     }

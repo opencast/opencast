@@ -54,7 +54,7 @@ public class VideoSegmenterRemoteImpl extends RemoteBase implements VideoSegment
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("track", MediaPackageElementParser.getAsXml(track)));
-      post.setEntity(new UrlEncodedFormEntity(params));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new VideoSegmenterException(e);
     }
