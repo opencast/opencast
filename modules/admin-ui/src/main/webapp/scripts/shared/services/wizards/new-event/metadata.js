@@ -51,7 +51,7 @@ angular.module('adminNg.services')
           // preserve default value, if set
           if (field.hasOwnProperty('value') && field.value) {
             field.presentableValue = me.extractPresentableValue(field);
-            me.ud[mainMetadataName].fields[field.id] = field;
+            me.ud[mainMetadataName].fields[i] = field;
           }
           // just hooking the tab index up here, as this is already running through all elements
           field.tabindex = i + 1;
@@ -108,19 +108,15 @@ angular.module('adminNg.services')
     };
 
     this.save = function (scope) {
-      //FIXME: This should be nicer, rather propagate the id and values
-      //instead of looking for them in the parent scope.
-      var params = scope.$parent.params,
-          fieldId = params.id,
-          value = params.value;
+      //FIXME: This should be nicer, rather propagate the id and values instead of looking for them in the parent scope.
+      var field = scope.$parent.params;
+      field.presentableValue = me.extractPresentableValue(field);
 
-      params.presentableValue = me.extractPresentableValue(params);
-
-      me.ud[mainMetadataName].fields[fieldId] = params;
-
-      if (angular.isDefined(me.requiredMetadata[fieldId])) {
-        me.updateRequiredMetadata(fieldId, value);
+      if (angular.isDefined(me.requiredMetadata[field.id])) {
+        me.updateRequiredMetadata(field.id, field.value);
       }
+
+      me.ud[mainMetadataName].fields[field.tabindex - 1] = field;
     };
 
     this.reset = function () {
