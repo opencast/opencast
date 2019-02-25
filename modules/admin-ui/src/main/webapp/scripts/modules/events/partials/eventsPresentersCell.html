@@ -1,4 +1,6 @@
-<span ng-repeat="presenter in row.presenters"
-      class=metadata-entry>
-  {{presenter}}
+<a class="crosslink metadata-entry"
+   ng-repeat="presenter in row.presenters"
+   ng-click="table.addFilterToStorage('presentersBibliographic', presenter )"
+   title="{{ 'EVENTS.EVENTS.TABLE.TOOLTIP.PRESENTER' | translate }}">
+  {{ presenter }}
 </span>
