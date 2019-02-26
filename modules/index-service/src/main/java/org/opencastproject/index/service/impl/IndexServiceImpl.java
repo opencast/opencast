@@ -1532,8 +1532,9 @@ public class IndexServiceImpl implements IndexService {
     try {
       final AQueryBuilder q = assetManager.createQuery();
       final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      q.delete(DEFAULT_OWNER, q.propertiesOf()).where(q.mediaPackageId(id)).willRemoveWholeMediaPackage(true).run();
-      q.delete(DEFAULT_OWNER, q.snapshot()).where(p).willRemoveWholeMediaPackage(true).run();
+      final AResult r = q.select(q.nothing()).where(p).run();
+      if (r.getSize() > 0)
+        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
     } catch (AssetManagerException e) {
       if (e.getCause() instanceof UnauthorizedException) {
         unauthorizedArchive = true;

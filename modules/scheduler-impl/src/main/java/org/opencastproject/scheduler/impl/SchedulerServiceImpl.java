@@ -904,10 +904,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       // Delete scheduler snapshot
       long deletedSnapshots = query.delete(SNAPSHOT_OWNER, query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query)))
-              .name("delete episode")
-              .willRemoveWholeMediaPackage(true)
-              .run();
+              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
+              .name("delete episode").run();
+
       if (deletedProperties + deletedSnapshots == 0)
         throw new NotFoundException();
 

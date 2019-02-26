@@ -29,13 +29,6 @@ public interface ADeleteQuery {
   ADeleteQuery name(String queryName);
 
   /**
-   * When this is called with true, the AssetManager will assume that the whole media package will be removed. This is
-   * faster, but then it is your responsibility to remove all properties associated with the media package since no
-   * orphan removal will take place.
-   */
-  ADeleteQuery willRemoveWholeMediaPackage(boolean willRemoveWholeMediaPackage);
-
-  /**
    * Delete the selected items.
    *
    * @return the number of affected items
