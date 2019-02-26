@@ -545,7 +545,8 @@
                "EDITOR": "Video Editor öffnen",
                "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
-               "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen"
+               "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

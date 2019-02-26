@@ -545,7 +545,8 @@
                "EDITOR": "Odpri video urejevalnik",
                "EDITOR_NEEDS_CUTTING": "Odpri video urejevalnik (opomba označuje, da je bilo sproženo obrezovanje videa)",
                "COMMENTS": "Poglej komentarje",
-               "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela"
+               "PAUSED_WORKFLOW": "Poglej začasno ustavljen potek dela",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

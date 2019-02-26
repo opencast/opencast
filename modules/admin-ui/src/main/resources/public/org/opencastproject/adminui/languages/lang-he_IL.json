@@ -545,7 +545,8 @@
                "EDITOR": "פתח עורך וידאו",
                "EDITOR_NEEDS_CUTTING": "פתח עורך וידאו (הערה מציינת כי חיתוך הווידאו התבקש)",
                "COMMENTS": "הצגת הערות",
-               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים"
+               "PAUSED_WORKFLOW": "הצגת תהליכי עבודה מושהים",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

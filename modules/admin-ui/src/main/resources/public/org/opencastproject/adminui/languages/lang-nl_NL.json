@@ -545,7 +545,8 @@
                "EDITOR": "Open video Editor",
                "EDITOR_NEEDS_CUTTING": "Open video-Editor (een opmerking geeft aan dat video trimmen is aangevraagd)",
                "COMMENTS": "Commentaar bekijken",
-               "PAUSED_WORKFLOW": "Onderbroken workflow weergeven"
+               "PAUSED_WORKFLOW": "Onderbroken workflow weergeven",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

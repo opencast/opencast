@@ -545,7 +545,8 @@
                "EDITOR": "Öppna videoredigeraren",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Visa kommentarer",
-               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde"
+               "PAUSED_WORKFLOW": "Visa pausat arbetsflöde",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

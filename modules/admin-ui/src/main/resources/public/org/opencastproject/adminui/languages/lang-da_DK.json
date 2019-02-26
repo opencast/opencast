@@ -545,7 +545,8 @@
                "EDITOR": "Åbn videoredigeringsværktøj",
                "EDITOR_NEEDS_CUTTING": "Åbn videoredigeringsværktøjet (en kommentar indikerer, at der er blevet anmodet om videobeskæring)",
                "COMMENTS": "Vis kommentarer",
-               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause"
+               "PAUSED_WORKFLOW": "Vis arbejdsgange på pause",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

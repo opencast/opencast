@@ -545,7 +545,8 @@
                "EDITOR": "Video editörünü aç",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "Yorumları görüntüle",
-               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle"
+               "PAUSED_WORKFLOW": "Duraklatılmış iş akışını görüntüle",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

@@ -545,7 +545,8 @@
                "EDITOR": "Otwórz Edytor wideo",
                "EDITOR_NEEDS_CUTTING": "Otwórz w Edytorze (komenarz wskazuje, że ktoś domaga się wycięcia fragmentu filmu)",
                "COMMENTS": "Pokaż komentarze",
-               "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań"
+               "PAUSED_WORKFLOW": "Zobacz zatrzymane procesy zadań",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

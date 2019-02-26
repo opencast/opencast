@@ -545,7 +545,8 @@
                "EDITOR": "打開視頻編輯器",
                "EDITOR_NEEDS_CUTTING": "Open video Editor (a comment indicates that cutting the video has been requested)",
                "COMMENTS": "檢視註解",
-               "PAUSED_WORKFLOW": "查看暫停的工作流"
+               "PAUSED_WORKFLOW": "查看暫停的工作流",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {

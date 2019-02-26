@@ -545,7 +545,8 @@
                "EDITOR": "Άνοιγμα επεξεργασίας βίντεο",
                "EDITOR_NEEDS_CUTTING": "Άνοιγμα επεξεργασίας βίντεο (ένα σχόλιο δείχνει ότι έχει ζητηθεί η επεξεργασία του βίντεο)",
                "COMMENTS": "Δείτε σχόλια",
-               "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση"
+               "PAUSED_WORKFLOW": "Δείτε σταματημένη εκδήλωση",
+               "PRESENTER": "Filter for this presenter"
             }
          },
          "SCHEDULING_STATUS": {
