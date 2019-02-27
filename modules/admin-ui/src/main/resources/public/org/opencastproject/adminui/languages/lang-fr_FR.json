@@ -10,7 +10,8 @@
    "SAVE": "Enregistrer",
    "LOGOUT": "Déconnexion",
    "RESET": "Remise à zéro",
-   "SELECT_NO_OPTIONS": "Pas d'options",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Oui",
    "LANGUAGES": {
       "ARABIC": "Arabe",

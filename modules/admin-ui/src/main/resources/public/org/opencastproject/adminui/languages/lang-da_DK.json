@@ -10,7 +10,8 @@
    "SAVE": "Gem",
    "LOGOUT": "Log ud",
    "RESET": "Nulstil",
-   "SELECT_NO_OPTIONS": "Intet valg",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisk",

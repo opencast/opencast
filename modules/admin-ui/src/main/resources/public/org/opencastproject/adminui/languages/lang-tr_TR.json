@@ -10,7 +10,8 @@
    "SAVE": "Kaydet",
    "LOGOUT": "Çıkış yap",
    "RESET": "Sıfırla",
-   "SELECT_NO_OPTIONS": "Seçenek yok",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Evet",
    "LANGUAGES": {
       "ARABIC": "Arapça",

@@ -10,7 +10,8 @@
    "SAVE": "Speichern",
    "LOGOUT": "Ausloggen",
    "RESET": "Zurücksetzen",
-   "SELECT_NO_OPTIONS": "Bitte auswählen…",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabisch",
@@ -546,7 +547,7 @@
                "EDITOR_NEEDS_CUTTING": "Video Editor öffnen (ein Kommentar zeigt, dass ein Videoschnitt angefordert wurde)",
                "COMMENTS": "Kommentare ansehen",
                "PAUSED_WORKFLOW": "Angehaltenen Workflow anzeigen",
-               "PRESENTER": "Filter for this presenter"
+               "PRESENTER": "Nach diesem Vortragenden filtern"
             }
          },
          "SCHEDULING_STATUS": {
@@ -877,7 +878,7 @@
                "ACTIONS": "Aktionen",
                "DETAILS": "Details",
                "DESCRIPTION": "Beschreibung",
-               "MORE_INFO": "More Information",
+               "MORE_INFO": "Mehr Informationen",
                "ID": "ID",
                "TYPE": "Typ",
                "TITLE": "Titel",
@@ -885,8 +886,8 @@
                "STARTED": "Gestartet",
                "SERIES": "Serie",
                "SUBMITTED": "Übermittelt",
-               "SUBMITTER": "Submitter",
-               "EXECUTION_TIME": "Execution time",
+               "SUBMITTER": "Absender",
+               "EXECUTION_TIME": "Ausführungszeit",
                "WDID": "Workflow-Definition",
                "MIMETYPE": "MIME-Type",
                "URL": "URL",
@@ -894,11 +895,11 @@
                "NO_CONFIGURATION": "Keine Konfigurationsparameter für die ausgewählten Workflow-Definition.",
                "WORKFLOW": "Workflow",
                "TOOLTIP": {
-                  "STOP": "Stop workflow",
-                  "ABORT": "Abort execution of workflow  (don't retry failed operation again)",
-                  "RETRY": "Retry execution of workflow",
-                  "DELETE": "Delete workflow",
-                  "DETAILS": "Open workflow details"
+                  "STOP": "Workflow stoppen",
+                  "ABORT": "Ausführung der Workflowinstanz unterbrechen (fehlgeschlagene Operationen nicht wiederholen)",
+                  "RETRY": "Ausführung der Workflowinstanz erneut versuchen",
+                  "DELETE": "Workflow löschen",
+                  "DETAILS": "Workflow-Details"
                },
                "OPERATION_STATUS": {
                   "INSTANTIATED": "Instanziiert",
@@ -2194,7 +2195,7 @@
    },
    "EDITABLE": {
       "MULTI": {
-         "PLACEHOLDER": "To insert multiple values press Enter in between"
+         "PLACEHOLDER": "Einen Wert mit Enter bestätigen um weitere Werte einzufügen"
       }
    }
 }

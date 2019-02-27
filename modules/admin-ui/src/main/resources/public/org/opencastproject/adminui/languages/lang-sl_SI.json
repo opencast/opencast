@@ -10,7 +10,8 @@
    "SAVE": "Shrani",
    "LOGOUT": "Odjava",
    "RESET": "Ponastavitev",
-   "SELECT_NO_OPTIONS": "Ni možnosti",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Da",
    "LANGUAGES": {
       "ARABIC": "arabščina",

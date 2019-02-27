@@ -10,7 +10,8 @@
    "SAVE": "Save",
    "LOGOUT": "Logout",
    "RESET": "Reset",
-   "SELECT_NO_OPTIONS": "No option",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Yes",
    "LANGUAGES": {
       "ARABIC": "Arabic",

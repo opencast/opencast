@@ -10,7 +10,8 @@
    "SAVE": "Spara",
    "LOGOUT": "Logga ut",
    "RESET": "Nollställ",
-   "SELECT_NO_OPTIONS": "Ingen option",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "Ja",
    "LANGUAGES": {
       "ARABIC": "Arabiska",

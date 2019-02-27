@@ -10,7 +10,8 @@
    "SAVE": "שמור",
    "LOGOUT": "התנתקות",
    "RESET": "איפוס",
-   "SELECT_NO_OPTIONS": "אין אפשרות",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "כן",
    "LANGUAGES": {
       "ARABIC": "ערבית",

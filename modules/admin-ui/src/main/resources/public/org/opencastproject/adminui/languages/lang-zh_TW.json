@@ -10,7 +10,8 @@
    "SAVE": "儲存",
    "LOGOUT": "登出",
    "RESET": "重設",
-   "SELECT_NO_OPTIONS": "沒有選項",
+   "SELECT_NO_OPTION_SELECTED": "No option selected",
+   "SELECT_NO_OPTIONS_AVAILABLE": "No options available",
    "YES": "是",
    "LANGUAGES": {
       "ARABIC": "阿拉伯文",
