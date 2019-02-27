@@ -43,8 +43,6 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EncoderException;
-import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.exception.IndexServiceException;
@@ -59,14 +57,12 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Stream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.publication.api.ConfigurablePublicationService;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
-import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
@@ -81,7 +77,6 @@ import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil.R;
-import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -97,17 +92,11 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JObject;
 import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 import com.entwinemedia.fn.data.json.Jsons.Functions;
 
-import org.apache.commons.fileupload.FileItemIterator;
-import org.apache.commons.fileupload.FileItemStream;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.json.simple.JSONArray;
@@ -420,23 +409,23 @@ public class ToolsEndpoint implements ManagedService {
     }
 
     // Get thumbnail
-    final List<Field> thumbnailFields = new ArrayList<>();
-    try {
-      final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
-      final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
-        .getThumbnail(mp, urlSigningService, expireSeconds);
-
-      optThumbnail.ifPresent(thumbnail -> {
-        thumbnailFields.add(f("type", thumbnail.getType().name()));
-        thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
-        thumbnailFields.add(f("defaultPosition",  thumbnailImpl.getDefaultPosition()));
-        thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
-        thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
-      });
-    } catch (UrlSigningException | URISyntaxException e) {
-      logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
-      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
-    }
+//    final List<Field> thumbnailFields = new ArrayList<>();
+//    try {
+//      final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
+//      final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
+//        .getThumbnail(mp, urlSigningService, expireSeconds);
+//
+//      optThumbnail.ifPresent(thumbnail -> {
+//        thumbnailFields.add(f("type", thumbnail.getType().name()));
+//        thumbnailFields.add(f("url", thumbnail.getUrl().toString()));
+//        thumbnailFields.add(f("defaultPosition",  thumbnailImpl.getDefaultPosition()));
+//        thumbnail.getPosition().ifPresent(p -> thumbnailFields.add(f("position", p)));
+//        thumbnail.getTrack().ifPresent(t -> thumbnailFields.add(f("track", t)));
+//      });
+//    } catch (UrlSigningException | URISyntaxException e) {
+//      logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
+//      throw new WebApplicationException(e, SC_INTERNAL_SERVER_ERROR);
+//    }
 
     final Map<String, String> latestWfProperties = WorkflowPropertiesUtil
       .getLatestWorkflowProperties(assetManager, mediaPackageId);
@@ -498,89 +487,91 @@ public class ToolsEndpoint implements ManagedService {
             f("presenters", arr($(event.getPresenters()).map(Functions.stringToJValue))),
             f(SOURCE_TRACKS_KEY, arr(sourceTracks)),
             f("previews", arr(jPreviews)), f(TRACKS_KEY, arr(jTracks)),
-            f("thumbnail", obj(thumbnailFields)),
+//            f("thumbnail", obj(thumbnailFields)),
             f("duration", v(mp.getDuration())), f(SEGMENTS_KEY, arr(jSegments)), f("workflows", arr(jWorkflows))));
   }
 
-  private ThumbnailImpl newThumbnailImpl() {
-    return new ThumbnailImpl(adminUIConfiguration, workspace, oaiPmhPublicationService, configurablePublicationService,
-      assetManager, composerService);
-  }
+//  private ThumbnailImpl newThumbnailImpl() {
+//    return new ThumbnailImpl(adminUIConfiguration, workspace, oaiPmhPublicationService, configurablePublicationService,
+//      assetManager, composerService);
+//  }
 
-  @POST
-  @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("{mediapackageid}/thumbnail.json")
-  public Response changeThumbnail(@PathParam("mediapackageid") final String mediaPackageId,
-    @Context HttpServletRequest request)
-    throws IndexServiceException, NotFoundException, DistributionException, MediaPackageException {
-
-    final Opt<Event> optEvent = getEvent(mediaPackageId);
-    if (optEvent.isNone()) {
-      return R.notFound();
-    }
-
-    if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
-      return R.locked();
-    }
-
-    final MediaPackage mp = index.getEventMediapackage(optEvent.get());
-
-    try {
-      final ThumbnailImpl thumbnail = newThumbnailImpl();
-
-      Optional<String> track = Optional.empty();
-      OptionalDouble position = OptionalDouble.empty();
-
-      final FileItemIterator iter = new ServletFileUpload().getItemIterator(request);
-      while (iter.hasNext()) {
-        final FileItemStream current = iter.next();
-        if (!current.isFormField() && THUMBNAIL_FILE.equalsIgnoreCase(current.getFieldName())) {
-          final MediaPackageElement distElement = thumbnail.upload(mp, current.openStream(), current.getContentType());
-          return RestUtils.okJson(obj(f("thumbnail",
-            obj(
-              f("position", thumbnail.getDefaultPosition()),
-              f("defaultPosition", thumbnail.getDefaultPosition()),
-              f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
-              f("url", signUrl(distElement.getURI()))))));
-        } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
-          final String value = Streams.asString(current.openStream());
-          if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
-            track = Optional.of(value);
-          }
-        } else if (current.isFormField() && THUMBNAIL_POSITION.equalsIgnoreCase(current.getFieldName())) {
-          final String value = Streams.asString(current.openStream());
-          position = OptionalDouble.of(Double.parseDouble(value));
-        }
-      }
-
-      if (!position.isPresent()) {
-        return R.badRequest("Missing thumbnail position");
-      }
-
-      final MediaPackageElement distributedElement;
-      final ThumbnailImpl.ThumbnailSource thumbnailSource;
-      if (track.isPresent()) {
-        distributedElement = thumbnail.chooseThumbnail(mp, track.get(), position.getAsDouble());
-        thumbnailSource = ThumbnailImpl.ThumbnailSource.SNAPSHOT;
-      } else {
-        distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble());
-        thumbnailSource = ThumbnailImpl.ThumbnailSource.DEFAULT;
-      }
-      return RestUtils.okJson(obj(f("thumbnail", obj(
-        f("type", thumbnailSource.name()),
-        f("position", position.getAsDouble()),
-        f("defaultPosition", thumbnail.getDefaultPosition()),
-        f("url", signUrl(distributedElement.getURI()))
-      ))));
-    } catch (IOException | FileUploadException e) {
-      logger.error("Error reading request body: {}", getStackTrace(e));
-      return R.serverError();
-    } catch (PublicationException | UnknownFileTypeException | EncoderException e) {
-      logger.error("Could not generate or publish thumbnail", e);
-      return R.serverError();
-    }
-  }
+//  @POST
+//  @Consumes(MediaType.MULTIPART_FORM_DATA)
+//  @Produces(MediaType.APPLICATION_JSON)
+//  @Path("{mediapackageid}/thumbnail.json")
+//  public Response changeThumbnail(@PathParam("mediapackageid") final String mediaPackageId,
+//    @Context HttpServletRequest request)
+//    throws IndexServiceException, NotFoundException, DistributionException, MediaPackageException {
+//
+//    final Opt<Event> optEvent = getEvent(mediaPackageId);
+//    if (optEvent.isNone()) {
+//      return R.notFound();
+//    }
+//
+//    if (WorkflowUtil.isActive(optEvent.get().getWorkflowState())) {
+//      return R.locked();
+//    }
+//
+//    final MediaPackage mp = index.getEventMediapackage(optEvent.get());
+//
+//    try {
+//      final ThumbnailImpl thumbnail = newThumbnailImpl();
+//
+//      Optional<String> track = Optional.empty();
+//      OptionalDouble position = OptionalDouble.empty();
+//
+//      final FileItemIterator iter = new ServletFileUpload().getItemIterator(request);
+//      while (iter.hasNext()) {
+//        final FileItemStream current = iter.next();
+//        if (!current.isFormField() && THUMBNAIL_FILE.equalsIgnoreCase(current.getFieldName())) {
+//          final MediaPackageElement distElement = thumbnail.upload(mp, current.openStream(), current.getContentType());
+//          return RestUtils.okJson(obj(f("thumbnail",
+//            obj(
+//              f("position", thumbnail.getDefaultPosition()),
+//              f("defaultPosition", thumbnail.getDefaultPosition()),
+//              f("type", ThumbnailImpl.ThumbnailSource.UPLOAD.name()),
+//              f("url", signUrl(distElement.getURI()))))));
+//        } else if (current.isFormField() && THUMBNAIL_TRACK.equalsIgnoreCase(current.getFieldName())) {
+//          final String value = Streams.asString(current.openStream());
+//          if (!THUMBNAIL_DEFAULT.equalsIgnoreCase(value)) {
+//            track = Optional.of(value);
+//          }
+//        } else if (current.isFormField() && THUMBNAIL_POSITION.equalsIgnoreCase(current.getFieldName())) {
+//          final String value = Streams.asString(current.openStream());
+//          position = OptionalDouble.of(Double.parseDouble(value));
+//        }
+//      }
+//
+//      if (!position.isPresent()) {
+//        return R.badRequest("Missing thumbnail position");
+//      }
+//
+//      final MediaPackageElement distributedElement;
+//      final ThumbnailImpl.ThumbnailSource thumbnailSource;
+//      if (track.isPresent()) {
+//        // distributedElement = thumbnail.chooseThumbnail(mp, track.get(), position.getAsDouble());
+//        distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble());
+//        thumbnailSource = ThumbnailImpl.ThumbnailSource.SNAPSHOT;
+//      } else {
+//        distributedElement = thumbnail.chooseDefaultThumbnail(mp, position.getAsDouble());
+//        thumbnailSource = ThumbnailImpl.ThumbnailSource.DEFAULT;
+//      }
+//      return RestUtils.okJson(obj(f("thumbnail", obj(
+//        f("type", thumbnailSource.name()),
+//        f("position", position.getAsDouble()),
+//        f("defaultPosition", thumbnail.getDefaultPosition()),
+//        f("url", signUrl(distributedElement.getURI()))
+//      ))));
+//    } catch (IOException | FileUploadException e) {
+//      logger.error("Error reading request body: {}", getStackTrace(e));
+//      return R.serverError();
+//    } 
+//    catch (PublicationException | UnknownFileTypeException | EncoderException e) {
+//      logger.error("Could not generate or publish thumbnail", e);
+//      return R.serverError();
+//    }
+//  }
 
   @POST
   @Path("{mediapackageid}/editor.json")
@@ -649,24 +640,24 @@ public class ToolsEndpoint implements ManagedService {
       }
 
       // Update default thumbnail (if used) since position may change due to cutting
-      MediaPackageElement distributedThumbnail = null;
-      if (editingInfo.getDefaultThumbnailPosition().isPresent()) {
-        try {
-          final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
-          final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
-            .getThumbnail(mediaPackage, urlSigningService, expireSeconds);
-          if (optThumbnail.isPresent() && optThumbnail.get().getType().equals(ThumbnailImpl.ThumbnailSource.DEFAULT)) {
-            distributedThumbnail = thumbnailImpl
-              .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble());
-          }
-        } catch (UrlSigningException | URISyntaxException e) {
-          logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
-          return R.serverError();
-        } catch (IOException | EncoderException | PublicationException | UnknownFileTypeException | MediaPackageException e) {
-          logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
-          return R.serverError();
-        }
-      }
+//      MediaPackageElement distributedThumbnail = null;
+//      if (editingInfo.getDefaultThumbnailPosition().isPresent()) {
+//        try {
+//          final ThumbnailImpl thumbnailImpl = newThumbnailImpl();
+//          final Optional<ThumbnailImpl.Thumbnail> optThumbnail = thumbnailImpl
+//            .getThumbnail(mediaPackage, urlSigningService, expireSeconds);
+//          if (optThumbnail.isPresent() && optThumbnail.get().getType().equals(ThumbnailImpl.ThumbnailSource.DEFAULT)) {
+//            distributedThumbnail = thumbnailImpl
+//              .chooseDefaultThumbnail(mediaPackage, editingInfo.getDefaultThumbnailPosition().getAsDouble());
+//          }
+//        } catch (UrlSigningException | URISyntaxException e) {
+//          logger.error("Error while trying to serialize the thumbnail url because: {}", getStackTrace(e));
+//          return R.serverError();
+//        } catch (IOException | EncoderException | PublicationException | UnknownFileTypeException | MediaPackageException e) {
+//          logger.error("Error while updating default thumbnail because: {}", getStackTrace(e));
+//          return R.serverError();
+//        }
+//      }
 
       if (editingInfo.getPostProcessingWorkflow().isPresent()) {
         final String workflowId = editingInfo.getPostProcessingWorkflow().get();
@@ -690,9 +681,9 @@ public class ToolsEndpoint implements ManagedService {
         }
       }
 
-      if (distributedThumbnail != null) {
-        return getVideoEditor(mediaPackageId);
-      }
+//      if (distributedThumbnail != null) {
+//        return getVideoEditor(mediaPackageId);
+//      }
     }
 
     return R.ok();

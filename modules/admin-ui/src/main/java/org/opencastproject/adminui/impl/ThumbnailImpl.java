@@ -430,9 +430,9 @@ public final class ThumbnailImpl {
   private MediaPackageElement chooseThumbnail(final MediaPackage mp, final Track track, final double position)
     throws PublicationException, MediaPackageException, EncoderException, IOException, NotFoundException,
     UnknownFileTypeException {
-    tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
-    tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
-    tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
+     tempThumbnail = composerService.imageSync(track, encodingProfile, position).get(0).getURI();
+     tempThumbnailMimeType = MimeTypes.fromURI(tempThumbnail);
+     tempThumbnailFileName = tempThumbnail.getPath().substring(tempThumbnail.getPath().lastIndexOf('/') + 1);
 
     final Collection<URI> deletionUris = new ArrayList<>(0);
     try {

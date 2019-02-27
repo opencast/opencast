@@ -72,8 +72,9 @@
                                                             ng-click="openArea('segments')" translate>VIDEO_TOOL.AREAS.SEGMENTS</a>
                 <a ng-class="{active: area === 'metadata'}"
                    ng-click="openArea('metadata')" translate>VIDEO_TOOL.AREAS.METADATA</a>
-                <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor'"
-                                                             ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a>
+                <!-- Thumbnail creation disabled --> 
+                <!-- <a ng-class="{active: area === 'thumbnail'}" ng-if="tab === 'editor'"
+                                                             ng-click="openArea('thumbnail')" translate>VIDEO_TOOL.AREAS.THUMBNAIL</a> -->
                 <a ng-class="{active: area === 'tracks'}" ng-if="tab === 'editor'"
                                                           ng-click="openArea('tracks')" translate>VIDEO_TOOL.AREAS.TRACKS</a>
                 <a ng-class="{active: area === 'comments'}"
@@ -97,97 +98,6 @@
                           </td>
                         </tr>
                       </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div ng-if="area === 'thumbnail'" class="editor-thumbnail">
-              <div class="area-body">
-                <div class="full-col">
-                  <div class="obj content-wrapper">
-                    <div class="thumbnail-canvas" style="background-image:url({{video.thumbnail.url}})">
-                      <div ng-show="video.thumbnail.loading">
-                        <i class='fa fa-spinner fa-spin spinner'></i>
-                      </div>
-                      <div ng-show="video.thumbnail && !video.thumbnail.url && !video.thumbnail.loading"
-                           translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.NOT_AVAILABLE">
-                        <!-- No preview available -->
-                      </div>
-                      <div ng-show="video.thumbnail && !video.thumbnail.loading && video.thumbnail.type === 'DEFAULT' && video.thumbnail.defaultThumbnailPositionChanged"
-                           translate="VIDEO_TOOL.THUMBNAIL.PREVIEW.OUTDATED">
-                        <!-- preview outdated -->
-                      </div>
-                      <div ng-show="!video || !video.thumbnail">
-                        <i class="fa fa-exclamation-circle error"></i>
-                      </div>
-                    </div>
-
-                    <div class="controls">
-                      <div class="description">
-                        <p translate="VIDEO_TOOL.THUMBNAIL.DESCRIPTION"><!-- Description --></p>
-                        <br/>
-                        <p ng-if="video.thumbnail.type === 'DEFAULT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.DEFAULT">
-                        <!-- You are currently using the default thumbnail. -->
-                        </p>
-                        <p ng-if="video.thumbnail.type === 'SNAPSHOT'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.SNAPSHOT">
-                        <!-- You are currently using a thumbnail that has been extracted from the video. -->
-                        </p>
-                        <p ng-if="video.thumbnail.type === 'UPLOAD'" translate="VIDEO_TOOL.THUMBNAIL.CURRENT.UPLOAD">
-                        <!-- You are currently using a thumbnail that has been uploaded. -->
-                        </p>
-                      </div>
-                      <div class="function-buttons">
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length === 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_VIDEO.TOOLTIP' |translate  }}"
-                           ng-click="changeThumbnail(undefined, 'single', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
-                          <!-- Extract -->
-                        </a>
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length > 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_LEFT_VIDEO.TOOLTIP' |translate  }}"
-                           ng-click="changeThumbnail(undefined, 'left', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
-                          <!-- Extract -->
-                        </a>
-                        <a class="extract-thumbnail"
-                           ng-if="video.source_tracks.length > 1"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.EXTRACT.FROM_RIGHT_VIDEO.TOOLTIP' | translate }}"
-                           ng-click="changeThumbnail(undefined, 'right', player.adapter.getCurrentTime())"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
-                          <!-- Extract from video -->
-                        </a>
-                        <form>
-                          <a class="upload-thumbnail"
-                             translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.LABEL"
-                             title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.UPLOAD.TOOLTIP' | translate }}"
-                             onclick="angular.element('#thumbnail-upload').click()"
-                             ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
-                            <!-- Upload image -->
-                          </a>
-                          <input
-                            id="thumbnail-upload"
-                            class="hidden"
-                            type="file"
-                            accept="image/*"
-                            onchange="angular.element(this).scope().changeThumbnail(this.files[0], undefined, undefined)"
-                            ng-disabled="video.thumbnail.loading"/>
-                        </form>
-                        <a class="use-default-thumbnail"
-                           translate="VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.LABEL"
-                           title="{{ 'VIDEO_TOOL.THUMBNAIL.ACTIONS.USE_DEFAULT.TOOLTIP' | translate }}"
-                           ng-click="changeThumbnail(undefined, 'DEFAULT', calculateDefaultThumbnailPosition())"
-                           ng-if="video.thumbnail.url && video.thumbnail.type !== 'DEFAULT'"
-                           ng-class="{disabled: !video.thumbnail || video.thumbnail.loading || activeTransaction}">
-                          <!-- Use default thumbnail -->
-                        </a>
-                      </div>
                     </div>
                   </div>
                 </div>
