@@ -2600,7 +2600,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     Query query = null;
     EntityManager em = null;
-    logger.debug("Finding services put in WARNING state by job {}", job.toJob().getSignature());
+    logger.trace("Finding services put in WARNING state by job {}", job.toJob().getSignature());
     try {
       em = emf.createEntityManager();
       // TODO: modify the query to avoid to go through the list here
